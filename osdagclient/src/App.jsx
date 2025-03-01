@@ -7,6 +7,7 @@ import {
   RouterProvider,
   Navigate,
   useNavigate,
+  useParams,
 } from 'react-router-dom';
 import { Worker } from '@react-pdf-viewer/core';
 
@@ -14,6 +15,7 @@ import Sidebar from './components/Sidebar';
 import Mainwindow from './components/Mainwindow';
 import Window from './components/Window';
 import FinePlate from './components/shearConnection/FinePlate';
+import CleatAngle from './components/shearConnection/CleatAngle';
 import { GlobalProvider } from './context/GlobalState';
 import { ModuleProvider } from './context/ModuleState';
 import { UserContext, UserProvider } from './context/UserState';
@@ -42,7 +44,6 @@ function App() {
     console.log('isLogged in useEffect : ' , isLoggedIn)
   } , [isLoggedIn])
 
-
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<Root loggedIn={loggedIn} />}>
@@ -62,11 +63,24 @@ function App() {
              <EndPlate /> 
           }
         />
+        <Route
+          path='/design/:designType/fin_plate'
+          element={
+             <FinePlate /> 
+          }
+        />
+        <Route
+          path='/design/:designType/end_plate'
+          element={
+             <EndPlate /> 
+          }
+        />
       <Route path='/user' element={<UserAccount />} />
       </Route>
       
     )
   );
+  
 
   return (
     <Worker workerUrl='https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js'>
@@ -141,5 +155,11 @@ const Root = ( loggedIn ) => {
     </>
   );
 };
+
+const DesignPage = () => {
+  const { item } = useParams();
+  return item === 'fin_plate' ? <FinePlate /> : item === 'cleat_angle' ? <CleatAngle /> : <div>Component not found</div>;
+};
+
 
 export default App;

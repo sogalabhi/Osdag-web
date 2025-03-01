@@ -76,7 +76,6 @@ const OutputDock = ({ output }) => {
 			setSpacingModel(true);
 		} else if (value === 'Capacity') {
 			setCapacityModel(true);
-		} else {
 			setSpacingModel(false);
 			setCapacityModel(false);
 		}
@@ -221,7 +220,7 @@ const OutputDock = ({ output }) => {
 
 				{/* Spacing  */}
 				<Modal
-				visible={spacingModel}
+				open={spacingModel}
 				onCancel={() => setSpacingModel(false)}
 				footer={null}
 				width= {'100vh'}
@@ -317,7 +316,7 @@ const OutputDock = ({ output }) => {
 				</Modal>
 				{/* Capacity */}
 				<Modal
-					visible={capacityModel}
+					open={capacityModel}
 					onCancel={() => setCapacityModel(false)}
 					footer={null}
 					width= {'120vh'}

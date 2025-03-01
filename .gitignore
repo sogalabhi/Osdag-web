@@ -54,4 +54,9 @@ file_storage/company_logo/*.png
 
 # ignore the input values files 
 file_storage/input_values_files/*.osi
+<<<<<<< HEAD
 conda_packages
+venv
+=======
+conda_packages
+>>>>>>> 3b45bbd3f17894acd9f895a4a3779ea222e8f4cf

@@ -1,0 +1,68 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop1
+  pull_request:
+    branches:
+      - develop1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        # image: postgres:14
+        image: eeshuyadav/postgres:v1.1
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: osdagdeveloper
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres_Intg_osdag
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Docker Compose
+        run: |
+          sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version 
+
+      - name: Pull backend Docker image
+        run: docker pull eeshuyadav/osdag-web-backend:v1.1
+
+      - name: Pull frontend Docker image
+        run: docker pull eeshuyadav/osdag-web-frontend:v1.1
+
+      - name: Start backend and frontend services
+        run: docker-compose up -d
+
+      - name: Wait for services to be ready
+        run: sleep 30
+
+      - name: Install frontend dependencies
+        run: docker-compose run frontend npm install
+
+      - name: Run backend migrations
+        run: docker-compose exec backend bash -c "source /opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && python manage.py migrate"
+
+      - name: Populate database
+        run: docker-compose exec backend bash -c "source /opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && python populate_database.py"
+
+      - name: Update sequences
+        run: docker-compose exec backend bash -c "source /opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && python update_sequences.py"
+
+      # - name: Run tests
+      #   run: docker-compose exec backend bash -c "source /opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && pytest"
+
+      - name: Stop services
+        run: docker-compose down
