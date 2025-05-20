@@ -11,12 +11,17 @@ from .inputdata.fin_plate_input import FinPlateInputData
 from .inputdata.cleat_angle_input import CleatAngleInputData
 from .inputdata.end_plate_input import EndPlateInputData
 from .inputdata.seated_angle_input import SeatedAngleInputData
+from .inputdata.cover_plate_bolted_input import CoverPlateBoltedInputData
+from .inputdata.beam_beam_end_plate_input import BeamBeamEndPlateInputData
+
 
 INPUT_DATA_FACTORY = {
     'Fin-Plate-Connection': FinPlateInputData(),
     'Cleat-Angle-Connection': CleatAngleInputData(),
-    'End-Plate-Connection':EndPlateInputData(),
-    'Seated-Angle-Connection':SeatedAngleInputData(),
+    'End-Plate-Connection': EndPlateInputData(),
+    'Seated-Angle-Connection': SeatedAngleInputData(),
+    'Cover-Plate-Bolted-Connection': CoverPlateBoltedInputData(),
+    'Beam-Beam-End-Plate-Connection': BeamBeamEndPlateInputData(),
 }
 
 
@@ -82,6 +87,14 @@ class InputData(APIView):
         elif(moduleName=="Seated-Angle-Connection"):
             cookie_id = request.COOKIES.get('seated_angle_connection')
             print('cookie id in seated angle connection input data ', cookie_id)
+            
+        elif(moduleName=='Cover-Plate-Bolted-Connection'):
+            cookie_id = request.COOKIES.get('cover_plate_bolted_connection_session')
+            print('cookie id in cover plate bolted connection input data ', cookie_id)
+            
+        elif(moduleName=='Beam-Beam-End-Plate-Connection'):
+            cookie_id = request.COOKIES.get('beam_beam_end_plate_connection_session')
+            print('cookie id in beam beam bolted connection input data ', cookie_id)
 
         if cookie_id == None or cookie_id == '': # Error Checking: If design session id provided.
             return Response("Error: Please open module", status=status.HTTP_400_BAD_REQUEST) # Returns error response.
@@ -95,13 +108,13 @@ class InputData(APIView):
 
         input_data_handler = INPUT_DATA_FACTORY.get(moduleName)
         return input_data_handler.process(
-            connectivity=connectivity,
+            connectivity = connectivity,
             boltDiameter = boltDiameter,
             propertyClass = propertyClass,
             thickness = thickness,
             angleList = angleList,
             seatedAngleList = seatedAngleList,
-            topAngleList =topAngleList,
+            topAngleList = topAngleList,
             email = email
         )
 

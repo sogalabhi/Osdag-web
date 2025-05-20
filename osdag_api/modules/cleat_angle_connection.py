@@ -3,6 +3,8 @@ from osdag_api.errors import MissingKeyError, InvalidInputTypeError
 from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
 import osdag_api.modules.shear_connection_common as scc
 from OCC.Core import BRepTools
+from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
+from OCC.Core.IGESControl import IGESControl_Writer
 from cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
 from design_type.connection.cleat_angle_connection import CleatAngleConnection
@@ -38,7 +40,7 @@ def get_required_keys_cleat_angle() -> List[str]:
         "Module",
         "Weld.Fab",
         "Weld.Material_Grade_OverWrite",
-        "Connector.Plate.Thickness_List",
+        "Connector.Angle_List",
     ]
 
 def validate_input(input_values: Dict[str,Any])-> None:
@@ -189,13 +191,13 @@ def validate_input(input_values: Dict[str,Any])-> None:
             "Weld.Material_Grade_OverWrite", "str where str can be converted to int.")
 
     # Validate Connector.Plate.Thickness_List
-    connector_plate_thicknesslist = input_values["Connector.Plate.Thickness_List"]
-    if (not isinstance(connector_plate_thicknesslist, list)  # Check if Connector.Plate.Thickness_List is a list.
-            # Check if all items in Connector.Plate.Thickness_List are str.
-            or not validate_list_type(connector_plate_thicknesslist, str)
-            or not custom_list_validation(connector_plate_thicknesslist, int_able)):  # Check if all items in Connector.Plate.Thickness_List can be converted to int.
-        raise InvalidInputTypeError(
-            "Connector.Plate.Thickness_List", "List[str] where all items can be converted to int")
+    # connector_plate_thicknesslist = input_values["Connector.Angle_List"]
+    # if (not isinstance(connector_plate_thicknesslist, list)  # Check if Connector.Plate.Thickness_List is a list.
+    #         # Check if all items in Connector.Plate.Thickness_List are str.
+    #         or not validate_list_type(connector_plate_thicknesslist, str)
+    #         or not custom_list_validation(connector_plate_thicknesslist, int_able)):  # Check if all items in Connector.Plate.Thickness_List can be converted to int.
+    #     raise InvalidInputTypeError(
+    #         "Connector.Angle_List", "List[str] where all items can be converted to int")
 
 
 def validate_input_new(input_values: Dict[str, Any]) -> None:
@@ -251,8 +253,8 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
 
     # Validate for keys that are arrays
     arr_keys = [("Bolt.Diameter", False),  # List of all parameters that can be converted to numbers (key, is_float)
-                ("Bolt.Grade", True),
-                ("Connector.Plate.Thickness_List", False)]
+                ("Bolt.Grade", True)]
+                # ("Connector.Plate.Thickness_List", False)]
     for key in arr_keys:
         print('validating arr key')
         # Check if key is a list where all items can be converted to numbers. If not, raise error.
@@ -303,8 +305,24 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     raw_output_text = module.output_values(True)
     raw_output_spacing = module.spacing(True)  # Generate output val
     # raw_output_capacities = module.capacities(True)
+    raw_bolt_capacity_supported = module.bolt_capacity_details_supported(True)
+    raw_bolt_capacity_suporting = module.bolt_capacity_details_suporting(True)
+    
+    # Add suffixes to duplicate-prone supported keys
+    raw_supported = [
+        (f"{key}_supported", label, typ, value, visible)
+        for key, label, typ, value, visible in raw_bolt_capacity_supported
+        if key  # only if key is not None
+    ]
+
+    raw_supporting = [
+        (f"{key}_supporting", label, typ, value, visible)
+        for key, label, typ, value, visible in raw_bolt_capacity_suporting
+        if key
+    ]
+    
     logs = module.logs
-    raw_output = raw_output_spacing + raw_output_text
+    raw_output = raw_output_spacing + raw_output_text + raw_supported + raw_supporting
     # os.system("clear")
     # Loop over all the text values and add them to ouptut dict.
     for param in raw_output:
@@ -319,12 +337,12 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             }  # Set label, key and value in output
     return output, logs
 
-
+#we do not have plate in just like in finplate case, we have cleatAngle which is combination of angle & nutbolts
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Beam", "Column", "Plate"):  # Error checking: If section is valid.
+    if section not in ("Model", "Beam", "Column", "cleatAngle"):  # Error checking: If section is valid.
         raise InvalidInputTypeError(
-            "section", "'Model', 'Beam', 'Column' or 'Plate'")
+            "section", "'Model', 'Beam', 'Column' or 'cleatAngle'")
     module = create_from_input(input_values)  # Cr`eate module from input.
     print('module from input values : ' , module)
     # Object that will create the CAD model.
@@ -364,6 +382,28 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 
     try : 
         BRepTools.breptools.Write(model, file_path) # Generate CAD Model
+        
+        if section == "Model":
+            # Save STEP
+            step_writer = STEPControl_Writer()
+            step_writer.Transfer(model, STEPControl_AsIs)
+            step_file_path = file_path.replace(".brep", ".step")
+            full_step_file_path = os.path.join(os.getcwd(), step_file_path)
+            if step_writer.Write(full_step_file_path) == 1:
+                print(f"STEP file saved at {full_step_file_path}")
+            else:
+                print("Warning: Failed to save STEP file!")
+
+            # Save IGES
+            iges_writer = IGESControl_Writer()
+            iges_writer.AddShape(model)
+            iges_file_path = file_path.replace(".brep", ".iges")
+            full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
+            if iges_writer.Write(full_iges_file_path) == 1:
+                print(f"IGES file saved at {full_iges_file_path}")
+            else:
+                print("Warning: Failed to save IGES file!")
+        
     except Exception as e : 
         print('Writing to BREP file failed e : ' , e)
     

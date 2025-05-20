@@ -28,6 +28,10 @@ from osdag_api.errors import MissingKeyError, InvalidInputTypeError
 from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
 import osdag_api.modules.shear_connection_common as scc
 from OCC.Core import BRepTools
+from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
+from OCC.Core.IGESControl import IGESControl_Writer
+# from OCC.Core.StlAPI import StlAPI_Writer
+# from OCC.Core.TopoDS import TopoDS_Solid, TopoDS_Shell
 from cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
 from design_type.connection.fin_plate_connection import FinPlateConnection
@@ -35,6 +39,8 @@ import sys
 import os
 import typing
 from typing import Dict, Any, List
+import traceback
+
 old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
 sys.stdout = old_stdout  # Reset log
@@ -276,13 +282,13 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
         print('validating string key')
         
         try : 
-            validate_string(key)  # Check if key is a string. If not, raise error.
+            validate_string(key) # Check if key is a string. If not, raise error.
         except : 
             print('error in validating string keys')
             print('string key passed  : ' , key )
 
     # Validate for keys that are numbers
-    num_keys = [("Bolt.Slip_Factor", True)  # List of all parameters that are numbers (key, is_float)
+    num_keys = [("Bolt.Slip_Factor", True),  # List of all parameters that are numbers (key, is_float)
                 ("Detailing.Gap", False),
                 ("Load.Axial", False),
                 ("Load.Shear", False),
@@ -310,7 +316,7 @@ def create_module() -> FinPlateConnection:
 
 
 def create_from_input(input_values: Dict[str, Any]) -> FinPlateConnection:
-    """Create an instance of the fin plate connection module design class from input values."""
+    """Create an instance of the beam beam end plate connection module design class from input values."""
     # validate_input(input_values)
     try : 
         module = create_module()  # Create module instance.
@@ -323,6 +329,7 @@ def create_from_input(input_values: Dict[str, Any]) -> FinPlateConnection:
         print(input_values)
         module.set_input_values(input_values)
     except Exception as e : 
+        traceback.print_exc()
         print('e in set_input_values : ' , e)
         print('error in setting the input values')
 
@@ -383,6 +390,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         # Setup the calculations object for generating CAD model.
         scc.setup_for_cad(cld, module)
     except Exception as e : 
+        traceback.print_exc()
         print('Error in setting up cad e : ' , e)
 
     # The section of the module that will be generated.
@@ -408,9 +416,40 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 
     try : 
         BRepTools.breptools.Write(model, file_path) # Generate CAD Model
+        
+        # Only if it's 'Model' section, save extra formats
+        if section == "Model":
+            # Save STEP
+            step_writer = STEPControl_Writer()
+            step_writer.Transfer(model, STEPControl_AsIs)
+            step_file_path = file_path.replace(".brep", ".step")
+            full_step_file_path = os.path.join(os.getcwd(), step_file_path)
+            if step_writer.Write(full_step_file_path) == 1:
+                print(f"STEP file saved at {full_step_file_path}")
+            else:
+                print("Warning: Failed to save STEP file!")
+
+            # Save IGES
+            iges_writer = IGESControl_Writer()
+            iges_writer.AddShape(model)
+            iges_file_path = file_path.replace(".brep", ".iges")
+            full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
+            if iges_writer.Write(full_iges_file_path) == 1:
+                print(f"IGES file saved at {full_iges_file_path}")
+            else:
+                print("Warning: Failed to save IGES file!")
+
+            # stl_writer = StlAPI_Writer()
+            # stl_file_path = file_path.replace(".brep", ".stl")
+            # full_stl_file_path = os.path.join(os.getcwd(), stl_file_path)
+
+            # # Only save STL if model is solid or shell
+            # if isinstance(model, (TopoDS_Solid, TopoDS_Shell)):
+            #     stl_writer.Write(model, full_stl_file_path)
+            #     print(f"STL file saved at {full_stl_file_path}")
+            # else:
+            #     print(" STL not saved because model is not a Solid or Shell.")
     except Exception as e : 
         print('Writing to BREP file failed e : ' , e)
     
     return file_path
-
-

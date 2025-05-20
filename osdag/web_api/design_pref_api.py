@@ -34,7 +34,10 @@ class DesignPreference(APIView):
         if connectivity == 'Beam-Beam':
             supported_section_results = Beams.objects.filter(Designation=supported_section).values()
             supporting_section_results = Beams.objects.filter(Designation=supporting_section).values()
-        else:
+        elif not connectivity:
+            supported_section_results = Beams.objects.filter(Designation=supported_section).values()
+            return Response({"supported_section_results": supported_section_results}, status=status.HTTP_200_OK)
+        else :
             supported_section_results = Beams.objects.filter(Designation=supported_section).values()
             supporting_section_results = Columns.objects.filter(Designation=supporting_section).values()
 

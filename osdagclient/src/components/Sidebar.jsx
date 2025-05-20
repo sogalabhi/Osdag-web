@@ -41,9 +41,7 @@ function Sidebar() {
   const navigate = useNavigate();
   return (
     <>
-      <div className={'sidebar'}>
-        
-      
+      <div className='sidebar'>
         <div className="sidebar-container">
           {
             data && data.data && data.data.map((item) => {

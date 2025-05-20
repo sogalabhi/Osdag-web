@@ -32,9 +32,9 @@ export default (state, action) => {
                 error_msg : 'Error in fetching Column, Beam and Material List'
             }
         case 'SET_BEAM_MATERIAL_LIST' :
-            prev = JSON.parse(localStorage.getItem("osdag-custom-materials"))
+            let preve = JSON.parse(localStorage.getItem("osdag-custom-materials"))
             state.materialList = action.payload.materialList
-            if(prev == null){
+            if(preve == null){
                 return{
                     ...state ,
                     beamList : action.payload.beamList,
@@ -96,6 +96,13 @@ export default (state, action) => {
                 ...state,
                 renderCadModel : action.payload
             }
+
+        case "SET_CAD_MODEL_PATHS":
+            return { 
+                ...state, 
+                cadModelPaths: action.payload 
+            }
+
         case 'SET_REPORT_ID_AND_DISPLAY_PDF' : 
             return{
                 ...state,

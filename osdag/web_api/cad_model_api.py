@@ -7,30 +7,20 @@
             Returns ouput dir name as content_type text/plain.
             Request must provide session cookie id.
 """
-from django.shortcuts import render, redirect
-from django.utils.html import escape, urlencode
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.views import View
 from osdag.models import Design
-from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from osdag_api import developed_modules, get_module_api
-from osdag_api.errors import OsdagApiException
-import typing
-import json
+import shutil
 import os
 import subprocess
-import time
-import sys
+from io import BytesIO
 
 # rest_framework
 from rest_framework import status
 from rest_framework.response import Response
-
-# importing models 
-from osdag.models import Design
-
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CADGeneration(View):
@@ -43,112 +33,130 @@ class CADGeneration(View):
     """
 
     def get(self, request: HttpRequest):
-        # Get design session id.
-        cookie_id = request.COOKIES.get("fin_plate_connection_session")
-        # cookie_id = request.COOKIES.get("connection_session")
-        print(cookie_id)
-        # Error Checking: If design session id provided.
-        if cookie_id == None or cookie_id == '':
-            # Returns error response.
-            return HttpResponse("Error: Please open module", status=400)
-        # Error Checking: If design session exists.
-        if not Design.objects.filter(cookie_id=cookie_id).exists():
-            # Return error response.
-            return HttpResponse("Error: This design session does not exist", status=404)
-        try:  # Error checking while loading input data
-            # Get session object from db.
-            try : 
-                design_session = Design.objects.get(cookie_id=cookie_id)
-            except : 
-                # print('Error in obtaining the fin_plate_connection_session')
-                print('Error in obtaining the connection_session')
-            
-            try : 
-                module_api = get_module_api(
-                    design_session.module_id)  # Get module api
-            except : 
-                print('error in obtaining modele_api from the design_session')
-            # Error Checking: If input data not entered.
-
-
-            #if not design_session.current_state:
-            #    # Return error response.
-            #    return HttpResponse("Error: Please enter input data first", status=409)
-            # Load input data into dictionary.
-            
-            try : 
-                input_values = design_session.input_values
-            except : 
-                print('error in loading the input_values from the design_session instance')
+        # Get design session id
+        fin_plate_cookie_id = request.COOKIES.get("fin_plate_connection_session")
+        cleat_angle_cookie_id = request.COOKIES.get("cleat_angle_connection_session")
+        end_plate_cookie_id = request.COOKIES.get("end_plate_connection_session")
+        seated_angle_cookie_id = request.COOKIES.get("seated_angle_connection")
+        cover_plate_bolted_cookie_id = request.COOKIES.get("cover_plate_bolted_connection_session")
+        beam_beam_end_plate_cookie_id = request.COOKIES.get("beam_beam_end_plate_connection_session")
+        
+        #Ensure that at least one session exists
+        if not fin_plate_cookie_id and not cleat_angle_cookie_id and not seated_angle_cookie_id and not end_plate_cookie_id and not cover_plate_bolted_cookie_id and not beam_beam_end_plate_cookie_id:
+            return JsonResponse({"status": "error", "message": "Please open a module"}, status=400)
+        
+        #determine the correct sessionId and fetch design session
+        if fin_plate_cookie_id:
+            cookie_id = fin_plate_cookie_id
+            session_type = "FinPlate"
+        elif cleat_angle_cookie_id:
+            cookie_id = cleat_angle_cookie_id
+            session_type = "CleatAngle"
+        elif end_plate_cookie_id:
+            cookie_id = end_plate_cookie_id
+            session_type = "EndPlate"
+        elif seated_angle_cookie_id:
+            cookie_id = seated_angle_cookie_id
+            session_type = "SeatedAngle"
+        elif cover_plate_bolted_cookie_id:
+            cookie_id = cover_plate_bolted_cookie_id
+            session_type = "CoverPlateBolted"
+        elif beam_beam_end_plate_cookie_id:
+            cookie_id = beam_beam_end_plate_cookie_id
+            session_type = "BeamBeamEndPlate"
+        
+        # # Error Checking: If design session exists.
+        # if not Design.objects.filter(cookie_id=cookie_id).exists():
+        #     # Return error response.
+        #     return HttpResponse("Error: This design session does not exist", status=404)
+        
+        try:
+            design_session = Design.objects.get(cookie_id=cookie_id)
+            module_api = get_module_api(design_session.module_id)
+            input_values = design_session.input_values
+        except Design.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Design session not found"}, status=404)
         except Exception as e:
-            # Return error response.
-            print('first erorr')
-            return HttpResponse("Error: Internal server error: " + repr(e), status=500)
-        section = "Model"  # Section of model to generate (default full model).
-        if request.GET.get("section") != None:  # If section is specified,
-            section = request.GET["section"]  # Set section
-            print('section : ' , section)
-        try:  # Error checking while Generating BREP File.
-            # Generate CAD Model.
-            print('creating cad model')
-            path = module_api.create_cad_model(
-                input_values, section, cookie_id)
-            print('path : ' , path)
-            designObject = Design.objects.get(cookie_id = cookie_id)
-            try : 
-                if(not path) : 
-                    print('path is false')
-                    # set the cad_design_status to False
-                    designObject.cad_design_status = False
-                    designObject.save()
+            return JsonResponse({"status": "error", "message": f"Unable to retrieve session - {repr(e)}"}, status=500)
+        
+        # Check for FreeCAD availability
+        command = shutil.which("FreeCADCmd")
+        if not command:
+            return JsonResponse({"status": "error", "message": "FreeCAD is not installed or not in system PATH."}, status=500)
+        
+        # Directory setup
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(os.path.dirname(current_dir))
+        macro_path = os.path.join(parent_dir, 'freecad_utils/open_brep_file.FCMacro')
+    
+        # Determine sections based on the session type
+        if session_type == "FinPlate":
+            sections = ["Model", "Beam", "Column", "Plate"]
+        elif session_type == "CleatAngle":
+            sections = ["Model", "Beam", "Column", "cleatAngle"]
+        elif session_type == "EndPlate":
+            sections = ["Model", "Beam", "Column", "Plate"]
+        elif session_type == "SeatedAngle":
+            sections = ["Model", "Beam", "Column", "SeatAngle"]
+        elif session_type == "CoverPlateBolted":
+            sections = ["Model", "Beam", "Connector"]
+        elif session_type == "BeamBeamEndPlate":
+            sections = ["Model", "Beam", "Connector"]
+        else:
+            return JsonResponse({"status": "error", "message": "Unknown module type"}, status=400)
+        
+        # initialize the empty dictionary to hold model data
+        output_files = {}
+        # Fetch Design object once
+        designObject = design_session
+        
+        for section in sections:
+            print(f'Generating section: {section}')
+            
+            try:
+                path = module_api.create_cad_model(input_values, section, cookie_id)
 
-                    return HttpResponse('CAD model generation failed' , status = 400)
-                if(path) : 
-                    # set the cad_design_status to True 
-                    print('path is valid')
-                    designObject.cad_design_status = True
-                    designObject.save()
-            except Exception as e :
-                print('Exception found while saving the CAD design status : ' , e) 
+                if not path:
+                    print(f'Error generating {section}: create_cad_model() returned None or empty string')
+                    continue  # Skip to the next section
 
-        except OsdagApiException as e:  # If section does no exist
-            return HttpResponse(repr(e), status=400)  # Return error response.
-        except Exception as e:
-            # Return error response.
-            return HttpResponse("Error: Internal server error: " + repr(e), status=500)
-        
-        #try : 
-        #    os.chdir('/home')
-        #except Exception as e : 
-        #    print('chdir e : ' , e)
-        
-        try : 
-            # Pass the path variable as a command-line argument to the FreeCAD macro
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            # Get the path of the parent directory
-            parent_dir = os.path.dirname(os.path.dirname(current_dir))
-            macro_path = os.path.join(
-                parent_dir, 'freecad_utils/open_brep_file.FCMacro')
-            if sys.platform == "win32":
-                command = "D:\\Softwares\\FreeCad\\bin\\FreeCADCmd.exe"
-            command = '/snap/bin/freecad.cmd'
-            # path = 'file_storage/cad_models/Uv9aURCfBDmhoosxMUy2UT7P3ghXcvV3_Model.brep'
-            path_to_file = os.path.join(parent_dir, path)
-            output_dir = os.path.join(
-                parent_dir, 'osdagclient/public/output-obj.obj')
-        except Exception as e : 
-            print('output dir e : ' , e)
-        # Call the subprocess to create the empty output file
-        try : 
-            subprocess.run(["touch", output_dir])
-        except Exception as e : 
-            print('subprocess run e : ' , e)
-        
-        command_with_arg = f'{command} {macro_path} {path_to_file} {output_dir}'
-        # Execute the command using subprocess.Popen()
-        process = subprocess.Popen(command_with_arg.split())
-        
-        time.sleep(3)
-        response = HttpResponse(output_dir, status=201)
-        response["content-type"] = "text/plain"
-        return response
+                # Mark this section as successfully generated
+                print(f'{section} generated successfully')
+                designObject.cad_design_status = True
+                designObject.save()
+
+                # Convert and store file paths
+                path_to_file = os.path.join(parent_dir, path)
+                if not os.path.exists(path_to_file):
+                    print(f'Generated file for {section} does not exist at: {path_to_file}')
+                    continue
+                # output_obj_path = os.path.join(parent_dir, f'osdagclient/public/output-{section.lower()}.obj')
+                output_obj_path = path_to_file.replace(".brep", ".obj")
+               
+                # Convert .brep to .obj using FreeCAD
+                command_with_arg = f'{command} {macro_path} {path_to_file} {output_obj_path}'
+                process = subprocess.Popen(command_with_arg.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = process.communicate()
+
+                if process.returncode != 0:
+                    print(f"FreeCAD conversion failed for {section}: {stderr.decode().strip()}")
+                    continue
+                
+                # Read the generated .obj file into BytesIO
+                output_obj = BytesIO() # create an in-memory buffer
+                with open(output_obj_path, "rb") as obj_file:
+                    output_obj.write(obj_file.read()) # Store the file inside memory
+                
+                output_files[section] = output_obj.getvalue().decode("utf-8") # Converts the file's content into a readable string for json
+                
+            except Exception as e:
+                print(f"Exception while generating {section}: {e}")
+                
+        if not output_files:
+            return JsonResponse({"status": "error", "message": "No CAD models were generated."}, status=500)
+                
+        return JsonResponse({
+            "status": "success",
+            "files": output_files,
+            "message": "CAD models generated successfully"
+        }, status=201)

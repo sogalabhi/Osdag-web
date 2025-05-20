@@ -1,16 +1,17 @@
 """
-    This file includes the Create Session and Delete Session API.
-    Create Session API (class CreateSession(View)):
-        Accepts POST requests.
-        Accepts content-type/form-data.
-        Request body must include module id.
-        Creates a session object in db and returns session id as cookie.
-    Delete Session API (class CreateSession(View)):
-        Accepts POST requests.
-        Requires no POST data.
-        Requires design_session cookie.
-        Deletes session object in db and deletes session id cookie.
+This file includes the Create Session and Delete Session API.
+Create Session API (class CreateSession(View)):
+    Accepts POST requests.
+    Accepts content-type/form-data.
+    Request body must include module id.
+    Creates a session object in db and returns session id as cookie.
+Delete Session API (class CreateSession(View)):
+    Accepts POST requests.
+    Requires no POST data.
+    Requires design_session cookie.
+    Deletes session object in db and deletes session id cookie.
 """
+
 from django.shortcuts import render, redirect
 from django.utils.html import escape, urlencode
 from django.http import HttpResponse, HttpRequest
@@ -27,7 +28,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-# importing serializers 
+
+# importing serializers
 from osdag.serializers import Design_Serializer
 
 # Author: Aaranyak Ghosh
@@ -35,43 +37,65 @@ from osdag.serializers import Design_Serializer
 
 class CreateSession(APIView):
     """
-        Create a session in database and set session cookie.
-            Create Session API (class CreateSession(View)):
-                Accepts POST requests..
-                Accepts content-type/form-data.
-                Request body must include module id.
-                Creates a session object in db and returns session id as cookie.
+    Create a session in database and set session cookie.
+        Create Session API (class CreateSession(View)):
+            Accepts POST requests..
+            Accepts content-type/form-data.
+            Request body must include module id.
+            Creates a session object in db and returns session id as cookie.
     """
 
-    def post(self,request) :
+    def post(self, request):
         print("CreateSession view reached")
-        module_id = request.data.get('module_id')
-        print('module_id in session : ' , module_id)
-        if module_id == None or module_id == '': # Error Checking: If module id provided.
-            print('module is None or Empty')
-            return JsonResponse("Error: Please specify module id", status=400) # Returns error response.
-        if request.COOKIES.get("end_plate_connection_session") is not None: # Error Checking: Already editing design.
-            print('end_plate_connection is there')
-            return JsonResponse({"status" : "set"}, status=200) # Returns error response. 
+        module_id = request.data.get("module_id")
+        print("module_id in session : ", module_id)
+        if (
+            module_id == None or module_id == ""
+        ):  # Error Checking: If module id provided.
+            print("module is None or Empty")
+            return JsonResponse(
+                "Error: Please specify module id", status=400
+            )  # Returns error response.
+        if (
+            request.COOKIES.get("end_plate_connection_session") is not None
+        ):  # Error Checking: Already editing design.
+            print("end_plate_connection is there")
+            return JsonResponse(
+                {"status": "set"}, status=200
+            )  # Returns error response.
         elif request.COOKIES.get("fin_plate_connection_session") is not None:
-               print('fin_plate_connection is there')
-               return JsonResponse({"status" : "set"}, status=200) # Returns error response. 
+            print("fin_plate_connection is there")
+            return JsonResponse(
+                {"status": "set"}, status=200
+            )  # Returns error response.
         elif request.COOKIES.get("cleat_angle_connection_session") is not None:
-               print('cleat_angle_connection_session is there')
-               return JsonResponse({"status" : "set"}, status=200) # Returns error response. 
+            print("cleat_angle_connection_session is there")
+            return JsonResponse(
+                {"status": "set"}, status=200
+            )  # Returns error response.
         elif request.COOKIES.get("seated_angle_connection") is not None:
             print("seated angle connection is there ")
-            return JsonResponse({"status" : "set"}, status=200)
-        if module_id not in developed_modules: # Error Checking: Does module api exist
-            print('module_id not developed')
-            return JsonResponse("Error: This module has not been developed yet", status=501) # Return error response.
+            return JsonResponse({"status": "set"}, status=200)
+        elif request.COOKIES.get("cover_plate_bolted_connection_session") is not None:
+            print("cover plate bolted connection is there ")
+            return JsonResponse({"status": "set"}, status=200)
+        elif request.COOKIES.get("beam_beam_end_plate_connection_session") is not None:
+            print("Beam Beam End Plate Connection is there ")
+            return JsonResponse({"status": "set"}, status=200)
+        if module_id not in developed_modules:  # Error Checking: Does module api exist
+            print("module_id not developed")
+            return JsonResponse(
+                "Error: This module has not been developed yet", status=501
+            )  # Return error response.
 
         # Define cookie keys for each module
         cookie_keys = {
             "Fin Plate Connection": "fin_plate_connection_session",
             "End Plate Connection": "end_plate_connection_session",
             "Cleat Angle Connection": "cleat_angle_connection_session",
-            "Seated Angle Connection": "seated_angle_connection"
+            "Seated Angle Connection": "seated_angle_connection",
+            "Cover Plate Bolted Connection": "cover_plate_bolted_connection_session",
+            "Beam Beam End Plate Connection": "beam_beam_end_plate_connection_session",
         }
 
         # Check for existing sessions
@@ -79,69 +103,94 @@ class CreateSession(APIView):
             if request.COOKIES.get(session_key):
                 return Response({"status": "set"}, status=status.HTTP_200_OK)
 
-
-        cookie_id = get_random_string(length=32) # creting a session from a random string
-        print('cookie id in session : ' ,cookie_id)
-        tempData = {
-            "cookie_id" : cookie_id,
-            "module_id" : module_id,
-            "input_values" : {}
-        }
-        print('tempData : ' , tempData)
-        print('type of tempData  : ' , type(tempData))
-        serializer = Design_Serializer(data = tempData)
-        print('serializers : ' , serializer)
-        if serializer.is_valid() : 
-            print('serializer is valid')
+        cookie_id = get_random_string(
+            length=32
+        )  # creting a session from a random string
+        print("cookie id in session : ", cookie_id)
+        tempData = {"cookie_id": cookie_id, "module_id": module_id, "input_values": {}}
+        print("tempData : ", tempData)
+        print("type of tempData  : ", type(tempData))
+        serializer = Design_Serializer(data=tempData)
+        print("serializers : ", serializer)
+        if serializer.is_valid():
+            print("serializer is valid")
             serializer.save()
 
             # create HTTPResponse and set the cookie
-            response = JsonResponse({"status" : "set"} , status=201)
-            
+            response = JsonResponse({"status": "set"}, status=201)
+
             cookie_key = cookie_keys.get(module_id)
             if cookie_key:
-                response.set_cookie(key=cookie_key, value=cookie_id, samesite='None', secure=True)
+                response.set_cookie(
+                    key=cookie_key, value=cookie_id, samesite="None", secure=True
+                )
                 print(f"Cookie Set: {cookie_key}")
             else:
                 print(f"Warning: Unknown module_id: {module_id}")
-                return Response({"error": "Invalid module_id"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Invalid module_id"}, status=status.HTTP_400_BAD_REQUEST
+                )
             return response
-        else : 
-            print('serializer is invalid')
-            print('serializer.errors : ' , serializer.errors)
-            return JsonResponse("Inernal Server Error: " , status=500, safe=False) # Return error response.
-
+        else:
+            print("serializer is invalid")
+            print("serializer.errors : ", serializer.errors)
+            return JsonResponse(
+                "Inernal Server Error: ", status=500, safe=False
+            )  # Return error response.
 
 
 class DeleteSession(APIView):
     """
-        Delete session cookie and session data in db.
-            Delete Session API (class CreateSession(View)):
-                Accepts POST requests.
-                Requires no POST data.
-                Requires design_session cookie.
-                Deletes session object in db and deletes session id cookie.
+    Delete session cookie and session data in db.
+        Delete Session API (class DeleteSession(APIView)):
+            Accepts POST requests.
+            Requires module_id in POST data.
+            Requires corresponding session cookie.
+            Deletes session object in db and deletes session id cookie.
     """
-    def post(self,request: HttpRequest) -> HttpResponse:
-        module_id = request.data.get('module_id')
-        print('module_id in session : ' , module_id)
-        if(module_id=='End Plate Connection'):
-           cookie_id = request.COOKIES.get("end_plate_connection_session") 
-        elif(module_id=='Fin Plate Connection'):# Get design session id.
-            cookie_id = request.COOKIES.get("fin_plate_connection_session") 
-        elif(module_id=='Cleat Angle Connection'):# Get design session id.
-            cookie_id = request.COOKIES.get("cleat_angle_connection_session")
-        elif(module_id=='Seated Angle Connection'):
-            cookie_id=request.COOKIES.get("seated_angle_connection") 
-        if cookie_id == None or cookie_id == '': # Error Checking: If design session id provided.
-            return HttpResponse("Error: Please open module", status=400) # Returns error response.
-        if not Design.objects.filter(cookie_id=cookie_id).exists(): # Error Checking: If design session exists.
-            return HttpResponse("Error: This design session does not exist", status=404) # Return error response.
-        try: # Try deleting session.
-            connection_session = Design.objects.get(cookie_id=cookie_id) # Design session object in db.
+    @csrf_exempt
+    def post(self, request):
+        module_id = request.data.get("module_id")
+        print("module_id in session : ", module_id)
+
+        # Define cookie keys for each module
+        cookie_keys = {
+            "Fin Plate Connection": "fin_plate_connection_session",
+            "End Plate Connection": "end_plate_connection_session",
+            "Cleat Angle Connection": "cleat_angle_connection_session",
+            "Seated Angle Connection": "seated_angle_connection",
+            "Cover Plate Bolted Connection": "cover_plate_bolted_connection_session",
+            "Beam Beam End Plate Connection": "beam_beam_end_plate_connection_session",
+        }
+
+        if module_id not in cookie_keys:
+            return JsonResponse("Error: Invalid module id", status=400, safe=False)
+
+        cookie_key = cookie_keys[module_id]
+        cookie_id = request.COOKIES.get(cookie_key)
+
+        if cookie_id is None or cookie_id == "":
+            return JsonResponse("Error: Please open module", status=400, safe=False)
+
+        if not Design.objects.filter(cookie_id=cookie_id).exists():
+            return JsonResponse(
+                "Error: This design session does not exist", status=404, safe=False
+            )
+
+        try:
+            connection_session = Design.objects.get(cookie_id=cookie_id)
             connection_session.delete()
-        except Exception as e: # Error Checking: While saving design.
-            return HttpResponse("Inernal Server Error: " + repr(e), status=500) # Return error response.
-        response = HttpResponse(status=200) # Status code 200 - Successfully deleted .
+        except Exception as e:
+            return JsonResponse(
+                f"Internal Server Error: {str(e)}", status=500, safe=False
+            )
+
+        # Create response
+        response = JsonResponse({"status": "deleted"}, status=200)
+
+        # Delete the cookie using the same parameters as when setting it
+        response.delete_cookie(
+            key=cookie_key, samesite="None"
+        )
 
         return response

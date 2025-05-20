@@ -9,7 +9,7 @@ class EndPlateInputData(InputDataBase):
         propertyClass, thickness, email  = kwargs["propertyClass"], kwargs["thickness"], kwargs["email"]
         
         if (connectivity is None and boltDiameter is None and propertyClass is None and thickness is None):
-            # fetch the list of all the connectivity options for Fin-Plate-Connection
+            # fetch the list of all the connectivity options for End-Plate-Connection
             print("\n\n")
             print('inside connectivtityList handling ')
             print("\n\n")

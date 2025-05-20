@@ -6,6 +6,10 @@ from django.http import FileResponse
 
 from osdag_api.modules.fin_plate_connection import create_from_input as fin_plate_create_from_input
 from osdag_api.modules.end_plate_connection import create_from_input as end_plate_create_from_input
+from osdag_api.modules.cleat_angle_connection import create_from_input as cleat_angle_create_from_input
+from osdag_api.modules.seated_angle_connection import create_from_input as seated_angle_create_from_input
+from osdag_api.modules.cover_plate_bolted_connection import create_from_input as cover_plate_bolted_create_from_input
+from osdag_api.modules.beam_beam_end_plate_connection import create_from_input as beam_beam_end_plate_create_from_input
 # importing models
 from osdag.models import Design
 
@@ -33,9 +37,27 @@ class CreateDesignReport(APIView):
         # obtain teh cookies
         metadata = request.data.get('metadata')
         print('metadata : ' , metadata)
-        cookie_id = request.COOKIES.get('fin_plate_connection_session') or request.COOKIES.get('end_plate_connection_session')
-        print('cookie_id : ', cookie_id)
-       
+        
+        # Step 1: Map all cookie keys to their respective create_from_input functions
+        module_cookie_map = {
+            'fin_plate_connection_session': fin_plate_create_from_input,
+            'end_plate_connection_session': end_plate_create_from_input,
+            'cleat_angle_connection_session': cleat_angle_create_from_input,
+            'seated_angle_connection': seated_angle_create_from_input,
+            'cover_plate_bolted_connection_session': cover_plate_bolted_create_from_input,
+            'beam_beam_end_plate_connection_session': beam_beam_end_plate_create_from_input,
+        }
+        
+        cookie_id = None
+        create_module_func = None
+
+        for cookie_key, create_func in module_cookie_map.items():
+            if cookie_key in request.COOKIES:
+                cookie_id = request.COOKIES.get(cookie_key)
+                create_module_func = create_func
+                break
+        
+        print("cookie_id:", cookie_id)
 
         # obtain the currenct working directory as it gets changed in the osdag desktop code, then 
         # we will use the same value to bring it back to the current directory 
@@ -65,7 +87,7 @@ class CreateDesignReport(APIView):
             }
 
             metadata_other = {
-                "ProjectTitle": "Fin Plate Connection",
+                "ProjectTitle": "Osdag",
                 "Subtitle": "",
                 "JobNumber": "1",
                 "AdditionalComments": "No Comments",
@@ -100,34 +122,39 @@ class CreateDesignReport(APIView):
         # if not, create one 
         cwd = os.path.join(os.getcwd() , "file_storage/design_report/")
         print('cwd_path : ' , cwd)
+        print("****")
         if(not os.path.exists) :
             print('path does not exists, creating one : ', cwd)
             os.mkdir(cwd) 
 
         try:
-            print('creating module from input')
-            if(request.COOKIES.get('end_plate_connection_session')):
-               module=end_plate_create_from_input(input_values)
-            else:
-              module=fin_plate_create_from_input(input_values)
+            print('Creating module from input')
+            print("*******")
+            module = create_module_func(input_values)
+            print("*$$$*", input_values)
+            print("*$$$$$$$*", module)
+            print("*******************")
         except Exception as e:
-            print('e : ', e)
+            print('Error while creating module:', e)
 
         try:
+            print("$$$$$$$$$$$$", metadata_final)
             print('generating the report .save_design')
             resultBoolean = module.save_design(metadata_final)
+            print("*********Haluuuuuuuuuu")
+            print(resultBoolean)
         except Exception as e:
             print('e : ', e)
         
         if(resultBoolean):
             print('The LaTEX file has been created successfully')
-
-
         
         os.chdir(current_directory)
         print('cwd after chdir : ' , os.getcwd())
 
+        print("***")
         if (resultBoolean):
+            print("**")
             print('inside sleep')
             # time.sleep(10)
             isExists = os.path.exists(f'{os.getcwd()}/file_storage/design_report/{report_id}.tex')

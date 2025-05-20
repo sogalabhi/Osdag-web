@@ -354,6 +354,7 @@ DISP_TITLE_CM = 'Connecting Members'
 ###################################
 KEY_MODULE = 'Module'
 KEY_CONN = 'Connectivity'
+KEY_CONN1 = 'Connectivity *'
 KEY_LOCATION = 'Conn_Location'
 KEY_ENDPLATE_TYPE = 'EndPlateType'
 KEY_MATERIAL = 'Material'

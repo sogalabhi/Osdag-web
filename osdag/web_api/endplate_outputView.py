@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from osdag_api import get_module_api
 from django.http import HttpResponse, HttpRequest
-from osdag_api.modules.fin_plate_connection import *
+from osdag_api.modules.end_plate_connection import *
 
 # importing from DRF
 from rest_framework.response import Response
@@ -45,7 +45,7 @@ from osdag.serializers import Design_Serializer
         "Member.Supported_Section.Material" : "E 250 (Fe 410 W)A",
         "Member.Supporting_Section.Designation" : "JB 150",
         "Member.Supporting_Section.Material" : "E 250 (Fe 410 W)A",
-        "Module" : "Fin Plate Connection",
+        "Module" : "End Plate Connection",
         "Weld.Fab" : "Shop Weld",
         "Weld.Material_Grade_OverWrite" : "410",
         "Connector.Plate.Thickness_List" : ["10" , "12" , "16" , "18" , "20"],

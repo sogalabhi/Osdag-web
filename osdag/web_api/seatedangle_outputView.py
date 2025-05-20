@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from osdag_api import get_module_api
 from django.http import HttpResponse, HttpRequest
-from osdag_api.modules.fin_plate_connection import *
+from osdag_api.modules.seated_angle_connection import *
 
 # importing from DRF
 from rest_framework.response import Response

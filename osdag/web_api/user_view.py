@@ -292,7 +292,7 @@ class ObtainInputFileView(APIView) :
     
 class SaveInputFileView(APIView) : 
     def post(self, request) : 
-        print('inside teh saveinput file view post')
+        print('inside the saveinput file view post')
 
         # obtain the file from the request 
         content = request.data.get('content')

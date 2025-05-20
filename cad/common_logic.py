@@ -175,6 +175,7 @@ class CommonDesignLogic(object):
 
 
         self.connectivityObj = None
+        self.CPObj = None
         self.folder = folder
 
 
@@ -303,7 +304,7 @@ class CommonDesignLogic(object):
 
         '''
 
-        A = self.module_class()
+        A = self.module_class
 
         if self.connection == KEY_DISP_FINPLATE:
             # A = self.module_class()
@@ -421,7 +422,7 @@ class CommonDesignLogic(object):
 
         '''
 
-        A = self.module_class()
+        A = self.module_class
 
         # if self.connection == KEY_DISP_FINPLATE:
             # A = self.module_class()
@@ -557,7 +558,7 @@ class CommonDesignLogic(object):
 
         '''
 
-        A = self.module_class()
+        A = self.module_class
 
         if self.connection == KEY_DISP_FINPLATE:
             # A = self.module_class()
@@ -681,9 +682,11 @@ class CommonDesignLogic(object):
         '''
         :return: The calculated values/parameters to create 3D CAD model of individual components.
         '''
+        
+        B = self.module_class
 
         if self.connection == KEY_DISP_BEAMCOVERPLATE:
-            B = BeamCoverPlate()
+            # B = BeamCoverPlate()
             # beam_data = self.fetchBeamPara()  # Fetches the beam dimensions
 
             beam_tw = float(B.section.web_thickness)
@@ -743,13 +746,13 @@ class CommonDesignLogic(object):
                 B.web_plate.thickness_provided) + beam_tw  # Space between bolt head and nut for web bolts
 
             # Bolt placement for Above Flange bolts, call to nutBoltPlacement_AF.py
-            bolting_AF = NutBoltArray_AF(BeamCoverPlate(), nut, bolt, numOfBoltsF, nutSpaceF)
+            bolting_AF = NutBoltArray_AF(B, nut, bolt, numOfBoltsF, nutSpaceF)
 
             # Bolt placement for Below Flange bolts, call to nutBoltPlacement_BF.py
-            bolting_BF = NutBoltArray_BF(BeamCoverPlate(), nut, bolt, numOfBoltsF, nutSpaceF)
+            bolting_BF = NutBoltArray_BF(B, nut, bolt, numOfBoltsF, nutSpaceF)
 
             # Bolt placement for Web Plate bolts, call to nutBoltPlacement_Web.py
-            bolting_Web = NutBoltArray_Web(BeamCoverPlate(), nut, bolt, numOfBoltsW, nutSpaceW)
+            bolting_Web = NutBoltArray_Web(B, nut, bolt, numOfBoltsW, nutSpaceW)
 
             # bbCoverPlate is an object which is passed BBCoverPlateBoltedCAD.py file, which initialized the parameters of each CAD component
             bbCoverPlate = BBCoverPlateBoltedCAD(beam_Left, beam_Right, plateAbvFlange, plateBelwFlange,
@@ -757,13 +760,13 @@ class CommonDesignLogic(object):
                                                  innerplateAbvFlangeBack, innerplateBelwFlangeFront,
                                                  innerplateBelwFlangeBack,
                                                  WebPlateLeft, WebPlateRight, bolting_AF, bolting_BF, bolting_Web,
-                                                 BeamCoverPlate())
+                                                 B)
 
             # bbCoverPlate.create_3DModel() will create the CAD model of each component, debugging this line will give moe clarity
             bbCoverPlate.create_3DModel()
 
         elif self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
-            B = self.module_class()
+            # B = self.module_class()
             beamLenght = (max(float(B.flange_plate.length), float(B.web_plate.length)) + 600) / 2
             beam = ISection(B=float(B.section.flange_width), T=float(B.section.flange_thickness),
                             D=float(B.section.depth), t=float(B.section.web_thickness), R1=float(B.section.root_radius),
@@ -2295,6 +2298,7 @@ class CommonDesignLogic(object):
 
         elif self.mainmodule == "Moment Connection":
             if self.connection == KEY_DISP_BEAMCOVERPLATE or self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
+                B = self.module_class
                 if self.component == "Beam":
                     if self.connection == KEY_DISP_BEAMCOVERPLATE:
                         final_model = self.CPObj.get_only_beams_Models()
@@ -2303,7 +2307,7 @@ class CommonDesignLogic(object):
                 elif self.component == "Connector":
                     if self.connection == KEY_DISP_BEAMCOVERPLATE:
                         cadlist = [self.CPObj.get_flangewebplatesModel(), self.CPObj.get_nut_bolt_arrayModels()]
-                        if self.B.preference != 'Outside':
+                        if B.preference != 'Outside':
                             cadlist.insert(1, self.CPObj.get_innetplatesModels())
                     else:
                         cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_welded_modules()]

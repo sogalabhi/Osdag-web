@@ -6,8 +6,6 @@ from Report_functions import *
 import logging
 import os
 
-
-
 class FinPlateConnection(ShearConnection):
 
     def __init__(self):
