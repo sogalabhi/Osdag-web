@@ -162,10 +162,10 @@ WSGI_APPLICATION = 'osdag_web.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mydb',
-        'USER': 'myuser',
-        'PASSWORD': 'mypassword',
-        'HOST': 'db',  # This should be the name of the service
+        'NAME': 'postgres_Intg_osdag',
+        'USER': 'osdagdeveloper',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',  # This should be the name of the service
         'PORT': '5432',
     }
 }
@@ -226,3 +226,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'file_storage/')
 
 SECRET_ROOT = os.path.join(BASE_DIR , 'secret/')
+
+
+
+

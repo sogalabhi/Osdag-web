@@ -22,17 +22,19 @@ import { useSelector } from "react-redux";
 // New component for the login page
 import LoginPage from "./components/userAuth/LoginPage";
 
-// jwt imports
-import jwt_decode from "jwt-decode";
-import EndPlate from "./components/shearConnection/EndPlate";
-import CleatAngle from "./components/shearConnection/CleatAngle";
-import SeatedAngle from "./components/shearConnection/SeatedAngle";
+// jwt imports 
+import jwt_decode from 'jwt-decode';
+import EndPlate from './components/shearConnection/EndPlate';
+import CleatAngle from './components/shearConnection/CleatAngle';
+import SeatedAngle from './components/shearConnection/SeatedAngle';
 import CoverPlateBolted from "./components/momentConnection/beamToBeamSplice/CoverPlateBolted";
 import BeamBeamEndPlate from "./components/momentConnection/beamToBeamSplice/BeamBeamEndPlate";
+import BoltedToEndPage from './components/TensionMembers/BoltedToEnd/pages/BoltedToEndPage';
+
 import CoverPlateWelded from "./components/momentConnection/beamToBeamSplice/CoverPlateWelded";
 import BeamToColumnEndPlate from "./components/momentConnection/BeamToColumnEndPlate";
 
-let renderedOnce = false;
+let renderedOnce = false
 
 function App() {
   // State to track user authentication status
@@ -81,7 +83,13 @@ function App() {
           path="/design/connections/beam-to-column/end_plate"
           element={<BeamToColumnEndPlate />}
         />
-        <Route path="/user" element={<UserAccount />} />
+        <Route
+          path='/design/:designType/bolted_to_end_gusset'
+          element={
+            <BoltedToEndPage/>
+          }
+        />
+      <Route path='/user' element={<UserAccount />} />
       </Route>
     )
   );
