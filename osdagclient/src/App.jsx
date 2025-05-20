@@ -87,10 +87,10 @@ function App() {
         <Route
           path='/design/:designType/bolted_to_end_gusset'
           element={
-            <BoltedToEndPage/>
+            <BoltedToEndPage />
           }
         />
-      <Route path='/user' element={<UserAccount />} />
+        <Route path='/user' element={<UserAccount />} />
       </Route>
     )
   );

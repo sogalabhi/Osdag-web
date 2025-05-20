@@ -111,7 +111,6 @@ class InputData(APIView):
         elif(moduleName=='Tension-Member-Bolted-Design'):
             cookie_id = request.COOKIES.get('tension_member_bolted_session')
             print('cookie id in tension member bolted input data ', cookie_id)
-
         # if cookie_id == None or cookie_id == '': # Error Checking: If design session id provided.
         #     return Response("Error: Please open module", status=status.HTTP_400_BAD_REQUEST) # Returns error response.
         # if not Design.objects.filter(cookie_id=cookie_id).exists(): # Error Checking: If design session exists.
