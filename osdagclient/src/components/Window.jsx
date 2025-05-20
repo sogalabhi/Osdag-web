@@ -205,7 +205,7 @@ const Window = () => {
               </div>
               <center>
                 <div className="">
-                  <button className="start-btn" onClick={() => {}}>
+                  <button className="start-btn" onClick={() => {navigate(`/design/${designType}/${selectedDesign}`)}}>
                     Start
                   </button>
                 </div>
