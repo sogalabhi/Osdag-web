@@ -107,11 +107,11 @@ class InputData(APIView):
             cookie_id = request.COOKIES.get('beam_to_column_end_plate_connection_session')
             print('cookie id in beam to column end plate connection input data ', cookie_id)
 
-        if cookie_id == None or cookie_id == '': # Error Checking: If design session id provided.
-            return Response("Error: Please open module", status=status.HTTP_400_BAD_REQUEST) # Returns error response.
-        if not Design.objects.filter(cookie_id=cookie_id).exists(): # Error Checking: If design session exists.
-            print('The design session does not exists')
-            return Response("Error: This design session does not exist", status = status.HTTP_404_NOT_FOUND) # Return error response.
+        # if cookie_id == None or cookie_id == '': # Error Checking: If design session id provided.
+        #     return Response("Error: Please open module", status=status.HTTP_400_BAD_REQUEST) # Returns error response.
+        # if not Design.objects.filter(cookie_id=cookie_id).exists(): # Error Checking: If design session exists.
+        #     print('The design session does not exists')
+        #     return Response("Error: This design session does not exist", status = status.HTTP_404_NOT_FOUND) # Return error response.
 
         if (not (moduleName in INPUT_DATA_FACTORY)):
             return Response({"error": "Bad Query Parameter (input data view)"}, status=status.HTTP_400_BAD_REQUEST)        

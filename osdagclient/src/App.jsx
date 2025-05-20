@@ -33,6 +33,7 @@ import BoltedToEndPage from './components/TensionMembers/BoltedToEnd/pages/Bolte
 
 import CoverPlateWelded from "./components/momentConnection/beamToBeamSplice/CoverPlateWelded";
 import BeamToColumnEndPlate from "./components/momentConnection/BeamToColumnEndPlate";
+import BoltedToEndPage from './components/TensionMembers/BoltedToEnd/pages/BoltedToEndPage';
 
 let renderedOnce = false
 
