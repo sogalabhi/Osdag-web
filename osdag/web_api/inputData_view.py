@@ -116,7 +116,6 @@ class InputData(APIView):
         # if not Design.objects.filter(cookie_id=cookie_id).exists(): # Error Checking: If design session exists.
         #     print('The design session does not exists')
         #     return Response("Error: This design session does not exist", status = status.HTTP_404_NOT_FOUND) # Return error response.
-        print('input INPUT_DATA_FACTORY : ', INPUT_DATA_FACTORY)
         if (not (moduleName in INPUT_DATA_FACTORY)):
             return Response({"error": "Bad Query Parameter (input data view)"}, status=status.HTTP_400_BAD_REQUEST)        
         print("///////////////////////////////////////// ", email)
