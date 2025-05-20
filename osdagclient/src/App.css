@@ -235,6 +235,7 @@
   height: auto;
   width: auto;
 
+
 }
 
 @media screen and (max-width: 1009px) {
@@ -280,6 +281,14 @@
 
 .bloc-tabs button{
   width: 15%;
+  border: 1px solid rgba(0, 0, 0, 0.274);
+
+  padding: 10px;
+
+}
+
+.bloc-tabs button {
+  height: 30px;
 }
 
 .tabs {
@@ -358,6 +367,19 @@
   display: grid;
   grid-template-columns: auto auto;
   align-content: center;
+}
+
+.conn-grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 20px;
+  text-align: center;
+
+}
+
+.conn-grid-item.selected {
+  background-color: #91b014;
 }
 
 .conn-grid-container {
@@ -478,7 +500,12 @@
   gap: 1rem;
   width: 100%; 
   font-size: 14px;
+  width: 100%;
+
+
 }
+
+.element {
 
 .element {
   margin-left: auto;
@@ -503,6 +530,10 @@
   background-color: rgb(0, 150, 255);
   color: white;
   cursor: pointer;
+}
+
+.module_nav div {
+  padding: 0.6rem;
 }
 
 .module_nav .dropdown-items:hover {
@@ -530,6 +561,8 @@
 .dropdown-menu div:hover {
   @apply bg-osdag-green cursor-pointer;
 }
+
+.dropdown-items {
 
 .dropdown-items {
   display: flex;
@@ -578,6 +611,8 @@
   font-size: 13px;
   color: black;
   cursor: pointer;
+  padding: 20px;
+
 }
 
 .loading-modal .ant-modal-content {
@@ -1333,7 +1368,7 @@
   background-color: rgb(168, 121, 121);
 }  */
 
-.btn{
+.btn {
   background-color: rgb(135, 91, 91);
   cursor: pointer;
   color: #f1f1f1;
@@ -1344,6 +1379,7 @@
   cursor: pointer;
   color: #f1f1f1;
 }
+
 
 .inputdock-btn Input:hover {
   background-color: rgb(168, 121, 121);
@@ -1406,6 +1442,7 @@
   width: 100%;
   flex-direction: column;
   justify-content: center;
+  display: flex;
   border: 1px solid #ccc;
   padding: 4px;
 }
@@ -1431,13 +1468,20 @@
 
 .spacing-left-body-align input {
   width: 40% !important;
+  margin: 5vh;
+  display: grid;
+  grid-template-columns: repeat(2, 2fr);
+  grid-template-rows: repeat(4, 2fr);
+  justify-items: center;
+  align-items: center;
 }
 
 .spacing-right-body {
-	display: flex;
-	width: 55%;
-  margin: 0.5rem;
-  background-color: white;
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 5vh;
 }
 
 .grid-container {
@@ -1460,36 +1504,26 @@
 }
 
 .Capacity-sub-body {
-	display: flex;
-  justify-content: space-between;
-  width: 100%;
+  display: flex;
+  border: 1px solid #ccc;
 }
 
 .Capacity-left-body {
-  width: 40%;
-	display: flex;
-  flex-direction: column;
-	align-items: center;
-  padding: 0.5rem;
-  font-size: 13px;
+  margin: 5vh;
+  display: grid;
+  grid-template-columns: repeat(2, 2fr);
+  grid-template-rows: repeat(3, 2fr);
+  justify-items: center;
+  align-items: center;
 }
 
-.Capacity-left-body-align {
-  display: flex;
-  justify-content: space-between;
-  margin: 1rem 0rem;
-
-}
-
-.Capacity-left-body-align input {
-  width: 30%;
-}
 
 .Capacity-right-body {
-  width: 60%;
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 5vh;
   flex-direction: column;
 }
 
@@ -1557,8 +1591,8 @@
 /* Design pref container*/
 .design-pref-cont {
   margin-top: 10px;
-  border: 1px solid #000; 
-  width: 100% !important;
+  border: 1px solid #000;
+  min-height: 600px;
   padding: 10px;
   overflow-y: scroll;
   height: 70vh;
@@ -1571,7 +1605,7 @@
   justify-content: space-around;
 }
 
-.Connector-col-beam-cont{
+.Connector-col-beam-cont {
   display: flex;
   flex-direction: row;
   padding: 10px;
@@ -1682,6 +1716,8 @@
   /* Set cursor to default (non-editable) */
 }
 
+#save-input-style {
+  color: #91b014;
 #save-input-style {
   color: #91b014;
   font-size: '16px';
