@@ -131,11 +131,6 @@ const BoltedToEndPage = () => {
     console.log(formData);
   };
 
-  function Model() {
-    const gltf = useLoader(GLTFLoader, '/src/assets/test.glb');
-    return <primitive object={gltf.scene} />;
-  }
-
   // Helper: Show morph target names on hover
   function ModelWithMorphTargets() {
     const meshRef = useRef();
