@@ -231,4 +231,4 @@ const BoltedToEndPage = () => {
   );
 };
 
-export default BoltedToEndPage;
+  export default BoltedToEndPage;
