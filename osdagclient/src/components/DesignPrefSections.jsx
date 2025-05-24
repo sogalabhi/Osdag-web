@@ -24,6 +24,7 @@ const DesignPrefSections = ({
   const { designPrefData, design_pref_defaults } = useContext(ModuleContext);
   console.log("****", designPrefData);
   console.log("**", design_pref_defaults);
+
   // Tabs configuration per module
   let tabs = [
     { name: "Column Section*", id: 0 },

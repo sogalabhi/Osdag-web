@@ -659,7 +659,7 @@ class BeamCoverPlate(MomentConnection):
                self.flange_plate.height if flag else '', True)
         out_list.append(t18)
 
-        t19 = ( KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
+        t19 = (KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
             self.plate_out_len if flag else '', True)
         out_list.append(t19)
 

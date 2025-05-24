@@ -29,6 +29,8 @@ import CleatAngle from "./components/shearConnection/CleatAngle";
 import SeatedAngle from "./components/shearConnection/SeatedAngle";
 import CoverPlateBolted from "./components/momentConnection/beamToBeamSplice/CoverPlateBolted";
 import BeamBeamEndPlate from "./components/momentConnection/beamToBeamSplice/BeamBeamEndPlate";
+import CoverPlateWelded from "./components/momentConnection/beamToBeamSplice/CoverPlateWelded";
+import BeamToColumnEndPlate from "./components/momentConnection/BeamToColumnEndPlate";
 
 let renderedOnce = false;
 
@@ -70,6 +72,14 @@ function App() {
         <Route
           path="/design/:designType/beam-to-beam-splice/end_plate"
           element={<BeamBeamEndPlate />}
+        />
+        <Route
+          path="/design/:designType/beam-to-beam-splice/cover_plate_welded"
+          element={<CoverPlateWelded />}
+        />
+        <Route
+          path="/design/connections/beam-to-column/end_plate"
+          element={<BeamToColumnEndPlate />}
         />
         <Route path="/user" element={<UserAccount />} />
       </Route>

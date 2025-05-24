@@ -81,6 +81,11 @@ class CreateSession(APIView):
             return JsonResponse({"status": "set"}, status=200)
         elif request.COOKIES.get("beam_beam_end_plate_connection_session") is not None:
             print("Beam Beam End Plate Connection is there ")
+        elif request.COOKIES.get("cover_plate_welded_connection_session") is not None:
+            print("Cover plate welded connection is there ")
+            return JsonResponse({"status": "set"}, status=200)
+        elif request.COOKIES.get("beam_to_column_end_plate_connection_session") is not None:
+            print("beam to column end plate connection is there ")
             return JsonResponse({"status": "set"}, status=200)
         if module_id not in developed_modules:  # Error Checking: Does module api exist
             print("module_id not developed")
@@ -96,6 +101,8 @@ class CreateSession(APIView):
             "Seated Angle Connection": "seated_angle_connection",
             "Cover Plate Bolted Connection": "cover_plate_bolted_connection_session",
             "Beam Beam End Plate Connection": "beam_beam_end_plate_connection_session",
+            "Cover Plate Welded Connection": "cover_plate_welded_connection_session",
+            "Beam-to-Column End Plate Connection": "beam_to_column_end_plate_connection_session", 
         }
 
         # Check for existing sessions
@@ -161,6 +168,8 @@ class DeleteSession(APIView):
             "Seated Angle Connection": "seated_angle_connection",
             "Cover Plate Bolted Connection": "cover_plate_bolted_connection_session",
             "Beam Beam End Plate Connection": "beam_beam_end_plate_connection_session",
+            "Cover Plate Welded Connection": "cover_plate_welded_connection_session",
+            "Beam-to-Column End Plate Connection": "beam_to_column_end_plate_connection_session",
         }
 
         if module_id not in cookie_keys:

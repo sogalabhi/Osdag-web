@@ -79,6 +79,7 @@ export const ModuleProvider = ({ children }) => {
         }
       );
       const jsonResponse = await response?.json();
+      console.log("connectivityList", jsonResponse);
       const data = jsonResponse.connectivityList;
       // dispatch the action to set the connectivityList
       dispatch({ type: "SET_CONNECTIVITY_LIST", payload: data });
@@ -96,43 +97,113 @@ export const ModuleProvider = ({ children }) => {
     update = false,
     type
   ) => {
-    try {
-      console.log("Haluuu", moduleName);
-      const email = localStorage.getItem("email");
-      console.log(email);
-      const response = await fetch(
-        `${BASE_URL}populate?moduleName=${moduleName}&connectivity=${connectivity}&email=${email}`,
-        {
-          method: "GET",
-          mode: "cors",
-          credentials: "include",
-        }
-      );
-      const jsonResponse = await response?.json();
+    console.log('getColumnBeamMaterialList called with:', {
+      moduleName,
+      connectivity, 
+      cmat,
+      update,
+      type
+    });
 
-      // diaptch the action
-      console.log("Material details", jsonResponse);
+    try {
+      console.log("GETTING COLUMN BEAM MATERIALS", moduleName);
+      const email = localStorage.getItem("email");
+      console.log("Using email:", email);
+
+      const url = `${BASE_URL}populate?moduleName=${state.currentModuleName}&connectivity=${connectivity}&email=${email}`;
+      console.log("Making request to:", url);
+
+      const response = await fetch(url, {
+        method: "GET",
+        mode: "cors",
+        credentials: "include",
+      });
+      console.log("Got response status:", response.status);
+
+      const jsonResponse = await response?.json();
+      console.log("Response data:", jsonResponse);
+
       if (update) {
+        console.log("Updating with material:", cmat);
         const mList = jsonResponse.materialList;
         const mat = mList.filter((item) => item.Grade === cmat);
-        if (type === "connector")
+        console.log("Filtered materials:", mat);
+
+        if (type === "connector") {
+          console.log("Saving connector material details");
           dispatch({ type: "SAVE_CM_DETAILS", payload: mat });
-        else if (type === "supported")
+        }
+        else if (type === "supported") {
+          console.log("Saving supported material details"); 
           dispatch({ type: "SAVE_SDM_DETAILS", payload: mat });
-        else if (type === "supporting")
+        }
+        else if (type === "supporting") {
+          console.log("Saving supporting material details");
           dispatch({ type: "SAVE_STM_DETAILS", payload: mat });
+        }
       }
+
       if (connectivity !== "Beam-Beam") {
+        console.log("Dispatching column-beam material list");
         dispatch({
           type: "SET_COLUMN_BEAM_MATERIAL_LIST",
           payload: jsonResponse,
         });
       } else if (connectivity === "Beam-Beam") {
+        console.log("Dispatching beam material list");
         dispatch({ type: "SET_BEAM_MATERIAL_LIST", payload: jsonResponse });
       }
+
     } catch (error) {
+      console.log("Error in getColumnBeamMaterialList:", error);
       dispatch({ type: "SET_ERR_MSG_COLUMN_BEAM_MATERIAL", payload: "" });
-      console.log("error : ", error);
+    }
+  };
+
+    const getColumnBeamMaterialList2 = async (
+    moduleName,
+    connectivity,
+    cmat,
+    update = false,
+    type
+  ) => {
+    console.log('getColumnBeamMaterialList called with:', {
+      moduleName,
+      connectivity, 
+      cmat,
+      update,
+      type
+    });
+
+    try {
+      console.log("GETTING COLUMN BEAM MATERIALS", moduleName);
+      const email = localStorage.getItem("email");
+      console.log("Using email:", email);
+
+      const url = `${BASE_URL}populate?moduleName=${state.currentModuleName}&connectivity=${connectivity}&email=${email}`;
+      console.log("Making request to:", url);
+
+      const response = await fetch(url, {
+        method: "GET",
+        mode: "cors",
+        credentials: "include",
+      });
+      console.log("Got response status:", response.status);
+
+      const jsonResponse = await response?.json();
+      console.log("Response data:", jsonResponse);
+
+     
+        console.log("Dispatching column-beam material list");
+        dispatch({
+          type: "SET_COLUMN_BEAM_MATERIAL_LIST",
+          payload: jsonResponse,
+        });
+      
+
+    } catch (error) {
+      console.log("Error in getColumnBeamMaterialList:", error);
+      dispatch({ type: "SET_ERR_MSG_COLUMN_BEAM_MATERIAL", payload: "" });
     }
   };
 
@@ -144,7 +215,8 @@ export const ModuleProvider = ({ children }) => {
   ) => {
     state.currentModuleName = moduleName;
     try {
-      console.log(moduleName);
+      state.currentModuleName = moduleName;
+      console.log('GETTING BEAM MATERIALS ',moduleName);
       const email = localStorage.getItem("email");
       console.log(email);
       const response = await fetch(
@@ -158,7 +230,8 @@ export const ModuleProvider = ({ children }) => {
       const jsonResponse = await response?.json();
 
       // diaptch the action
-      console.log("Material details", jsonResponse);
+
+      console.log("BEAM MATERIAL LIST", jsonResponse);
       if (update) {
         const mList = jsonResponse.materialList;
         const mat = mList.filter((item) => item.Grade === cmat);
@@ -168,6 +241,50 @@ export const ModuleProvider = ({ children }) => {
           dispatch({ type: "SAVE_SDM_DETAILS", payload: mat });
       }
       dispatch({ type: "SET_BEAM_MATERIAL_LIST", payload: jsonResponse });
+    } catch (error) {
+      dispatch({ type: "SET_ERR_MSG_COLUMN_BEAM_MATERIAL", payload: "" });
+      console.log("error : ", error);
+    }
+  };
+
+
+  const getBeamMaterialList2 = async (
+    moduleName,
+    cmat,
+    update = false,
+    type
+  ) => {
+    //console.log("here");
+
+    try {
+      console.log("GETTING LIST FOR :", moduleName);
+      state.currentModuleName = moduleName;
+      const email = localStorage.getItem("email");
+      const response = await fetch(
+        `${BASE_URL}populate?moduleName=${moduleName}&email=${email}`,
+        {
+          method: "GET",
+          mode: "cors",
+          credentials: "include",
+        }
+      );
+      const jsonResponse = await response?.json();
+      console.log("BEAM WELDED details", jsonResponse);
+
+      if (update) {
+        const mList = jsonResponse.materialList;
+        const mat = mList.filter((item) => item.Grade === cmat);
+
+        if (type === "connector")
+          dispatch({ type: "SAVE_CM_DETAILS", payload: mat });
+        else if (type === "supported")
+          dispatch({ type: "SAVE_SDM_DETAILS", payload: mat });
+      }
+
+      dispatch({
+        type: "SET_COLUMN_BEAM_MATERIAL_LIST",
+        payload: jsonResponse,
+      });
     } catch (error) {
       dispatch({ type: "SET_ERR_MSG_COLUMN_BEAM_MATERIAL", payload: "" });
       console.log("error : ", error);
@@ -324,6 +441,7 @@ export const ModuleProvider = ({ children }) => {
   };
 
   const createSession = async (module_id) => {
+    console.log("Creating session for module: ", module_id);
     try {
       const requestData = { module_id: module_id };
       console.log(requestData);
@@ -372,6 +490,15 @@ export const ModuleProvider = ({ children }) => {
           getBeamMaterialList("Cover-Plate-Bolted-Connection");
         } else if (module_id == "Beam Beam End Plate Connection") {
           getBeamMaterialList("Beam-Beam-End-Plate-Connection");
+        } else if (module_id == "Cover Plate Welded Connection") {
+          getBeamMaterialList2("Cover-Plate-Welded-Connection");
+        } else if (module_id == "Beam-to-Column End Plate Connection") {
+          getConnectivityList("Beam-to-Column-End-Plate-Connection");
+          getBeamMaterialList("Beam-to-Column-End-Plate-Connection");
+          getColumnBeamMaterialList(
+            state.currentModuleName,
+            "Column-Flange-Beam-Web"
+          );
         }
 
         getBoltDiameterList();
@@ -447,6 +574,7 @@ export const ModuleProvider = ({ children }) => {
       } else {
         console.log(`API Error: ${response.status} - ${data.message}`);
 
+        console.log("Error in creating CAD model: ", data, response);
         dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
       }
     } catch (error) {
@@ -510,7 +638,7 @@ export const ModuleProvider = ({ children }) => {
           console.log("error in creating the CAD model from createDesign");
         }
       } else if (response.status == 400) {
-        console.log("BAD input values");
+        console.log("BAD input values", response);
 
         // set the render CAD to false to display the default image only
         dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
@@ -541,7 +669,7 @@ export const ModuleProvider = ({ children }) => {
   const getSupportedData = async (param) => {
     try {
       const response = await fetch(
-        `${BASE_URL}design-preferences/?supported_section=${param.section}`,
+        `${BASE_URL}design-preferences/?supported_section=${param.supported_section}`,
         {
           method: "GET",
           mode: "cors",

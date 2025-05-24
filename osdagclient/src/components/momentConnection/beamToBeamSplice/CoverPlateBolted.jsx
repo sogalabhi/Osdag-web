@@ -6,6 +6,7 @@ import { Select, Input, Modal, Button, Row, Col, Upload } from "antd";
 import { useNavigate } from "react-router-dom";
 import Logs from "../../Logs";
 import Model from "./btobRender";
+
 import { Canvas } from "@react-three/fiber";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Viewer } from "@react-pdf-viewer/core";
@@ -14,6 +15,7 @@ import { Transfer } from "antd";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { Html, PerspectiveCamera } from "@react-three/drei";
 import useViewCamera from "./btobViewCamera";
+
 import { useFrame } from "@react-three/fiber";
 
 // import assets
@@ -717,7 +719,7 @@ function CoverPlateBolted() {
 
   useEffect(() => {
     getSupportedData({
-      section: inputs.member_designation,
+      supported_section: inputs.member_designation,
     });
   }, [inputs.member_designation]);
 
@@ -1140,6 +1142,7 @@ function CoverPlateBolted() {
                 onCreated={({ gl }) => {
                   gl.setClearColor("#ADD8E6"); // set background inside WebGL itself, not just CSS
                 }}>
+
                   <PerspectiveCamera
                     ref={cameraRef}
                     makeDefault
@@ -1291,6 +1294,7 @@ function CoverPlateBolted() {
                     <Button type="button" onClick={handleSaveProfile}>
                       Save Profile
                     </Button>
+                  
                   </div>
                   <Row
                     gutter={[16, 16]}

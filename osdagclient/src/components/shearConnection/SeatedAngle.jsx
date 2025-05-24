@@ -270,6 +270,8 @@ function SeatedAngle() {
       setImageSource(CFBW);
     } else if (selectedOption === "Column Web-Beam-Web") {
       setImageSource(CWBW);
+    } else if (selectedOption === "Beam-Beam") {
+      setImageSource(BB);
     } else if (selectedOption === "") {
       setImageSource(ErrorImg);
     }

@@ -272,7 +272,7 @@ def create_from_input(input_values: Dict[str, Any]) -> BeamCoverPlate:
     
     # Set the input values on the module instance.
     try : 
-        print(input_values)
+        print("INPUT SET FOR FINAL OUTPUT",input_values)
         module.set_input_values(input_values)
     except Exception as e : 
         traceback.print_exc()

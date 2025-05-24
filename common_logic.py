@@ -684,6 +684,7 @@ class CommonDesignLogic(object):
         '''
         
         B = self.module_class
+
         if self.connection == KEY_DISP_BEAMCOVERPLATE:
             # B = BeamCoverPlate()
             # beam_data = self.fetchBeamPara()  # Fetches the beam dimensions
@@ -2428,3 +2429,6 @@ class CommonDesignLogic(object):
 # if __name__!= "__main__":
 #
 #     CommonDesignLogic()
+
+
+

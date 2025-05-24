@@ -71,7 +71,6 @@ class CoverPlateBoltedOutputData(APIView):
         }
         print('tempData : ', tempData)
         print('type of input_values : ', type(input_values))
-
         # obtaining the record from the Design model
         designRecord = Design.objects.get(cookie_id=cookie_id)
         serailizer = Design_Serializer(designRecord, data=tempData)

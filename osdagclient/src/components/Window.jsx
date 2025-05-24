@@ -53,13 +53,18 @@ const Window = () => {
     getLeafLevelDesignType,
     error_message,
   } = useContext(GlobalContext);
-  const { setTheCookie, cookieSetter } = useContext(ModuleContext);
 
   // Radio selected ,Background change
   const [selectedItemBack, setSelectedItemBack] = useState(null);
   const wrapper = () => {
     getDesignTypes(designType);
   };
+
+  console.log("**", results);
+  console.log("****", getDesignTypes);
+  console.log("*******", subDesignTypes);
+  console.log("*********", leafLevelDesignType);
+  console.log("************", getLeafLevelDesignType);
 
   useEffect(() => {
     if (!results) return;
@@ -325,10 +330,32 @@ const Window = () => {
                     onClick={() => {
                       if (
                         selectedDesign === "cover_plate_bolted" ||
-                        selectedDesign === "cover_plate_welded" ||
-                        selectedDesign === "end_plate"
+                        selectedDesign === "cover_plate_welded"
                       ) {
-                        navigate(`/design/${designType}/beam-to-beam-splice/${selectedDesign}`);
+                        navigate(
+                          `/design/${designType}/beam-to-beam-splice/${selectedDesign}`
+                        );
+                      } else if (selectedDesign === "end_plate") {
+                        const subtypeName =
+                          subDesignTypes?.data?.[
+                            subActiveTab - 1
+                          ]?.name?.toLowerCase();
+
+                        if (subtypeName?.includes("beam-to-beam")) {
+                          navigate(
+                            `/design/${designType}/beam-to-beam-splice/${selectedDesign}`
+                          );
+                        } else if (subtypeName?.includes("beam-to-column")) {
+                          navigate(
+                            `/design/${designType}/beam-to-column/${selectedDesign}`
+                          );
+                        } else {
+                          // fallback route or error (optional)
+                          console.warn(
+                            "Unsupported subtype for end_plate:",
+                            subtypeName
+                          );
+                        }
                       }
                     }}
                   >

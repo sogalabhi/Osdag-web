@@ -1,56 +1,43 @@
 /* eslint-disable no-unused-vars */
-import "../../App.css";
+import "../../../App.css";
 import { Suspense, useContext, useEffect, useRef, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import { Select, Input, Modal, Button, Row, Col } from "antd";
+import { Select, Input, Modal, Button, Row, Col, Upload } from "antd";
 import { useNavigate } from "react-router-dom";
-import CFBW from "../../assets/ShearConnection/sc_fin_plate/fin_cf_bw.png";
-import CWBW from "../../assets/ShearConnection/sc_fin_plate/fin_cw_bw.png";
-import BB from "../../assets/ShearConnection/sc_fin_plate/fin_beam_beam.png";
-import ErrorImg from "../../assets/notSelected.png";
-import OutputDock from "../OutputDock";
-import Logs from "../Logs";
-import Model from "./threerender";
+import Logs from "../../Logs";
+import Model from "../../shearConnection/threerender";
 import { Canvas } from "@react-three/fiber";
-import { ModuleContext } from "../../context/ModuleState";
-import { Viewer } from "@react-pdf-viewer/core";
+import { ModuleContext } from "../../../context/ModuleState";
 import { Transfer } from "antd";
-// Import the styles
-import "@react-pdf-viewer/core/lib/styles/index.css";
 import { Html, PerspectiveCamera } from "@react-three/drei";
-import useViewCamera from "./useViewCamera";
-import { useFrame } from "@react-three/fiber";
-import { useThree } from "@react-three/fiber";
+import useViewCamera from "../../shearConnection/useViewCamera";
+import CoverPlateWeldedOutputDock from "./CoverPlateWeldedOutputDock";
 
 // import assets
-import cad_background from "../../assets/cad_empty_image.png";
-import { Tube } from "@react-three/drei";
-import DesignPrefSections from "../DesignPrefSections";
-import CustomSectionModal from "../CustomSectionModal";
+import cad_background from "../../../assets/cad_empty_image.png";
+import DesignPrefSections from "../../DesignPrefSections";
+import CustomSectionModal from "../../CustomSectionModal";
 
 // drop down
-import DropdownMenu from "../DropdownMenu";
-import ScreenShotCapture from "../ScreenShotCapture";
+import DropdownMenu from "../../DropdownMenu";
 
 const { Option } = Select;
-
-const conn_map = {
-  "Column Flange-Beam-Web": "Column Flange-Beam Web",
-  "Column Web-Beam-Web": "Column Web-Beam Web",
-  "Beam-Beam": "Beam-Beam",
-};
 
 const MenuItems = [
   {
     label: "File",
     dropdown: [
       { name: "Load Input", shortcut: "Ctrl+L" },
+      { name: "Download Input", shortcut: "Ctrl+D" },
       { name: "Save Input", shortcut: "Alt+N" },
-      { name: "Download Input", shortcut: "Alt+D" },
       { name: "Save Log Messages", shortcut: "Alt+M" },
       { name: "Create Design Report", shortcut: "Alt+C" },
       { name: "Save 3D Model", shortcut: "Alt+3" },
       { name: "Save Cad Image", shortcut: "Alt+1" },
+      { name: "Save Front View", shortcut: "Alt+Shift+F" },
+      { name: "Save Top View", shortcut: "Alt+Shift+T" },
+      { name: "Save Side View", shortcut: "Alt+Shift+S" },
+      { name: "Quit", shortcut: "Shift+Q" },
     ],
   },
   {
@@ -67,6 +54,7 @@ const MenuItems = [
       { name: "Model" },
       { name: "Beam" },
       { name: "Column" },
+      { name: "FinePlate" },
       { name: "Change Background" },
     ],
   },
@@ -121,17 +109,14 @@ const MenuItems = [
 // };
 // end
 
-function FinePlate() {
-  const [selectedOption, setSelectedOption] = useState(
-    "Column Flange-Beam-Web"
-  );
-  const [imageSource, setImageSource] = useState("");
+function CoverPlateWelded() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [output, setOutput] = useState(null);
   const [logs, setLogs] = useState(null);
   const [displayOutput, setDisplayOutput] = useState();
   const [boltDiameterSelect, setBoltDiameterSelect] = useState("All");
-  const [thicknessSelect, setThicknessSelect] = useState("All");
+  const [flangeThicknessSelect, setFlangeThicknessSelect] = useState("All");
+  const [webThicknessSelect, setWebThicknessSelect] = useState("All");
   const [propertyClassSelect, setPropertyClassSelect] = useState("All");
   const [designPrefModalStatus, setDesignPrefModalStatus] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -139,9 +124,7 @@ function FinePlate() {
   const [displaySaveInputPopup, setDisplaySaveInputPopup] = useState(false);
   const [saveInputFileName, setSaveInputFileName] = useState("");
   const {
-    connectivityList,
     beamList,
-    columnList,
     materialList,
     boltDiameterList,
     thicknessList,
@@ -154,7 +137,7 @@ function FinePlate() {
     createSession,
     createDesign,
     createDesignReport,
-    getDesingPrefData,
+    getSupportedData,
     deleteSession,
   } = useContext(ModuleContext);
 
@@ -162,36 +145,32 @@ function FinePlate() {
     [setTimeout(() => setDisplaySaveInputPopup(false), 4000)];
 
   const [inputs, setInputs] = useState({
-    bolt_diameter: [],
-    bolt_grade: [],
-    bolt_type: "Bearing Bolt",
-    connector_material: "E 250 (Fe 410 W)A",
-    load_shear: "70",
-    load_axial: "30",
-    module: "Fin Plate Connection",
-    plate_thickness: [],
-    beam_section: "MB 300",
-    column_section: "HB 150",
-    primary_beam: "JB 200",
-    secondary_beam: "JB 150",
-    supported_material: "E 165 (Fe 290)",
-    supporting_material: "E 165 (Fe 290)",
-    bolt_hole_type: "Standard",
-    bolt_slip_factor: "0.3",
+    flange_plate_preferences: "Outside",
+    flange_plate_thickness: [],
+    connector_material: "E 165 (Fe 290)",
+    web_plate_thickness: [],
+    design_method: "Limit State Design", 
+    detailing_gap: "3",
+    load_axial: "100",
+    load_moment: "100",
+    load_shear: "100",
+    material: "E 165 (Fe 290)",
+    member_designation: "MB 600",
+    member_material: "E 165 (Fe 290)",
+    module: "Beam-to-Beam Cover Plate Welded Connection",
     weld_fab: "Shop Weld",
-    weld_material_grade: "410",
-    detailing_edge_type: "Rolled, machine-flame cut, sawn and planed",
-    detailing_gap: "10",
-    detailing_corr_status: "No",
-    design_method: "Limit State Design",
-    bolt_tension_type: "Pre-tensioned",
+    weld_material_grade_overwrite: "290",
+    weld_type: "Fillet Weld"
   });
 
   const [isModalpropertyClassListOpen, setModalpropertyClassListOpen] =
     useState(false);
-  const [plateThicknessModal, setPlateThicknessModal] = useState(false);
+  const [flangePlateThicknessModal, setFlangePlateThicknessModal] =
+    useState(false);
+  const [webPlateThicknessModal, setWebPlateThicknessModal] = useState(false);
   const [allSelected, setAllSelected] = useState({
-    plate_thickness: true,
+    flange_plate_thickness: true,
+    web_plate_thickness: true,
     bolt_diameter: true,
     bolt_grade: true,
   });
@@ -200,23 +179,21 @@ function FinePlate() {
   const [modelKey, setModelKey] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectedView, setSelectedView] = useState("Model");
-  const options = ["Model", "Beam", "Column", "Plate"];
+  const options = ["Model", "Beam", "Connector"];
   const { position: cameraPos, fov } = useViewCamera(selectedView);
   const cameraRef = useRef();
-  const canvasRef = useRef();
-  const [screenshotTrigger, setScreenshotTrigger] = useState(false);
-  const triggerScreenshotCapture = () => {
-    setScreenshotTrigger(true);
-  };
 
   useEffect(() => {
-    createSession("Fin Plate Connection");
+    createSession("Cover Plate Welded Connection");
   }, []);
 
   useEffect(() => {
     return () => {
-      if (location.pathname != "/design/connections/fin_plate") {
-        deleteSession("Fin Plate Connection");
+      if (
+        location.pathname !=
+        "/design/connections/beam-to-beam-splice/cover_plate_welded"
+      ) {
+        deleteSession("Cover Plate Welded Connection");
       }
     };
   }, []);
@@ -260,70 +237,83 @@ function FinePlate() {
       setModalOpen(false);
     }
   };
-  const handleAllSelectPT = (value) => {
+
+  const handleAllSelectFlangePT = (value) => {
     if (value === "Customized") {
       // check, if the plate_thickness already has a value, then set it to that value
       // else, set it to an empty list
-      if (inputs.plate_thickness.length != 0) {
-        setInputs({ ...inputs, plate_thickness: inputs.plate_thickness });
+      if (inputs.flange_plate_thickness.length != 0) {
+        setInputs({
+          ...inputs,
+          flange_plate_thickness: inputs.flange_plate_thickness,
+        });
       } else {
         // if the length is 0 , then set it to an empty array
-        setInputs({ ...inputs, plate_thickness: [] });
+        setInputs({ ...inputs, flange_plate_thickness: [] });
       }
-      setThicknessSelect("Customized");
-      setAllSelected({ ...allSelected, plate_thickness: false });
-      setPlateThicknessModal(true);
+      setFlangeThicknessSelect("Customized");
+      setAllSelected({ ...allSelected, flange_plate_thickness: false });
+      setFlangePlateThicknessModal(true);
     } else {
-      setThicknessSelect("All");
-      setAllSelected({ ...allSelected, plate_thickness: true });
-      setPlateThicknessModal(false);
+      setFlangeThicknessSelect("All");
+      setAllSelected({ ...allSelected, flange_plate_thickness: true });
+      setFlangePlateThicknessModal(false);
     }
   };
 
-  useEffect(() => {
-    if (!selectedOption) return;
-
-    if (selectedOption === "Column Flange-Beam-Web") {
-      setImageSource(CFBW);
-    } else if (selectedOption === "Column Web-Beam-Web") {
-      setImageSource(CWBW);
-    } else if (selectedOption === "Beam-Beam") {
-      setImageSource(BB);
-    } else if (selectedOption === "") {
-      setImageSource(ErrorImg);
+  const handleAllSelectWebPT = (value) => {
+    if (value === "Customized") {
+      setInputs({
+        ...inputs,
+        web_plate_thickness:
+          inputs.web_plate_thickness.length !== 0
+            ? inputs.web_plate_thickness
+            : [],
+      });
+      setWebThicknessSelect("Customized");
+      setAllSelected({ ...allSelected, web_plate_thickness: false });
+      setWebPlateThicknessModal(true);
+    } else {
+      setWebThicknessSelect("All");
+      setAllSelected({ ...allSelected, web_plate_thickness: true });
+      setWebPlateThicknessModal(false);
     }
-  }, [selectedOption]);
+  };
 
   const handleSelectChange = (value) => {
     setOutput(null);
-    setSelectedOption(value);
   };
 
   useEffect(() => {
     if (displayOutput) {
       try {
-        setLogs(designLogs);
+        setLogs(designLogs); 
+        if (!designLogs) {
+          throw new Error('No logs data');
+        }
       } catch (error) {
         console.log(error);
-        setOutput(null);
+        setLogs(null);
       }
     }
-  }, [designLogs]);
+  }, [designLogs, displayOutput]);
 
   useEffect(() => {
     if (displayOutput) {
       try {
         const formatedOutput = {};
+        
+        if (!designData) {
+          throw new Error('No design data');
+        }
 
         for (const [key, value] of Object.entries(designData)) {
-          const newKey = key.split(".")[0];
+          const newKey = key;
           const label = value.label;
           const val = value.value;
 
-          if (val) {
-            if (!formatedOutput[newKey])
-              formatedOutput[newKey] = [{ label, val }];
-            else formatedOutput[newKey].push({ label, val });
+          if (val !== undefined && val !== null) {
+            formatedOutput[newKey] = { label, val };
           }
         }
 
@@ -334,98 +324,39 @@ function FinePlate() {
         setOutput(null);
       }
     }
-  }, [designData]);
+  }, [designData, displayOutput]);
 
   const handleSubmit = async () => {
     let param = {};
-    console.log(allSelected, boltDiameterList);
-    if (
-      selectedOption === "Column Flange-Beam-Web" ||
-      selectedOption === "Column Web-Beam-Web"
-    ) {
-      if (
-        !inputs.beam_section ||
-        !inputs.column_section ||
-        inputs.beam_section === "Select Section" ||
-        inputs.column_section === "Select Section"
-      ) {
-        alert("Please input all the fields");
-        return;
-      }
-      param = {
-        "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
-        "Bolt.Diameter": allSelected.bolt_diameter
-          ? boltDiameterList
-          : inputs.bolt_diameter,
-        "Bolt.Grade": allSelected.bolt_grade
-          ? propertyClassList
-          : inputs.bolt_grade,
-        "Bolt.Slip_Factor": inputs.bolt_slip_factor,
-        "Bolt.TensionType": inputs.bolt_tension_type,
-        "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-        Connectivity: conn_map[selectedOption],
-        "Connector.Material": inputs.connector_material,
-        "Design.Design_Method": inputs.design_method,
-        "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
-        "Detailing.Edge_type": inputs.detailing_edge_type,
-        "Detailing.Gap": inputs.detailing_gap,
-        "Load.Axial": inputs.load_axial || "",
-        "Load.Shear": inputs.load_shear || "",
-        Material: inputs.connector_material,
-        "Member.Supported_Section.Designation": inputs.beam_section,
-        "Member.Supported_Section.Material": inputs.supported_material,
-        "Member.Supporting_Section.Designation": inputs.column_section,
-        "Member.Supporting_Section.Material": inputs.supporting_material,
-        Module: "Fin Plate Connection",
-        "Weld.Fab": inputs.weld_fab,
-        "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
-        "Connector.Plate.Thickness_List": allSelected.plate_thickness
-          ? thicknessList
-          : inputs.plate_thickness,
-      };
-    } else {
-      if (!inputs.primary_beam || !inputs.secondary_beam) {
-        alert("Please input all the fields");
-        return;
-      }
-      param = {
-        "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
-        "Bolt.Diameter": allSelected.bolt_diameter
-          ? boltDiameterList
-          : inputs.bolt_diameter,
-        "Bolt.Grade": allSelected.bolt_grade
-          ? propertyClassList
-          : inputs.bolt_grade,
-        "Bolt.Slip_Factor": inputs.bolt_slip_factor,
-        "Bolt.TensionType": inputs.bolt_tension_type,
-        "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-        Connectivity: conn_map[selectedOption],
-        "Connector.Material": inputs.connector_material,
-        "Design.Design_Method": inputs.design_method,
-        "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
-        "Detailing.Edge_type": inputs.detailing_edge_type,
-        "Detailing.Gap": inputs.detailing_gap,
-        "Load.Axial": inputs.load_axial || "",
-        "Load.Shear": inputs.load_shear || "",
-        Material: "E 300 (Fe 440)",
-        "Member.Supported_Section.Designation": inputs.secondary_beam,
-        "Member.Supported_Section.Material": inputs.supported_material,
-        "Member.Supporting_Section.Designation": inputs.primary_beam,
-        "Member.Supporting_Section.Material": inputs.supporting_material,
-        Module: "Fin Plate Connection",
-        "Weld.Fab": inputs.weld_fab,
-        "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
-        "Connector.Plate.Thickness_List": allSelected.plate_thickness
-          ? thicknessList
-          : inputs.plate_thickness,
-      };
+    if (!inputs.member_designation || inputs.member_designation === "Select Section" || !inputs.load_shear) {
+      alert("Please input all the fields");
+      return;
     }
+    
+    param = {
+      "Connector.Flange_Plate.Preferences": inputs.flange_plate_preferences,
+      "Connector.Flange_Plate.Thickness_list": allSelected.flange_plate_thickness ? thicknessList : inputs.flange_plate_thickness,
+      "Connector.Material": inputs.connector_material,
+      "Connector.Web_Plate.Thickness_List": allSelected.web_plate_thickness ? thicknessList : inputs.web_plate_thickness,
+      "Design.Design_Method": inputs.design_method,
+      "Detailing.Gap": inputs.detailing_gap,
+      "Load.Axial": inputs.load_axial || "",
+      "Load.Moment": inputs.load_moment || "", 
+      "Load.Shear": inputs.load_shear || "",
+      "Material": inputs.material,
+      "Member.Designation": inputs.member_designation,
+      "Member.Material": inputs.member_material,
+      "Module": "Beam-to-Beam Cover Plate Welded Connection",
+      "Weld.Fab": inputs.weld_fab,
+      "Weld.Material_Grade_OverWrite": inputs.weld_material_grade_overwrite,
+      "Weld.Type": inputs.weld_type
+    };
+  
     console.log(param);
-    createDesign(param, "Fin-Plate-Connection");
+    createDesign(param, "Cover-Plate-Welded-Connection");
     setDisplayOutput(true);
-
     setLoading(true);
-    setModelKey((prev) => prev + 1); //Forces model to reload
+    setModelKey((prev) => prev + 1);
   };
 
   // Create design report ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -515,6 +446,7 @@ function FinePlate() {
   const handleCancel = () => {
     setCreateDesignReportBool(false);
   };
+
   const convertToCSV = (data) => {
     const keys = Object.keys(data);
     const values = Object.values(data);
@@ -559,94 +491,57 @@ function FinePlate() {
     let data = {};
 
     if (
-      selectedOption === "Column Flange-Beam-Web" ||
-      selectedOption === "Column Web-Beam-Web"
+      !inputs.member_designation ||
+      inputs.member_designation === "Select Section" ||
+      !inputs.load_shear
     ) {
-      if (!inputs.beam_section || !inputs.column_section || !output) {
-        alert("Please submit the design first.");
-        return;
-      }
-      data = {
-        "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
-        "Bolt.Diameter": allSelected.bolt_diameter
-          ? boltDiameterList
-          : inputs.bolt_diameter,
-        "Bolt.Grade": allSelected.bolt_grade
-          ? propertyClassList
-          : inputs.bolt_grade,
-        "Bolt.Slip_Factor": inputs.bolt_slip_factor,
-        "Bolt.TensionType": inputs.bolt_tension_type,
-        "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-        Connectivity: conn_map[selectedOption],
-        "Connector.Material": inputs.connector_material,
-        "Design.Design_Method": inputs.design_method,
-        "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
-        "Detailing.Edge_type": inputs.detailing_edge_type,
-        "Detailing.Gap": inputs.detailing_gap,
-        "Load.Axial": inputs.load_axial || "",
-        "Load.Shear": inputs.load_shear || "",
-        Material: "E 250 (Fe 410 W)A",
-        "Member.Supported_Section.Designation": inputs.beam_section,
-        "Member.Supported_Section.Material": inputs.supported_material,
-        "Member.Supporting_Section.Designation": inputs.column_section,
-        "Member.Supporting_Section.Material": inputs.supporting_material,
-        Module: "Fin Plate Connection",
-        "Weld.Fab": inputs.weld_fab,
-        "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
-        "Connector.Plate.Thickness_List": allSelected.plate_thickness
-          ? thicknessList
-          : inputs.plate_thickness,
-      };
-    } else {
-      if (!inputs.primary_beam || !inputs.secondary_beam || !output) {
-        alert("Please submit the design first.");
-        return;
-      }
-      data = {
-        "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
-        "Bolt.Diameter": allSelected.bolt_diameter
-          ? boltDiameterList
-          : inputs.bolt_diameter,
-        "Bolt.Grade": allSelected.bolt_grade
-          ? propertyClassList
-          : inputs.bolt_grade,
-        "Bolt.Slip_Factor": inputs.bolt_slip_factor,
-        "Bolt.TensionType": inputs.bolt_tension_type,
-        "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-        Connectivity: conn_map[selectedOption],
-        "Connector.Material": inputs.connector_material,
-        "Design.Design_Method": inputs.design_method,
-        "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
-        "Detailing.Edge_type": inputs.detailing_edge_type,
-        "Detailing.Gap": inputs.detailing_gap,
-        "Load.Axial": inputs.load_axial || "",
-        "Load.Shear": inputs.load_shear || "",
-        Material: "E 300 (Fe 440)",
-        "Member.Supported_Section.Designation": inputs.secondary_beam,
-        "Member.Supported_Section.Material": inputs.supported_material,
-        "Member.Supporting_Section.Designation": inputs.primary_beam,
-        "Member.Supporting_Section.Material": inputs.supporting_material,
-        Module: "Fin Plate Connection",
-        "Weld.Fab": inputs.weld_fab,
-        "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
-        "Connector.Plate.Thickness_List": allSelected.plate_thickness
-          ? thicknessList
-          : inputs.plate_thickness,
-      };
+      alert("Please input all the fields");
+      return;
     }
 
-    Object.keys(output).map((key, index) => {
-      Object.values(output[key]).map((elm, index1) => {
-        data[key + "." + elm.label.split(" ").join("_")] = elm.val;
-      });
-    });
+    // Add input data
+    data = {
+      "Connector.Flange_Plate.Preferences": inputs.flange_plate_preferences,
+      "Connector.Flange_Plate.Thickness_list": allSelected.flange_plate_thickness
+        ? thicknessList
+        : inputs.flange_plate_thickness,
+      "Connector.Material": inputs.connector_material,
+      "Connector.Web_Plate.Thickness_List": allSelected.web_plate_thickness
+        ? thicknessList
+        : inputs.web_plate_thickness,
+      "Design.Design_Method": inputs.design_method,
+      "Detailing.Gap": inputs.detailing_gap,
+      "Load.Axial": inputs.load_axial || "",
+      "Load.Moment": inputs.load_moment || "",
+      "Load.Shear": inputs.load_shear || "",
+      "Material": inputs.material,
+      "Member.Designation": inputs.member_designation,
+      "Member.Material": inputs.member_material,
+      "Module": "Beam-to-Beam Cover Plate Welded Connection",
+      "Weld.Fab": inputs.weld_fab,
+      "Weld.Material_Grade_OverWrite": inputs.weld_material_grade_overwrite,
+      "Weld.Type": inputs.weld_type
+    };
 
-    data = convertToCSV(data);
-    const csvContent =
-      "data:text/csv;charset=utf-8," + encodeURIComponent(data);
+    // Add output data if available
+    if (output) {
+      for (const key in output) {
+        if (output.hasOwnProperty(key)) {
+          const { label, val } = output[key];
+          if (label && val !== undefined && val !== null) {
+            const safeLabel = label.replace(/\s+/g, "_");
+            data[`${key}.${safeLabel}`] = val;
+          }
+        }
+      }
+    }
+
+    // Convert to CSV and download
+    const csvContent = convertToCSV(data);
+    const encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", csvContent);
-    link.setAttribute("download", "output.csv");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "cover_plate_welded_output.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -666,37 +561,21 @@ function FinePlate() {
   };
 
   const handleReset = () => {
-    if (
-      conn_map[selectedOption] == "Column Flange-Beam Web" ||
-      conn_map[selectedOption] == "Column Web-Beam Web"
-    ) {
-      // resetting the inputs
-      setInputs({
-        bolt_diameter: inputs.bolt_diameter,
-        bolt_grade: inputs.bolt_grade,
-        bolt_type: "Bearing Bolt",
-        connector_material: inputs.connector_material,
-        load_shear: "",
-        load_axial: "",
-        module: "Fin Plate Connection",
-        plate_thickness: inputs.plate_thickness,
-        beam_section: "Select Section",
-        column_section: "Select Section",
-      });
-    } else if (conn_map[selectedOption] == "Beam-Beam") {
-      setInputs({
-        bolt_diameter: inputs.bolt_diameter,
-        bolt_grade: inputs.bolt_grade,
-        bolt_type: "Bearing Bolt",
-        connector_material: inputs.connector_material,
-        load_shear: "",
-        load_axial: "",
-        module: "Fin Plate Connection",
-        plate_thickness: inputs.plate_thickness,
-        primary_beam: "JB 200",
-        secondary_beam: "JB 150",
-      });
-    }
+    // resetting the inputs
+    setInputs({
+      bolt_diameter: inputs.bolt_diameter,
+      bolt_grade: inputs.bolt_grade,
+      bolt_type: "Bearing Bolt",
+      connector_material: inputs.connector_material,
+      load_shear: "",
+      load_moment: "",
+      load_axial: "",
+      module: "Cover Plate Welded Connection",
+      flange_plate_thickness: inputs.flange_plate_thickness,
+      flange_plate_preferences: "Outside",
+      web_plate_thickness: inputs.web_plate_thickness,
+      member_designation: "Select Section",
+    });
 
     // reset setAllSelected
     setAllSelected({
@@ -707,8 +586,10 @@ function FinePlate() {
 
     setBoltDiameterSelect("All");
     setPropertyClassSelect("All");
-    setThicknessSelect("All");
-    handleAllSelectPT("All"); // for thickness
+    setFlangeThicknessSelect("All");
+    setWebThicknessSelect("All");
+    handleAllSelectWebPT("All"); // for thickness
+    handleAllSelectFlangePT("All"); // for thickness
     handleSelectChangePropertyClass("All"); // for property Class
     handleSelectChangeBoltBeam("All"); // for bolt diameter
 
@@ -737,13 +618,22 @@ function FinePlate() {
     setInputs({ ...inputs, bolt_grade: nextTargetKeys });
   };
   //
-  // plate_thickness
-  const [selectedPlateThicknessItems, setSelectedPlateThicknessItems] =
-    useState([]);
+  //flange plate_thickness
+  const [
+    selectedFlangePlateThicknessItems,
+    setSelectedFlangePlateThicknessItems,
+  ] = useState([]);
+  const handleTransferChangeInFlangePlateThickness = (nextTargetKeys) => {
+    setSelectedFlangePlateThicknessItems(nextTargetKeys);
+    setInputs({ ...inputs, flange_plate_thickness: nextTargetKeys });
+  };
 
-  const handleTransferChangeInPlateThickness = (nextTargetKeys) => {
-    setSelectedPlateThicknessItems(nextTargetKeys);
-    setInputs({ ...inputs, plate_thickness: nextTargetKeys });
+  //web plate_thickness
+  const [selectedWebPlateThicknessItems, setSelectedWebPlateThicknessItems] =
+    useState([]);
+  const handleTransferChangeInWebPlateThickness = (nextTargetKeys) => {
+    setSelectedWebPlateThicknessItems(nextTargetKeys);
+    setInputs({ ...inputs, web_plate_thickness: nextTargetKeys });
   };
 
   // Get local Stored Items
@@ -790,31 +680,10 @@ function FinePlate() {
   };
 
   useEffect(() => {
-    if (
-      conn_map[selectedOption] == "Column Flange-Beam Web" ||
-      conn_map[selectedOption] == "Column Web-Beam Web"
-    ) {
-      if (inputs.column_section != "" && inputs.beam_section != "") {
-        getDesingPrefData({
-          supported_section: inputs.beam_section,
-          supporting_section: inputs.column_section,
-          connectivity: conn_map[selectedOption].split(" ").join("-"),
-        });
-      }
-    } else if (conn_map[selectedOption] == "Beam-Beam") {
-      getDesingPrefData({
-        supported_section: inputs.secondary_beam,
-        supporting_section: inputs.primary_beam,
-        connectivity: conn_map[selectedOption],
-      });
-    }
-  }, [
-    inputs.column_section,
-    inputs.beam_section,
-    inputs.primary_beam,
-    inputs.secondary_beam,
-    selectedOption,
-  ]);
+    getSupportedData({
+      supported_section: inputs.member_designation,
+    });
+  }, [inputs.member_designation]);
 
   const obtainStoredCompanyLogoImages = () => {
     console.log("obtain stored company logo images");
@@ -857,13 +726,10 @@ function FinePlate() {
               setInputs={setInputs}
               allSelected={allSelected}
               setAllSelected={setAllSelected}
-              selectedOption={selectedOption}
-              setSelectedOption={setSelectedOption}
               logs={logs}
               setCreateDesignReportBool={setCreateDesignReportBool}
               setDisplaySaveInputPopup={setDisplaySaveInputPopup}
               setSaveInputFileName={setSaveInputFileName}
-              triggerScreenshotCapture={triggerScreenshotCapture}
             />
           ))}
 
@@ -898,98 +764,25 @@ function FinePlate() {
               <h3>Connecting Members</h3>
               <div className="component-grid">
                 <div className="component-grid-align">
-                  <h4>Connectivity</h4>
-                  <Select onSelect={handleSelectChange} value={selectedOption}>
-                    {(connectivityList || []).map((item, index) => (
+                  <h4>Section Designation*</h4>
+                  <Select
+                    value={inputs.member_designation || beamList[2]}
+                    onSelect={(value) =>
+                      setInputs({ ...inputs, member_designation: value })
+                    }
+                  >
+                    {beamList?.map((item, index) => (
                       <Option key={index} value={item}>
                         {item}
                       </Option>
                     ))}
                   </Select>
                 </div>
-                <div className="connectionimg">
-                  <img
-                    src={imageSource}
-                    alt="Component"
-                    height="100px"
-                    width="100px"
-                  />
-                </div>
-
-                {selectedOption === "Beam-Beam" ? (
-                  <>
-                    <div className="component-grid-align">
-                      <h4>Primary Beam*</h4>
-                      <Select
-                        value={inputs.primary_beam || beamList[2]}
-                        onSelect={(value) =>
-                          setInputs({ ...inputs, primary_beam: value })
-                        }
-                      >
-                        {beamList?.map((item, index) => (
-                          <Option key={index} value={item}>
-                            {item}
-                          </Option>
-                        ))}
-                      </Select>
-                    </div>
-
-                    <div className="component-grid-align">
-                      <h4>Secondary Beam*</h4>
-                      <Select
-                        value={inputs.secondary_beam || beamList[0]}
-                        onSelect={(value) =>
-                          setInputs({ ...inputs, secondary_beam: value })
-                        }
-                      >
-                        {beamList.map((item, index) => (
-                          <Option key={index} value={item}>
-                            {item}
-                          </Option>
-                        ))}
-                      </Select>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="component-grid-align">
-                      <h4>Column Section*</h4>
-                      <Select
-                        value={inputs.column_section || columnList[0]}
-                        onSelect={(value) =>
-                          setInputs({ ...inputs, column_section: value })
-                        }
-                      >
-                        {(columnList || []).map((item, index) => (
-                          <Option key={index} value={item}>
-                            {item}
-                          </Option>
-                        ))}
-                      </Select>
-                    </div>
-
-                    <div className="component-grid-align">
-                      <h4>Beam Section*</h4>
-                      <Select
-                        value={inputs.beam_section || beamList[28]}
-                        onSelect={(value) =>
-                          setInputs({ ...inputs, beam_section: value })
-                        }
-                      >
-                        {beamList.map((item, index) => (
-                          <Option key={index} value={item}>
-                            {item}
-                          </Option>
-                        ))}
-                      </Select>
-                    </div>
-                  </>
-                )}
 
                 <div className="component-grid-align">
                   <h4>Material</h4>
                   <Select
-                    value={inputs.connector_material || materialList[0].Grade}
+                    value={inputs.material || materialList[0].Grade}
                     onSelect={(value) => {
                       if (value == -1) {
                         setShowModal(true);
@@ -1001,11 +794,13 @@ function FinePlate() {
                       console.log(material);
                       setInputs({
                         ...inputs,
+                        material: material.Grade,
                         connector_material: material.Grade,
+                        member_material: material.Grade,
                       });
                     }}
                   >
-                    {materialList.map((item, index) => (
+                    {materialList?.map((item, index) => (
                       <Option key={index} value={item.id}>
                         {item.Grade}
                       </Option>
@@ -1023,6 +818,8 @@ function FinePlate() {
                   <Input
                     type="text"
                     name="ShearForce"
+                    defaultValue="2"
+                    placeholder="2"
                     onInput={(event) => {
                       event.target.value = event.target.value.replace(
                         /[^0-9.]/g,
@@ -1038,10 +835,33 @@ function FinePlate() {
                 </div>
 
                 <div className="component-grid-align">
+                  <h4>Moment Force(kN)</h4>
+                  <Input
+                    type="text"
+                    name="ShearForce"
+                    defaultValue="2"
+                    placeholder="2"
+                    onInput={(event) => {
+                      event.target.value = event.target.value.replace(
+                        /[^0-9.]/g,
+                        ""
+                      );
+                    }}
+                    pattern="\d*"
+                    value={inputs.load_moment}
+                    onChange={(event) =>
+                      setInputs({ ...inputs, load_moment: event.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="component-grid-align">
                   <h4>Axial Force(kN)</h4>
                   <Input
                     type="text"
                     name="AxialForce"
+                    defaultValue="0"
+                    placeholder="0"
                     onInput={(event) => {
                       event.target.value = event.target.value.replace(
                         /[^0-9.]/g,
@@ -1059,66 +879,28 @@ function FinePlate() {
 
               {/* Section End */}
               {/* Section Start */}
-              <h3>Bolt</h3>
+             
+              {/* Section End */}
+              <h3>Flange Splice Plate</h3>
               <div className="component-grid">
-                <div className="component-grid-align">
-                  <h4>Diameter(mm)</h4>
-                  <Select
-                    onSelect={handleSelectChangeBoltBeam}
-                    value={boltDiameterSelect}
-                  >
-                    <Option value="Customized">Customized</Option>
-                    <Option value="All">All</Option>
-                  </Select>
-                </div>
-
-                {/* Diameter(mm) Pop up  */}
-                <Modal
-                  open={isModalOpen}
-                  onCancel={() => setModalOpen(false)}
-                  footer={null}
-                  width={500}
-                  height={500}
-                >
-                  <div className="popUp">
-                    <h3>Customized</h3>
-                    <Transfer
-                      dataSource={boltDiameterList
-                        .sort((a, b) => Number(a) - Number(b))
-                        .map((label) => ({
-                          key: label,
-                          label: <h5>{label}</h5>,
-                        }))}
-                      targetKeys={selectedDiameterNewItems}
-                      onChange={handleTransferChange}
-                      render={(item) => item.label}
-                      titles={["Available", "Selected"]}
-                      showSearch
-                      listStyle={{ height: 400, width: 300 }}
-                    />
-                  </div>
-                </Modal>
-
                 <div className="component-grid-align">
                   <h4>Type</h4>
                   <Select
-                    value={inputs.bolt_type}
+                    value={inputs.flange_plate_preferences}
                     onSelect={(value) =>
-                      setInputs({ ...inputs, bolt_type: value })
+                      setInputs({ ...inputs, flange_plate_preferences: value })
                     }
                   >
-                    <Option value="Bearing_Bolt">Bearing Bolt</Option>
-                    <Option value="Friction_Grip_Bolt">
-                      Friction Grip Bolt
-                    </Option>
+                    <Option value="Outside">Outside</Option>
+                    <Option value="Outside + Inside">Outside + Inside</Option>
                   </Select>
                 </div>
 
                 <div className="component-grid-align">
-                  <h4>Property Class</h4>
+                  <h4>Thickness(mm)</h4>
                   <Select
-                    onSelect={handleSelectChangePropertyClass}
-                    value={propertyClassSelect}
+                    onSelect={handleAllSelectFlangePT}
+                    value={flangeThicknessSelect}
                   >
                     <Option value="Customized">Customized</Option>
                     <Option value="All">All</Option>
@@ -1126,45 +908,48 @@ function FinePlate() {
                 </div>
 
                 <Modal
-                  open={isModalpropertyClassListOpen}
-                  onCancel={() => setModalpropertyClassListOpen(false)}
+                  open={flangePlateThicknessModal}
+                  onCancel={() => setFlangePlateThicknessModal(false)}
                   footer={null}
                   width={500}
                   height={500}
                 >
                   <div className="popUp">
                     <h3>Customized</h3>
-                    <Transfer
-                      dataSource={propertyClassList
+                    {/* <Transfer
+                      dataSource={thicknessList
                         .sort((a, b) => Number(a) - Number(b))
                         .map((label) => ({
                           key: label,
                           label: <h5>{label}</h5>,
                         }))}
-                      targetKeys={selectedpropertyClassListItems}
-                      onChange={handleTransferChangeInPropertyClassList}
+                      targetKeys={selectedFlangePlateThicknessItems}
+                      onChange={handleTransferChangeInFlangePlateThickness}
                       render={(item) => item.label}
                       titles={["Available", "Selected"]}
                       showSearch
                       listStyle={{ height: 400, width: 300 }}
-                    />
+                    /> */}
                   </div>
                 </Modal>
               </div>
-              {/* Section End */}
-              <h3>Plate</h3>
+
+              <h3>Web Splice Plate</h3>
               <div className="component-grid">
                 <div className="component-grid-align">
                   <h4>Thickness(mm)</h4>
-                  <Select onSelect={handleAllSelectPT} value={thicknessSelect}>
+                  <Select
+                    onSelect={handleAllSelectWebPT}
+                    value={webThicknessSelect}
+                  >
                     <Option value="Customized">Customized</Option>
                     <Option value="All">All</Option>
                   </Select>
                 </div>
 
                 <Modal
-                  open={plateThicknessModal}
-                  onCancel={() => setPlateThicknessModal(false)}
+                  open={webPlateThicknessModal}
+                  onCancel={() => setWebPlateThicknessModal(false)}
                   footer={null}
                   width={500}
                   height={500}
@@ -1172,14 +957,14 @@ function FinePlate() {
                   <div className="popUp">
                     <h3>Customized</h3>
                     <Transfer
-                      dataSource={propertyClassList
+                      dataSource={thicknessList
                         .sort((a, b) => Number(a) - Number(b))
                         .map((label) => ({
                           key: label,
                           label: <h5>{label}</h5>,
                         }))}
-                      targetKeys={selectedPlateThicknessItems}
-                      onChange={handleTransferChangeInPlateThickness}
+                      targetKeys={selectedWebPlateThicknessItems}
+                      onChange={handleTransferChangeInWebPlateThickness}
                       render={(item) => item.label}
                       titles={["Available", "Selected"]}
                       showSearch
@@ -1228,12 +1013,11 @@ function FinePlate() {
             ) : renderBoolean ? (
               <div
                 className="cadModel"
+                style={{
+                  backgroundImage: `url(${cad_background})`,
+                }}
               >
-                <Canvas gl={{ antialias: true, preserveDrawingBuffer: true }} 
-                onCreated={({ gl }) => {
-                  gl.setClearColor("#ADD8E6"); // set background inside WebGL itself, not just CSS
-                }}>
-
+                <Canvas gl={{ antialias: true }}>
                   <PerspectiveCamera
                     ref={cameraRef}
                     makeDefault
@@ -1254,11 +1038,6 @@ function FinePlate() {
                       selectedView={selectedView}
                       key={modelKey}
                     />
-                    <ScreenShotCapture
-                      screenshotTrigger={screenshotTrigger}
-                      setScreenshotTrigger={setScreenshotTrigger}
-                      selectedView={selectedView}
-                    />
                   </Suspense>
                 </Canvas>
               </div>
@@ -1270,7 +1049,7 @@ function FinePlate() {
 
           {/* Right */}
           <div className="superMain_right">
-            {<OutputDock output={output} />}
+            {<CoverPlateWeldedOutputDock output={output} />}
 
             <div className="outputdock-btn">
               <Input
@@ -1368,12 +1147,12 @@ function FinePlate() {
                       />
                     </Col>
                   </Row>
-                  {/* <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
+                  <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
                     <Upload beforeUpload={handleFileChange} showUploadList={false}>
-                      <Button onClick={handleUseProfile} icon={<UploadOutlined />}>Select File</Button>
+                      <Button onClick={handleUseProfile} >Select File</Button>
                     </Upload>
                     <Button type="button" onClick={handleSaveProfile}>Save Profile</Button>
-                  </div> */}
+                  </div>
                   <Row
                     gutter={[16, 16]}
                     align="middle"
@@ -1508,9 +1287,9 @@ function FinePlate() {
                   maskClosable={false}
                 >
                   <DesignPrefSections
+                    module="Cover Plate Welded Connection"
                     inputs={inputs}
                     setInputs={setInputs}
-                    selectedOption={selectedOption}
                     setDesignPrefModalStatus={setDesignPrefModalStatus}
                     confirmationModal={confirmationModal}
                     setConfirmationModal={setConfirmationModal}
@@ -1551,4 +1330,4 @@ function FinePlate() {
   );
 }
 
-export default FinePlate;
+export default CoverPlateWelded;

@@ -42,6 +42,7 @@ function DropdownMenu({
   const { SaveInputValueFile } = useContext(UserContext);
   const { downloadCADModel } = useContext(ModuleContext);
 
+
   const [isOpen, setIsOpen] = useState(false);
   const parentRef = useRef(null);
 
@@ -200,6 +201,7 @@ function DropdownMenu({
         }
 
         console.log(inputFromFileObj);
+        
         setInputs(inputFromFileObj);
         setAllSelected({
           plate_thickness: false,
@@ -479,6 +481,7 @@ function DropdownMenu({
         triggerScreenshotCapture();
         console.log("Image saved successfully");
         break;
+
       // File End
       // Edit Start
       case `Design Preferences`:
@@ -572,6 +575,7 @@ function DropdownMenu({
       if (match) {
         res.push(match[1]);
       }
+
     }
     return res;
   };

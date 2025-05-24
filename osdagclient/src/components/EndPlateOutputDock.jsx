@@ -291,6 +291,7 @@ const EndPlateOutputDock = ({ output }) => {
             <div className="details-main-body-capacity">
               <div className="details-main-body-align">
                 <p>Shear Yielding Capacity (kN)</p>
+
                 <Input
                   type="text"
                   style={{
@@ -314,6 +315,7 @@ const EndPlateOutputDock = ({ output }) => {
               <div className="details-main-body-align">
                 <p>Block Shear Capacity (kN)</p>
 
+
                 <Input
                   type="text"
                   style={{
@@ -328,6 +330,7 @@ const EndPlateOutputDock = ({ output }) => {
                       output?.Plate[
                         output?.Plate.findIndex(
                           (val) => val.label == "Block Shear Capacity (kN)"
+
                         )
                       ]?.val) ||
                     "0"
@@ -336,6 +339,7 @@ const EndPlateOutputDock = ({ output }) => {
               </div>
               <div className="details-main-body-align">
                 <p>Moment Demand per Bolt (kNm)</p>
+
                 <Input
                   type="text"
                   style={{
@@ -499,6 +503,7 @@ const EndPlateOutputDock = ({ output }) => {
                 alt="SpacingImage"
                 width="400"
                 height="300"
+
               />
             </div>
           </div>
@@ -793,5 +798,6 @@ const EndPlateOutputDock = ({ output }) => {
     </>
   );
 };
+
 
 export default EndPlateOutputDock;

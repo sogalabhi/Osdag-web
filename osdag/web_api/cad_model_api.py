@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from osdag_api import developed_modules, get_module_api
 import shutil
+import json
 import os
 import subprocess
 from io import BytesIO
@@ -39,12 +40,14 @@ class CADGeneration(View):
         end_plate_cookie_id = request.COOKIES.get("end_plate_connection_session")
         seated_angle_cookie_id = request.COOKIES.get("seated_angle_connection")
         cover_plate_bolted_cookie_id = request.COOKIES.get("cover_plate_bolted_connection_session")
+        cover_plate_welded_cookie_id = request.COOKIES.get("cover_plate_welded_connection_session")
+        beam_column_end_plate_cookie_id = request.COOKIES.get("beam_to_column_end_plate_connection_session")
         beam_beam_end_plate_cookie_id = request.COOKIES.get("beam_beam_end_plate_connection_session")
         
         #Ensure that at least one session exists
-        if not fin_plate_cookie_id and not cleat_angle_cookie_id and not seated_angle_cookie_id and not end_plate_cookie_id and not cover_plate_bolted_cookie_id and not beam_beam_end_plate_cookie_id:
+        if not fin_plate_cookie_id and not cleat_angle_cookie_id and not seated_angle_cookie_id and not end_plate_cookie_id and not cover_plate_bolted_cookie_id and not beam_beam_end_plate_cookie_id and not cover_plate_welded_cookie_id and not beam_column_end_plate_cookie_id:
             return JsonResponse({"status": "error", "message": "Please open a module"}, status=400)
-        
+    
         #determine the correct sessionId and fetch design session
         if fin_plate_cookie_id:
             cookie_id = fin_plate_cookie_id
@@ -64,6 +67,12 @@ class CADGeneration(View):
         elif beam_beam_end_plate_cookie_id:
             cookie_id = beam_beam_end_plate_cookie_id
             session_type = "BeamBeamEndPlate"
+        elif cover_plate_welded_cookie_id:
+            cookie_id = cover_plate_welded_cookie_id
+            session_type = "CoverPlateWelded"
+        elif beam_column_end_plate_cookie_id:
+            cookie_id = beam_column_end_plate_cookie_id
+            session_type = "BeamToColumnEndPlate"
         
         # # Error Checking: If design session exists.
         # if not Design.objects.filter(cookie_id=cookie_id).exists():
@@ -102,6 +111,10 @@ class CADGeneration(View):
             sections = ["Model", "Beam", "Connector"]
         elif session_type == "BeamBeamEndPlate":
             sections = ["Model", "Beam", "Connector"]
+        elif session_type == "CoverPlateWelded":
+            sections = ["Model", "Beam", "Connector"]
+        elif session_type == "BeamToColumnEndPlate":
+            sections = ["Model", "Beam", "Column", "Connector"]
         else:
             return JsonResponse({"status": "error", "message": "Unknown module type"}, status=400)
         
@@ -119,7 +132,7 @@ class CADGeneration(View):
                 if not path:
                     print(f'Error generating {section}: create_cad_model() returned None or empty string')
                     continue  # Skip to the next section
-
+                
                 # Mark this section as successfully generated
                 print(f'{section} generated successfully')
                 designObject.cad_design_status = True
@@ -132,7 +145,7 @@ class CADGeneration(View):
                     continue
                 # output_obj_path = os.path.join(parent_dir, f'osdagclient/public/output-{section.lower()}.obj')
                 output_obj_path = path_to_file.replace(".brep", ".obj")
-               
+
                 # Convert .brep to .obj using FreeCAD
                 command_with_arg = f'{command} {macro_path} {path_to_file} {output_obj_path}'
                 process = subprocess.Popen(command_with_arg.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)

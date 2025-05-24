@@ -13,7 +13,8 @@ from .inputdata.end_plate_input import EndPlateInputData
 from .inputdata.seated_angle_input import SeatedAngleInputData
 from .inputdata.cover_plate_bolted_input import CoverPlateBoltedInputData
 from .inputdata.beam_beam_end_plate_input import BeamBeamEndPlateInputData
-
+from .inputdata.cover_plate_weld_input import CoverPlateWeldedInputData
+from .inputdata.beam_to_column_end_plate_input import BeamToColumnEndPlateInputData
 
 INPUT_DATA_FACTORY = {
     'Fin-Plate-Connection': FinPlateInputData(),
@@ -22,6 +23,8 @@ INPUT_DATA_FACTORY = {
     'Seated-Angle-Connection': SeatedAngleInputData(),
     'Cover-Plate-Bolted-Connection': CoverPlateBoltedInputData(),
     'Beam-Beam-End-Plate-Connection': BeamBeamEndPlateInputData(),
+    'Cover-Plate-Welded-Connection': CoverPlateWeldedInputData(),
+    'Beam-to-Column-End-Plate-Connection': BeamToColumnEndPlateInputData()
 }
 
 
@@ -96,6 +99,14 @@ class InputData(APIView):
             cookie_id = request.COOKIES.get('beam_beam_end_plate_connection_session')
             print('cookie id in beam beam bolted connection input data ', cookie_id)
 
+        elif(moduleName=='Cover-Plate-Welded-Connection'):
+            cookie_id = request.COOKIES.get('cover_plate_welded_connection_session')
+            print('cookie id in cover plate welded connection input data ', cookie_id)
+            
+        elif(moduleName=='Beam-to-Column-End-Plate-Connection'):
+            cookie_id = request.COOKIES.get('beam_to_column_end_plate_connection_session')
+            print('cookie id in beam to column end plate connection input data ', cookie_id)
+
         if cookie_id == None or cookie_id == '': # Error Checking: If design session id provided.
             return Response("Error: Please open module", status=status.HTTP_400_BAD_REQUEST) # Returns error response.
         if not Design.objects.filter(cookie_id=cookie_id).exists(): # Error Checking: If design session exists.
@@ -103,7 +114,7 @@ class InputData(APIView):
             return Response("Error: This design session does not exist", status = status.HTTP_404_NOT_FOUND) # Return error response.
 
         if (not (moduleName in INPUT_DATA_FACTORY)):
-            return Response({"error": "Bad Query Parameter"}, status=status.HTTP_400_BAD_REQUEST)        
+            return Response({"error": "Bad Query Parameter (input data view)"}, status=status.HTTP_400_BAD_REQUEST)        
         print("///////////////////////////////////////// ", email)
 
         input_data_handler = INPUT_DATA_FACTORY.get(moduleName)

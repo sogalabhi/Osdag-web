@@ -10,6 +10,8 @@ from osdag_api.modules.cleat_angle_connection import create_from_input as cleat_
 from osdag_api.modules.seated_angle_connection import create_from_input as seated_angle_create_from_input
 from osdag_api.modules.cover_plate_bolted_connection import create_from_input as cover_plate_bolted_create_from_input
 from osdag_api.modules.beam_beam_end_plate_connection import create_from_input as beam_beam_end_plate_create_from_input
+from osdag_api.modules.cover_plate_welded_connection import create_from_input as cover_plate_welded_create_from_input
+from osdag_api.modules.beam_column_end_plate import create_from_input as beam_to_column_end_plate_create_from_input
 # importing models
 from osdag.models import Design
 
@@ -46,6 +48,8 @@ class CreateDesignReport(APIView):
             'seated_angle_connection': seated_angle_create_from_input,
             'cover_plate_bolted_connection_session': cover_plate_bolted_create_from_input,
             'beam_beam_end_plate_connection_session': beam_beam_end_plate_create_from_input,
+            'cover_plate_welded_connection_session': cover_plate_welded_create_from_input,
+            'beam_to_column_end_plate_connection_session':beam_to_column_end_plate_create_from_input
         }
         
         cookie_id = None
@@ -76,7 +80,7 @@ class CreateDesignReport(APIView):
         print('logs type ; ', type(logs))
         print('design_status : ' , design_status )
 
-        if (metadata is None or metadata is ''):
+        if (metadata is None or metadata == ''):
             print('The metadata is None ')
             print('Setting the default metadata values')
             metadata_profile = {
