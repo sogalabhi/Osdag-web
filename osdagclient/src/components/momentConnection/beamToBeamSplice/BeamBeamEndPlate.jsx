@@ -391,7 +391,7 @@ function BeamBeamEndPlate() {
         Module: "Beam-to-Beam End Plate Connection",
       };
       console.log(param);
-      createDesign(param, "Beam-Beam-End-Plate-Connection");
+      createDesign(param, "Tension-Member-Bolted-Design");
       setDisplayOutput(true);
 
       setLoading(true);

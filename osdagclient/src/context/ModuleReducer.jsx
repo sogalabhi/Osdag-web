@@ -31,22 +31,23 @@ export default (state, action) => {
                 materialList : [...state.materialList, ...prev],
                 error_msg : 'Error in fetching Column, Beam and Material List'
             }
-        case 'SET_BEAM_MATERIAL_LIST' :
-            let preve = JSON.parse(localStorage.getItem("osdag-custom-materials"))
-            state.materialList = action.payload.materialList
-            if(preve == null){
-                return{
-                    ...state ,
-                    beamList : action.payload.beamList,
-                    error_msg : 'Error in fetching Beam and Material List'
-                }
-            }
-            return{
-                ...state ,
-                beamList : action.payload.beamList,
-                materialList : [...state.materialList, ...prev],
-                error_msg : 'Error in fetching Beam and Material List'
-            }
+        case 'SET_BEAM_MATERIAL_LIST':
+            console.log("abhi reducer", action.payload);
+            const prevCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials")) || [];
+            // Remove direct state mutation!
+            // state.materialList = action.payload.materialList;
+
+            return {
+                ...state,
+                sectionProfileList: action.payload.sectionProfileList || [],
+                beamList: action.payload.beamList || [],
+                materialList: [
+                    ...(action.payload.materialList || []),
+                    ...prevCustomMaterials
+                ],
+                error_msg: 'Error in fetching Beam and Material List'
+            };
+
         case 'SET_COOKIE_FETCH' : 
             return{
                 ...state,
@@ -54,9 +55,10 @@ export default (state, action) => {
             }
         
         case 'SET_BOLT_DIAMETER_LIST' : 
+            console.log("boltList", action.payload)
             return{
                 ...state,
-                boltDiameterList : action.payload.boltList
+                boltDiameterList : action.payload.boltDiameterList
             }
            
         case 'SET_THICKNESS_LIST' : 

@@ -8,8 +8,7 @@ from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
 from cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
-from design_type.connection.fin_plate_connection import FinPlateConnection
-from design_type.connection.end_plate_connection import EndPlateConnection
+from design_type.tension_member.tension_bolted import Tension_bolted
 import sys
 import os
 import typing
@@ -18,34 +17,25 @@ old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
 sys.stdout = old_stdout  # Reset log
 
-
 def get_required_keys() -> List[str]:
     return [
-        "Bolt.Bolt_Hole_Type",
+        "Section.Profile",
+        "Section.Designation",
+        "Section.Material",
+        "Plate.Thickness",
         "Bolt.Diameter",
         "Bolt.Grade",
-        "Bolt.Slip_Factor",
-        "Bolt.TensionType",
         "Bolt.Type",
-        "Connectivity",
-        "Connector.Material",
+        "Bolt.Pitch",
+        "Bolt.Gauge",
+        "Bolt.EndDistance",
+        "Bolt.EdgeDistance",
+        "Load.Axial",
         "Design.Design_Method",
         "Detailing.Corrosive_Influences",
         "Detailing.Edge_type",
-        "Detailing.Gap",
-        "Load.Axial",
-        "Load.Shear",
-        "Material",
-        "Member.Supported_Section.Designation",
-        "Member.Supported_Section.Material",
-        "Member.Supporting_Section.Designation",
-        "Member.Supporting_Section.Material",
-        "Module",
-        "Weld.Fab",
-        "Weld.Material_Grade_OverWrite",
-        "Connector.Plate.Thickness_List",
+        "Module"
     ]
-
 
 def validate_input(input_values: Dict[str, Any]) -> None:
     """Validate type for all values in design dict. Raise error when invalid"""
@@ -281,14 +271,14 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
         validate_arr(key[0], key[1])
 
 
-def create_module() -> EndPlateConnection:
+def create_module() -> Tension_bolted:
     """Create an instance of the End plate connection module design class and set it up for use"""
-    module = EndPlateConnection()  # Create an instance of the EndPlateConnection
+    module = Tension_bolted()  # Create an instance of the Tension_bolted
     module.set_osdaglogger(None)
     return module
 
 
-def create_from_input(input_values: Dict[str, Any]) -> EndPlateConnection:
+def create_from_input(input_values: Dict[str, Any]) -> Tension_bolted:
     """Create an instance of the End plate connection module design class from input values."""
     # validate_input(input_values)
     try : 

@@ -25,7 +25,6 @@ import logging
 from design_type.member import Member
 
 
-
 class Tension_bolted(Member):
 
     def __init__(self):
