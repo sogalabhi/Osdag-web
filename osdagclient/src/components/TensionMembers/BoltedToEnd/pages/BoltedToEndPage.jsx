@@ -3,6 +3,12 @@ import DockTemplatePage from '../../../core/components/DockTemplatePage';
 import InputDockTemplate from '../../../core/components/InputDockTemplate';
 import MiddleDockTemplate from '../../../core/components/MiddleDockTemplate';
 import OutputDockTemplate from '../../../core/components/OutputDockTemplate';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Stage } from '@react-three/drei';
+import { Suspense } from 'react';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { useLoader } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 
 const BoltedToEndPage = () => {
   // State for input, output, dropdowns, logs
@@ -125,6 +131,70 @@ const BoltedToEndPage = () => {
     console.log(formData);
   };
 
+  function Model() {
+    const gltf = useLoader(GLTFLoader, '/src/assets/test.glb');
+    return <primitive object={gltf.scene} />;
+  }
+
+  // Helper: Show morph target names on hover
+  function ModelWithMorphTargets() {
+    const meshRef = useRef();
+    const [hoveredMorph, setHoveredMorph] = useState(null);
+    const gltf = useLoader(GLTFLoader, '/src/assets/test.glb');
+
+    function findMeshWithMorphTargets(object) {
+      if (object.morphTargetDictionary) return object;
+      if (object.children) {
+        for (let child of object.children) {
+          const found = findMeshWithMorphTargets(child);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    const mesh = findMeshWithMorphTargets(gltf.scene);
+    const morphNames = mesh?.morphTargetDictionary
+      ? Object.keys(mesh.morphTargetDictionary)
+      : [];
+
+    // Simulate picking a morph key name to show on hover
+    const handlePointerMove = (e) => {
+      if (morphNames.length > 0) {
+        const offsetX = e.pointerId; // Random logic to vary key (you can replace with custom logic)
+        const index = offsetX % morphNames.length;
+        setHoveredMorph(morphNames[index]);
+      }
+    };
+
+    return (
+      <group>
+        <primitive
+          ref={meshRef}
+          object={gltf.scene}
+          onPointerMove={handlePointerMove}
+          onPointerOut={() => setHoveredMorph(null)}
+        />
+        {hoveredMorph && (
+          <Html center>
+            <div
+              style={{
+                background: 'rgba(30,30,30,0.85)',
+                color: '#fff',
+                padding: '8px 12px',
+                borderRadius: 6,
+                fontSize: 14,
+                pointerEvents: 'none',
+              }}
+            >
+              Morph Target: <b>{hoveredMorph}</b>
+            </div>
+          </Html>
+        )}
+      </group>
+    );
+  }
+
   return (
     <DockTemplatePage
       InputComponent={
@@ -137,10 +207,19 @@ const BoltedToEndPage = () => {
         />
       }
       MiddleComponent={
-        <MiddleDockTemplate
-          imageUrl="http://localhost:5173/src/assets/TensionMember/bolted_to_end.png"
-          logs={logs}
-        />
+        <>
+          <div style={{ width: '100%', height: 500, background: '#222', borderRadius: 8 }}>
+            <Canvas camera={{ position: [1, 1, 4], fov: 50 }}>
+              <ambientLight intensity={0.7} />
+              <Suspense fallback={null}>
+                <Stage environment={null} intensity={0.8} adjustCamera={false}>
+                  <ModelWithMorphTargets scale={0.3} />
+                </Stage>
+              </Suspense>
+              <OrbitControls enablePan enableZoom enableRotate />
+            </Canvas>
+          </div>
+        </>
       }
       OutputComponent={
         <OutputDockTemplate
