@@ -36,7 +36,6 @@ export default (state, action) => {
             const prevCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials")) || [];
             // Remove direct state mutation!
             // state.materialList = action.payload.materialList;
-
             return {
                 ...state,
                 sectionProfileList: action.payload.sectionProfileList || [],
@@ -45,6 +44,8 @@ export default (state, action) => {
                     ...(action.payload.materialList || []),
                     ...prevCustomMaterials
                 ],
+                angleList: action.payload.angleList || [], 
+                channelList: action.payload.channelList || [],
                 error_msg: 'Error in fetching Beam and Material List'
             };
 

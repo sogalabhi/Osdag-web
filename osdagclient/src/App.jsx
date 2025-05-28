@@ -77,6 +77,18 @@ function App() {
           element={<BeamBeamEndPlate />}
         />
         <Route
+          path='/design/:designType/bolted_to_end_gusset'
+          element={
+            <BoltedToEndPage />
+          }
+        />
+        <Route
+          path='/design/:designType/bolted_to_end_gusset'
+          element={
+            <BoltedToEndPage />
+          }
+        />
+        <Route
           path="/design/:designType/beam-to-beam-splice/cover_plate_welded"
           element={<CoverPlateWelded />}
         />
@@ -93,10 +105,10 @@ function App() {
         <Route
           path='/design/:designType/bolted_to_end_gusset'
           element={
-            <BoltedToEndPage/>
+            <BoltedToEndPage />
           }
         />
-      <Route path='/user' element={<UserAccount />} />
+        <Route path='/user' element={<UserAccount />} />
       </Route>
     )
   );

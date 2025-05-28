@@ -22,6 +22,7 @@ let initialValue = {
   thicknessList: [],
   propertyClassList: [],
   angleList: [],
+  channelList: [],
   topAngleList: [],
   sessionCreated: false,
   sendNextRequests: false,
@@ -513,7 +514,7 @@ export const ModuleProvider = ({ children }) => {
         getBoltDiameterList();
         getThicknessList();
         getPropertyClassList();
-      } else {
+    } else {
         state.sendNextRequests = false;
       }
 
