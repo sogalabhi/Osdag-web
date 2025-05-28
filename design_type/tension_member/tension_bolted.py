@@ -891,6 +891,7 @@ class Tension_bolted(Member):
                     sec_depth.append(self.section.min_leg)
 
             elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
+                print("In Tension_bolted.max_section() function. Back to Back Angles or Star Angles", design_dictionary[KEY_SEC_MATERIAL])
                 self.section = Angle(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
                 self.min_rad_gyration_calc(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL],
                                            key=design_dictionary[KEY_SEC_PROFILE],
@@ -911,6 +912,7 @@ class Tension_bolted(Member):
                                            B_b=self.section.flange_width, T_t=self.section.flange_thickness,t = self.section.web_thickness)
                 sec_gyr[self.section.designation] = self.min_radius_gyration
                 sec_depth.append(self.section.depth)
+            print("Section designation:", self.section.designation)
             sec_area[self.section.designation] = self.section.area
 
 
