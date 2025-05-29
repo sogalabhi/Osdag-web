@@ -30,6 +30,7 @@ class Tension_bolted(Member):
     def __init__(self):
         super(Tension_bolted, self).__init__()
         self.design_status = False
+        self.mainmodule = "Member"
 
     ###############################################
     # Design Preference Functions Start
@@ -838,7 +839,6 @@ class Tension_bolted(Member):
         return self.section_size
 
     def max_section(self, design_dictionary, sizelist):
-        print("In Tension_bolted.max_section() function. ")
         "selecting components class based on the section passed "
         sec_area = {}
         sec_gyr = {}
@@ -855,9 +855,7 @@ class Tension_bolted(Member):
                     sec_depth.append(self.section.min_leg)
 
             elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
-                print("In Tension_bolted.max_section() function. Back to Back Angles or Star Angles", design_dictionary[KEY_SEC_MATERIAL])
                 self.section = Angle(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-                print("Section designation1:", self.section.designation)
                 self.min_rad_gyration_calc(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL],
                                            key=design_dictionary[KEY_SEC_PROFILE],
                                            subkey=design_dictionary[KEY_LOCATION], D_a=self.section.a,
@@ -877,7 +875,6 @@ class Tension_bolted(Member):
                                            B_b=self.section.flange_width, T_t=self.section.flange_thickness,t = self.section.web_thickness)
                 sec_gyr[self.section.designation] = self.min_radius_gyration
                 sec_depth.append(self.section.depth)
-            print("Section designation:", self.section.designation)
             sec_area[self.section.designation] = self.section.area
 
 
@@ -1036,9 +1033,8 @@ class Tension_bolted(Member):
             else:
                 pass
 
-        print("*****************")
         for selectedsize in self.sizelist:
-            # print('selectedsize',self.sizelist)
+            
             self.section_size = self.select_section(design_dictionary,selectedsize)
             self.bolt_diameter_min= min(self.bolt.bolt_diameter)
 
@@ -1187,7 +1183,6 @@ class Tension_bolted(Member):
             # logger.info(" :=========End Of design===========")
 
         if self.member_design_status == True:
-            print("pass")
             self.design_status = True
             self.select_bolt_dia(design_dictionary)
         else:
@@ -1208,7 +1203,6 @@ class Tension_bolted(Member):
                 pass
 
 
-        print(self.section_size_1.designation)
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             self.min_plate_height = self.section_size_1.min_plate_height()
             self.max_plate_height = self.section_size_1.max_plate_height()
@@ -1448,9 +1442,6 @@ class Tension_bolted(Member):
                                                      'machine_flame_cut'), 2)
 
         self.bolt.min_edge_dist_round = round_up(self.bolt.min_edge_dist, 5)
-        print(self.bolt.min_edge_dist_round,self.bolt.max_end_dist,"hfhh")
-
-        print(self.bolt.min_edge_dist_round,self.bolt.min_edge_dist, "gbfhgfbdhhbdg")
 
         self.bolt.calculate_bolt_capacity(bolt_diameter_provided=self.bolt.bolt_diameter_provided,
                                           bolt_grade_provided=self.bolt.bolt_grade_provided,
@@ -1497,7 +1488,6 @@ class Tension_bolted(Member):
                                                  shear_ecc=False, min_bolts_one_line=1, min_bolt_line=2,beta_lg=self.bolt.beta_lg,min_end_dist=self.bolt.min_end_dist_round)
 
         self.plate.edge_dist_provided = round(((self.max_plate_height - ((self.plate.bolts_one_line -1) * self.plate.gauge_provided))/2),2)
-        print(self.plate.bolt_line)
 
         self.member_check(design_dictionary)
 

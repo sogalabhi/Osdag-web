@@ -171,6 +171,7 @@ class CommonDesignLogic(object):
         self.display = display
         self.mainmodule = mainmodule
         self.connection = connection
+        self.module_class = mainmodule
         print(self.connection)
 
 
@@ -1704,7 +1705,7 @@ class CommonDesignLogic(object):
         return tensionCAD
 
     def display_3DModel(self, component, bgcolor):
-
+        print("Display 3D Model")
         self.component = component
 
         self.display.EraseAll()
@@ -2016,8 +2017,11 @@ class CommonDesignLogic(object):
 
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
+                print("commonlogic.py: Tension Bolted Connection Display")
                 self.T = self.module_class()
+                print("commonlogic.py: Tension Bolted Connection Display", self.T.sec_profile)
                 self.TObj = self.createTensionCAD()
+                print("commonlogic.py: Tension Bolted Connection Display", self.TObj.sec_profile)
 
                 member = self.TObj.get_members_models()
                 plate = self.TObj.get_plates_models()
