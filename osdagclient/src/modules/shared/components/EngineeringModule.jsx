@@ -238,7 +238,7 @@ export const EngineeringModule = ({
         <div className="superMain_right">
           <OutputDockComponent
             output={output}
-            extraState={extraState} // ← ADD THIS LINE
+            extraState={extraState}
           />
           <div className="outputdock-btn">
             <Input
