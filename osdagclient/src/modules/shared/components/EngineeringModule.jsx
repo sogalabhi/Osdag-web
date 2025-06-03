@@ -94,19 +94,6 @@ export const EngineeringModule = ({
     setScreenshotTrigger(true);
   };
 
-  console.log("Debug - contextData:", contextData);
-  console.log("Debug - modalConfig:", moduleConfig.modalConfig);
-
-  {
-    moduleConfig.modalConfig.map((modal) => {
-      console.log(`Debug - Modal ${modal.key}:`, {
-        dataSource: contextData[modal.dataSource],
-        selectedItems: selectedItems[modal.inputKey],
-        isOpen: modalStates[modal.key],
-      });
-    });
-  }
-
   return (
     <div className="module_base">
       {/* Navigation */}
@@ -251,7 +238,7 @@ export const EngineeringModule = ({
         </div>
       </div>
 
-      {/* REPLACED LARGE MODAL WITH SIMPLE COMPONENT */}
+      {/* Designreport separate modal */}
       <DesignReportModal
         isOpen={createDesignReportBool}
         onCancel={handleCancelDesignReport}
