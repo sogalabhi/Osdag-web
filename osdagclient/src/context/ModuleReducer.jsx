@@ -59,7 +59,7 @@ export default (state, action) => {
             console.log("boltList", action.payload)
             return{
                 ...state,
-                boltDiameterList : action.payload.boltDiameterList
+                boltDiameterList : action.payload.boltList || [],
             }
            
         case 'SET_THICKNESS_LIST' : 

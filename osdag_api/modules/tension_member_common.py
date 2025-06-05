@@ -9,4 +9,4 @@ def setup_for_cad(cdl: CommonDesignLogic, module_class):
     module_object = module_class
     print(module_object.module)
     if module_object.module == "Bolted Tension Member Design":
-        cdl.CPObj = cdl.createTensionCAD()
+        cdl.TObj = cdl.createTensionCAD()
