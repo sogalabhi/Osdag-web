@@ -2388,7 +2388,6 @@ class CommonDesignLogic(object):
             if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
                 print("Connection is ", self.connection)
                 if self.component == "Member":
-                    
                     final_model = self.TObj.get_members_models()
                 elif self.component == "Plate":
                     if self.connection == KEY_DISP_TENSION_BOLTED:
