@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "antd";
+import { Button, Input } from "antd";
 import "../../../../App.css";
 
 function BoltedToEndOutputDock({ output }) {
@@ -19,55 +19,61 @@ function BoltedToEndOutputDock({ output }) {
 
     if (!output) {
         return (
-            <div className="OutputDock">
+            <>
                 <p>Output Dock</p>
-                <div className="output-content">
-                    <div className="output-item">
-                        <div>
-                            <strong>No output to display. Submit the design to see results.</strong>
+                <div className="subMainBody scroll-data">
+                    <div className="component-grid">
+                        <div className="component-grid-align">
+                            <h4>No output to display. Submit the design to see results.</h4>
                         </div>
                     </div>
                 </div>
-            </div>
+            </>
         );
     }
 
     return (
-        <div className="OutputDock">
+        <>
             <p>Output Dock</p>
-            <div className="output-content scroll-data">
+            <div className="subMainBody scroll-data">
                 {Object.keys(output).map((key, i) => {
                     if (key === "NULL") return null;
                     return (
-                        <div key={i} className="component-grid">
-                            <div className="component-grid-align">
-                                <h3>{key}</h3>
-                            </div>
-                            <div className="details-main-body">
+                        <div key={i}>
+                            <h3>{key}</h3>
+                            <div>
                                 {output[key].map((item, index) => {
                                     if (item.label === "Pattern" || item.label === "Spacing Details") {
                                         return (
-                                            <div key={index} className="output-item">
-                                                <div className="output-label">
-                                                    <strong>{item.label}</strong>
-                                                </div>
-                                                <div className="output-value">
-                                                    <Button
-                                                        className="pattern-btn"
+                                            <div key={index} className="component-grid">
+                                                <div className="component-grid-align">
+                                                    <h4>{item.label}</h4>
+                                                    <Input
+                                                        className="btn"
+                                                        type="button"
+                                                        value={item.label}
                                                         onClick={() => handlePatternClick(item.label, item.val)}
-                                                    >
-                                                        {item.label}
-                                                    </Button>
+                                                    />
                                                 </div>
                                             </div>
                                         );
                                     } else {
                                         return (
-                                            <div key={index} className="output-item">
-                                                <div className="output-label">
-                                                    <strong>{item.label}</strong>
+                                            <div key={index} className="component-grid">
+                                                <div className="component-grid-align">
+                                                    <h4>{item.label}</h4>
+                                                    <Input
+                                                        type="text"
+                                                        style={{
+                                                            color: "rgb(0 0 0 / 67%)",
+                                                            fontSize: "12px",
+                                                            fontWeight: "500",
+                                                        }}
+                                                        name={`${key}_${item.label}`}
+                                                        value={item.val}
+                                                        disabled
+                                                    />
                                                 </div>
-                                                <div className="output-value">{item.val}</div>
                                             </div>
                                         );
                                     }
@@ -145,7 +151,7 @@ function BoltedToEndOutputDock({ output }) {
                     </div>
                 )}
             </div>
-        </div>
+        </>
     );
 }
 
