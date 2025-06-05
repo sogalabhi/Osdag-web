@@ -2281,7 +2281,6 @@ class CommonDesignLogic(object):
 
         final_model = None
         cadlist = []
-        print("ABhiijth")
         print("self.mainmodule", self.mainmodule)
         print("self.Component", self.component)
         print("self.connection", self.connection)
@@ -2387,17 +2386,24 @@ class CommonDesignLogic(object):
         elif self.mainmodule == "Member":
             print("Main module is Member", self.connection)
             if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
-                print("Connection is Tension Bolted or Welded", self.connection)
+                print("Connection is ", self.connection)
                 if self.component == "Member":
-                    
                     final_model = self.TObj.get_members_models()
                 elif self.component == "Plate":
                     if self.connection == KEY_DISP_TENSION_BOLTED:
                         cadlist = [self.TObj.get_plates_models(), self.TObj.get_nut_bolt_array_models()]
                     else:
                         cadlist = [self.TObj.get_plates_models(), self.TObj.get_welded_models()]
+                elif self.component == "Endplate":
+                    if self.connection == KEY_DISP_TENSION_BOLTED:
+                        final_model = self.TObj.get_end_plates_models()
+                    else:
+                        # For welded connections, combine endplate with welds
+                        cadlist = [self.TObj.get_end_plates_models(), self.TObj.get_welded_models()]
+                elif self.component == "Model":
+                    final_model = self.TObj.get_models()
                 else:
-                    # print(type(self.TObj.shape))
+                    print("self.TObj: ", self.TObj.shape)   
                     final_model = self.TObj.shape
                     # cadlist = self.TObj.get_models() #TODO: get_models() in BoltedCAD.py and WeldedCAD.py is not returning anything right now.
 
@@ -2405,6 +2411,8 @@ class CommonDesignLogic(object):
             final_model = cadlist[0]
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        elif cadlist and len(cadlist) == 1:
+            final_model = cadlist[0]
 
         return final_model
 

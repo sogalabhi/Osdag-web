@@ -551,6 +551,33 @@ class Tension_bolted(Member):
 
         return pattern
 
+    def get_3d_components(self):
+        components = []
+
+        t1 = ('Model', self.call_3DModel)
+        components.append(t1)
+
+        t2 = ('Member', self.call_3DMember)
+        components.append(t2)
+
+        t3 = ('Plate', self.call_3DPlate)
+        components.append(t3)
+
+        t4 = ('Endplate', self.call_3DEndplate)
+        components.append(t4)
+
+        return components
+
+    def call_3DPlate(self, ui, bgcolor):
+        from PyQt5.QtWidgets import QCheckBox
+        from PyQt5.QtCore import Qt
+        for chkbox in ui.frame.children():
+            if chkbox.objectName() == 'Endplate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.setChecked(Qt.Unchecked)
+        ui.commLogicObj.display_3DModel("Plate", bgcolor)
+
     def output_values(self, flag):
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
@@ -784,7 +811,7 @@ class Tension_bolted(Member):
 
     def set_input_values(self, design_dictionary):
         # Map frontend keys to backend keys
-        print("Setting input values for Tension_bolted class.", design_dictionary)
+        # print("Setting input values for Tension_bolted class.", design_dictionary)
         super(Tension_bolted, self).set_input_values(design_dictionary)
         print("************* Input values set successfully *************")
         self.module = design_dictionary[KEY_MODULE]
@@ -810,6 +837,14 @@ class Tension_bolted(Member):
                          edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
                          mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
                          corrosive_influences=design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES])
+        # Print all these lines by line
+        # print(f"grade={design_dictionary[KEY_GRD]}")
+        # print(f"diameter={design_dictionary[KEY_D]}")
+        # print(f"bolt_type={design_dictionary[KEY_TYP]}")
+        # print(f"bolt_hole_type={design_dictionary[KEY_DP_BOLT_HOLE_TYPE]}")
+        # print(f"edge_type={design_dictionary[KEY_DP_DETAILING_EDGE_TYPE]}")
+        # print(f"mu_f={design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None)}")
+        # print(f"corrosive_influences={design_dictionary[KEY_DP_DETAILING_CORROSIVE_INFLUENCES]}")
         self.count = 0
         self.member_design_status = False
         self.max_limit_status_1 = False
@@ -828,14 +863,12 @@ class Tension_bolted(Member):
     def select_section(self, design_dictionary, selectedsize):
 
         "selecting components class based on the section passed "
-
         if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Back to Back Angles', 'Star Angles']:
             self.section_size = Angle(designation=selectedsize, material_grade=design_dictionary[KEY_SEC_MATERIAL])
         elif design_dictionary[KEY_SEC_PROFILE] in ['Channels', 'Back to Back Channels']:
             self.section_size = Channel(designation=selectedsize, material_grade=design_dictionary[KEY_SEC_MATERIAL])
         else:
             pass
-
         return self.section_size
 
     def max_section(self, design_dictionary, sizelist):
@@ -878,7 +911,7 @@ class Tension_bolted(Member):
             sec_area[self.section.designation] = self.section.area
 
 
-        print(sec_gyr)
+        # print(sec_gyr)
         if len(sec_area)>=2:
             self.max_area = max(sec_area, key=sec_area.get)
         else:
@@ -1022,7 +1055,7 @@ class Tension_bolted(Member):
             [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self.max_gyr)
         else:
             pass
-
+        
         self.count = self.count + 1
         "Loop checking each member from sizelist based on yield capacity"
         if (previous_size) == None:
@@ -1032,12 +1065,11 @@ class Tension_bolted(Member):
                 self.sizelist.remove(previous_size)
             else:
                 pass
-
         for selectedsize in self.sizelist:
             
             self.section_size = self.select_section(design_dictionary,selectedsize)
+            # print("The selected section size is: ", self.bolt)
             self.bolt_diameter_min= min(self.bolt.bolt_diameter)
-
             self.edge_dist_min = IS800_2007.cl_10_2_4_2_min_edge_end_dist(self.bolt_diameter_min,self.bolt.bolt_hole_type,
                                                                           'machine_flame_cut')
             self.d_0_min = IS800_2007.cl_10_2_1_bolt_hole_size(self.bolt_diameter_min,
@@ -1375,7 +1407,7 @@ class Tension_bolted(Member):
 
         if self.bolt_design_status == True:
             self.design_status = True
-            print("bolt ok")
+            # print("bolt ok")
             self.get_bolt_grade(design_dictionary)
 
         else:
@@ -1653,7 +1685,7 @@ class Tension_bolted(Member):
             # self.initial_member_capacity(design_dictionary, previous_size)
             if len(self.sizelist)>=2:
                 size = self.section_size_1.designation
-                print("recheck",size )
+                # print("recheck",size )
                 self.initial_member_capacity(design_dictionary, size)
             else:
                 self.design_status = False
@@ -1774,13 +1806,13 @@ class Tension_bolted(Member):
 
             self.plate.tension_blockshear_area_input(A_vg = A_vg, A_vn = A_vn, A_tg = A_tg, A_tn = A_tn, f_u = self.plate.fu, f_y = self.plate.fy)
             self.plate_tension_capacity = min(self.plate.tension_yielding_capacity,self.plate.tension_rupture_capacity,self.plate.block_shear_capacity)
-            print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
+            # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
 
             if design_dictionary[KEY_SEC_PROFILE] == "Star Angles":
                 max_tension_yield = 2 * self.depth_max * self.plate.fy * max(self.plate.thickness)/ 1.1
             else:
                 max_tension_yield = self.depth_max * self.plate.fy * max(self.plate.thickness)/ 1.1
-            print(max_tension_yield)
+            # print(max_tension_yield)
             if self.plate_tension_capacity > self.res_force:
                 # print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity,self.plate.block_shear_capacity,"darshan")
                 break
@@ -1852,7 +1884,7 @@ class Tension_bolted(Member):
                 logger.info(":=========End Of design===========")
 
             elif (8 * self.bolt.bolt_diameter_provided) > self.comb_thick:
-                print("bolt check")
+                # print("bolt check")
                 status = False
                 while status == False:
                     self.plate.bolt_capacity_red = self.plate.get_bolt_red(self.plate.bolts_one_line,
@@ -1881,7 +1913,7 @@ class Tension_bolted(Member):
                 if len(self.sizelist) >= 2:
                     size = self.section_size_1.designation
                     # dia = self.bolt.bolt_diameter_provided
-                    print("recheck", size)
+                    # print("recheck", size)
                     self.initial_member_capacity(design_dictionary, size)
 
                 else:
@@ -1892,13 +1924,13 @@ class Tension_bolted(Member):
             else:
                 pass
         else:
-            print(self.plate_tension_capacity, "hsdvdhsd")
+            # print(self.plate_tension_capacity, "hsdvdhsd")
             if self.plate_tension_capacity < max_tension_yield and self.res_force < max_tension_yield:
-                print(self.section_size_1.designation, "hsdvdhsd")
+                # print(self.section_size_1.designation, "hsdvdhsd")
                 # self.initial_member_capacity(design_dictionary, previous_size=self.section_size_1.designation)
                 if len(self.sizelist) >= 2:
                     size = self.section_size_1.designation
-                    print("recheck", size)
+                    # print("recheck", size)
                     self.initial_member_capacity(design_dictionary, size)
                 else:
                     self.design_status = False
@@ -1914,7 +1946,7 @@ class Tension_bolted(Member):
                                .format(round(self.res_force / 1000, 2), round(self.plate_tension_capacity / 1000, 2), max(self.plate.thickness)))
                 logger.error(":Design is unsafe. \n ")
                 logger.info(":=========End Of design===========")
-                print(self.design_status)
+                # print(self.design_status)
 
     def status_pass(self,design_dictionary):
         if (2 * self.plate.length) > self.length:
@@ -1968,7 +2000,7 @@ class Tension_bolted(Member):
     def intermittent_bolt(self, design_dictionary):
         # print(self.bolt.min_edge_dist_round, "gbfhgf")
         # # print(round(self.plate.beta_lj, 2), "hcbvhg")
-        print(self.bolt.max_edge_dist,"ghxvjhshd")
+        # print(self.bolt.max_edge_dist,"ghxvjhshd")
         self.inter_length = self.length - 2 * (self.plate.end_dist_provided + (self.plate.bolt_line -1)*self.plate.pitch_provided)
         if design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
             # print (Angle)
@@ -2047,6 +2079,7 @@ class Tension_bolted(Member):
         f.close()
 
     def save_design(self, popup_summary):
+        print("Saving design results...")
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
         if self.member_design_status == True:
             section_size = self.section_size_1
@@ -2730,7 +2763,7 @@ class Tension_bolted(Member):
         Disp_3D_image = "/ResourceFiles/images/3d.png"
 
 
-        print(sys.path[0])
+        # print(sys.path[0])
         rel_path = str(sys.path[0])
         rel_path = rel_path.replace("\\", "/")
 
@@ -2739,5 +2772,4 @@ class Tension_bolted(Member):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
-
-
+        return True
