@@ -38,33 +38,19 @@ const image_map = {
 };
 
 const Window = () => {
-  const navigate = useNavigate();
-  const { designType } = useParams();
-  const [activeTab, setActiveTab] = useState(1);
-  const [subActiveTab, setSubActiveTab] = useState(1);
-  const [selectedDesign, setSelectedDesign] = useState(null);
+    const navigate = useNavigate();
+    const { designType } = useParams();
+    const [activeTab, setActiveTab] = useState(1)
+    const [subActiveTab, setSubActiveTab] = useState(1)
+    const [selectedDesign, setSelectedDesign] = useState(null)
+    const { results, getDesignTypes, getSubDesignTypes, subDesignTypes, leafLevelDesignType, getLeafLevelDesignType, error_message } = useContext(GlobalContext)
+    const { setTheCookie, cookieSetter } = useContext(ModuleContext)
 
-  const {
-    results,
-    getDesignTypes,
-    getSubDesignTypes,
-    subDesignTypes,
-    leafLevelDesignType,
-    getLeafLevelDesignType,
-    error_message,
-  } = useContext(GlobalContext);
-
-  // Radio selected ,Background change
-  const [selectedItemBack, setSelectedItemBack] = useState(null);
-  const wrapper = () => {
-    getDesignTypes(designType);
-  };
-
-  console.log("**", results);
-  console.log("****", getDesignTypes);
-  console.log("*******", subDesignTypes);
-  console.log("*********", leafLevelDesignType);
-  console.log("************", getLeafLevelDesignType);
+    // Radio selected ,Background change
+    const [selectedItemBack, setSelectedItemBack] = useState(null);
+    const wrapper = () => {
+        getDesignTypes(designType)
+    }
 
   useEffect(() => {
     if (!results) return;
@@ -205,7 +191,7 @@ const Window = () => {
               </div>
               <center>
                 <div className="">
-                  <button className="start-btn" onClick={() => {}}>
+                  <button className="start-btn" onClick={() => {navigate(`/design/${designType}/${selectedDesign}`)}}>
                     Start
                   </button>
                 </div>

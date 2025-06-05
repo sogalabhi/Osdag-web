@@ -43,9 +43,10 @@ class CADGeneration(View):
         cover_plate_welded_cookie_id = request.COOKIES.get("cover_plate_welded_connection_session")
         beam_column_end_plate_cookie_id = request.COOKIES.get("beam_to_column_end_plate_connection_session")
         beam_beam_end_plate_cookie_id = request.COOKIES.get("beam_beam_end_plate_connection_session")
-        
+        tension_member_bolted_cookie_id = request.COOKIES.get("tension_member_bolted_design_session")
+        print("cookieeeeee ", request.COOKIES)
         #Ensure that at least one session exists
-        if not fin_plate_cookie_id and not cleat_angle_cookie_id and not seated_angle_cookie_id and not end_plate_cookie_id and not cover_plate_bolted_cookie_id and not beam_beam_end_plate_cookie_id and not cover_plate_welded_cookie_id and not beam_column_end_plate_cookie_id:
+        if not fin_plate_cookie_id and not cleat_angle_cookie_id and not seated_angle_cookie_id and not end_plate_cookie_id and not cover_plate_bolted_cookie_id and not beam_beam_end_plate_cookie_id and not cover_plate_welded_cookie_id and not beam_column_end_plate_cookie_id and not tension_member_bolted_cookie_id:
             return JsonResponse({"status": "error", "message": "Please open a module"}, status=400)
     
         #determine the correct sessionId and fetch design session
@@ -73,7 +74,10 @@ class CADGeneration(View):
         elif beam_column_end_plate_cookie_id:
             cookie_id = beam_column_end_plate_cookie_id
             session_type = "BeamToColumnEndPlate"
-        
+        elif tension_member_bolted_cookie_id:
+            cookie_id = tension_member_bolted_cookie_id
+            session_type = "TensionMemberBoltedDesign"
+        print("session_type", session_type)
         # # Error Checking: If design session exists.
         # if not Design.objects.filter(cookie_id=cookie_id).exists():
         #     # Return error response.
@@ -90,6 +94,9 @@ class CADGeneration(View):
         
         # Check for FreeCAD availability
         command = shutil.which("FreeCADCmd")
+        print(f"Detected FreeCADCmd path: {command}")
+        command = "D:\\Program Files\\FreeCAD 1.0\\bin\\freecadcmd.exe"
+
         if not command:
             return JsonResponse({"status": "error", "message": "FreeCAD is not installed or not in system PATH."}, status=500)
         
@@ -115,6 +122,9 @@ class CADGeneration(View):
             sections = ["Model", "Beam", "Connector"]
         elif session_type == "BeamToColumnEndPlate":
             sections = ["Model", "Beam", "Column", "Connector"]
+        elif session_type == "TensionMemberBoltedDesign":
+            # sections = ["Plate"]
+            sections = ["Member","Model","Plate", "Endplate"]
         else:
             return JsonResponse({"status": "error", "message": "Unknown module type"}, status=400)
         
@@ -122,10 +132,9 @@ class CADGeneration(View):
         output_files = {}
         # Fetch Design object once
         designObject = design_session
-        
+        print("Design sections: ", sections)
         for section in sections:
             print(f'Generating section: {section}')
-            
             try:
                 path = module_api.create_cad_model(input_values, section, cookie_id)
 
