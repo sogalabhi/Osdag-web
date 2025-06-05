@@ -31,6 +31,7 @@ class Tension_bolted(Member):
         super(Tension_bolted, self).__init__()
         self.design_status = False
         self.mainmodule = "Member"
+        self.logs = []
 
     ###############################################
     # Design Preference Functions Start
@@ -806,8 +807,10 @@ class Tension_bolted(Member):
         if self.supported_section.designation in red_list or self.supporting_section.designation in red_list:
             logger.warning(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
+            self.logs.append({"msg": " : You are using a section (in red color) that is not available in latest version of IS 808", "type": "warning"})
             logger.info(
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
+            self.logs.append({"msg": " : You are using a section (in red color) that is not available in latest version of IS 808", "type": "info"})
 
     def set_input_values(self, design_dictionary):
         # Map frontend keys to backend keys
@@ -1187,7 +1190,10 @@ class Tension_bolted(Member):
                 # self.design_status = False
                 logger.warning(" : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
                                "member size {}.".format(round(self.load.axial_force,2),round(self.force1/1000,2),self.max_area))
+                self.logs.append({"msg": " : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
+                               "member size {}.".format(round(self.load.axial_force,2),round(self.force1/1000,2),self.max_area), "type": "warning"})
                 logger.info(" : Define member(s) with a higher cross sectional area.")
+                self.logs.append({"msg": " : Define member(s) with a higher cross sectional area.", "type": "info"})
                 # logge r.error(": Design is not safe. \n ")
                 # logger.info(" :=========End Of design===========")
                 break
@@ -1199,7 +1205,10 @@ class Tension_bolted(Member):
                 # self.design_status = False
                 logger.warning(" : The member length ({} mm) exceeds the maximum allowable length ({} mm) with respect to the maximum available "
                                "member size {}.".format(self.length,round(self.len2,2),self.max_gyr))
+                self.logs.append({"msg": " : The member length ({} mm) exceeds the maximum allowable length ({} mm) with respect to the maximum available "
+                               "member size {}.".format(self.length,round(self.len2,2),self.max_gyr), "type": "warning"})
                 logger.info(" : Select member(s) with a higher radius of gyration value.")
+                self.logs.append({"msg": " : Select member(s) with a higher radius of gyration value.", "type": "info"})
                 # logger.error(": Design is not safe. \n ")
                 # logger.info(" :=========End Of design===========")
                 break
@@ -1210,7 +1219,10 @@ class Tension_bolted(Member):
         if self.member_design_status == False and self.max_limit_status_1!=True and self.max_limit_status_2!=True:
             logger.warning(" : The available depth of the member cannot accommodate the minimum available bolt diameter of {} mm considering the "
                            "minimum spacing limit [Ref. Cl. 10.2, IS 800:2007].".format(self.bolt_diameter_min))
+            self.logs.append({"msg": " : The available depth of the member cannot accommodate the minimum available bolt diameter of {} mm considering the "
+                           "minimum spacing limit [Ref. Cl. 10.2, IS 800:2007].".format(self.bolt_diameter_min), "type": "warning"})
             logger.info(" : Reduce the bolt diameter or increase the member depth and re-design.")
+            self.logs.append({"msg": " : Reduce the bolt diameter or increase the member depth and re-design.", "type": "info"})
             # logger.error(": Design is not safe. \n ")
             # logger.info(" :=========End Of design===========")
 
@@ -1220,7 +1232,9 @@ class Tension_bolted(Member):
         else:
             self.design_status = False
             logger.error(": Design is unsafe. \n ")
+            self.logs.append({"msg": ": Design is unsafe. \n ", "type": "error"})
             logger.info(" :=========End Of design===========")
+            self.logs.append({"msg": " :=========End Of design===========", "type": "info"})
 
     def select_bolt_dia(self,design_dictionary,dia_remove =None):
 
@@ -1321,6 +1335,9 @@ class Tension_bolted(Member):
             logger.warning(" : The combined thickness ({} mm) exceeds the allowable large grip limit check (of {} mm) for the minimum available "
                            "bolt diameter of {} mm [Ref. Cl.10.3.3.2, IS 800:2007]."
                            .format((self.plate.thickness_provided + self.thick),(8*self.bolt.bolt_diameter[-1]),self.bolt.bolt_diameter[-1]))
+            self.logs.append({"msg": " : The combined thickness ({} mm) exceeds the allowable large grip limit check (of {} mm) for the minimum available "
+                           "bolt diameter of {} mm [Ref. Cl.10.3.3.2, IS 800:2007]."
+                           .format((self.plate.thickness_provided + self.thick),(8*self.bolt.bolt_diameter[-1]),self.bolt.bolt_diameter[-1]), "type": "warning"})
             # logger.error(": Design is not safe. \n ")
             # logger.info(" :=========End Of design===========")
         else:
@@ -1414,8 +1431,11 @@ class Tension_bolted(Member):
             self.design_status = False
             if self.plate.reason != "":
                 logger.warning(self.plate.reason)
+                self.logs.append({"msg": self.plate.reason, "type": "warning"})
             logger.error(": Design is unsafe. \n ")
+            self.logs.append({"msg": ": Design is unsafe. \n ", "type": "error"})
             logger.info(" :=========End Of design===========")
+            self.logs.append({"msg": " :=========End Of design===========", "type": "info"})
 
     def get_bolt_grade(self,design_dictionary):
 
@@ -1692,9 +1712,15 @@ class Tension_bolted(Member):
                 logger.warning(" : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
                                "member size {}."
                                .format(round(self.load.axial_force,2),round(self.section_size_1.tension_rupture_capacity/1000,2),self.max_area))
+                self.logs.append({"msg": " : The factored tension force ({} kN) exceeds the tension capacity ({} kN) with respect to the maximum available "
+                               "member size {}."
+                               .format(round(self.load.axial_force,2),round(self.section_size_1.tension_rupture_capacity/1000,2),self.max_area), "type": "warning"})
                 logger.info(" : Select member(s) with a higher cross sectional area.")
+                self.logs.append({"msg": " : Select member(s) with a higher cross sectional area.", "type": "info"})
                 logger.error(": Design is unsafe. \n ")
+                self.logs.append({"msg": ": Design is unsafe. \n ", "type": "error"})
                 logger.info(" :=========End Of design===========")
+                self.logs.append({"msg": " :=========End Of design===========", "type": "info"})
 
     def get_plate_thickness(self,design_dictionary):
 
@@ -1879,9 +1905,13 @@ class Tension_bolted(Member):
             if (2 * self.plate.length) > self.length:
                 self.design_status = False
                 logger.warning (":The plate length of {} mm is larger than the member length of {} mm.". format(2*self.plate.length,self.length))
+                self.logs.append({"msg": ":The plate length of {} mm is larger than the member length of {} mm.". format(2*self.plate.length,self.length), "type": "warning"})
                 logger.info(":Try a bolt of larger diameter and/or increase the member length.")
+                self.logs.append({"msg": ":Try a bolt of larger diameter and/or increase the member length.", "type": "info"})
                 logger.error(":Design is unsafe. \n ")
+                self.logs.append({"msg": ":Design is unsafe. \n ", "type": "error"})
                 logger.info(":=========End Of design===========")
+                self.logs.append({"msg": ":=========End Of design===========", "type": "info"})
 
             elif (8 * self.bolt.bolt_diameter_provided) > self.comb_thick:
                 # print("bolt check")
@@ -1953,32 +1983,46 @@ class Tension_bolted(Member):
             self.design_status = False
             logger.warning(":The plate length of {} mm is larger than the member length of {} mm.".format(2 * self.plate.length,
                                                                                                 self.length))
+            self.logs.append({"msg": ":The plate length of {} mm is larger than the member length of {} mm.".format(2 * self.plate.length,
+                                                                                                self.length), "type": "warning"})
 
             logger.info(":Try a bolt of larger diameter and/or increase the member length.")
+            self.logs.append({"msg": ":Try a bolt of larger diameter and/or increase the member length.", "type": "info"})
             logger.error(":Design is unsafe. \n ")
+            self.logs.append({"msg": ":Design is unsafe. \n ", "type": "error"})
             logger.info(":=========End Of design===========")
+            self.logs.append({"msg": ":=========End Of design===========", "type": "info"})
 
         else:
             self.plate_design_status = True
             self.design_status = True
             self.intermittent_bolt(design_dictionary)
             logger.info(":In the case of reverse loading, the slenderness value shall be less than 180 [Ref. Table 3, IS 800:2007].")
+            self.logs.append({"msg": ":In the case of reverse loading, the slenderness value shall be less than 180 [Ref. Table 3, IS 800:2007].", "type": "info"})
             if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
                 logger.info(":In the case of reverse loading for double sections, spacing of the intermittent connection shall be less than 600 "
                             "[Ref. Cl. 10.2.5.5, IS 800:2007].")
+                self.logs.append({"msg": ":In the case of reverse loading for double sections, spacing of the intermittent connection shall be less than 600 "
+                            "[Ref. Cl. 10.2.5.5, IS 800:2007].", "type": "info"})
             else:
                 pass
             logger.info(":To reduce the quantity of bolts, define a list of diameter, plate thickness and/or member size higher than the "
                         "one currently defined.")
+            self.logs.append({"msg": ":To reduce the quantity of bolts, define a list of diameter, plate thickness and/or member size higher than the "
+                        "one currently defined.", "type": "info"})
 
             if self.load.axial_force < (self.res_force / 1000):
                 logger.info(":The minimum design force based on the member size is used for performing the connection design, i.e. {} kN "
                             "[Ref. Cl. 10.7, IS 800:2007].".format(round(self.res_force / 1000, 2)))
+                self.logs.append({"msg": ":The minimum design force based on the member size is used for performing the connection design, i.e. {} kN "
+                            "[Ref. Cl. 10.7, IS 800:2007].".format(round(self.res_force / 1000, 2)), "type": "info"})
             else:
                 pass
 
             logger.info(":Overall bolted tension member design is safe. \n")
+            self.logs.append({"msg": ":Overall bolted tension member design is safe. \n", "type": "info"})
             logger.info(":=========End Of design===========")
+            self.logs.append({"msg": ":=========End Of design===========", "type": "info"})
 
             if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
                 self.min_rad_gyration_calc(designation=self.section_size_1.designation,

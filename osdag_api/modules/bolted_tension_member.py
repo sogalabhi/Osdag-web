@@ -300,7 +300,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             }
             print(f"in bolted_tension_member.py: Added output[{key}] = {output[key]}")
     print("in bolted_tension_member.py: Final output dict:", output)
-    return output, []
+    return output, module.logs
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
     if section not in ("Model", "Member", "Plate", "Endplate"):

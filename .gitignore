@@ -59,3 +59,5 @@ conda_packages
 # ignore the brep files
 file_storage/cad_models/*.brep
 file_storage/cad_models/*.obj
+file_storage/cad_models/*.iges
+file_storage/cad_models/*.step
