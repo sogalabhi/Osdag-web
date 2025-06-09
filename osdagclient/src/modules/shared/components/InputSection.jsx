@@ -19,9 +19,8 @@ export const InputSection = ({
   toggleAllSelected,
   contextData,
   extraState = {},
-  setExtraState = () => {}
+  setExtraState = () => {},
 }) => {
-  
   const [imageSource, setImageSource] = useState("");
 
   // Common select styles with high z-index
@@ -188,8 +187,10 @@ export const InputSection = ({
       case 'endPlateSelect':
         const conn_map = {
           "Flushed - Reversible Moment": "Flushed - Reversible Moment",
-          "Extended One Way - Irreversible Moment": "Extended One Way - Irreversible Moment", 
-          "Extended Both Ways - Reversible Moment": "Extended Both Ways - Reversible Moment",
+          "Extended One Way - Irreversible Moment":
+            "Extended One Way - Irreversible Moment",
+          "Extended Both Ways - Reversible Moment":
+            "Extended Both Ways - Reversible Moment",
         };
         const endPlateOptions = Object.keys(conn_map).map(item => ({ value: item, label: conn_map[item] }));
         const selectedEndPlate = endPlateOptions.find(option => option.value === extraState.selectedOption);
@@ -210,7 +211,7 @@ export const InputSection = ({
           />
         );
 
-      case 'number':
+      case "number":
         return (
           <Input
             type="text"
@@ -218,7 +219,9 @@ export const InputSection = ({
               event.target.value = event.target.value.replace(/[^0-9.]/g, "");
             }}
             value={inputs[field.key]}
-            onChange={(event) => setInputs({ ...inputs, [field.key]: event.target.value })}
+            onChange={(event) =>
+              setInputs({ ...inputs, [field.key]: event.target.value })
+            }
           />
         );
 
@@ -246,7 +249,9 @@ export const InputSection = ({
         return (
           <Input
             value={inputs[field.key]}
-            onChange={(event) => setInputs({ ...inputs, [field.key]: event.target.value })}
+            onChange={(event) =>
+              setInputs({ ...inputs, [field.key]: event.target.value })
+            }
           />
         );
     }

@@ -566,7 +566,7 @@ export const useEngineeringModule = (moduleConfig) => {
     setSelectedView,
     screenshotTrigger,
     setScreenshotTrigger,
-    extraState, 
+    extraState,
     setExtraState,
 
     // Navigation and Reset states
