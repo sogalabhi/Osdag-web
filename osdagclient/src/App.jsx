@@ -13,7 +13,6 @@ import { Worker } from "@react-pdf-viewer/core";
 import Sidebar from "./components/Sidebar";
 import Mainwindow from "./components/Mainwindow";
 import Window from "./components/Window";
-import FinePlate from "./components/shearConnection/FinePlate";
 import { GlobalProvider } from "./context/GlobalState";
 import { ModuleProvider } from "./context/ModuleState";
 import { UserContext, UserProvider } from "./context/UserState";
@@ -24,6 +23,9 @@ import LoginPage from "./components/userAuth/LoginPage";
 
 // jwt imports
 import jwt_decode from "jwt-decode";
+
+// module imports
+import FinePlate from "./modules/FinPlate/FinPlate";
 import EndPlate from "./components/shearConnection/EndPlate";
 import CleatAngle from "./components/shearConnection/CleatAngle";
 import SeatedAngle from "./components/shearConnection/SeatedAngle";

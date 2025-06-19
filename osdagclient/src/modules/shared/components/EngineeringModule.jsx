@@ -28,6 +28,8 @@ export const EngineeringModule = ({
   const {
     // Context data
     beamList,
+    columnList,
+    connectivityList,
     materialList,
     boltDiameterList,
     thicknessList,
@@ -80,10 +82,21 @@ export const EngineeringModule = ({
     moduleConfig.cameraKey,
     selectedView
   );
-  const options = ["Model", "Beam", "Connector"];
+
+  // Determine view options based on module
+  const getViewOptions = () => {
+    if (moduleConfig.cameraKey === "FinPlate") {
+      return ["Model", "Beam", "Column", "Plate"];
+    }
+    return ["Model", "Beam", "Connector"];
+  };
+
+  const options = getViewOptions();
 
   const contextData = {
     beamList,
+    columnList,
+    connectivityList,
     materialList,
     boltDiameterList,
     thicknessList,

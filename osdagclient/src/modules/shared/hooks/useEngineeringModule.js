@@ -4,6 +4,8 @@ import { ModuleContext } from "../../../context/ModuleState";
 export const useEngineeringModule = (moduleConfig) => {
   const {
     beamList,
+    columnList,
+    connectivityList,
     materialList,
     boltDiameterList,
     thicknessList,
@@ -17,6 +19,7 @@ export const useEngineeringModule = (moduleConfig) => {
     createDesign,
     createDesignReport,
     getSupportedData,
+    getDesingPrefData,
     deleteSession,
   } = useContext(ModuleContext);
 
@@ -61,9 +64,19 @@ export const useEngineeringModule = (moduleConfig) => {
     }, {})
   );
 
-  const [extraState, setExtraState] = useState({
-    selectedOption: "Flushed - Reversible Moment", // Default for BeamBeamEndPlate
-  });
+  // Initialize extraState based on module type
+  const getInitialExtraState = () => {
+    if (moduleConfig.cameraKey === "FinPlate") {
+      return {
+        selectedOption: "Column Flange-Beam-Web", // Default for FinPlate
+      };
+    }
+    return {
+      selectedOption: "Flushed - Reversible Moment", // Default for BeamBeamEndPlate
+    };
+  };
+
+  const [extraState, setExtraState] = useState(getInitialExtraState());
 
   // Design report states
   const [createDesignReportBool, setCreateDesignReportBool] = useState(false);
@@ -110,11 +123,13 @@ export const useEngineeringModule = (moduleConfig) => {
     }
   }, [designLogs]);
 
-  // Handle design data
+  // Handle design data - Both modules use same flat structure now
   useEffect(() => {
     if (displayOutput) {
       try {
         const formatedOutput = {};
+        
+        // Both FinPlate and BeamBeamEndPlate use flat structure: { "Bolt.Diameter": { label, val } }
         for (const [key, value] of Object.entries(designData)) {
           const newKey = key;
           const label = value.label;
@@ -123,6 +138,7 @@ export const useEngineeringModule = (moduleConfig) => {
             formatedOutput[newKey] = { label, val };
           }
         }
+        
         setOutput(formatedOutput);
       } catch (error) {
         console.log(error);
@@ -141,12 +157,52 @@ export const useEngineeringModule = (moduleConfig) => {
     }
   }, [renderCadModel, cadModelPaths]);
 
-  // Get supported data when member designation changes
+  // Get supported data when member designation changes (BeamBeamEndPlate)
   useEffect(() => {
-    getSupportedData({
-      supported_section: inputs.member_designation,
-    });
+    if (inputs.member_designation && moduleConfig.cameraKey !== "FinPlate") {
+      getSupportedData({
+        supported_section: inputs.member_designation,
+      });
+    }
   }, [inputs.member_designation]);
+
+  // Get design preferences data for FinPlate
+  useEffect(() => {
+    if (moduleConfig.cameraKey === "FinPlate" && getDesingPrefData) {
+      const conn_map = {
+        "Column Flange-Beam-Web": "Column Flange-Beam Web",
+        "Column Web-Beam-Web": "Column Web-Beam Web",
+        "Beam-Beam": "Beam-Beam",
+      };
+
+      const connectivity = extraState.selectedOption || inputs.connectivity;
+
+      if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
+        if (inputs.column_section && inputs.beam_section) {
+          getDesingPrefData({
+            supported_section: inputs.beam_section,
+            supporting_section: inputs.column_section,
+            connectivity: conn_map[connectivity].split(" ").join("-"),
+          });
+        }
+      } else if (connectivity === "Beam-Beam") {
+        if (inputs.primary_beam && inputs.secondary_beam) {
+          getDesingPrefData({
+            supported_section: inputs.secondary_beam,
+            supporting_section: inputs.primary_beam,
+            connectivity: conn_map[connectivity],
+          });
+        }
+      }
+    }
+  }, [
+    inputs.column_section,
+    inputs.beam_section,
+    inputs.primary_beam,
+    inputs.secondary_beam,
+    extraState.selectedOption,
+    inputs.connectivity,
+  ]);
 
   const updateModalState = (modalKey, isOpen) => {
     setModalStates((prev) => ({
@@ -191,7 +247,7 @@ export const useEngineeringModule = (moduleConfig) => {
       boltDiameterList,
       propertyClassList,
       thicknessList,
-    });
+    }, extraState);
 
     createDesign(param, moduleConfig.designType);
     setDisplayOutput(true);
@@ -213,6 +269,9 @@ export const useEngineeringModule = (moduleConfig) => {
       updateSelectionState(selection.key, "All");
     });
 
+    // Reset extraState to initial values
+    setExtraState(getInitialExtraState());
+
     setRenderBoolean(false);
     setOutput(null);
   };
@@ -228,9 +287,9 @@ export const useEngineeringModule = (moduleConfig) => {
       boltDiameterList,
       propertyClassList,
       thicknessList,
-    });
+    }, extraState);
 
-    // Add output data to the submission data
+    // Add output data to the submission data - Both modules use same flat structure now
     for (const key in output) {
       if (output.hasOwnProperty(key)) {
         const { label, val } = output[key];
@@ -297,6 +356,8 @@ export const useEngineeringModule = (moduleConfig) => {
   return {
     // Context data
     beamList,
+    columnList,
+    connectivityList,
     materialList,
     boltDiameterList,
     thicknessList,
