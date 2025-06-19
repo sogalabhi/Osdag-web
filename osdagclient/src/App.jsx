@@ -20,11 +20,14 @@ import UserAccount from "./components/userAccount/UserAccount";
 // New component for the login page
 import LoginPage from "./components/userAuth/LoginPage";
 
-// jwt imports 
-import jwt_decode from 'jwt-decode';
-import EndPlate from './components/shearConnection/EndPlate';
-import CleatAngle from './components/shearConnection/CleatAngle';
-import SeatedAngle from './components/shearConnection/SeatedAngle';
+// jwt imports
+import jwt_decode from "jwt-decode";
+
+// module imports
+import FinePlate from "./modules/FinPlate/FinPlate";
+import EndPlate from "./components/shearConnection/EndPlate";
+import CleatAngle from "./components/shearConnection/CleatAngle";
+import SeatedAngle from "./components/shearConnection/SeatedAngle";
 import CoverPlateBolted from "./modules/coverPlateBolted/CoverPlateBolted";
 import BeamBeamEndPlate from "./modules/beamBeamEndPlate/BeamBeamEndPlate";
 import BoltedToEndPage from './components/TensionMembers/BoltedToEnd/pages/BoltedToEndPage';

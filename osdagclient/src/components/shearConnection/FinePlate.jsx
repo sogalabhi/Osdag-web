@@ -460,7 +460,7 @@ function FinePlate() {
     }
   }, [designLogs, displayOutput]);
 
-  useEffect(() => {
+ useEffect(() => {
     if (displayOutput) {
       try {
         console.log("Actual Output", designData);
