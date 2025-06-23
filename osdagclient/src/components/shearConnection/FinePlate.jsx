@@ -460,7 +460,7 @@ function FinePlate() {
     }
   }, [designLogs, displayOutput]);
 
- useEffect(() => {
+  useEffect(() => {
     if (displayOutput) {
       try {
         console.log("Actual Output", designData);
@@ -826,6 +826,7 @@ function FinePlate() {
     }
   };
 
+  const [showResetConfirmation, setShowResetConfirmation] = useState(false);
   const handleReset = () => {
     setConfirmationType("reset");
     setShowResetConfirmation(true);
