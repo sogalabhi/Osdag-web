@@ -826,7 +826,6 @@ function FinePlate() {
     }
   };
 
-  const [showResetConfirmation, setShowResetConfirmation] = useState(false);
   const handleReset = () => {
     setConfirmationType("reset");
     setShowResetConfirmation(true);

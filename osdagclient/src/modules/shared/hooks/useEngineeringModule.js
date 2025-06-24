@@ -461,7 +461,7 @@ export const useEngineeringModule = (moduleConfig) => {
       thicknessList,
     }, extraState);
 
-    // Add output data to the submission data - Both modules use same flat structure now
+    // Add output data to the submission data
     for (const key in output) {
       if (output.hasOwnProperty(key)) {
         const { label, val } = output[key];
