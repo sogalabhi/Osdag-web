@@ -1226,14 +1226,13 @@ function FinePlate() {
                 <p>Loading Model...</p>
               </div>
             ) : renderBoolean ? (
-              <div
-                className="cadModel"
-              >
-                <Canvas gl={{ antialias: true, preserveDrawingBuffer: true }} 
-                onCreated={({ gl }) => {
-                  gl.setClearColor("#ADD8E6"); // set background inside WebGL itself, not just CSS
-                }}>
-
+              <div className="cadModel">
+                <Canvas
+                  gl={{ antialias: true, preserveDrawingBuffer: true }}
+                  onCreated={({ gl }) => {
+                    gl.setClearColor("#ADD8E6"); // set background inside WebGL itself, not just CSS
+                  }}
+                >
                   <PerspectiveCamera
                     ref={cameraRef}
                     makeDefault

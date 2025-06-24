@@ -184,7 +184,10 @@ function CoverPlateBolted() {
   const [loading, setLoading] = useState(false);
   const [selectedView, setSelectedView] = useState("Model");
   const options = ["Model", "Beam", "Connector"];
-  const { position: cameraPos, fov } = useViewCamera("CoverPlateBolted",selectedView);
+  const { position: cameraPos, fov } = useViewCamera(
+    "CoverPlateBolted",
+    selectedView
+  );
   const cameraRef = useRef();
   const [screenshotTrigger, setScreenshotTrigger] = useState(false);
   const triggerScreenshotCapture = () => {
@@ -1112,14 +1115,13 @@ function CoverPlateBolted() {
                 <p>Loading Model...</p>
               </div>
             ) : renderBoolean ? (
-              <div
-                className="cadModel"
-              >
-                <Canvas gl={{ antialias: true, preserveDrawingBuffer: true }} 
-                onCreated={({ gl }) => {
-                  gl.setClearColor("#ADD8E6"); // set background inside WebGL itself, not just CSS
-                }}>
-
+              <div className="cadModel">
+                <Canvas
+                  gl={{ antialias: true, preserveDrawingBuffer: true }}
+                  onCreated={({ gl }) => {
+                    gl.setClearColor("#ADD8E6"); // set background inside WebGL itself, not just CSS
+                  }}
+                >
                   <PerspectiveCamera
                     ref={cameraRef}
                     makeDefault
@@ -1271,7 +1273,6 @@ function CoverPlateBolted() {
                     <Button type="button" onClick={handleSaveProfile}>
                       Save Profile
                     </Button>
-                  
                   </div>
                   <Row
                     gutter={[16, 16]}
