@@ -15,6 +15,7 @@ from .inputdata.cover_plate_bolted_input import CoverPlateBoltedInputData
 from .inputdata.beam_beam_end_plate_input import BeamBeamEndPlateInputData
 from .inputdata.cover_plate_weld_input import CoverPlateWeldedInputData
 from .inputdata.beam_to_column_end_plate_input import BeamToColumnEndPlateInputData
+from .inputdata.tension_member_bolted_input import TensionMemberBoltedInputData
 
 INPUT_DATA_FACTORY = {
     'Fin-Plate-Connection': FinPlateInputData(),
@@ -24,7 +25,8 @@ INPUT_DATA_FACTORY = {
     'Cover-Plate-Bolted-Connection': CoverPlateBoltedInputData(),
     'Beam-Beam-End-Plate-Connection': BeamBeamEndPlateInputData(),
     'Cover-Plate-Welded-Connection': CoverPlateWeldedInputData(),
-    'Beam-to-Column-End-Plate-Connection': BeamToColumnEndPlateInputData()
+    'Beam-to-Column-End-Plate-Connection': BeamToColumnEndPlateInputData(),
+    'Tension-Member-Bolted-Design': TensionMemberBoltedInputData()
 }
 
 
@@ -106,13 +108,14 @@ class InputData(APIView):
         elif(moduleName=='Beam-to-Column-End-Plate-Connection'):
             cookie_id = request.COOKIES.get('beam_to_column_end_plate_connection_session')
             print('cookie id in beam to column end plate connection input data ', cookie_id)
-
-        if cookie_id == None or cookie_id == '': # Error Checking: If design session id provided.
-            return Response("Error: Please open module", status=status.HTTP_400_BAD_REQUEST) # Returns error response.
-        if not Design.objects.filter(cookie_id=cookie_id).exists(): # Error Checking: If design session exists.
-            print('The design session does not exists')
-            return Response("Error: This design session does not exist", status = status.HTTP_404_NOT_FOUND) # Return error response.
-
+        elif(moduleName=='Tension-Member-Bolted-Design'):
+            cookie_id = request.COOKIES.get('tension_member_bolted_design_session')
+            print('cookie id in tension member bolted input data ', cookie_id)
+        # if cookie_id == None or cookie_id == '': # Error Checking: If design session id provided.
+        #     return Response("Error: Please open module", status=status.HTTP_400_BAD_REQUEST) # Returns error response.
+        # if not Design.objects.filter(cookie_id=cookie_id).exists(): # Error Checking: If design session exists.
+        #     print('The design session does not exists')
+        #     return Response("Error: This design session does not exist", status = status.HTTP_404_NOT_FOUND) # Return error response.
         if (not (moduleName in INPUT_DATA_FACTORY)):
             return Response({"error": "Bad Query Parameter (input data view)"}, status=status.HTTP_400_BAD_REQUEST)        
         print("///////////////////////////////////////// ", email)

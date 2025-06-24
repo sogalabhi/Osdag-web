@@ -18,6 +18,7 @@ class CADDownload(APIView):
             seated_angle_cookie_id = request.COOKIES.get("seated_angle_connection")
             cover_plate_bolted_cookie_id = request.COOKIES.get("cover_plate_bolted_connection_session")
             beam_beam_end_plate_cookie_id = request.COOKIES.get("beam_beam_end_plate_connection_session")
+            tension_member_bolted_cookie_id = request.COOKIES.get("tension_member_bolted_design_session")
 
             # Determine the correct sessionId
             session_id = None
@@ -33,6 +34,8 @@ class CADDownload(APIView):
                 session_id = cover_plate_bolted_cookie_id
             elif beam_beam_end_plate_cookie_id:
                 session_id = beam_beam_end_plate_cookie_id
+            elif tension_member_bolted_cookie_id:
+                session_id = tension_member_bolted_cookie_id
 
             if not session_id:
                 return JsonResponse({"status": "error", "message": "No session cookie found."}, status=400)

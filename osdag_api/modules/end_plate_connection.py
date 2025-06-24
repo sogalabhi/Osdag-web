@@ -55,7 +55,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     # Check if input_values contains all required keys.
     missing_keys = contains_keys(input_values, required_keys)
     if missing_keys != None:  # If keys are missing.
-        # Raise error for the first missing key.
+        # Raise error for the first missing key.a
         raise MissingKeyError(missing_keys[0])
 
     # Validate key types one by one:

@@ -8,7 +8,8 @@ developed_modules = [
     "Cover Plate Bolted Connection",
     "Cover Plate Welded Connection",
     "Beam Beam End Plate Connection",
-    "Beam-to-Column End Plate Connection"
+    "Beam-to-Column End Plate Connection",
+    "Tension Member Bolted Design",
 ]
 
 module_dict = [
@@ -49,9 +50,9 @@ module_dict = [
         "path":"Connection/Moment Connection/",
     },
     {
-        "key": "Cover Plate Bolted Connection",
-        "image": "/static/images/modules/cover_plate_bolted_connection.png",
-        "name": "Cover Plate Bolted",
+        "key": "Cover Plate Welded Connection",
+        "image": "/static/images/modules/cover_plate_welded_connection.png",
+        "name": "Cover Plate Welded",
         "path": "Connection/Moment Connection/",
     },
     {
@@ -59,5 +60,12 @@ module_dict = [
         "image": "/static/images/modules/beam_to_column_end_plate_connection.png",
         "name": "Beam-to-Column End Plate",
         "path": "Connection/Moment Connection/",
+        "path":"Connection/Moment Connection/"
+    },
+    {
+        "key": "Tension Member Bolted Design",
+        "image":"/static/images/modules/tension_member_bolted.png",
+        "name":"Tension Member Bolted Design",
+        "path":"Tension Member/tension_bolted/"
     }
 ]

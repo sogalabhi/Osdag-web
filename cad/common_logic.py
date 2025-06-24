@@ -171,9 +171,6 @@ class CommonDesignLogic(object):
         self.display = display
         self.mainmodule = mainmodule
         self.connection = connection
-        print(self.connection)
-
-
         self.connectivityObj = None
         self.CPObj = None
         self.folder = folder
@@ -1619,6 +1616,7 @@ class CommonDesignLogic(object):
         T = self.module_class
 
         # Types of connections =  #'Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels'
+        print("Creating Tension CAD for connection type: ", self.connection)
         if self.connection == KEY_DISP_TENSION_BOLTED:
             bolt_d = float(T.bolt.bolt_diameter_provided)  # Bolt diameter (shank part), entered by user
             bolt_r = bolt_d / 2  # Bolt radius (Shank part)
@@ -2016,14 +2014,20 @@ class CommonDesignLogic(object):
         else:
             if self.connection == KEY_DISP_TENSION_BOLTED:
                 self.T = self.module_class()
+                print("Creating Tension CAD for connection type: ", self.connection)
                 self.TObj = self.createTensionCAD()
+                print("TObj created: ", self.TObj)
 
                 member = self.TObj.get_members_models()
+                print("Member models: ", member)
                 plate = self.TObj.get_plates_models()
+                print("Plate models: ", plate)
 
                 nutbolt = self.TObj.get_nut_bolt_array_models()
+                print("Nutbolt models: ", nutbolt)
 
                 onlymember = self.TObj.get_only_members_models()
+                print("Only member models: ", onlymember)
                 # distance = self.T.length/2 - (2* self.T.plate.end_dist_provided + (self.T.plate.bolt_line - 1 ) * self.T.plate.pitch_provided)
                 # Point = gp_Pnt(distance, 0.0, 300)
                 # DisplayMsg(self.display, Point, self.T.section_size_1.designation)
@@ -2277,7 +2281,9 @@ class CommonDesignLogic(object):
 
         final_model = None
         cadlist = []
-
+        print("self.mainmodule", self.mainmodule)
+        print("self.Component", self.component)
+        print("self.connection", self.connection)
         if self.mainmodule == "Shear Connection":
             if self.component == "Beam":
                 final_model = self.connectivityObj.get_beamModel()
@@ -2378,7 +2384,9 @@ class CommonDesignLogic(object):
                     final_model = self.BPObj.get_models()
 
         elif self.mainmodule == "Member":
+            print("Main module is Member", self.connection)
             if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
+                print("Connection is ", self.connection)
                 if self.component == "Member":
                     final_model = self.TObj.get_members_models()
                 elif self.component == "Plate":
@@ -2386,8 +2394,16 @@ class CommonDesignLogic(object):
                         cadlist = [self.TObj.get_plates_models(), self.TObj.get_nut_bolt_array_models()]
                     else:
                         cadlist = [self.TObj.get_plates_models(), self.TObj.get_welded_models()]
+                elif self.component == "Endplate":
+                    if self.connection == KEY_DISP_TENSION_BOLTED:
+                        final_model = self.TObj.get_end_plates_models()
+                    else:
+                        # For welded connections, combine endplate with welds
+                        cadlist = [self.TObj.get_end_plates_models(), self.TObj.get_welded_models()]
+                elif self.component == "Model":
+                    final_model = self.TObj.get_models()
                 else:
-                    # print(type(self.TObj.shape))
+                    print("self.TObj: ", self.TObj.shape)   
                     final_model = self.TObj.shape
                     # cadlist = self.TObj.get_models() #TODO: get_models() in BoltedCAD.py and WeldedCAD.py is not returning anything right now.
 
@@ -2395,6 +2411,8 @@ class CommonDesignLogic(object):
             final_model = cadlist[0]
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        elif cadlist and len(cadlist) == 1:
+            final_model = cadlist[0]
 
         return final_model
 

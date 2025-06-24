@@ -12,6 +12,7 @@ from osdag_api.modules.cover_plate_bolted_connection import create_from_input as
 from osdag_api.modules.beam_beam_end_plate_connection import create_from_input as beam_beam_end_plate_create_from_input
 from osdag_api.modules.cover_plate_welded_connection import create_from_input as cover_plate_welded_create_from_input
 from osdag_api.modules.beam_column_end_plate import create_from_input as beam_to_column_end_plate_create_from_input
+from osdag_api.modules.bolted_tension_member import create_from_input as tension_member_bolted_create_from_input
 # importing models
 from osdag.models import Design
 
@@ -49,7 +50,8 @@ class CreateDesignReport(APIView):
             'cover_plate_bolted_connection_session': cover_plate_bolted_create_from_input,
             'beam_beam_end_plate_connection_session': beam_beam_end_plate_create_from_input,
             'cover_plate_welded_connection_session': cover_plate_welded_create_from_input,
-            'beam_to_column_end_plate_connection_session':beam_to_column_end_plate_create_from_input
+            'beam_to_column_end_plate_connection_session':beam_to_column_end_plate_create_from_input,
+            'tension_member_bolted_design_session': tension_member_bolted_create_from_input
         }
         
         cookie_id = None

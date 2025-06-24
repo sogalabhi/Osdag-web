@@ -22,6 +22,7 @@ let initialValue = {
   thicknessList: [],
   propertyClassList: [],
   angleList: [],
+  channelList: [],
   topAngleList: [],
   sessionCreated: false,
   sendNextRequests: false,
@@ -106,13 +107,13 @@ export const ModuleProvider = ({ children }) => {
     });
 
     try {
+      
       console.log("GETTING COLUMN BEAM MATERIALS", moduleName);
       const email = localStorage.getItem("email");
       console.log("Using email:", email);
 
       const url = `${BASE_URL}populate?moduleName=${state.currentModuleName}&connectivity=${connectivity}&email=${email}`;
       console.log("Making request to:", url);
-
       const response = await fetch(url, {
         method: "GET",
         mode: "cors",
@@ -122,7 +123,6 @@ export const ModuleProvider = ({ children }) => {
 
       const jsonResponse = await response?.json();
       console.log("Response data:", jsonResponse);
-
       if (update) {
         console.log("Updating with material:", cmat);
         const mList = jsonResponse.materialList;
@@ -212,17 +212,23 @@ export const ModuleProvider = ({ children }) => {
       state.currentModuleName = moduleName;
       console.log("GETTING BEAM MATERIALS ", moduleName);
       const email = localStorage.getItem("email");
-      console.log(email);
+      // Build the URL with or without email if present
+      let url = `${BASE_URL}populate?moduleName=${moduleName}`;
+      if (email) {
+        url += `&email=${encodeURIComponent(email)}`;
+      }
       const response = await fetch(
-        `${BASE_URL}populate?moduleName=${moduleName}&email=${email}`,
+        url,
         {
           method: "GET",
           mode: "cors",
           credentials: "include",
         }
       );
+      console.log("url : ", url);
+      console.log("response : ", response);
       const jsonResponse = await response?.json();
-
+      
       // diaptch the action
 
       console.log("BEAM MATERIAL LIST", jsonResponse);
@@ -349,6 +355,7 @@ export const ModuleProvider = ({ children }) => {
 
   const getBoltDiameterList = async () => {
     try {
+      console.log("bolt diameter list opened");
       const response = await fetch(
         `${BASE_URL}populate?moduleName=${state.currentModuleName}&boltDiameter=Customized`,
         {
@@ -451,6 +458,7 @@ export const ModuleProvider = ({ children }) => {
       const data = await response.json();
       console.log(data);
       if (data["status"] == "set") {
+        console.log("module_id : ", module_id);
         // fetch the connectivityList
         if (module_id == "Fin Plate Connection") {
           getConnectivityList("Fin-Plate-Connection");
@@ -492,12 +500,14 @@ export const ModuleProvider = ({ children }) => {
             state.currentModuleName,
             "Column-Flange-Beam-Web"
           );
+        } else if (module_id == "Tension Member Bolted Design") {
+          getBeamMaterialList("Tension-Member-Bolted-Design");
         }
 
         getBoltDiameterList();
         getThicknessList();
         getPropertyClassList();
-      } else {
+    } else {
         state.sendNextRequests = false;
       }
 
@@ -624,7 +634,7 @@ export const ModuleProvider = ({ children }) => {
         body: JSON.stringify(param),
       });
       const jsonResponse = await response?.json();
-      console.log(jsonResponse);
+      console.log("modulestate jsonResponse : ", jsonResponse);
       dispatch({ type: "SET_DESIGN_DATA_AND_LOGS", payload: jsonResponse });
       if (response.status == 201) {
         // call the thunk to create the CAD Model
@@ -866,6 +876,7 @@ export const ModuleProvider = ({ children }) => {
     <ModuleContext.Provider
       value={{
         // State variables
+        sectionProfileList: state.sectionProfileList,
         connectivityList: state.connectivityList,
         beamList: state.beamList,
         columnList: state.columnList,

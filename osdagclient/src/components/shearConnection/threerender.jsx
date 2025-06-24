@@ -61,11 +61,19 @@ function Model({ modelPaths, selectedView }) {
     [parsedModels, texture]
   );
   const geometrySeatedAngle = useMemo(
-    () => (parsedModels?.SeatAngle ? getGeometry(parsedModels.SeatAngle) : null ),
+    () => (parsedModels?.SeatAngle ? getGeometry(parsedModels.SeatAngle) : null),
     [parsedModels, texture]
   );
   const geometryConnector = useMemo(
-    () => (parsedModels?.Connector ? getGeometry(parsedModels.Connector) : null ),
+    () => (parsedModels?.Connector ? getGeometry(parsedModels.Connector) : null),
+    [parsedModels, texture]
+  );
+  const geometryMember = useMemo(
+    () => (parsedModels?.Member ? getGeometry(parsedModels.Member) : null),
+    [parsedModels, texture]
+  );
+  const geometryEndplate = useMemo(
+    () => (parsedModels?.Endplate ? getGeometry(parsedModels.Endplate) : null),
     [parsedModels, texture]
   );
 
@@ -234,8 +242,52 @@ function Model({ modelPaths, selectedView }) {
         </mesh>
       )}
 
+      {/* Member Section */}
+      {selectedView === "Member" && geometryMember && (
+        <mesh
+          geometry={geometryMember}
+          scale={0.008}
+          position={[0, -4, 0]}
+          rotation={[Math.PI / -2, 0, 0]}
+        >
+          <meshPhysicalMaterial
+            map={texture}
+            attach="material"
+            metalness={0.25}
+            roughness={0.3}
+            opacity={1.0}
+            transparent={true}
+            transmission={0.99}
+            clearcoat={1.0}
+            clearcoatRoughness={0.25}
+          />
+        </mesh>
+      )}
+      {/* Endplate Section */}
+      {selectedView === "Endplate" && geometryEndplate && (
+        <mesh
+          geometry={geometryEndplate}
+          scale={0.008}
+          position={[0, -4, 0]}
+          rotation={[Math.PI / -2, 0, 0]}
+        >
+          <meshPhysicalMaterial
+            map={texture}
+            attach="material"
+            metalness={0.25}
+            roughness={0.3}
+            opacity={1.0}
+            transparent={true}
+            transmission={0.99}
+            clearcoat={1.0}
+            clearcoatRoughness={0.25}
+          />
+        </mesh>
+      )}
+
       {/* Controls */}
       <OrbitControls enableDamping={true} target={[0, 0, 0]} />
+      
     </group>
   );
 }
