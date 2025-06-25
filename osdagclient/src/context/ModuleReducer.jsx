@@ -83,6 +83,13 @@ export default (state, action) => {
         topAngleList: action.payload.topAngleList || [],
       };
 
+    case "SET_CHANNEL_LIST":
+      console.log("channelList", action.payload);
+      return {
+        ...state,
+        channelList: action.payload.channelList || [],
+      };
+
     case "SET_DESIGN_DATA_AND_LOGS":
       return {
         ...state,
