@@ -40,7 +40,8 @@ import BoltedToEndPage from './components/TensionMembers/BoltedToEnd/pages/Bolte
 
 // module imports
 import FinPlate from "./modules/FinPlate/FinPlate";
-import CoverPlateWelded from "./components/momentConnection/beamToBeamSplice/CoverPlateWelded";
+import CoverPlateWelded from "./modules/coverPlateWelded/CoverPlateWelded";
+
 import BeamToColumnEndPlate from "./components/momentConnection/BeamToColumnEndPlate";
 import { clearSessionsOnNavigation } from "./utils/sessionManager";
 import Homepage from "./homepage/pages/Homepage";
@@ -89,7 +90,7 @@ function App() {
         />
         <Route
           path='/design/:designType/bolted_to_end_gusset'
-          element={<BoltedToEnd />} 
+          element={<BoltedToEnd />}
         />
         <Route
           path="/design/:designType/beam-to-beam-splice/cover_plate_welded"
