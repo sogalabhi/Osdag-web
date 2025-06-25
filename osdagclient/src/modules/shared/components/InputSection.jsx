@@ -57,6 +57,7 @@ export const InputSection = ({
   }, [extraState.selectedOption]);
 
   const handleCustomizableSelect = (field, value) => {
+
     if (value === "Customized") {
       if (inputs[field.key].length !== 0) {
         setInputs({ ...inputs, [field.key]: inputs[field.key] });
@@ -116,14 +117,14 @@ export const InputSection = ({
             />
           );
         } else if (field.options === 'materialList') {
-          const materialOptions = contextData.materialList?.map(item => ({ value: item.id, label: item.Grade })) || [];
-          const currentValue = inputs[field.key] || contextData.materialList[0]?.Grade;
-          // Find by id first, then by Grade if not found
-          let selectedOption = materialOptions.find(option => option.value === currentValue);
-          if (!selectedOption) {
-            selectedOption = materialOptions.find(option => option.label === currentValue);
+   
+          // Check for duplicates in materialList
+          const grades = contextData.materialList?.map(item => item.Grade) || [];
+          const duplicateGrades = grades.filter((grade, index) => grades.indexOf(grade) !== index);
+          if (duplicateGrades.length > 0) {
+            console.warn(`Duplicate grades found in materialList:`, duplicateGrades);
           }
-          
+
           return (
             <Select
               className="react-select-container"
@@ -137,10 +138,11 @@ export const InputSection = ({
                   setInputs({ ...inputs, [field.key]: selectedOption.value });
                 }
               }}
-              isSearchable={false}
-              menuPortalTarget={document.body}
-              styles={selectStyles}
-            />
+            >
+              {contextData.materialList.map((item, index) => (
+                <Option key={`${item.id}-${index}`} value={item.id}>{item.Grade}</Option>
+              ))}
+            </Select>
           );
         } else {
           const options = field.options?.map(option => ({
@@ -231,14 +233,64 @@ export const InputSection = ({
         
         return (
           <Select
-            className="react-select-container"
-            classNamePrefix="react-select"
-            value={selectedCustomizable}
-            options={customizableOptions}
-            onChange={(selectedOption) => handleCustomizableSelect(field, selectedOption.value)}
-            isSearchable={false}
-            menuPortalTarget={document.body}
-            styles={selectStyles}
+            onSelect={(value) => handleCustomizableSelect(field, value)}
+            value={selectionStates[field.selectionKey]}
+          >
+            <Option value="All">All</Option>
+            <Option value="Customized">Customized</Option>
+          </Select>
+        );
+
+      case 'sectionProfileList':
+        // Check for duplicates in sectionProfileList
+        const profiles = contextData.sectionProfileList || [];
+        const duplicateProfiles = profiles.filter((profile, index) => profiles.indexOf(profile) !== index);
+        if (duplicateProfiles.length > 0) {
+          console.warn(`⚠️ Duplicate profiles found in sectionProfileList:`, duplicateProfiles);
+        }
+
+        return (
+          <Select
+            value={inputs[field.key]}
+            onSelect={(value) => {
+              if (field.onChange) {
+                field.onChange(value, inputs, setInputs, contextData, extraState, setExtraState);
+              } else {
+                setInputs({ ...inputs, [field.key]: value });
+              }
+            }}
+          >
+            {(contextData.sectionProfileList || []).map((profile, index) => (
+              <Option key={`${profile}-${index}`} value={profile}>
+                {profile}
+              </Option>
+            ))}
+          </Select>
+        );
+
+      case 'dynamicSelect':
+        const options = field.getOptions ? field.getOptions(inputs, extraState) : [];
+        return (
+          <Select
+            value={inputs[field.key]}
+            onSelect={(value) => setInputs({ ...inputs, [field.key]: value })}
+          >
+            {options.map((option, index) => (
+              <Option key={index} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        );
+
+      case 'image':
+        const imageUrl = field.imageSource ? field.imageSource(extraState) : null;
+        return imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={field.label || "Section Profile"}
+            height={field.height || "100px"}
+            width={field.width || "100px"}
           />
         );
 
