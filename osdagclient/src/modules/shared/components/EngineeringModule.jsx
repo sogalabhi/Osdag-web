@@ -8,11 +8,11 @@ import Select from 'react-select';
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
 import { InputSection } from "../components/InputSection";
 import { CustomizationModal } from "../components/CustomizationModal";
-import { DesignReportModal } from "../components/DesignReportModal";
+import { DesignReportModal } from "../components/DesignReportModal"; 
 import useViewCamera from "./btobViewCamera";
 import Model from "./btobRender";
 import Logs from "../../../components/Logs";
-import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
+import MomentDropdownMenu from "../../../components/MomentDropDownMenu";
 import ScreenshotCapture from "../../../components/ScreenShotCapture";
 import DesignPrefSections from "../../../components/DesignPrefSections";
 import Designsvg from "../../../assets/Designsvg.svg";
@@ -40,8 +40,6 @@ export const EngineeringModule = ({
   const {
     // Context data
     beamList,
-    columnList,
-    connectivityList,
     materialList,
     boltDiameterList,
     thicknessList,
@@ -78,16 +76,6 @@ export const EngineeringModule = ({
     extraState,
     setExtraState,
 
-    // Navigation and Reset states
-    showResetConfirmation,
-    setShowResetConfirmation,
-    confirmationType,
-    setConfirmationType,
-    isLoadingModalVisible,
-    setIsLoadingModalVisible,
-    loadingStage,
-    setLoadingStage,
-
     // Actions
     updateModalState,
     updateSelectionState,
@@ -95,8 +83,6 @@ export const EngineeringModule = ({
     toggleAllSelected,
     handleSubmit,
     handleReset,
-    handleHomeClick,
-    performReset,
     handleCreateDesignReport,
     handleOkDesignReport,
     handleCancelDesignReport,
@@ -254,8 +240,6 @@ export const EngineeringModule = ({
 
   const contextData = {
     beamList,
-    columnList,
-    connectivityList,
     materialList,
     boltDiameterList,
     thicknessList,
@@ -271,7 +255,7 @@ export const EngineeringModule = ({
       {/* Navigation */}
       <div className="module_nav">
         {menuItems.map((item, index) => (
-          <UnifiedDropdownMenu
+          <MomentDropdownMenu
             key={index}
             label={item.label}
             dropdown={item.dropdown}
@@ -282,10 +266,6 @@ export const EngineeringModule = ({
             logs={logs}
             setCreateDesignReportBool={setCreateDesignReportBool}
             triggerScreenshotCapture={triggerScreenshotCapture}
-            selectedOption={extraState.selectedOption}
-            setSelectedOption={(value) =>
-              setExtraState({ ...extraState, selectedOption: value })
-            }
           />
         ))}
 
@@ -545,7 +525,7 @@ export const EngineeringModule = ({
         )}
       </div>
 
-      {/* Design Report Modal */}
+      {/* Designreport separate modal */}
       <DesignReportModal
         isOpen={createDesignReportBool}
         onCancel={handleCancelDesignReport}
@@ -555,35 +535,21 @@ export const EngineeringModule = ({
         output={output}
       />
 
-      {/* Customization Modals */}
-      {moduleConfig.modalConfig.map((modal) => {
-        // Handle dynamic data source for tension member
-        let dataSource = contextData[modal.dataSource] || [];
-        
-        // Check if this is section designation modal and get dynamic data
-        const sectionField = moduleConfig.inputSections
-          .flatMap(section => section.fields)
-          .find(field => field.modalKey === modal.key);
-          
-        if (sectionField && sectionField.getDynamicDataSource) {
-          dataSource = sectionField.getDynamicDataSource(inputs, contextData);
-        }
-        
-        return (
-          <CustomizationModal
-            key={modal.key}
-            isOpen={modalStates[modal.key]}
-            onClose={() => updateModalState(modal.key, false)}
-            title="Customized"
-            dataSource={dataSource}
-            selectedItems={selectedItems[modal.inputKey]}
-            onTransferChange={(nextTargetKeys) =>
-              updateSelectedItems(modal.inputKey, nextTargetKeys)
-            }
-          />
-        );
-      })}
-o
+      {/* Modals */}
+      {moduleConfig.modalConfig.map((modal) => (
+        <CustomizationModal
+          key={modal.key}
+          isOpen={modalStates[modal.key]}
+          onClose={() => updateModalState(modal.key, false)}
+          title="Customized"
+          dataSource={contextData[modal.dataSource] || []}
+          selectedItems={selectedItems[modal.inputKey]}
+          onTransferChange={(nextTargetKeys) =>
+            updateSelectedItems(modal.inputKey, nextTargetKeys)
+          }
+        />
+      ))}
+
       {/* Design Preferences Modal */}
       {designPrefModalStatus && (
         <Modal
