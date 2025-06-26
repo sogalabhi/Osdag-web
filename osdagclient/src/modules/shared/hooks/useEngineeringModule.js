@@ -87,7 +87,9 @@ export const useEngineeringModule = (moduleConfig) => {
     } else if (moduleConfig.cameraKey === "TensionMember") {
       return {
         selectedProfile: "Back to Back Angles",
-        imageSource: moduleConfig.getSectionImage ? moduleConfig.getSectionImage("Back to Back Angles") : null,
+        imageSource: moduleConfig.getSectionImage
+          ? moduleConfig.getSectionImage("Back to Back Angles")
+          : null,
       };
     }
     return {
@@ -135,7 +137,6 @@ export const useEngineeringModule = (moduleConfig) => {
 
   // Comprehensive reset function
   const resetToDefaultState = () => {
-
     if (resetModuleState) {
       resetModuleState();
     }
@@ -196,7 +197,6 @@ export const useEngineeringModule = (moduleConfig) => {
     setTimeout(() => {
       const moduleName = moduleConfig.designType;
       getModuleData(moduleName);
-
     }, 100);
   }, []);
 
@@ -204,7 +204,8 @@ export const useEngineeringModule = (moduleConfig) => {
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       if (hasUnsavedWork()) {
-        const message = "You have unsaved design progress. Are you sure you want to leave?";
+        const message =
+          "You have unsaved design progress. Are you sure you want to leave?";
         event.preventDefault();
         event.returnValue = message;
         return message;
@@ -327,7 +328,10 @@ export const useEngineeringModule = (moduleConfig) => {
 
       const connectivity = extraState?.selectedOption || inputs.connectivity;
 
-      if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
+      if (
+        connectivity === "Column Flange-Beam-Web" ||
+        connectivity === "Column Web-Beam-Web"
+      ) {
         if (inputs.column_section && inputs.beam_section) {
           getDesingPrefData({
             supported_section: inputs.beam_section,
@@ -400,13 +404,18 @@ export const useEngineeringModule = (moduleConfig) => {
       return;
     }
 
-    const param = moduleConfig.buildSubmissionParams(inputs, allSelected, {
-      boltDiameterList,
-      propertyClassList,
-      thicknessList,
-      angleList,
-      channelList,
-    }, extraState);
+    const param = moduleConfig.buildSubmissionParams(
+      inputs,
+      allSelected,
+      {
+        boltDiameterList,
+        propertyClassList,
+        thicknessList,
+        angleList,
+        channelList,
+      },
+      extraState
+    );
 
     // Show loading modal
     setIsLoadingModalVisible(true);
@@ -471,13 +480,18 @@ export const useEngineeringModule = (moduleConfig) => {
       return;
     }
 
-    let data = moduleConfig.buildSubmissionParams(inputs, allSelected, {
-      boltDiameterList,
-      propertyClassList,
-      thicknessList,
-      angleList,
-      channelList,
-    }, extraState);
+    let data = moduleConfig.buildSubmissionParams(
+      inputs,
+      allSelected,
+      {
+        boltDiameterList,
+        propertyClassList,
+        thicknessList,
+        angleList,
+        channelList,
+      },
+      extraState
+    );
 
     // Add output data to the submission data
     for (const key in output) {
@@ -492,7 +506,8 @@ export const useEngineeringModule = (moduleConfig) => {
 
     // Convert to CSV and download
     data = convertToCSV(data);
-    const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(data);
+    const csvContent =
+      "data:text/csv;charset=utf-8," + encodeURIComponent(data);
     const link = document.createElement("a");
     link.setAttribute("href", csvContent);
     link.setAttribute("download", "output.csv");

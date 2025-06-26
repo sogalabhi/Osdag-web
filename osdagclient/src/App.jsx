@@ -20,14 +20,16 @@ import UserAccount from "./components/userAccount/UserAccount";
 // New component for the login page
 import LoginPage from "./components/userAuth/LoginPage";
 
-// jwt imports 
-import jwt_decode from 'jwt-decode';
-import EndPlate from './components/shearConnection/EndPlate';
-import CleatAngle from './components/shearConnection/CleatAngle';
-import SeatedAngle from './components/shearConnection/SeatedAngle';
+// jwt imports
+import jwt_decode from "jwt-decode";
+import EndPlate from "./components/shearConnection/EndPlate";
+import CleatAngle from "./components/shearConnection/CleatAngle";
+import SeatedAngle from "./components/shearConnection/SeatedAngle";
 import CoverPlateBolted from "./modules/coverPlateBolted/CoverPlateBolted";
 import BeamBeamEndPlate from "./modules/beamBeamEndPlate/BeamBeamEndPlate";
-import BoltedToEnd from './modules/TensionMembers/BoltedToEnd/BoltedToEnd';
+import CoverPlateWelded from "./components/momentConnection/beamToBeamSplice/CoverPlateWelded";
+import BeamToColumnEndPlate from "./components/momentConnection/BeamToColumnEndPlate";
+import BoltedToEnd from "./modules/TensionMembers/BoltedToEnd/BoltedToEnd";
 
 // module imports
 import FinPlate from "./modules/FinPlate/FinPlate";
@@ -36,7 +38,7 @@ import CoverPlateWelded from "./modules/coverPlateWelded/CoverPlateWelded";
 import BeamToColumnEndPlate from "./components/momentConnection/BeamToColumnEndPlate";
 import Homepage from "./homepage/pages/Homepage";
 
-let renderedOnce = false
+let renderedOnce = false;
 
 function App() {
   // State to track user authentication status
@@ -72,7 +74,7 @@ function App() {
           element={<BeamBeamEndPlate />}
         />
         <Route
-          path='/design/:designType/bolted_to_end_gusset'
+          path="/design/:designType/bolted_to_end_gusset"
           element={<BoltedToEnd />}
         />
         <Route
@@ -83,7 +85,7 @@ function App() {
           path="/design/connections/beam-to-column/end_plate"
           element={<BeamToColumnEndPlate />}
         />
-        <Route path='/user' element={<UserAccount />} />
+        <Route path="/user" element={<UserAccount />} />
       </Route>
     )
   );
@@ -115,8 +117,11 @@ const Root = (loggedIn) => {
     const currentPath = window.location.pathname;
 
     // Clear sessions when navigating to non-design pages
-    if (currentPath === '/' || currentPath === '/home' || currentPath.startsWith('/user')) {
-      
+    if (
+      currentPath === "/" ||
+      currentPath === "/home" ||
+      currentPath.startsWith("/user")
+    ) {
     }
   }, []);
 
@@ -126,7 +131,7 @@ const Root = (loggedIn) => {
     // then, implemented access_token checking and decoding
     if (localStorage.getItem("access")) {
       const decodedAccessToken = jwt_decode(localStorage.getItem("access"));
-     
+
       // check expiration
       if (
         decodedAccessToken.exp > Date.now() / 1000 &&
@@ -135,7 +140,7 @@ const Root = (loggedIn) => {
       ) {
         // the user should automatically be logged in
         loggedIn = true;
-        
+
         userLogin(
           decodedAccessToken.username,
           "", // Don't pass password for security
@@ -146,7 +151,6 @@ const Root = (loggedIn) => {
         // login again
         loggedIn = false;
       }
-
     } else {
       // login again
       loggedIn = false;
@@ -157,8 +161,7 @@ const Root = (loggedIn) => {
 
   // Check if the current pathname matches the specified path
   const isDesignPage = window.location.pathname.startsWith("/design/");
-  const isUserProfilePage =
-    window.location.pathname.startsWith("/user");
+  const isUserProfilePage = window.location.pathname.startsWith("/user");
   const isLoginPage = window.location.pathname === "/";
 
   return (

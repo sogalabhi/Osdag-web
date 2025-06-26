@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Modal, Row, Col, Input, Button, Upload } from 'antd';
+import React, { useState } from "react";
+import { Modal, Row, Col, Input, Button, Upload } from "antd";
 
 export const DesignReportModal = ({
   isOpen,
@@ -7,22 +7,22 @@ export const DesignReportModal = ({
   onOk,
   designReportInputs,
   setDesignReportInputs,
-  output
+  output,
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
-  
+
   const handleFieldChange = (field, value) => {
-    setDesignReportInputs(prev => ({
+    setDesignReportInputs((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleFileChange = (event) => {
     const imageFile = event.target.files[0];
     const imageFileName = event.target.files[0]?.name || "";
-    
-    setDesignReportInputs(prev => ({
+
+    setDesignReportInputs((prev) => ({
       ...prev,
       companyLogo: imageFile,
       companyLogoName: imageFileName,
@@ -49,11 +49,11 @@ export const DesignReportModal = ({
             const trimmedValue = value.trim();
 
             if (trimmedField === "CompanyName") {
-              handleFieldChange('companyName', trimmedValue);
+              handleFieldChange("companyName", trimmedValue);
             } else if (trimmedField === "Designer") {
-              handleFieldChange('designer', trimmedValue);
+              handleFieldChange("designer", trimmedValue);
             } else if (trimmedField === "Group/TeamName") {
-              handleFieldChange('groupTeamName', trimmedValue);
+              handleFieldChange("groupTeamName", trimmedValue);
             }
           }
         });
@@ -111,7 +111,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           <Col span={18}>
             <Input
               value={designReportInputs.companyName}
-              onChange={(e) => handleFieldChange('companyName', e.target.value)}
+              onChange={(e) => handleFieldChange("companyName", e.target.value)}
               placeholder="Enter company name"
             />
           </Col>
@@ -129,7 +129,9 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
               onChange={handleFileChange}
             />
             {designReportInputs.companyLogoName && (
-              <div style={{ marginTop: "5px", fontSize: "12px", color: "#666" }}>
+              <div
+                style={{ marginTop: "5px", fontSize: "12px", color: "#666" }}
+              >
                 Selected: {designReportInputs.companyLogoName}
               </div>
             )}
@@ -144,7 +146,9 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           <Col span={18}>
             <Input
               value={designReportInputs.groupTeamName}
-              onChange={(e) => handleFieldChange('groupTeamName', e.target.value)}
+              onChange={(e) =>
+                handleFieldChange("groupTeamName", e.target.value)
+              }
               placeholder="Enter team name"
             />
           </Col>
@@ -158,7 +162,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           <Col span={18}>
             <Input
               value={designReportInputs.designer}
-              onChange={(e) => handleFieldChange('designer', e.target.value)}
+              onChange={(e) => handleFieldChange("designer", e.target.value)}
               placeholder="Enter designer name"
             />
           </Col>
@@ -173,10 +177,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
             gap: "10px",
           }}
         >
-          <Upload
-            beforeUpload={handleProfileFileChange}
-            showUploadList={false}
-          >
+          <Upload beforeUpload={handleProfileFileChange} showUploadList={false}>
             <Button>Select Profile File</Button>
           </Upload>
           <Button type="button" onClick={handleUseProfile}>
@@ -195,7 +196,9 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           <Col span={18}>
             <Input
               value={designReportInputs.projectTitle}
-              onChange={(e) => handleFieldChange('projectTitle', e.target.value)}
+              onChange={(e) =>
+                handleFieldChange("projectTitle", e.target.value)
+              }
               placeholder="Enter project title"
             />
           </Col>
@@ -209,7 +212,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           <Col span={18}>
             <Input
               value={designReportInputs.subtitle}
-              onChange={(e) => handleFieldChange('subtitle', e.target.value)}
+              onChange={(e) => handleFieldChange("subtitle", e.target.value)}
               placeholder="Enter subtitle"
             />
           </Col>
@@ -223,7 +226,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           <Col span={18}>
             <Input
               value={designReportInputs.jobNumber}
-              onChange={(e) => handleFieldChange('jobNumber', e.target.value)}
+              onChange={(e) => handleFieldChange("jobNumber", e.target.value)}
               placeholder="Enter job number"
             />
           </Col>
@@ -237,7 +240,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           <Col span={18}>
             <Input
               value={designReportInputs.client}
-              onChange={(e) => handleFieldChange('client', e.target.value)}
+              onChange={(e) => handleFieldChange("client", e.target.value)}
               placeholder="Enter client name"
             />
           </Col>
@@ -251,7 +254,9 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           <Col span={18}>
             <Input.TextArea
               value={designReportInputs.additionalComments}
-              onChange={(e) => handleFieldChange('additionalComments', e.target.value)}
+              onChange={(e) =>
+                handleFieldChange("additionalComments", e.target.value)
+              }
               rows={4}
               placeholder="Enter additional comments"
               showCount
@@ -261,14 +266,16 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
         </Row>
 
         {/* Action Buttons */}
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "flex-end", 
-          gap: "10px",
-          marginTop: "20px",
-          paddingTop: "15px",
-          borderTop: "1px solid #f0f0f0"
-        }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "10px",
+            marginTop: "20px",
+            paddingTop: "15px",
+            borderTop: "1px solid #f0f0f0",
+          }}
+        >
           <Button type="default" onClick={onCancel}>
             Cancel
           </Button>

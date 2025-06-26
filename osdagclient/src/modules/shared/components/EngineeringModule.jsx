@@ -96,9 +96,9 @@ export const EngineeringModule = ({
 
   // Get the backend parameter name (different from display name for some cases)
   const getBackendViewName = (displayOption) => {
-    // Map UI display names to backend parameter names  
+    // Map UI display names to backend parameter names
     const backendMapping = {
-      "CoverPlate": "Connector", // UI shows "CoverPlate" but backend expects "Connector"
+      CoverPlate: "Connector", // UI shows "CoverPlate" but backend expects "Connector"
     };
     return backendMapping[displayOption] || displayOption;
   };
@@ -151,22 +151,20 @@ export const EngineeringModule = ({
   // Get the display name for view options (for better UI labels)
   const getViewDisplayName = (option) => {
     const displayNames = {
-      "Model": "Model",
-      "Beam": "Beam",
-      "Column": "Column",
-      "Connector": "Connector",
-      "CoverPlate": "Cover Plate",
-      "Member": "Member",
-      "Plate": "Plate",
-      "Endplate": "End Plate",
-      "EndPlate": "End Plate",
-      "CleatAngle": "Cleat Angle",
-      "SeatedAngle": "Seated Angle"
+      Model: "Model",
+      Beam: "Beam",
+      Column: "Column",
+      Connector: "Connector",
+      CoverPlate: "Cover Plate",
+      Member: "Member",
+      Plate: "Plate",
+      Endplate: "End Plate",
+      EndPlate: "End Plate",
+      CleatAngle: "Cleat Angle",
+      SeatedAngle: "Seated Angle",
     };
     return displayNames[option] || option;
   };
-
-
 
   // Initialize selectedView to first option if not set
   React.useEffect(() => {
@@ -270,10 +268,13 @@ export const EngineeringModule = ({
                 title={`View ${getViewDisplayName(option)}`}
               >
                 <div
-                  className={`option-box ${selectedView === option ? "selected" : ""
-                    }`}
+                  className={`option-box ${
+                    selectedView === option ? "selected" : ""
+                  }`}
                 ></div>
-                <span className="option-label">{getViewDisplayName(option)}</span>
+                <span className="option-label">
+                  {getViewDisplayName(option)}
+                </span>
               </div>
             ))}
           </div>
@@ -336,7 +337,8 @@ export const EngineeringModule = ({
                 <p>Click "Design" to generate and view the 3D model</p>
                 <div className="model-info">
                   <small>
-                    Available views: {viewOptions.map(getViewDisplayName).join(", ")}
+                    Available views:{" "}
+                    {viewOptions.map(getViewDisplayName).join(", ")}
                   </small>
                 </div>
               </div>
@@ -509,8 +511,12 @@ export const EngineeringModule = ({
       {/* Enhanced CSS for better UI */}
       <style jsx>{`
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
 
         .options-container {
@@ -520,7 +526,7 @@ export const EngineeringModule = ({
           background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
           border-radius: 8px;
           margin-bottom: 8px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .option-wrapper {
@@ -538,7 +544,7 @@ export const EngineeringModule = ({
         .option-wrapper:hover {
           background: rgba(255, 255, 255, 0.9);
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .option-box {
@@ -643,7 +649,7 @@ export const EngineeringModule = ({
         .model-loading-fallback .spinner {
           width: 30px;
           height: 30px;
-          border: 3px solid rgba(255,255,255,0.3);
+          border: 3px solid rgba(255, 255, 255, 0.3);
           border-top: 3px solid white;
           border-radius: 50%;
           animation: spin 1s linear infinite;
@@ -654,7 +660,7 @@ export const EngineeringModule = ({
           height: 400px;
           border-radius: 8px;
           overflow: hidden;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
 
         .outputdock-btn input[type="button"]:disabled,

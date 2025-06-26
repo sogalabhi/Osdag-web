@@ -1,6 +1,10 @@
 import { useMemo } from "react";
 
-export default function useViewCamera(moduleName, selectedView, connectivity = null) {
+export default function useViewCamera(
+  moduleName,
+  selectedView,
+  connectivity = null
+) {
   const cameraSettings = useMemo(
     () => ({
       BeamBeamEndPlate: {
@@ -48,7 +52,7 @@ export default function useViewCamera(moduleName, selectedView, connectivity = n
         FinPlate: { position: [-8, 6, -8], fov: 38 },
         // Legacy support
         Plate: { position: [-8, 6, -8], fov: 38 },
-        
+
         connectivitySettings: {
           "Column Flange-Beam-Web": {
             Model: { position: [10, 8, 10], fov: 40 },
@@ -117,21 +121,27 @@ export default function useViewCamera(moduleName, selectedView, connectivity = n
 
   // Get base module settings
   const moduleSettings = cameraSettings[moduleName] || cameraSettings.default;
-  
+
   // Handle FinPlate connectivity-specific settings
-  if (moduleName === "FinPlate" && connectivity && moduleSettings.connectivitySettings) {
-    const connectivitySettings = moduleSettings.connectivitySettings[connectivity];
-    
+  if (
+    moduleName === "FinPlate" &&
+    connectivity &&
+    moduleSettings.connectivitySettings
+  ) {
+    const connectivitySettings =
+      moduleSettings.connectivitySettings[connectivity];
+
     if (connectivitySettings) {
-      const viewSettings = connectivitySettings[selectedView] || connectivitySettings.Model;
-      
+      const viewSettings =
+        connectivitySettings[selectedView] || connectivitySettings.Model;
+
       // Log if using fallback view for connectivity
       if (!connectivitySettings[selectedView]) {
         console.warn(
           `Camera settings not found for view: ${selectedView} in connectivity: ${connectivity}, using Model view`
         );
       }
-      
+
       return viewSettings;
     } else {
       console.warn(
@@ -139,9 +149,13 @@ export default function useViewCamera(moduleName, selectedView, connectivity = n
       );
     }
   }
-  
+
   // Default handling for non-FinPlate modules or when no connectivity is provided
-  const viewSettings = moduleSettings[selectedView] || moduleSettings.Model || cameraSettings.default[selectedView] || cameraSettings.default.Model;
+  const viewSettings =
+    moduleSettings[selectedView] ||
+    moduleSettings.Model ||
+    cameraSettings.default[selectedView] ||
+    cameraSettings.default.Model;
 
   // Log warning if using fallback
   if (!cameraSettings[moduleName]) {
@@ -149,7 +163,7 @@ export default function useViewCamera(moduleName, selectedView, connectivity = n
       `Camera settings not found for module: ${moduleName}, using default settings`
     );
   }
-  
+
   if (!moduleSettings[selectedView] && !cameraSettings.default[selectedView]) {
     console.warn(
       `Camera settings not found for view: ${selectedView} in module: ${moduleName}, using Model view`

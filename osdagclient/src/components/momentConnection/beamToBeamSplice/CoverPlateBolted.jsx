@@ -1285,6 +1285,13 @@ function CoverPlateBolted() {
                     gl.setClearColor("#ADD8E6"); // set background inside WebGL itself, not just CSS
                   }}
                 >
+              <div className="cadModel">
+                <Canvas
+                  gl={{ antialias: true, preserveDrawingBuffer: true }}
+                  onCreated={({ gl }) => {
+                    gl.setClearColor("#ADD8E6"); // set background inside WebGL itself, not just CSS
+                  }}
+                >
                   <PerspectiveCamera
                     ref={cameraRef}
                     makeDefault
@@ -1588,11 +1595,13 @@ function CoverPlateBolted() {
       </div>
 
       {/* <CustomSectionModal
+      {/* <CustomSectionModal
         showModal={showModal}
         setShowModal={setShowModal}
         setInputValues={setInputs}
         inputValues={inputs}
         type="connector"
+      /> */}
       /> */}
 
       {displayPDF ? (

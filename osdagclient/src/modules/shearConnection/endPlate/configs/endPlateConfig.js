@@ -1,34 +1,34 @@
-export const beamBeamEndPlateConfig = {
-  sessionName: "Beam Beam End Plate Connection",
-  routePath: "/design/connections/beam-to-beam-splice/end_plate",
-  designType: "Beam-Beam-End-Plate-Connection",
-  cameraKey: "BeamBeamEndPlate",
-  cadOptions: ["Model", "Beam", "EndPlate"],
+export const endPlateConfig = {
+  sessionName: "End Plate Connection",
+  routePath: "/design/connections/shear/end_plate",
+  designType: "Shear-Connection",
+  cameraKey: "EndPlate",
 
   defaultInputs: {
-    bolt_hole_type: "Standard",
     bolt_diameter: [],
     bolt_grade: [],
-    bolt_slip_factor: "0.3",
-    bolt_tension_type: "Non pre-tensioned",
     bolt_type: "Bearing Bolt",
-    connectivity: "Coplanar Tension-Compression Flange",
-    plate_thickness: [],
     connector_material: "E 250 (Fe 410 W)A",
-    design_method: "Limit State Design",
-    detailing_corr_status: "No",
-    detailing_edge_type: "Sheared or hand flame cut",
-    detailing_gap: "0",
-    load_axial: "100",
-    load_moment: "100",
-    load_shear: "100",
-    material: "E 250 (Fe 410 W)A",
-    supported_designation: "WPB 900 X 300 X 291.46",
-    supported_material: "E 250 (Fe 410 W)A",
-    module: "Beam-Beam-End-Plate-Connection",
+    load_shear: "70",
+    load_axial: "30",
+    module: "End Plate Connection",
+    plate_thickness: [],
+    beam_section: "MB 300",
+    column_section: "HB 150",
+    primary_beam: "JB 200",
+    secondary_beam: "JB 150",
+    supported_material: "E 165 (Fe 290)",
+    supporting_material: "E 165 (Fe 290)",
+    bolt_hole_type: "Standard",
+    bolt_slip_factor: "0.3",
     weld_fab: "Shop Weld",
     weld_material_grade: "410",
-    weld_type: "Groove Weld",
+    detailing_edge_type: "Rolled, machine-flame cut, sawn and planed",
+    detailing_gap: "10",
+    detailing_corr_status: "No",
+    design_method: "Limit State Design",
+    bolt_tension_type: "Pre-tensioned",
+    module: "End Plate",
   },
 
   modalConfig: [
@@ -65,56 +65,48 @@ export const beamBeamEndPlateConfig = {
 
   validateInputs: (inputs) => {
     if (
-      !inputs.supported_designation ||
-      inputs.supported_designation === "Select Section" ||
-      inputs.load_shear === ""
+      !inputs.beam_section ||
+      !inputs.column_section ||
+      inputs.beam_section === "Select Section" ||
+      inputs.column_section === "Select Section"
     ) {
       return { isValid: false, message: "Please input all the fields" };
     }
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraData) => {
-    const conn_map = {
-      "Flushed - Reversible Moment": "Flushed - Reversible Moment",
-      "Extended One Way - Irreversible Moment":
-        "Extended One Way - Irreversible Moment",
-      "Extended Both Ways - Reversible Moment":
-        "Extended Both Ways - Reversible Moment",
-    };
-
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     return {
       "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
       "Bolt.Diameter": allSelected.bolt_diameter
-        ? lists.boltDiameterList
+        ? boltDiameterList
         : inputs.bolt_diameter,
       "Bolt.Grade": allSelected.bolt_grade
-        ? lists.propertyClassList
+        ? propertyClassList
         : inputs.bolt_grade,
       "Bolt.Slip_Factor": inputs.bolt_slip_factor,
       "Bolt.TensionType": inputs.bolt_tension_type,
       "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-      "Connectivity *": inputs.connectivity,
-      EndPlateType:
-        conn_map[extraData?.selectedOption] || "Flushed - Reversible Moment",
-      "Connector.Plate.Thickness_List": allSelected.plate_thickness
-        ? lists.thicknessList
-        : inputs.plate_thickness,
-      "Connector.Material": inputs.supported_material,
+      Connectivity: conn_map[selectedOption],
+      "Connector.Material": inputs.connector_material,
       "Design.Design_Method": inputs.design_method,
       "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
       "Detailing.Edge_type": inputs.detailing_edge_type,
       "Detailing.Gap": inputs.detailing_gap,
       "Load.Axial": inputs.load_axial || "",
-      "Load.Moment": inputs.load_moment || "",
       "Load.Shear": inputs.load_shear || "",
-      Material: inputs.material,
-      "Member.Supported_Section.Designation": inputs.supported_designation,
+      Material: inputs.connector_material,
+      "Member.Supported_Section.Designation": inputs.beam_section,
       "Member.Supported_Section.Material": inputs.supported_material,
+      "Member.Supporting_Section.Designation": inputs.column_section,
+      "Member.Supporting_Section.Material": inputs.supporting_material,
+      Module: "End Plate Connection",
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
-      "Weld.Type": inputs.weld_type,
-      Module: "Beam-Beam-End-Plate-Connection",
+      "Connector.Plate.Thickness_List": allSelected.plate_thickness
+        ? thicknessList
+        : inputs.plate_thickness,
+      Module: "End Plate Connection",
     };
   },
 
@@ -124,49 +116,67 @@ export const beamBeamEndPlateConfig = {
       fields: [
         {
           key: "connectivity",
-          label: "Connectivity *",
+          label: "Connectivity",
           type: "select",
-          options: [
-            {
-              value: "Coplanar Tension-Compression Flange",
-              label: "Coplanner Tension-Compression Flange",
-            },
-            {
-              value: "Coplanar Tension Flange",
-              label: "Coplanner Tension Flange",
-              disabled: true,
-            },
-            {
-              value: "Coplanar Compression Flange",
-              label: "Coplanner Compression Flange",
-              disabled: true,
-            },
-          ],
-        },
-        {
-          key: "endPlateType",
-          label: "End Plate Type *",
-          type: "endPlateSelect",
-        },
-        {
-          key: "supported_designation",
-          label: "Beam Section*",
-          type: "select",
-          options: "beamList",
+          options: "connectivityList",
           required: true,
+          onChange: (value, inputs, setInputs) => {
+            setInputs({ ...inputs, connectivity: value });
+          },
         },
+        ...(inputs.connectivity === "Beam-Beam"
+          ? [
+              {
+                key: "primary_beam",
+                label: "Primary Beam*",
+                type: "select",
+                options: "beamList",
+                defaultValue: "beamList[2]",
+                required: true,
+              },
+              {
+                key: "secondary_beam",
+                label: "Secondary Beam*",
+                type: "select",
+                options: "beamList",
+                defaultValue: "beamList[0]",
+                required: true,
+              },
+            ]
+          : [
+              {
+                key: "column_section",
+                label: "Column Section*",
+                type: "select",
+                options: "columnList",
+                defaultValue: "columnList[0]",
+                required: true,
+              },
+              {
+                key: "beam_section",
+                label: "Beam Section*",
+                type: "select",
+                options: "beamList",
+                defaultValue: "beamList[28]",
+                required: true,
+              },
+            ]),
         {
-          key: "material",
+          key: "connector_material",
           label: "Material",
           type: "select",
           options: "materialList",
-          onChange: (value, inputs, setInputs, materialList) => {
+          defaultValue: "materialList[0].Grade",
+          onChange: (value, inputs, setInputs, materialList, setShowModal) => {
+            if (value == -1) {
+              setShowModal(true);
+              return;
+            }
             const material = materialList.find((item) => item.id === value);
+            console.log(material);
             setInputs({
               ...inputs,
-              material: material.Grade,
               connector_material: material.Grade,
-              supported_material: material.Grade,
             });
           },
         },
@@ -176,7 +186,6 @@ export const beamBeamEndPlateConfig = {
       title: "Factored Loads",
       fields: [
         { key: "load_shear", label: "Shear Force(kN)", type: "number" },
-        { key: "load_moment", label: "Bending Moment (kNm)", type: "number" },
         { key: "load_axial", label: "Axial Force(kN)", type: "number" },
       ],
     },
@@ -211,26 +220,16 @@ export const beamBeamEndPlateConfig = {
       ],
     },
     {
-      title: "End Plate",
+      title: "Plate",
       fields: [
         {
           key: "plate_thickness",
-          label: "Thickness(mm)",
-          type: "customizable",
-          selectionKey: "thicknessSelect",
-          modalKey: "plateThickness",
-          dataSource: "thicknessList",
-        },
-      ],
-    },
-    {
-      title: "Weld",
-      fields: [
-        {
-          key: "weld_type",
           label: "Type",
           type: "select",
-          options: [{ value: "Groove Weld", label: "Groove Weld" }],
+          options: [
+            { value: "Outside", label: "Outside" },
+            { value: "Outside + Inside", label: "Outside + Inside" },
+          ],
         },
       ],
     },

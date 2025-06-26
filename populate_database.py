@@ -16,7 +16,3 @@ data = file.read()
 cursor.execute(data)
 print('SUCCESS : Database Populated')
 
-
-
-
-

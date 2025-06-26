@@ -4,7 +4,7 @@ export const coverPlateBoltedConfig = {
   designType: "Cover-Plate-Bolted-Connection",
   cameraKey: "CoverPlateBolted",
   cadOptions: ["Model", "Beam", "CoverPlate"],
-  
+
   defaultInputs: {
     bolt_hole_type: "Standard",
     bolt_diameter: [],
@@ -30,23 +30,53 @@ export const coverPlateBoltedConfig = {
   },
 
   modalConfig: [
-  { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-  { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-  { key: "flangePlateThickness", inputKey: "flange_plate_thickness", dataSource: "thicknessList" },
-  { key: "webPlateThickness", inputKey: "web_plate_thickness", dataSource: "thicknessList" },
-],
+    {
+      key: "boltDiameter",
+      inputKey: "bolt_diameter",
+      dataSource: "boltDiameterList",
+    },
+    {
+      key: "propertyClass",
+      inputKey: "bolt_grade",
+      dataSource: "propertyClassList",
+    },
+    {
+      key: "flangePlateThickness",
+      inputKey: "flange_plate_thickness",
+      dataSource: "thicknessList",
+    },
+    {
+      key: "webPlateThickness",
+      inputKey: "web_plate_thickness",
+      dataSource: "thicknessList",
+    },
+  ],
 
   selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
+    {
+      key: "boltDiameterSelect",
+      inputKey: "bolt_diameter",
+      defaultValue: "All",
+    },
     { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "flangeThicknessSelect", inputKey: "flange_plate_thickness", defaultValue: "All" },
-    { key: "webThicknessSelect", inputKey: "web_plate_thickness", defaultValue: "All" },
+    {
+      key: "flangeThicknessSelect",
+      inputKey: "flange_plate_thickness",
+      defaultValue: "All",
+    },
+    {
+      key: "webThicknessSelect",
+      inputKey: "web_plate_thickness",
+      defaultValue: "All",
+    },
   ],
 
   validateInputs: (inputs) => {
-    if (!inputs.member_designation || 
-        inputs.member_designation === "Select Section" || 
-        inputs.load_shear === "") {
+    if (
+      !inputs.member_designation ||
+      inputs.member_designation === "Select Section" ||
+      inputs.load_shear === ""
+    ) {
       return { isValid: false, message: "Please input all the fields" };
     }
     return { isValid: true };
@@ -55,17 +85,24 @@ export const coverPlateBoltedConfig = {
   buildSubmissionParams: (inputs, allSelected, lists) => {
     return {
       "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
-      "Bolt.Diameter": allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
-      "Bolt.Grade": allSelected.bolt_grade ? lists.propertyClassList : inputs.bolt_grade,
+      "Bolt.Diameter": allSelected.bolt_diameter
+        ? lists.boltDiameterList
+        : inputs.bolt_diameter,
+      "Bolt.Grade": allSelected.bolt_grade
+        ? lists.propertyClassList
+        : inputs.bolt_grade,
       "Bolt.Slip_Factor": inputs.bolt_slip_factor,
       "Bolt.TensionType": inputs.bolt_tension_type,
       "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
       "Connector.Flange_Plate.Preferences": inputs.flange_plate_preferences,
-      "Connector.Flange_Plate.Thickness_list": allSelected.flange_plate_thickness 
-        ? lists.thicknessList : inputs.flange_plate_thickness,
+      "Connector.Flange_Plate.Thickness_list":
+        allSelected.flange_plate_thickness
+          ? lists.thicknessList
+          : inputs.flange_plate_thickness,
       "Connector.Material": inputs.connector_material,
-      "Connector.Web_Plate.Thickness_List": allSelected.web_plate_thickness 
-        ? lists.thicknessList : inputs.web_plate_thickness,
+      "Connector.Web_Plate.Thickness_List": allSelected.web_plate_thickness
+        ? lists.thicknessList
+        : inputs.web_plate_thickness,
       "Design.Design_Method": inputs.design_method,
       "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
       "Detailing.Edge_type": inputs.detailing_edge_type,
@@ -89,7 +126,7 @@ export const coverPlateBoltedConfig = {
           label: "Section Designation*",
           type: "select",
           options: "beamList",
-          required: true
+          required: true,
         },
         {
           key: "material",
@@ -97,24 +134,24 @@ export const coverPlateBoltedConfig = {
           type: "select",
           options: "materialList",
           onChange: (value, inputs, setInputs, materialList) => {
-            const material = materialList.find(item => item.id === value);
+            const material = materialList.find((item) => item.id === value);
             setInputs({
               ...inputs,
               material: material.Grade,
               connector_material: material.Grade,
               member_material: material.Grade,
             });
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       title: "Factored Loads",
       fields: [
         { key: "load_shear", label: "Shear Force(kN)", type: "number" },
         { key: "load_moment", label: "Moment Force(kN)", type: "number" },
-        { key: "load_axial", label: "Axial Force(kN)", type: "number" }
-      ]
+        { key: "load_axial", label: "Axial Force(kN)", type: "number" },
+      ],
     },
     {
       title: "Bolt",
@@ -125,7 +162,7 @@ export const coverPlateBoltedConfig = {
           type: "customizable",
           selectionKey: "boltDiameterSelect",
           modalKey: "boltDiameter",
-          dataSource: "boltDiameterList"
+          dataSource: "boltDiameterList",
         },
         {
           key: "bolt_type",
@@ -133,8 +170,8 @@ export const coverPlateBoltedConfig = {
           type: "select",
           options: [
             { value: "Bearing_Bolt", label: "Bearing Bolt" },
-            { value: "Friction_Grip_Bolt", label: "Friction Grip Bolt" }
-          ]
+            { value: "Friction_Grip_Bolt", label: "Friction Grip Bolt" },
+          ],
         },
         {
           key: "bolt_grade",
@@ -142,9 +179,9 @@ export const coverPlateBoltedConfig = {
           type: "customizable",
           selectionKey: "propertyClassSelect",
           modalKey: "propertyClass",
-          dataSource: "propertyClassList"
-        }
-      ]
+          dataSource: "propertyClassList",
+        },
+      ],
     },
     {
       title: "Flange Splice Plate",
@@ -155,8 +192,8 @@ export const coverPlateBoltedConfig = {
           type: "select",
           options: [
             { value: "Outside", label: "Outside" },
-            { value: "Outside + Inside", label: "Outside + Inside" }
-          ]
+            { value: "Outside + Inside", label: "Outside + Inside" },
+          ],
         },
         {
           key: "flange_plate_thickness",
@@ -164,9 +201,9 @@ export const coverPlateBoltedConfig = {
           type: "customizable",
           selectionKey: "flangeThicknessSelect",
           modalKey: "flangePlateThickness",
-          dataSource: "thicknessList"
-        }
-      ]
+          dataSource: "thicknessList",
+        },
+      ],
     },
     {
       title: "Web Splice Plate",
@@ -177,9 +214,9 @@ export const coverPlateBoltedConfig = {
           type: "customizable",
           selectionKey: "webThicknessSelect",
           modalKey: "webPlateThickness",
-          dataSource: "thicknessList"
-        }
-      ]
-    }
-  ]
+          dataSource: "thicknessList",
+        },
+      ],
+    },
+  ],
 };

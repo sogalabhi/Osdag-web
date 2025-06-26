@@ -64,7 +64,7 @@ function Model({ modelPaths, selectedView }) {
       parsedModels?.Connector ? getGeometry(parsedModels.Connector) : null,
     [parsedModels, texture]
   );
-  
+
   // Tension Member specific geometries
   const geometryMember = useMemo(
     () => (parsedModels?.Member ? getGeometry(parsedModels.Member) : null),
@@ -302,40 +302,41 @@ function Model({ modelPaths, selectedView }) {
       )}
 
       {/* EndPlate Section - For Beam-Beam End Plate and Tension Members */}
-      {(selectedView === "EndPlate" || selectedView === "Endplate") && geometryEndplate && (
-        <>
-          <mesh
-            geometry={geometryEndplate}
-            scale={0.008}
-            position={[0, 0, 4]}
-            rotation={[Math.PI / -2, 0, 0]}
-          >
-            <meshPhysicalMaterial
-              attach="material"
-              map={texture}
-              metalness={0.25}
-              roughness={0.1}
-              opacity={1.0}
-              transparent={true}
-              transmission={0.99}
-              clearcoat={1.0}
-              clearcoatRoughness={0.25}
+      {(selectedView === "EndPlate" || selectedView === "Endplate") &&
+        geometryEndplate && (
+          <>
+            <mesh
+              geometry={geometryEndplate}
+              scale={0.008}
+              position={[0, 0, 4]}
+              rotation={[Math.PI / -2, 0, 0]}
+            >
+              <meshPhysicalMaterial
+                attach="material"
+                map={texture}
+                metalness={0.25}
+                roughness={0.1}
+                opacity={1.0}
+                transparent={true}
+                transmission={0.99}
+                clearcoat={1.0}
+                clearcoatRoughness={0.25}
+              />
+            </mesh>
+            {/* Endplate outline */}
+            <primitive
+              object={
+                new THREE.LineSegments(
+                  new THREE.EdgesGeometry(geometryEndplate, 15),
+                  new THREE.LineBasicMaterial({ color: "black" })
+                )
+              }
+              scale={0.008}
+              rotation={[Math.PI / -2, 0, 0]}
+              position={[0, 0, 4]}
             />
-          </mesh>
-          {/* Endplate outline */}
-          <primitive
-            object={
-              new THREE.LineSegments(
-                new THREE.EdgesGeometry(geometryEndplate, 15),
-                new THREE.LineBasicMaterial({ color: "black" })
-              )
-            }
-            scale={0.008}
-            rotation={[Math.PI / -2, 0, 0]}
-            position={[0, 0, 4]}
-          />
-        </>
-      )}
+          </>
+        )}
 
       {/* Controls */}
       <OrbitControls enableDamping={true} target={[0, 0, 0]} />

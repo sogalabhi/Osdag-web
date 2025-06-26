@@ -1,8 +1,8 @@
-import React from 'react';
-import { EngineeringModule } from '../shared/components/EngineeringModule';
-import { beamBeamEndPlateConfig } from './configs/beamBeamEndPlateConfig';
-import BeamBeamEndPlateOutputDock from './components/BeamBeamEndPlateOutputDock';
-import { menuItems } from '../shared/utils/moduleUtils';
+import React from "react";
+import { EngineeringModule } from "../shared/components/EngineeringModule";
+import { beamBeamEndPlateConfig } from "./configs/beamBeamEndPlateConfig";
+import BeamBeamEndPlateOutputDock from "./components/BeamBeamEndPlateOutputDock";
+import { menuItems } from "../shared/utils/moduleUtils";
 
 function BeamBeamEndPlate() {
   return (
