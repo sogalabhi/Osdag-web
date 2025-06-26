@@ -9,10 +9,10 @@ import CWBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cw_bw.png";
 import BB from "../../../assets/ShearConnection/sc_fin_plate/fin_beam_beam.png";
 import ErrorImg from "../../../assets/notSelected.png";
 
-export const InputSection = ({ 
-  section, 
-  inputs, 
-  setInputs, 
+export const InputSection = ({
+  section,
+  inputs,
+  setInputs,
   selectionStates,
   updateSelectionState,
   updateModalState,
@@ -38,13 +38,13 @@ export const InputSection = ({
         "Column Web-Beam-Web": CWBW,
         "Beam-Beam": BB,
       };
-      
+
       const endPlateImageMap = {
         "Flushed - Reversible Moment": FRM,
         "Extended One Way - Irreversible Moment": EOWIM,
         "Extended Both Ways - Reversible Moment": EBWRM,
       };
-      
+
       // Check if it's a connectivity or end plate selection
       if (connectivityImageMap[extraState.selectedOption]) {
         setImageSource(connectivityImageMap[extraState.selectedOption]);
@@ -85,7 +85,7 @@ export const InputSection = ({
           const beamOptions = contextData.beamList?.map(item => ({ value: item, label: item })) || [];
           const currentValue = inputs[field.key] || contextData.beamList[2];
           const selectedOption = beamOptions.find(option => option.value === currentValue);
-          
+
           return (
             <Select
               className="react-select-container"
@@ -102,7 +102,7 @@ export const InputSection = ({
           const columnOptions = contextData.columnList?.map(item => ({ value: item, label: item })) || [];
           const currentValue = inputs[field.key] || contextData.columnList[0];
           const selectedOption = columnOptions.find(option => option.value === currentValue);
-          
+
           return (
             <Select
               className="react-select-container"
@@ -116,7 +116,7 @@ export const InputSection = ({
             />
           );
         } else if (field.options === 'materialList') {
-   
+
           // Check for duplicates in materialList
           const grades = contextData.materialList?.map(item => item.Grade) || [];
           const duplicateGrades = grades.filter((grade, index) => grades.indexOf(grade) !== index);
@@ -150,7 +150,7 @@ export const InputSection = ({
             isDisabled: option.disabled
           })) || [];
           const selectedOption = options.find(option => option.value === inputs[field.key]);
-          
+
           return (
             <Select
               className="react-select-container"
@@ -169,7 +169,7 @@ export const InputSection = ({
         const connectivityOptions = (contextData.connectivityList || []).map(item => ({ value: item, label: item }));
         const connectivityValue = extraState.selectedOption || inputs.connectivity;
         const selectedConnectivity = connectivityOptions.find(option => option.value === connectivityValue);
-        
+
         return (
           <Select
             className="react-select-container"
@@ -178,7 +178,7 @@ export const InputSection = ({
             options={connectivityOptions}
             onChange={(selectedOption) => {
               setExtraState({ ...extraState, selectedOption: selectedOption.value });
-              setInputs({ ...inputs, connectivity: selectedOption.value, output: null }); 
+              setInputs({ ...inputs, connectivity: selectedOption.value, output: null });
             }}
             isSearchable={false}
             menuPortalTarget={document.body}
@@ -194,7 +194,7 @@ export const InputSection = ({
         };
         const endPlateOptions = Object.keys(conn_map).map(item => ({ value: item, label: conn_map[item] }));
         const selectedEndPlate = endPlateOptions.find(option => option.value === extraState.selectedOption);
-        
+
         return (
           <Select
             className="react-select-container"
@@ -203,7 +203,7 @@ export const InputSection = ({
             options={endPlateOptions}
             onChange={(selectedOption) => {
               setExtraState({ ...extraState, selectedOption: selectedOption.value });
-              setInputs({ ...inputs, output: null }); 
+              setInputs({ ...inputs, output: null });
             }}
             isSearchable={false}
             menuPortalTarget={document.body}
@@ -229,7 +229,7 @@ export const InputSection = ({
           { value: "All", label: "All" }
         ];
         const selectedCustomizable = customizableOptions.find(option => option.value === selectionStates[field.selectionKey]);
-        
+
         return (
           <Select
             onSelect={(value) => handleCustomizableSelect(field, value)}
@@ -291,7 +291,7 @@ export const InputSection = ({
             height={field.height || "100px"}
             width={field.width || "100px"}
           />
-        );
+        ) : null;
 
       default:
         return (
