@@ -44,6 +44,8 @@ import SelectModulePage from "./homepage/pages/SelectModulePage";
 import FinPlate from "./modules/shearConnection/endPlate/FinPlate";
 import CleatAngle from "./modules/shearConnection/cleatAngle/CleatAngle";
 import EndPlate from "./modules/shearConnection/endPlate/EndPlate";
+import SimplySupportedBeam from "./modules/flexuralMember/simplySupportedBeam";
+
 let renderedOnce = false;
 
 function App() {
@@ -113,7 +115,11 @@ function App() {
           path="/design/connections/beam-to-column/end_plate"
           element={<BeamToColumnEndPlate />}
         />
-        <Route path='/user' element={<UserAccount />} />
+        <Route
+          path="/design/:designType/simply_supported_beam"
+          element={<SimplySupportedBeam />}
+        />
+        <Route path="/user" element={<UserAccount />} />
       </Route>
     )
   );
