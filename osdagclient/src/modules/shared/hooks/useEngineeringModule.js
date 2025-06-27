@@ -91,6 +91,13 @@ export const useEngineeringModule = (moduleConfig) => {
           ? moduleConfig.getSectionImage("Back to Back Angles")
           : null,
       };
+    } else if (moduleConfig.cameraKey === "FlexuralMember") {
+      return {
+        selectedProfile: "Beams",
+        imageSource: moduleConfig.getSectionImage
+          ? moduleConfig.getSectionImage("Beams")
+          : null,
+      };
     }
     return {
       selectedOption: "Flushed - Reversible Moment", // Default for BeamBeamEndPlate
@@ -278,7 +285,7 @@ export const useEngineeringModule = (moduleConfig) => {
         for (const [key, value] of Object.entries(designData)) {
           const newKey = key;
           const label = value.label;
-          const val = value.value;
+          const val = value.val; // Fixed: was value.value, now value.val
           if (val !== undefined && val !== null) {
             formatedOutput[newKey] = { label, val };
           }
@@ -413,6 +420,8 @@ export const useEngineeringModule = (moduleConfig) => {
         thicknessList,
         angleList,
         channelList,
+        beamList,
+        columnList,
       },
       extraState
     );
@@ -489,6 +498,8 @@ export const useEngineeringModule = (moduleConfig) => {
         thicknessList,
         angleList,
         channelList,
+        beamList,
+        columnList,
       },
       extraState
     );

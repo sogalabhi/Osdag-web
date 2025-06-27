@@ -27,16 +27,15 @@ import CleatAngle from "./components/shearConnection/CleatAngle";
 import SeatedAngle from "./components/shearConnection/SeatedAngle";
 import CoverPlateBolted from "./modules/coverPlateBolted/CoverPlateBolted";
 import BeamBeamEndPlate from "./modules/beamBeamEndPlate/BeamBeamEndPlate";
-import CoverPlateWelded from "./components/momentConnection/beamToBeamSplice/CoverPlateWelded";
-import BeamToColumnEndPlate from "./components/momentConnection/BeamToColumnEndPlate";
 import BoltedToEnd from "./modules/TensionMembers/BoltedToEnd/BoltedToEnd";
 
 // module imports
-import FinPlate from "./modules/FinPlate/FinPlate";
+import FinPlate from "./modules/shearConnection/finPlate/FinPlate";
 import CoverPlateWelded from "./modules/coverPlateWelded/CoverPlateWelded";
 
 import BeamToColumnEndPlate from "./components/momentConnection/BeamToColumnEndPlate";
 import Homepage from "./homepage/pages/Homepage";
+import SimplySupportedBeam from "./modules/flexuralMember/simplySupportedBeam";
 
 let renderedOnce = false;
 
@@ -84,6 +83,10 @@ function App() {
         <Route
           path="/design/connections/beam-to-column/end_plate"
           element={<BeamToColumnEndPlate />}
+        />
+        <Route
+          path="/design/:designType/simply_supported_beam"
+          element={<SimplySupportedBeam />}
         />
         <Route path="/user" element={<UserAccount />} />
       </Route>
