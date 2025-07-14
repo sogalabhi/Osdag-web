@@ -228,7 +228,7 @@ export const EngineeringModule = ({
 
   // Get connectivity for FinPlate module
   const getConnectivity = () => {
-    if (moduleConfig.cameraKey === "FinPlate") {
+    if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
       return extraState?.selectedOption || inputs?.connectivity;
     }
     return null;
@@ -249,7 +249,7 @@ export const EngineeringModule = ({
 
     // Fallback based on module type for backward compatibility
     switch (moduleConfig.cameraKey) {
-      case "FinPlate":
+      case MODULE_KEY_FIN_PLATE:
         return ["Model", "Beam", "Column", "Plate"];
       case "TensionMember":
         return ["Model", "Member", "Plate", "Endplate"];

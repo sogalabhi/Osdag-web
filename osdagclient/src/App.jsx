@@ -38,12 +38,15 @@ import BeamBeamEndPlate from "./modules/beamBeamEndPlate/BeamBeamEndPlate";
 import FinPlate from "./modules/FinPlate/FinPlate";
 import CoverPlateWelded from "./modules/coverPlateWelded/CoverPlateWelded";
 
-import BeamToColumnEndPlate from "./components/momentConnection/BeamToColumnEndPlate";
 import Homepage from "./homepage/pages/Homepage";
 import SelectModulePage from "./homepage/pages/SelectModulePage";
 import CleatAngle from "./modules/shearConnection/cleatAngle/CleatAngle";
 import EndPlate from "./modules/shearConnection/endPlate/EndPlate";
 import SimplySupportedBeam from "./modules/flexuralMember/simplySupportedBeam";
+import BoltedToEnd from "./modules/TensionMembers/BoltedToEnd/BoltedToEnd";
+import CoverPlateBolted from "./modules/coverPlateBolted/CoverPlateBolted";
+import BeamBeamEndPlate from "./modules/beamBeamEndPlate/BeamBeamEndPlate";
+
 
 let renderedOnce = false;
 
@@ -60,33 +63,18 @@ function App() {
         {/* <Route path="/home" element={<Mainwindow />} /> */}
         <Route path="/home" element={<Homepage />} />
         <Route path="/" element={<LoginPage />} />
-        <Route path="/Connections" element={<SelectModulePage />} />
-        <Route path="/TensionMember" element={<SelectModulePage />} />
-        <Route path="/CompressionMember" element={<SelectModulePage />} />
-        <Route path="/FlexureMember" element={<SelectModulePage />} />
-        <Route path="/Beam-Column" element={<SelectModulePage />} />
-        <Route path="/PlateGirder" element={<SelectModulePage />} />
-        <Route path="/Truss" element={<SelectModulePage />} />
-        <Route path="/2DFrame" element={<SelectModulePage />} />
-        <Route path="/3DFrame" element={<SelectModulePage />} />
-        <Route path="/GroupDesign" element={<SelectModulePage />} />
+        <Route path="/:moduleName" element={<SelectModulePage />} />
         <Route path="/design-type/:designType" element={<Window />} />
         {/* Shear Connection Routes */}
         <Route path="/design/connections/shear/fin_plate/:projectId?" element={<FinPlate />} />
         <Route path="/design/connections/shear/end_plate/:projectId?" element={<EndPlate />} />
         <Route path="/design/connections/shear/cleat_angle/:projectId?" element={<CleatAngle />} />
-        <Route path="/design/connections/shear/seated_angle/:projectId?" element={<SeatedAngle />} />
-        
         {/* Legacy Routes - Keep for backward compatibility */}
         <Route path="/design/:designType/fin_plate/:projectId?" element={<FinPlate />} />
         <Route path="/design/:designType/end_plate/:projectId?" element={<EndPlate />} />
         <Route
           path="/design/:designType/cleat_angle/:projectId?"
           element={<CleatAngle />}
-        />
-        <Route
-          path="/design/:designType/seated_angle/:projectId?"
-          element={<SeatedAngle />}
         />
         <Route
           path="/design/:designType/beam-to-beam-splice/cover_plate_bolted/:projectId?"
@@ -108,12 +96,7 @@ function App() {
           path="/design/:designType/beam-to-beam-splice/cover_plate_welded/:projectId?"
           element={<CoverPlateWelded />}
         />
-        {/* Beam to Column Routes */}
-        <Route path="/design/connections/column-beam/end_plate/:projectId?" element={<BeamToColumnEndPlate />} />
-        <Route
-          path="/design/connections/beam-to-column/end_plate/:projectId?"
-          element={<BeamToColumnEndPlate />}
-        />
+        {/* Remove BeamToColumnEndPlate routes */}
         <Route
           path="/design/:designType/simply_supported_beam/:projectId?"
           element={<SimplySupportedBeam />}
