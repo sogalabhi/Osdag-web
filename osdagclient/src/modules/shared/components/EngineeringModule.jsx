@@ -81,6 +81,7 @@ export const EngineeringModule = ({
     setScreenshotTrigger,
     extraState,
     setExtraState,
+    loadedFromProject,
 
     // Project management states
     currentProjectId,

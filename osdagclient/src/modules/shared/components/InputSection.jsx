@@ -82,7 +82,8 @@ export const InputSection = ({
     }
 
     switch (field.type) {
-      case 'select':
+      case 'select': {
+        let optionsArr = [];
         if (field.options === 'beamList') {
           const beamOptions = contextData.beamList?.map(item => ({ value: item, label: item })) || [];
           const currentValue = inputs[field.key] || contextData.beamList[2];
@@ -177,7 +178,20 @@ export const InputSection = ({
             </Select>
           );
         }
-
+        // If loaded value is not in options, add it as a custom option
+        const selectValue = safeInputs[field.key];
+        const displayOptions = optionsArr.includes(selectValue) || selectValue === undefined ? optionsArr : [selectValue, ...optionsArr];
+        return (
+          <Select
+            value={selectValue}
+            onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
+          >
+            {displayOptions.map((option, index) => (
+              <Option key={index} value={option}>{option}</Option>
+            ))}
+          </Select>
+        );
+      }
       case 'connectivitySelect':
         const connectivityOptions = (contextData.connectivityList || []).map(item => ({ value: item, label: item }));
         const connectivityValue = extraState.selectedOption || inputs.connectivity;
@@ -192,13 +206,10 @@ export const InputSection = ({
             value={extraState.selectedOption || safeInputs.connectivity}
           >
             {(safeContextData.connectivityList || []).map((item, index) => (
-              <Option key={index} value={item}>
-                {item}
-              </Option>
+              <Option key={index} value={item}>{item}</Option>
             ))}
           </Select>
         );
-
       case 'endPlateSelect':
         const conn_map = {
           "Flushed - Reversible Moment": "Flushed - Reversible Moment",
@@ -219,7 +230,6 @@ export const InputSection = ({
             styles={selectStyles}
           />
         );
-
       case 'number':
         return (
           <Input
@@ -227,13 +237,12 @@ export const InputSection = ({
             onInput={(event) => {
               event.target.value = event.target.value.replace(/[^0-9.]/g, "");
             }}
-            value={safeInputs[field.key]}
+            value={safeInputs[field.key] ?? ""}
             onChange={(event) =>
               setInputs({ ...safeInputs, [field.key]: event.target.value })
             }
           />
         );
-
       case 'customizable':
         const customizableOptions = [
           { value: "Customized", label: "Customized" },
@@ -250,7 +259,6 @@ export const InputSection = ({
             <Option value="Customized">Customized</Option>
           </Select>
         );
-
       case 'sectionProfileList':
         // Check for duplicates in sectionProfileList
         const profiles = safeContextData.sectionProfileList || [];
@@ -286,7 +294,6 @@ export const InputSection = ({
             ))}
           </Select>
         );
-
       case 'dynamicSelect':
         const options = field.getOptions ? field.getOptions(inputs, extraState) : [];
         return (
@@ -301,7 +308,6 @@ export const InputSection = ({
             ))}
           </Select>
         );
-
       case 'image':
         const imageUrl = field.imageSource ? field.imageSource(extraState) : null;
         return imageUrl ? (
@@ -312,11 +318,10 @@ export const InputSection = ({
             width={field.width || "100px"}
           />
         ) : null;
-
       default:
         return (
           <Input
-            value={safeInputs[field.key]}
+            value={safeInputs[field.key] ?? ""}
             onChange={(event) =>
               setInputs({ ...safeInputs, [field.key]: event.target.value })
             }
