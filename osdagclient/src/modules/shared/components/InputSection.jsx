@@ -21,7 +21,9 @@ export const InputSection = ({
   extraState = {},
   setExtraState = () => { }
 }) => {
-
+  // Ensure inputs and contextData are always defined
+  const safeInputs = inputs || {};
+  const safeContextData = contextData || {};
   const [imageSource, setImageSource] = useState("");
 
   // Common select styles with high z-index
@@ -58,10 +60,10 @@ export const InputSection = ({
 
   const handleCustomizableSelect = (field, value) => {
     if (value === "Customized") {
-      if (inputs[field.key].length !== 0) {
-        setInputs({ ...inputs, [field.key]: inputs[field.key] });
+      if (safeInputs[field.key]?.length !== 0) {
+        setInputs({ ...safeInputs, [field.key]: safeInputs[field.key] });
       } else {
-        setInputs({ ...inputs, [field.key]: [] });
+        setInputs({ ...safeInputs, [field.key]: [] });
       }
       updateSelectionState(field.selectionKey, "Customized");
       toggleAllSelected(field.key, false);
@@ -88,15 +90,15 @@ export const InputSection = ({
 
           return (
             <Select
-              className="react-select-container"
-              classNamePrefix="react-select"
-              value={selectedOption}
-              options={beamOptions}
-              onChange={(selectedOption) => setInputs({ ...inputs, [field.key]: selectedOption.value })}
-              isSearchable={false}
-              menuPortalTarget={document.body}
-              styles={selectStyles}
-            />
+              value={safeInputs[field.key] || (safeContextData.beamList?.[2] || '')}
+              onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
+            >
+              {(safeContextData.beamList || []).map((item, index) => (
+                <Option key={index} value={item}>
+                  {item}
+                </Option>
+              ))}
+            </Select>
           );
         } else if (field.options === 'columnList') {
           const columnOptions = contextData.columnList?.map(item => ({ value: item, label: item })) || [];
@@ -105,41 +107,48 @@ export const InputSection = ({
 
           return (
             <Select
-              className="react-select-container"
-              classNamePrefix="react-select"
-              value={selectedOption}
-              options={columnOptions}
-              onChange={(selectedOption) => setInputs({ ...inputs, [field.key]: selectedOption.value })}
-              isSearchable={false}
-              menuPortalTarget={document.body}
-              styles={selectStyles}
-            />
+              value={safeInputs[field.key] || (safeContextData.columnList?.[0] || '')}
+              onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
+            >
+              {(safeContextData.columnList || []).map((item, index) => (
+                <Option key={index} value={item}>
+                  {item}
+                </Option>
+              ))}
+            </Select>
           );
         } else if (field.options === 'materialList') {
 
           // Check for duplicates in materialList
-          const grades = contextData.materialList?.map(item => item.Grade) || [];
-          const duplicateGrades = grades.filter((grade, index) => grades.indexOf(grade) !== index);
+          const grades =
+            safeContextData.materialList?.map((item) => item.Grade) || [];
+          const duplicateGrades = grades.filter(
+            (grade, index) => grades.indexOf(grade) !== index
+          );
           if (duplicateGrades.length > 0) {
             console.warn(`Duplicate grades found in materialList:`, duplicateGrades);
           }
 
           return (
             <Select
-              className="react-select-container"
-              classNamePrefix="react-select"
-              value={selectedOption}
-              options={materialOptions}
-              onChange={(selectedOption) => {
+              value={safeInputs[field.key] || (safeContextData.materialList?.[0]?.Grade || '')}
+              onSelect={(value) => {
                 if (field.onChange) {
-                  field.onChange(selectedOption.value, inputs, setInputs, contextData.materialList);
+                  field.onChange(
+                    value,
+                    safeInputs,
+                    setInputs,
+                    safeContextData.materialList
+                  );
                 } else {
-                  setInputs({ ...inputs, [field.key]: selectedOption.value });
+                  setInputs({ ...safeInputs, [field.key]: value });
                 }
               }}
             >
-              {contextData.materialList.map((item, index) => (
-                <Option key={`${item.id}-${index}`} value={item.id}>{item.Grade}</Option>
+              {(safeContextData.materialList || []).map((item, index) => (
+                <Option key={`${item.id}-${index}`} value={item.id}>
+                  {item.Grade}
+                </Option>
               ))}
             </Select>
           );
@@ -153,15 +162,19 @@ export const InputSection = ({
 
           return (
             <Select
-              className="react-select-container"
-              classNamePrefix="react-select"
-              value={selectedOption}
-              options={options}
-              onChange={(selectedOption) => setInputs({ ...inputs, [field.key]: selectedOption.value })}
-              isSearchable={false}
-              menuPortalTarget={document.body}
-              styles={selectStyles}
-            />
+              value={safeInputs[field.key]}
+              onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
+            >
+              {field.options.map((option, index) => (
+                <Option
+                  key={index}
+                  value={option.value || option}
+                  disabled={option.disabled}
+                >
+                  {option.label || option}
+                </Option>
+              ))}
+            </Select>
           );
         }
 
@@ -172,18 +185,18 @@ export const InputSection = ({
 
         return (
           <Select
-            className="react-select-container"
-            classNamePrefix="react-select"
-            value={selectedConnectivity}
-            options={connectivityOptions}
-            onChange={(selectedOption) => {
-              setExtraState({ ...extraState, selectedOption: selectedOption.value });
-              setInputs({ ...inputs, connectivity: selectedOption.value, output: null });
+            onSelect={(value) => {
+              setExtraState({ ...extraState, selectedOption: value });
+              setInputs({ ...safeInputs, connectivity: value, output: null });
             }}
-            isSearchable={false}
-            menuPortalTarget={document.body}
-            styles={selectStyles}
-          />
+            value={extraState.selectedOption || safeInputs.connectivity}
+          >
+            {(safeContextData.connectivityList || []).map((item, index) => (
+              <Option key={index} value={item}>
+                {item}
+              </Option>
+            ))}
+          </Select>
         );
 
       case 'endPlateSelect':
@@ -197,13 +210,9 @@ export const InputSection = ({
 
         return (
           <Select
-            className="react-select-container"
-            classNamePrefix="react-select"
-            value={selectedEndPlate}
-            options={endPlateOptions}
-            onChange={(selectedOption) => {
-              setExtraState({ ...extraState, selectedOption: selectedOption.value });
-              setInputs({ ...inputs, output: null });
+            onSelect={(value) => {
+              setExtraState({ ...extraState, selectedOption: value });
+              setInputs({ ...safeInputs, output: null });
             }}
             isSearchable={false}
             menuPortalTarget={document.body}
@@ -218,8 +227,10 @@ export const InputSection = ({
             onInput={(event) => {
               event.target.value = event.target.value.replace(/[^0-9.]/g, "");
             }}
-            value={inputs[field.key]}
-            onChange={(event) => setInputs({ ...inputs, [field.key]: event.target.value })}
+            value={safeInputs[field.key]}
+            onChange={(event) =>
+              setInputs({ ...safeInputs, [field.key]: event.target.value })
+            }
           />
         );
 
@@ -242,24 +253,33 @@ export const InputSection = ({
 
       case 'sectionProfileList':
         // Check for duplicates in sectionProfileList
-        const profiles = contextData.sectionProfileList || [];
-        const duplicateProfiles = profiles.filter((profile, index) => profiles.indexOf(profile) !== index);
+        const profiles = safeContextData.sectionProfileList || [];
+        const duplicateProfiles = profiles.filter(
+          (profile, index) => profiles.indexOf(profile) !== index
+        );
         if (duplicateProfiles.length > 0) {
           console.warn(`⚠️ Duplicate profiles found in sectionProfileList:`, duplicateProfiles);
         }
 
         return (
           <Select
-            value={inputs[field.key]}
+            value={safeInputs[field.key]}
             onSelect={(value) => {
               if (field.onChange) {
-                field.onChange(value, inputs, setInputs, contextData, extraState, setExtraState);
+                field.onChange(
+                  value,
+                  safeInputs,
+                  setInputs,
+                  safeContextData,
+                  extraState,
+                  setExtraState
+                );
               } else {
-                setInputs({ ...inputs, [field.key]: value });
+                setInputs({ ...safeInputs, [field.key]: value });
               }
             }}
           >
-            {(contextData.sectionProfileList || []).map((profile, index) => (
+            {(safeContextData.sectionProfileList || []).map((profile, index) => (
               <Option key={`${profile}-${index}`} value={profile}>
                 {profile}
               </Option>
@@ -271,8 +291,8 @@ export const InputSection = ({
         const options = field.getOptions ? field.getOptions(inputs, extraState) : [];
         return (
           <Select
-            value={inputs[field.key]}
-            onSelect={(value) => setInputs({ ...inputs, [field.key]: value })}
+            value={safeInputs[field.key]}
+            onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
           >
             {options.map((option, index) => (
               <Option key={index} value={option.value}>
@@ -296,8 +316,10 @@ export const InputSection = ({
       default:
         return (
           <Input
-            value={inputs[field.key]}
-            onChange={(event) => setInputs({ ...inputs, [field.key]: event.target.value })}
+            value={safeInputs[field.key]}
+            onChange={(event) =>
+              setInputs({ ...safeInputs, [field.key]: event.target.value })
+            }
           />
         );
     }
