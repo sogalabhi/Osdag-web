@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
@@ -15,6 +15,18 @@ import Logs from "../../../components/Logs";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import ScreenshotCapture from "../../../components/ScreenShotCapture";
 import DesignPrefSections from "../../../components/DesignPrefSections";
+import Designsvg from "../../../assets/Designsvg.svg";
+import Resetsvg from "../../../assets/Resetsvg.svg";
+import Outputsvg from "../../../assets/Outputsvg.svg";
+import Reportsvg from "../../../assets/Reportsvg.svg";
+import InputDockHiddensvg from "../../../assets/InputDockHiddensvg.svg";
+import InputDockVisiblesvg from "../../../assets/InputDockVisiblesvg.svg";
+import OutputDockHiddensvg from "../../../assets/OutputDockHiddensvg.svg";
+import OutputDockVisiblesvg from "../../../assets/OutputDockVisiblesvg.svg";
+import Logsvg from "../../../assets/Logsvg.svg";
+import ArrowDownsvg from "../../../assets/ArrowDownsvg.svg";
+import Homesvg from "../../../assets/Homesvg.svg";
+import GridSelector from "../utils/GridSelector";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -90,7 +102,122 @@ export const EngineeringModule = ({
     handleCancelDesignReport,
   } = useEngineeringModule(moduleConfig);
 
-   // Get connectivity for FinPlate module
+  const [showResetButton, setShowResetButton] = useState(false);
+  const [showInputDock, setShowInputDock] = useState(true);
+  const [showOutputDock, setShowOutputDock] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);
+  const [bgColor, setBgColor] = useState("#666666"); // Gray default background
+  const [isDesignComplete, setIsDesignComplete] = useState(false);
+  const [showOptionsContainer, setShowOptionsContainer] = useState(false); // New state for options container
+  const [isGridActive, setIsGridActive] = useState(false);
+  const [orthographicView, setOrthographicView] = useState(null); // New state for orthographic view
+  const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
+
+  // Only change dock visibility after design is complete
+  useEffect(() => {
+    if (!loading && !isRedesigning && output && renderBoolean) {
+      setIsDesignComplete(true);
+      setShowOptionsContainer(true); // Show options container after design is complete
+      // Auto-switch to output dock only after design is complete
+      setShowInputDock(false);
+      setShowOutputDock(true);
+      setShowLogs(true);
+    } else if (isRedesigning || loading) {
+      setIsDesignComplete(false);
+      setShowOptionsContainer(false);
+    }
+  }, [loading, output, renderBoolean, isRedesigning]);
+
+  const handleGridToggle = () => {
+    setIsGridActive(!isGridActive);
+    console.log("Grid toggled:", !isGridActive);
+  };
+
+  // Handle orthographic view changes from GridSelector
+  const handleOrthographicViewChange = (viewType) => {
+    console.log("Switching to orthographic view:", viewType);
+    setOrthographicView(viewType);
+  };
+
+  const handleSubmitEnhanced = async () => {
+    // If there's already an existing design, completely reset everything
+    if (isDesignComplete || renderBoolean || output) {
+      console.log("Resetting existing design...");
+      
+      // Immediately hide current model and output
+      setIsRedesigning(true);
+      setIsDesignComplete(false);
+      setShowOutputDock(false);
+      setShowLogs(false);
+      setShowOptionsContainer(false);
+      setOrthographicView(null);
+      setSelectedView("Model");
+      
+      // Reset all the data that controls model rendering
+      await performReset();
+      
+      // Small delay to ensure reset is processed
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    // Call the actual submit function
+    try {
+      await handleSubmit();
+      setShowResetButton(true);
+    } catch (error) {
+      console.error("Design submission failed:", error);
+    } finally {
+      // Reset the redesigning state after completion
+      setIsRedesigning(false);
+    }
+  };
+
+  // Toggle reset button visibility
+  const toggleResetButton = () => {
+    setShowResetButton(!showResetButton);
+  };
+
+  // Toggle functions for SVG clicks
+  const toggleInputDock = () => {
+    if (showInputDock) return;
+    setShowInputDock(true);
+    setShowOutputDock(false);
+  };
+
+  const toggleOutputDock = () => {
+    if (!isDesignComplete || showOutputDock) return;
+    setShowInputDock(false);
+    setShowOutputDock(true);
+  };
+
+  const toggleLogs = () => {
+    setShowLogs(!showLogs);
+  };
+
+  const handleResetEnhanced = async () => {
+    setShowResetConfirmation(true);
+    setConfirmationType("reset");
+  };
+
+  const performResetEnhanced = async () => {
+    performReset();
+    setShowResetButton(false);
+    setShowResetConfirmation(false);
+    setShowOutputDock(false);
+    setShowInputDock(true);
+    setIsDesignComplete(false);
+    setShowLogs(false); // Reset logs visibility
+    setShowOptionsContainer(false); // Hide options container on reset
+    setOrthographicView(null); // Reset orthographic view
+    setIsRedesigning(false); // Reset redesigning state
+  };
+
+  const handleColorChange = (color) => {
+    setBgColor(color);
+    console.log("Background color changed to:", color);
+  };
+
+  // Get connectivity for FinPlate module
   const getConnectivity = () => {
     if (moduleConfig.cameraKey === "FinPlate") {
       return extraState?.selectedOption || inputs?.connectivity;
@@ -98,12 +225,19 @@ export const EngineeringModule = ({
     return null;
   };
 
-  const { position: cameraPos, fov } = useViewCamera(
+  const cameraSettings = useViewCamera(
     moduleConfig.cameraKey,
     selectedView,
-    getConnectivity()
+    getConnectivity(),
+    orthographicView
   );
 
+  const {
+    position: cameraPos,
+    fov,
+    modelPosition,
+    modelScale,
+  } = cameraSettings;
 
   // Determine view options based on module
   const getViewOptions = () => {
@@ -159,119 +293,224 @@ export const EngineeringModule = ({
         )}
 
         <div className="element">
-          <div className="home-btn" onClick={handleHomeClick}>
-            Home
-          </div>
+          {/* All 4 buttons together with same styling */}
+          <img
+            src={showInputDock ? InputDockVisiblesvg : InputDockHiddensvg}
+            alt="Toggle Input Dock"
+            className="navbar-control-icon"
+            onClick={toggleInputDock}
+            title="Toggle Input Dock"
+          />
+          <img
+            src={showOutputDock ? OutputDockVisiblesvg : OutputDockHiddensvg}
+            alt="Toggle Output Dock"
+            className={`navbar-control-icon ${
+              !isDesignComplete ? "disabled" : ""
+            }`}
+            onClick={isDesignComplete ? toggleOutputDock : undefined}
+            style={{
+              opacity: isDesignComplete ? 1 : 0.5,
+              cursor: isDesignComplete ? "pointer" : "not-allowed",
+            }}
+            title="Toggle Output Dock"
+          />
+          <img
+            src={Logsvg}
+            alt="Toggle Logs"
+            className="navbar-control-icon"
+            onClick={toggleLogs}
+            title="Toggle Logs"
+          />
+          <img
+            src={Homesvg}
+            alt="Home"
+            className="navbar-control-icon"
+            onClick={handleHomeClick}
+            title="Home"
+          />
         </div>
       </div>
 
-      {/* Main Body */}
-      <div className="superMainBody">
-        {/* Left - Input Dock */}
-        <div className="InputDock">
-          <p>Input Dock</p>
-          <div className="subMainBody scroll-data">
-            {moduleConfig.inputSections.map((section, index) => (
-              <InputSection
-                key={index}
-                section={section}
-                inputs={inputs}
-                setInputs={setInputs}
-                selectionStates={selectionStates}
-                updateSelectionState={updateSelectionState}
-                updateModalState={updateModalState}
-                toggleAllSelected={toggleAllSelected}
-                contextData={contextData}
-                extraState={extraState}
-                setExtraState={setExtraState}
-              />
-            ))}
-          </div>
+      <div
+        className={`superMainBody ${!showInputDock ? "no-input-dock" : ""} ${
+          !showOutputDock ? "no-output-dock" : ""
+        }`}
+      >
+        {/* Left - Input Dock - Only show if showInputDock is true */}
+        {showInputDock && (
+          <div className="InputDock">
+            <p>Input Dock</p>
+            <div className="subMainBody scroll-data">
+              {moduleConfig.inputSections.map((section, index) => (
+                <InputSection
+                  key={index}
+                  section={section}
+                  inputs={inputs}
+                  setInputs={setInputs}
+                  selectionStates={selectionStates}
+                  updateSelectionState={updateSelectionState}
+                  updateModalState={updateModalState}
+                  toggleAllSelected={toggleAllSelected}
+                  contextData={contextData}
+                  extraState={extraState}
+                  setExtraState={setExtraState}
+                />
+              ))}
+            </div>
 
-          <div className="inputdock-btn">
-            <Input type="button" value="Reset" onClick={handleReset} />
-            <Input type="button" value="Design" onClick={handleSubmit} />
+            <div className="inputdock-btn">
+              <button onClick={handleSubmitEnhanced}>
+                <img src={Designsvg} alt="Design" />
+                Design
+              </button>
+
+              <button
+                className="arrow-down-btn"
+                onClick={toggleResetButton}
+                title="Toggle Reset Options"
+              >
+                <img
+                  src={ArrowDownsvg}
+                  alt="Toggle Reset"
+                  className={`arrow-icon ${showResetButton ? "rotated" : ""}`}
+                />
+              </button>
+
+              {showResetButton && (
+                <button onClick={handleResetEnhanced} className="reset-btn">
+                  <img src={Resetsvg} alt="Reset" />
+                  Reset
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Middle - 3D Model */}
-        <div className="superMainBody_mid">
-          <div className="options-container">
-            {options.map((option) => (
-              <div
-                key={option}
-                className="option-wrapper"
-                onClick={() => setSelectedView(option)}
-              >
-                <div
-                  className={`option-box ${
-                    selectedView === option ? "selected" : ""
-                  }`}
-                ></div>
-                <span className="option-label">{option}</span>
+        <div
+          className={`superMainBody_mid ${
+            showOptionsContainer ? "has-options" : ""
+          }`}
+        >
+          {/* Options Container - Only show after design is complete */}
+          {showOptionsContainer && (
+            <div className="options-container">
+              <div className="view-options">
+                {options.map((option) => (
+                  <div
+                    key={option}
+                    className="option-wrapper"
+                    onClick={() => {
+                      setSelectedView(option);
+                      setOrthographicView(null); 
+                    }}
+                  >
+                    <div
+                      className={`option-box ${
+                        selectedView === option && !orthographicView
+                          ? "selected"
+                          : ""
+                      }`}
+                    ></div>
+                    <span className="option-label">{option}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-
-          {loading ? (
-            <div className="modelLoading">
-              <p>Loading Model...</p>
             </div>
-          ) : renderBoolean ? (
-            <div className="cadModel">
-              <Canvas
-                gl={{ antialias: true, preserveDrawingBuffer: true }}
-                onCreated={({ gl }) => {
-                  gl.setClearColor("#ADD8E6");
-                }}
-              >
-                <PerspectiveCamera
-                  ref={cameraRef}
-                  makeDefault
-                  position={cameraPos}
-                  fov={fov}
-                  near={0.1}
-                  far={1000}
-                />
-                <Suspense
-                  fallback={
-                    <Html>
-                      <p>Loading 3D Model...</p>
-                    </Html>
-                  }
-                >
-                  <Model
-                    modelPaths={cadModelPaths}
-                    selectedView={selectedView}
-                    key={modelKey}
-                  />
-                  <ScreenshotCapture
-                    screenshotTrigger={screenshotTrigger}
-                    setScreenshotTrigger={setScreenshotTrigger}
-                    selectedView={selectedView}
-                  />
-                </Suspense>
-              </Canvas>
-            </div>
-          ) : (
-            <div className="modelback"></div>
           )}
 
-          <Logs logs={logs} />
+          <div className={`model-container ${!showLogs ? "full-height" : ""}`}>
+            {loading || isRedesigning ? (
+              <div className="modelLoading">
+                <p>{isRedesigning ? "Updating Model..." : "Loading Model..."}</p>
+              </div>
+            ) : renderBoolean ? (
+              <div className="cadModel">
+                {/* Existing background color picker - left side */}
+                <div className="canvas-control-bar-overlay">
+                  <label htmlFor="bgColorPicker" className="bg-picker-label">
+                    Background:
+                  </label>
+                  <input
+                    type="color"
+                    id="bgColorPicker"
+                    value={bgColor}
+                    onChange={(e) => setBgColor(e.target.value)}
+                    className="bg-color-picker"
+                    title="Change Background Color"
+                  />
+                </div>
+
+                {/* Grid selector - right side */}
+                <GridSelector onViewChange={handleOrthographicViewChange} />
+
+                <Canvas
+                  gl={{ antialias: true, preserveDrawingBuffer: true }}
+                  style={{ width: "100%", height: "100%" }}
+                >
+                  <color attach="background" args={[bgColor]} />
+                  <PerspectiveCamera
+                    ref={cameraRef}
+                    makeDefault
+                    position={cameraPos}
+                    fov={fov}
+                    near={0.1}
+                    far={1000}
+                  />
+                  <Suspense
+                    fallback={
+                      <Html>
+                        <p>Loading 3D Model...</p>
+                      </Html>
+                    }
+                  >
+                    <Model
+                      modelPaths={cadModelPaths}
+                      selectedView={selectedView}
+                      cameraSettings={{
+                        ...cameraSettings,
+                        connectivity: getConnectivity(), // Add connectivity info
+                      }}
+                      key={modelKey}
+                    />
+                    <ScreenshotCapture
+                      screenshotTrigger={screenshotTrigger}
+                      setScreenshotTrigger={setScreenshotTrigger}
+                      selectedView={selectedView}
+                    />
+                  </Suspense>
+                </Canvas>
+              </div>
+            ) : (
+              <div className="modelback"></div>
+            )}
+          </div>
+
+          {showLogs && (
+            <div className="logs-container">
+              <Logs logs={logs} />
+            </div>
+          )}
         </div>
 
-        {/* Right - Output Dock */}
-        <div className="superMain_right">
-          <OutputDockComponent output={output} extraState={extraState} />
-          <div className="outputdock-btn">
-            <Input
-              type="button"
-              value="Create Design Report"
-              onClick={handleCreateDesignReport}
-            />
-            <Input type="button" value="Save Output" onClick={saveOutput} />
+        {/* Right - Output Dock - Only show if showOutputDock is true and design is complete */}
+        {showOutputDock && isDesignComplete && (
+          <div className="superMain_right">
+            <div className="OutputDock">
+              <OutputDockComponent output={output} extraState={extraState} />
+              <div className="inputdock-btn">
+                <Button onClick={handleCreateDesignReport}>
+                  <img src={Reportsvg} alt="Report" />
+                  Generate Report
+                </Button>
+                <Button onClick={saveOutput}>
+                  <img src={Outputsvg} alt="Output" />
+                  Save Output
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Design Report Modal */}
@@ -343,7 +582,7 @@ export const EngineeringModule = ({
             key="confirm"
             type="primary"
             style={{ background: "rgb(135, 91, 91)", color: "white" }}
-            onClick={performReset}
+            onClick={performResetEnhanced}
           >
             {confirmationType === "reset"
               ? "Yes, Reset Everything"
@@ -372,45 +611,22 @@ export const EngineeringModule = ({
         closable={false}
         maskClosable={false}
         centered
-        width={400}
+        width={420}
         className="loading-modal"
         styles={{
           body: {
             textAlign: "center",
-            padding: "40px 20px",
+            padding: "30px 20px",
           },
         }}
       >
         <div className="loading-content">
-          <div
-            style={{
-              fontSize: "18px",
-              marginBottom: "20px",
-              fontWeight: "bold",
-            }}
-          >
-            Processing Design
+          <div>🔧 OSDAG Design Processing</div>
+          <div>
+            <div className="spinner"></div>
           </div>
-          <div style={{ marginBottom: "20px" }}>
-            <div
-              className="spinner"
-              style={{
-                border: "4px solid #f3f3f3",
-                borderTop: "4px solid #3498db",
-                borderRadius: "50%",
-                width: "40px",
-                height: "40px",
-                animation: "spin 1s linear infinite",
-                margin: "0 auto",
-              }}
-            ></div>
-          </div>
-          <div style={{ fontSize: "14px", color: "#666" }}>
-            {loadingStage || "Please wait while we generate your results..."}
-          </div>
-          <div style={{ marginTop: "10px", fontSize: "12px", color: "#999" }}>
-            This may take a few moments
-          </div>
+          <div>{loadingStage || "Generating your engineering design..."}</div>
+          <div>Please wait while we create your 3D model</div>
         </div>
       </Modal>
 

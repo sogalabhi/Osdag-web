@@ -212,8 +212,8 @@ export const finPlateConfig = {
           label: "Type",
           type: "select",
           options: [
-            { value: "Bearing_Bolt", label: "Bearing Bolt" },
-            { value: "Friction_Grip_Bolt", label: "Friction Grip Bolt" }
+            { value: "Bearing Bolt", label: "Bearing Bolt" },
+            { value: "Friction Grip Bolt", label: "Friction Grip Bolt" }
           ]
         },
         {

@@ -2,11 +2,21 @@ import { OrbitControls, useTexture } from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { useEffect, useState, useMemo } from "react";
 import * as THREE from "three";
+import AxisHelperWidget from "../utils/AxisHelperWidget";
 
-function Model({ modelPaths, selectedView }) {
+function Model({ modelPaths, selectedView, cameraSettings }) {
   const [parsedModels, setParsedModels] = useState(null);
   const texture = useTexture("/texture.png");
   texture.needsUpdate = true;
+
+  // Get model position, scale, orthographic view, and connectivity from camera settings
+  const modelPosition = cameraSettings?.modelPosition || [0, -4, 0];
+  const modelScale = cameraSettings?.modelScale || 0.008;
+  const orthographicView = cameraSettings?.orthographicView || null;
+  const connectivity = cameraSettings?.connectivity || null;
+
+  // Check if we're in the specific FinPlate Column Web-Beam-Web case
+  const isColumnWebBeamWeb = connectivity === "Column Web-Beam-Web";
 
   useEffect(() => {
     if (modelPaths) {
@@ -42,7 +52,7 @@ function Model({ modelPaths, selectedView }) {
     return g;
   };
 
-  // All geometry definitions - FIXED: Added missing ones
+  // All geometry definitions
   const geometryModel = useMemo(
     () => (parsedModels?.Model ? getGeometry(parsedModels.Model) : null),
     [parsedModels, texture]
@@ -71,30 +81,34 @@ function Model({ modelPaths, selectedView }) {
 
   return (
     <group name="scene">
-      <axesHelper args={[200]} />
       {/* Lighting to ensure visibility */}
-      <ambientLight intensity={1.5} />
-      <directionalLight position={[5, 5, 5]} intensity={1.5} />
+      <ambientLight intensity={2.0} />
+      <directionalLight position={[5, 5, 5]} intensity={2.0} />
+      <directionalLight position={[-5, -5, -5]} intensity={1.5} />
+      <pointLight position={[10, 10, 10]} intensity={1.5} />
+      <pointLight position={[-10, -10, -10]} intensity={1.5} />
+      <spotLight position={[0, 10, 0]} angle={0.3} penumbra={1} intensity={1.0} />
+      <AxisHelperWidget orthographicView={orthographicView} />
+      <primitive object={new THREE.AxesHelper(5)} />
 
-      {/* Model Section */}
+      {/* Model Section - Blue Solid Material */}
       {selectedView === "Model" && geometryModel && (
         <>
           <mesh
             geometry={geometryModel}
-            scale={0.008}
-            rotation={[Math.PI / -2, 0, 0]}
-            position={[0, 0, 4]}
+            scale={modelScale}
+            rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
+            position={modelPosition}
           >
             <meshPhysicalMaterial
               attach="material"
-              map={texture}
-              metalness={0.25}
-              roughness={0.1}
+              color="#2E5A87"
+              metalness={0.3}
+              roughness={0.4}
               opacity={1.0}
-              transparent={true}
-              transmission={0.99}
-              clearcoat={1.0}
-              clearcoatRoughness={0.25}
+              transparent={false}
+              clearcoat={0.8}
+              clearcoatRoughness={0.2}
             />
           </mesh>
           <primitive
@@ -104,24 +118,24 @@ function Model({ modelPaths, selectedView }) {
                 new THREE.LineBasicMaterial({ color: "black" })
               )
             }
-            scale={0.008}
-            rotation={[Math.PI / -2, 0, 0]}
-            position={[0, 0, 4]}
+            scale={modelScale}
+            rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
+            position={modelPosition}
           />
         </>
       )}
 
-      {/* Beam Section */}
+      {/* Beam Section - Keep existing material */}
       {selectedView === "Beam" && geometryBeam && (
         <>
           <mesh
             geometry={geometryBeam}
-            scale={0.008}
-            position={[0, 0, 4]}
+            scale={modelScale}
+            position={modelPosition}
             rotation={[Math.PI / -2, 0, 0]}
           >
             <meshPhysicalMaterial
-              color="#808080" //#594100
+              color="#808080"
               attach="material"
               metalness={0.25}
               roughness={0.3}
@@ -132,7 +146,6 @@ function Model({ modelPaths, selectedView }) {
               clearcoatRoughness={0.25}
             />
           </mesh>
-          {/* Beam outline - FIXED: Use correct geometry */}
           <primitive
             object={
               new THREE.LineSegments(
@@ -140,21 +153,21 @@ function Model({ modelPaths, selectedView }) {
                 new THREE.LineBasicMaterial({ color: "black" })
               )
             }
-            scale={0.008}
+            scale={modelScale}
             rotation={[Math.PI / -2, 0, 0]}
-            position={[0, 0, 4]}
+            position={modelPosition}
           />
         </>
       )}
 
-      {/* Column Section - FIXED: Consistent styling and correct geometry */}
+      {/* Column Section - Keep existing material */}
       {selectedView === "Column" && geometryColumn && (
         <>
           <mesh
             geometry={geometryColumn}
-            scale={0.008}
-            position={[0, 0, 4]}
-            rotation={[Math.PI / -2, 0, 0]}
+            scale={modelScale}
+            position={modelPosition}
+            rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
           >
             <meshPhysicalMaterial
               color="#594100"
@@ -168,7 +181,6 @@ function Model({ modelPaths, selectedView }) {
               clearcoatRoughness={0.25}
             />
           </mesh>
-          {/* Column outline - FIXED: Use geometryColumn instead of geometryBeam */}
           <primitive
             object={
               new THREE.LineSegments(
@@ -176,35 +188,33 @@ function Model({ modelPaths, selectedView }) {
                 new THREE.LineBasicMaterial({ color: "black" })
               )
             }
-            scale={0.008}
-            rotation={[Math.PI / -2, 0, 0]}
-            position={[0, 0, 4]}
+            scale={modelScale}
+            rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
+            position={modelPosition}
           />
         </>
       )}
 
-      {/* Plate Section - FIXED: Consistent styling and correct geometry */}
+      {/* Plate Section - Blue Solid Material */}
       {selectedView === "Plate" && geometryPlate && (
         <>
           <mesh
             geometry={geometryPlate}
-            scale={0.008}
-            position={[0, 0, 4]}
+            scale={modelScale}
+            position={modelPosition}
             rotation={[Math.PI / -2, 0, 0]}
           >
             <meshPhysicalMaterial
               attach="material"
-              map={texture}
-              metalness={0.25}
-              roughness={0.1}
+              color="#2E5A87"
+              metalness={0.3}
+              roughness={0.4}
               opacity={1.0}
-              transparent={true}
-              transmission={0.99}
-              clearcoat={1.0}
-              clearcoatRoughness={0.25}
+              transparent={false}
+              clearcoat={0.8}
+              clearcoatRoughness={0.2}
             />
           </mesh>
-          {/* Plate outline - FIXED: Use geometryPlate instead of geometryBeam */}
           <primitive
             object={
               new THREE.LineSegments(
@@ -212,35 +222,33 @@ function Model({ modelPaths, selectedView }) {
                 new THREE.LineBasicMaterial({ color: "black" })
               )
             }
-            scale={0.008}
+            scale={modelScale}
             rotation={[Math.PI / -2, 0, 0]}
-            position={[0, 0, 4]}
+            position={modelPosition}
           />
         </>
       )}
 
-      {/* Connector Section */}
+      {/* Connector Section - Blue Solid Material */}
       {selectedView === "Connector" && geometryConnector && (
         <>
           <mesh
             geometry={geometryConnector}
-            scale={0.008}
-            position={[0, 0, 5]}
+            scale={modelScale}
+            position={[modelPosition[0], modelPosition[1], modelPosition[2] + 1]} // Slightly offset
             rotation={[Math.PI / -2, 0, 0]}
           >
             <meshPhysicalMaterial
-              map={texture}
               attach="material"
-              metalness={0.25}
-              roughness={0.3}
+              color="#2E5A87"
+              metalness={0.3}
+              roughness={0.4}
               opacity={1.0}
-              transparent={true}
-              transmission={0.99}
-              clearcoat={1.0}
-              clearcoatRoughness={0.25}
+              transparent={false}
+              clearcoat={0.8}
+              clearcoatRoughness={0.2}
             />
           </mesh>
-          {/* Connector outline */}
           <primitive
             object={
               new THREE.LineSegments(
@@ -248,15 +256,15 @@ function Model({ modelPaths, selectedView }) {
                 new THREE.LineBasicMaterial({ color: "black" })
               )
             }
-            scale={0.008}
+            scale={modelScale}
             rotation={[Math.PI / -2, 0, 0]}
-            position={[0, 0, 5]}
+            position={[modelPosition[0], modelPosition[1], modelPosition[2] + 1]}
           />
         </>
       )}
 
       {/* Controls */}
-      <OrbitControls enableDamping={true} target={[0, 0, 0]} />
+      <OrbitControls enableDamping={false} target={[0, 0, 0]} />
     </group>
   );
 }

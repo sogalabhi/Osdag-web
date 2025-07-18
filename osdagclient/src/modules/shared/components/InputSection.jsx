@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Input } from 'antd';
+import { Input } from 'antd';
+import Select from 'react-select';
 import FRM from "../../../assets/flush_ep.png";
 import EOWIM from "../../../assets/owe_ep.png";
 import EBWRM from "../../../assets/extended.png";
@@ -7,8 +8,6 @@ import CFBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cf_bw.png";
 import CWBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cw_bw.png";
 import BB from "../../../assets/ShearConnection/sc_fin_plate/fin_beam_beam.png";
 import ErrorImg from "../../../assets/notSelected.png";
-
-const { Option } = Select;
 
 export const InputSection = ({ 
   section, 
@@ -24,6 +23,12 @@ export const InputSection = ({
 }) => {
   
   const [imageSource, setImageSource] = useState("");
+
+  // Common select styles with high z-index
+  const selectStyles = {
+    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    menu: (base) => ({ ...base, zIndex: 9999 })
+  };
 
   // Handle connectivity selection with image (for FinePlate)
   useEffect(() => {
@@ -77,78 +82,107 @@ export const InputSection = ({
     switch (field.type) {
       case 'select':
         if (field.options === 'beamList') {
+          const beamOptions = contextData.beamList?.map(item => ({ value: item, label: item })) || [];
+          const currentValue = inputs[field.key] || contextData.beamList[2];
+          const selectedOption = beamOptions.find(option => option.value === currentValue);
+          
           return (
             <Select
-              value={inputs[field.key] || contextData.beamList[2]}
-              onSelect={(value) => setInputs({ ...inputs, [field.key]: value })}
-            >
-              {contextData.beamList?.map((item, index) => (
-                <Option key={index} value={item}>{item}</Option>
-              ))}
-            </Select>
+              className="react-select-container"
+              classNamePrefix="react-select"
+              value={selectedOption}
+              options={beamOptions}
+              onChange={(selectedOption) => setInputs({ ...inputs, [field.key]: selectedOption.value })}
+              isSearchable={false}
+              menuPortalTarget={document.body}
+              styles={selectStyles}
+            />
           );
         } else if (field.options === 'columnList') {
+          const columnOptions = contextData.columnList?.map(item => ({ value: item, label: item })) || [];
+          const currentValue = inputs[field.key] || contextData.columnList[0];
+          const selectedOption = columnOptions.find(option => option.value === currentValue);
+          
           return (
             <Select
-              value={inputs[field.key] || contextData.columnList[0]}
-              onSelect={(value) => setInputs({ ...inputs, [field.key]: value })}
-            >
-              {contextData.columnList?.map((item, index) => (
-                <Option key={index} value={item}>{item}</Option>
-              ))}
-            </Select>
+              className="react-select-container"
+              classNamePrefix="react-select"
+              value={selectedOption}
+              options={columnOptions}
+              onChange={(selectedOption) => setInputs({ ...inputs, [field.key]: selectedOption.value })}
+              isSearchable={false}
+              menuPortalTarget={document.body}
+              styles={selectStyles}
+            />
           );
         } else if (field.options === 'materialList') {
+          const materialOptions = contextData.materialList?.map(item => ({ value: item.id, label: item.Grade })) || [];
+          const currentValue = inputs[field.key] || contextData.materialList[0]?.Grade;
+          // Find by id first, then by Grade if not found
+          let selectedOption = materialOptions.find(option => option.value === currentValue);
+          if (!selectedOption) {
+            selectedOption = materialOptions.find(option => option.label === currentValue);
+          }
+          
           return (
             <Select
-              value={inputs[field.key] || contextData.materialList[0].Grade}
-              onSelect={(value) => {
+              className="react-select-container"
+              classNamePrefix="react-select"
+              value={selectedOption}
+              options={materialOptions}
+              onChange={(selectedOption) => {
                 if (field.onChange) {
-                  field.onChange(value, inputs, setInputs, contextData.materialList);
+                  field.onChange(selectedOption.value, inputs, setInputs, contextData.materialList);
                 } else {
-                  setInputs({ ...inputs, [field.key]: value });
+                  setInputs({ ...inputs, [field.key]: selectedOption.value });
                 }
               }}
-            >
-              {contextData.materialList.map((item, index) => (
-                <Option key={index} value={item.id}>{item.Grade}</Option>
-              ))}
-            </Select>
+              isSearchable={false}
+              menuPortalTarget={document.body}
+              styles={selectStyles}
+            />
           );
         } else {
+          const options = field.options?.map(option => ({
+            value: option.value || option,
+            label: option.label || option,
+            isDisabled: option.disabled
+          })) || [];
+          const selectedOption = options.find(option => option.value === inputs[field.key]);
+          
           return (
             <Select
-              value={inputs[field.key]}
-              onSelect={(value) => setInputs({ ...inputs, [field.key]: value })}
-            >
-              {field.options.map((option, index) => (
-                <Option 
-                  key={index} 
-                  value={option.value || option} 
-                  disabled={option.disabled}
-                >
-                  {option.label || option}
-                </Option>
-              ))}
-            </Select>
+              className="react-select-container"
+              classNamePrefix="react-select"
+              value={selectedOption}
+              options={options}
+              onChange={(selectedOption) => setInputs({ ...inputs, [field.key]: selectedOption.value })}
+              isSearchable={false}
+              menuPortalTarget={document.body}
+              styles={selectStyles}
+            />
           );
         }
 
       case 'connectivitySelect':
+        const connectivityOptions = (contextData.connectivityList || []).map(item => ({ value: item, label: item }));
+        const connectivityValue = extraState.selectedOption || inputs.connectivity;
+        const selectedConnectivity = connectivityOptions.find(option => option.value === connectivityValue);
+        
         return (
-          <Select 
-            onSelect={(value) => {
-              setExtraState({ ...extraState, selectedOption: value });
-              setInputs({ ...inputs, connectivity: value, output: null }); 
-            }} 
-            value={extraState.selectedOption || inputs.connectivity}
-          >
-            {(contextData.connectivityList || []).map((item, index) => (
-              <Option key={index} value={item}>
-                {item}
-              </Option>
-            ))}
-          </Select>
+          <Select
+            className="react-select-container"
+            classNamePrefix="react-select"
+            value={selectedConnectivity}
+            options={connectivityOptions}
+            onChange={(selectedOption) => {
+              setExtraState({ ...extraState, selectedOption: selectedOption.value });
+              setInputs({ ...inputs, connectivity: selectedOption.value, output: null }); 
+            }}
+            isSearchable={false}
+            menuPortalTarget={document.body}
+            styles={selectStyles}
+          />
         );
 
       case 'endPlateSelect':
@@ -157,21 +191,23 @@ export const InputSection = ({
           "Extended One Way - Irreversible Moment": "Extended One Way - Irreversible Moment", 
           "Extended Both Ways - Reversible Moment": "Extended Both Ways - Reversible Moment",
         };
+        const endPlateOptions = Object.keys(conn_map).map(item => ({ value: item, label: conn_map[item] }));
+        const selectedEndPlate = endPlateOptions.find(option => option.value === extraState.selectedOption);
         
         return (
-          <Select 
-            onSelect={(value) => {
-              setExtraState({ ...extraState, selectedOption: value });
+          <Select
+            className="react-select-container"
+            classNamePrefix="react-select"
+            value={selectedEndPlate}
+            options={endPlateOptions}
+            onChange={(selectedOption) => {
+              setExtraState({ ...extraState, selectedOption: selectedOption.value });
               setInputs({ ...inputs, output: null }); 
-            }} 
-            value={extraState.selectedOption}
-          >
-            {Object.keys(conn_map).map((item, index) => (
-              <Option key={index} value={item}>
-                {conn_map[item]}
-              </Option>
-            ))}
-          </Select>
+            }}
+            isSearchable={false}
+            menuPortalTarget={document.body}
+            styles={selectStyles}
+          />
         );
 
       case 'number':
@@ -187,14 +223,23 @@ export const InputSection = ({
         );
 
       case 'customizable':
+        const customizableOptions = [
+          { value: "Customized", label: "Customized" },
+          { value: "All", label: "All" }
+        ];
+        const selectedCustomizable = customizableOptions.find(option => option.value === selectionStates[field.selectionKey]);
+        
         return (
           <Select
-            onSelect={(value) => handleCustomizableSelect(field, value)}
-            value={selectionStates[field.selectionKey]}
-          >
-            <Option value="Customized">Customized</Option>
-            <Option value="All">All</Option>
-          </Select>
+            className="react-select-container"
+            classNamePrefix="react-select"
+            value={selectedCustomizable}
+            options={customizableOptions}
+            onChange={(selectedOption) => handleCustomizableSelect(field, selectedOption.value)}
+            isSearchable={false}
+            menuPortalTarget={document.body}
+            styles={selectStyles}
+          />
         );
 
       default:
@@ -208,7 +253,7 @@ export const InputSection = ({
   };
 
   return (
-    <div>
+    <div className="cards">
       <h3>{section.title}</h3>
       <div className="component-grid">
         {section.fields.map((field, index) => {
@@ -216,7 +261,6 @@ export const InputSection = ({
           if (field.conditionalDisplay && !field.conditionalDisplay(extraState)) {
             return null;
           }
-          
           return (
             <div key={index}>
               <div className="component-grid-align">

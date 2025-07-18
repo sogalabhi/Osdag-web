@@ -212,8 +212,7 @@ export const BaseOutputDock = ({
     const fieldValue = getOutputValue(field.key, output);
 
     return (
-      <div key={index} className="component-grid">
-        <div className="component-grid-align">
+        <div key={index} className="component-grid-align">
           <h4>{field.label}</h4>
           {isModalTrigger ? (
             <Input
@@ -236,7 +235,6 @@ export const BaseOutputDock = ({
             />
           )}
         </div>
-      </div>
     );
   };
 
@@ -245,9 +243,11 @@ export const BaseOutputDock = ({
       <p>{title}</p>
       <div className="subMainBody scroll-data">
         {Object.entries(outputConfig.sections).map(([sectionName, fields]) => (
-          <div key={sectionName}>
+          <div key={sectionName} className='cards'>
             <h3>{sectionName}</h3>
-            {fields.map((field, index) => renderField(field, index))}
+              <div className="component-grid">
+                {fields.map((field, index) => renderField(field, index))}
+              </div>
           </div>
         ))}
       </div>
