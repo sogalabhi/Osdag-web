@@ -77,6 +77,7 @@ const MainContent = () => {
       'cpw': 'Cover Plate Welded',
       'boltedtoendplate': 'Tension Member Bolted',
       'ssb': 'Simply Supported Beam',
+      'pg': 'Plate Girder',
       [MODULE_KEY_FIN_PLATE]: MODULE_DISPLAY_FIN_PLATE,
       'End-Plate-Connection': 'End Plate Connection',
       'Cleat-Angle-Connection': 'Cleat Angle Connection',

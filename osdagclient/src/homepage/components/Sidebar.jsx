@@ -65,16 +65,6 @@ const Sidebar = ({ setshowSideBar, active }) => {
         link: '/Beam-Column',
       },
       {
-        name: 'Plate Girder',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        ),
-        active: false,
-        link: '/PlateGirder',
-      },
-      {
         name: 'Truss',
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -132,11 +122,17 @@ const Sidebar = ({ setshowSideBar, active }) => {
       {/* Logo Section */}
       <div className=" border-b border-osdag-border dark:border-gray-700">
         <div className="flex items-center justify-center relative">
-          <img
-            src={osdagLogo}
-            alt="osdag-logo"
-            className="w-20 h-20 mx-6 my-6"
-          />
+          <div className="flex items-center justify-center flex-col">
+            <img
+              src={osdagLogo}
+              alt="osdag-logo"
+              className="w-20 h-20 mx-6 my-3"
+            />
+            <div className="text-center mb-2">
+              <p className="text-xs text-osdag-text-muted font-medium">Version 1.0.0</p>
+            </div>
+          </div>
+
           <button
             className="absolute right-5 top-5 md:block lg:hidden xl:hidden 2xl:hidden p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
             aria-label="Close sidebar"
@@ -194,9 +190,6 @@ const Sidebar = ({ setshowSideBar, active }) => {
             alt="iitb-logo"
             className="w-16 h-16 dark:invert"
           />
-        </div>
-        <div className="text-center">
-          <p className="text-xs text-osdag-text-muted font-medium">Version 1.0.0</p>
         </div>
       </div>
     </div>

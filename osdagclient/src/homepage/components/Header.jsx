@@ -6,6 +6,7 @@ const Header = ({ setshowSideBar, active }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showResourcesDropdown, setShowResourcesDropdown] = useState(false);
+  const [showAboutDropdown, setShowAboutDropdown] = useState(false);
 
   // Check if user is a guest
   const isGuest = isGuestUser();
@@ -56,7 +57,7 @@ const Header = ({ setshowSideBar, active }) => {
       item.name.toLowerCase().includes(query) ||
       item.type.toLowerCase().includes(query)
     );
-    
+
     // Don't show projects for guest users
     const filteredProjects = isGuest ? [] : searchData.projects.filter(item =>
       item.name.toLowerCase().includes(query) ||
@@ -96,6 +97,9 @@ const Header = ({ setshowSideBar, active }) => {
       }
       if (!e.target.closest('.resources-dropdown')) {
         setShowResourcesDropdown(false);
+      }
+      if (!e.target.closest('.about-dropdown')) {
+        setShowAboutDropdown(false);
       }
     };
 
@@ -195,18 +199,37 @@ const Header = ({ setshowSideBar, active }) => {
 
           {/* Desktop Icons */}
           <div className="hidden md:flex items-center space-x-1 pb-6">
-            {/* Info Button */}
-            <div className="relative group">
-              <button className="p-3 text-osdag-text-muted hover:text-white dark:text-gray-400 dark:hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6">
+            {/* About Button with Dropdown */}
+            <div className="relative about-dropdown group">
+              <button
+                onClick={() => setShowAboutDropdown(!showAboutDropdown)}
+                className={`p-3 transition-all duration-300 rounded-xl group-hover:px-6 ${showAboutDropdown ? 'bg-osdag-green text-white' : 'text-osdag-text-muted hover:text-white hover:bg-osdag-green'
+                  }`}
+              >
                 <div className="flex items-center space-x-2">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
-                    Help
+                    About
                   </span>
+                  <svg className={`w-4 h-4 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-all duration-300 ${showAboutDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </div>
               </button>
+              {(showAboutDropdown || false) && (
+                <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800/20 border border-osdag-border dark:border-gray-700 rounded-xl shadow-lg z-20 min-w-48 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="py-2">
+                    <button className="w-full px-4 py-2 text-left text-osdag-text-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                      Help
+                    </button>
+                    <button className="w-full px-4 py-2 text-left text-osdag-text-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                      Info
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             {/* Settings Button */}
             <div className="relative group">
@@ -230,9 +253,7 @@ const Header = ({ setshowSideBar, active }) => {
                   }`}
               >
                 <div className="flex items-center space-x-2">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-640v560h560v-560h-80v280l-100-60-100 60v-280H200Zm0 560v-560 560Z" /></svg>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
                     Resources
                   </span>
@@ -268,7 +289,7 @@ const Header = ({ setshowSideBar, active }) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
-                    Load Input
+                    Import Input
                   </span>
                 </div>
               </button>

@@ -5,6 +5,7 @@ import MainContent from '../components/MainContent';
 import Footer from '../components/Footer';
 import { useParams } from 'react-router-dom';
 import TabbedModulePage from '../components/ModulesCardLayout';
+import bg from '../../assets/bg.png';
 
 const SelectModulePage = () => {
     const [showSideBar, setshowSideBar] = useState(false);
@@ -24,7 +25,18 @@ const SelectModulePage = () => {
                 <div className="flex-shrink-0 hidden lg:block">
                     <Sidebar setshowSideBar={setshowSideBar} active={moduleName} />
                 </div>
-                <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                <div
+                    className="flex-1 flex flex-col min-w-0 overflow-hidden"
+                    style={{
+                        backgroundImage: `url(${bg})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        ...(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                            ? { backgroundColor: 'rgba(0,0,0,0.5)' }
+                            : {}),
+                    }}
+                >
                     {/* Header */}
                     <Header setshowSideBar={setshowSideBar} active={moduleName} />
 
@@ -34,7 +46,7 @@ const SelectModulePage = () => {
                     </div>
 
                     {/* Footer */}
-                    <Footer />
+                    {/* <Footer /> */}
                 </div>
             </div>
         </div>
