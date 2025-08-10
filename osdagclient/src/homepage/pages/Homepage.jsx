@@ -35,7 +35,7 @@ const Homepage = () => {
           </div>
 
           {/* Footer */}
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </div>
     </div>
