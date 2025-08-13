@@ -130,7 +130,7 @@ function FinePlate() {
   const [imageSource, setImageSource] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
   const [output, setOutput] = useState(null);
-  const [logs, setLogs] = useState(null);
+  const [logs, setLogs] = useState([]);
   const [displayOutput, setDisplayOutput] = useState();
   const [boltDiameterSelect, setBoltDiameterSelect] = useState("All");
   const [thicknessSelect, setThicknessSelect] = useState("All");
@@ -171,7 +171,7 @@ function FinePlate() {
     setRenderBoolean(false);
     setModelKey(0);
     setOutput(null);
-    setLogs(null);
+    setLogs([]);
     setDisplayOutput(false);
     setLoading(false);
 
@@ -451,12 +451,12 @@ function FinePlate() {
         setLogs(designLogs);
       } catch (error) {
         console.log("FINPLATE: Error setting logs:", error);
-        setLogs(null);
+        setLogs([]);
       }
     } else {
       // When displayOutput is false, clear the logs
       console.log("FINPLATE: Clearing logs (displayOutput is false)");
-      setLogs(null);
+      setLogs([]);
     }
   }, [designLogs, displayOutput]);
 
@@ -880,7 +880,7 @@ function FinePlate() {
       setRenderBoolean(false);
       setModelKey(0);
       setOutput(null);
-      setLogs(null);
+      setLogs([]);
       setDisplayOutput(false);
       setLoading(false);
 

@@ -17,6 +17,11 @@ export const BaseOutputDock = ({
   title = "Output Dock",
   extraState = {}
 }) => {
+  // Debug: Log the props received
+  console.log('BaseOutputDock received:', { output, outputConfig, title, extraState });
+  console.log('Output keys available:', Object.keys(output || {}));
+  console.log('OutputConfig sections:', Object.keys(outputConfig?.sections || {}));
+  
   // Shared state management
   const [activeModals, setActiveModals] = useState({});
   const [activeSections, setActiveSections] = useState({});
@@ -69,13 +74,33 @@ export const BaseOutputDock = ({
 
   // Helper function to get output value - Works for both module formats
   const getOutputValue = (key, output) => {
-    if (!output) return " ";
+    if (!output) {
+      console.log(`getOutputValue: No output provided for key ${key}`);
+      return " ";
+    }
+    
+    // Debug: Log the key and output structure
+    console.log(`Getting value for key: ${key}`, { 
+      output, 
+      keyValue: output[key],
+      outputKeys: Object.keys(output),
+      hasKey: key in output,
+      keyType: typeof key
+    });
     
     // Both modules now use flat structure: { "Bolt.Diameter": { label, val } }
     if (output[key]?.val !== undefined) {
+      console.log(`Found value in output[${key}].val:`, output[key].val);
       return output[key].val;
     }
     
+    // Try alternative structures
+    if (output[key] !== undefined) {
+      console.log(`Found value in output[${key}]:`, output[key]);
+      return output[key];
+    }
+    
+    console.log(`No value found for key: ${key}`);
     return " ";
   };
 

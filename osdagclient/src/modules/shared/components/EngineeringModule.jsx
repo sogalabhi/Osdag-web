@@ -12,6 +12,7 @@ import { DesignReportModal } from "../components/DesignReportModal";
 import useViewCamera from "./btobViewCamera";
 import Model from "./btobRender";
 import Logs from "../../../components/Logs";
+import Header from "../../../components/Header";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import ScreenshotCapture from "../../../components/ScreenShotCapture";
 import DesignPrefSections from "../../../components/DesignPrefSections";
@@ -36,6 +37,14 @@ export const EngineeringModule = ({
 }) => {
   const navigate = useNavigate();
   const cameraRef = useRef();
+
+  // Dock visibility states
+  const [leftDockOpen, setLeftDockOpen] = useState(true);
+  const [bottomDockOpen, setBottomDockOpen] = useState(false);
+  const [rightDockOpen, setRightDockOpen] = useState(true);
+
+  // Add dock switching state
+  const [currentDock, setCurrentDock] = useState("input");
 
   const {
     // Context data
@@ -293,8 +302,6 @@ export const EngineeringModule = ({
     return displayNames[option] || option;
   };
 
-
-
   // Initialize selectedView to first option if not set
   React.useEffect(() => {
     if (!selectedView && viewOptions.length > 0) {
@@ -472,24 +479,28 @@ export const EngineeringModule = ({
           </div>
         )}
 
-        {/* Middle - 3D Model */}
-        <div className="superMainBody_mid">
-          {/* Dynamic View Options */}
-          <div className="options-container">
-            {viewOptions.map((option) => (
-              <div
-                key={option}
-                className="option-wrapper"
-                onClick={() => setSelectedView(option)}
-                title={`View ${getViewDisplayName(option)}`}
-              >
+        {/* Center Viewport */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* View Options */}
+          <div className="p-4 flex-shrink-0">
+            <div className="flex gap-3 p-3 bg-gradient-to-br from-blue-50 to-blue-200 rounded-lg mb-2 shadow-md">
+              {viewOptions.map((option) => (
                 <div
-                  className={`option-box ${selectedView === option ? "selected" : ""
-                    }`}
-                ></div>
-                <span className="option-label">{getViewDisplayName(option)}</span>
-              </div>
-            ))}
+                  key={option}
+                  className="flex items-center gap-1.5 p-2 px-3 rounded-md cursor-pointer transition-all duration-200 bg-white/70 border border-white/30 hover:bg-white/90 hover:-translate-y-0.5 hover:shadow-lg"
+                  onClick={() => setSelectedView(option)}
+                  title={`View ${getViewDisplayName(option)}`}
+                >
+                  <div
+                    className={`w-3 h-3 rounded-full border-2 transition-all duration-200 ${selectedView === option
+                        ? "bg-gradient-to-br from-blue-500 to-purple-600 border-blue-500 shadow-[0_0_0_2px_rgba(102,126,234,0.3)]"
+                        : "border-gray-400"
+                      }`}
+                  ></div>
+                  <span className="text-sm font-medium text-gray-700 select-none hover:text-blue-600">{getViewDisplayName(option)}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* 3D Model Canvas */}
@@ -651,6 +662,8 @@ export const EngineeringModule = ({
         )}
       </div>
 
+
+
       {/* Design Report Modal */}
       <DesignReportModal
         isOpen={createDesignReportBool}
@@ -665,7 +678,7 @@ export const EngineeringModule = ({
       {moduleConfig.modalConfig.map((modal) => {
         // Handle dynamic data sources
         let dataSource = [];
-        
+
         if (modal.dataSource) {
           // Static data source from contextData
           dataSource = contextData[modal.dataSource] || [];
@@ -674,7 +687,7 @@ export const EngineeringModule = ({
           const dynamicField = moduleConfig.inputSections
             .flatMap(section => section.fields)
             .find(field => field.modalKey === modal.key && field.getDynamicDataSource);
-          
+
           if (dynamicField && dynamicField.getDynamicDataSource) {
             dataSource = dynamicField.getDynamicDataSource(inputs, contextData) || [];
           }

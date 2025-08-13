@@ -185,6 +185,8 @@ export const InputSection = ({
           <Select
             value={selectValue}
             onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
+            className="w-full"
+            placeholder={field.placeholder || `Select ${field.label}`}
           >
             {displayOptions.map((option, index) => (
               <Option key={index} value={option}>{option}</Option>
@@ -198,17 +200,42 @@ export const InputSection = ({
         const selectedConnectivity = connectivityOptions.find(option => option.value === connectivityValue);
 
         return (
-          <Select
-            onSelect={(value) => {
-              setExtraState({ ...extraState, selectedOption: value });
-              setInputs({ ...safeInputs, connectivity: value, output: null });
-            }}
-            value={extraState.selectedOption || safeInputs.connectivity}
-          >
-            {(safeContextData.connectivityList || []).map((item, index) => (
-              <Option key={index} value={item}>{item}</Option>
-            ))}
-          </Select>
+          <div className="w-full">
+            <Select
+              value={safeInputs[field.key]}
+              onSelect={(value) => {
+                if (field.onChange) {
+                  field.onChange(
+                    value,
+                    safeInputs,
+                    setInputs,
+                    safeContextData,
+                    extraState,
+                    setExtraState
+                  );
+                } else {
+                  setInputs({ ...safeInputs, [field.key]: value });
+                }
+              }}
+              className="w-full h-11"
+              placeholder={field.placeholder || `Select ${field.label}`}
+            >
+              {(safeContextData.connectivityList || []).map((connectivity, index) => (
+                <Option key={index} value={connectivity}>
+                  <div className="flex items-center justify-between py-1">
+                    <span>{connectivity}</span>
+                    {imageSource && (
+                      <img
+                        src={imageSource}
+                        alt="Connectivity"
+                        className="w-8 h-8 rounded border border-gray-200 ml-2 object-cover"
+                      />
+                    )}
+                  </div>
+                </Option>
+              ))}
+            </Select>
+          </div>
         );
       case 'endPlateSelect':
         const conn_map = {
@@ -233,14 +260,13 @@ export const InputSection = ({
       case 'number':
         return (
           <Input
-            type="text"
-            onInput={(event) => {
-              event.target.value = event.target.value.replace(/[^0-9.]/g, "");
-            }}
+            type="number"
             value={safeInputs[field.key] ?? ""}
             onChange={(event) =>
               setInputs({ ...safeInputs, [field.key]: event.target.value })
             }
+            placeholder={field.placeholder || `ex. ${field.label}`}
+            className="w-full h-11 border border-gray-300 rounded-lg px-3 text-sm bg-white transition-all duration-200 hover:border-gray-400 focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 focus:outline-none placeholder:text-gray-400"
           />
         );
       case 'customizable':
@@ -252,23 +278,16 @@ export const InputSection = ({
 
         return (
           <Select
+            value={safeInputs[field.key] || "All"}
             onSelect={(value) => handleCustomizableSelect(field, value)}
-            value={selectionStates[field.selectionKey]}
+            className="w-full h-11"
+            placeholder={field.placeholder || `Select ${field.label}`}
           >
             <Option value="All">All</Option>
             <Option value="Customized">Customized</Option>
           </Select>
         );
-      case 'sectionProfileList':
-        // Check for duplicates in sectionProfileList
-        const profiles = safeContextData.sectionProfileList || [];
-        const duplicateProfiles = profiles.filter(
-          (profile, index) => profiles.indexOf(profile) !== index
-        );
-        if (duplicateProfiles.length > 0) {
-          console.warn(`⚠️ Duplicate profiles found in sectionProfileList:`, duplicateProfiles);
-        }
-
+      case 'sectionProfileSelect':
         return (
           <Select
             value={safeInputs[field.key]}
@@ -286,9 +305,11 @@ export const InputSection = ({
                 setInputs({ ...safeInputs, [field.key]: value });
               }
             }}
+            className="w-full h-11"
+            placeholder={field.placeholder || `Select ${field.label}`}
           >
             {(safeContextData.sectionProfileList || []).map((profile, index) => (
-              <Option key={`${profile}-${index}`} value={profile}>
+              <Option key={index} value={profile}>
                 {profile}
               </Option>
             ))}
@@ -300,6 +321,8 @@ export const InputSection = ({
           <Select
             value={safeInputs[field.key]}
             onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
+            className="w-full h-11"
+            placeholder={field.placeholder || `Select ${field.label}`}
           >
             {options.map((option, index) => (
               <Option key={index} value={option.value}>
@@ -316,6 +339,7 @@ export const InputSection = ({
             alt={field.label || "Section Profile"}
             height={field.height || "100px"}
             width={field.width || "100px"}
+            className="rounded border border-gray-200"
           />
         ) : null;
       default:
@@ -325,6 +349,8 @@ export const InputSection = ({
             onChange={(event) =>
               setInputs({ ...safeInputs, [field.key]: event.target.value })
             }
+            placeholder={field.placeholder || `ex. ${field.label}`}
+            className="w-full h-11 border border-gray-300 rounded-lg px-3 text-sm bg-white transition-all duration-200 hover:border-gray-400 focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 focus:outline-none placeholder:text-gray-400"
           />
         );
     }

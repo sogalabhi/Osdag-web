@@ -1,56 +1,59 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react';
 
 const Logs = ({ logs }) => {
-    // Move endOfDesignLog INSIDE the component as state
-    const [endOfDesignLog, setEndOfDesignLog] = useState("");
-
-    // Reset endOfDesignLog when logs prop changes or becomes null/empty
-    useEffect(() => {
-        if (!logs || logs.length === 0) {
-            setEndOfDesignLog("");
-            return;
-        }
-
-        // Find the end of design log in the current logs
-        let foundEndLog = "";
-        logs.forEach(log => {
-            if (log.msg.includes('=== End Of Design ===')) {
-                foundEndLog = log.msg;
-            }
-        });
-        
-        setEndOfDesignLog(foundEndLog);
-        
-        if (foundEndLog) {
-            console.log("LOGS: Found end of design log");
-        } else {
-            console.log("LOGS: No end of design log found");
-        }
-    }, [logs]);
-
-    return (
-        <div className='log-box'>
-            {logs && logs.map((log, index) => {
-                if (log.msg.includes('=== End Of Design ===')) {
-                    return null;
-                }
-                return (
-                    <p key={index} style={{
-                        color: log.type === 'error' ? 'red' : (
-                            log.type === 'warning' ? 'orange' : 'blue'
-                        )
-                    }}>
-                        <span className='log-info-text'>{log.type}: </span>
-                        <span className='log-text'>{log.msg}</span>
-                    </p>
-                )
-            })}
-            {endOfDesignLog && <p style={{ color: 'green' }}>
-                <span className='log-info-text'>INFO: </span>
-                <span className='log-text'>{endOfDesignLog}</span>
-            </p>}
+  // Ensure logs is always an array, even if null/undefined is passed
+  const safeLogs = logs || [];
+  // Reverse the logs so that the most recent log appears at the top
+  const reversedLogs = [...safeLogs].reverse();
+  return (
+    <div className="h-full bg-white p-4 font-mono text-sm overflow-y-auto">
+      <div className="mb-4 pb-2 border-b border-gray-700">
+        <h3 className="text-lg font-semibold ">System Logs</h3>
+      </div>
+      
+      {reversedLogs.length === 0 ? (
+        <div className="italic">
+          No logs available. System logs will appear here during operation.
         </div>
-    )
-}
+      ) : (
+        <div className="space-y-2">
+          {reversedLogs.map((log, index) => {
+            // Handle different log formats
+            let logType = 'info';
+            let logMessage = '';
+            
+            if (typeof log === 'object' && log !== null) {
+              // Handle log object with msg and type properties
+              logType = log.type || 'info';
+              logMessage = log.msg || JSON.stringify(log);
+            } else if (typeof log === 'string') {
+              // Handle string logs
+              logMessage = log;
+            } else {
+              // Handle other types
+              logMessage = String(log);
+            }
+            
+            return (
+              <div key={index} className="flex items-start space-x-2">
+                <span className={`${
+                  logType === 'error' ? 'text-red-400' : 
+                  logType === 'warning' ? 'text-yellow-400' : 
+                  logType === 'success' ? 'text-green-400' : 
+                  'text-blue-400'
+                }`}>
+                  [{logType.toUpperCase()}]
+                </span>
+                <span className={`break-words align-left${logMessage === '=== End Of Design ===' ? ' text-osdag-green' : ''}`}>
+                  {logMessage}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
-export default Logs
+export default Logs;
