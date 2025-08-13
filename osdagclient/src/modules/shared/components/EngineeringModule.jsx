@@ -1,9 +1,9 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
 import { useNavigate } from "react-router-dom";
-import { Input, Modal, Button, Alert } from "antd";
+import { Input, Modal, Button, Alert, Select } from "antd";
 
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
 import { InputSection } from "../components/InputSection";
@@ -12,6 +12,7 @@ import { DesignReportModal } from "../components/DesignReportModal";
 import useViewCamera from "./btobViewCamera";
 import Model from "./btobRender";
 import Logs from "../../../components/Logs";
+import Header from "../../../components/Header";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import ScreenshotCapture from "../../../components/ScreenShotCapture";
 import DesignPrefSections from "../../../components/DesignPrefSections";
@@ -25,6 +26,14 @@ export const EngineeringModule = ({
 }) => {
   const navigate = useNavigate();
   const cameraRef = useRef();
+
+  // Dock visibility states
+  const [leftDockOpen, setLeftDockOpen] = useState(true);
+  const [bottomDockOpen, setBottomDockOpen] = useState(false);
+  const [rightDockOpen, setRightDockOpen] = useState(true);
+
+  // Add dock switching state
+  const [currentDock, setCurrentDock] = useState("input");
 
   const {
     // Context data
@@ -100,6 +109,11 @@ export const EngineeringModule = ({
     handleCancelDesignReport,
   } = useEngineeringModule(moduleConfig);
 
+  // Dock toggle handlers
+  const toggleLeftDock = () => setLeftDockOpen(!leftDockOpen);
+  const toggleBottomDock = () => setBottomDockOpen(!bottomDockOpen);
+  const toggleRightDock = () => setRightDockOpen(!rightDockOpen);
+
   // Get the backend parameter name (different from display name for some cases)
   const getBackendViewName = (displayOption) => {
     // Map UI display names to backend parameter names  
@@ -174,8 +188,6 @@ export const EngineeringModule = ({
     return displayNames[option] || option;
   };
 
-
-
   // Initialize selectedView to first option if not set
   React.useEffect(() => {
     if (!selectedView && viewOptions.length > 0) {
@@ -201,181 +213,214 @@ export const EngineeringModule = ({
     setScreenshotTrigger(true);
   };
 
-  return (
-    <div className="module_base">
-      {/* Navigation */}
-      <div className="module_nav">
-        {menuItems.map((item, index) => (
-          <UnifiedDropdownMenu
-            key={index}
-            label={item.label}
-            dropdown={item.dropdown}
-            setDesignPrefModalStatus={setDesignPrefModalStatus}
-            inputs={inputs}
-            setInputs={setInputs}
-            allSelected={allSelected}
-            logs={logs}
-            setCreateDesignReportBool={setCreateDesignReportBool}
-            triggerScreenshotCapture={triggerScreenshotCapture}
-            selectedOption={extraState.selectedOption}
-            setSelectedOption={(value) =>
-              setExtraState({ ...extraState, selectedOption: value })
-            }
-          />
-        ))}
+  // Render dock content based on current selection
+  const renderDockContent = () => {
+    switch (currentDock) {
+      case "input":
+        return (
+          <>
+            {loadedFromProject && (
+              <Alert message="Input fields loaded from saved project." type="success" showIcon style={{ marginBottom: 16 }} />
+            )}
+            <div className="mb-5">
+              {moduleConfig.inputSections.map((section, index) => (
+                <InputSection
+                  key={index}
+                  section={section}
+                  inputs={inputs}
+                  setInputs={setInputs}
+                  selectionStates={selectionStates}
+                  updateSelectionState={updateSelectionState}
+                  updateModalState={updateModalState}
+                  toggleAllSelected={toggleAllSelected}
+                  contextData={contextData}
+                  extraState={extraState}
+                  setExtraState={setExtraState}
+                />
+              ))}
+            </div>
 
-        {displaySaveInputPopup && (
-          <span id="save-input-style" style={{ marginTop: "18px" }}>
-            <strong>Saved input file as "{saveInputFileName}"</strong>
-          </span>
+            <div className="flex gap-3 py-4 border-t border-gray-200 mt-5">
+              <Input type="button" value="Reset" onClick={handleReset} className="flex-1 py-2.5 px-4 border-none rounded-md text-sm font-medium cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg bg-gray-100 text-gray-600 hover:bg-gray-200" />
+              <Input type="button" value="Design" onClick={handleSubmit} className="flex-1 py-2.5 px-4 border-none rounded-md text-sm font-medium cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg bg-osdag-green text-white hover:bg-osdag-green/90" />
+            </div>
+          </>
+        );
+      case "assumptions":
+        return (
+          <div className="mb-6 relative">
+            <div className="border-2 border-osdag-green rounded-xl p-4 bg-white">
+              <div className="absolute -top-3 left-4 bg-white px-3">
+                <h3 className="text-lg font-semibold text-gray-900 m-0">Assumptions & Preferences</h3>
+              </div>
+              <div className="pt-2">
+                <p className="text-gray-600">This is the Additional Inputs content including assumptions and preferences.</p>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="h-screen flex flex-col w-full bg-gray-100 overflow-hidden">
+      {/* Header */}
+      <Header
+        leftDockOpen={leftDockOpen}
+        bottomDockOpen={bottomDockOpen}
+        rightDockOpen={rightDockOpen}
+        onToggleLeftDock={toggleLeftDock}
+        onToggleBottomDock={toggleBottomDock}
+        onToggleRightDock={toggleRightDock}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex mt-12 w-full overflow-hidden">
+        {/* Left Dock - Input Panel */}
+        {leftDockOpen && (
+          <div className="w-80 bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col h-full">
+            <div className="h-full overflow-y-auto">
+              <div className="p-4">
+                <div className="flex space-x-1 mb-4">
+                  <button
+                    className={`px-4 py-2 rounded-lg font-bold transition-all duration-200 ${currentDock === "input"
+                        ? "bg-osdag-green text-white"
+                        : "bg-white text-black border border-black"
+                      }`}
+                    onClick={() => setCurrentDock("input")}
+                  >
+                    Basic Inputs
+                  </button>
+                  <button
+                    className={`px-4 py-2 rounded-lg font-bold transition-all duration-200 ${currentDock === "assumptions"
+                        ? "bg-osdag-green text-white"
+                        : "bg-white text-black border border-black"
+                      }`}
+                    onClick={() => setCurrentDock("assumptions")}
+                  >
+                    Additional Inputs
+                  </button>
+                </div>
+                {renderDockContent()}
+              </div>
+            </div>
+          </div>
         )}
 
-        <div className="element">
-          <div className="home-btn" onClick={handleHomeClick}>
-            Home
-          </div>
-        </div>
-      </div>
-
-      {/* Main Body */}
-      <div className="superMainBody">
-        {/* Left - Input Dock */}
-        <div className="InputDock">
-          <p>Input Dock</p>
-          {loadedFromProject && (
-            <Alert message="Input fields loaded from saved project." type="success" showIcon style={{ marginBottom: 16 }} />
-          )}
-          <div className="subMainBody scroll-data">
-            {moduleConfig.inputSections.map((section, index) => (
-              <InputSection
-                key={index}
-                section={section}
-                inputs={inputs}
-                setInputs={setInputs}
-                selectionStates={selectionStates}
-                updateSelectionState={updateSelectionState}
-                updateModalState={updateModalState}
-                toggleAllSelected={toggleAllSelected}
-                contextData={contextData}
-                extraState={extraState}
-                setExtraState={setExtraState}
-              />
-            ))}
-          </div>
-
-          <div className="inputdock-btn">
-            <Input type="button" value="Reset" onClick={handleReset} />
-            <Input type="button" value="Design" onClick={handleSubmit} />
-          </div>
-        </div>
-
-        {/* Middle - 3D Model */}
-        <div className="superMainBody_mid">
-          {/* Dynamic View Options */}
-          <div className="options-container">
-            {viewOptions.map((option) => (
-              <div
-                key={option}
-                className="option-wrapper"
-                onClick={() => setSelectedView(option)}
-                title={`View ${getViewDisplayName(option)}`}
-              >
+        {/* Center Viewport */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* View Options */}
+          <div className="p-4 flex-shrink-0">
+            <div className="flex gap-3 p-3 bg-gradient-to-br from-blue-50 to-blue-200 rounded-lg mb-2 shadow-md">
+              {viewOptions.map((option) => (
                 <div
-                  className={`option-box ${selectedView === option ? "selected" : ""
-                    }`}
-                ></div>
-                <span className="option-label">{getViewDisplayName(option)}</span>
-              </div>
-            ))}
+                  key={option}
+                  className="flex items-center gap-1.5 p-2 px-3 rounded-md cursor-pointer transition-all duration-200 bg-white/70 border border-white/30 hover:bg-white/90 hover:-translate-y-0.5 hover:shadow-lg"
+                  onClick={() => setSelectedView(option)}
+                  title={`View ${getViewDisplayName(option)}`}
+                >
+                  <div
+                    className={`w-3 h-3 rounded-full border-2 transition-all duration-200 ${selectedView === option
+                        ? "bg-gradient-to-br from-blue-500 to-purple-600 border-blue-500 shadow-[0_0_0_2px_rgba(102,126,234,0.3)]"
+                        : "border-gray-400"
+                      }`}
+                  ></div>
+                  <span className="text-sm font-medium text-gray-700 select-none hover:text-blue-600">{getViewDisplayName(option)}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* 3D Model Canvas */}
-          {loading ? (
-            <div className="modelLoading">
-              <div className="loading-container">
-                <div className="loading-spinner"></div>
-                <p>Loading Model...</p>
-                <span className="loading-subtext">
-                  {loadingStage || "Preparing 3D visualization..."}
-                </span>
-              </div>
-            </div>
-          ) : renderBoolean ? (
-            <div className="cadModel">
-              <Canvas
-                gl={{ antialias: true, preserveDrawingBuffer: true }}
-                onCreated={({ gl }) => {
-                  gl.setClearColor("#ADD8E6");
-                }}
-              >
-                <PerspectiveCamera
-                  ref={cameraRef}
-                  makeDefault
-                  position={cameraPos}
-                  fov={fov}
-                  near={0.1}
-                  far={1000}
-                />
-                <Suspense
-                  fallback={
-                    <Html>
-                      <div className="model-loading-fallback">
-                        <div className="spinner"></div>
-                        <p>Loading 3D Model...</p>
-                      </div>
-                    </Html>
-                  }
-                >
-                  <Model
-                    modelPaths={cadModelPaths}
-                    selectedView={getBackendViewName(selectedView)}
-                    key={modelKey}
-                  />
-                  <ScreenshotCapture
-                    screenshotTrigger={screenshotTrigger}
-                    setScreenshotTrigger={setScreenshotTrigger}
-                    selectedView={getBackendViewName(selectedView)}
-                  />
-                </Suspense>
-              </Canvas>
-            </div>
-          ) : (
-            <div className="modelback">
-              <div className="no-model-message">
-                <div className="no-model-icon">📐</div>
-                <h3>No Model Generated</h3>
-                <p>Click "Design" to generate and view the 3D model</p>
-                <div className="model-info">
-                  <small>
-                    Available views: {viewOptions.map(getViewDisplayName).join(", ")}
-                  </small>
+          <div className="flex-1 p-4 overflow-hidden">
+            {loading ? (
+              <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                <div className="text-center">
+                  <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-lg font-semibold text-gray-700">Loading Model...</p>
+                  <span className="text-gray-500 text-sm block mt-1">
+                    {loadingStage || "Preparing 3D visualization..."}
+                  </span>
                 </div>
+              </div>
+            ) : renderBoolean ? (
+              <div className="rounded-lg overflow-hidden shadow-lg">
+                <Canvas
+                  gl={{ antialias: true, preserveDrawingBuffer: true }}
+                  onCreated={({ gl }) => {
+                    gl.setClearColor("#ADD8E6");
+                  }}
+                >
+                  <PerspectiveCamera
+                    ref={cameraRef}
+                    makeDefault
+                    position={cameraPos}
+                    fov={fov}
+                    near={0.1}
+                    far={1000}
+                  />
+                  <Suspense
+                    fallback={
+                      <Html>
+                        <div className="text-center text-white">
+                          <div className="w-8 h-8 border-3 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-2.5"></div>
+                          <p className="text-white">Loading 3D Model...</p>
+                        </div>
+                      </Html>
+                    }
+                  >
+                    <Model
+                      modelPaths={cadModelPaths}
+                      selectedView={getBackendViewName(selectedView)}
+                      key={modelKey}
+                    />
+                    <ScreenshotCapture
+                      screenshotTrigger={screenshotTrigger}
+                      setScreenshotTrigger={setScreenshotTrigger}
+                      selectedView={getBackendViewName(selectedView)}
+                    />
+                  </Suspense>
+                </Canvas>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                <div className="text-center text-gray-500">
+                  <div className="text-5xl mb-4 opacity-60">📐</div>
+                  <h3 className="m-0 mb-2 text-gray-600">No Model Generated</h3>
+                  <p className="m-0 mb-4 text-sm">Click "Design" to generate and view the 3D model</p>
+                  <div className="px-3 py-2 bg-white/70 rounded inline-block">
+                    <small className="text-gray-600">
+                      Available views: {viewOptions.map(getViewDisplayName).join(", ")}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Dock - Logs Panel */}
+          {bottomDockOpen && (
+            <div className="h-64 bg-gray-900 shadow-lg transition-all duration-300 ease-in-out flex flex-col border-t border-gray-700">
+              <div className="h-full overflow-y-auto">
+                <Logs logs={logs || []} />
               </div>
             </div>
           )}
-
-          <Logs logs={logs} />
         </div>
 
-        {/* Right - Output Dock */}
-        <div className="superMain_right">
-          <OutputDockComponent output={output} extraState={extraState} />
-          <div className="outputdock-btn">
-            <Input
-              type="button"
-              value="Create Design Report"
-              onClick={handleCreateDesignReport}
-              disabled={!output || Object.keys(output).length === 0}
-            />
-            <Input
-              type="button"
-              value="Save Output"
-              onClick={saveOutput}
-              disabled={!output || Object.keys(output).length === 0}
-            />
+        {/* Right Dock - Output Panel */}
+        {rightDockOpen && (
+          <div className="w-80 bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col h-full">
+            <div className="h-full overflow-y-auto">
+              <OutputDockComponent output={output} extraState={extraState} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
+
+
 
       {/* Design Report Modal */}
       <DesignReportModal
@@ -391,7 +436,7 @@ export const EngineeringModule = ({
       {moduleConfig.modalConfig.map((modal) => {
         // Handle dynamic data sources
         let dataSource = [];
-        
+
         if (modal.dataSource) {
           // Static data source from contextData
           dataSource = contextData[modal.dataSource] || [];
@@ -400,7 +445,7 @@ export const EngineeringModule = ({
           const dynamicField = moduleConfig.inputSections
             .flatMap(section => section.fields)
             .find(field => field.modalKey === modal.key && field.getDynamicDataSource);
-          
+
           if (dynamicField && dynamicField.getDynamicDataSource) {
             dataSource = dynamicField.getDynamicDataSource(inputs, contextData) || [];
           }
@@ -495,204 +540,28 @@ export const EngineeringModule = ({
         maskClosable={false}
         centered
         width={400}
-        className="loading-modal"
+        className="text-center"
         styles={{
           body: {
-            textAlign: "center",
             padding: "40px 20px",
           },
         }}
       >
-        <div className="loading-content">
-          <div
-            style={{
-              fontSize: "18px",
-              marginBottom: "20px",
-              fontWeight: "bold",
-            }}
-          >
+        <div>
+          <div className="text-lg mb-5 font-bold text-gray-800">
             Processing Design
           </div>
-          <div style={{ marginBottom: "20px" }}>
-            <div
-              className="spinner"
-              style={{
-                border: "4px solid #f3f3f3",
-                borderTop: "4px solid #3498db",
-                borderRadius: "50%",
-                width: "40px",
-                height: "40px",
-                animation: "spin 1s linear infinite",
-                margin: "0 auto",
-              }}
-            ></div>
+          <div className="mb-5">
+            <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto"></div>
           </div>
-          <div style={{ fontSize: "14px", color: "#666" }}>
+          <div className="text-gray-600 text-sm">
             {loadingStage || "Please wait while we generate your results..."}
           </div>
-          <div style={{ marginTop: "10px", fontSize: "12px", color: "#999" }}>
+          <div className="mt-2.5 text-gray-400 text-xs">
             This may take a few moments
           </div>
         </div>
       </Modal>
-
-      {/* Enhanced CSS for better UI */}
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        .options-container {
-          display: flex;
-          gap: 12px;
-          padding: 12px;
-          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-          border-radius: 8px;
-          margin-bottom: 8px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .option-wrapper {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 8px 12px;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          background: rgba(255, 255, 255, 0.7);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .option-wrapper:hover {
-          background: rgba(255, 255, 255, 0.9);
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .option-box {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          border: 2px solid #ccc;
-          transition: all 0.2s ease;
-        }
-
-        .option-box.selected {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-color: #667eea;
-          box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
-        }
-
-        .option-label {
-          font-size: 13px;
-          font-weight: 500;
-          color: #333;
-          user-select: none;
-        }
-
-        .option-wrapper:hover .option-label {
-          color: #667eea;
-        }
-
-        .modelLoading {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 400px;
-          background: linear-gradient(135deg, #f6f9fc 0%, #e9ecef 100%);
-          border-radius: 8px;
-          border: 2px dashed #dee2e6;
-        }
-
-        .loading-container {
-          text-align: center;
-        }
-
-        .loading-spinner {
-          width: 40px;
-          height: 40px;
-          border: 4px solid #f3f3f3;
-          border-top: 4px solid #3498db;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin: 0 auto 15px;
-        }
-
-        .loading-subtext {
-          color: #6c757d;
-          font-size: 12px;
-          display: block;
-          margin-top: 5px;
-        }
-
-        .modelback {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 400px;
-          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-          border-radius: 8px;
-          border: 2px dashed #dee2e6;
-        }
-
-        .no-model-message {
-          text-align: center;
-          color: #6c757d;
-        }
-
-        .no-model-icon {
-          font-size: 48px;
-          margin-bottom: 16px;
-          opacity: 0.6;
-        }
-
-        .no-model-message h3 {
-          margin: 0 0 8px 0;
-          color: #495057;
-        }
-
-        .no-model-message p {
-          margin: 0 0 16px 0;
-          font-size: 14px;
-        }
-
-        .model-info {
-          padding: 8px 12px;
-          background: rgba(255, 255, 255, 0.7);
-          border-radius: 4px;
-          display: inline-block;
-        }
-
-        .model-loading-fallback {
-          text-align: center;
-          color: white;
-        }
-
-        .model-loading-fallback .spinner {
-          width: 30px;
-          height: 30px;
-          border: 3px solid rgba(255,255,255,0.3);
-          border-top: 3px solid white;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin: 0 auto 10px;
-        }
-
-        .cadModel {
-          height: 400px;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-        }
-
-        .outputdock-btn input[type="button"]:disabled,
-        .inputdock-btn input[type="button"]:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      `}</style>
     </div>
   );
 };

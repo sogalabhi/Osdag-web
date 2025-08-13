@@ -617,9 +617,68 @@
 }
 
 .ant-select-selector {
-  height: 1.5rem !important;
-  align-items: center;
-  background-color: #f1f1f1 !important;
+  height: 44px !important;
+  padding: 0 12px !important;
+  background: white !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.ant-select:hover .ant-select-selector {
+  border-color: #9ca3af !important;
+}
+
+.ant-select.ant-select-focused .ant-select-selector {
+  border-color: #91b014 !important;
+  box-shadow: 0 0 0 3px rgba(145, 176, 20, 0.1) !important;
+}
+
+/* Enhanced dropdown styling */
+.ant-select-dropdown {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+}
+
+.ant-select-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.ant-select-item:hover {
+  background-color: #f9fafb;
+}
+
+.ant-select-item-option-selected {
+  background-color: rgba(145, 176, 20, 0.1);
+  color: #91b014;
+}
+
+/* Enhanced scrollbar for the input dock */
+.scroll-data {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f9fafb;
+}
+
+.scroll-data::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scroll-data::-webkit-scrollbar-track {
+  background: #f9fafb;
+  border-radius: 2px;
+}
+
+.scroll-data::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.scroll-data::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .modelLoading {
@@ -1066,4 +1125,47 @@
 
 .loading-modal .ant-modal-mask {
   background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Custom Scrollbar Styles for Dock Panels */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Dark theme scrollbar for logs panel */
+.scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+.scrollbar-track-gray-800::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+/* Firefox scrollbar styles */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.scrollbar-thumb-gray-600 {
+  scrollbar-color: #4b5563 #1f2937;
 }

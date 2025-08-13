@@ -17,6 +17,11 @@ export const BaseOutputDock = ({
   title = "Output Dock",
   extraState = {}
 }) => {
+  // Debug: Log the props received
+  console.log('BaseOutputDock received:', { output, outputConfig, title, extraState });
+  console.log('Output keys available:', Object.keys(output || {}));
+  console.log('OutputConfig sections:', Object.keys(outputConfig?.sections || {}));
+  
   // Shared state management
   const [activeModals, setActiveModals] = useState({});
   const [activeSections, setActiveSections] = useState({});
@@ -69,13 +74,33 @@ export const BaseOutputDock = ({
 
   // Helper function to get output value - Works for both module formats
   const getOutputValue = (key, output) => {
-    if (!output) return " ";
+    if (!output) {
+      console.log(`getOutputValue: No output provided for key ${key}`);
+      return " ";
+    }
+    
+    // Debug: Log the key and output structure
+    console.log(`Getting value for key: ${key}`, { 
+      output, 
+      keyValue: output[key],
+      outputKeys: Object.keys(output),
+      hasKey: key in output,
+      keyType: typeof key
+    });
     
     // Both modules now use flat structure: { "Bolt.Diameter": { label, val } }
     if (output[key]?.val !== undefined) {
+      console.log(`Found value in output[${key}].val:`, output[key].val);
       return output[key].val;
     }
     
+    // Try alternative structures
+    if (output[key] !== undefined) {
+      console.log(`Found value in output[${key}]:`, output[key]);
+      return output[key];
+    }
+    
+    console.log(`No value found for key: ${key}`);
     return " ";
   };
 
@@ -242,14 +267,62 @@ export const BaseOutputDock = ({
   console.log("output", output);
   return (
     <>
-      <p>{title}</p>
-      <div className="subMainBody scroll-data">
-        {Object.entries(outputConfig.sections).map(([sectionName, fields]) => (
-          <div key={sectionName}>
-            <h3>{sectionName}</h3>
-            {fields.map((field, index) => renderField(field, index))}
-          </div>
-        ))}
+      <div className="p-4 space-y-6">
+        {/* Render sections based on output config */}
+        {Object.entries(outputConfig.sections).map(([sectionName, fields]) => {
+          console.log(`Rendering section: ${sectionName}`, { fields, output });
+          return (
+            <div key={sectionName} className="mb-6 relative">
+              {/* Section container with green border and rounded corners */}
+              <div className="border-2 border-osdag-green rounded-xl p-4 bg-white">
+                {/* Section title positioned on the border */}
+                <div className="absolute -top-3 left-4 bg-white px-3">
+                  <h4 className="text-sm font-semibold text-gray-900">{sectionName}</h4>
+                </div>
+                
+                {/* Section content */}
+                <div className="space-y-4 pt-2">
+                  {fields.map((field, index) => {
+                    console.log(`Rendering field: ${field.key}`, { field, output });
+                    // Skip modal fields (they're handled by buttons)
+                    if (outputConfig.modals[field.key]) {
+                      return null;
+                    }
+                    
+                    return (
+                      <div key={index} className="flex justify-between items-center">
+                        <span className="text-sm font-semibold text-gray-900">{field.label}:</span>
+                        <span className="text-sm font-medium text-gray-700 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 min-w-[80px] text-center">
+                          {getOutputValue(field.key, output)}
+                        </span>
+                      </div>
+                    );
+                  })}
+
+                  {/* Add modal buttons for fields that have modals */}
+                  {fields.some(field => outputConfig.modals[field.key]) && (
+                    <div className="pt-2">
+                      {fields.map((field) => {
+                        if (!outputConfig.modals[field.key]) return null;
+                        
+                        const modalConfig = outputConfig.modals[field.key];
+                        return (
+                          <button
+                            key={field.key}
+                            className="px-4 py-2 bg-osdag-green text-white rounded-lg hover:bg-osdag-green/90 transition-colors font-medium"
+                            onClick={() => handleDialog(field.key)}
+                          >
+                            {modalConfig.buttonText}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Dynamic Modal Rendering */}

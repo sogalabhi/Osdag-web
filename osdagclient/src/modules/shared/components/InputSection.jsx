@@ -95,6 +95,8 @@ export const InputSection = ({
           <Select
             value={selectValue}
             onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
+            className="w-full"
+            placeholder={field.placeholder || `Select ${field.label}`}
           >
             {displayOptions.map((option, index) => (
               <Option key={index} value={option}>{option}</Option>
@@ -104,73 +106,107 @@ export const InputSection = ({
       }
       case 'connectivitySelect':
         return (
-          <Select
-            onSelect={(value) => {
-              setExtraState({ ...extraState, selectedOption: value });
-              setInputs({ ...safeInputs, connectivity: value, output: null });
-            }}
-            value={extraState.selectedOption || safeInputs.connectivity}
-          >
-            {(safeContextData.connectivityList || []).map((item, index) => (
-              <Option key={index} value={item}>{item}</Option>
-            ))}
-          </Select>
+          <div className="w-full">
+            <Select
+              value={safeInputs[field.key]}
+              onSelect={(value) => {
+                if (field.onChange) {
+                  field.onChange(
+                    value,
+                    safeInputs,
+                    setInputs,
+                    safeContextData,
+                    extraState,
+                    setExtraState
+                  );
+                } else {
+                  setInputs({ ...safeInputs, [field.key]: value });
+                }
+              }}
+              className="w-full h-11"
+              placeholder={field.placeholder || `Select ${field.label}`}
+            >
+              {(safeContextData.connectivityList || []).map((connectivity, index) => (
+                <Option key={index} value={connectivity}>
+                  <div className="flex items-center justify-between py-1">
+                    <span>{connectivity}</span>
+                    {imageSource && (
+                      <img
+                        src={imageSource}
+                        alt="Connectivity"
+                        className="w-8 h-8 rounded border border-gray-200 ml-2 object-cover"
+                      />
+                    )}
+                  </div>
+                </Option>
+              ))}
+            </Select>
+          </div>
         );
       case 'endPlateSelect':
-        const conn_map = {
-          "Flushed - Reversible Moment": "Flushed - Reversible Moment",
-          "Extended One Way - Irreversible Moment": "Extended One Way - Irreversible Moment",
-          "Extended Both Ways - Reversible Moment": "Extended Both Ways - Reversible Moment",
-        };
-
         return (
-          <Select
-            onSelect={(value) => {
-              setExtraState({ ...extraState, selectedOption: value });
-              setInputs({ ...safeInputs, output: null });
-            }}
-            value={extraState.selectedOption}
-          >
-            {Object.keys(conn_map).map((item, index) => (
-              <Option key={index} value={item}>
-                {conn_map[item]}
-              </Option>
-            ))}
-          </Select>
+          <div className="w-full">
+            <Select
+              value={safeInputs[field.key]}
+              onSelect={(value) => {
+                if (field.onChange) {
+                  field.onChange(
+                    value,
+                    safeInputs,
+                    setInputs,
+                    safeContextData,
+                    extraState,
+                    setExtraState
+                  );
+                } else {
+                  setInputs({ ...safeInputs, [field.key]: value });
+                }
+              }}
+              className="w-full h-11"
+              placeholder={field.placeholder || `Select ${field.label}`}
+            >
+              {(safeContextData.endPlateList || []).map((endPlate, index) => (
+                <Option key={index} value={endPlate}>
+                  <div className="flex items-center justify-between py-1">
+                    <span>{endPlate}</span>
+                    {imageSource && (
+                      <img
+                        src={imageSource}
+                        alt="End Plate"
+                        className="w-8 h-8 rounded border border-gray-200 ml-2 object-cover"
+                      />
+                    )}
+                  </div>
+                </Option>
+              ))}
+            </Select>
+          </div>
         );
       case 'number':
         return (
           <Input
-            type="text"
-            onInput={(event) => {
-              event.target.value = event.target.value.replace(/[^0-9.]/g, "");
-            }}
+            type="number"
             value={safeInputs[field.key] ?? ""}
             onChange={(event) =>
               setInputs({ ...safeInputs, [field.key]: event.target.value })
             }
+            placeholder={field.placeholder || `ex. ${field.label}`}
+            className="w-full h-11 border border-gray-300 rounded-lg px-3 text-sm bg-white transition-all duration-200 hover:border-gray-400 focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 focus:outline-none placeholder:text-gray-400"
           />
         );
-      case 'customizable':
+      case 'customizableSelect':
         return (
           <Select
+            value={safeInputs[field.key] || "All"}
             onSelect={(value) => handleCustomizableSelect(field, value)}
-            value={selectionStates[field.selectionKey]}
+            className="w-full h-11"
+            placeholder={field.placeholder || `Select ${field.label}`}
           >
             <Option value="All">All</Option>
             <Option value="Customized">Customized</Option>
           </Select>
         );
-      case 'sectionProfileList':
-        // Check for duplicates in sectionProfileList
-        const profiles = safeContextData.sectionProfileList || [];
-        const duplicateProfiles = profiles.filter(
-          (profile, index) => profiles.indexOf(profile) !== index
-        );
-        if (duplicateProfiles.length > 0) {
-          console.warn(`⚠️ Duplicate profiles found in sectionProfileList:`, duplicateProfiles);
-        }
-
+      case 'sectionProfileSelect':
         return (
           <Select
             value={safeInputs[field.key]}
@@ -188,9 +224,11 @@ export const InputSection = ({
                 setInputs({ ...safeInputs, [field.key]: value });
               }
             }}
+            className="w-full h-11"
+            placeholder={field.placeholder || `Select ${field.label}`}
           >
             {(safeContextData.sectionProfileList || []).map((profile, index) => (
-              <Option key={`${profile}-${index}`} value={profile}>
+              <Option key={index} value={profile}>
                 {profile}
               </Option>
             ))}
@@ -202,6 +240,8 @@ export const InputSection = ({
           <Select
             value={safeInputs[field.key]}
             onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
+            className="w-full h-11"
+            placeholder={field.placeholder || `Select ${field.label}`}
           >
             {options.map((option, index) => (
               <Option key={index} value={option.value}>
@@ -218,6 +258,7 @@ export const InputSection = ({
             alt={field.label || "Section Profile"}
             height={field.height || "100px"}
             width={field.width || "100px"}
+            className="rounded border border-gray-200"
           />
         ) : null;
       default:
@@ -227,47 +268,58 @@ export const InputSection = ({
             onChange={(event) =>
               setInputs({ ...safeInputs, [field.key]: event.target.value })
             }
+            placeholder={field.placeholder || `ex. ${field.label}`}
+            className="w-full h-11 border border-gray-300 rounded-lg px-3 text-sm bg-white transition-all duration-200 hover:border-gray-400 focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 focus:outline-none placeholder:text-gray-400"
           />
         );
     }
   };
 
   return (
-    <div>
-      <h3>{section.title}</h3>
-      <div className="component-grid">
-        {section.fields.map((field, index) => {
-          // Check conditional display again for the entire field container
-          if (field.conditionalDisplay && !field.conditionalDisplay(extraState)) {
-            return null;
-          }
+    <div className="mb-6 relative">
+      {/* Fieldset-style border */}
+      <div className="border-2 border-osdag-green rounded-xl p-4 bg-white">
+        {/* Legend-style title that cuts through the border */}
+        <div className="absolute -top-3 left-4 bg-white px-3">
+          <h3 className="text-lg font-semibold text-gray-900 m-0">{section.title}</h3>
+        </div>
+        
+        {/* Content with consistent spacing */}
+        <div className="pt-2">
+          {section.fields.map((field, index) => {
+            // Check conditional display again for the entire field container
+            if (field.conditionalDisplay && !field.conditionalDisplay(extraState)) {
+              return null;
+            }
 
-          return (
-            <div key={index}>
-              {field.type === 'image' ? (
-                <div className="connectionimg">
-                  {renderField(field)}
-                </div>
-              ) : (
-                <div className="component-grid-align">
-                  <h4>{field.label}</h4>
-                  {renderField(field)}
-                </div>
-              )}
-              {/* Render image separately for connectivity and endPlateSelect types */}
-              {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (
-                <div className="connectionimg">
-                  <img
-                    src={imageSource}
-                    alt="Component"
-                    height="100px"
-                    width="100px"
-                  />
-                </div>
-              )}
-            </div>
-          );
-        })}
+            return (
+              <div key={index} className="mb-6 last:mb-0">
+                {field.type === 'image' ? (
+                  <div className="flex justify-center my-3">
+                    {renderField(field)}
+                  </div>
+                ) : (
+                  <div className="flex justify-between items-center">
+                    <h4 className={`text-sm font-semibold text-gray-900 flex-[0_0_45%] ${field.required ? 'after:content-["_*"] after:text-red-500 after:font-bold' : ''}`}>{field.label}</h4>
+                    {renderField(field)}
+                  </div>
+                )}
+                {/* Render image separately for connectivity and endPlateSelect types */}
+                {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (
+                  <div className="flex justify-center mt-3">
+                    <img
+                      src={imageSource}
+                      alt="Component"
+                      height="60px"
+                      width="60px"
+                      className="rounded border border-gray-200"
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
