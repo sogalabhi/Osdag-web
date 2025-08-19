@@ -49,6 +49,34 @@ const GridSelector = ({ onViewChange }) => {
         onViewChange && onViewChange('ZX');
       }
     }
+    else if (rowIndex === 1) {
+      if (colIndex === 0) {
+        onViewChange && onViewChange('ANGLE1');  // Middle-left: Diagonal top-right
+      } else if (colIndex === 1) {
+        onViewChange && onViewChange('ANGLE2');  // Middle-center: Diagonal top-left
+      } else if (colIndex === 2) {
+        onViewChange && onViewChange('ANGLE3');  // Middle-right: Bottom-right angled
+      }
+    }
+    else if (rowIndex === 2) {
+      if (colIndex === 0) {
+        onViewChange && onViewChange('ANGLE4');
+      } else if (colIndex === 1) {
+        onViewChange && onViewChange('ANGLE5');
+      } else if (colIndex === 2) {
+        onViewChange && onViewChange('ANGLE6');
+      }
+    } 
+  };
+
+  const getButtonTitle = (rowIndex, colIndex) => {
+    if (rowIndex === 0) {
+      return ['XY Axis View', 'YZ Axis View', 'ZX Axis View'][colIndex];
+    } else if (rowIndex === 1) {
+      return ['Diagonal Top-Right', 'Diagonal Top-Left', 'Bottom-Right Angled'][colIndex];
+    } else {
+      return ['Bottom-Left Elevated', 'High Angle Behind', 'Side Angle Behind'][colIndex];
+    }
   };
 
   return (
@@ -64,12 +92,7 @@ const GridSelector = ({ onViewChange }) => {
                 key={buttonId}
                 className={`grid-button ${isActive ? 'active' : ''}`}
                 onClick={() => handleButtonClick(rowIndex, colIndex)}
-                title={
-                  rowIndex === 0 && colIndex === 0 ? 'XY Axis View' :
-                  rowIndex === 0 && colIndex === 1 ? 'YZ Axis View' :
-                  rowIndex === 0 && colIndex === 2 ? 'ZX Axis View' :
-                  `Grid ${position}`
-                }
+                title={getButtonTitle(rowIndex, colIndex)}
               >
                 <img
                   src={getSquareIcon(position)}

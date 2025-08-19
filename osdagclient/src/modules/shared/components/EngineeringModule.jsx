@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
 import { useNavigate } from "react-router-dom";
 import { Input, Modal, Button } from "antd";
-
+import Select from 'react-select';
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
 import { InputSection } from "../components/InputSection";
 import { CustomizationModal } from "../components/CustomizationModal";
@@ -112,6 +112,7 @@ export const EngineeringModule = ({
   const [isGridActive, setIsGridActive] = useState(false);
   const [orthographicView, setOrthographicView] = useState(null); // New state for orthographic view
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
+  const [selectedSection, setSelectedSection] = useState("Section Details");
 
   // Only change dock visibility after design is complete
   useEffect(() => {
@@ -339,23 +340,52 @@ export const EngineeringModule = ({
         {/* Left - Input Dock - Only show if showInputDock is true */}
         {showInputDock && (
           <div className="InputDock">
-            <p>Input Dock</p>
+            <div className="flex justify-between inputRow">
+              <span>Input Dock</span>
+              <Select
+                value={{ value: selectedSection, label: selectedSection }}
+                onChange={(option) => {
+                  setSelectedSection(option.value);
+                  
+                  // Open design preferences modal if that option is selected
+                  if (option.value === "Design Preferences") {
+                    setDesignPrefModalStatus(true);
+                  }
+                }} 
+                options={[
+                  { value: "Section Details", label: "Section Details"},
+                  { value: "Design Preferences", label: "Design Preferences" },
+                  { value: "Additional Inputs", label: "Additional Inputs" }
+                ]}
+                classNamePrefix="section-select"
+                isSearchable={false}
+              />
+            </div>
             <div className="subMainBody scroll-data">
-              {moduleConfig.inputSections.map((section, index) => (
-                <InputSection
-                  key={index}
-                  section={section}
-                  inputs={inputs}
-                  setInputs={setInputs}
-                  selectionStates={selectionStates}
-                  updateSelectionState={updateSelectionState}
-                  updateModalState={updateModalState}
-                  toggleAllSelected={toggleAllSelected}
-                  contextData={contextData}
-                  extraState={extraState}
-                  setExtraState={setExtraState}
-                />
-              ))}
+              {selectedSection !== "Additional Inputs" && 
+                moduleConfig.inputSections.map((section, index) => (
+                  <InputSection
+                    key={index}
+                    section={section}
+                    inputs={inputs} 
+                    setInputs={setInputs}
+                    selectionStates={selectionStates}
+                    updateSelectionState={updateSelectionState}
+                    updateModalState={updateModalState}
+                    toggleAllSelected={toggleAllSelected}
+                    contextData={contextData}
+                    extraState={extraState}
+                    setExtraState={setExtraState}
+                  />
+                ))
+              }
+              
+              {selectedSection === "Additional Inputs" && (
+                <div className="additional-inputs-content">
+                  {/* Add your additional inputs content here */}
+                  <p>Additional Inputs Content</p>
+                </div>
+              )}
             </div>
 
             <div className="inputdock-btn">

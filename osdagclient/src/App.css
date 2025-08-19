@@ -662,8 +662,122 @@
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.InputDock p {
-  @apply w-20 my-2 ml-4 py-1 px-1 text-sm text-center rounded-xl font-medium bg-osdag-green text-white flex-shrink-0;
+.section-select__control {
+  width: 160px !important;
+  margin: 8px 16px !important;
+  font-size: 14px !important;
+  border-radius: 10px !important;
+  font-weight: 500 !important;
+  background-color: #91b014 !important;
+  border: none !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  box-shadow: none !important;
+}
+
+.section-select__control:hover {
+  background-color: #91b014 !important;
+  border-color: #91b014 !important;
+}
+
+.section-select__control--is-focused {
+  background-color: #91b014 !important;
+  border-color: #91b014 !important;
+  box-shadow: none !important;
+}
+
+.section-select__value-container {
+  padding: 0 12px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  position: relative !important;
+}
+
+.section-select__single-value {
+  color: white !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.section-select__placeholder {
+  color: white !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  position: absolute !important;
+}
+
+.section-select__dropdown-indicator {
+  color: white !important;
+  padding: 2px !important;
+  width: 18px !important;
+  height: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-right: 4px !important;
+}
+
+.section-select__dropdown-indicator:hover {
+  color: white !important;
+}
+
+.section-select__indicator-separator {
+  display: none !important;
+}
+
+.section-select__menu {
+  z-index: 9999 !important;
+  max-height: 200px !important;
+  border: 1px solid #000 !important;
+  border-radius: 6px !important;
+  background-color: white !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  margin-top: 2px !important;
+}
+
+.section-select__menu-list {
+  max-height: 200px !important;
+  overflow-y: auto !important;
+}
+
+.section-select__option {
+  font-size: 13px !important;
+  color: #1A1A1A !important;
+  cursor: pointer !important;
+  padding: 8px 12px !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.section-select__option--is-focused {
+  background-color: rgba(145, 176, 20, 0.1) !important;
+  color: #91B014 !important;
+}
+
+.section-select__option--is-selected {
+  background-color: rgba(145, 176, 20, 0.2) !important;
+  color: #91B014 !important;
+  font-weight: 600 !important;
+}
+
+.section-select__option--is-disabled {
+  color: #999 !important;
+  background-color: #f5f5f5 !important;
+  cursor: not-allowed !important;
+}
+
+.InputDock .inputRow span {
+  @apply w-28 text-center h-8 mt-2 ml-4 pt-1 cursor-pointer text-sm rounded-xl font-medium bg-osdag-green text-white;
 }
 
 .cards {

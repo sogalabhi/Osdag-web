@@ -151,6 +151,13 @@ const ORTHOGRAPHIC_VIEWS = {
   XY: { position: [0, 0, 25], fov: 45 }, // Looking down Z-axis
   YZ: { position: [25, 0, 0], fov: 45 }, // Looking along X-axis
   ZX: { position: [0, 25, 0], fov: 45 }, // Looking down Y-axis
+
+  ANGLE1: { position: [15, 10, 20], fov: 45 },   // Diagonal top-right view
+  ANGLE2: { position: [-15, 12, 18], fov: 45 },  // Diagonal top-left view
+  ANGLE3: { position: [20, -8, 15], fov: 45 },   // Bottom-right angled view
+  ANGLE4: { position: [-12, -15, 22], fov: 45 }, // Bottom-left elevated view
+  ANGLE5: { position: [8, 18, -20], fov: 45 },   // High angle from behind
+  ANGLE6: { position: [-20, 5, -15], fov: 45 },  // Side angle from behind
 };
 
 export default function useViewCamera(
@@ -178,7 +185,7 @@ export default function useViewCamera(
     }
 
     function getBaseSettings() {
-      // 🎯 CHECK FOR LIVE OVERRIDE FROM CONSOLE INSIDE THE CALLBACK!
+      // CHECK FOR LIVE OVERRIDE FROM CONSOLE INSIDE THE CALLBACK!
       if (
         typeof window !== "undefined" &&
         window.LIVE_CAMERA_SETTINGS &&
@@ -196,7 +203,7 @@ export default function useViewCamera(
             liveSettings.connectivitySettings[connectivity];
           if (connectivitySettings && connectivitySettings[selectedView]) {
             console.log(
-              "🎯 Using LIVE camera override for:",
+              "Using LIVE camera override for:",
               moduleName,
               connectivity,
               selectedView
@@ -208,7 +215,7 @@ export default function useViewCamera(
         // Handle regular settings
         if (liveSettings[selectedView]) {
           console.log(
-            "🎯 Using LIVE camera override for:",
+            "Using LIVE camera override for:",
             moduleName,
             selectedView
           );
