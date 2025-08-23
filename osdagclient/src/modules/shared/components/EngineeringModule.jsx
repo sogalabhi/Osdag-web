@@ -12,7 +12,6 @@ import { DesignReportModal } from "../components/DesignReportModal";
 import useViewCamera from "./btobViewCamera";
 import Model from "./btobRender";
 import Logs from "../../../components/Logs";
-import Header from "../../../components/Header";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import ScreenshotCapture from "../../../components/ScreenShotCapture";
 import DesignPrefSections from "../../../components/DesignPrefSections";
@@ -38,14 +37,6 @@ export const EngineeringModule = ({
   const navigate = useNavigate();
   const cameraRef = useRef();
 
-  // Dock visibility states
-  const [leftDockOpen, setLeftDockOpen] = useState(true);
-  const [bottomDockOpen, setBottomDockOpen] = useState(false);
-  const [rightDockOpen, setRightDockOpen] = useState(true);
-
-  // Add dock switching state
-  const [currentDock, setCurrentDock] = useState("input");
-
   const {
     // Context data
     beamList,
@@ -55,10 +46,6 @@ export const EngineeringModule = ({
     boltDiameterList,
     thicknessList,
     propertyClassList,
-    angleList,
-    channelList,
-    sectionProfileList,
-    topAngleList,
     cadModelPaths,
 
     // State
@@ -90,11 +77,6 @@ export const EngineeringModule = ({
     setScreenshotTrigger,
     extraState,
     setExtraState,
-    loadedFromProject,
-
-    // Project management states
-    currentProjectId,
-    projectNameLoading,
 
     // Navigation and Reset states
     showResetConfirmation,
@@ -238,76 +220,35 @@ export const EngineeringModule = ({
 
   // Get connectivity for FinPlate module
   const getConnectivity = () => {
-    if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
+    if (moduleConfig.cameraKey === "FinPlate") {
       return extraState?.selectedOption || inputs?.connectivity;
     }
     return null;
   };
 
-  const { position: cameraPos, fov } = useViewCamera(
+  const cameraSettings = useViewCamera(
     moduleConfig.cameraKey,
-    getBackendViewName(selectedView),
-    getConnectivity()
+    selectedView,
+    getConnectivity(),
+    orthographicView
   );
 
-  // Get view options from module configuration
+  const {
+    position: cameraPos,
+    fov,
+    modelPosition,
+    modelScale,
+  } = cameraSettings;
+
+  // Determine view options based on module
   const getViewOptions = () => {
-    // Use cadOptions from module config if available, otherwise fallback to default
-    if (moduleConfig.cadOptions && Array.isArray(moduleConfig.cadOptions)) {
-      return moduleConfig.cadOptions;
+    if (moduleConfig.cameraKey === "FinPlate") {
+      return ["Model", "Beam", "Column", "Plate"];
     }
-
-    // Fallback based on module type for backward compatibility
-    switch (moduleConfig.cameraKey) {
-      case MODULE_KEY_FIN_PLATE:
-        return ["Model", "Beam", "Column", "Plate"];
-      case "TensionMember":
-        return ["Model", "Member", "Plate", "Endplate"];
-      case "BeamToColumnEndPlate":
-        return ["Model", "Beam", "Column", "EndPlate"];
-      case "BeamBeamEndPlate":
-        return ["Model", "Beam", "EndPlate"];
-      case "CoverPlateBolted":
-        return ["Model", "Beam", "Plate"];
-      case "CoverPlateWelded":
-        return ["Model", "Beam", "CoverPlate"];
-      case "CleatAngle":
-        return ["Model", "Beam", "Column", "CleatAngle"];
-      case "SeatedAngle":
-        return ["Model", "Beam", "Column", "SeatedAngle"];
-      case "FlexuralMember":
-        return ["Model", "Beam"];
-      default:
-        return ["Model", "Beam", "Connector"];
-    }
+    return ["Model", "Beam", "Connector"];
   };
 
-  const viewOptions = getViewOptions();
-
-  // Get the display name for view options (for better UI labels)
-  const getViewDisplayName = (option) => {
-    const displayNames = {
-      "Model": "Model",
-      "Beam": "Beam",
-      "Column": "Column",
-      "Connector": "Connector",
-      "CoverPlate": "Cover Plate",
-      "Member": "Member",
-      "Plate": "Plate",
-      "Endplate": "End Plate",
-      "EndPlate": "End Plate",
-      "CleatAngle": "Cleat Angle",
-      "SeatedAngle": "Seated Angle"
-    };
-    return displayNames[option] || option;
-  };
-
-  // Initialize selectedView to first option if not set
-  React.useEffect(() => {
-    if (!selectedView && viewOptions.length > 0) {
-      setSelectedView(viewOptions[0]);
-    }
-  }, [selectedView, viewOptions, setSelectedView]);
+  const options = getViewOptions();
 
   const contextData = {
     beamList,
@@ -317,10 +258,6 @@ export const EngineeringModule = ({
     boltDiameterList,
     thicknessList,
     propertyClassList,
-    angleList,
-    channelList,
-    sectionProfileList,
-    topAngleList,
   };
 
   const triggerScreenshotCapture = () => {
@@ -479,91 +416,35 @@ export const EngineeringModule = ({
           </div>
         )}
 
-        {/* Center Viewport */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* View Options */}
-          <div className="p-4 flex-shrink-0">
-            <div className="flex gap-3 p-3 bg-gradient-to-br from-blue-50 to-blue-200 rounded-lg mb-2 shadow-md">
-              {viewOptions.map((option) => (
-                <div
-                  key={option}
-                  className="flex items-center gap-1.5 p-2 px-3 rounded-md cursor-pointer transition-all duration-200 bg-white/70 border border-white/30 hover:bg-white/90 hover:-translate-y-0.5 hover:shadow-lg"
-                  onClick={() => setSelectedView(option)}
-                  title={`View ${getViewDisplayName(option)}`}
-                >
+        {/* Middle - 3D Model */}
+        <div
+          className={`superMainBody_mid ${
+            showOptionsContainer ? "has-options" : ""
+          }`}
+        >
+          {/* Options Container - Only show after design is complete */}
+          {showOptionsContainer && (
+            <div className="options-container">
+              <div className="view-options">
+                {options.map((option) => (
                   <div
-                    className={`w-3 h-3 rounded-full border-2 transition-all duration-200 ${selectedView === option
-                        ? "bg-gradient-to-br from-blue-500 to-purple-600 border-blue-500 shadow-[0_0_0_2px_rgba(102,126,234,0.3)]"
-                        : "border-gray-400"
+                    key={option}
+                    className="option-wrapper"
+                    onClick={() => {
+                      setSelectedView(option);
+                      setOrthographicView(null); 
+                    }}
+                  >
+                    <div
+                      className={`option-box ${
+                        selectedView === option && !orthographicView
+                          ? "selected"
+                          : ""
                       }`}
-                  ></div>
-                  <span className="text-sm font-medium text-gray-700 select-none hover:text-blue-600">{getViewDisplayName(option)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 3D Model Canvas */}
-          {loading ? (
-            <div className="modelLoading">
-              <div className="loading-container">
-                <div className="loading-spinner"></div>
-                <p>Loading Model...</p>
-                <span className="loading-subtext">
-                  {loadingStage || "Preparing 3D visualization..."}
-                </span>
-              </div>
-            </div>
-          ) : renderBoolean ? (
-            <div className="cadModel">
-              <Canvas
-                gl={{ antialias: true, preserveDrawingBuffer: true }}
-                onCreated={({ gl }) => {
-                  gl.setClearColor("#ADD8E6");
-                }}
-              >
-                <PerspectiveCamera
-                  ref={cameraRef}
-                  makeDefault
-                  position={cameraPos}
-                  fov={fov}
-                  near={0.1}
-                  far={1000}
-                />
-                <Suspense
-                  fallback={
-                    <Html>
-                      <div className="model-loading-fallback">
-                        <div className="spinner"></div>
-                        <p>Loading 3D Model...</p>
-                      </div>
-                    </Html>
-                  }
-                >
-                  <Model
-                    modelPaths={cadModelPaths}
-                    selectedView={getBackendViewName(selectedView)}
-                    key={modelKey}
-                  />
-                  <ScreenshotCapture
-                    screenshotTrigger={screenshotTrigger}
-                    setScreenshotTrigger={setScreenshotTrigger}
-                    selectedView={getBackendViewName(selectedView)}
-                  />
-                </Suspense>
-              </Canvas>
-            </div>
-          ) : (
-            <div className="modelback">
-              <div className="no-model-message">
-                <div className="no-model-icon">📐</div>
-                <h3>No Model Generated</h3>
-                <p>Click "Design" to generate and view the 3D model</p>
-                <div className="model-info">
-                  <small>
-                    Available views: {viewOptions.map(getViewDisplayName).join(", ")}
-                  </small>
-                </div>
+                    ></div>
+                    <span className="option-label">{option}</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -662,8 +543,6 @@ export const EngineeringModule = ({
         )}
       </div>
 
-
-
       {/* Design Report Modal */}
       <DesignReportModal
         isOpen={createDesignReportBool}
@@ -675,38 +554,19 @@ export const EngineeringModule = ({
       />
 
       {/* Customization Modals */}
-      {moduleConfig.modalConfig.map((modal) => {
-        // Handle dynamic data sources
-        let dataSource = [];
-
-        if (modal.dataSource) {
-          // Static data source from contextData
-          dataSource = contextData[modal.dataSource] || [];
-        } else {
-          // Dynamic data source - find the field with getDynamicDataSource
-          const dynamicField = moduleConfig.inputSections
-            .flatMap(section => section.fields)
-            .find(field => field.modalKey === modal.key && field.getDynamicDataSource);
-
-          if (dynamicField && dynamicField.getDynamicDataSource) {
-            dataSource = dynamicField.getDynamicDataSource(inputs, contextData) || [];
+      {moduleConfig.modalConfig.map((modal) => (
+        <CustomizationModal
+          key={modal.key}
+          isOpen={modalStates[modal.key]}
+          onClose={() => updateModalState(modal.key, false)}
+          title="Customized"
+          dataSource={contextData[modal.dataSource] || []}
+          selectedItems={selectedItems[modal.inputKey]}
+          onTransferChange={(nextTargetKeys) =>
+            updateSelectedItems(modal.inputKey, nextTargetKeys)
           }
-        }
-
-        return (
-          <CustomizationModal
-            key={modal.key}
-            isOpen={modalStates[modal.key]}
-            onClose={() => updateModalState(modal.key, false)}
-            title="Customized"
-            dataSource={dataSource}
-            selectedItems={selectedItems[modal.inputKey]}
-            onTransferChange={(nextTargetKeys) =>
-              updateSelectedItems(modal.inputKey, nextTargetKeys)
-            }
-          />
-        );
-      })}
+        />
+      ))}
 
       {/* Design Preferences Modal */}
       {designPrefModalStatus && (
@@ -791,7 +651,7 @@ export const EngineeringModule = ({
         }}
       >
         <div className="loading-content">
-          <div>OSDAG Design Processing</div>
+          <div>🔧 OSDAG Design Processing</div>
           <div>
             <div className="spinner"></div>
           </div>
@@ -814,5 +674,3 @@ export const EngineeringModule = ({
     </div>
   );
 };
-
-export default EngineeringModule;

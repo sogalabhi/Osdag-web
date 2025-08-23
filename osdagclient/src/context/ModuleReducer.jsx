@@ -197,6 +197,58 @@ export default (state, action) => {
         ...state,
         materialList: [...state.materialList, ...action.payload],
       };
+    case "SET_ALL_MODULE_DATA":
+      console.log("🔄 [REDUCER] Processing SET_ALL_MODULE_DATA action");
+      console.log("🔄 [REDUCER] Payload received:", action.payload);
+      
+      const {
+        materialList = [],
+        boltDiameterList = [],
+        thicknessList = [],
+        propertyClassList = [],
+        connectivityList = [],
+        beamList = [],
+        columnList = [],
+        angleList = [],
+        topAngleList = [],
+        channelList = [],
+        sectionProfileList = [],
+        endPlateTypeList = [],
+        weldTypes = [],
+        weldFab = []
+      } = action.payload;
+
+      // Merge with existing custom materials from localStorage
+      const prevCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials")) || [];
+      const mergedMaterialList = [...materialList, ...prevCustomMaterials];
+
+      console.log("🔄 [REDUCER] Setting state with:");
+      console.log("🔄 [REDUCER] - materialList length:", mergedMaterialList.length);
+      console.log("🔄 [REDUCER] - boltDiameterList length:", boltDiameterList.length);
+      console.log("🔄 [REDUCER] - thicknessList length:", thicknessList.length);
+      console.log("🔄 [REDUCER] - propertyClassList length:", propertyClassList.length);
+      console.log("🔄 [REDUCER] - connectivityList length:", connectivityList.length);
+      console.log("🔄 [REDUCER] - beamList length:", beamList.length);
+      console.log("🔄 [REDUCER] - columnList length:", columnList.length);
+
+      return {
+        ...state,
+        materialList: mergedMaterialList,
+        boltDiameterList,
+        thicknessList,
+        propertyClassList,
+        connectivityList,
+        beamList,
+        columnList,
+        angleList,
+        topAngleList,
+        channelList,
+        sectionProfileList,
+        endPlateTypeList,
+        weldTypes,
+        weldFab,
+        error_msg: "",
+      };
     case "RESET_MODULE_STATE":
       console.log("REDUCER: Resetting module state to initial values");
       return {

@@ -1,13 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: 'class',
-  content: ["./src/**/*.{js,jsx,ts,tsx,html}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       colors: {
         osdag: {
           green: '#91B014',
-          'dark-green': '#3c4708',
+          'dark-green': '#7f9915',
           'light-green': '#A8C517',
           'bg-gray': '#F8F9FA',
           'card-bg': '#FFFFFF',
@@ -28,38 +30,16 @@ export default {
         'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
         'card-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         'search': '0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06)',
+        'auth': '0 10px 25px rgb(0 0 0 / 5%), 0 20px 48px rgb(0 0 0 / 5%), 0 1px 4px rgb(0 0 0 / 10%)',
       },
       width: {
         'sidebar': '288px',
         'search': '600px',
       },
-             height: {
-         'card-content': '320px',
-       },
+      height: {
+        'card-content': '320px',
+      },
     },
   },
-  plugins: [
-    function({ addUtilities }) {
-      addUtilities({
-        '.scrollbar-thin': {
-          'scrollbar-width': 'thin',
-          'scrollbar-color': '#91B014 transparent',
-        },
-        '.scrollbar-thin::-webkit-scrollbar': {
-          width: '6px',
-        },
-        '.scrollbar-thin::-webkit-scrollbar-track': {
-          background: 'transparent',
-        },
-        '.scrollbar-thin::-webkit-scrollbar-thumb': {
-          'background-color': '#91B014',
-          'border-radius': '3px',
-        },
-        '.scrollbar-thin::-webkit-scrollbar-thumb:hover': {
-          'background-color': '#A8C517',
-        },
-      })
-    }
-  ],
+  plugins: [],
 }
-

@@ -1,6 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
 // import { useHistory } from 'react-router-dom';
-import './Auth.css';
 import icon from '../../assets/logo-osdag.png';
 // import { createJWTToken } from '../../context/ModuleState';
 import { UserContext } from '../../context/UserState';
@@ -21,17 +20,17 @@ let globalOTP = null;
 const LoginPage = () => {
     const navigate = useNavigate();
 
-    const { 
-        userSignup, 
-        userLogin, 
-        loginCredValid, 
-        verifyEmail, 
-        ForgetPassword, 
-        isLoggedIn, 
-        setIsLoggedIn, 
+    const {
+        userSignup,
+        userLogin,
+        loginCredValid,
+        verifyEmail,
+        ForgetPassword,
+        isLoggedIn,
+        setIsLoggedIn,
         LoginMessage,
         SignupMessage,
-        OTPMessage 
+        OTPMessage
     } = useContext(UserContext);
 
     // Form states
@@ -39,11 +38,11 @@ const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    
+
     // Loading states
     const [isLoading, setIsLoading] = useState(false);
     const [isOTPLoading, setIsOTPLoading] = useState(false);
-    
+
     // Error states
     const [errors, setErrors] = useState({});
     const [generalError, setGeneralError] = useState('');
@@ -150,7 +149,7 @@ const LoginPage = () => {
             const response = await verifyEmail(verifyEmails);
             if (response && response.success) {
                 globalOTP = localStorage.getItem('otp');
-            setInputDisabled(false);
+                setInputDisabled(false);
                 setSuccessMessage("OTP sent successfully to your email");
             } else {
                 setGeneralError(response?.message || "Failed to send OTP");
@@ -174,7 +173,7 @@ const LoginPage = () => {
             localStorage.removeItem('otp');
             globalOTP = null;
             setSuccessMessage("OTP verification successful");
-            
+
             if (loginCredValid && !toggleForgotPassword) {
                 setIsLoggedIn(true);
             } else if (toggleForgotPassword) {
@@ -217,9 +216,9 @@ const LoginPage = () => {
             const response = await ForgetPassword(fPasswordNewPass);
             if (response && response.success) {
                 setSuccessMessage("Password updated successfully! You can now log in.");
-            handleFPasswordModalClose();
+                handleFPasswordModalClose();
                 setTimeout(() => {
-            window.location.href = '/';
+                    window.location.href = '/';
                 }, 2000);
             } else {
                 setGeneralError(response?.message || "Failed to update password");
@@ -233,7 +232,7 @@ const LoginPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
@@ -245,7 +244,7 @@ const LoginPage = () => {
         try {
             if (isSignup) {
                 const response = await userSignup(username, email, password, false);
-                
+
                 if (response && response.success) {
                     setSuccessMessage("Account created successfully! You can now log in.");
                     setIsSignup(false);
@@ -257,19 +256,19 @@ const LoginPage = () => {
                 }
             } else {
                 const response = await userLogin(username, password, false);
-                
+
                 if (response && response.success) {
                     localStorage.setItem("username", username);
                     if (response.isGuest) {
-                    navigate('/home');
+                        navigate('/home');
                     } else {
                         // For regular users, they need email verification
                         setVerifyEmailModalVisible(true);
                     }
                 } else {
                     setGeneralError(response?.message || "Login failed");
+                }
             }
-        }
         } catch (error) {
             setGeneralError("An unexpected error occurred. Please try again.");
         } finally {
@@ -290,12 +289,12 @@ const LoginPage = () => {
         try {
             let guestEmail = `GUEST.${generateRandomString(10)}@gmail.com`;
             const guestPassword = generateRandomString(12);
-            
+
             const response = await userLogin(guestEmail, guestPassword, true);
-            
+
             if (response && response.success) {
                 localStorage.setItem("email", guestEmail);
-            navigate('/home');
+                navigate('/home');
             } else {
                 setGeneralError("Failed to enter guest mode. Please try again.");
             }
@@ -309,10 +308,10 @@ const LoginPage = () => {
 
     return (
         <>
-            <section className='auth-section'>
-                {isSignup && <img src={icon} alt='stack overflow' className='login-logo' height={180} width={500} />}
-                <div className='auth-container-2'>
-                    {!isSignup && <img src={icon} alt='stack overflow' className='login-logo' height={110} width={300} />}
+            <section className='min-h-screen min-w-screen mx-auto bg-white flex justify-center items-center'>
+                {isSignup && <img src={icon} alt='stack overflow' className='p-5 pr-8' height={180} width={500} />}
+                <div className='min-w-[20%] flex flex-col justify-center items-center rounded-[3rem]'>
+                    {!isSignup && <img src={icon} alt='stack overflow' className='p-5 pr-8' height={110} width={300} />}
 
                     {/* Display general alerts */}
                     {generalError && (
@@ -325,7 +324,7 @@ const LoginPage = () => {
                             style={{ marginBottom: '16px', width: '400px' }}
                         />
                     )}
-                    
+
                     {successMessage && (
                         <Alert
                             message={successMessage}
@@ -337,100 +336,96 @@ const LoginPage = () => {
                         />
                     )}
 
-                    <div className='google-guest-container'>
+                    <div className='flex flex-row gap-4 mb-4'>
                         {/*<button className="google-signin-button" onClick={handleGoogleSignIn}>
                     <img className="google-logo" src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" />
                     Sign in with Google
                 </button> */}
-                        <button 
-                            className="guest-signin-button" 
+                        <button
+                            className="inline-block px-5 py-3 text-base font-bold text-white bg-osdag-green border border-black rounded cursor-pointer transition-colors duration-300 hover:bg-osdag-dark-green focus:outline-none active:bg-osdag-dark-green disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                             onClick={handleGuestSignIn}
                             disabled={isLoading}
                         >
                             {isLoading ? <Spin size="small" /> : 'Guest Mode'}
                         </button>
                     </div>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} className='w-full min-w-[300px] md:min-w-[400px] p-4 md:p-5 bg-white rounded-[10px] flex flex-col justify-evenly shadow-auth m-2 md:m-4'>
                         {
                             isSignup && (
-                                <label htmlFor="email">
-                                    <h4>Email *</h4>
-                                    <input 
-                                        type="email" 
-                                        name='email' 
-                                        id='email' 
+                                <label htmlFor="email" className='flex flex-col'>
+                                    <h4 className='mb-1.5 mt-2.5'>Email *</h4>
+                                    <input
+                                        type="email"
+                                        name='email'
+                                        id='email'
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        style={{ borderColor: errors.email ? '#ff4d4f' : '' }}
+                                        className={`p-2.5 w-full border border-gray-300 text-sm m-1.5 rounded transition-colors duration-300 focus:outline-none focus:border-osdag-green focus:shadow-[0_0_0_2px_rgba(145,176,20,0.1)] ${errors.email ? 'border-red-500' : ''}`}
                                     />
-                                    {errors.email && <span style={{ color: '#ff4d4f', fontSize: '12px' }}>{errors.email}</span>}
+                                    {errors.email && <span className='text-red-500 text-xs mt-1 block'>{errors.email}</span>}
                                 </label>
 
                             )
                         }
                         <label htmlFor='name'>
                             <h4>Username *</h4>
-                            <input 
-                                type="text" 
-                                id='name' 
-                                name='name' 
+                            <input
+                                type="text"
+                                id='name'
+                                name='name'
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                style={{ borderColor: errors.username ? '#ff4d4f' : '' }}
+                                className={`p-2.5 w-full border border-gray-300 text-sm m-1.5 rounded transition-colors duration-300 focus:outline-none focus:border-osdag-green focus:shadow-[0_0_0_2px_rgba(145,176,20,0.1)] ${errors.username ? 'border-red-500' : ''}`}
                             />
-                            {errors.username && <span style={{ color: '#ff4d4f', fontSize: '12px' }}>{errors.username}</span>}
+                            {errors.username && <span className='text-red-500 text-xs mt-1 block'>{errors.username}</span>}
                         </label>
 
-                        <label >
-                            <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                <h4>Password *</h4>
+                        <label htmlFor='password' className='flex flex-col'>
+                            <div className='flex justify-between'>
+                                <h4 className='mb-1.5 mt-2.5'>Password *</h4>
                             </div>
-                            <input 
-                                type="password" 
-                                name='password' 
-                                id='password' 
+                            <input
+                                type="password"
+                                name='password'
+                                id='password'
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                style={{ borderColor: errors.password ? '#ff4d4f' : '' }}
+                                className={`p-2.5 w-full border border-gray-300 text-sm m-1.5 rounded transition-colors duration-300 focus:outline-none focus:border-osdag-green focus:shadow-[0_0_0_2px_rgba(145,176,20,0.1)] ${errors.password ? 'border-red-500' : ''}`}
                             />
-                            {errors.password && <span style={{ color: '#ff4d4f', fontSize: '12px' }}>{errors.password}</span>}
-                            {!isSignup && <p style={{ color: "#91b014", fontSize: '13px' }} onClick={handleVerifyEmailModal} >Forgot Password?</p>}
+                            {errors.password && <span className='text-red-500 text-xs mt-1 block'>{errors.password}</span>}
+                            {!isSignup && <p className='text-osdag-green text-sm cursor-pointer hover:underline' onClick={handleVerifyEmailModal} >Forgot Password?</p>}
                         </label>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <h4></h4>
-                            {/* { !isSignup && <p style={{ color: "#91b014", fontSize:'13px'}} onClick={handleFPasswordModal}>Forgot Password?</p> } */}
-                        </div>
-                        {isSignup && <p style={{ color: "#666767", fontSize: "13px" }}>Passwords must contain at least eight<br />characters, including at least 1 letter and 1<br /> number.</p>}
+                        {isSignup && <p className='text-osdag-text-secondary text-sm'>Passwords must contain at least eight<br />characters, including at least 1 letter and 1<br /> number.</p>}
                         {
                             isSignup && (
-                                <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+                                <div className='flex flex-row items-center'>
                                     <input
                                         type="checkbox"
                                         id="check"
                                         height={80}
                                         width={80}
                                     />
-                                    <label htmlFor="check" style={{ marginLeft: "10px" }}>
-                                        <p style={{ fontSize: "13px", margin: 0 }}>Terms,<br />And Conditions.</p>
+                                    <label htmlFor="check" className='ml-2'>
+                                        <p className='text-sm m-0'>Terms,<br />And Conditions.</p>
                                     </label>
                                 </div>
                             )
                         }
-                        <button type='submit' className='auth-btn' disabled={isLoading}>{isLoading ? <Spin size="small" /> : (isSignup ? 'Sign up' : 'Log in')}</button>
+                        <button type='submit' className='mt-2.5 py-2.5 px-1.5 bg-osdag-green border border-black text-white rounded cursor-pointer transition-colors duration-200 text-sm font-medium flex items-center justify-center gap-2 hover:bg-osdag-dark-green disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed' disabled={isLoading}>{isLoading ? <Spin size="small" /> : (isSignup ? 'Sign up' : 'Log in')}</button>
                         {
                             isSignup && (
-                                <p style={{ color: "#666767", fontSize: "13px" }}>
+                                <p className='text-osdag-text-secondary text-sm'>
                                     By clicking "Sign up", you agree to our
-                                    <span style={{ color: "#91b014" }}> terms of<br /> service</span>,
-                                    <span style={{ color: "#91b014" }}> privacy policy</span> and
-                                    <span style={{ color: "#91b014" }}> cookie policy</span>
+                                    <span className='text-osdag-green'> terms of<br /> service</span>,
+                                    <span className='text-osdag-green'> privacy policy</span> and
+                                    <span className='text-osdag-green'> cookie policy</span>
                                 </p>
                             )
                         }
                     </form>
                     <p>
                         {isSignup ? 'Already have an account?' : "Don't have an account?"}
-                        <button type='button' className='handle-switch-btn' onClick={handleSwitch} disabled={isLoading}>{isSignup ? "Log in" : 'sign up'}</button>
+                        <button type='button' className='bg-transparent text-osdag-green border-none text-sm cursor-pointer transition-colors duration-200 hover:text-osdag-dark-green hover:underline disabled:text-gray-300 disabled:cursor-not-allowed' onClick={handleSwitch} disabled={isLoading}>{isSignup ? "Log in" : 'sign up'}</button>
                     </p>
                 </div>
             </section>
@@ -446,70 +441,72 @@ const LoginPage = () => {
                 ]}
                 maskClosable={false}
             >
-                <div className='verify-email-popup'>
-                    <img src={icon} alt='stack overflow' className='login-logo' height={110} width={300} />
-                    
+                <div className='flex flex-col gap-4'>
+                    <img src={icon} alt='stack overflow' className='self-center py-2.5' height={110} width={300} />
+
                     {generalError && (
                         <Alert
                             message={generalError}
                             type="error"
                             showIcon
-                            style={{ marginBottom: '16px' }}
+                            className='mb-4'
                         />
                     )}
-                    
+
                     {successMessage && (
                         <Alert
                             message={successMessage}
                             type="success"
                             showIcon
-                            style={{ marginBottom: '16px' }}
+                            className='mb-4'
                         />
                     )}
-                    
-                    <label htmlFor="verifyemail">
-                        <h4>Email:</h4>
-                        <input 
-                            type="email" 
-                            name='verifyemail' 
-                            id='verifyemail' 
+
+                    <label htmlFor="verifyemail" className='flex flex-col'>
+                        <h4 className='mb-2 mt-0'>Email:</h4>
+                        <input
+                            type="email"
+                            name='verifyemail'
+                            id='verifyemail'
                             value={verifyEmails}
                             onChange={(e) => setVerifyEmail(e.target.value)}
                             placeholder="Enter your email address"
+                            className='p-2.5 w-full border border-gray-300 text-sm m-1.5 rounded transition-colors duration-300 focus:outline-none focus:border-osdag-green focus:shadow-[0_0_0_2px_rgba(145,176,20,0.1)]'
                         />
                     </label>
-                    
-                    <label htmlFor="otp">
-                        <h4>Enter OTP:</h4>
-                        <input 
-                            type="text" 
-                            name='otp' 
-                            id='otp' 
+
+                    <label htmlFor="otp" className='flex flex-col'>
+                        <h4 className='mb-2 mt-0'>Enter OTP:</h4>
+                        <input
+                            type="text"
+                            name='otp'
+                            id='otp'
                             value={otp}
-                            onChange={(e) => setOtp(e.target.value)} 
+                            onChange={(e) => setOtp(e.target.value)}
                             disabled={isInputDisabled}
                             placeholder="Enter 6-digit OTP"
                             maxLength={6}
+                            className='p-2.5 w-full border border-gray-300 text-sm m-1.5 rounded transition-colors duration-300 focus:outline-none focus:border-osdag-green focus:shadow-[0_0_0_2px_rgba(145,176,20,0.1)] disabled:bg-gray-100 disabled:cursor-not-allowed'
                         />
                     </label>
-                    
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
-                        <Button 
-                            key="getotp" 
+
+                    <div className='flex gap-2.5 mt-4'>
+                        <Button
+                            key="getotp"
                             onClick={handleVerifyEmail}
                             loading={isOTPLoading}
                             disabled={!verifyEmails.trim()}
                         >
-                        Get OTP
-                    </Button>
-                        <Button 
-                            key="verifyemailbtn" 
+                            Get OTP
+                        </Button>
+                        <Button
+                            key="verifyemailbtn"
                             type="primary"
                             onClick={handleVerify}
                             disabled={isInputDisabled || !otp.trim()}
                         >
-                        Verify
-                    </Button>
+                            Verify
+                        </Button>
                     </div>
                 </div>
             </Modal>
@@ -523,9 +520,9 @@ const LoginPage = () => {
                     <Button key="cancel" onClick={handleFPasswordModalClose}>
                         Cancel
                     </Button>,
-                    <Button 
-                        key="update" 
-                        type="primary" 
+                    <Button
+                        key="update"
+                        type="primary"
                         onClick={handleFPassword}
                         loading={isLoading}
                         disabled={!fPasswordNewPass.trim()}
@@ -541,19 +538,20 @@ const LoginPage = () => {
                             message={generalError}
                             type="error"
                             showIcon
-                            style={{ marginBottom: '16px' }}
+                            className='mb-4'
                         />
                     )}
-                    
-                    <label htmlFor="newpassword">
-                        <h4>New Password:</h4>
-                        <input 
-                            type="password" 
-                            name='newpassword' 
-                            id='newpassword' 
+
+                    <label htmlFor="newpassword" className='flex flex-col'>
+                        <h4 className='mb-2 mt-0'>New Password:</h4>
+                        <input
+                            type="password"
+                            name='newpassword'
+                            id='newpassword'
                             value={fPasswordNewPass}
                             onChange={(e) => setFPasswordNewPass(e.target.value)}
                             placeholder="Enter new password (min 8 characters)"
+                            className='p-2.5 w-full border border-gray-300 text-sm m-1.5 rounded transition-colors duration-300 focus:outline-none focus:border-osdag-green focus:shadow-[0_0_0_2px_rgba(145,176,20,0.1)]'
                         />
                     </label>
                 </div>

@@ -338,10 +338,11 @@ export const ModuleProvider = ({ children }) => {
   // Simplified: One API call to get ALL module data
   const getModuleData = async (moduleName) => {
     try {
-      console.log("CleatAngle - getModuleData called with moduleName:", moduleName);
+      console.log("🚀 [MODULE CONTEXT] getModuleData called with moduleName:", moduleName);
+      console.log("🚀 [MODULE CONTEXT] Current timestamp:", new Date().toISOString());
       
       if (!moduleName) {
-        console.error("No module name provided for getModuleData");
+        console.error("❌ [MODULE CONTEXT] No module name provided for getModuleData");
         return;
       }
 
@@ -351,7 +352,10 @@ export const ModuleProvider = ({ children }) => {
         url += `&email=${encodeURIComponent(email)}`;
       }
 
-      console.log("CleatAngle - Making request to URL:", url);
+      console.log("🌐 [MODULE CONTEXT] Making API request to URL:", url);
+      console.log("🌐 [MODULE CONTEXT] Request method: GET");
+      console.log("🌐 [MODULE CONTEXT] CORS mode: cors");
+      console.log("🌐 [MODULE CONTEXT] Credentials: include");
 
       const response = await fetch(url, {
         method: "GET",
@@ -359,20 +363,53 @@ export const ModuleProvider = ({ children }) => {
         credentials: "include",
       });
 
+      console.log("📡 [MODULE CONTEXT] Response received:");
+      console.log("📡 [MODULE CONTEXT] Response status:", response.status);
+      console.log("📡 [MODULE CONTEXT] Response ok:", response.ok);
+      console.log("📡 [MODULE CONTEXT] Response headers:", Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        console.error(`Failed to fetch module data: ${response.status}`);
+        console.error(`❌ [MODULE CONTEXT] Failed to fetch module data: ${response.status}`);
+        console.error(`❌ [MODULE CONTEXT] Response status text: ${response.statusText}`);
         return;
       }
 
       const data = await response.json();
-      console.log("CleatAngle - Received data from API:", data);
-      console.log("CleatAngle - ConnectivityList in response:", data.connectivityList);
+      console.log("✅ [MODULE CONTEXT] Successfully parsed JSON response:");
+      console.log("✅ [MODULE CONTEXT] Full response data:", data);
+      console.log("✅ [MODULE CONTEXT] Response data type:", typeof data);
+      console.log("✅ [MODULE CONTEXT] Response data keys:", Object.keys(data));
+      
+      // Log specific data fields
+      if (data.connectivityList) {
+        console.log("✅ [MODULE CONTEXT] ConnectivityList in response:", data.connectivityList);
+        console.log("✅ [MODULE CONTEXT] ConnectivityList length:", data.connectivityList?.length);
+      }
+      if (data.materialList) {
+        console.log("✅ [MODULE CONTEXT] MaterialList in response:", data.materialList);
+        console.log("✅ [MODULE CONTEXT] MaterialList length:", data.materialList?.length);
+      }
+      if (data.boltDiameterList) {
+        console.log("✅ [MODULE CONTEXT] BoltDiameterList in response:", data.boltDiameterList);
+        console.log("✅ [MODULE CONTEXT] BoltDiameterList length:", data.boltDiameterList?.length);
+      }
+      if (data.thicknessList) {
+        console.log("✅ [MODULE CONTEXT] ThicknessList in response:", data.thicknessList);
+        console.log("✅ [MODULE CONTEXT] ThicknessList length:", data.thicknessList?.length);
+      }
+      if (data.propertyClassList) {
+        console.log("✅ [MODULE CONTEXT] PropertyClassList in response:", data.propertyClassList);
+        console.log("✅ [MODULE CONTEXT] PropertyClassList length:", data.propertyClassList?.length);
+      }
      
+      console.log("📤 [MODULE CONTEXT] Dispatching SET_ALL_MODULE_DATA action");
       dispatch({ type: "SET_ALL_MODULE_DATA", payload: data });
-      console.log("CleatAngle - Dispatched SET_ALL_MODULE_DATA");
+      console.log("✅ [MODULE CONTEXT] Successfully dispatched SET_ALL_MODULE_DATA");
 
     } catch (error) {
-      console.error("Error loading module data:", error);
+      console.error("❌ [MODULE CONTEXT] Error loading module data:", error);
+      console.error("❌ [MODULE CONTEXT] Error stack:", error.stack);
+      console.error("❌ [MODULE CONTEXT] Error message:", error.message);
     }
   };
 
