@@ -70,7 +70,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
       parsedModels?.Connector ? getGeometry(parsedModels.Connector) : null,
     [parsedModels, texture]
   );
-  
+
   // Tension Member specific geometries
   const geometryMember = useMemo(
     () => (parsedModels?.Member ? getGeometry(parsedModels.Member) : null),

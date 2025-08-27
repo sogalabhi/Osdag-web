@@ -437,7 +437,7 @@
 }
 
 .superMainBody {
-  @apply flex w-full bg-gray-100 dark:bg-slate-950 overflow-hidden;
+  @apply flex w-full bg-gray-100 dark:bg-osdag-dark-color overflow-hidden;
   height: calc(100vh - 25px);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -560,9 +560,6 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.bg-picker-label {
-  @apply text-xs font-medium text-gray-700 dark:text-gray-300 mr-1;
-}
 
 .bg-color-picker {
   @apply w-8 h-8 rounded cursor-pointer border-2 border-[#e0e0e0] outline-none p-0 overflow-hidden transition-all duration-200 ease-linear;
@@ -658,7 +655,7 @@
 }
 
 .InputDock {
-  @apply w-1/4 h-full bg-white dark:bg-slate-950 border-r border-osdag-border dark:border-gray-700 flex flex-col translate-x-0;
+  @apply w-1/4 h-full bg-white dark:bg-osdag-dark-color border-r border-osdag-border dark:border-gray-700 flex flex-col translate-x-0;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -792,7 +789,7 @@
 }
 
 .cards h3 {
-  @apply text-base font-bold text-osdag-text-primary dark:text-white bg-white dark:bg-gray-800 px-1 absolute -top-4 left-4;
+  @apply text-base font-bold text-osdag-text-primary dark:text-white bg-white dark:bg-osdag-dark-color px-1 absolute -top-4 left-4;
 }
 
 .component-grid {
@@ -805,38 +802,6 @@
 
 .component-grid-align {
   @apply flex w-full justify-between items-center mb-3;
-}
-
-.component-grid input {
-  width: 60% !important;
-  height: 24px !important;
-  padding: 0 6px !important;
-  font-size: 13px !important;
-  background-color: white !important;
-  border: 1px solid #000 !important;
-  border-radius: 6px !important;
-  box-shadow: none !important;
-}
-
-.component-grid input:focus {
-  outline: none !important;
-  border-color: #91B014 !important;
-  box-shadow: 0 0 0 2px rgba(145, 176, 20, 0.2) !important;
-}
-
-.component-grid input:hover {
-  border-color: #91B014 !important;
-}
-
-.dark .component-grid input {
-  background-color: #374151 !important;
-  border-color: #6b7280 !important;
-  color: white !important;
-}
-
-.dark .component-grid input:focus,
-.dark .component-grid input:hover {
-  border-color: #91B014 !important;
 }
 
 .react-select-container {
@@ -1028,19 +993,12 @@
 }
 
 .OutputDock {
-  @apply w-full h-full bg-white dark:bg-slate-950 border-r border-osdag-border dark:border-gray-700 flex flex-col;
+  @apply w-full h-full bg-white dark:bg-osdag-dark-color border-r border-osdag-border dark:border-gray-700 flex flex-col;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .OutputDock p {
   @apply w-32 my-2 ml-4 py-1 px-1 text-sm text-center rounded-xl font-medium bg-osdag-green text-white flex-shrink-0;
-}
-
-.subMainBody .cards .component-grid input,
-.spacing-left-body-align input,
-.Capacity-left-body-align input,
-.details-main-body-align input {
-  color: #000000 !important;
 }
 
 .option-wrapper {
@@ -1069,10 +1027,6 @@
 
 .superMainBody_right {
   @apply flex flex-col gap-[10px] p-[10px] m-0 ml-0 relative bottom-[1px] right-[200px];
-}
-
-.superMainBody_right input {
-  @apply ml-[10px] rounded-[2px];
 }
 
 .tab-btn {
@@ -1225,12 +1179,6 @@
   background-color: rgb(168, 121, 121);
 }  */
 
-.btn{
-  background-color: rgb(135, 91, 91);
-  cursor: pointer;
-  color: #f1f1f1;
-}
-
 /* .inputdock-btn Input {
   background-color: rgb(135, 91, 91);
   cursor: pointer;
@@ -1320,10 +1268,6 @@
   margin: 1rem 0rem;
 }
 
-.spacing-left-body-align input {
-  width: 40% !important;
-}
-
 .spacing-right-body {
 	display: flex;
 	width: 55%;
@@ -1372,10 +1316,6 @@
 
 }
 
-.Capacity-left-body-align input {
-  width: 30%;
-}
-
 .Capacity-right-body {
   width: 60%;
 	display: flex;
@@ -1414,11 +1354,6 @@
   align-items: center;
 }
 
-.details-main-body-align input {
-  width: 50%;
-  margin: 0.25rem 0rem;
-}
-
 .paraSpace {
   margin-bottom: 8px;
 }
@@ -1438,11 +1373,6 @@
 
 .design-report-form label {
   font-size: 13px !important;
-}
-
-.design-report-form input {
-  font-size: 13px !important;
-  padding: 0 !important;
 }
 
 /* Design pref container*/

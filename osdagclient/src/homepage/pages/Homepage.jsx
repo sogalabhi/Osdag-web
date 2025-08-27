@@ -13,7 +13,7 @@ const Homepage = () => {
         {/* Sidebar */}
         {showSideBar && (
           <div className="fixed inset-0 z-40 flex">
-            <div className="flex-shrink-0 bg-white dark:bg-slate-950 w-sidebar h-screen border-r border-osdag-border dark:border-gray-700">
+            <div className="flex-shrink-0 bg-white dark:bg-osdag-dark-color w-sidebar h-screen border-r border-osdag-border dark:border-gray-700">
               <Sidebar setshowSideBar={setshowSideBar} />
             </div>
             {/* Overlay to close sidebar */}

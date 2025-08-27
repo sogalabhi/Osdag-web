@@ -11,9 +11,9 @@ import Detailing_FP from "../../../assets/Detailing-Flush.png";
 import Detailing_OWE from "../../../assets/Detailing-OWE.png";
 import GrooveImg from "../../../assets/BB-BC-single_bevel_groove.png";
 
-export const BaseOutputDock = ({ 
-  output, 
-  outputConfig, 
+export const BaseOutputDock = ({
+  output,
+  outputConfig,
   title = "Output Dock",
   extraState = {}
 }) => {
@@ -22,7 +22,7 @@ export const BaseOutputDock = ({
   console.log('BaseOutputDock received:', { output, normalizedOutput, outputConfig, title, extraState });
   console.log('Output keys available:', Object.keys(normalizedOutput || {}));
   console.log('OutputConfig sections:', Object.keys(outputConfig?.sections || {}));
-  
+
   // Shared state management
   const [activeModals, setActiveModals] = useState({});
   const [activeSections, setActiveSections] = useState({});
@@ -66,8 +66,8 @@ export const BaseOutputDock = ({
       capacity2: capacityIMG2
     };
 
-    if (imageType === 'groove' || imageType === 'spacing' || 
-        imageType === 'capacity1' || imageType === 'capacity2') {
+    if (imageType === 'groove' || imageType === 'spacing' ||
+      imageType === 'capacity1' || imageType === 'capacity2') {
       return imageMap[imageType];
     }
     return imageMap[imageType]?.[selectedOption] || null;
@@ -80,28 +80,28 @@ export const BaseOutputDock = ({
       console.log(`getOutputValue: No output provided for key ${key}`);
       return " ";
     }
-    
+
     // Debug: Log the key and output structure
-    console.log(`Getting value for key: ${key}`, { 
-      output: out, 
+    console.log(`Getting value for key: ${key}`, {
+      output: out,
       keyValue: out[key],
       outputKeys: Object.keys(out),
       hasKey: key in output,
       keyType: typeof key
     });
-    
+
     // Both modules now use flat structure: { "Bolt.Diameter": { label, val } }
     if (out[key]?.val !== undefined) {
       console.log(`Found value in output[${key}].val:`, out[key].val);
       return out[key].val;
     }
-    
+
     // Try alternative structures
     if (out[key] !== undefined) {
       console.log(`Found value in output[${key}]:`, out[key]);
       return out[key];
     }
-    
+
     console.log(`No value found for key: ${key}`);
     return " ";
   };
@@ -128,11 +128,7 @@ export const BaseOutputDock = ({
                     type="text"
                     value={getOutputValue(key, output)}
                     disabled
-                    style={{
-                      color: "rgb(0 0 0 / 67%)",
-                      fontSize: "12px",
-                      fontWeight: "500",
-                    }}
+                    className='text-black dark:text-white'
                   />
                 </div>
               ))}
@@ -187,9 +183,9 @@ export const BaseOutputDock = ({
                   </div>
                   {sectionIdx < 2 && ( // Show images for first two sections
                     <div className="Capacity-right-body">
-                      <img 
-                        src={getImageForModal(sectionIdx === 0 ? 'capacity1' : 'capacity2')} 
-                        alt={`Capacity Image ${sectionIdx + 1}`} 
+                      <img
+                        src={getImageForModal(sectionIdx === 0 ? 'capacity1' : 'capacity2')}
+                        alt={`Capacity Image ${sectionIdx + 1}`}
                       />
                       <h5>Block Shear Pattern</h5>
                     </div>
@@ -208,7 +204,7 @@ export const BaseOutputDock = ({
           {image && <img src={image} alt={`${config.imageType} Image`} />}
         </div>
       );
-    } else if(config.layout === "single-column") {
+    } else if (config.layout === "single-column") {
       return (
         <div className="details-main-body">
           <div className="details-main-body-inside">
@@ -219,11 +215,7 @@ export const BaseOutputDock = ({
                   type="text"
                   value={getOutputValue(key, output)}
                   disabled
-                  style={{
-                    color: "rgb(0 0 0 / 67%)",
-                    fontSize: "12px",
-                    fontWeight: "500",
-                  }}
+                  className='text-black dark:text-white'
                 />
               </div>
             ))}
@@ -239,29 +231,25 @@ export const BaseOutputDock = ({
     const fieldValue = getOutputValue(field.key, output);
 
     return (
-        <div key={index} className="component-grid-align">
-          <h4>{field.label}</h4>
-          {isModalTrigger ? (
-            <Input
-              className="btn"
-              type="button"
-              value={outputConfig.modals[field.key].buttonText || field.label}
-              disabled={!output}
-              onClick={() => handleDialog(field.key)}
-            />
-          ) : (
-            <Input
-              type="text"
-              value={fieldValue}
-              disabled
-              style={{
-                color: "rgb(0 0 0 / 67%)",
-                fontSize: "12px",
-                fontWeight: "500",
-              }}
-            />
-          )}
-        </div>
+      <div key={index} className="component-grid-align">
+        <h4>{field.label}</h4>
+        {isModalTrigger ? (
+          <Input
+            className="btn"
+            type="button"
+            value={outputConfig.modals[field.key].buttonText || field.label}
+            disabled={!output}
+            onClick={() => handleDialog(field.key)}
+          />
+        ) : (
+          <Input
+            type="text"
+            value={fieldValue}
+            disabled
+            className='text-black dark:text-white'
+          />
+        )}
+      </div>
     );
   };
   console.log("output", output);
@@ -271,10 +259,10 @@ export const BaseOutputDock = ({
       <div className="subMainBody scroll-data">
         {Object.entries(outputConfig.sections).map(([sectionName, fields]) => (
           <div key={sectionName} className='cards'>
-            <h3>{sectionName}</h3>
-              <div className="component-grid">
-                {fields.map((field, index) => renderField(field, index))}
-              </div>
+            <h3 className='text-black dark:text-white'>{sectionName}</h3>
+            <div className="component-grid">
+              {fields.map((field, index) => renderField(field, index))}
+            </div>
           </div>
         ))}
       </div>

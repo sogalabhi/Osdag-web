@@ -118,7 +118,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
   const { moduleName } = useParams();
 
   return (
-    <div className="w-sidebar h-screen border-r border-osdag-border dark:border-gray-700 flex flex-col bg-white dark:bg-slate-900">
+    <div className="w-sidebar h-screen border-r border-osdag-border dark:border-gray-700 flex flex-col bg-white dark:bg-osdag-dark-color">
       {/* Logo Section */}
       <div className=" border-b border-osdag-border dark:border-gray-700">
         <div className="flex items-center justify-center relative">

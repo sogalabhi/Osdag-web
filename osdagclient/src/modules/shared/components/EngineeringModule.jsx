@@ -362,7 +362,7 @@ export const EngineeringModule = ({
             </div>
             <div className="subMainBody scroll-data">
 
-              
+
               {selectedSection !== "Additional Inputs" &&
                 moduleConfig.inputSections.map((section, index) => (
                   <InputSection
@@ -441,7 +441,7 @@ export const EngineeringModule = ({
                         : ""
                         }`}
                     ></div>
-                    <span className="option-label">{option}</span>
+                    <span className="option-label dark:text-white">{option}</span>
                   </div>
                 ))}
               </div>
@@ -456,8 +456,8 @@ export const EngineeringModule = ({
             ) : renderBoolean ? (
               <div className="cadModel">
                 {/* Existing background color picker - left side */}
-                <div className="canvas-control-bar-overlay">
-                  <label htmlFor="bgColorPicker" className="bg-picker-label">
+                <div className="absolute top-2 left-2 flex items-center gap-2 bg-white/90 dark:bg-osdag-dark-color/90 px-3 py-1.5 rounded-lg shadow-md z-10">
+                  <label htmlFor="bgColorPicker" className="text-xs font-medium text-black dark:text-white mr-1">
                     Background:
                   </label>
                   <input

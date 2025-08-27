@@ -361,7 +361,7 @@ const Header = ({ setshowSideBar, active }) => {
         </div>
       </div>
       {/* Search Section - Hidden for guest users */}
-      {!active && !isGuest && <div className="px-12 pb-8 dark:bg-slate-950">
+      {!active && !isGuest && <div className="px-12 pb-8 dark:bg-osdag-dark-color">
         <div className="flex items-center justify-center">
           <div className="relative w-search search-container">
             <div className="absolute inset-y-0 left-5 flex items-center space-x-3">
@@ -400,7 +400,7 @@ const Header = ({ setshowSideBar, active }) => {
 
             {/* Search Results Modal */}
             {isSearchFocused && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-950 border border-osdag-border dark:border-gray-700 rounded-2xl shadow-xl z-50 max-h-96 overflow-y-auto scrollbar-thin">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-osdag-dark-color border border-osdag-border dark:border-gray-700 rounded-2xl shadow-xl z-50 max-h-96 overflow-y-auto scrollbar-thin">
                 {searchQuery.trim() ? (
                   <>
                     {/* Modules Section */}

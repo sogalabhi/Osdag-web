@@ -147,7 +147,7 @@ const SectionCards = ({ section, activeSubmodule, onModuleClick }) => {
 
   return (
   <div
-    className="flex-1 min-w-[380px] bg-white dark:bg-slate-950 border-2 border-osdag-border rounded-xl mb-8 px-4 py-4 shadow-card dark:text-gray-300"
+    className="flex-1 min-w-[380px] bg-white dark:bg-osdag-dark-color border-2 border-osdag-border rounded-xl mb-8 px-4 py-4 shadow-card dark:text-gray-300"
   >
     <div className="mb-4 -mt-7 inline-block px-2">{section.label}</div>
     <div className="flex gap-6">
@@ -155,7 +155,7 @@ const SectionCards = ({ section, activeSubmodule, onModuleClick }) => {
         <div
           key={opt.key}
           onClick={() => handleModuleClick(opt.key, section.label)}
-          className="group flex-1 h-40 min-w-[120px] bg-white dark:bg-slate-900 flex flex-col items-center justify-between
+          className="group flex-1 h-40 min-w-[120px] bg-white dark:bg-osdag-dark-color flex flex-col items-center justify-between
             border rounded-lg shadow-card transition-all duration-200
             hover:border-osdag-green relative cursor-pointer"
         >
@@ -290,7 +290,7 @@ const TabbedModulePage = () => {
             className={`flex-1 py-3 text-lg font-semibold border-2 rounded-xl transition-colors duration-150
               ${activeSubmodule === tab.key
                 ? 'bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green'
-                : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-slate-950 dark:text-gray-300  dark:hover:text-osdag-green"
+                : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300  dark:hover:text-osdag-green"
               }
             `}
           >

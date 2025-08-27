@@ -9,6 +9,7 @@ export default {
     extend: {
       colors: {
         osdag: {
+          'dark-color': '#333333',
           green: '#91B014',
           'dark-green': '#7f9915',
           'light-green': '#A8C517',

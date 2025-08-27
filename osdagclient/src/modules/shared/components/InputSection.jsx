@@ -153,15 +153,19 @@ export const InputSection = ({
         } else if (field.options === 'boltDiameterList') {
           const list = safeContextData.boltDiameterList || [];
           const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
-          const value = isCustomized
-            ? (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [])
-            : (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : (list[0] || ''));
+          if (!isCustomized) {
+            return (
+              <Select value={"All"} disabled>
+                <Option value="All">All</Option>
+              </Select>
+            );
+          }
+          const value = Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [];
           return (
             <Select
-              mode={isCustomized ? 'multiple' : undefined}
+              mode="multiple"
               value={value}
               onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
-              onSelect={(val) => !isCustomized && setInputs({ ...safeInputs, [field.key]: val })}
             >
               {list.map((item, index) => (
                 <Option key={index} value={item}>{item}</Option>
@@ -171,15 +175,19 @@ export const InputSection = ({
         } else if (field.options === 'thicknessList') {
           const list = safeContextData.thicknessList || [];
           const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
-          const value = isCustomized
-            ? (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [])
-            : (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : (list[0] || ''));
+          if (!isCustomized) {
+            return (
+              <Select value={"All"} disabled>
+                <Option value="All">All</Option>
+              </Select>
+            );
+          }
+          const value = Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [];
           return (
             <Select
-              mode={isCustomized ? 'multiple' : undefined}
+              mode="multiple"
               value={value}
               onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
-              onSelect={(val) => !isCustomized && setInputs({ ...safeInputs, [field.key]: val })}
             >
               {list.map((item, index) => (
                 <Option key={index} value={item}>{item}</Option>
@@ -189,15 +197,19 @@ export const InputSection = ({
         } else if (field.options === 'propertyClassList') {
           const list = safeContextData.propertyClassList || [];
           const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
-          const value = isCustomized
-            ? (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [])
-            : (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : (list[0] || ''));
+          if (!isCustomized) {
+            return (
+              <Select value={"All"} disabled>
+                <Option value="All">All</Option>
+              </Select>
+            );
+          }
+          const value = Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [];
           return (
             <Select
-              mode={isCustomized ? 'multiple' : undefined}
+              mode="multiple"
               value={value}
               onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
-              onSelect={(val) => !isCustomized && setInputs({ ...safeInputs, [field.key]: val })}
             >
               {list.map((item, index) => (
                 <Option key={index} value={item}>{item}</Option>
@@ -366,7 +378,7 @@ export const InputSection = ({
 
         return (
           <Select
-            value={safeInputs[field.key] || "All"}
+            value={selectionStates?.[field.selectionKey] || "All"}
             onSelect={(value) => handleCustomizableSelect(field, value)}
             className="w-full h-11"
             placeholder={field.placeholder || `Select ${field.label}`}
