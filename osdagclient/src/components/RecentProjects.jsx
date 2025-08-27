@@ -13,7 +13,7 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
   const navigate = useNavigate();
 
   const BASE_URL = 'http://localhost:8000/api/';
-  
+
   // Check if user is a guest
   const isGuest = isGuestUser();
   const userEmail = getCurrentUserEmail();
@@ -43,11 +43,11 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         // Store project data in localStorage for the module to use
         localStorage.setItem('currentProject', JSON.stringify(data.project));
-        
+
         // Navigate to the appropriate module with project name in URL
         const moduleRoutes = {
           // Short keys from SelectModulePage
@@ -71,7 +71,7 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
           'Tension-Member-Bolted-Design': '/design/tension-member/bolted_to_end_gusset',
           'Simply-Supported-Beam': '/design/FlexureMember/simply_supported_beam'
         };
-        
+
         const route = moduleRoutes[project.module_id];
         if (route) {
           // Navigate with project name in URL
@@ -93,7 +93,7 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 1) {
       return 'Yesterday';
     } else if (diffDays < 7) {
@@ -137,34 +137,49 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
     );
   };
 
-  // Show guest message instead of projects for guest users
   if (isGuest) {
     return (
-      <div className="text-center p-10">
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="Guest Mode"
+      <div className="text-center p-10 dark:text-white">
+        {/* Guest Icon */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="mx-auto mb-6 h-20 w-20 text-osdag-green"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1.5}
         >
-          <p className="text-gray-600 mb-4">
-            Projects are not available in guest mode. Please sign up or log in to save and manage your projects.
-          </p>
-        </Empty>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M16 14a4 4 0 01-8 0m8 0a4 4 0 00-8 0m8 0v2a4 4 0 01-8 0v-2m12-4a4 4 0 11-8 0 4 4 0 018 0zM6 18v2a4 4 0 008 0v-2"
+          />
+        </svg>
+
+        {/* Big Guest Mode Text */}
+        <h1 className="text-4xl font-bold mb-4">Guest Mode</h1>
+
+        {/* Guest Message */}
+        <p className="text-lg max-w-xl mx-auto">
+          Projects are not available in guest mode. Please sign up or log in to save and manage your projects.
+        </p>
       </div>
     );
   }
+
 
   if (loading) {
     return (
       <div className="text-center p-10">
         <Spin size="large" />
-        <div className="mt-4">Loading recent projects...</div>
+        <div className="mt-4 dark:text-white">Loading recent projects...</div>
       </div>
     );
   }
 
   if (projects.length === 0) {
     return (
-      <div className="text-center p-10">
+      <div className="text-center p-10  dark:text-white">
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description="No recent projects"
@@ -178,7 +193,7 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
   }
 
   return (
-    <div className="rounded-2xl border border-osdag-border dark:border-gray-700 shadow-card hover:shadow-card-hover transition-shadow duration-200">
+    <div className=" dark:text-white rounded-2xl border border-osdag-border dark:border-gray-700 shadow-card hover:shadow-card-hover transition-shadow duration-200">
       <div className="p-6 border-b border-osdag-border dark:border-gray-700">
         <h2 className="text-card-title text-osdag-text-primary dark:text-white flex items-center">
           <ClockCircleOutlined className="mr-2" />
@@ -212,7 +227,7 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
 
                     {/* Action buttons - show on hover */}
                     <div className="flex flex-wrap gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-all duration-300 max-h-0 group-hover:max-h-20 overflow-hidden">
-                      <button 
+                      <button
                         className="px-3 py-1.5 text-xs font-medium bg-osdag-green/10 text-osdag-green rounded-lg hover:bg-osdag-green/20 transition-colors"
                         onClick={(e) => {
                           e.preventDefault();

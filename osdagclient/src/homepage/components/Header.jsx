@@ -203,28 +203,41 @@ const Header = ({ setshowSideBar, active }) => {
             <div className="relative about-dropdown group">
               <button
                 onClick={() => setShowAboutDropdown(!showAboutDropdown)}
-                className={`p-3 transition-all duration-300 rounded-xl group-hover:px-6 ${showAboutDropdown ? 'bg-osdag-green text-white' : 'text-osdag-text-muted hover:text-white hover:bg-osdag-green'
+                className={`p-3 transition-all duration-300 rounded-xl group-hover:px-6 ${showAboutDropdown
+                  ? 'bg-osdag-green text-white'
+                  : 'text-black dark:text-white hover:text-white hover:bg-osdag-green'
                   }`}
               >
                 <div className="flex items-center space-x-2">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
                     About
                   </span>
-                  <svg className={`w-4 h-4 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-all duration-300 ${showAboutDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className={`w-4 h-4 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-all duration-300 ${showAboutDropdown ? 'rotate-180' : ''
+                      }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
               </button>
               {(showAboutDropdown || false) && (
-                <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800/20 border border-osdag-border dark:border-gray-700 rounded-xl shadow-lg z-20 min-w-48 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 top-full mt-2 bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green rounded-xl shadow-lg z-20 min-w-48 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="py-2">
-                    <button className="w-full px-4 py-2 text-left text-osdag-text-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <button className="w-full px-4 py-2 text-left text-osdag-green dark:text-white hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
                       Help
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-osdag-text-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <button className="w-full px-4 py-2 text-left text-osdag-green dark:text-white hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
                       Info
                     </button>
                   </div>
@@ -233,10 +246,15 @@ const Header = ({ setshowSideBar, active }) => {
             </div>
             {/* Settings Button */}
             <div className="relative group">
-              <button className="p-3 text-osdag-text-muted hover:text-white dark:text-gray-400 dark:hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6">
+              <button className="p-3 text-black dark:text-white hover:text-white dark:hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6">
                 <div className="flex items-center space-x-2">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
@@ -249,32 +267,48 @@ const Header = ({ setshowSideBar, active }) => {
             <div className="relative resources-dropdown group">
               <button
                 onClick={() => setShowResourcesDropdown(!showResourcesDropdown)}
-                className={`p-3 transition-all duration-300 rounded-xl group-hover:px-6 ${showResourcesDropdown ? 'bg-osdag-green text-white' : 'text-osdag-text-muted hover:text-white hover:bg-osdag-green'
+                className={`p-3 transition-all duration-300 rounded-xl group-hover:px-6 ${showResourcesDropdown
+                  ? 'bg-osdag-green text-white'
+                  : 'text-black dark:text-white hover:text-white hover:bg-osdag-green'
                   }`}
               >
                 <div className="flex items-center space-x-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-640v560h560v-560h-80v280l-100-60-100 60v-280H200Zm0 560v-560 560Z" /></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="currentColor"
+                  >
+                    <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-640v560h560v-560h-80v280l-100-60-100 60v-280H200Zm0 560v-560 560Z" />
+                  </svg>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
                     Resources
                   </span>
-                  <svg className={`w-4 h-4 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-all duration-300 ${showResourcesDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className={`w-4 h-4 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-all duration-300 ${showResourcesDropdown ? 'rotate-180' : ''
+                      }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
               </button>
               {(showResourcesDropdown || false) && (
-                <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800/20 border border-osdag-border dark:border-gray-700 rounded-xl shadow-lg z-20 min-w-48 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 top-full mt-2 bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green rounded-xl shadow-lg z-20 min-w-48 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="py-2">
-                    <button className="w-full px-4 py-2 text-left text-osdag-text-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <button className="w-full px-4 py-2 text-left text-osdag-green dark:text-white hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
                       Videos
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-osdag-text-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <button className="w-full px-4 py-2 text-left text-osdag-green dark:text-white hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
                       Osi File
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-osdag-text-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <button className="w-full px-4 py-2 text-left text-osdag-green dark:text-white hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
                       Documentation
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-osdag-text-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <button className="w-full px-4 py-2 text-left text-osdag-green dark:text-white hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
                       Databases
                     </button>
                   </div>
@@ -283,10 +317,15 @@ const Header = ({ setshowSideBar, active }) => {
             </div>
             {/* Documents Button */}
             <div className="relative group">
-              <button className="p-3 text-osdag-text-muted hover:text-white dark:text-gray-400 dark:hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6">
+              <button className="p-3 text-black dark:text-white hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6">
                 <div className="flex items-center space-x-2">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
                   </svg>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
                     Import Input
@@ -298,19 +337,27 @@ const Header = ({ setshowSideBar, active }) => {
             <div className="relative group">
               <button
                 onClick={toggleTheme}
-                className="p-2 text-osdag-text-muted hover:text-osdag-text-secondary dark:hover:text-gray-300 transition-colors"
+                className="p-2 text-black dark:text-white hover:text-osdag-green transition-colors"
               >
-                {isDark ?
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                {isDark ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#ffffff"
+                  >
                     <path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
-                  </svg> :
+                  </svg>
+                ) : (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                   </svg>
-                }
+                )}
               </button>
             </div>
           </div>
+
         </div>
       </div>
       {/* Search Section - Hidden for guest users */}

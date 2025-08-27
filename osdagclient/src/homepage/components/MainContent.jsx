@@ -93,11 +93,11 @@ const MainContent = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-950 flex-1 px-12 pb-6">
+    <div className=" flex-1 px-12 pb-6">
       <div className="max-w-7xl mx-auto h-full">
         <div className={`grid grid-cols-1 ${isGuest ? 'xl:grid-cols-1' : 'xl:grid-cols-2'} gap-8 h-full`}>
           {/* Recent Projects Card */}
-          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-osdag-border dark:border-gray-700 p-6">
+          <div className=" rounded-lg shadow-sm border border-osdag-border dark:border-gray-700 p-6">
             <RecentProjects projects={projects} loading={loading} onDeleteProject={handleDeleteProject} />
           </div>
           

@@ -31,23 +31,23 @@ export default (state, action) => {
         materialList: [...state.materialList, ...prev],
         error_msg: "Error in fetching Column, Beam and Material List",
       };
-    case 'SET_BEAM_MATERIAL_LIST':
-            console.log("abhi reducer", action.payload);
-            const prevCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials")) || [];
-            // Remove direct state mutation!
-            // state.materialList = action.payload.materialList;
-            return {
-                ...state,
-                sectionProfileList: action.payload.sectionProfileList || [],
-                beamList: action.payload.beamList || [],
-                materialList: [
-                    ...(action.payload.materialList || []),
-                    ...prevCustomMaterials
-                ],
-                angleList: action.payload.angleList || [], 
-                channelList: action.payload.channelList || [],
-                error_msg: 'Error in fetching Beam and Material List'
-            };
+    // case 'SET_BEAM_MATERIAL_LIST':
+    //         console.log("abhi reducer", action.payload);
+    //         const prevCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials")) || [];
+    //         // Remove direct state mutation!
+    //         // state.materialList = action.payload.materialList;
+    //         return {
+    //             ...state,
+    //             sectionProfileList: action.payload.sectionProfileList || [],
+    //             beamList: action.payload.beamList || [],
+    //             materialList: [
+    //                 ...(action.payload.materialList || []),
+    //                 ...prevCustomMaterials
+    //             ],
+    //             angleList: action.payload.angleList || [], 
+    //             channelList: action.payload.channelList || [],
+    //             error_msg: 'Error in fetching Beam and Material List'
+    //         };
     case "SET_COOKIE_FETCH":
       return {
         ...state,
@@ -219,11 +219,11 @@ export default (state, action) => {
       } = action.payload;
 
       // Merge with existing custom materials from localStorage
-      const prevCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials")) || [];
-      const mergedMaterialList = [...materialList, ...prevCustomMaterials];
+      // const prevCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials")) || [];
+      // const mergedMaterialList = [...materialList, ...prevCustomMaterials];
 
       console.log("🔄 [REDUCER] Setting state with:");
-      console.log("🔄 [REDUCER] - materialList length:", mergedMaterialList.length);
+      // console.log("🔄 [REDUCER] - materialList length:", mergedMaterialList.length);
       console.log("🔄 [REDUCER] - boltDiameterList length:", boltDiameterList.length);
       console.log("🔄 [REDUCER] - thicknessList length:", thicknessList.length);
       console.log("🔄 [REDUCER] - propertyClassList length:", propertyClassList.length);
@@ -233,7 +233,7 @@ export default (state, action) => {
 
       return {
         ...state,
-        materialList: mergedMaterialList,
+        // materialList: mergedMaterialList,
         boltDiameterList,
         thicknessList,
         propertyClassList,

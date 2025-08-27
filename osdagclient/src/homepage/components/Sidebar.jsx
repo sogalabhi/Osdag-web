@@ -118,7 +118,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
   const { moduleName } = useParams();
 
   return (
-    <div className="w-sidebar h-screen border-r border-osdag-border dark:border-gray-700 flex flex-col">
+    <div className="w-sidebar h-screen border-r border-osdag-border dark:border-gray-700 flex flex-col bg-white dark:bg-slate-900">
       {/* Logo Section */}
       <div className=" border-b border-osdag-border dark:border-gray-700">
         <div className="flex items-center justify-center relative">
@@ -134,15 +134,23 @@ const Sidebar = ({ setshowSideBar, active }) => {
           </div>
 
           <button
-            className="absolute right-5 top-5 md:block lg:hidden xl:hidden 2xl:hidden p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+            className="absolute right-5 top-5 md:block lg:hidden xl:hidden 2xl:hidden p-2 rounded transition 
+             hover:bg-gray-200 dark:hover:bg-gray-700"
             aria-label="Close sidebar"
             onClick={handleCloseSidebar}
             type="button"
           >
-            <svg className="w-6 h-6 text-osdag-text dark:text-osdag-text-dark" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <svg
+              className="w-6 h-6 text-osdag-text dark:text-osdag-text-dark"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
+
         </div>
       </div>
 
@@ -158,26 +166,31 @@ const Sidebar = ({ setshowSideBar, active }) => {
           return (
             <Link to={item.link} key={index} onClick={handleCloseSidebar}>
               <div
-                className={`mx-4 mb-2 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ease-in-out group
-          ${isActive
-                    ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
-                    : 'hover:text-osdag-light-green hover:bg-gray-50 dark:hover:bg-gray-800/20 text-osdag-text dark:text-osdag-text-dark'
-                  }`}
+                className={`
+      mx-4 mb-2 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ease-in-out group
+      ${isActive
+                    ? 'bg-osdag-green text-white dark:bg-osdag-dark-green dark:text-white'
+                    : 'hover:text-osdag-green hover:bg-black/10 dark:hover:bg-black/40 text-black dark:text-white'}
+    `}
               >
                 <div className="flex items-center space-x-3">
-                  <div className={`transition-colors duration-200 flex items-center justify-center h-6 w-6
-            ${isActive
-                      ? 'text-white dark:text-osdag-text-dark'
-                      : 'group-hover:text-osdag-light-green text-osdag-icon dark:text-osdag-icon-dark'
-                    }`}>
-                    <span className="h-5 w-5 flex items-center justify-center dark:text-gray-300">
+                  <div
+                    className={`
+          transition-colors duration-200 flex items-center justify-center h-6 w-6
+          ${isActive
+                        ? 'text-white dark:text-white'
+                        : 'group-hover:text-osdag-green text-black dark:text-osdag-green'}
+        `}
+                  >
+                    <span className="h-5 w-5 flex items-center justify-center">
                       {item.icon}
                     </span>
                   </div>
-                  <span className="font-medium dark:text-gray-300">{item.name}</span>
+                  <span className="font-medium dark:text-white">{item.name}</span>
                 </div>
               </div>
             </Link>
+
           );
         })}
 
