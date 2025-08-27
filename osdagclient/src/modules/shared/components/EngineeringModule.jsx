@@ -116,6 +116,7 @@ export const EngineeringModule = ({
 
   // Only change dock visibility after design is complete
   useEffect(() => {
+    console.log("[EngineeringModule] useEffect output:", output);
     if (!loading && !isRedesigning && output && renderBoolean) {
       setIsDesignComplete(true);
       setShowOptionsContainer(true); // Show options container after design is complete
@@ -144,7 +145,7 @@ export const EngineeringModule = ({
     // If there's already an existing design, completely reset everything
     if (isDesignComplete || renderBoolean || output) {
       console.log("Resetting existing design...");
-      
+
       // Immediately hide current model and output
       setIsRedesigning(true);
       setIsDesignComplete(false);
@@ -153,14 +154,14 @@ export const EngineeringModule = ({
       setShowOptionsContainer(false);
       setOrthographicView(null);
       setSelectedView("Model");
-      
+
       // Reset all the data that controls model rendering
       await performReset();
-      
+
       // Small delay to ensure reset is processed
       await new Promise(resolve => setTimeout(resolve, 100));
     }
-    
+
     // Call the actual submit function
     try {
       await handleSubmit();
@@ -305,9 +306,8 @@ export const EngineeringModule = ({
           <img
             src={showOutputDock ? OutputDockVisiblesvg : OutputDockHiddensvg}
             alt="Toggle Output Dock"
-            className={`navbar-control-icon ${
-              !isDesignComplete ? "disabled" : ""
-            }`}
+            className={`navbar-control-icon ${!isDesignComplete ? "disabled" : ""
+              }`}
             onClick={isDesignComplete ? toggleOutputDock : undefined}
             style={{
               opacity: isDesignComplete ? 1 : 0.5,
@@ -333,9 +333,8 @@ export const EngineeringModule = ({
       </div>
 
       <div
-        className={`superMainBody ${!showInputDock ? "no-input-dock" : ""} ${
-          !showOutputDock ? "no-output-dock" : ""
-        }`}
+        className={`superMainBody ${!showInputDock ? "no-input-dock" : ""} ${!showOutputDock ? "no-output-dock" : ""
+          }`}
       >
         {/* Left - Input Dock - Only show if showInputDock is true */}
         {showInputDock && (
@@ -346,14 +345,14 @@ export const EngineeringModule = ({
                 value={{ value: selectedSection, label: selectedSection }}
                 onChange={(option) => {
                   setSelectedSection(option.value);
-                  
+
                   // Open design preferences modal if that option is selected
                   if (option.value === "Design Preferences") {
                     setDesignPrefModalStatus(true);
                   }
-                }} 
+                }}
                 options={[
-                  { value: "Section Details", label: "Section Details"},
+                  { value: "Section Details", label: "Section Details" },
                   { value: "Design Preferences", label: "Design Preferences" },
                   { value: "Additional Inputs", label: "Additional Inputs" }
                 ]}
@@ -362,12 +361,14 @@ export const EngineeringModule = ({
               />
             </div>
             <div className="subMainBody scroll-data">
-              {selectedSection !== "Additional Inputs" && 
+
+              
+              {selectedSection !== "Additional Inputs" &&
                 moduleConfig.inputSections.map((section, index) => (
                   <InputSection
                     key={index}
                     section={section}
-                    inputs={inputs} 
+                    inputs={inputs}
                     setInputs={setInputs}
                     selectionStates={selectionStates}
                     updateSelectionState={updateSelectionState}
@@ -379,7 +380,7 @@ export const EngineeringModule = ({
                   />
                 ))
               }
-              
+
               {selectedSection === "Additional Inputs" && (
                 <div className="additional-inputs-content">
                   {/* Add your additional inputs content here */}
@@ -418,9 +419,8 @@ export const EngineeringModule = ({
 
         {/* Middle - 3D Model */}
         <div
-          className={`superMainBody_mid ${
-            showOptionsContainer ? "has-options" : ""
-          }`}
+          className={`superMainBody_mid ${showOptionsContainer ? "has-options" : ""
+            }`}
         >
           {/* Options Container - Only show after design is complete */}
           {showOptionsContainer && (
@@ -432,15 +432,14 @@ export const EngineeringModule = ({
                     className="option-wrapper"
                     onClick={() => {
                       setSelectedView(option);
-                      setOrthographicView(null); 
+                      setOrthographicView(null);
                     }}
                   >
                     <div
-                      className={`option-box ${
-                        selectedView === option && !orthographicView
-                          ? "selected"
-                          : ""
-                      }`}
+                      className={`option-box ${selectedView === option && !orthographicView
+                        ? "selected"
+                        : ""
+                        }`}
                     ></div>
                     <span className="option-label">{option}</span>
                   </div>
@@ -524,6 +523,7 @@ export const EngineeringModule = ({
         </div>
 
         {/* Right - Output Dock - Only show if showOutputDock is true and design is complete */}
+        {console.log("Output: " + output)}
         {showOutputDock && isDesignComplete && (
           <div className="superMain_right">
             <div className="OutputDock">

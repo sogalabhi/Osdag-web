@@ -106,7 +106,7 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
   const getModuleDisplayName = (moduleId) => {
     const moduleNames = {
       // Short keys from SelectModulePage
-      'fp': 'Fin Plate Connection',
+      'fp': 'Fin-Plate-Connection',
       'ca': 'Cleat Angle Connection',
       'ep': 'End Plate Connection',
       'sa': 'Seated Angle Connection',

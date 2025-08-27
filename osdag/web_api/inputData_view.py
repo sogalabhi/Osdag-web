@@ -43,7 +43,7 @@ class InputData(APIView):
         propertyClass = <String> ( Optional query )
 
     Example : 
-        moduleName = Fin Plate Connection
+        moduleName = Fin-Plate-Connection
         connectivity = Beam-Beam
         boltDiameter = Customized 
         propertyClass = Customized

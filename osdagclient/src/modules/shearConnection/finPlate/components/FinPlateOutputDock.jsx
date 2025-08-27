@@ -4,6 +4,7 @@ import { finPlateOutputConfig } from "../configs/finPlateOutputConfig";
 import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 const FinPlateOutputDock = ({ output, extraState }) => {
+  console.log("FinPlateOutputDock received:", { output, extraState });
   return (
     <BaseOutputDock
       output={output}

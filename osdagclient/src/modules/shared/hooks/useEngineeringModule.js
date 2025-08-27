@@ -4,8 +4,12 @@ import { ModuleContext } from "../../../context/ModuleState";
 
 export const useEngineeringModule = (moduleConfig) => {
   const navigate = useNavigate();
-  
+
+  // ===================================================================
+  // SIMPLIFIED CONTEXT API - Using 8 Core Functions
+  // ===================================================================
   const {
+    // State variables (unchanged)
     beamList,
     columnList,
     connectivityList,
@@ -18,12 +22,14 @@ export const useEngineeringModule = (moduleConfig) => {
     displayPDF,
     renderCadModel,
     cadModelPaths,
-    createDesign,
-    createDesignReport,
-    getSupportedData,
-    getDesingPrefData,
-    resetModuleState,
-    getModuleData,
+
+    // NEW SIMPLIFIED API - 8 Core Functions Only
+    getModuleData,              // Universal data fetcher
+    manageDesignPreferences,    // Design preferences management  
+    createDesign,               // Design calculation
+    createCADModel,             // CAD generation
+    generateReport,             // Unified report generation
+    resetModuleState,           // State reset
   } = useContext(ModuleContext);
 
   // Core state management
@@ -34,6 +40,18 @@ export const useEngineeringModule = (moduleConfig) => {
   const [loading, setLoading] = useState(false);
   const [renderBoolean, setRenderBoolean] = useState(false);
   const [modelKey, setModelKey] = useState(0);
+
+  // Sync local output/logs/display with context design results
+  useEffect(() => {
+    if (designData && Object.keys(designData).length > 0) {
+      console.log("[useEngineeringModule] useEffect output::", designData);
+      setOutput(designData);
+      setDisplayOutput(true);
+    }
+    if (designLogs) {
+      setLogs(designLogs);
+    }
+  }, [designData, designLogs]);
 
   // Modal states
   const [modalStates, setModalStates] = useState(
@@ -81,26 +99,39 @@ export const useEngineeringModule = (moduleConfig) => {
 
   const [extraState, setExtraState] = useState(getInitialExtraState());
 
-  // On mount: Load module data with comprehensive logging
+  // On mount: Load module data using simplified API with enhanced error handling
   useEffect(() => {
-    console.log('🔍 [ENGINEERING MODULE] useEffect triggered for module data loading');
-    console.log('🔍 [ENGINEERING MODULE] moduleConfig:', moduleConfig);
-    console.log('🔍 [ENGINEERING MODULE] moduleConfig.designType:', moduleConfig?.designType);
-    
-    if (moduleConfig && moduleConfig.designType) {
-      console.log('✅ [ENGINEERING MODULE] Calling getModuleData for:', moduleConfig.designType);
-      console.log('✅ [ENGINEERING MODULE] getModuleData function available:', !!getModuleData);
-      
-      try {
-        getModuleData(moduleConfig.designType);
-        console.log('✅ [ENGINEERING MODULE] getModuleData called successfully');
-      } catch (error) {
-        console.error('❌ [ENGINEERING MODULE] Error calling getModuleData:', error);
+    const loadModuleData = async () => {
+      console.log('🔍 [ENGINEERING MODULE] Loading module data for:', moduleConfig?.designType);
+
+      if (!moduleConfig?.designType) {
+        console.warn('⚠️ [ENGINEERING MODULE] No moduleConfig or designType available');
+        return;
       }
-    } else {
-      console.warn('⚠️ [ENGINEERING MODULE] No moduleConfig or designType available');
-      console.warn('⚠️ [ENGINEERING MODULE] moduleConfig:', moduleConfig);
-    }
+
+      if (!getModuleData) {
+        console.error('❌ [ENGINEERING MODULE] getModuleData function not available');
+        return;
+      }
+
+      try {
+        console.log('🚀 [ENGINEERING MODULE] Calling getModuleData with simplified API');
+
+        // Use the new simplified API which returns { success, data, error }
+        const result = await getModuleData(moduleConfig.designType);
+
+        if (result && result.success) {
+          console.log('✅ [ENGINEERING MODULE] Module data loaded successfully');
+          console.log('✅ [ENGINEERING MODULE] Data keys:', Object.keys(result.data || {}));
+        } else {
+          console.error('❌ [ENGINEERING MODULE] Failed to load module data:', result?.error || 'Unknown error');
+        }
+      } catch (error) {
+        console.error('❌ [ENGINEERING MODULE] Exception while loading module data:', error);
+      }
+    };
+
+    loadModuleData();
   }, [moduleConfig?.designType, getModuleData]);
 
   // Design report states
@@ -246,22 +277,22 @@ export const useEngineeringModule = (moduleConfig) => {
     }
   }, [designLogs, displayOutput]);
 
-  // Handle design data - Both modules use same flat structure now
+  // Handle design data - normalize to { key: { label, val } }
   useEffect(() => {
     if (displayOutput) {
       try {
         const formatedOutput = {};
-        
-        // Both FinPlate and BeamBeamEndPlate use flat structure: { "Bolt.Diameter": { label, val } }
-        for (const [key, value] of Object.entries(designData)) {
-          const newKey = key;
-          const label = value.label;
-          const val = value.value;
+
+        // Both FinPlate and others use flat entries: { label, val }
+        // Be defensive to support { label, value } too
+        for (const [key, value] of Object.entries(designData || {})) {
+          const label = value?.label ?? key;
+          const val = value?.val ?? value?.value ?? value;
           if (val !== undefined && val !== null) {
-            formatedOutput[newKey] = { label, val };
+            formatedOutput[key] = { label, val };
           }
         }
-        
+
         setOutput(formatedOutput);
       } catch (error) {
         console.log(error);
@@ -275,7 +306,7 @@ export const useEngineeringModule = (moduleConfig) => {
     if (renderCadModel && cadModelPaths) {
       setRenderBoolean(true);
       setLoading(false);
-      
+
       // Hide loading modal when model is ready
       setTimeout(() => {
         setIsLoadingModalVisible(false);
@@ -286,44 +317,82 @@ export const useEngineeringModule = (moduleConfig) => {
     }
   }, [renderCadModel, cadModelPaths]);
 
-  // Get supported data when member designation changes (BeamBeamEndPlate)
+  // Get supported data when member designation changes (BeamBeamEndPlate) - Using simplified API
   useEffect(() => {
-    if (inputs.member_designation && moduleConfig.cameraKey !== "FinPlate") {
-      getSupportedData({
-        supported_section: inputs.member_designation,
-      });
-    }
-  }, [inputs.member_designation]);
+    const loadSupportedData = async () => {
+      if (inputs.member_designation && moduleConfig.cameraKey !== "FinPlate" && manageDesignPreferences) {
+        try {
+          console.log('🔧 [ENGINEERING MODULE] Loading supported data for:', inputs.member_designation);
 
-  // Get design preferences data for FinPlate
-  useEffect(() => {
-    if (moduleConfig.cameraKey === "FinPlate" && getDesingPrefData) {
-      const conn_map = {
-        "Column Flange-Beam-Web": "Column Flange-Beam Web",
-        "Column Web-Beam-Web": "Column Web-Beam Web",
-        "Beam-Beam": "Beam-Beam",
-      };
-
-      const connectivity = extraState?.selectedOption || inputs.connectivity;
-
-      if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
-        if (inputs.column_section && inputs.beam_section) {
-          getDesingPrefData({
-            supported_section: inputs.beam_section,
-            supporting_section: inputs.column_section,
-            connectivity: conn_map[connectivity].split(" ").join("-"),
+          const result = await manageDesignPreferences('get', {
+            supported_section: inputs.member_designation,
           });
-        }
-      } else if (connectivity === "Beam-Beam") {
-        if (inputs.primary_beam && inputs.secondary_beam) {
-          getDesingPrefData({
-            supported_section: inputs.secondary_beam,
-            supporting_section: inputs.primary_beam,
-            connectivity: conn_map[connectivity],
-          });
+
+          if (result && result.success) {
+            console.log('✅ [ENGINEERING MODULE] Supported data loaded successfully');
+          } else {
+            console.error('❌ [ENGINEERING MODULE] Failed to load supported data:', result?.error);
+          }
+        } catch (error) {
+          console.error('❌ [ENGINEERING MODULE] Exception loading supported data:', error);
         }
       }
-    }
+    };
+
+    loadSupportedData();
+  }, [inputs.member_designation, manageDesignPreferences, moduleConfig.cameraKey]);
+
+  // Get design preferences data for FinPlate - Using simplified API
+  useEffect(() => {
+    const loadDesignPreferences = async () => {
+      if (moduleConfig.cameraKey === "FinPlate" && manageDesignPreferences) {
+        const conn_map = {
+          "Column Flange-Beam-Web": "Column Flange-Beam Web",
+          "Column Web-Beam-Web": "Column Web-Beam Web",
+          "Beam-Beam": "Beam-Beam",
+        };
+
+        const connectivity = extraState?.selectedOption || inputs.connectivity;
+
+        try {
+          let params = null;
+
+          if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
+            if (inputs.column_section && inputs.beam_section) {
+              params = {
+                supported_section: inputs.beam_section,
+                supporting_section: inputs.column_section,
+                connectivity: conn_map[connectivity].split(" ").join("-"),
+              };
+            }
+          } else if (connectivity === "Beam-Beam") {
+            if (inputs.primary_beam && inputs.secondary_beam) {
+              params = {
+                supported_section: inputs.secondary_beam,
+                supporting_section: inputs.primary_beam,
+                connectivity: conn_map[connectivity],
+              };
+            }
+          }
+
+          if (params) {
+            console.log('🔧 [ENGINEERING MODULE] Loading design preferences for FinPlate:', params);
+
+            const result = await manageDesignPreferences('get', params);
+
+            if (result && result.success) {
+              console.log('✅ [ENGINEERING MODULE] Design preferences loaded successfully');
+            } else {
+              console.error('❌ [ENGINEERING MODULE] Failed to load design preferences:', result?.error);
+            }
+          }
+        } catch (error) {
+          console.error('❌ [ENGINEERING MODULE] Exception loading design preferences:', error);
+        }
+      }
+    };
+
+    loadDesignPreferences();
   }, [
     inputs.column_section,
     inputs.beam_section,
@@ -331,6 +400,8 @@ export const useEngineeringModule = (moduleConfig) => {
     inputs.secondary_beam,
     extraState.selectedOption,
     inputs.connectivity,
+    manageDesignPreferences,
+    moduleConfig.cameraKey,
   ]);
 
   // Auto-hide save input popup
@@ -389,9 +460,22 @@ export const useEngineeringModule = (moduleConfig) => {
     setIsLoadingModalVisible(true);
     setLoadingStage("Generating design calculations...");
 
-    createDesign(param, moduleConfig.designType);
-    setDisplayOutput(true);
-    setModelKey((prev) => prev + 1);
+    try {
+      await createDesign(param, moduleConfig.designType, null);
+      // Auto-trigger CAD after successful design
+      setLoadingStage("Generating 3D model...");
+      const cadResult = await createCADModel(param, moduleConfig.designType, null);
+      if (cadResult?.success) {
+        setDisplayOutput(true);
+        setLoading(false);
+        setModelKey((prev) => prev + 1);
+      } else {
+        setLoading(false);
+      }
+    } catch (e) {
+      console.error('[ENGINEERING MODULE] Error in design/CAD flow:', e);
+      setLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -491,12 +575,35 @@ export const useEngineeringModule = (moduleConfig) => {
     setCreateDesignReportBool(true);
   };
 
-  const handleOkDesignReport = () => {
+  const handleOkDesignReport = async () => {
     if (!output) {
       alert("Please submit the design first.");
       return;
     }
-    createDesignReport(designReportInputs);
+
+    try {
+      console.log('📄 [ENGINEERING MODULE] Generating design report with simplified API');
+
+      // Use the new simplified generateReport function
+      const result = await generateReport('design_report', {
+        ...designReportInputs,
+        moduleId: moduleConfig.designType,
+        inputValues: inputs,
+        designStatus: true,
+        logs: logs || [],
+      });
+
+      if (result && result.success) {
+        console.log('✅ [ENGINEERING MODULE] Design report generated successfully');
+      } else {
+        console.error('❌ [ENGINEERING MODULE] Failed to generate design report:', result?.error);
+        alert(`Failed to generate design report: ${result?.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('❌ [ENGINEERING MODULE] Exception generating design report:', error);
+      alert(`Error generating design report: ${error.message}`);
+    }
+
     handleCancelDesignReport();
   };
 
@@ -517,7 +624,9 @@ export const useEngineeringModule = (moduleConfig) => {
   };
 
   return {
-    // Context data
+    // ===================================================================
+    // CONTEXT DATA - Module state variables
+    // ===================================================================
     beamList,
     columnList,
     connectivityList,
@@ -528,9 +637,20 @@ export const useEngineeringModule = (moduleConfig) => {
     displayPDF,
     renderCadModel,
     cadModelPaths,
-    createDesignReport,
 
-    // State
+    // ===================================================================
+    // SIMPLIFIED API ACCESS - Expose core functions for advanced usage
+    // ===================================================================
+    getModuleData,              // Universal data fetcher
+    manageDesignPreferences,    // Design preferences management  
+    generateReport,             // Unified report generation
+    createDesign,               // Design calculation
+    resetModuleState,           // State reset
+
+
+    // ===================================================================
+    // COMPONENT STATE - Internal hook state
+    // ===================================================================
     inputs,
     setInputs,
     output,
@@ -542,10 +662,16 @@ export const useEngineeringModule = (moduleConfig) => {
     selectionStates,
     allSelected,
     selectedItems,
+    extraState,
+    setExtraState,
+
+    // Report states
     createDesignReportBool,
     setCreateDesignReportBool,
     designReportInputs,
     setDesignReportInputs,
+
+    // Modal states
     designPrefModalStatus,
     setDesignPrefModalStatus,
     confirmationModal,
@@ -558,8 +684,6 @@ export const useEngineeringModule = (moduleConfig) => {
     setSelectedView,
     screenshotTrigger,
     setScreenshotTrigger,
-    extraState, 
-    setExtraState,
 
     // Navigation and Reset states
     showResetConfirmation,
@@ -571,7 +695,9 @@ export const useEngineeringModule = (moduleConfig) => {
     loadingStage,
     setLoadingStage,
 
-    // Actions
+    // ===================================================================
+    // ACTIONS - Hook action functions
+    // ===================================================================
     updateModalState,
     updateSelectionState,
     updateSelectedItems,

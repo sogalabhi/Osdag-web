@@ -76,7 +76,7 @@ Contains InputData API:
 `osdag_api/modules/module_id` module API
 ### Structure of Module API (example API for fin_plate_connection)
 ```
-Api for Fin Plate Connection module
+Api for Fin-Plate-Connection module
 Functions:
     get_required_keys() -> List[str]:
         Return all required input parameters for the module.
@@ -85,9 +85,9 @@ Functions:
         Check if all required parameters are given.
         Check if all parameters are of correct data type.
     create_module() -> FnPlateConnection:
-        Create an instance of the fin plate connection module design class and set it up for use
+        Create an instance of the Fin-Plate-Connection module design class and set it up for use
     create_from_input(input_values: Dict[str, Any]) -> FinPlateConnection
-        Create an instance of the fin plate connection module design class from input values.
+        Create an instance of the Fin-Plate-Connection module design class from input values.
     generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         Generate, format and return the input values from the given output values.
             Output format (json): {

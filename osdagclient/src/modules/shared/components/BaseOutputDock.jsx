@@ -18,8 +18,9 @@ export const BaseOutputDock = ({
   extraState = {}
 }) => {
   // Debug: Log the props received
-  console.log('BaseOutputDock received:', { output, outputConfig, title, extraState });
-  console.log('Output keys available:', Object.keys(output || {}));
+  const normalizedOutput = output && output.data ? output.data : output;
+  console.log('BaseOutputDock received:', { output, normalizedOutput, outputConfig, title, extraState });
+  console.log('Output keys available:', Object.keys(normalizedOutput || {}));
   console.log('OutputConfig sections:', Object.keys(outputConfig?.sections || {}));
   
   // Shared state management
@@ -73,31 +74,32 @@ export const BaseOutputDock = ({
   };
 
   // Helper function to get output value - Works for both module formats
-  const getOutputValue = (key, output) => {
-    if (!output) {
+  const getOutputValue = (key, rawOutput) => {
+    const out = rawOutput && rawOutput.data ? rawOutput.data : rawOutput;
+    if (!out) {
       console.log(`getOutputValue: No output provided for key ${key}`);
       return " ";
     }
     
     // Debug: Log the key and output structure
     console.log(`Getting value for key: ${key}`, { 
-      output, 
-      keyValue: output[key],
-      outputKeys: Object.keys(output),
+      output: out, 
+      keyValue: out[key],
+      outputKeys: Object.keys(out),
       hasKey: key in output,
       keyType: typeof key
     });
     
     // Both modules now use flat structure: { "Bolt.Diameter": { label, val } }
-    if (output[key]?.val !== undefined) {
-      console.log(`Found value in output[${key}].val:`, output[key].val);
-      return output[key].val;
+    if (out[key]?.val !== undefined) {
+      console.log(`Found value in output[${key}].val:`, out[key].val);
+      return out[key].val;
     }
     
     // Try alternative structures
-    if (output[key] !== undefined) {
-      console.log(`Found value in output[${key}]:`, output[key]);
-      return output[key];
+    if (out[key] !== undefined) {
+      console.log(`Found value in output[${key}]:`, out[key]);
+      return out[key];
     }
     
     console.log(`No value found for key: ${key}`);

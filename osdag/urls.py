@@ -90,7 +90,7 @@ urlpatterns = [
 
     # output generation from input
     path('calculate-output/Fin-Plate-Connection',
-         OutputData.as_view(), name='Fin-plate-connection'),
+         OutputData.as_view(), name='Fin-Plate-Connection'),
 
     path('calculate-output/End-Plate-Connection',
          EndPLateOutputData.as_view(), name='End-Plate-Connection'),

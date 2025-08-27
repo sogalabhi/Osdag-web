@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input } from 'antd';
-import Select from 'react-select';
+import { Input, Select } from 'antd';
 import FRM from "../../../assets/flush_ep.png";
 import EOWIM from "../../../assets/owe_ep.png";
 import EBWRM from "../../../assets/extended.png";
@@ -21,16 +20,37 @@ export const InputSection = ({
   extraState = {},
   setExtraState = () => { }
 }) => {
+  // console.group('[ENG MODULE] ContextData');
+  // console.log('connectivityList', contextData.connectivityList?.length, contextData.connectivityList?.slice(0, 5));
+  // console.log('materialList', contextData.materialList?.length, contextData.materialList?.slice?.(0, 3));
+  // console.log('beamList', contextData.beamList?.length, contextData.beamList?.slice(0, 3));
+  // console.log('columnList', contextData.columnList?.length, contextData.columnList?.slice(0, 3));
+  // console.log('boltDiameterList', contextData.boltDiameterList?.length, contextData.boltDiameterList?.slice?.(0, 5));
+  // console.log('thicknessList', contextData.thicknessList?.length, contextData.thicknessList?.slice?.(0, 5));
+  // console.log('propertyClassList', contextData.propertyClassList?.length, contextData.propertyClassList?.slice?.(0, 5));
+  // console.groupEnd();
+
+  // Full dump (be careful: can be large)
+  // console.log('[ENG MODULE] ContextData JSON:', JSON.stringify(contextData, null, 2));
   // Ensure inputs and contextData are always defined
   const safeInputs = inputs || {};
   const safeContextData = contextData || {};
   const [imageSource, setImageSource] = useState("");
 
-  // Common select styles with high z-index
-  const selectStyles = {
-    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    menu: (base) => ({ ...base, zIndex: 9999 })
-  };
+  // Debug logging for context data
+  useEffect(() => {
+    console.log("🎯 [INPUT SECTION] Context data received:", {
+      connectivityList: safeContextData.connectivityList?.length || 0,
+      materialList: safeContextData.materialList?.length || 0,
+      beamList: safeContextData.beamList?.length || 0,
+      columnList: safeContextData.columnList?.length || 0,
+      boltDiameterList: safeContextData.boltDiameterList?.length || 0,
+      thicknessList: safeContextData.thicknessList?.length || 0,
+      propertyClassList: safeContextData.propertyClassList?.length || 0
+    });
+  }, [safeContextData]);
+
+  const { Option } = Select;
 
   // Handle connectivity selection with image (for FinePlate)
   useEffect(() => {
@@ -59,16 +79,28 @@ export const InputSection = ({
   }, [extraState.selectedOption]);
 
   const handleCustomizableSelect = (field, value) => {
-    if (value === "Customized") {
-      if (safeInputs[field.key]?.length !== 0) {
-        setInputs({ ...safeInputs, [field.key]: safeInputs[field.key] });
-      } else {
-        setInputs({ ...safeInputs, [field.key]: [] });
+    const getAllValuesForInputKey = (inputKey) => {
+      switch (inputKey) {
+        case 'bolt_diameter':
+          return Array.isArray(safeContextData.boltDiameterList) ? safeContextData.boltDiameterList : [];
+        case 'bolt_grade':
+          return Array.isArray(safeContextData.propertyClassList) ? safeContextData.propertyClassList : [];
+        case 'plate_thickness':
+          return Array.isArray(safeContextData.thicknessList) ? safeContextData.thicknessList : [];
+        default:
+          return [];
       }
+    };
+
+    if (value === "Customized") {
+      const current = Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [];
+      setInputs({ ...safeInputs, [field.key]: current });
       updateSelectionState(field.selectionKey, "Customized");
       toggleAllSelected(field.key, false);
       updateModalState(field.modalKey, true);
     } else {
+      const allValues = getAllValuesForInputKey(field.key);
+      setInputs({ ...safeInputs, [field.key]: allValues });
       updateSelectionState(field.selectionKey, "All");
       toggleAllSelected(field.key, true);
       updateModalState(field.modalKey, false);
@@ -118,6 +150,60 @@ export const InputSection = ({
               ))}
             </Select>
           );
+        } else if (field.options === 'boltDiameterList') {
+          const list = safeContextData.boltDiameterList || [];
+          const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
+          const value = isCustomized
+            ? (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [])
+            : (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : (list[0] || ''));
+          return (
+            <Select
+              mode={isCustomized ? 'multiple' : undefined}
+              value={value}
+              onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
+              onSelect={(val) => !isCustomized && setInputs({ ...safeInputs, [field.key]: val })}
+            >
+              {list.map((item, index) => (
+                <Option key={index} value={item}>{item}</Option>
+              ))}
+            </Select>
+          );
+        } else if (field.options === 'thicknessList') {
+          const list = safeContextData.thicknessList || [];
+          const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
+          const value = isCustomized
+            ? (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [])
+            : (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : (list[0] || ''));
+          return (
+            <Select
+              mode={isCustomized ? 'multiple' : undefined}
+              value={value}
+              onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
+              onSelect={(val) => !isCustomized && setInputs({ ...safeInputs, [field.key]: val })}
+            >
+              {list.map((item, index) => (
+                <Option key={index} value={item}>{item}</Option>
+              ))}
+            </Select>
+          );
+        } else if (field.options === 'propertyClassList') {
+          const list = safeContextData.propertyClassList || [];
+          const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
+          const value = isCustomized
+            ? (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [])
+            : (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : (list[0] || ''));
+          return (
+            <Select
+              mode={isCustomized ? 'multiple' : undefined}
+              value={value}
+              onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
+              onSelect={(val) => !isCustomized && setInputs({ ...safeInputs, [field.key]: val })}
+            >
+              {list.map((item, index) => (
+                <Option key={index} value={item}>{item}</Option>
+              ))}
+            </Select>
+          );
         } else if (field.options === 'materialList') {
 
           // Check for duplicates in materialList
@@ -130,9 +216,11 @@ export const InputSection = ({
             console.warn(`Duplicate grades found in materialList:`, duplicateGrades);
           }
 
+          const selectedMaterialGrade = safeInputs[field.key] || (safeContextData.materialList?.[0]?.Grade || '');
+
           return (
             <Select
-              value={safeInputs[field.key] || (safeContextData.materialList?.[0]?.Grade || '')}
+              value={selectedMaterialGrade}
               onSelect={(value) => {
                 if (field.onChange) {
                   field.onChange(
@@ -147,7 +235,7 @@ export const InputSection = ({
               }}
             >
               {(safeContextData.materialList || []).map((item, index) => (
-                <Option key={`${item.id}-${index}`} value={item.id}>
+                <Option key={`${item.id}-${index}`} value={item.Grade}>
                   {item.Grade}
                 </Option>
               ))}
@@ -202,7 +290,7 @@ export const InputSection = ({
         return (
           <div className="w-full">
             <Select
-              value={safeInputs[field.key]}
+              value={connectivityValue}
               onSelect={(value) => {
                 if (field.onChange) {
                   field.onChange(

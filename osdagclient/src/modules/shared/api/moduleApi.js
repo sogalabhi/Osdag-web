@@ -4,8 +4,11 @@ export const BASE_URL = "http://127.0.0.1:8000/";
 
 export const createDesign = async (param, module_id, onCADSuccess = null, dispatch) => {
   try {
-    console.log("param", param);
-    const response = await fetch(`${BASE_URL}calculate-output/${module_id}`, {
+    console.log("[createDesign] param:", param);
+    const url = `${BASE_URL}calculate-output/${module_id}`;
+    console.log("[createDesign] Fetching URL:", url);
+
+    const response = await fetch(url, {
       method: "POST",
       mode: "cors",
       headers: {
@@ -15,14 +18,27 @@ export const createDesign = async (param, module_id, onCADSuccess = null, dispat
       credentials: "include",
       body: JSON.stringify(param),
     });
+
+    console.log("[createDesign] Response status:", response.status);
+
     const jsonResponse = await response?.json();
-    dispatch && dispatch({ type: "SET_DESIGN_DATA_AND_LOGS", payload: jsonResponse });
+    console.log("[createDesign] jsonResponse:", jsonResponse);
+
+    if (dispatch) {
+      console.log("[createDesign] Dispatching SET_DESIGN_DATA_AND_LOGS with payload:", jsonResponse);
+      dispatch({ type: "SET_DESIGN_DATA_AND_LOGS", payload: jsonResponse });
+    }
+
     if (response.status == 201 && jsonResponse?.data && Object.keys(jsonResponse.data).length > 0) {
+      console.log("[createDesign] Design created successfully, invoking onCADSuccess if provided.");
       if (onCADSuccess && typeof onCADSuccess === 'function') {
         onCADSuccess(jsonResponse.data, jsonResponse.logs);
       }
     } else if (response.status == 400) {
+      console.log("[createDesign] Received 400 status, dispatching SET_RENDER_CAD_MODEL_BOOLEAN false");
       dispatch && dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
+    } else {
+      console.log("[createDesign] Unexpected response status or missing data.");
     }
   } catch (error) {
     console.log("Error in creating the design:", error);

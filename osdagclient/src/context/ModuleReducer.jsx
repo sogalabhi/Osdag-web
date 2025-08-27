@@ -2,205 +2,16 @@
 /* 
     ######################################################### 
     # Author : Atharva Pingale ( FOSSEE Summer Fellow '23 ) # 
+    # Simplified ModuleReducer - Consolidated Actions       #
     ######################################################### 
 */
 
 export default (state, action) => {
   switch (action.type) {
-    case "SET_CONNECTIVITY_LIST":
-      return {
-        ...state,
-        connectivityList: action.payload,
-        error_msg: "Error in fetching Connectivity List",
-      };
-    case "SET_COLUMN_BEAM_MATERIAL_LIST":
-      let prev = JSON.parse(localStorage.getItem("osdag-custom-materials"));
-      state.materialList = action.payload.materialList;
-      if (prev == null) {
-        return {
-          ...state,
-          columnList: action.payload.columnList,
-          beamList: action.payload.beamList,
-          error_msg: "Error in fetching Column, Beam and Material List",
-        };
-      }
-      return {
-        ...state,
-        columnList: action.payload.columnList,
-        beamList: action.payload.beamList,
-        materialList: [...state.materialList, ...prev],
-        error_msg: "Error in fetching Column, Beam and Material List",
-      };
-    // case 'SET_BEAM_MATERIAL_LIST':
-    //         console.log("abhi reducer", action.payload);
-    //         const prevCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials")) || [];
-    //         // Remove direct state mutation!
-    //         // state.materialList = action.payload.materialList;
-    //         return {
-    //             ...state,
-    //             sectionProfileList: action.payload.sectionProfileList || [],
-    //             beamList: action.payload.beamList || [],
-    //             materialList: [
-    //                 ...(action.payload.materialList || []),
-    //                 ...prevCustomMaterials
-    //             ],
-    //             angleList: action.payload.angleList || [], 
-    //             channelList: action.payload.channelList || [],
-    //             error_msg: 'Error in fetching Beam and Material List'
-    //         };
-    case "SET_COOKIE_FETCH":
-      return {
-        ...state,
-        setTheCookie: !state.setTheCookie,
-      };
-    case "SET_BOLT_DIAMETER_LIST":
-      return {
-        ...state,
-        boltDiameterList: action.payload.boltList,
-      };
-
-    case "SET_THICKNESS_LIST":
-      return {
-        ...state,
-        thicknessList: action.payload.thicknessList,
-      };
-
-    case "SET_PROPERTY_CLASS_LIST":
-      return {
-        ...state,
-        propertyClassList: action.payload.propertyClassList,
-      };
-    case "SET_CLEAT_ANGLE_LIST":
-      console.log("angleList", action.payload);
-      return {
-        ...state,
-        angleList: action.payload.angleList || [],
-      };
-
-    case "SET_TOP_ANGLE":
-      console.log("topAngleList", action.payload);
-      return {
-        ...state,
-        topAngleList: action.payload.topAngleList || [],
-      };
-
-    case "SET_CHANNEL_LIST":
-      console.log("channelList", action.payload);
-      return {
-        ...state,
-        channelList: action.payload.channelList || [],
-      };
-
-    case "SET_DESIGN_DATA_AND_LOGS":
-      return {
-        ...state,
-        designData: action.payload.data,
-        designLogs: action.payload.logs,
-      };
-
-    case "SET_RENDER_CAD_MODEL_BOOLEAN":
-      return {
-        ...state,
-        renderCadModel: action.payload,
-      };
-
-    case "SET_CAD_MODEL_PATHS":
-      return {
-        ...state,
-        cadModelPaths: action.payload,
-      };
-
-    case "SET_REPORT_ID_AND_DISPLAY_PDF":
-      return {
-        ...state,
-        report_id: action.payload,
-        displayPDF: true,
-      };
-    case "SET_BLOBL_URL":
-      return {
-        ...state,
-        blobUrl: action.payload,
-      };
-    case "SAVE_DESIGN_PREF_DATA":
-      return {
-        ...state,
-        designPrefData: action.payload,
-      };
-    case "UPDATE_SUPPORTING_ST_DATA":
-      let { supporting_section_results } = state.designPrefData;
-      supporting_section_results = supporting_section_results[0];
-
-      if (action.payload.includes("Cus")) {
-        supporting_section_results.Source = "Custom";
-        supporting_section_results.Type = "Welded";
-        return {
-          ...state,
-          designPrefData: {
-            ...state.designPrefData,
-            supporting_section_results: [supporting_section_results],
-          },
-        };
-      }
-
-      supporting_section_results.Source = "IS808_Rev";
-      supporting_section_results.Type = "Rolled";
-      return {
-        ...state,
-        designPrefData: {
-          ...state.designPrefData,
-          supporting_section_results: [supporting_section_results],
-        },
-      };
-    case "UPDATE_SUPPORTED_ST_DATA":
-      let { supported_section_results } = state.designPrefData;
-      supported_section_results = supported_section_results[0];
-
-      if (action.payload.includes("Cus")) {
-        supported_section_results.Source = "Custom";
-        supported_section_results.Type = "Welded";
-        return {
-          ...state,
-          designPrefData: {
-            ...state.designPrefData,
-            supported_section_results: [supported_section_results],
-          },
-        };
-      }
-
-      supported_section_results.Source = "IS808_Rev";
-      supported_section_results.Type = "Rolled";
-      return {
-        ...state,
-        designPrefData: {
-          ...state.designPrefData,
-          supported_section_results: [supported_section_results],
-        },
-      };
-
-    case "SAVE_CM_DETAILS":
-      return {
-        ...state,
-        conn_material_details: action.payload,
-      };
-    case "SAVE_SDM_DETAILS":
-      return {
-        ...state,
-        supported_material_details: action.payload,
-      };
-    case "SAVE_STM_DETAILS":
-      return {
-        ...state,
-        supporting_material_details: action.payload,
-      };
-    case "UPDATE_MATERIAL_FROM_CACHES":
-      return {
-        ...state,
-        materialList: [...state.materialList, ...action.payload],
-      };
-    case "SET_ALL_MODULE_DATA":
-      console.log("🔄 [REDUCER] Processing SET_ALL_MODULE_DATA action");
-      console.log("🔄 [REDUCER] Payload received:", action.payload);
-      
+    // ===================================================================
+    // CONSOLIDATED DATA ACTIONS - Replace 10+ individual actions
+    // ===================================================================
+    case "SET_ALL_MODULE_DATA": {
       const {
         materialList = [],
         boltDiameterList = [],
@@ -218,42 +29,267 @@ export default (state, action) => {
         weldFab = []
       } = action.payload;
 
-      // Merge with existing custom materials from localStorage
-      // const prevCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials")) || [];
-      // const mergedMaterialList = [...materialList, ...prevCustomMaterials];
-
-      console.log("🔄 [REDUCER] Setting state with:");
-      // console.log("🔄 [REDUCER] - materialList length:", mergedMaterialList.length);
-      console.log("🔄 [REDUCER] - boltDiameterList length:", boltDiameterList.length);
-      console.log("🔄 [REDUCER] - thicknessList length:", thicknessList.length);
-      console.log("🔄 [REDUCER] - propertyClassList length:", propertyClassList.length);
-      console.log("🔄 [REDUCER] - connectivityList length:", connectivityList.length);
-      console.log("🔄 [REDUCER] - beamList length:", beamList.length);
-      console.log("🔄 [REDUCER] - columnList length:", columnList.length);
+      // Merge with existing custom materials from localStorage if needed
+      const existingCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials") || "[]");
+      const mergedMaterialList = existingCustomMaterials.length > 0 
+        ? [...materialList, ...existingCustomMaterials]
+        : materialList;
 
       return {
         ...state,
-        // materialList: mergedMaterialList,
+        // Core data lists
+        materialList: mergedMaterialList,
         boltDiameterList,
         thicknessList,
         propertyClassList,
         connectivityList,
+        
+        // Structural elements
         beamList,
         columnList,
+        
+        // Module-specific lists
         angleList,
         topAngleList,
         channelList,
         sectionProfileList,
         endPlateTypeList,
+        
+        // Welding data
         weldTypes,
         weldFab,
+        
+        // Clear any previous errors
         error_msg: "",
       };
-    case "RESET_MODULE_STATE":
-      console.log("REDUCER: Resetting module state to initial values");
+    }
+
+    // Legacy individual actions for backward compatibility (redirect to SET_ALL_MODULE_DATA)
+    case "SET_CONNECTIVITY_LIST":
       return {
         ...state,
-        // Reset all the design-related state that persists
+        connectivityList: action.payload,
+        error_msg: "",
+      };
+
+    case "SET_COLUMN_BEAM_MATERIAL_LIST": {
+      const existingCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials") || "[]");
+      const mergedMaterialList = existingCustomMaterials.length > 0
+        ? [...(action.payload.materialList || []), ...existingCustomMaterials]
+        : (action.payload.materialList || []);
+
+      return {
+        ...state,
+        columnList: action.payload.columnList || [],
+        beamList: action.payload.beamList || [],
+        materialList: mergedMaterialList,
+        error_msg: "",
+      };
+    }
+
+    case "SET_BOLT_DIAMETER_LIST":
+      return {
+        ...state,
+        boltDiameterList: action.payload.boltList || action.payload,
+        error_msg: "",
+      };
+
+    case "SET_THICKNESS_LIST":
+      return {
+        ...state,
+        thicknessList: action.payload.thicknessList || action.payload,
+        error_msg: "",
+      };
+
+    case "SET_PROPERTY_CLASS_LIST":
+      return {
+        ...state,
+        propertyClassList: action.payload.propertyClassList || action.payload,
+        error_msg: "",
+      };
+
+    case "SET_CLEAT_ANGLE_LIST":
+      return {
+        ...state,
+        angleList: action.payload.angleList || action.payload || [],
+        error_msg: "",
+      };
+
+    case "SET_TOP_ANGLE":
+      return {
+        ...state,
+        topAngleList: action.payload.topAngleList || action.payload || [],
+        error_msg: "",
+      };
+
+    case "SET_CHANNEL_LIST":
+      return {
+        ...state,
+        channelList: action.payload.channelList || action.payload || [],
+        error_msg: "",
+      };
+
+    // ===================================================================
+    // DESIGN & CAD ACTIONS - Consolidated and simplified
+    // ===================================================================
+    case "SET_DESIGN_DATA_AND_LOGS":
+      console.log("[SET_DESIGN_DATA_AND_LOGS] action.payload:", action.payload);
+      return {
+        ...state,
+        designData: action.payload.data || {},
+        designLogs: action.payload.logs || [],
+        error_msg: "",
+      };
+
+    case "SET_RENDER_CAD_MODEL_BOOLEAN":
+      return {
+        ...state,
+        renderCadModel: action.payload,
+      };
+
+    case "SET_CAD_MODEL_PATHS":
+      return {
+        ...state,
+        cadModelPaths: action.payload || {},
+      };
+
+    // ===================================================================
+    // REPORT ACTIONS - Consolidated
+    // ===================================================================
+    case "SET_REPORT_ID_AND_DISPLAY_PDF":
+      return {
+        ...state,
+        report_id: action.payload,
+        displayPDF: true,
+        error_msg: "",
+      };
+
+    case "SET_BLOBL_URL":
+      return {
+        ...state,
+        blobUrl: action.payload,
+      };
+
+    // ===================================================================
+    // DESIGN PREFERENCES - Consolidated and simplified
+    // ===================================================================
+    case "SAVE_DESIGN_PREF_DATA":
+      return {
+        ...state,
+        designPrefData: action.payload || {},
+        error_msg: "",
+      };
+
+    case "UPDATE_SECTION_DATA": {
+      // Consolidated action for both supporting and supported section updates
+      const { sectionType, materialValue } = action.payload;
+      const designPrefData = { ...state.designPrefData };
+      
+      const isCustom = materialValue?.includes?.("Cus") || false;
+      const sectionKey = sectionType === "supporting" ? "supporting_section_results" : "supported_section_results";
+      
+      if (designPrefData[sectionKey] && designPrefData[sectionKey][0]) {
+        const sectionResults = { ...designPrefData[sectionKey][0] };
+        sectionResults.Source = isCustom ? "Custom" : "IS808_Rev";
+        sectionResults.Type = isCustom ? "Welded" : "Rolled";
+        designPrefData[sectionKey] = [sectionResults];
+      }
+
+      return {
+        ...state,
+        designPrefData,
+        error_msg: "",
+      };
+    }
+
+    // Legacy actions for backward compatibility
+    case "UPDATE_SUPPORTING_ST_DATA":
+      return {
+        ...state,
+        ...((state, action) => {
+          const designPrefData = { ...state.designPrefData };
+          if (designPrefData.supporting_section_results?.[0]) {
+            const sectionResults = { ...designPrefData.supporting_section_results[0] };
+            const isCustom = action.payload?.includes?.("Cus") || false;
+            sectionResults.Source = isCustom ? "Custom" : "IS808_Rev";
+            sectionResults.Type = isCustom ? "Welded" : "Rolled";
+            designPrefData.supporting_section_results = [sectionResults];
+          }
+          return { designPrefData, error_msg: "" };
+        })(state, action)
+      };
+
+    case "UPDATE_SUPPORTED_ST_DATA":
+      return {
+        ...state,
+        ...((state, action) => {
+          const designPrefData = { ...state.designPrefData };
+          if (designPrefData.supported_section_results?.[0]) {
+            const sectionResults = { ...designPrefData.supported_section_results[0] };
+            const isCustom = action.payload?.includes?.("Cus") || false;
+            sectionResults.Source = isCustom ? "Custom" : "IS808_Rev";
+            sectionResults.Type = isCustom ? "Welded" : "Rolled";
+            designPrefData.supported_section_results = [sectionResults];
+          }
+          return { designPrefData, error_msg: "" };
+        })(state, action)
+      };
+
+    // ===================================================================
+    // MATERIAL MANAGEMENT - Consolidated
+    // ===================================================================
+    case "SAVE_MATERIAL_DETAILS": {
+      // Unified action for all material detail saving
+      const { materialType, materialData } = action.payload;
+      
+      switch (materialType) {
+        case "connector":
+          return { ...state, conn_material_details: materialData, error_msg: "" };
+        case "supported": 
+          return { ...state, supported_material_details: materialData, error_msg: "" };
+        case "supporting":
+          return { ...state, supporting_material_details: materialData, error_msg: "" };
+        default:
+          return state;
+      }
+    }
+
+    // Legacy material actions for backward compatibility
+    case "SAVE_CM_DETAILS":
+      return {
+        ...state,
+        conn_material_details: action.payload,
+        error_msg: "",
+      };
+
+    case "SAVE_SDM_DETAILS":
+      return {
+        ...state,
+        supported_material_details: action.payload,
+        error_msg: "",
+      };
+
+    case "SAVE_STM_DETAILS":
+      return {
+        ...state,
+        supporting_material_details: action.payload,
+        error_msg: "",
+      };
+
+    case "UPDATE_MATERIAL_FROM_CACHES":
+      return {
+        ...state,
+        materialList: [...(state.materialList || []), ...(action.payload || [])],
+        error_msg: "",
+      };
+
+    // ===================================================================
+    // UTILITY ACTIONS
+    // ===================================================================
+    case "RESET_MODULE_STATE":
+      return {
+        ...state,
+        // Reset design-related state
         designData: {},
         designLogs: [],
         renderCadModel: false,
@@ -262,7 +298,25 @@ export default (state, action) => {
         report_id: "",
         blobUrl: "",
         designPrefData: {},
+        error_msg: "",
       };
+
+    case "SET_ERR_MSG":
+      return {
+        ...state,
+        error_msg: action.payload || "",
+      };
+
+    case "SET_CURRENT_MODULE_NAME":
+      return {
+        ...state,
+        currentModuleName: action.payload,
+        error_msg: "",
+      };
+
+    // Remove unused cookie action
+    case "SET_COOKIE_FETCH":
+      return state; // No-op - this action is no longer needed
     default:
       return state;
   }

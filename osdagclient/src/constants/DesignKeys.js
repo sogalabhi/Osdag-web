@@ -86,4 +86,4 @@ export const KEY_DESIGN_TYPE_FLEXURE = "KEY_DESIGN_TYPE_FLEXURE";
 
 // Module Keys
 export const MODULE_KEY_FIN_PLATE = 'Fin-Plate-Connection'; // canonical key for API, state, config
-export const MODULE_DISPLAY_FIN_PLATE = 'Fin Plate Connection'; // display name for UI 
+export const MODULE_DISPLAY_FIN_PLATE = 'Fin-Plate-Connection'; // display name for UI 
