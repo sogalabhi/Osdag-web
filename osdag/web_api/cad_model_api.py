@@ -75,7 +75,7 @@ class CADGeneration(View):
         # Check for FreeCAD availability
         command = shutil.which("FreeCADCmd")
         print(f"Detected FreeCADCmd path: {command}")
-        command = "D:\\Program Files\\FreeCAD 1.0\\bin\\freecadcmd.exe"
+        # command = "D:\\Program Files\\FreeCAD 1.0\\bin\\freecadcmd.exe"
 
         if not command:
             return JsonResponse({"status": "error", "message": "FreeCAD is not installed or not in system PATH."}, status=500)
@@ -89,7 +89,7 @@ class CADGeneration(View):
         if session_type == "FinPlate":
             sections = ["Model", "Beam", "Column", "Plate"]
         elif session_type == "CleatAngle":
-            sections = ["Model", "Beam", "Column", "CleatAngle"]
+            sections = ["Model", "Beam", "Column", "cleatAngle"]
         elif session_type == "EndPlate":
             sections = ["Model", "Beam", "Column", "Plate"]
         elif session_type == "SeatedAngle":

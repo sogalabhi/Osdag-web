@@ -20,18 +20,6 @@ export const InputSection = ({
   extraState = {},
   setExtraState = () => { }
 }) => {
-  // console.group('[ENG MODULE] ContextData');
-  // console.log('connectivityList', contextData.connectivityList?.length, contextData.connectivityList?.slice(0, 5));
-  // console.log('materialList', contextData.materialList?.length, contextData.materialList?.slice?.(0, 3));
-  // console.log('beamList', contextData.beamList?.length, contextData.beamList?.slice(0, 3));
-  // console.log('columnList', contextData.columnList?.length, contextData.columnList?.slice(0, 3));
-  // console.log('boltDiameterList', contextData.boltDiameterList?.length, contextData.boltDiameterList?.slice?.(0, 5));
-  // console.log('thicknessList', contextData.thicknessList?.length, contextData.thicknessList?.slice?.(0, 5));
-  // console.log('propertyClassList', contextData.propertyClassList?.length, contextData.propertyClassList?.slice?.(0, 5));
-  // console.groupEnd();
-
-  // Full dump (be careful: can be large)
-  // console.log('[ENG MODULE] ContextData JSON:', JSON.stringify(contextData, null, 2));
   // Ensure inputs and contextData are always defined
   const safeInputs = inputs || {};
   const safeContextData = contextData || {};
@@ -46,9 +34,12 @@ export const InputSection = ({
       columnList: safeContextData.columnList?.length || 0,
       boltDiameterList: safeContextData.boltDiameterList?.length || 0,
       thicknessList: safeContextData.thicknessList?.length || 0,
-      propertyClassList: safeContextData.propertyClassList?.length || 0
+      propertyClassList: safeContextData.propertyClassList?.length || 0,
+      angleList: safeContextData.angleList?.length || 0 
     });
   }, [safeContextData]);
+
+  console.log("angleList###########", safeContextData.angleList);
 
   const { Option } = Select;
 
@@ -87,6 +78,8 @@ export const InputSection = ({
           return Array.isArray(safeContextData.propertyClassList) ? safeContextData.propertyClassList : [];
         case 'plate_thickness':
           return Array.isArray(safeContextData.thicknessList) ? safeContextData.thicknessList : [];
+        case 'angle_list':
+          return Array.isArray(safeContextData.angleList) ? safeContextData.angleList : [];
         default:
           return [];
       }
@@ -196,6 +189,28 @@ export const InputSection = ({
           );
         } else if (field.options === 'propertyClassList') {
           const list = safeContextData.propertyClassList || [];
+          const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
+          if (!isCustomized) {
+            return (
+              <Select value={"All"} disabled>
+                <Option value="All">All</Option>
+              </Select>
+            );
+          }
+          const value = Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [];
+          return (
+            <Select
+              mode="multiple"
+              value={value}
+              onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
+            >
+              {list.map((item, index) => (
+                <Option key={index} value={item}>{item}</Option>
+              ))}
+            </Select>
+          );
+        } else if (field.options === 'angleList') { // FIXED: Added angleList handling
+          const list = safeContextData.angleList || [];
           const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
           if (!isCustomized) {
             return (

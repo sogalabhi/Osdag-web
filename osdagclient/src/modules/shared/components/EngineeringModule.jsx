@@ -46,6 +46,7 @@ export const EngineeringModule = ({
     boltDiameterList,
     thicknessList,
     propertyClassList,
+    angleList,
     cadModelPaths,
 
     // State
@@ -245,12 +246,15 @@ export const EngineeringModule = ({
   const getViewOptions = () => {
     if (moduleConfig.cameraKey === "FinPlate") {
       return ["Model", "Beam", "Column", "Plate"];
+    }  else if (moduleConfig.cameraKey === "CleatAngle") {
+      return ["Model", "Beam", "Column", "CleatAngle"]; // FIXED: Use CleatAngle instead of Connector
     }
     return ["Model", "Beam", "Connector"];
   };
 
   const options = getViewOptions();
 
+  // FIXED: Include angleList in contextData
   const contextData = {
     beamList,
     columnList,
@@ -259,7 +263,10 @@ export const EngineeringModule = ({
     boltDiameterList,
     thicknessList,
     propertyClassList,
+    angleList, // FIXED: Added angleList to context data
   };
+
+  console.log("CadModelPaths*************", cadModelPaths);
 
   const triggerScreenshotCapture = () => {
     setScreenshotTrigger(true);
@@ -374,7 +381,7 @@ export const EngineeringModule = ({
                     updateSelectionState={updateSelectionState}
                     updateModalState={updateModalState}
                     toggleAllSelected={toggleAllSelected}
-                    contextData={contextData}
+                    contextData={contextData} // FIXED: This now includes angleList
                     extraState={extraState}
                     setExtraState={setExtraState}
                   />
@@ -560,7 +567,7 @@ export const EngineeringModule = ({
           isOpen={modalStates[modal.key]}
           onClose={() => updateModalState(modal.key, false)}
           title="Customized"
-          dataSource={contextData[modal.dataSource] || []}
+          dataSource={contextData[modal.dataSource] || []} // FIXED: This now includes angleList
           selectedItems={selectedItems[modal.inputKey]}
           onTransferChange={(nextTargetKeys) =>
             updateSelectedItems(modal.inputKey, nextTargetKeys)
