@@ -46,6 +46,7 @@ export const EngineeringModule = ({
     boltDiameterList,
     thicknessList,
     propertyClassList,
+    boltTypeList,
     cadModelPaths,
 
     // State
@@ -243,13 +244,29 @@ export const EngineeringModule = ({
 
   // Determine view options based on module
   const getViewOptions = () => {
+    console.log("🔍 [ENGINEERING MODULE] getViewOptions called with cameraKey:", moduleConfig.cameraKey);
+    
     if (moduleConfig.cameraKey === "FinPlate") {
+      console.log("📋 [ENGINEERING MODULE] Returning FinPlate view options");
       return ["Model", "Beam", "Column", "Plate"];
     }
+    else if (moduleConfig.cameraKey === "EndPlate") {
+      console.log("📋 [ENGINEERING MODULE] Returning EndPlate view options");
+      return ["Model", "Beam", "Column", "EndPlate"];
+    }
+    console.log("📋 [ENGINEERING MODULE] Returning default view options");
     return ["Model", "Beam", "Connector"];
   };
 
   const options = getViewOptions();
+  
+  console.log("🔍 [ENGINEERING MODULE] Module Config:", {
+    sessionName: moduleConfig.sessionName,
+    designType: moduleConfig.designType,
+    cameraKey: moduleConfig.cameraKey,
+    cadOptions: moduleConfig.cadOptions
+  });
+  console.log("🔍 [ENGINEERING MODULE] Final view options:", options);
 
   const contextData = {
     beamList,
@@ -259,6 +276,7 @@ export const EngineeringModule = ({
     boltDiameterList,
     thicknessList,
     propertyClassList,
+    boltTypeList,
   };
 
   const triggerScreenshotCapture = () => {

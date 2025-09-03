@@ -2,17 +2,30 @@ export const endPlateOutputConfig = {
   sections: {
     Bolt: [
       { key: "Bolt.Diameter", label: "Diameter (mm)" },
-      { key: "Bolt.PropertyClass", label: "Property Class" },
-      { key: "Bolt.ShearCapacity", label: "shear Capacity (KN)" },
-      { key: "Bolt.BoltForce", label: "Bolt Force (KN)" },
-      { key: "Bolt.BoltColumn", label: "Bolt Column (nos)" },
-      { key: "Bolt.BoltRows", label: "Bolt Rows (nos)" },
+      { key: "Bolt.Grade_Provided", label: "Property Class" },
+      { key: "Bolt.Shear", label: "Shear Capacity (kN)" },
+      { key: "Bolt.Bearing", label: "Bearing Capacity (kN)" },
+      { key: "Bolt.Capacity", label: "Bolt Value (kN)" },
+      { key: "Bolt.Tension", label: "Bolt Tension Capacity (kN)" },
+      { key: "Bolt.Force (kN)", label: "Bolt Shear Force (kN)" },
+      { key: "Bolt.TensionForce", label: "Bolt Tension Force (kN)" },
+      { key: "Bolt.PryingForce", label: "Bolt Prying Force (kN)" },
+      { key: "Bolt.TensionTotal", label: "Total Bolt Tension (kN)" },
+      { key: "Bolt.IR", label: "Interaction Ratio" },
+      { key: "Bolt.Rows", label: "Rows of Bolts" },
+      { key: "Bolt.Betalj", label: "β<sub>lj</sub>" },
+      { key: "Bolt.Betalg", label: "β<sub>lg</sub>" },
+      { key: "Bolt.Betapk", label: "β<sub>pk</sub>" },
       { key: "BoltCapacityModal", label: "Capacity" },
     ],
     Plate: [
       { key: "Plate.Thickness", label: "Thickness (mm)" },
       { key: "Plate.Height", label: "Height (mm)" },
-      { key: "Plate.Length", label: "Length (mm)" },
+      { key: "Plate.Length", label: "Width (mm)" },
+      { key: "Plate.Shear", label: "Shear Yielding Capacity (kN)" },
+      { key: "Plate.BlockShear", label: "Block Shear Capacity (kN)" },
+      { key: "Plate.MomDemand", label: "Moment Demand per Bolt (kNm)" },
+      { key: "Plate.MomCapacity", label: "Moment Capacity per Bolt (kNm)" },
       { key: "PlateSpacingModal", label: "Spacing" },
     ],
     "Section Details": [{ key: "SectionCapacityModal", label: "Capacity" }],
@@ -28,7 +41,7 @@ export const endPlateOutputConfig = {
     PlateSpacingModal: { type: "spacing", buttonText: "Plate Spacing" },
     SectionCapacityModal: {
       type: "capacity",
-      buttonText: "Sectin Details Capacity",
+      buttonText: "Section Details Capacity",
     },
   },
 
@@ -84,65 +97,25 @@ export const endPlateOutputConfig = {
           label: "Shear Yielding Capacity (kN)",
         },
         {
-          key: "Plate.Rupture",
-          label: "Rupture Capacity (kN)",
-        },
-        {
           key: "Plate.BlockShear",
           label: "Block Shear Capacity (kN)",
         },
         {
-          key: "Plate.TensionYield",
-          label: "Tension Yielding Capacity (kN)",
+          key: "Plate.MomDemand",
+          label: "Moment Demand per Bolt (kNm)",
         },
         {
-          key: "Plate.TensionRupture",
-          label: "Tension Rupture Capacity (kN)",
+          key: "Plate.MomCapacity",
+          label: "Moment Capacity per Bolt (kNm)",
         },
-        {
-          key: "Plate.BlockShearAxial",
-          label: "Axial Block Shear Capacity (kN)",
-        },
+      ],
+      SectionCapacityModal: [
         {
           key: "Plate.MomDemand",
           label: "Moment Demand (kNm)",
         },
         {
           key: "Plate.MomCapacity",
-          label: "Moment Capacity (kNm)",
-        },
-      ],
-      SectionCapacityModal: [
-        {
-          key: "Member.shear_yielding",
-          label: "Shear Yielding Capacity (kN)",
-        },
-        {
-          key: "Member.shear_rupture",
-          label: "Rupture Capacity (kN)",
-        },
-        {
-          key: "Member.shear_blockshear",
-          label: "Block Shear Capacity (kN)",
-        },
-        {
-          key: "Member.tension_yielding",
-          label: "Tension Yielding Capacity (kN)",
-        },
-        {
-          key: "Member.tension_rupture",
-          label: "Tension Rupture Capacity (kN)",
-        },
-        {
-          key: "Member.tension_blockshear",
-          label: "Axial Block Shear Capacity (kN)",
-        },
-        {
-          key: "Plate.MomDemand",
-          label: "Moment Demand (kNm)",
-        },
-        {
-          key: "Section.MomCapacity",
           label: "Moment Capacity (kNm)",
         },
       ],

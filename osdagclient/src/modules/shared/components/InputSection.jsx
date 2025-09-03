@@ -38,17 +38,17 @@ export const InputSection = ({
   const [imageSource, setImageSource] = useState("");
 
   // Debug logging for context data
-  useEffect(() => {
-    console.log("🎯 [INPUT SECTION] Context data received:", {
-      connectivityList: safeContextData.connectivityList?.length || 0,
-      materialList: safeContextData.materialList?.length || 0,
-      beamList: safeContextData.beamList?.length || 0,
-      columnList: safeContextData.columnList?.length || 0,
-      boltDiameterList: safeContextData.boltDiameterList?.length || 0,
-      thicknessList: safeContextData.thicknessList?.length || 0,
-      propertyClassList: safeContextData.propertyClassList?.length || 0
-    });
-  }, [safeContextData]);
+  // useEffect(() => {
+  //   console.log("🎯 [INPUT SECTION] Context data received:", {
+  //     connectivityList: safeContextData.connectivityList?.length || 0,
+  //     materialList: safeContextData.materialList?.length || 0,
+  //     beamList: safeContextData.beamList?.length || 0,
+  //     columnList: safeContextData.columnList?.length || 0,
+  //     boltDiameterList: safeContextData.boltDiameterList?.length || 0,
+  //     thicknessList: safeContextData.thicknessList?.length || 0,
+  //     propertyClassList: safeContextData.propertyClassList?.length || 0
+  //   });
+  // }, [safeContextData]);
 
   const { Option } = Select;
 
@@ -210,6 +210,18 @@ export const InputSection = ({
               mode="multiple"
               value={value}
               onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
+            >
+              {list.map((item, index) => (
+                <Option key={index} value={item}>{item}</Option>
+              ))}
+            </Select>
+          );
+        } else if (field.options === 'boltTypeList') {
+          const list = safeContextData.boltTypeList || [];
+          return (
+            <Select
+              value={safeInputs[field.key]}
+              onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
             >
               {list.map((item, index) => (
                 <Option key={index} value={item}>{item}</Option>
