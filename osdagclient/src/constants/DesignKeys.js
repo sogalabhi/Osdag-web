@@ -86,6 +86,7 @@ export const KEY_DESIGN_TYPE_FLEXURE = "KEY_DESIGN_TYPE_FLEXURE";
 
 // Module Keys - FinPlate
 export const MODULE_KEY_FIN_PLATE = 'Fin-Plate-Connection'; // canonical key for API, state, config
+export const MODULE_KEY_SEAT_PLATE = 'Seat-Plate-Connection'; // canonical key for API, state, config
 export const MODULE_DISPLAY_FIN_PLATE = 'Fin-Plate-Connection'; // display name for UI 
 
 // Module Keys - CleatAngle

@@ -17,33 +17,33 @@ import { createDesign as apiCreateDesign, createDesignReport as apiCreateDesignR
 let initialValue = {
   error_msg: "",
   currentModuleName: "",
-  
+
   // Common fields for all modules
   materialList: [],
   boltDiameterList: [],
   thicknessList: [],
   propertyClassList: [],
-  
+
   // Structural elements
   beamList: [],
   columnList: [],
   connectivityList: [],
-  
+
   // Angle-specific (cleat angle, seated angle)
   angleList: [],
   topAngleList: [],
-  
+
   // Tension member specific
   sectionProfileList: [],
   channelList: [],
-  
+
   // Welded connection specific
   weldTypes: [],
   weldFab: [],
-  
+
   // End plate specific
   endPlateTypeList: [],
-  
+
   // Session variables removed for multi-module support
   designLogs: [],
   designData: {},
@@ -88,7 +88,7 @@ export const ModuleProvider = ({ children }) => {
   // ===================================================================
   // 1. POPULATE - Universal Module Data Fetcher
   // ===================================================================
-  
+
   /**
    * Universal function to get all module data in one API call
    * Replaces: getConnectivityList, getColumnBeamMaterialList, getBeamMaterialList, 
@@ -100,10 +100,10 @@ export const ModuleProvider = ({ children }) => {
    */
   const getModuleData = useCallback(async (moduleName, options = {}) => {
     try {
-      console.log("🚀 [MODULE CONTEXT] getModuleData called:", { moduleName, options });
-      
+      // console.log("🚀 [MODULE CONTEXT] getModuleData called:", { moduleName, options });
+
       if (!moduleName) {
-        console.error("❌ [MODULE CONTEXT] No module name provided");
+        // console.error("❌ [MODULE CONTEXT] No module name provided");
         dispatch({ type: "SET_ERR_MSG", payload: "Module name is required" });
         return { success: false, error: "Module name is required" };
       }
@@ -114,7 +114,7 @@ export const ModuleProvider = ({ children }) => {
       // Build URL with parameters
       const email = localStorage.getItem("email");
       let url = `${BASE_URL}populate?moduleName=${moduleName}`;
-      
+
       if (options.connectivity) {
         url += `&connectivity=${encodeURIComponent(options.connectivity)}`;
       }
@@ -122,7 +122,7 @@ export const ModuleProvider = ({ children }) => {
         url += `&email=${encodeURIComponent(email)}`;
       }
 
-      console.log("🌐 [MODULE CONTEXT] API Request:", url);
+      // console.log("🌐 [MODULE CONTEXT] API Request:", url);
 
       const response = await fetch(url, {
         method: "GET",
@@ -135,14 +135,14 @@ export const ModuleProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      console.log("✅ [MODULE CONTEXT] Data received:", Object.keys(data));
+      // console.log("✅ [MODULE CONTEXT] Data received:", Object.keys(data));
 
       // Dispatch comprehensive data update
       dispatch({ type: "SET_ALL_MODULE_DATA", payload: data });
-      
+
       return { success: true, data };
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error loading module data:", error);
+      // console.error("❌ [MODULE CONTEXT] Error loading module data:", error);
       dispatch({ type: "SET_ERR_MSG", payload: "Failed to load module data" });
       return { success: false, error: error.message };
     }
@@ -170,7 +170,7 @@ export const ModuleProvider = ({ children }) => {
         case 'add': {
           const { grade, inputs, connectivity, type } = data;
           const email = localStorage.getItem("email");
-          
+
           const response = await fetch(`${BASE_URL}materialDetails/`, {
             method: "POST",
             mode: "cors",
@@ -189,7 +189,7 @@ export const ModuleProvider = ({ children }) => {
           });
 
           const result = await response.json();
-          
+
           // Refresh module data to include the new material
           if (connectivity) {
             await getModuleData(state.currentModuleName, { connectivity });
@@ -232,7 +232,7 @@ export const ModuleProvider = ({ children }) => {
   // ===================================================================
   // 2. CALCULATE - Design Computation
   // ===================================================================
-  
+
   /**
    * Create design calculation
    * Uses external API function for consistency
@@ -254,7 +254,7 @@ export const ModuleProvider = ({ children }) => {
   const createCADModel = useCallback(async (inputData, moduleId, onCADSuccess = null) => {
     try {
       console.log("🎯 [MODULE CONTEXT] Creating CAD model:", { moduleId, hasInputData: !!inputData });
-      
+
       const response = await fetch(`${BASE_URL}design/cad`, {
         method: "POST",
         mode: "cors",
@@ -274,12 +274,12 @@ export const ModuleProvider = ({ children }) => {
       const data = await response.json();
 
       if (response.status === 201 && data.status === "success") {
-        console.log("✅ [MODULE CONTEXT] CAD Model Generated Successfully");
+        console.log("✅ [MODULE CONTEXT] CAD Model Generated Successfully" + response.json);
 
         // Store CAD data and trigger rendering
         dispatch({ type: "SET_CAD_MODEL_PATHS", payload: data.files });
         dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: true });
-        
+
         // Execute success callback if provided
         if (onCADSuccess && typeof onCADSuccess === 'function') {
           try {
@@ -373,7 +373,7 @@ export const ModuleProvider = ({ children }) => {
             link.setAttribute("download", `osdag_report_${report_id}.pdf`);
             link.click();
             link.remove();
-            
+
             console.log("✅ [MODULE CONTEXT] PDF downloaded successfully");
             return { success: true, message: "PDF downloaded successfully" };
           } else {
@@ -470,7 +470,7 @@ export const ModuleProvider = ({ children }) => {
         case 'get': {
           const { supported_section, supporting_section, connectivity } = params;
           let url = `${BASE_URL}design-preferences/?`;
-          
+
           if (supported_section) url += `supported_section=${encodeURIComponent(supported_section)}&`;
           if (supporting_section) url += `supporting_section=${encodeURIComponent(supporting_section)}&`;
           if (connectivity) url += `connectivity=${encodeURIComponent(connectivity)}`;
@@ -483,14 +483,14 @@ export const ModuleProvider = ({ children }) => {
 
           const data = await response.json();
           dispatch({ type: "SAVE_DESIGN_PREF_DATA", payload: data });
-          
+
           console.log("✅ [MODULE CONTEXT] Design preferences loaded");
           return { success: true, data };
         }
 
         case 'material_update': {
           const { materialType, materialData } = params;
-          
+
           if (materialType === "connector") {
             dispatch({ type: "SAVE_CM_DETAILS", payload: [materialData] });
           } else if (materialType === "supported") {
@@ -505,7 +505,7 @@ export const ModuleProvider = ({ children }) => {
 
         case 'section_update': {
           const { id, materialValue } = params;
-          
+
           if (id === 1) {
             dispatch({ type: "UPDATE_SUPPORTING_ST_DATA", payload: materialValue });
           } else if (id === 2) {
@@ -553,27 +553,27 @@ export const ModuleProvider = ({ children }) => {
         boltDiameterList: state.boltDiameterList,
         thicknessList: state.thicknessList,
         propertyClassList: state.propertyClassList,
-        
+
         // Structural elements
         beamList: state.beamList,
         columnList: state.columnList,
         connectivityList: state.connectivityList,
-        
+
         // Angle-specific (cleat angle, seated angle)
         angleList: state.angleList,
         topAngleList: state.topAngleList,
-        
+
         // Tension member specific
         sectionProfileList: state.sectionProfileList,
         channelList: state.channelList,
-        
+
         // Welded connection specific
         weldTypes: state.weldTypes,
         weldFab: state.weldFab,
-        
+
         // End plate specific
         endPlateTypeList: state.endPlateTypeList,
-        
+
         // Session-related state
         error_msg: state.error_msg,
         designData: state.designData,
@@ -591,22 +591,22 @@ export const ModuleProvider = ({ children }) => {
         // ===================================================================
         // SIMPLIFIED API - 8 CORE FUNCTIONS ONLY
         // ===================================================================
-        
+
         // 1. POPULATE (3 functions)
         getModuleData,              // Universal data fetcher - replaces 12+ functions
         getConnectivityData,        // Connectivity-specific data
         manageCustomMaterials,      // Custom material operations
-        
+
         // 2. CALCULATE (1 function) 
         createDesign,               // Design calculation
-        
+
         // 3. CAD (2 functions)
         createCADModel,             // Generate 3D model
         downloadCADModel,           // Download CAD file
-        
+
         // 4. REPORTS (1 function)
         generateReport,             // Generate PDF/CSV/design reports
-        
+
         // 5. PREFERENCES (1 function)
         manageDesignPreferences,    // Design settings and material properties
 
@@ -620,7 +620,7 @@ export const ModuleProvider = ({ children }) => {
         // ⚠️  WARNING: These functions are deprecated and will be removed in v2.0
         // ⚠️  Use the 8 core functions above for all new development
         // ⚠️  These exist only for backward compatibility with existing components
-        
+
         // 🚫 DEPRECATED: Use getModuleData() instead
         getConnectivityList: (moduleName) => {
           console.warn('🚫 DEPRECATED: getConnectivityList() - Use getModuleData() instead');
@@ -638,7 +638,7 @@ export const ModuleProvider = ({ children }) => {
           console.warn('🚫 DEPRECATED: getPropertyClassList() - Use getModuleData() instead');
           return getModuleData(moduleName);
         },
-        
+
         // 🚫 DEPRECATED: Use manageCustomMaterials() instead
         addCustomMaterialToDB: (grade, inputs, connectivity, type) => {
           console.warn('🚫 DEPRECATED: addCustomMaterialToDB() - Use manageCustomMaterials("add", {...}) instead');
@@ -648,7 +648,7 @@ export const ModuleProvider = ({ children }) => {
           console.warn('🚫 DEPRECATED: updateMaterialListFromCaches() - Use manageCustomMaterials("sync") instead');
           return manageCustomMaterials('sync');
         },
-        
+
         // 🚫 DEPRECATED: Use manageDesignPreferences() instead
         getDesingPrefData: (params) => {
           console.warn('🚫 DEPRECATED: getDesingPrefData() - Use manageDesignPreferences("get", params) instead');
@@ -666,7 +666,7 @@ export const ModuleProvider = ({ children }) => {
           console.warn('🚫 DEPRECATED: updateSourceAndMechType() - Use manageDesignPreferences("section_update", {...}) instead');
           return manageDesignPreferences('section_update', { id, materialValue });
         },
-        
+
         // 🚫 DEPRECATED: Use generateReport() instead
         createDesignReport: (params, moduleId, inputValues, designStatus, logs) => {
           console.warn('🚫 DEPRECATED: createDesignReport() - Use generateReport("design_report", {...}) instead');

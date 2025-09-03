@@ -18,6 +18,7 @@ export const useEngineeringModule = (moduleConfig) => {
     thicknessList,
     propertyClassList,
     angleList, // FIXED: Added angleList from context
+    boltTypeList,
     designLogs,
     designData,
     displayPDF,
@@ -91,6 +92,10 @@ export const useEngineeringModule = (moduleConfig) => {
     if (moduleConfig.cameraKey === "FinPlate") {
       return {
         selectedOption: "Column Flange-Beam-Web", // Default for FinPlate
+      };
+    } else if (moduleConfig.cameraKey === "EndPlate") {
+      return {
+        selectedOption: "Column Flange-Beam-Web", // Default for EndPlate
       };
     }
     return {
@@ -638,6 +643,7 @@ export const useEngineeringModule = (moduleConfig) => {
     thicknessList,
     propertyClassList,
     angleList, // FIXED: Added angleList to return object
+    boltTypeList,
     displayPDF,
     renderCadModel,
     cadModelPaths,

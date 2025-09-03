@@ -9,6 +9,16 @@ export const cleatAngleConfig = {
   cadOptions: ["Model", "Beam", "Column", "CleatAngle"],
 
   defaultInputs: {
+    connectivity: "Beam-Beam", // Default connectivity
+    column_section: "",
+    beam_section: "",
+    primary_beam: "",
+    secondary_beam: "",
+    load_shear: "20",
+    connector_material: "E 250 (Fe 410 W)A",
+    bolt_type: "Bearing_Bolt",
+
+    // Default selections for customizable fields (initially empty)
     bolt_diameter: [],
     bolt_grade: [],
     bolt_type: "Bearing Bolt",
@@ -34,18 +44,21 @@ export const cleatAngleConfig = {
     module: MODULE_KEY_CLEAT_ANGLE,
   },
 
+  // --- Configuration for modal pop-ups (Customized selections) ---
   modalConfig: [
     { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
     { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
     { key: "angleList", inputKey: "angle_list", dataSource: "angleList" },
   ],
 
+  // --- Configuration for the "All" / "Customized" dropdowns ---
   selectionConfig: [
     { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
     { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
     { key: "angleListSelect", inputKey: "angle_list", defaultValue: "All" },
   ],
 
+  // --- Input validation logic ---
   validateInputs: (inputs, extraState) => {
     // FIXED: Handle connectivity from extraState properly
     const connectivity = extraState?.selectedOption || inputs.connectivity || "Column Flange-Beam-Web";
@@ -70,6 +83,7 @@ export const cleatAngleConfig = {
     return { isValid: true };
   },
 
+  // --- Function to build the final API submission payload ---
   buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
     const conn_map = {
       "Column Flange-Beam-Web": "Column Flange-Beam Web",
@@ -229,7 +243,7 @@ export const cleatAngleConfig = {
       ]
     },
     {
-      title: "Cleat Angle",
+      title: "Angle Section",
       fields: [
         {
           key: "angle_list",

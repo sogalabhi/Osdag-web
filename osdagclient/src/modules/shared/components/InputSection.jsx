@@ -231,6 +231,18 @@ export const InputSection = ({
               ))}
             </Select>
           );
+        } else if (field.options === 'boltTypeList') {
+          const list = safeContextData.boltTypeList || [];
+          return (
+            <Select
+              value={safeInputs[field.key]}
+              onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
+            >
+              {list.map((item, index) => (
+                <Option key={index} value={item}>{item}</Option>
+              ))}
+            </Select>
+          );
         } else if (field.options === 'materialList') {
 
           // Check for duplicates in materialList
