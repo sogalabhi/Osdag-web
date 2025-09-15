@@ -31,11 +31,13 @@ from OCC.Core import BRepTools
 from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
+
 # from OCC.Core.StlAPI import StlAPI_Writer
 # from OCC.Core.TopoDS import TopoDS_Solid, TopoDS_Shell
 from cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
-from design_type.connection.fin_plate_connection import FinPlateConnection
+from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+from osdag_core.custom_logger import CustomLogger
 import sys
 import os
 import typing
@@ -353,37 +355,65 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     module = create_from_input(input_values)  # Create module from input.
     print('in fin_plate_connection.py: module : ' , module)
     print('in fin_plate_connection.py: type of module : ' , type(module))
+    # Initialize logs variable first
+    logs = []
+    
+    try:
+        # Generate output values in unformatted form.
+        raw_output_text = module.output_values(True)
+        print('in fin_plate_connection.py: raw_output_text:', raw_output_text)
+        raw_output_spacing = module.spacing(True)
+        print('in fin_plate_connection.py: raw_output_spacing:', raw_output_spacing)
+        raw_output_capacities = module.capacities(True)
+        print('in fin_plate_connection.py: raw_output_capacities:', raw_output_capacities)
+        raw_output_section_capacities = module.section_capacities(True)
+        print('in fin_plate_connection.py: raw_output_section_capacities:', raw_output_section_capacities)
+        
+        # Get logs from the custom logger
+        if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
+            logs = module.logger.get_logs()
+            print(f'Retrieved {len(logs)} logs from custom logger')
+        else:
+            print('Logger is not CustomLogger instance or logger not found')
+            print(f'Logger type: {type(module.logger) if hasattr(module, "logger") else "No logger"}')
 
-    # Generate output values in unformatted form.
-    raw_output_text = module.output_values(True)
-    print('in fin_plate_connection.py: raw_output_text:', raw_output_text)
-    raw_output_spacing = module.spacing(True)  # Generate output val
-    print('in fin_plate_connection.py: raw_output_spacing:', raw_output_spacing)
-    raw_output_capacities = module.capacities(True)
-    print('in fin_plate_connection.py: raw_output_capacities:', raw_output_capacities)
-    raw_output_section_capacities = module.section_capacities(True)
-    print('in fin_plate_connection.py: raw_output_section_capacities:', raw_output_section_capacities)
-    logs = module.logs
-    print('in fin_plate_connection.py: logs:', logs)
-    raw_output = raw_output_text + raw_output_spacing + raw_output_capacities + raw_output_section_capacities
-    print('in fin_plate_connection.py: raw_output combined:', raw_output)
-    # os.system("clear")
-    # Loop over all the text values and add them to ouptut dict.
-    for param in raw_output:
-        print("in fin_plate_connection.py: Processing param:", param)
-        if param[2] == "TextBox":  # If the parameter is a text output,
-            key = param[0]  # id/key
-            label = param[1]  # label text.
-            value = param[3]  # Value as string.
-            output[key] = {
-                "key": key,
-                "label": label,
-                "val": value  # Changed from "value" to "val" to match frontend expectations
-            }  # Set label, key and value in output
-            print(f"in fin_plate_connection.py: Added output[{key}] = {output[key]}")
-    print("in fin_plate_connection.py: Final output dict:", output)
-    print("in fin_plate_connection.py: Output keys:", list(output.keys()))
-    print("in fin_plate_connection.py: Returning logs:", logs)
+        # Combine all raw outputs
+        raw_output = raw_output_text + raw_output_spacing + raw_output_capacities + raw_output_section_capacities
+        print('in fin_plate_connection.py: raw_output combined length:', len(raw_output))
+
+        # Process each parameter with handling for both 4 and 5 element tuples
+        for i, param in enumerate(raw_output):
+            print(f"in fin_plate_connection.py: Processing param {i}: {param}")
+            print(f"Param length: {len(param)}")
+            
+            # Handle both 4-element and 5-element tuples
+            if len(param) >= 4:
+                key = param[0]
+                label = param[1] 
+                param_type = param[2]
+                value = param[3]
+                
+                print(f"Key: {key}, Label: {label}, Type: {param_type}, Value: {value}")
+                
+                # Check if it's a TextBox type and has a valid key
+                if param_type == "TextBox" and key is not None:
+                    # Handle numpy types
+                    if hasattr(value, 'item'):  # numpy scalar
+                        value = value.item()
+                    
+                    output[key] = {
+                        "key": key,
+                        "label": label,
+                        "val": value
+                    }
+    except Exception as e:
+        print(f'Error in generate_output: {e}')
+        import traceback
+        traceback.print_exc()
+        
+    print("in fin_plate_connection.py: Final output dict: ", output)
+    print("in fin_plate_connection.py: Output keys: ", list(output.keys()))
+    print("in fin_plate_connection.py: Returning logs: **********", logs)
     return output, logs
 
 
