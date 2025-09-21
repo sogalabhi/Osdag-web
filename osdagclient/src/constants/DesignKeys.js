@@ -92,3 +92,4 @@ export const MODULE_DISPLAY_FIN_PLATE = 'Fin-Plate-Connection'; // display name 
 // Module Keys - CleatAngle
 export const MODULE_KEY_CLEAT_ANGLE = 'Cleat-Angle-Connection';
 export const MODULE_DISPLAY_CLEAT_ANGLE = 'Cleat-Angle-Connection';
+export const MODULE_DISPLAY_SEAT_PLATE = 'Seat-Plate-Connection'; // display name for UI 

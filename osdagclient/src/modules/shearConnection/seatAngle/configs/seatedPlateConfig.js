@@ -1,26 +1,29 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
-import { MODULE_KEY_CLEAT_ANGLE, MODULE_DISPLAY_CLEAT_ANGLE } from '../../../../constants/DesignKeys';
+import { MODULE_KEY_SEAT_PLATE, MODULE_DISPLAY_SEAT_PLATE } from '../../../../constants/DesignKeys';
 
-export const cleatAngleConfig = {
-  sessionName: MODULE_DISPLAY_CLEAT_ANGLE,
-  routePath: "/design/connections/shear/cleatAngle",
-  designType: MODULE_KEY_CLEAT_ANGLE, 
-  cameraKey: "CleatAngle",
-  cadOptions: ["Model", "Beam", "Column", "CleatAngle"],
-
+export const seatedPlateConfig = {
+  sessionName: MODULE_DISPLAY_SEAT_PLATE,
+  routePath: "/design/connections/shear/seat_plate",
+  designType: MODULE_KEY_SEAT_PLATE,
+  cameraKey: "SeatedPlate",
+  cadOptions: ["Model", "Beam", "Column", "Plate"],
+  
   defaultInputs: {
     bolt_diameter: [],
     bolt_grade: [],
     bolt_type: "Bearing Bolt",
     connector_material: "E 250 (Fe 410 W)A",
-    load_shear: "20",
-    load_axial: "10",
+    load_shear: "70",
+    load_axial: "30",
+    module: MODULE_KEY_SEAT_PLATE,
+    plate_thickness: [],
     beam_section: "MB 300",
-    column_section: "HB 150", 
-    primary_beam: "MB 300",
-    secondary_beam: "MB 300",
+    column_section: "HB 150",
+    primary_beam: "JB 200",
+    secondary_beam: "JB 150",
     supported_material: "E 165 (Fe 290)",
     supporting_material: "E 165 (Fe 290)",
+    // Hardcoded defaults for undefined fields:
     bolt_hole_type: "Standard",
     bolt_slip_factor: "0.3",
     bolt_tension_type: "Pre-tensioned",
@@ -30,29 +33,22 @@ export const cleatAngleConfig = {
     detailing_gap: "10",
     detailing_corr_status: "No",
     design_method: "Limit State Design",
-    angle_list: [],
-    module: MODULE_KEY_CLEAT_ANGLE,
   },
 
   modalConfig: [
     { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
     { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "angleList", inputKey: "angle_list", dataSource: "angleList" },
+    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
   ],
 
   selectionConfig: [
-    {
-      key: "boltDiameterSelect",
-      inputKey: "bolt_diameter",
-      defaultValue: "All",
-    },
+    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
     { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "angleListSelect", inputKey: "angle_list", defaultValue: "All" },
+    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
   ],
 
-  validateInputs: (inputs, extraState) => {
-    // FIXED: Handle connectivity from extraState properly
-    const connectivity = extraState?.selectedOption || inputs.connectivity || "Column Flange-Beam-Web";
+  validateInputs: (inputs) => {
+    const connectivity = inputs.connectivity;
     
     if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
       if (!inputs.beam_section || !inputs.column_section || 
@@ -66,62 +62,69 @@ export const cleatAngleConfig = {
       }
     }
     
-    // FIXED: Added validation for angle_list
-    if (!inputs.angle_list || (Array.isArray(inputs.angle_list) && inputs.angle_list.length === 0)) {
-      return { isValid: false, message: "Please select at least one angle from the angle list" };
-    }
-    
     return { isValid: true };
   },
 
   buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
     const conn_map = {
       "Column Flange-Beam-Web": "Column Flange-Beam Web",
-      "Column Web-Beam-Web": "Column Web-Beam Web", 
+      "Column Web-Beam-Web": "Column Web-Beam Web",
       "Beam-Beam": "Beam-Beam",
     };
 
-    const connectivity = extraState?.selectedOption || inputs.connectivity || "Column Flange-Beam-Web";
+    const connectivity = extraState?.selectedOption || inputs.connectivity;
     
-    // Common parameters
-    const baseParams = {
-      "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
-      "Bolt.Diameter": allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
-      "Bolt.Grade": allSelected.bolt_grade ? lists.propertyClassList : inputs.bolt_grade,
-      "Bolt.Slip_Factor": inputs.bolt_slip_factor,
-      "Bolt.TensionType": inputs.bolt_tension_type,
-      "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-      "Connectivity": conn_map[connectivity],
-      "Connector.Material": inputs.connector_material,
-      "Design.Design_Method": inputs.design_method,
-      "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
-      "Detailing.Edge_type": inputs.detailing_edge_type,
-      "Detailing.Gap": inputs.detailing_gap,
-      "Load.Axial": inputs.load_axial || "",
-      "Load.Shear": inputs.load_shear || "",
-      "Material": inputs.connector_material,
-      "Module": MODULE_KEY_CLEAT_ANGLE,
-      "Weld.Fab": inputs.weld_fab,
-      "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
-      "Connector.Angle_List": allSelected.angle_list ? lists.angleList : inputs.angle_list, // FIXED: Ensure angleList is included
-    };
-
-    // Connectivity-specific member assignments
-    if (connectivity === "Beam-Beam") {
+    if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
       return {
-        ...baseParams,
-        "Member.Supported_Section.Designation": inputs.secondary_beam,
-        "Member.Supporting_Section.Designation": inputs.primary_beam,
+        "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
+        "Bolt.Diameter": allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
+        "Bolt.Grade": allSelected.bolt_grade ? lists.propertyClassList : inputs.bolt_grade,
+        "Bolt.Slip_Factor": inputs.bolt_slip_factor,
+        "Bolt.TensionType": inputs.bolt_tension_type,
+        "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
+        "Connectivity": conn_map[connectivity],
+        "Connector.Material": inputs.connector_material,
+        "Design.Design_Method": inputs.design_method,
+        "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
+        "Detailing.Edge_type": inputs.detailing_edge_type,
+        "Detailing.Gap": inputs.detailing_gap,
+        "Load.Axial": inputs.load_axial || "",
+        "Load.Shear": inputs.load_shear || "",
+        "Material": inputs.connector_material,
+        "Member.Supported_Section.Designation": inputs.beam_section,
         "Member.Supported_Section.Material": inputs.supported_material,
+        "Member.Supporting_Section.Designation": inputs.column_section,
         "Member.Supporting_Section.Material": inputs.supporting_material,
+        "Module": MODULE_KEY_FIN_PLATE,
+        "Weld.Fab": inputs.weld_fab,
+        "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
+        "Connector.Plate.Thickness_List": allSelected.plate_thickness ? lists.thicknessList : inputs.plate_thickness,
       };
     } else {
       return {
-        ...baseParams,
-        "Member.Supported_Section.Designation": inputs.beam_section,
-        "Member.Supporting_Section.Designation": inputs.column_section,
+        "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
+        "Bolt.Diameter": allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
+        "Bolt.Grade": allSelected.bolt_grade ? lists.propertyClassList : inputs.bolt_grade,
+        "Bolt.Slip_Factor": inputs.bolt_slip_factor,
+        "Bolt.TensionType": inputs.bolt_tension_type,
+        "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
+        "Connectivity": conn_map[connectivity],
+        "Connector.Material": inputs.connector_material,
+        "Design.Design_Method": inputs.design_method,
+        "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
+        "Detailing.Edge_type": inputs.detailing_edge_type,
+        "Detailing.Gap": inputs.detailing_gap,
+        "Load.Axial": inputs.load_axial || "",
+        "Load.Shear": inputs.load_shear || "",
+        "Material": "E 300 (Fe 440)",
+        "Member.Supported_Section.Designation": inputs.secondary_beam,
         "Member.Supported_Section.Material": inputs.supported_material,
+        "Member.Supporting_Section.Designation": inputs.primary_beam,
         "Member.Supporting_Section.Material": inputs.supporting_material,
+        "Module": MODULE_KEY_FIN_PLATE,
+        "Weld.Fab": inputs.weld_fab,
+        "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
+        "Connector.Plate.Thickness_List": allSelected.plate_thickness ? lists.thicknessList : inputs.plate_thickness,
       };
     }
   },
@@ -133,12 +136,7 @@ export const cleatAngleConfig = {
         {
           key: "connectivity",
           label: UI_STRINGS.CONNECTIVITY,
-          type: "connectivitySelect",
-          // FIXED: Added onChange handler to set extraState
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
-            setExtraState({ ...extraState, selectedOption: value });
-            setInputs({ ...inputs, connectivity: value });
-          }
+          type: "connectivitySelect"
         },
         {
           key: "column_section", 
@@ -218,8 +216,8 @@ export const cleatAngleConfig = {
           label: UI_STRINGS.TYPE,
           type: "select",
           options: [
-            { value: "Bearing_Bolt", label: "Bearing Bolt" },
-            { value: "Friction_Grip_Bolt", label: "Friction Grip Bolt" }
+            { value: "Bearing_Bolt", label: UI_STRINGS.TYPE + " (Bearing Bolt)" },
+            { value: "Friction_Grip_Bolt", label: UI_STRINGS.TYPE + " (Friction Grip Bolt)" }
           ]
         },
         {
@@ -233,15 +231,15 @@ export const cleatAngleConfig = {
       ]
     },
     {
-      title: "Cleat Angle",
+      title: UI_STRINGS.PLATE,
       fields: [
         {
-          key: "angle_list",
-          label: "Angle List",
+          key: "plate_thickness",
+          label: UI_STRINGS.THICKNESS,
           type: "customizable",
-          selectionKey: "angleListSelect",
-          modalKey: "angleList",
-          dataSource: "angleList"
+          selectionKey: "thicknessSelect",
+          modalKey: "plateThickness",
+          dataSource: "thicknessList"
         }
       ]
     }
