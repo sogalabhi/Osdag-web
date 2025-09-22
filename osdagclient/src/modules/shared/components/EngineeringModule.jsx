@@ -21,7 +21,7 @@ import Outputsvg from "../../../assets/Outputsvg.svg";
 import Reportsvg from "../../../assets/Reportsvg.svg";
 import InputDockHiddensvg from "../../../assets/InputDockHiddensvg.svg";
 import InputDockVisiblesvg from "../../../assets/InputDockVisiblesvg.svg";
-import OutputDockHiddensvg from "../../../assets/OutputDockHiddensvg.svg";
+import OutputDockHiddensvg from "../../../assets/OutputDockhiddensvg.svg";
 import OutputDockVisiblesvg from "../../../assets/OutputDockVisiblesvg.svg";
 import Logsvg from "../../../assets/Logsvg.svg";
 import ArrowDownsvg from "../../../assets/ArrowDownsvg.svg";

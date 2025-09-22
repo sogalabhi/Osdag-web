@@ -16,6 +16,7 @@
     "@react-three/drei": "^10.7.3",
     "@react-three/fiber": "^9.3.0",
     "@reduxjs/toolkit": "^1.9.5",
+    "@rollup/rollup-linux-x64-gnu": "^4.52.0",
     "antd": "^5.5.0",
     "axios": "^1.4.0",
     "base-64": "^1.0.0",
