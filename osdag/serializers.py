@@ -23,8 +23,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims
         token['email'] = user.email
         print('token email : ' , token['email'])
-        token['password'] = user.password
-        print('token password : ' , token['password'])
         token['username'] = user.username
         print('token username : ' , token['username'])
         #token['isGuest'] = user.isGuest

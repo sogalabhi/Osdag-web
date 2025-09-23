@@ -16,8 +16,8 @@ class ProjectAPI(APIView):
     def get(self, request):
         """Get user-specific projects (for recent projects list)"""
         try:
-            if not request.user or not request.user.is_authenticated:
-                return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
+            # if not request.user or not request.user.is_authenticated:
+            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
 
             # Disallow guest users from listing projects
             if hasattr(request, 'auth') and isinstance(request.auth, dict):
@@ -57,8 +57,8 @@ class ProjectAPI(APIView):
     def post(self, request):
         """Create a new project"""
         try:
-            if not request.user or not request.user.is_authenticated:
-                return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
+            # if not request.user or not request.user.is_authenticated:
+            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
 
             # Disallow guest users from creating projects
             if hasattr(request, 'auth') and isinstance(request.auth, dict):
@@ -112,8 +112,8 @@ class ProjectDetailAPI(APIView):
     def get(self, request, project_id):
         """Get a specific project"""
         try:
-            if not request.user or not request.user.is_authenticated:
-                return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
+            # if not request.user or not request.user.is_authenticated:
+            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from reading projects
             if hasattr(request, 'auth') and isinstance(request.auth, dict):
                 if request.auth.get('is_guest') is True:
@@ -153,8 +153,8 @@ class ProjectDetailAPI(APIView):
     def put(self, request, project_id):
         """Update project data (name, osi_file_path)"""
         try:
-            if not request.user or not request.user.is_authenticated:
-                return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
+            # if not request.user or not request.user.is_authenticated:
+            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from updating projects
             if hasattr(request, 'auth') and isinstance(request.auth, dict):
                 if request.auth.get('is_guest') is True:
@@ -203,8 +203,8 @@ class ProjectDetailAPI(APIView):
     def delete(self, request, project_id):
         """Delete a project"""
         try:
-            if not request.user or not request.user.is_authenticated:
-                return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
+            # if not request.user or not request.user.is_authenticated:
+            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from deleting projects
             if hasattr(request, 'auth') and isinstance(request.auth, dict):
                 if request.auth.get('is_guest') is True:
@@ -242,8 +242,8 @@ class ProjectByNameAPI(APIView):
     def get(self, request, project_name):
         """Get a specific project by name"""
         try:
-            if not request.user or not request.user.is_authenticated:
-                return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
+            # if not request.user or not request.user.is_authenticated:
+            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from reading projects by name
             if hasattr(request, 'auth') and isinstance(request.auth, dict):
                 if request.auth.get('is_guest') is True:
@@ -283,8 +283,8 @@ class ProjectByNameAPI(APIView):
     def put(self, request, project_name):
         """Update project data (name, osi_file_path) by name"""
         try:
-            if not request.user or not request.user.is_authenticated:
-                return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
+            # if not request.user or not request.user.is_authenticated:
+            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from updating projects by name
             if hasattr(request, 'auth') and isinstance(request.auth, dict):
                 if request.auth.get('is_guest') is True:

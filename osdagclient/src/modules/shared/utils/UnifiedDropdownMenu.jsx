@@ -81,11 +81,10 @@ function UnifiedDropdownMenu({
   setAllSelected,
   logs,
   setCreateDesignReportBool,
-  setDisplaySaveInputPopup,
   setSaveInputFileName,
   triggerScreenshotCapture,
   selectedOption = null,
-  setSelectedOption = () => {},
+  setSelectedOption = () => { },
   moduleType, // "finplate" | "endplate" | "coverplate"
   currentProjectId,
 }) {
@@ -97,7 +96,7 @@ function UnifiedDropdownMenu({
     topAngleList,
     downloadCADModel,
   } = useContext(ModuleContext);
-  
+
   const { SaveInputValueFile } = useContext(UserContext);
   const BASE_URL = 'http://localhost:8000/api/';
   const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
@@ -275,6 +274,12 @@ function UnifiedDropdownMenu({
     }
     // Determine module_id; try inputs.module or selected module key
     const module_id = inputs?.module || MODULE_KEY_FIN_PLATE;
+    // Ensure projectId is present to link OSI to project
+    const pid = getProjectIdFromUrl();
+    if (!pid) {
+      message.warning('No active project. Open or create a project first.');
+      return;
+    }
     try {
       const res = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
         method: 'POST',
@@ -286,13 +291,14 @@ function UnifiedDropdownMenu({
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setDisplaySaveInputPopup(true);
+        // setDisplaySaveInputPopup(true);
         const savedName = (inputs?.project_name || inputs?.name || 'project');
         setSaveInputFileName(data?.data?.id ? `${savedName}.osi` : savedName);
         message.success('Saved OSI and project created');
-
+        console.log('[saveInput] data:', data);
+        console.log('[saveInput] pid:', pid);
+        console.log('[saveInput] data.url:', data.url);
         // Update project's osi_file_path via projectId from URL
-        const pid = getProjectIdFromUrl();
         if (pid && data.url) {
           try {
             const upd = await fetch(`${BASE_URL}projects/${pid}/`, {
@@ -304,11 +310,15 @@ function UnifiedDropdownMenu({
               body: JSON.stringify({ osi_file_path: data.url }),
             });
             const updData = await upd.json();
+
             if (!upd.ok || !updData.success) {
               message.warning('Saved OSI, but failed to link to project');
+              console.log('[saveInput] updData:', updData);
             }
+            setIsOpen(false);
           } catch (_e) {
             message.warning('Saved OSI, but failed to link to project');
+            console.log('[saveInput] error linking project:', _e);
           }
         }
       } else {
@@ -316,6 +326,7 @@ function UnifiedDropdownMenu({
       }
     } catch (err) {
       message.error('Failed to save OSI');
+      console.log('[saveInput] err:', err);
     }
   };
 
@@ -348,6 +359,7 @@ function UnifiedDropdownMenu({
     parentRef.current.appendChild(element);
     element.click();
     parentRef.current.removeChild(element);
+    console.log('[saveLogMessages] content:', content);
   };
 
   const handleClick = (option) => {
@@ -391,7 +403,7 @@ function UnifiedDropdownMenu({
               ],
               suggestedName: "3dmodel",
             };
-            
+
             const handle = await window.showSaveFilePicker(options);
             const fileExtension = handle.name.split(".").pop();
             const blob = await downloadCADModel(fileExtension);

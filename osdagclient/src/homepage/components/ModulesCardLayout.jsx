@@ -4,7 +4,7 @@ import coverPlateBolted from "../../assets/ShearConnection/sc_fin_plate.png";
 import coverPlateWelded from "../../assets/ShearConnection/sc_fin_plate.png";
 import endPlate from "../../assets/ShearConnection/sc_fin_plate.png";
 import ProjectNameModal from "../../components/ProjectNameModal";
-import { getCurrentUserEmail, isGuestUser } from "../../utils/auth";
+import { getCurrentUserEmail, isGuestUser, getAccessToken } from "../../utils/auth";
 import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../../constants/DesignKeys';
 
 // Submodules for each main module
@@ -123,7 +123,7 @@ const MODULE_ROUTES = {
   // Shear Connections
   fp: "/design/connections/shear/fin_plate",
   [MODULE_KEY_FIN_PLATE]: "/design/connections/shear/fin_plate",
-  ca: "/design/connections/shear/cleat_angle", 
+  ca: "/design/connections/shear/cleat_angle",
   ep: "/design/connections/shear/end_plate",
   sa: "/design/connections/shear/seated_angle",
   // Moment Connections - Beam to Beam
@@ -139,39 +139,39 @@ const MODULE_ROUTES = {
 // SectionCards component for rendering section cards
 const SectionCards = ({ section, activeSubmodule, onModuleClick }) => {
   const navigate = useNavigate();
-  
+
   const handleModuleClick = (optionKey, sectionLabel) => {
     // Call the parent handler instead of directly navigating
     onModuleClick(optionKey, sectionLabel);
   };
 
   return (
-  <div
-    className="flex-1 min-w-[380px] bg-white dark:bg-osdag-dark-color border-2 border-osdag-border rounded-xl mb-8 px-4 py-4 shadow-card dark:text-gray-300"
-  >
-    <div className="mb-4 -mt-7 inline-block px-2">{section.label}</div>
-    <div className="flex gap-6">
-      {section.options.map((opt) => (
-        <div
-          key={opt.key}
-          onClick={() => handleModuleClick(opt.key, section.label)}
-          className="group flex-1 h-40 min-w-[120px] bg-white dark:bg-osdag-dark-color flex flex-col items-center justify-between
+    <div
+      className="flex-1 min-w-[380px] bg-white dark:bg-osdag-dark-color border-2 border-osdag-border rounded-xl mb-8 px-4 py-4 shadow-card dark:text-gray-300"
+    >
+      <div className="mb-4 -mt-7 inline-block px-2">{section.label}</div>
+      <div className="flex gap-6">
+        {section.options.map((opt) => (
+          <div
+            key={opt.key}
+            onClick={() => handleModuleClick(opt.key, section.label)}
+            className="group flex-1 h-40 min-w-[120px] bg-white dark:bg-osdag-dark-color flex flex-col items-center justify-between
             border rounded-lg shadow-card transition-all duration-200
             hover:border-osdag-green relative cursor-pointer"
-        >
-          <img src={opt.img} alt={opt.label} className="h-20 mt-5 mb-2" />
-          <div className="font-semibold mb-2">{opt.label}</div>
-          <div
-            className="absolute cursor-pointer text-center left-0 right-0 bottom-[-40px] opacity-0 group-hover:bottom-0 group-hover:opacity-100
-              text-osdag-green font-bold text-base border-t bg-white border-osdag-border rounded-b-lg py-2 transition-all duration-200"
-            
           >
-            Open
+            <img src={opt.img} alt={opt.label} className="h-20 mt-5 mb-2" />
+            <div className="font-semibold mb-2">{opt.label}</div>
+            <div
+              className="absolute cursor-pointer text-center left-0 right-0 bottom-[-40px] opacity-0 group-hover:bottom-0 group-hover:opacity-100
+              text-osdag-green font-bold text-base border-t bg-white border-osdag-border rounded-b-lg py-2 transition-all duration-200"
+
+            >
+              Open
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
-  </div>
   );
 };
 
@@ -181,11 +181,11 @@ const TabbedModulePage = () => {
   const navigate = useNavigate();
   const submodules = MODULE_SUBMODULES[moduleName] || [];
   const [activeSubmodule, setActiveSubmodule] = useState(submodules[0]?.key);
-  
+
   // Modal state
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
-  
+
   useEffect(() => {
     setActiveSubmodule(submodules[0]?.key);
   }, [moduleName]);
@@ -193,8 +193,11 @@ const TabbedModulePage = () => {
   const handleModuleClick = (optionKey, sectionLabel) => {
     // Determine the route based on the module
     let route = '';
-    
+
     // Special handling for end plate modules based on context
+    console.log('[handleModuleClick] optionKey:', optionKey);
+    console.log('[handleModuleClick] sectionLabel:', sectionLabel);
+    console.log('[handleModuleClick] activeSubmodule:', activeSubmodule);
     if (optionKey === "ep") {
       if (activeSubmodule === "moment") {
         if (sectionLabel === "Beam to Beam Splice") {
@@ -238,10 +241,13 @@ const TabbedModulePage = () => {
         // Replace spaces with underscores for project name
         const safeProjectName = (projectName || `${selectedModule.label} Project`).replace(/\s+/g, '_');
         // Create project in database
+        const token = getAccessToken();
+        console.log('[ModulesCardLayout] creating project with access token (first 20 chars):', (token || '').slice(0, 20));
         const response = await fetch('http://localhost:8000/api/projects/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify({
             name: safeProjectName,
@@ -252,10 +258,10 @@ const TabbedModulePage = () => {
         });
 
         const data = await response.json();
-        
+
         if (data.success) {
-          // Navigate to the module with project name in URL
-          navigate(`${selectedModule.route}/${safeProjectName}`);
+          // Navigate to the module with projectId query param (required by EngineeringModule)
+          navigate(`${selectedModule.route}?projectId=${encodeURIComponent(data.project_id)}`);
         } else {
           // Still navigate even if project creation fails, but without project name
           navigate(selectedModule.route);
@@ -265,7 +271,7 @@ const TabbedModulePage = () => {
         navigate(selectedModule.route);
       }
     }
-    
+
     setShowProjectModal(false);
     setSelectedModule(null);
   };
@@ -305,9 +311,9 @@ const TabbedModulePage = () => {
           ? (CONNECTIONS_TAB_CONTENT[activeSubmodule] || [])
           : (GENERIC_SUBMODULE_CONTENT[activeSubmodule] || [])
         ).map((section) => (
-          <SectionCards 
-            key={section.label} 
-            section={section} 
+          <SectionCards
+            key={section.label}
+            section={section}
             activeSubmodule={activeSubmodule}
             onModuleClick={handleModuleClick}
           />
