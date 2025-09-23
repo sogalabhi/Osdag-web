@@ -169,7 +169,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres_Intg_osdag',
         'USER': 'osdagdeveloper',
-        'PASSWORD': 'Postgress',
+        'PASSWORD': 'password',
         'HOST': 'localhost',  # This should be the name of the service
         'PORT': '5432',
     }
@@ -223,6 +223,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
+
+# OSI files storage
+OSIFILES_URL = '/osifiles/'
+OSIFILES_ROOT = BASE_DIR / 'osifiles'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -231,3 +235,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'file_storage/')
 
 SECRET_ROOT = os.path.join(BASE_DIR , 'secret/')
+
+
+
+
+

@@ -5,20 +5,63 @@ import { useNavigate } from 'react-router-dom';
 import { isGuestUser, getCurrentUserEmail } from '../utils/auth';
 import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../constants/DesignKeys';
 
-const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => {
-  // Remove internal state and fetching logic
-  // const [projects, setProjects] = useState([]);
-  // const [loading, setLoading] = useState(true);
+const RecentProjects = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
+  const [projects, setProjects] = React.useState(projectsProp);
+  const [loading, setLoading] = React.useState(loadingProp);
   const [deletingProject, setDeletingProject] = React.useState(null);
   const navigate = useNavigate();
 
   const BASE_URL = 'http://localhost:8000/api/';
+  const SERVER_ROOT = BASE_URL.replace(/api\/?$/, '');
+
+  const getAccessToken = () => {
+    return (
+      localStorage.getItem('access') ||
+      localStorage.getItem('token') ||
+      ''
+    );
+  };
 
   // Check if user is a guest
   const isGuest = isGuestUser();
   const userEmail = getCurrentUserEmail();
 
-  // Remove useEffect and fetchRecentProjects
+  React.useEffect(() => {
+    if (isGuest) {
+      setProjects([]);
+      setLoading(false);
+      return;
+    }
+    // If parent did not pass projects, fetch from API
+    if (!projectsProp || projectsProp.length === 0) {
+      const fetchRecentProjects = async () => {
+        setLoading(true);
+        try {
+          const res = await fetch(`${BASE_URL}projects/`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${getAccessToken()}`,
+            },
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            setProjects(data.projects || []);
+          } else {
+            message.error(data.error || 'Failed to load projects');
+          }
+        } catch (e) {
+          message.error('Failed to load projects');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchRecentProjects();
+    } else {
+      setProjects(projectsProp);
+      setLoading(loadingProp);
+    }
+  }, [isGuest, projectsProp, loadingProp]);
 
   const handleDeleteProject = async (projectId) => {
     setDeletingProject(projectId);
@@ -28,17 +71,13 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
     setDeletingProject(null);
   };
 
-  const handleOpenProject = (project) => {
-    // Directly open the project without showing a modal
-    handleProjectModalConfirm(project);
-  };
-
-  const handleProjectModalConfirm = async (project) => {
+  const handleOpenProject = async (project) => {
     try {
-      const response = await fetch(`${BASE_URL}projects/${project.id}/?user_email=${encodeURIComponent(userEmail)}`, {
+      const response = await fetch(`${BASE_URL}projects/${project.id}/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAccessToken()}`,
         },
       });
 
@@ -85,6 +124,27 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
       }
     } catch (error) {
       message.error('Failed to load project');
+    }
+  };
+
+  const handleDownloadOsi = (project) => {
+    try {
+      const filePath = project.osi_file_path || '';
+      const fileName = filePath.split('\\').pop().split('/').pop();
+      if (!fileName) {
+        message.error('No OSI file available');
+        return;
+      }
+      const downloadUrl = `${SERVER_ROOT}user/obtain-input-file/?filename=${encodeURIComponent(fileName)}`;
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {
+      message.error('Failed to download OSI');
     }
   };
 
@@ -216,19 +276,18 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
                       <span className="text-item-text text-osdag-text-primary dark:text-white font-semibold">
                         {project.name}
                       </span>
-                      {project.has_output && (
-                        <FileTextOutlined className="text-green-500 text-sm" title="Has output" />
-                      )}
                     </div>
 
                     <p className="text-subtitle text-osdag-text-secondary dark:text-gray-400 mb-2">
-                      {getModuleDisplayName(project.module_id)}
+                      Last modified: {formatDate(project.updated_at)} · Created: {new Date(project.created_at).toLocaleDateString()}
                     </p>
 
                     {/* Action buttons - show on hover */}
                     <div className="flex flex-wrap gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-all duration-300 max-h-0 group-hover:max-h-20 overflow-hidden">
-                      <button
-                        className="px-3 py-1.5 text-xs font-medium bg-osdag-green/10 text-osdag-green rounded-lg hover:bg-osdag-green/20 transition-colors"
+                      <Button
+                        type="default"
+                        size="small"
+                        className="px-3 py-1.5 text-xs font-medium"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -236,7 +295,28 @@ const RecentProjects = ({ projects = [], loading = false, onDeleteProject }) => 
                         }}
                       >
                         Open Project
-                      </button>
+                      </Button>
+                      <Button
+                        type="default"
+                        size="small"
+                        disabled
+                        className="px-3 py-1.5 text-xs font-medium"
+                        icon={<FileTextOutlined />}
+                      >
+                        Generate Report
+                      </Button>
+                      <Button
+                        type="default"
+                        size="small"
+                        className="px-3 py-1.5 text-xs font-medium"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDownloadOsi(project);
+                        }}
+                      >
+                        Download OSI
+                      </Button>
                       <Popconfirm
                         title="Are you sure you want to delete this project?"
                         onConfirm={() => handleDeleteProject(project.id)}

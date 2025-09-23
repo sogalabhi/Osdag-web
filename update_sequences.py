@@ -7,7 +7,7 @@ from psycopg2 import sql
 
 
 conn = psycopg2.connect(database='postgres_Intg_osdag', host='localhost',
-                        user='osdagdeveloper', password='Postgress', port='5432')
+                        user='osdagdeveloper', password='password', port='5432')
 cursor = conn.cursor()
 file = open("ResourceFiles/Database/update_sequences.sql", "r+")
 
@@ -15,6 +15,11 @@ data = file.read()
 
 cursor.execute(data)
 print('SUCCESS : Sequences Updated')
+
+
+
+
+
 
 
 

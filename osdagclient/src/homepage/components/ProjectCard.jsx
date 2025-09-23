@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProjectNameModal from '../../components/ProjectNameModal';
-import { getCurrentUserEmail, isGuestUser } from '../../utils/auth';
+import { isGuestUser } from '../../utils/auth';
 import { MODULE_KEY_FIN_PLATE } from '../../constants/DesignKeys';
 
 const MODULE_ROUTES = {
@@ -59,19 +59,14 @@ const ProjectCard = ({ title, items, type = 'project' }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access') || localStorage.getItem('token') || ''}`,
           },
-          body: JSON.stringify({
-            name: safeProjectName,
-            module_id: selectedModule.module_id,
-            module_name: selectedModule.name,
-            user_email: getCurrentUserEmail(),
-          }),
+          body: JSON.stringify({ name: safeProjectName }),
         });
-        if (response.ok) {
+        const data = await response.json();
+        if (response.ok && data.success) {
           const route = MODULE_ROUTES[selectedModule.module_id];
-          if (route) {
-            navigate(`${route}/${encodeURIComponent(safeProjectName)}`);
-          }
+          if (route) navigate(`${route}?projectId=${encodeURIComponent(data.project_id)}`);
         }
       } catch (e) {
         // handle error

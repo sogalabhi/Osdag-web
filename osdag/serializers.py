@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 # importing models 
 from osdag.models import Anchor_Bolt , Angle_Pitch , Angles , Beams , Bolt , Bolt_fy_fu , CHS , Channels , Columns , EqualAngle , UnequalAngle , Material , RHS , SHS, CustomMaterials 
-from osdag.models import Design, UserAccount
+from osdag.models import Design, UserAccount, OsiFile
 
 # simplejwt imports 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -48,6 +48,13 @@ class UserAccount_Serializer(serializers.ModelSerializer):
         instance.allInputValueFiles = validated_data.get('allInputValueFiles', instance.allInputValueFiles)
         instance.save()
         return instance
+
+
+class OsiFileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OsiFile
+        fields = ['id', 'file', 'created_at']
 
 
 class Design_Serializer(serializers.ModelSerializer) : 

@@ -28,7 +28,8 @@ from django.http import FileResponse, JsonResponse
 from django.contrib.auth import authenticate
 
 # importing serializers
-from osdag.serializers import UserAccount_Serializer
+from osdag.serializers import UserAccount_Serializer, OsiFileSerializer
+from osdag.models import OsiFile
 
 # other imports 
 from django.contrib.auth.models import User
@@ -266,23 +267,26 @@ class CheckEmailView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
 class LoginView(APIView):
     def post(self, request):
         try:
             is_guest = request.data.get('isGuest')
             
             if is_guest:
-                # Generate a unique guest username each time
+                # Issue JWT tokens without creating/storing a guest user
                 guest_username = "guest_" + ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
                 guest_email = guest_username + "@guest.com"
-                guest_password = User.objects.make_random_password()
-                user = User.objects.create_user(username=guest_username, email=guest_email, password=guest_password)
-                # Optionally, set user.is_active = False or limit permissions
-                refresh = RefreshToken.for_user(user)
+
+                refresh = RefreshToken()
+                refresh["user_id"] = 0  # synthetic id for guest
+                refresh["username"] = guest_username
+                refresh["email"] = guest_email
+                refresh["is_guest"] = True
+                access = refresh.access_token
+
                 return Response({
                     'message': 'Guest login successful',
-                    'access': str(refresh.access_token),
+                    'access': str(access),
                     'refresh': str(refresh),
                     'username': guest_username,
                     'email': guest_email,
@@ -412,63 +416,22 @@ class SaveInputFileView(APIView) :
     def post(self, request) : 
         print('inside the saveinput file view post')
 
-        # obtain the file from the request 
-        content = request.data.get('content')
-        email = request.data.get('email')
-        print('content : ' , content)
-        print('email : ' , email)
+        # New implementation: accept multipart upload of .osi file and store via OsiFile model
+        try:
+            uploaded_file = request.FILES.get('file')
+            if not uploaded_file:
+                return Response({'message': 'No file provided under field "file"'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # create a file in the file_storage 
-        # fileName = ''.join(str(uuid.uuid4()).split('-')) + ".osi"
-        
-        # obtain the index of the allInputFiles of the user 
-        userObject = UserAccount.objects.get(email = email)
-        fileIndex = len(userObject.allInputValueFiles)
-        fileName = email + f"_fin_plate_connection_{fileIndex}.osi"
-        print('fileName : ' , fileName)
-        currentDirectory = os.getcwd()
-        print('currentDirectory : ' , currentDirectory)
-        fullPath = currentDirectory + "/file_storage/input_values_files/" + fileName
-        print('fullPath : ' , fullPath)
-        
-        # check if the input_values_files directory exists or not 
-        # if not, then create one 
-        if(not os.path.exists(os.path.join(os.getcwd() , "file_storage/input_values_files/"))) : 
-            print('The input_values_files dir dies not exist, creating one')
-            os.mkdir(os.path.join(os.getcwd() , "file_storage/input_values_files/"))
-
-        # create the file
-        try : 
-            print('creating the .osi file')
-            with open(fullPath , "wt") as destination : 
-                destination.write(content)
-            destination.close()
-            print('created the .osi file ')
-            
-            try : 
-                # append the fulllPath of the file to the email
-                userObject = UserAccount.objects.get(email = email)
-                
-                # check if the file path already exists in the list or not 
-                # if not, then append
-                # else do not append
-                if not fullPath in userObject.allInputValueFiles : 
-                    userObject.allInputValueFiles.append(fullPath)
-                
-                allInputValueFilesLength = len(userObject.allInputValueFiles)
-                userObject.save()
-                print('the filePath has been appended and linked to the user')
-            except Exception as e: 
-                print('An exception has occured : ' , e)
-
-                return Response({'message' : 'Failed to connect the file to the User'} , status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
-            return Response({'message' : "File stored successfully" , 'allInputValueFilesLength' : allInputValueFilesLength , 'fileName' : fileName} , status = status.HTTP_201_CREATED)
-        
-        except : 
-            print('Error in creating an storing the contents of the file')
-
-            return Response({'message' : "Failed to store the contents of the file"} , status = status.HTTP_400_BAD_REQUEST)
+            serializer = OsiFileSerializer(data={'file': uploaded_file})
+            if serializer.is_valid():
+                osifile = serializer.save()
+                file_url = osifile.file.url
+                return Response({'message': 'File stored successfully', 'url': file_url, 'id': osifile.id}, status=status.HTTP_201_CREATED)
+            else:
+                return Response({'message': 'Invalid file upload', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print('Error saving OSI file via OsiFile model: ', e)
+            return Response({'message': 'Failed to store the file'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SetRefreshTokenCookieView(APIView) : 

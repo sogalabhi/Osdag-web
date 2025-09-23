@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Input, Modal, Button } from "antd";
 import Select from 'react-select';
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
@@ -27,6 +27,7 @@ import Logsvg from "../../../assets/Logsvg.svg";
 import ArrowDownsvg from "../../../assets/ArrowDownsvg.svg";
 import Homesvg from "../../../assets/Homesvg.svg";
 import GridSelector from "../utils/GridSelector";
+import { message, Modal as AntdModal } from 'antd';
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -115,6 +116,44 @@ export const EngineeringModule = ({
   const [orthographicView, setOrthographicView] = useState(null); // New state for orthographic view
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
   const [selectedSection, setSelectedSection] = useState("Section Details");
+  // Auth helpers
+  const BASE_URL = 'http://localhost:8000/api/';
+  const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
+  const isGuest = () => (localStorage.getItem('userType') === 'guest');
+  const location = useLocation();
+
+  const getProjectIdFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const pid = params.get('projectId');
+    return pid ? parseInt(pid, 10) : null;
+  };
+
+  // Enforce project presence for authenticated users
+  useEffect(() => {
+    if (isGuest()) return; // guests can open without a project
+    const projectId = getProjectIdFromUrl();
+    if (!projectId || Number.isNaN(projectId)) {
+      message.warning('No active project. Redirecting to home.');
+      navigate('/');
+      return;
+    }
+    (async () => {
+      try {
+        const res = await fetch(`${BASE_URL}projects/${projectId}/`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${getAccessToken()}` },
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          message.warning('Project not found. Redirecting to home.');
+          navigate('/');
+        }
+      } catch (_e) {
+        message.warning('Cannot verify project. Redirecting to home.');
+        navigate('/');
+      }
+    })();
+  }, [location.search]);
 
   // Only change dock visibility after design is complete
   useEffect(() => {
