@@ -20,7 +20,7 @@ export const CONNECTIONS_TAB_CONTENT = {
         {
             label: "Shear Connections",
             options: [
-                { key: "FinPlate", label: "Fin Plate", img: coverPlateBolted },
+                { key: "FinPlateConnection", label: "Fin Plate", img: coverPlateBolted },
                 { key: "CleatAngle", label: "Cleat Angle", img: endPlate },
                 { key: "EndPlate", label: "End Plate", img: endPlate },
                 { key: "SeatedAngle", label: "Seated Angle", img: endPlate },

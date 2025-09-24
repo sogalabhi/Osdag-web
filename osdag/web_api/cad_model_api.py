@@ -52,7 +52,7 @@ class CADGeneration(View):
             
             # Determine session type from module_id
             module_type_mapping = {
-                "Fin-Plate-Connection": "FinPlate",
+                "FinPlateConnection": "FinPlateConnection",
                 "Cleat-Angle-Connection": "CleatAngle", 
                 "End-Plate-Connection": "EndPlate",
                 "Seated-Angle-Connection": "SeatedAngle",
@@ -86,7 +86,7 @@ class CADGeneration(View):
         macro_path = os.path.join(parent_dir, 'freecad_utils/open_brep_file.FCMacro')
     
         # Determine sections based on the session type and what each backend module expects
-        if session_type == "FinPlate":
+        if session_type == "FinPlateConnection":
             sections = ["Model", "Beam", "Column", "Plate"]
         elif session_type == "CleatAngle":
             sections = ["Model", "Beam", "Column", "cleatAngle"]

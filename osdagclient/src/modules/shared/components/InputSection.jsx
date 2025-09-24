@@ -24,23 +24,6 @@ export const InputSection = ({
   const safeInputs = inputs || {};
   const safeContextData = contextData || {};
   const [imageSource, setImageSource] = useState("");
-
-  // Debug logging for context data
-  useEffect(() => {
-    console.log("🎯 [INPUT SECTION] Context data received:", {
-      connectivityList: safeContextData.connectivityList?.length || 0,
-      materialList: safeContextData.materialList?.length || 0,
-      beamList: safeContextData.beamList?.length || 0,
-      columnList: safeContextData.columnList?.length || 0,
-      boltDiameterList: safeContextData.boltDiameterList?.length || 0,
-      thicknessList: safeContextData.thicknessList?.length || 0,
-      propertyClassList: safeContextData.propertyClassList?.length || 0,
-      angleList: safeContextData.angleList?.length || 0 
-    });
-  }, [safeContextData]);
-
-  console.log("angleList###########", safeContextData.angleList);
-
   const { Option } = Select;
 
   // Handle connectivity selection with image (for FinePlate)

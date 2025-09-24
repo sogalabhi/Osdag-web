@@ -85,7 +85,7 @@ function UnifiedDropdownMenu({
   triggerScreenshotCapture,
   selectedOption = null,
   setSelectedOption = () => { },
-  moduleType, // "finplate" | "endplate" | "coverplate"
+  moduleType, // "FinPlateConnection" | "endplate" | "coverplate"
   currentProjectId,
 }) {
   const {

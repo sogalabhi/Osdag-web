@@ -262,7 +262,7 @@ export const EngineeringModule = ({
 
   // Get connectivity for FinPlate module
   const getConnectivity = () => {
-    if (moduleConfig.cameraKey === "FinPlate") {
+    if (moduleConfig.cameraKey === "FinPlateConnection") {
       return extraState?.selectedOption || inputs?.connectivity;
     }
     return null;
@@ -286,7 +286,7 @@ export const EngineeringModule = ({
   const getViewOptions = () => {
     console.log("🔍 [ENGINEERING MODULE] getViewOptions called with cameraKey:", moduleConfig.cameraKey);
 
-    if (moduleConfig.cameraKey === "FinPlate") {
+    if (moduleConfig.cameraKey === "FinPlateConnection") {
       console.log("📋 [ENGINEERING MODULE] Returning FinPlate view options");
       return ["Model", "Beam", "Column", "Plate"];
     }

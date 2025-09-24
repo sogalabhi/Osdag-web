@@ -125,7 +125,7 @@ export default function useViewCamera(moduleName, selectedView, connectivity = n
   const moduleSettings = cameraSettings[moduleName] || cameraSettings.default;
   
   // Handle FinPlate connectivity-specific settings
-  if (moduleName === "FinPlate" && connectivity && moduleSettings.connectivitySettings) {
+  if (moduleName === "FinPlateConnection" && connectivity && moduleSettings.connectivitySettings) {
     const connectivitySettings = moduleSettings.connectivitySettings[connectivity];
     
     if (connectivitySettings) {

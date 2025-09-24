@@ -303,7 +303,7 @@ class CommonDesignLogic(object):
 
         A = self.module_class
 
-        if self.connection == KEY_DISP_FINPLATE or self.connection == 'Fin-Plate-Connection':
+        if self.connection == KEY_DISP_FINPLATE or self.connection == 'FinPlateConnection':
             # A = self.module_class()
             # A = FinPlateConnection()
             plate = Plate(L=A.plate.height, W=A.plate.length, T=A.plate.thickness_provided)
@@ -337,7 +337,7 @@ class CommonDesignLogic(object):
 
 
         # --Notch dimensions
-        if self.connection == KEY_DISP_FINPLATE or self.connection == 'Fin-Plate-Connection':
+        if self.connection == KEY_DISP_FINPLATE or self.connection == 'FinPlateConnection':
             gap = A.plate.gap
             notchObj = Notch(R1=notch_R1,
                              height=notch_height,
@@ -387,7 +387,7 @@ class CommonDesignLogic(object):
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        if self.connection == KEY_DISP_FINPLATE or self.connection == 'Fin-Plate-Connection':  # finBeamWebBeamWeb/endBeamWebBeamWeb
+        if self.connection == KEY_DISP_FINPLATE or self.connection == 'FinPlateConnection':  # finBeamWebBeamWeb/endBeamWebBeamWeb
             nut_space = A.supported_section.web_thickness + A.plate.thickness_provided + nut_T
             nutBoltArray = finNutBoltArray(A.bolt,  A.plate, nut, bolt, nut_space)
             beamwebconn = FinBeamWebBeamWeb(supporting, supported, notchObj, plate, Fweld1, nutBoltArray, gap)
@@ -522,7 +522,7 @@ class CommonDesignLogic(object):
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        if self.connection == KEY_DISP_FINPLATE or self.connection == 'Fin-Plate-Connection':  # finColWebBeamWeb
+        if self.connection == KEY_DISP_FINPLATE or self.connection == 'FinPlateConnection':  # finColWebBeamWeb
             gap = A.plate.gap
             nut_space = A.supported_section.web_thickness + int(A.plate.thickness_provided) + nut_T
             nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
@@ -569,7 +569,7 @@ class CommonDesignLogic(object):
         print(f"CAD - Has cleat: {hasattr(A, 'cleat')}")
         print(f"CAD - Has plate: {hasattr(A, 'plate')}")
 
-        if self.connection == KEY_DISP_FINPLATE or self.connection == 'Fin-Plate-Connection':
+        if self.connection == KEY_DISP_FINPLATE or self.connection == 'FinPlateConnection':
             # A = self.module_class()
             # A = FinPlateConnection()
             gap = A.plate.gap
@@ -645,7 +645,7 @@ class CommonDesignLogic(object):
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        if self.connection == KEY_DISP_FINPLATE or self.connection == 'Fin-Plate-Connection':
+        if self.connection == KEY_DISP_FINPLATE or self.connection == 'FinPlateConnection':
             nut_space = A.supported_section.web_thickness+ int(A.plate.thickness_provided) + nut_T
             # nutBoltArray = finNutBoltArray(A, nut, bolt, nut_space)  # finColFlangeBeamWeb
             # colflangeconn = finColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray, gap)
@@ -1748,7 +1748,7 @@ class CommonDesignLogic(object):
             self.loc = A.connectivity
 
 
-            if self.loc == "Column Flange-Beam Web" and (self.connection == KEY_DISP_FINPLATE or self.connection == 'Fin-Plate-Connection'):
+            if self.loc == "Column Flange-Beam Web" and (self.connection == KEY_DISP_FINPLATE or self.connection == 'FinPlateConnection'):
                 # pass
                 # print("hghghghg")
                 self.display.View.SetProj(OCC.Core.V3d.V3d_XnegYnegZpos)
@@ -1794,7 +1794,7 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
                 osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                                     update=True)
-                if self.connection == KEY_DISP_FINPLATE or self.connection == 'Fin-Plate-Connection' or self.connection == KEY_DISP_ENDPLATE or self.connection == 'End-Plate-Connection':
+                if self.connection == KEY_DISP_FINPLATE or self.connection == 'FinPlateConnection' or self.connection == KEY_DISP_ENDPLATE or self.connection == 'End-Plate-Connection':
                     print(f"CAD - FinPlate/EndPlate display branch selected")
                     osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=Quantity_NOC_RED, update=True)
                     osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color=Quantity_NOC_RED, update=True)

@@ -100,7 +100,7 @@ class CreateDesignReport(APIView):
         
         # Map module IDs to their respective create_from_input functions
         module_function_map = {
-            'Fin-Plate-Connection': fin_plate_create_from_input,
+            'FinPlateConnection': fin_plate_create_from_input,
             'End-Plate-Connection': end_plate_create_from_input,
             'Cleat-Angle-Connection': cleat_angle_create_from_input,
             'Seated-Angle-Connection': seated_angle_create_from_input,

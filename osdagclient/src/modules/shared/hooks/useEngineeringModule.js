@@ -89,7 +89,7 @@ export const useEngineeringModule = (moduleConfig) => {
 
   // Initialize extraState based on module type
   const getInitialExtraState = () => {
-    if (moduleConfig.cameraKey === "FinPlate") {
+    if (moduleConfig.cameraKey === "FinPlateConnection") {
       return {
         selectedOption: "Column Flange-Beam-Web", // Default for FinPlate
       };
@@ -326,7 +326,7 @@ export const useEngineeringModule = (moduleConfig) => {
   // Get supported data when member designation changes (BeamBeamEndPlate) - Using simplified API
   useEffect(() => {
     const loadSupportedData = async () => {
-      if (inputs.member_designation && moduleConfig.cameraKey !== "FinPlate" && moduleConfig.cameraKey !== "CleatAngle" && manageDesignPreferences) {
+      if (inputs.member_designation && moduleConfig.cameraKey !== "FinPlateConnection" && moduleConfig.cameraKey !== "CleatAngle" && manageDesignPreferences) {
         try {
           console.log('Loading supported data for:', inputs.member_designation);
 
@@ -351,7 +351,7 @@ export const useEngineeringModule = (moduleConfig) => {
   // Get design preferences data for FinPlate and CleatAngle - Using simplified API
   useEffect(() => {
     const loadDesignPreferences = async () => {
-      if ((moduleConfig.cameraKey === "FinPlate" || moduleConfig.cameraKey === "CleatAngle") && manageDesignPreferences) {
+      if ((moduleConfig.cameraKey === "FinPlateConnection" || moduleConfig.cameraKey === "CleatAngle") && manageDesignPreferences) {
         const conn_map = {
           "Column Flange-Beam-Web": "Column Flange-Beam Web",
           "Column Web-Beam-Web": "Column Web-Beam Web",

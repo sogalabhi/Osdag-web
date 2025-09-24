@@ -666,12 +666,6 @@ export const ModuleProvider = ({ children }) => {
           console.warn('🚫 DEPRECATED: updateSourceAndMechType() - Use manageDesignPreferences("section_update", {...}) instead');
           return manageDesignPreferences('section_update', { id, materialValue });
         },
-
-        // 🚫 DEPRECATED: Use generateReport() instead
-        createDesignReport: (params, moduleId, inputValues, designStatus, logs) => {
-          console.warn('🚫 DEPRECATED: createDesignReport() - Use generateReport("design_report", {...}) instead');
-          return generateReport('design_report', { ...params, moduleId, inputValues, designStatus, logs });
-        },
       }}
     >
       {children}

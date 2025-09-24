@@ -19,7 +19,7 @@ from .inputdata.tension_member_bolted_input import TensionMemberBoltedInputData
 from .inputdata.simply_supported_beam_input import SimplySupportedBeamInputData
 
 INPUT_DATA_FACTORY = {
-    'Fin-Plate-Connection': FinPlateInputData(),
+    'FinPlateConnection': FinPlateInputData(),
     'Cleat-Angle-Connection': CleatAngleInputData(),
     'End-Plate-Connection': EndPlateInputData(),
     'Seated-Angle-Connection': SeatedAngleInputData(),
@@ -43,19 +43,19 @@ class InputData(APIView):
         propertyClass = <String> ( Optional query )
 
     Example : 
-        moduleName = Fin-Plate-Connection
+        moduleName = FinPlateConnection
         connectivity = Beam-Beam
         boltDiameter = Customized 
         propertyClass = Customized
         thickness = Customized
 
     Example URL would look like this : 
-        1. http://127.0.0.1:8000/populate?moduleName=Fin-Plate-Connection&connectivity=Column-Flange-Beam-Web
-        2. http://127.0.0.1:8000/populate?moduleName=Fin-Plate-Connection&boltDiameter=Customized
-        3. http://127.0.0.1:8000/populate?moduleName=Fin-Plate-Connection&propertyClass=Customized
-        4. http://127.0.0.1:8000/populate?moduleName=Fin-Plate-Connection&connectivity=Column-Web-Beam-Web
-        5. http://127.0.0.1:8000/populate?moduleName=Fin-Plate-Connection
-        6. http://127.0.0.1:8000/populate?moduleName=Fin-Plate-Connection&thickness=Customized
+        1. http://127.0.0.1:8000/populate?moduleName=FinPlateConnection&connectivity=Column-Flange-Beam-Web
+        2. http://127.0.0.1:8000/populate?moduleName=FinPlateConnection&boltDiameter=Customized
+        3. http://127.0.0.1:8000/populate?moduleName=FinPlateConnection&propertyClass=Customized
+        4. http://127.0.0.1:8000/populate?moduleName=FinPlateConnection&connectivity=Column-Web-Beam-Web
+        5. http://127.0.0.1:8000/populate?moduleName=FinPlateConnection
+        6. http://127.0.0.1:8000/populate?moduleName=FinPlateConnection&thickness=Customized
 
     """
 

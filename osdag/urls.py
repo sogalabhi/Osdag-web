@@ -98,8 +98,8 @@ urlpatterns = [
     path('api/module-routes/', ModuleRoutes.as_view()),
 
     # output generation from input
-    path('calculate-output/Fin-Plate-Connection',
-         OutputData.as_view(), name='Fin-Plate-Connection'),
+    path('calculate-output/FinPlateConnection',
+         OutputData.as_view(), name='FinPlateConnection'),
 
     path('calculate-output/End-Plate-Connection',
          EndPLateOutputData.as_view(), name='End-Plate-Connection'),

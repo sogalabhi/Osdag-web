@@ -32,7 +32,7 @@ class ModuleApiType(_Protocol):
         """Generate the CAD model from input values as a BREP file. Return file path."""
         pass
 module_dict : Dict[str, ModuleApiType] = {
-    'Fin-Plate-Connection': fin_plate_connection,
+    'FinPlateConnection': fin_plate_connection,
     'End-Plate-Connection': end_plate_connection,
     'Cleat-Angle-Connection': cleat_angle_connection,
     'Seated-Angle-Connection': seated_angle_connection,

@@ -57,7 +57,7 @@ Member.Supported_Section.Designation: MB 350
 Member.Supported_Section.Material: E 250 (Fe 410 W)A
 Member.Supporting_Section.Designation: HB 450
 Member.Supporting_Section.Material: E 250 (Fe 410 W)A
-Module: Fin-Plate-Connection
+Module: FinPlateConnection
 Weld.Fab: Shop Weld
 Weld.Material_Grade_OverWrite: '410'
 out_titles_status:
@@ -89,7 +89,7 @@ out_titles_status:
     "Member.Supported_Section.Material" : "E 250 (Fe 410 W)A",
     "Member.Supporting_Section.Designation" : "HB 450",
     "Member.Supporting_Section.Material" : "E 250 (Fe 410 W)A",
-    "Module" : "Fin-Plate-Connection",
+    "Module" : "FinPlateConnection",
     "Weld.Fab" : "Shop Weld",
     "Weld.Material_Grade_OverWrite" : "410",
     "Connector.Plate.Thickness_List" : "10",
@@ -117,7 +117,7 @@ out_titles_status:
     "Member.Supported_Section.Material" : "E 250 (Fe 410 W)A",
     "Member.Supporting_Section.Designation" : "HB 450",
     "Member.Supporting_Section.Material" : "E 250 (Fe 410 W)A",
-    "Module" : "Fin-Plate-Connection",
+    "Module" : "FinPlateConnection",
     "Weld.Fab" : "Shop Weld",
     "Weld.Material_Grade_OverWrite" : "410",
     "Connector.Plate.Thickness_List" : ["10" , "12" , "16" , "18" , "20"]
