@@ -355,30 +355,11 @@ export const ModuleProvider = ({ children }) => {
             throw new Error("Report ID is required for PDF generation");
           }
 
-          const response = await fetch(`${BASE_URL}getPDF?report_id=${report_id}`, {
-            method: "GET",
-            mode: "cors",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "Cache-Control": "no-cache",
-              Pragma: "no-cache",
-            },
-          });
-
-          if (response.ok) {
-            // Auto-download the PDF
-            const link = document.createElement("a");
-            link.href = response.url;
-            link.setAttribute("download", `osdag_report_${report_id}.pdf`);
-            link.click();
-            link.remove();
-
-            console.log("✅ [MODULE CONTEXT] PDF downloaded successfully");
-            return { success: true, message: "PDF downloaded successfully" };
-          } else {
-            throw new Error(`PDF generation failed: ${response.status} ${response.statusText}`);
-          }
+          // Open the backend PDF endpoint in a new tab; the backend will compile and stream the PDF
+          const pdfUrl = `${BASE_URL}getPDF?report_id=${report_id}`;
+          window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+          console.log("✅ [MODULE CONTEXT] Opened PDF in a new tab:", pdfUrl);
+          return { success: true, message: "PDF opened in a new tab" };
         }
 
         case 'csv': {
@@ -396,6 +377,7 @@ export const ModuleProvider = ({ children }) => {
         case 'design_report': {
           // Use external API for design report generation
           const { moduleId, inputValues, designStatus = true, logs = [] } = params;
+          console.log("🛠️ [MODULE CONTEXT] Generating design report with params:", params);
           return apiCreateDesignReport(params, moduleId, inputValues, designStatus, logs, uploadCompanyLogo, generateReport);
         }
 

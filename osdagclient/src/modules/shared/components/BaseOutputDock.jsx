@@ -77,32 +77,18 @@ export const BaseOutputDock = ({
   const getOutputValue = (key, rawOutput) => {
     const out = rawOutput && rawOutput.data ? rawOutput.data : rawOutput;
     if (!out) {
-      console.log(`getOutputValue: No output provided for key ${key}`);
       return " ";
     }
 
-    // Debug: Log the key and output structure
-    console.log(`Getting value for key: ${key}`, {
-      output: out,
-      keyValue: out[key],
-      outputKeys: Object.keys(out),
-      hasKey: key in output,
-      keyType: typeof key
-    });
-
     // Both modules now use flat structure: { "Bolt.Diameter": { label, val } }
     if (out[key]?.val !== undefined) {
-      console.log(`Found value in output[${key}].val:`, out[key].val);
       return out[key].val;
     }
 
     // Try alternative structures
     if (out[key] !== undefined) {
-      console.log(`Found value in output[${key}]:`, out[key]);
       return out[key];
     }
-
-    console.log(`No value found for key: ${key}`);
     return " ";
   };
 

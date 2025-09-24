@@ -336,7 +336,7 @@ KEY_MODULE_STATUS = 'Module.Status'
 
 TYPE_MODULE = 'Window Title'
 
-KEY_DISP_FINPLATE = 'Fin Plate Connection'
+KEY_DISP_FINPLATE = 'FinPlateConnection'
 KEY_DISP_ENDPLATE = 'End Plate Connection'
 KEY_DISP_CLEATANGLE = 'Cleat Angle Connection'
 KEY_DISP_SEATED_ANGLE = 'Seated Angle Connection'

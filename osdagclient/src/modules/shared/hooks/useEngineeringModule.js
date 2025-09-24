@@ -592,11 +592,24 @@ export const useEngineeringModule = (moduleConfig) => {
     try {
       console.log('Generating design report with simplified API');
 
+      // Build the same submission params used for calculate-output
+      const submissionParams = moduleConfig.buildSubmissionParams(
+        inputs,
+        allSelected,
+        {
+          boltDiameterList,
+          propertyClassList,
+          thicknessList,
+          angleList,
+        },
+        extraState
+      );
+
       // Prepare payload with selected sections for filtering
       const payload = {
         ...designReportInputs,
         moduleId: moduleConfig.designType,
-        inputValues: inputs,
+        inputValues: submissionParams,
         designStatus: true,
         logs: logs || [],
       };

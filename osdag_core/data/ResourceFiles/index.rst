@@ -26,7 +26,7 @@ Osdag Homepage_.
 ***********************
 1.1. Shear Connection
 #######################
-1.1.1. Fin Plate Connection
+1.1.1. FinPlateConnection
 ****************************
 1.1.1.1 Column Flange-Beam Web (CFBW) connectivity
 

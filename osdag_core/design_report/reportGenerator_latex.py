@@ -467,7 +467,13 @@ class CreateLatex(Document):
 
         with doc.create(Section('Design Log')):
             doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
-            logger_msgs=reportsummary['logger_messages'].split('\n')
+            raw_logger = reportsummary['logger_messages']
+            logger_msgs = []
+            if isinstance(raw_logger, str):
+                logger_msgs = raw_logger.split('\n')
+            else:
+                logger_msgs = raw_logger
+
             for msg in logger_msgs:
                 if('WARNING' in msg):
                     colour='blue'
