@@ -1,7 +1,7 @@
 import {React , useContext} from 'react';
 import { List, Button } from 'antd';
 // import './UserAccount.css'; 
-import { UserContext } from '../../context/UserState';
+import { UserContext } from '../context/UserState';
 
 
 let renderOnce = false

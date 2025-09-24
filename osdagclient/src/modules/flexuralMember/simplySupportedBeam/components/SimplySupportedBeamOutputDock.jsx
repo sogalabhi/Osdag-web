@@ -1,4 +1,3 @@
-import React from "react";
 import { BaseOutputDock } from "../../../shared/components/BaseOutputDock";
 import { simplySupportedBeamOutputConfig } from "../configs/simplySupportedBeamOutputConfig";
 

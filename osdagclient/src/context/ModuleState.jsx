@@ -93,7 +93,7 @@ export const ModuleProvider = ({ children }) => {
    * Universal function to get all module data in one API call
    * Replaces: getConnectivityList, getColumnBeamMaterialList, getBeamMaterialList, 
    *          getBoltDiameterList, getThicknessList, getPropertyClassList, etc.
-   * @param {string} moduleName - Module identifier (e.g., 'Fin-Plate-Connection')
+   * @param {string} moduleName - Module identifier (e.g., 'FinPlateConnection')
    * @param {Object} options - Optional parameters
    * @param {string} options.connectivity - Connection type filter
    * @param {Object} options.filters - Additional filters for data

@@ -10,7 +10,11 @@ export const DesignReportModal = ({
   output
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
-  
+  const [availableSections, setAvailableSections] = useState([]);
+  const [selectedSections, setSelectedSections] = useState([]);
+  const [showSectionFilter, setShowSectionFilter] = useState(false);
+  const [loadingSections, setLoadingSections] = useState(false);
+
   const handleFieldChange = (field, value) => {
     setDesignReportInputs(prev => ({
       ...prev,
@@ -21,7 +25,7 @@ export const DesignReportModal = ({
   const handleFileChange = (event) => {
     const imageFile = event.target.files[0];
     const imageFileName = event.target.files[0]?.name || "";
-    
+
     setDesignReportInputs(prev => ({
       ...prev,
       companyLogo: imageFile,
@@ -259,11 +263,89 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
             />
           </Col>
         </Row>
-
+        <Button type="dashed" onClick={async () => {
+          setLoadingSections(true);
+          // Fetch sections from backend API
+          try {
+            const resp = await fetch(`/api/report/sections?report_id=${someReportId}`, {
+              headers: { Authorization: `Bearer ${yourAccessToken}` },
+            });
+            const data = await resp.json();
+            if (data.success) {
+              setAvailableSections(data.sections);
+              const allSections = Object.keys(data.sections).reduce((acc, section) => {
+                const subs = data.sections[section] || [];
+                acc.push(section, ...subs.map(sub => `${section}/${sub}`));
+                return acc;
+              }, []);
+              setSelectedSections(allSections);  // Select all by default
+              setShowSectionFilter(true);
+            } else {
+              // message.error("Failed to load sections.");
+            }
+          } catch (e) {
+            console.log('Error fetching sections:', e);
+            // message.error("Error fetching sections.");
+          }
+          setLoadingSections(false);
+        }}>More... Customize Sections</Button>
+        {showSectionFilter && (
+          <div style={{ maxHeight: 300, overflowY: "auto", border: "1px solid #ddd", padding: 12, marginTop: 16 }}>
+            <h4>Select Sections to Include</h4>
+            {loadingSections ? <Spin /> : (
+              <div>
+                {Object.keys(availableSections).map(section => (
+                  <div key={section}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={selectedSections.includes(section)}
+                        onChange={e => {
+                          const checked = e.target.checked;
+                          setSelectedSections(prev => {
+                            if (checked) return [...prev, section];
+                            else return prev.filter(s => s !== section && !s.startsWith(`${section}/`));
+                          });
+                        }}
+                      />
+                      <strong>{section}</strong>
+                    </label>
+                    <div style={{ marginLeft: 20 }}>
+                      {availableSections[section].map(sub => (
+                        <div key={sub}>
+                          <label>
+                            <input
+                              type="checkbox"
+                              checked={selectedSections.includes(`${section}/${sub}`)}
+                              onChange={e => {
+                                const checked = e.target.checked;
+                                setSelectedSections(prev => {
+                                  if (checked) return [...prev, `${section}/${sub}`];
+                                  else return prev.filter(s => s !== `${section}/${sub}`);
+                                });
+                              }}
+                            />
+                            {sub}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Button type="primary" onClick={() => {
+              setShowSectionFilter(false);
+              // Here you can call your submit with selectedSections
+              // e.g. onOk(selectedSections)
+            }}>Confirm</Button>
+            <Button onClick={() => setShowSectionFilter(false)} style={{ marginLeft: 8 }}>Cancel</Button>
+          </div>
+        )}
         {/* Action Buttons */}
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "flex-end", 
+        <div style={{
+          display: "flex",
+          justifyContent: "flex-end",
           gap: "10px",
           marginTop: "20px",
           paddingTop: "15px",

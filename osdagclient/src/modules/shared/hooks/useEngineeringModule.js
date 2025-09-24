@@ -583,7 +583,7 @@ export const useEngineeringModule = (moduleConfig) => {
     setCreateDesignReportBool(true);
   };
 
-  const handleOkDesignReport = async () => {
+  const handleOkDesignReport = async (selectedSections = []) => {
     if (!output) {
       alert("Please submit the design first.");
       return;
@@ -592,21 +592,30 @@ export const useEngineeringModule = (moduleConfig) => {
     try {
       console.log('Generating design report with simplified API');
 
-      // Use the new simplified generateReport function
-      const result = await generateReport('design_report', {
+      // Prepare payload with selected sections for filtering
+      const payload = {
         ...designReportInputs,
         moduleId: moduleConfig.designType,
         inputValues: inputs,
         designStatus: true,
         logs: logs || [],
-      });
+      };
+
+      // Add sections if provided for customized filtering
+      if (selectedSections && selectedSections.length > 0) {
+        payload.sections = selectedSections;
+      }
+
+      const result = await generateReport('design_report', payload);
 
       if (result && result.success) {
         console.log('Design report generated successfully');
+        // Optionally show success message or further user feedback
       } else {
         console.error('Failed to generate design report:', result?.error);
         alert(`Failed to generate design report: ${result?.error || 'Unknown error'}`);
       }
+
     } catch (error) {
       console.error('Exception generating design report:', error);
       alert(`Error generating design report: ${error.message}`);
@@ -614,6 +623,7 @@ export const useEngineeringModule = (moduleConfig) => {
 
     handleCancelDesignReport();
   };
+
 
   const handleCancelDesignReport = () => {
     setDesignReportInputs({

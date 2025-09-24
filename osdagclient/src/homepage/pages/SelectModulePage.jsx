@@ -32,7 +32,6 @@ const SelectModulePage = () => {
           {/* Background image */}
           <div
             className="absolute inset-0 bg-[url('/images/howrah.png')] bg-cover bg-center"
-            // If `bg` is an imported image asset, you will need to adjust importing or keep as static URL path
           ></div>
 
           {/* Overlay: white with opacity for light; black with opacity for dark */}
@@ -47,9 +46,6 @@ const SelectModulePage = () => {
             <div className="flex-1 lg:overflow-y-auto">
               <TabbedModulePage />
             </div>
-
-            {/* Footer */}
-            {/* <Footer /> */}
           </div>
         </div>
       </div>

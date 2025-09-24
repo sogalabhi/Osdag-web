@@ -285,12 +285,12 @@ export const EngineeringModule = ({
   // Determine view options based on module
   const getViewOptions = () => {
     console.log("🔍 [ENGINEERING MODULE] getViewOptions called with cameraKey:", moduleConfig.cameraKey);
-    
+
     if (moduleConfig.cameraKey === "FinPlate") {
       console.log("📋 [ENGINEERING MODULE] Returning FinPlate view options");
       return ["Model", "Beam", "Column", "Plate"];
     }
-     else if (moduleConfig.cameraKey === "CleatAngle") {
+    else if (moduleConfig.cameraKey === "CleatAngle") {
       return ["Model", "Beam", "Column", "CleatAngle"]; // FIXED: Use CleatAngle instead of Connector
     }
     else if (moduleConfig.cameraKey === "EndPlate") {

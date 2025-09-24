@@ -116,7 +116,7 @@ const Header = ({ setshowSideBar, active }) => {
         <div className="flex items-center justify-between py-4 md:py-0">
           {/* Hamburger Menu Icon (Mobile/Tablet Only) */}
           <button
-            className="md:hidden p-2 rounded-lg text-osdag-text-muted hover:text-osdag-text-primary focus:outline-none focus:ring-2 focus:ring-osdag-green"
+            className="block lg:hidden p-2 rounded-lg text-osdag-text-muted hover:text-osdag-text-primary focus:outline-none focus:ring-2 focus:ring-osdag-green"
             aria-label="Open menu"
             onClick={() => {
               setshowSideBar(true);

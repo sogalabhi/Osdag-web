@@ -1,8 +1,8 @@
 import { useState, useContext, useEffect } from 'react';
 // import { useHistory } from 'react-router-dom';
-import icon from '../../assets/logo-osdag.png';
+import icon from '../assets/logo-osdag.png';
 // import { createJWTToken } from '../../context/ModuleState';
-import { UserContext } from '../../context/UserState';
+import { UserContext } from '../context/UserState';
 import { Modal, Button, Alert, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ProjectNameModal from '../../components/ProjectNameModal';
+import ProjectNameModal from '../components/ProjectNameModal';
 import { isGuestUser } from '../../utils/auth';
 import { MODULE_KEY_FIN_PLATE } from '../../constants/DesignKeys';
 

@@ -48,9 +48,6 @@ const Homepage = () => {
             <div className="flex-1 lg:overflow-y-auto">
               <MainContent />
             </div>
-
-            {/* Footer (optional) */}
-            {/* <Footer /> */}
           </div>
         </div>
       </div>

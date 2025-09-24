@@ -1,4 +1,4 @@
-// Beam API utilities
+// Beam API osdag_core.utils.common
 
 export const getSectionSize = async (sectionType) => {
   // Placeholder function for getting section size

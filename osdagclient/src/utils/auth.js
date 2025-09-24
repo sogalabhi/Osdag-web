@@ -1,4 +1,4 @@
-// Authentication utilities with improved security
+// Authentication osdag_core.utils.common with improved security
 import jwt_decode from 'jwt-decode';
 
 const TOKEN_KEY = 'access_token';

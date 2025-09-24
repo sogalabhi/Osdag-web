@@ -74,7 +74,7 @@ const MainContent = () => {
 
   function getModuleDisplayName(moduleId) {
     const moduleNames = {
-      'fp': 'Fin-Plate-Connection',
+      'fp': 'FinPlateConnection',
       'ca': 'Cleat Angle Connection',
       'ep': 'End Plate Connection',
       'sa': 'Seated Angle Connection',

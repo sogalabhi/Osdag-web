@@ -11,7 +11,7 @@ The ModuleContext has been simplified from **25+ functions to 8 core functions**
 **Universal data fetcher that replaces 12+ functions**
 - Replaces: `getConnectivityList`, `getColumnBeamMaterialList`, `getBeamMaterialList`, `getBoltDiameterList`, `getThicknessList`, `getPropertyClassList`, etc.
 - **Parameters:**
-  - `moduleName` (string): Module identifier (e.g., 'Fin-Plate-Connection')
+  - `moduleName` (string): Module identifier (e.g., 'FinPlateConnection')
   - `options` (object): Optional parameters
     - `connectivity` (string): Connection type filter
     - `filters` (object): Additional filters
@@ -20,10 +20,10 @@ The ModuleContext has been simplified from **25+ functions to 8 core functions**
 **Example:**
 ```javascript
 // Get all data for a module
-const result = await getModuleData('Fin-Plate-Connection');
+const result = await getModuleData('FinPlateConnection');
 
 // Get connectivity-specific data
-const result = await getModuleData('Fin-Plate-Connection', { 
+const result = await getModuleData('FinPlateConnection', { 
   connectivity: 'Beam-Beam' 
 });
 ```
@@ -108,7 +108,7 @@ await generateReport('csv');
 
 // Generate design report
 await generateReport('design_report', {
-  moduleId: 'Fin-Plate-Connection',
+  moduleId: 'FinPlateConnection',
   inputValues: { /* design inputs */ },
   designStatus: true,
   logs: []

@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
-const ProjectNameModal = ({ 
-  visible, 
-  onCancel, 
-  onConfirm, 
+const ProjectNameModal = ({
+  visible,
+  onCancel,
+  onConfirm,
   moduleName,
   title = "Name Your Project",
   message = "Please give your project a name to save it for later access.",
   defaultValue = '',
   confirmText = "Create Project",
-  loading = false 
+  loading = false
 }) => {
   const [projectName, setProjectName] = useState('');
   const [error, setError] = useState('');
@@ -27,12 +27,12 @@ const ProjectNameModal = ({
       setError('Please enter a project name');
       return;
     }
-    
+
     if (projectName.trim().length < 3) {
       setError('Project name must be at least 3 characters long');
       return;
     }
-    
+
     setError('');
     onConfirm(projectName.trim());
   };
@@ -111,7 +111,7 @@ const ProjectNameModal = ({
           }}>
             {message}
           </p>
-          
+
           <div style={{ marginBottom: '8px' }}>
             <label style={{
               display: 'block',
@@ -153,7 +153,7 @@ const ProjectNameModal = ({
               </div>
             )}
           </div>
-          
+
           {error && (
             <div style={{
               color: '#ff4d4f',
@@ -174,7 +174,7 @@ const ProjectNameModal = ({
           fontSize: '13px',
           color: '#586069'
         }}>
-          <strong>Tip:</strong> Use a descriptive name that will help you identify this project later. 
+          <strong>Tip:</strong> Use a descriptive name that will help you identify this project later.
           You can always rename it later.
         </div>
 
