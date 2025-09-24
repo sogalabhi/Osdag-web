@@ -19,9 +19,6 @@ export const BaseOutputDock = ({
 }) => {
   // Debug: Log the props received
   const normalizedOutput = output && output.data ? output.data : output;
-  console.log('BaseOutputDock received:', { output, normalizedOutput, outputConfig, title, extraState });
-  console.log('Output keys available:', Object.keys(normalizedOutput || {}));
-  console.log('OutputConfig sections:', Object.keys(outputConfig?.sections || {}));
 
   // Shared state management
   const [activeModals, setActiveModals] = useState({});

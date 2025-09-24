@@ -403,9 +403,9 @@ export const EngineeringModule = ({
       >
         {/* Left - Input Dock - Only show if showInputDock is true */}
         {showInputDock && (
-          <div className="InputDock">
+          <div className="w-[400px] bg-white">
             <div className="flex justify-between inputRow">
-              <span>Input Dock</span>
+              <span className="flex justify-center items-center w-32 my-2 ml-4 py-1 px-1 text-sm text-center rounded-xl font-medium bg-osdag-green text-white flex-shrink-0">Input Dock</span>
               <Select
                 value={{ value: selectedSection, label: selectedSection }}
                 onChange={(option) => {
@@ -417,17 +417,15 @@ export const EngineeringModule = ({
                   }
                 }}
                 options={[
+                  { value: "Additional Inputs", label: "Additional Inputs" },
                   { value: "Section Details", label: "Section Details" },
-                  { value: "Design Preferences", label: "Design Preferences" },
-                  { value: "Additional Inputs", label: "Additional Inputs" }
+                  { value: "Design Preferences", label: "Design Preferences" }
                 ]}
                 classNamePrefix="section-select"
                 isSearchable={false}
               />
             </div>
             <div className="subMainBody scroll-data">
-
-
               {selectedSection !== "Additional Inputs" &&
                 moduleConfig.inputSections.map((section, index) => (
                   <InputSection
@@ -454,30 +452,26 @@ export const EngineeringModule = ({
               )}
             </div>
 
-            <div className="inputdock-btn">
-              <button onClick={handleSubmitEnhanced}>
-                <img src={Designsvg} alt="Design" />
+            <div className="flex items-center justify-between w-full gap-x-4 px-4">
+
+              {/* Design Button */}
+              <button
+                onClick={handleSubmitEnhanced}
+                className="flex flex-1 items-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-2 rounded-lg shadow-md"
+              >
+                <img src={Designsvg} alt="Design icon" className="w-5 h-5" />
                 Design
               </button>
 
+              {/* Reset Button */}
               <button
-                className="arrow-down-btn"
-                onClick={toggleResetButton}
-                title="Toggle Reset Options"
+                onClick={handleResetEnhanced}
+                className="flex flex-1 items-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-2 rounded-lg shadow-md"
               >
-                <img
-                  src={ArrowDownsvg}
-                  alt="Toggle Reset"
-                  className={`arrow-icon ${showResetButton ? "rotated" : ""}`}
-                />
+                <img src={Resetsvg} alt="Reset icon" className="w-5 h-5" />
+                Reset
               </button>
 
-              {showResetButton && (
-                <button onClick={handleResetEnhanced} className="reset-btn">
-                  <img src={Resetsvg} alt="Reset" />
-                  Reset
-                </button>
-              )}
             </div>
           </div>
         )}
@@ -593,15 +587,23 @@ export const EngineeringModule = ({
           <div className="superMain_right">
             <div className="OutputDock">
               <OutputDockComponent output={output} extraState={extraState} />
-              <div className="inputdock-btn">
-                <Button onClick={handleCreateDesignReport}>
-                  <img src={Reportsvg} alt="Report" />
+              <div className="flex justify-end flex-col items-center gap-y-3 mt-2">
+                <div
+                  onClick={handleCreateDesignReport}
+                  className="cursor-pointer flex items-center gap-x-2 bg-osdag-green text-white font-semibold p-4 rounded-lg shadow-md duration-200"
+                >
+                  <img src={Reportsvg} alt="Report icon" className="w-5 h-5" />
                   Generate Report
-                </Button>
-                <Button onClick={saveOutput}>
-                  <img src={Outputsvg} alt="Output" />
+                </div>
+
+                <div
+                  onClick={saveOutput}
+                  className="cursor-pointer flex items-center gap-x-2 bg-osdag-green text-white font-semibold p-3 mb-1 rounded-lg shadow-md duration-200"
+                >
+                  <img src={Outputsvg} alt="Save icon" className="w-5 h-5" />
                   Save Output
-                </Button>
+                </div>
+
               </div>
             </div>
           </div>
