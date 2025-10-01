@@ -436,54 +436,54 @@ function SeatedAngle() {
     setSelectedFile(file);
   };
 
-  const handleUseProfile = () => {
-    if (selectedFile) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const contents = event.target.result;
-        const lines = contents.split("\n");
+  // const handleUseProfile = () => {
+  //   if (selectedFile) {
+  //     const reader = new FileReader();
+  //     reader.onload = (event) => {
+  //       const contents = event.target.result;
+  //       const lines = contents.split("\n");
 
-        lines.forEach((line) => {
-          const [field, value] = line.split(":");
-          const trimmedField = field.trim();
-          const trimmedValue = value.trim();
+  //       lines.forEach((line) => {
+  //         const [field, value] = line.split(":");
+  //         const trimmedField = field.trim();
+  //         const trimmedValue = value.trim();
 
-          if (trimmedField === "CompanyName") {
-            setCompanyName(trimmedValue);
-          } else if (trimmedField === "Designer") {
-            setDesigner(trimmedValue);
-          } else if (trimmedField === "Group/TeamName") {
-            setGroupTeamName(trimmedValue);
-          }
-        });
-      };
-      reader.readAsText(selectedFile);
-    }
-  };
+  //         if (trimmedField === "CompanyName") {
+  //           setCompanyName(trimmedValue);
+  //         } else if (trimmedField === "Designer") {
+  //           setDesigner(trimmedValue);
+  //         } else if (trimmedField === "Group/TeamName") {
+  //           setGroupTeamName(trimmedValue);
+  //         }
+  //       });
+  //     };
+  //     reader.readAsText(selectedFile);
+  //   }
+  // };
 
-  const handleSaveProfile = () => {
-    const profileSummary = `CompanyLogo: C:/Users/SURAJ/Pictures/codeup.png
-  CompanyName: ${companyName}
-  Designer: ${designer}
-  Group/TeamName: ${groupTeamName}`;
+  // const handleSaveProfile = () => {
+  //   const profileSummary = `CompanyLogo: C:/Users/SURAJ/Pictures/codeup.png
+  // CompanyName: ${companyName}
+  // Designer: ${designer}
+  // Group/TeamName: ${groupTeamName}`;
 
-    const blob = new Blob([profileSummary], {
-      type: "text/plain;charset=utf-8",
-    });
-    const url = URL.createObjectURL(blob);
+  //   const blob = new Blob([profileSummary], {
+  //     type: "text/plain;charset=utf-8",
+  //   });
+  //   const url = URL.createObjectURL(blob);
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${companyName}.txt`;
+  //   const link = document.createElement("a");
+  //   link.href = url;
+  //   link.download = `${companyName}.txt`;
 
-    link.style.display = "none";
-    document.body.appendChild(link);
+  //   link.style.display = "none";
+  //   document.body.appendChild(link);
 
-    link.click();
+  //   link.click();
 
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+  //   document.body.removeChild(link);
+  //   URL.revokeObjectURL(url);
+  // };
 
   const handleCreateDesignReport = () => {
     setCreateDesignReportBool(true);
@@ -624,7 +624,8 @@ function SeatedAngle() {
     }
 
     for (const key in output) {
-      if (output.hasOwnProperty(key)) {
+      // if (output.hasOwnProperty(key)) {
+      if (Object.hasOwn(output, key)) {
         const { label, val } = output[key];
         if (label && val !== undefined && val !== null) {
           const safeLabel = label.replace(/\s+/g, "_");
@@ -894,7 +895,7 @@ function SeatedAngle() {
               <div className="component-grid">
                 <div className="component-grid-align">
                   <h4>Connectivity</h4>
-                  <Select onSelect={handleSelectChange} value={selectedOption}>
+                  <Select onChange={handleSelectChange} value={selectedOption}>
                     {connectivityList.map((item, index) => (
                       <Option key={index} value={item}>
                         {item}
