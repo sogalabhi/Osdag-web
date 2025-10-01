@@ -182,7 +182,7 @@ function SeatedAngle() {
 
   useEffect(() => {
     return () => {
-      if (location.pathname != "/design/connections/seated_angle") {
+      if (location.pathname != "/design/connections/seatedAngle") {
         deleteSession("Seated Angle Connection");
       }
     };

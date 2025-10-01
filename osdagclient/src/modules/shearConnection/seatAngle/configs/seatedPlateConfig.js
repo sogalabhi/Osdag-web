@@ -1,9 +1,9 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
-import { MODULE_KEY_SEAT_PLATE, MODULE_DISPLAY_SEAT_PLATE } from '../../../../constants/DesignKeys';
+import { MODULE_KEY_SEAT_PLATE, MODULE_DISPLAY_SEAT_PLATE, MODULE_KEY_FIN_PLATE } from '../../../../constants/DesignKeys';
 
 export const seatedPlateConfig = {
   sessionName: MODULE_DISPLAY_SEAT_PLATE,
-  routePath: "/design/connections/shear/seat_plate",
+  routePath: "/design/connections/shear/seatAngle",
   designType: MODULE_KEY_SEAT_PLATE,
   cameraKey: "SeatedPlate",
   cadOptions: ["Model", "Beam", "Column", "Plate"],

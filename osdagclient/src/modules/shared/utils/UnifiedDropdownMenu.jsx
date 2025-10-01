@@ -553,7 +553,8 @@ function UnifiedDropdownMenu({
         // Default value
         setInputs({
           ...inputs,
-          [inputKey]: option.name,
+          // [inputKey]: option.name,
+          graphicsOption: option.name,
         });
         break;
     }

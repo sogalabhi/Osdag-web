@@ -125,7 +125,7 @@ const MODULE_ROUTES = {
   [MODULE_KEY_FIN_PLATE]: "/design/connections/shear/fin_plate",
   ca: "/design/connections/shear/cleat_angle", 
   ep: "/design/connections/shear/end_plate",
-  sa: "/design/connections/shear/seated_angle",
+  sa: "/design/connections/shear/seatAngle",
   // Moment Connections - Beam to Beam
   cpb: "/design/connections/beam-to-beam-splice/cover_plate_bolted",
   cpw: "/design/connections/beam-to-beam-splice/cover_plate_welded",
