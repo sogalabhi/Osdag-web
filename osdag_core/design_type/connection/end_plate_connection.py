@@ -47,7 +47,7 @@ from ...Common import *
 from ...design_report.reportGenerator_latex import CreateLatex
 from ...Report_functions import *
 import logging
-from importlib.resources import files
+from importlib_resources  import files
 
 
 class EndPlateConnection(ShearConnection):

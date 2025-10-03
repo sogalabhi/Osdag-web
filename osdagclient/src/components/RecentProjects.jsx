@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Popconfirm, message, Spin, Empty } from 'antd';
 import { EyeOutlined, DeleteOutlined, ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { isGuestUser, getCurrentUserEmail } from '../utils/auth';
 import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../constants/DesignKeys';
 
@@ -206,30 +206,15 @@ const RecentProjects = ({ projects: projectsProp = [], loading: loadingProp = fa
 
   if (isGuest) {
     return (
-      <div className="text-center p-10 dark:text-white">
-        {/* Guest Icon */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="mx-auto mb-6 h-20 w-20 text-osdag-green"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.5}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M16 14a4 4 0 01-8 0m8 0a4 4 0 00-8 0m8 0v2a4 4 0 01-8 0v-2m12-4a4 4 0 11-8 0 4 4 0 018 0zM6 18v2a4 4 0 008 0v-2"
-          />
-        </svg>
+      <div className="h-[400px] flex items-center justify-center text-center p-10 dark:text-white bg-white/50 dark:bg-white/70">
+        <div className="text-lg max-w-xl mx-auto dark:text-black gap-y-10 ">
+          <h1 className="text-4xl font-bold mb-4 dark:text-black">Guest Mode</h1>
+          <p className="pb-4">
+            Projects are not available in guest mode. Please sign up or log in to save and manage your projects.
+          </p>
+          <Link to="/" className="text-white mt-10 bg-osdag-green px-4 py-2 rounded-md">Login</Link>
+        </div>
 
-        {/* Big Guest Mode Text */}
-        <h1 className="text-4xl font-bold mb-4">Guest Mode</h1>
-
-        {/* Guest Message */}
-        <p className="text-lg max-w-xl mx-auto">
-          Projects are not available in guest mode. Please sign up or log in to save and manage your projects.
-        </p>
       </div>
     );
   }
@@ -260,7 +245,7 @@ const RecentProjects = ({ projects: projectsProp = [], loading: loadingProp = fa
   }
 
   return (
-    <div className=" dark:text-white rounded-2xl border border-osdag-border dark:border-gray-700 shadow-card hover:shadow-card-hover transition-shadow duration-200">
+    <div className=" dark:text-white rounded-2xl shadow-card hover:shadow-card-hover transition-shadow duration-200">
       <div className="p-6 border-b border-osdag-border dark:border-gray-700">
         <h2 className="text-card-title text-osdag-text-primary dark:text-white flex items-center">
           <ClockCircleOutlined className="mr-2" />

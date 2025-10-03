@@ -159,26 +159,6 @@ export const finPlateConfig = {
           }
         },
         {
-          key: "primary_beam",
-          label: UI_STRINGS.PRIMARY_BEAM,
-          type: "select", 
-          options: "beamList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
-            return connectivity === "Beam-Beam";
-          }
-        },
-        {
-          key: "secondary_beam",
-          label: UI_STRINGS.SECONDARY_BEAM,
-          type: "select",
-          options: "beamList", 
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
-            return connectivity === "Beam-Beam";
-          }
-        },
-        {
           key: "connector_material",
           label: UI_STRINGS.MATERIAL,
           type: "select",

@@ -102,7 +102,7 @@ const MainContent = () => {
       <div className="max-w-7xl mx-auto h-full">
         <div className={`grid grid-cols-1 ${isGuest ? 'xl:grid-cols-1' : 'xl:grid-cols-2'} gap-8 h-full`}>
           {/* Recent Projects Card */}
-          <div className=" rounded-lg shadow-sm border border-osdag-border dark:border-gray-700 p-6">
+          <div className=" rounded-lg shadow-sm  p-6">
             <RecentProjects projects={projects} loading={loading} onDeleteProject={handleDeleteProject} />
           </div>
           

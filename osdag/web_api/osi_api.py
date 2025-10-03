@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
@@ -57,7 +58,9 @@ class SaveOsiFromInputs(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class OpenOsiUpload(APIView):
-    permission_classes = [IsAuthenticated]
+    # Allow OSI load without auth so inputs can be populated directly
+    permission_classes = [AllowAny]
+    parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request):
         try:

@@ -4,10 +4,10 @@ const Logs = ({ logs }) => {
   // Ensure logs is always an array, even if null/undefined is passed
   const safeLogs = logs || [];
   // Reverse the logs so that the most recent log appears at the top
-  const reversedLogs = [...safeLogs].reverse();
+const reversedLogs = [...safeLogs].reverse();
   
   return (
-    <div className="h-full bg-white p-4 font-mono text-sm overflow-y-auto">
+    <div className="h-full bg-white dark:bg-osdag-dark-color dark:text-white p-4 font-mono text-sm overflow-y-auto">
       <div className="mb-4 pb-2 border-b border-gray-700">
         <h3 className="text-lg font-semibold">System Logs</h3>
       </div>

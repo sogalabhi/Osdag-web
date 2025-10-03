@@ -1,8 +1,3 @@
-// constants/modules.js
-import coverPlateBolted from "../assets/ShearConnection/sc_fin_plate.png";
-import coverPlateWelded from "../assets/ShearConnection/sc_fin_plate.png";
-import endPlate from "../assets/ShearConnection/sc_fin_plate.png";
-
 export const MODULE_SUBMODULES = {
     Connections: [
         { key: "Shear", label: "Shear Connection" },
@@ -20,10 +15,10 @@ export const CONNECTIONS_TAB_CONTENT = {
         {
             label: "Shear Connections",
             options: [
-                { key: "FinPlateConnection", label: "Fin Plate", img: coverPlateBolted },
-                { key: "CleatAngle", label: "Cleat Angle", img: endPlate },
-                { key: "EndPlate", label: "End Plate", img: endPlate },
-                { key: "SeatedAngle", label: "Seated Angle", img: endPlate },
+                { key: "FinPlateConnection", label: "Fin Plate", img: "shear_fin_plate_connec.svg" },
+                { key: "CleatAngle", label: "Cleat Angle", img: "shear_fin_plate_connec.svg" },
+                { key: "EndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" },
+                { key: "SeatedAngle", label: "Seated Angle", img: "shear_fin_plate_connec.svg" },
             ],
         },
     ],
@@ -31,28 +26,28 @@ export const CONNECTIONS_TAB_CONTENT = {
         {
             label: "Beam to Beam Splice",
             options: [
-                { key: "CoverPlateBolted", label: "Cover Plate Bolted", img: coverPlateBolted },
-                { key: "CoverPlateWelded", label: "Cover Plate Welded", img: coverPlateWelded },
-                { key: "EndPlate", label: "End Plate", img: endPlate },
+                { key: "CoverPlateBolted", label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
+                { key: "CoverPlateWelded", label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
+                { key: "EndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" },
             ],
         },
         {
             label: "Beam to Column Splice",
-            options: [{ key: "EndPlate", label: "End Plate", img: endPlate }],
+            options: [{ key: "EndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" }],
         },
         {
             label: "Column to Column Splice",
             options: [
-                { key: "CoverPlateBolted", label: "Cover Plate Bolted", img: coverPlateBolted },
-                { key: "CoverPlateWelded", label: "Cover Plate Welded", img: coverPlateWelded },
-                { key: "EndPlate", label: "End Plate", img: endPlate },
+                { key: "CoverPlateBolted", label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
+                { key: "CoverPlateWelded", label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
+                { key: "EndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" },
             ],
         },
     ],
     BasePlate: [
         {
             label: "Base Plates",
-            options: [{ key: "BasePlateConnection", label: "Base Plate Connection", img: endPlate }],
+            options: [{ key: "BasePlateConnection", label: "Base Plate Connection", img: "shear_fin_plate_connec.svg" }],
         },
     ],
     Truss: [{ label: "Truss Connections", options: [] }],
@@ -63,31 +58,31 @@ export const GENERIC_SUBMODULE_CONTENT = {
         {
             label: "Tension Member",
             options: [
-                { key: "BoltedToEndPlate", label: "Bolted to End Plate", img: coverPlateBolted },
-                { key: "WeldedToEndPlate", label: "Welded to End Plate", img: coverPlateWelded },
+                { key: "BoltedToEndPlate", label: "Bolted to End Plate", img: "shear_fin_plate_connec.svg" },
+                { key: "WeldedToEndPlate", label: "Welded to End Plate", img: "shear_fin_plate_connec.svg" },
             ],
         },
     ],
     Compression: [
         {
             label: "Compression Member",
-            options: [{ key: "StrutsInTrusses", label: "Struts in Trusses", img: coverPlateBolted }],
+            options: [{ key: "StrutsInTrusses", label: "Struts in Trusses", img: "shear_fin_plate_connec.svg" }],
         },
     ],
     Flexure: [
         {
             label: "Flexure Member",
             options: [
-                { key: "SimplySupportedBeam", label: "Simply Supported Beam", img: endPlate },
-                { key: "CantileverBeam", label: "Cantilever Beam", img: coverPlateBolted },
-                { key: "PlateGirder", label: "Plate Girder", img: coverPlateBolted },
+                { key: "SimplySupportedBeam", label: "Simply Supported Beam", img: "shear_fin_plate_connec.svg" },
+                { key: "CantileverBeam", label: "Cantilever Beam", img: "shear_fin_plate_connec.svg" },
+                { key: "PlateGirder", label: "Plate Girder", img: "shear_fin_plate_connec.svg" },
             ],
         },
     ],
 };
 
 export const MODULE_ROUTES = {
-    FinPlate: "/design/connections/shear/fin_plate",
+    FinPlateConnection: "/design/connections/shear/fin_plate",
     CleatAngle: "/design/connections/shear/cleat_angle",
     EndPlate: "/design/connections/shear/end_plate",
     SeatedAngle: "/design/connections/shear/seated_angle",

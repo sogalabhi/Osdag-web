@@ -148,7 +148,7 @@ class CreateDesignReport(APIView):
             }
             # generate a random string for report id
             report_id = get_random_string(length=16)
-            file_path = "file_storage/design_report/" + report_id
+            file_path = os.path.join(os.getcwd(), "file_storage", "design_report", report_id)
 
             # appenend the file path in the meta data
             metadata_final = {
@@ -157,7 +157,12 @@ class CreateDesignReport(APIView):
                 metadata_final[key] = metadata_other[key]
 
             metadata_final['does_design_exist'] = design_status
-            metadata_final['logger_messages'] = logs
+            # Convert logs to string format for LaTeX
+            if logs and isinstance(logs, list):
+                logger_string = '\n'.join([f"{log.get('timestamp', '')} - {log.get('type', 'INFO')} - {log.get('message', '')}" for log in logs])
+            else:
+                logger_string = "No logs available"
+            metadata_final['logger_messages'] = logger_string
             # Attach optional UI customization
             if sections:
                 metadata_final['selected_sections'] = sections
@@ -168,10 +173,15 @@ class CreateDesignReport(APIView):
         else : 
             # generate a random string for report id
             report_id = get_random_string(length=16)
-            file_path = "file_storage/design_report/" + report_id
+            file_path = os.path.join(os.getcwd(), "file_storage", "design_report", report_id)
             metadata_final = metadata
             metadata_final['does_design_exist'] = design_status
-            metadata_final['logger_messages'] = logs
+            # Convert logs to string format for LaTeX
+            if logs and isinstance(logs, list):
+                logger_string = '\n'.join([f"{log.get('timestamp', '')} - {log.get('type', 'INFO')} - {log.get('message', '')}" for log in logs])
+            else:
+                logger_string = "No logs available"
+            metadata_final['logger_messages'] = logger_string
             metadata_final['filename'] = file_path
             # Attach optional UI customization
             if sections:
@@ -218,14 +228,14 @@ class CreateDesignReport(APIView):
         if (resultBoolean):
             print("**")
             print('inside sleep')
-            # time.sleep(10)
-            isExists = os.path.exists(f'{os.getcwd()}/file_storage/design_report/{report_id}.tex')
-            print('report path : ' , f'{os.getcwd()}/{report_id}.tex')
+            time.sleep(10)
+            isExists = os.path.exists(f'{file_path}.tex')
+            print('report path : ' , f'{file_path}.tex')
             print('isExists : ' , isExists)
             # If sections provided, post-filter LaTeX file to include only selected sections
             try:
                 if sections:
-                    tex_path = f'{os.getcwd()}/file_storage/design_report/{report_id}.tex'
+                    tex_path = f'{file_path}.tex'
                     with open(tex_path, 'r', encoding='utf-8') as rf:
                         original_tex = rf.read()
                     filtered_tex = filter_latex_content(original_tex, sections)

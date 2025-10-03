@@ -115,7 +115,7 @@ export const EngineeringModule = ({
   const [isGridActive, setIsGridActive] = useState(false);
   const [orthographicView, setOrthographicView] = useState(null); // New state for orthographic view
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
-  const [selectedSection, setSelectedSection] = useState("Section Details");
+  const [selectedSection, setSelectedSection] = useState("Additional Inputs");
   // Auth helpers
   const BASE_URL = 'http://localhost:8000/api/';
   const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
@@ -260,7 +260,7 @@ export const EngineeringModule = ({
     console.log("Background color changed to:", color);
   };
 
-  // Get connectivity for FinPlate module
+  // Get connectivity for FinPlateConnection module
   const getConnectivity = () => {
     if (moduleConfig.cameraKey === "FinPlateConnection") {
       return extraState?.selectedOption || inputs?.connectivity;
@@ -403,7 +403,7 @@ export const EngineeringModule = ({
       >
         {/* Left - Input Dock - Only show if showInputDock is true */}
         {showInputDock && (
-          <div className="w-[400px] bg-white">
+          <div className="w-[400px] bg-white dark:bg-osdag-dark-color">
             <div className="flex justify-between inputRow">
               <span className="flex justify-center items-center w-32 my-2 ml-4 py-1 px-1 text-sm text-center rounded-xl font-medium bg-osdag-green text-white flex-shrink-0">Input Dock</span>
               <Select
@@ -425,8 +425,8 @@ export const EngineeringModule = ({
                 isSearchable={false}
               />
             </div>
-            <div className="subMainBody scroll-data">
-              {selectedSection !== "Additional Inputs" &&
+            <div className="subMainBody scroll-data dark:bg-osdag-dark-color bg-white">
+              {selectedSection !== "Section Details" &&
                 moduleConfig.inputSections.map((section, index) => (
                   <InputSection
                     key={index}
@@ -618,6 +618,16 @@ export const EngineeringModule = ({
         designReportInputs={designReportInputs}
         setDesignReportInputs={setDesignReportInputs}
         output={output}
+        moduleId={moduleConfig?.designType}
+        inputValues={inputs}
+        logs={logs}
+        moduleConfig={moduleConfig}
+        boltDiameterList={boltDiameterList}
+        propertyClassList={propertyClassList}
+        thicknessList={thicknessList}
+        angleList={angleList}
+        allSelected={allSelected}
+        extraState={extraState}
       />
 
       {/* Customization Modals */}

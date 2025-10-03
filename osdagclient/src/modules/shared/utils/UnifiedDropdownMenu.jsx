@@ -78,7 +78,7 @@ function UnifiedDropdownMenu({
   inputs,
   allSelected,
   setInputs,
-  setAllSelected,
+  setAllSelected = () => {},
   logs,
   setCreateDesignReportBool,
   setSaveInputFileName,
@@ -152,10 +152,13 @@ function UnifiedDropdownMenu({
         }
       } catch (err) {
         message.error('Failed to open OSI');
+      } finally {
+        // Ensure we remove the temporary input element after handling the file
+        if (parentRef.current && element && parentRef.current.contains(element)) {
+          parentRef.current.removeChild(element);
+        }
       }
     });
-
-    parentRef.current.removeChild(element);
   };
 
   const buildContentString = () => {

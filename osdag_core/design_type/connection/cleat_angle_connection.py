@@ -7,7 +7,7 @@ from ...Report_functions import *
 from ...design_report.reportGenerator_latex import CreateLatex
 from ...utils.common.load import Load
 import logging
-from importlib.resources import files
+from importlib_resources  import files
 
 class CleatAngleConnection(ShearConnection):
 

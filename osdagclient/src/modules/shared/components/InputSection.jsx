@@ -187,7 +187,7 @@ export const InputSection = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800/20 border-2 border-osdag-green rounded-xl mb-5 mx-4 shadow-sm relative pt-4">
+    <div className="bg-white dark:bg-osdag-dark-color/90 border-2 border-osdag-green rounded-xl mb-5 mx-4 shadow-sm relative pt-4">
       <h3 className="text-base font-bold text-osdag-text-primary dark:text-white bg-white dark:bg-osdag-dark-color px-1 absolute -top-4 left-4">
         {section.title}
       </h3>
