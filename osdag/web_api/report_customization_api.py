@@ -263,21 +263,25 @@ class CustomizeReport(APIView):
                 print(f'[report_customization_api] CustomizeReport:compiling in {os.getcwd()}')
                 print(f'[report_customization_api] CustomizeReport:tex file exists: {os.path.exists("filtered_report.tex")}')
                 
-                # Compile LaTeX - use the same pdflatex path as in LaTeX generation
-                script_dir = os.path.dirname(os.path.abspath(__file__))
-                # Go up to project root, then to osdag_core/data/ResourceFiles
-                project_root = os.path.dirname(os.path.dirname(script_dir))
-                latex_executable = os.path.join(project_root, "osdag_core", "data", "ResourceFiles", "osdag-latex-env", "bin", "windows", "pdflatex.exe")
-                latex_executable = os.path.abspath(latex_executable)
+                # Compile LaTeX - use system pdflatex (same as working design_report_csv_view.py)
+                print(f'[report_customization_api] CustomizeReport:using system pdflatex')
                 
-                print(f'[report_customization_api] CustomizeReport:using pdflatex: {latex_executable}')
-                print(f'[report_customization_api] CustomizeReport:pdflatex exists: {os.path.exists(latex_executable)}')
+                # Check if pdflatex is available
+                try:
+                    subprocess.run(['pdflatex', '--version'], capture_output=True, text=True, timeout=10)
+                    print('[report_customization_api] CustomizeReport:pdflatex is available')
+                except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError):
+                    print('[report_customization_api] CustomizeReport:pdflatex not found, trying alternative approach')
+                    return Response(
+                        {"error": "LaTeX (pdflatex) not found. Please install a LaTeX distribution like MiKTeX or TeX Live."}, 
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
                 
                 try:
                     if platform.system().lower() == 'windows':
                         print('[report_customization_api] CustomizeReport:running pdflatex on windows')
                         result = subprocess.run([
-                            latex_executable, '-interaction=nonstopmode', 
+                            'pdflatex', '-interaction=nonstopmode', 
                             'filtered_report.tex'
                         ], capture_output=True, text=True, timeout=60)
                     else:

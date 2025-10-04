@@ -61,3 +61,6 @@ file_storage/cad_models/*.brep
 file_storage/cad_models/*.obj
 file_storage/cad_models/*.iges
 file_storage/cad_models/*.step
+file_storage/cad_models/*.stp
+file_storage/cad_models/*.glb
+file_storage/
