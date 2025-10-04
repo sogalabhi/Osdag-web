@@ -24,7 +24,6 @@ import SelectModulePage from "./homepage/pages/SelectModulePage";
 import FinPlate from "./modules/shearConnection/finPlate/FinPlate";
 import CleatAngle from "./modules/shearConnection/cleatAngle/CleatAngle";
 import EndPlate from "./modules/shearConnection/endPlate/EndPlate";
-import SeatedPlate from "./modules/shearConnection/seatAngle/SeatedPlate";
 
 // Tension members modules
 import BoltedToEnd from "./modules/TensionMembers/BoltedToEnd/BoltedToEnd";
@@ -56,7 +55,7 @@ function App() {
         {/* Design routes grouped with dynamic designType */}
         <Route path="/design/:designType/shear/fin_plate/:projectId?" element={<FinPlate />} />
         <Route path="/design/:designType/shear/end_plate/:projectId?" element={<EndPlate />} />
-        <Route path="/design/:designType/shear/seatAngle/:projectId?" element={<SeatedPlate />} />
+        {/* <Route path="/design/:designType/shear/seatAngle/:projectId?" element={<SeatedPlate />} /> */}
         <Route path="/design/:designType/shear/cleat_angle/:projectId?" element={<CleatAngle />} />
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_bolted/:projectId?" element={<CoverPlateBolted />} />
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_welded/:projectId?" element={<CoverPlateWelded />} />
