@@ -303,6 +303,7 @@ export const EngineeringModule = ({
 
   const options = getViewOptions();
 
+  
   console.log("🔍 [ENGINEERING MODULE] Module Config:", {
     sessionName: moduleConfig.sessionName,
     designType: moduleConfig.designType,

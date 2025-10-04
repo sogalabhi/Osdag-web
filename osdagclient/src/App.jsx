@@ -32,6 +32,7 @@ import BoltedToEnd from "./modules/TensionMembers/BoltedToEnd/BoltedToEnd";
 // Beam modules
 import SimplySupportedBeam from "./modules/flexuralMember/simplySupportedBeam";
 import BeamBeamEndPlate from "./modules/beamBeamEndPlate/BeamBeamEndPlate";
+import SeatedPlate from "./modules/shearConnection/seatAngle/SeatedPlate";
 
 // Cover plate modules
 import CoverPlateBolted from "./modules/coverPlateBolted/CoverPlateBolted";
