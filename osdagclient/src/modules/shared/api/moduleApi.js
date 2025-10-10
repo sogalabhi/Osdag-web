@@ -169,6 +169,22 @@ export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => 
       body: JSON.stringify({ module_id: moduleKey, input_values: inputParams }),
       credentials: "include"
     });
+    // CAD-specific: simple alert on 500
+    if (cadRes.status === 500) {
+      let message = "Server error (500)";
+      try {
+        const body = await cadRes.json();
+        message = body?.message || message;
+      } catch (_) {
+        try {
+          const text = await cadRes.text();
+          if (text) message = text;
+        } catch (_) {}
+      }
+      // eslint-disable-next-line no-alert
+      alert(message);
+      return { design: designData, cad: null, error: message };
+    }
     const cadData = await cadRes.json();
     console.log("[designAndGenerateCad] CAD API response:", cadData);
     if (cadRes.status === 201 && cadData.status === "success") {
