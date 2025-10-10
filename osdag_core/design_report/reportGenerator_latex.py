@@ -15,8 +15,7 @@ from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor, 
 from pylatex.base_classes import Environment, CommandBase, Arguments
 from pylatex.package import Package
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, MediumText, LineBreak, simple_page_number, NewPage
-# from importlib_resources  import files
-from importlib.resources  import files
+from importlib.resources import files
 from ..Report_functions import *
 from ..utils.common.common_calculation import *
 from pylatex.utils import NoEscape
@@ -174,24 +173,23 @@ class CreateLatex(Document):
                 if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
                     with doc.create(Subsection("List of Input Section")):
                         with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
-                            # Handle both string and list formats
-                            if isinstance(uiObj[i], list):
-                                list_sec = uiObj[i]
-                            else:
-                                list_sec = uiObj[i].strip("['']").split("', '")
-                            
-                            print( 'list_sec', list_sec)
-                            str_len = len(list_sec)
+                            list_sec = uiObj[i].strip("['']")
+                            print( 'list_sec', list_sec,'\n', list_sec.split("', '"))
+                            # count = 0
+                            # for i in list_sec:
+                            #     print(i)
+                            #     count += 1
+                            str_len = len(list_sec.split("', '"))
                             print( 'str_len', str_len)
-                            print(f"list_sec[0:220]", list_sec[0:220])
-                            print('\n',','.join(f"'{x}'" for x in list_sec[0:220]))
-                            
+                            print(f"list_sec.split("', '")[0:220].strip("")", list_sec.split("', '")[0:220])
+                            print('\n',','.join(f"'{x}'" for x in list_sec.split("', '")[0:220]))
+                            # list_sec.split("', '")[0:220]
                             if str_len > 200: # 130
                                 table.add_hline()
                                 table.add_row((MultiColumn(1, align='|c|', data=i, ),
-                                               MultiColumn(1, align='|X|', data=','.join(f"'{x}'" for x in list_sec[0:220])),))
+                                               MultiColumn(1, align='|X|', data=','.join(f"'{x}'" for x in list_sec.split("', '")[0:220])),))
                                 extra_page = True
-                                list_sec_modified = ','.join(f"'{x}'" for x in list_sec[220:])
+                                list_sec_modified = ','.join(f"'{x}'" for x in list_sec.split("', '")[220:])
                                 # table.add_hline()
                                 # doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
                                 # doc.append(NewPage())
@@ -199,7 +197,7 @@ class CreateLatex(Document):
                             else:
                                 table.add_hline()
                                 table.add_row((MultiColumn(1, align='|c|', data=i, ),
-                                               MultiColumn(1, align='|X|', data=','.join(f"'{x}'" for x in list_sec),)))
+                                               MultiColumn(1, align='|X|', data=uiObj[i].strip("[]")),))
                             # str_len = len(uiObj[i])
                             # loop_len = round_up((str_len/100),1,1)
                             # table.add_hline()
@@ -506,37 +504,7 @@ class CreateLatex(Document):
 
             # Ensure the path is absolute
             latex_executable = os.path.abspath(latex_executable)
-            
-            # Extract directory and filename for proper file saving
-            file_dir = os.path.dirname(filename)
-            file_name = os.path.basename(filename)
-            
-            print(f"[LaTeX] Original filename: {filename}")
-            print(f"[LaTeX] File directory: {file_dir}")
-            print(f"[LaTeX] File name: {file_name}")
-            
-            # Change to target directory to save files there
-            original_cwd = os.getcwd()
-            print(f"[LaTeX] Original CWD: {original_cwd}")
-            
-            if file_dir:
-                os.makedirs(file_dir, exist_ok=True)
-                os.chdir(file_dir)
-                print(f"[LaTeX] Changed to directory: {os.getcwd()}")
-            
-            # Generate PDF and TEX files in the target directory
-            print(f"[LaTeX] Generating files with name: {file_name}")
-            doc.generate_pdf(file_name, compiler=latex_executable, clean_tex = False)
-            
-            # Check if files were created
-            tex_file = f"{file_name}.tex"
-            pdf_file = f"{file_name}.pdf"
-            print(f"[LaTeX] TEX file exists: {os.path.exists(tex_file)}")
-            print(f"[LaTeX] PDF file exists: {os.path.exists(pdf_file)}")
-            
-            # Restore original working directory
-            os.chdir(original_cwd)
-            print(f"[LaTeX] Restored CWD: {os.getcwd()}")
+            doc.generate_pdf(filename, compiler=latex_executable, clean_tex = False)
         except:
             pass
 
