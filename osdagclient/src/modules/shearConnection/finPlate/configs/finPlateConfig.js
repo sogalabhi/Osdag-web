@@ -47,12 +47,17 @@ export const finPlateConfig = {
     { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
   ],
 
-  validateInputs: (inputs) => {
-    const connectivity = inputs.connectivity;
-    
+  validateInputs: (inputs, extraState) => {
+    const connectivity = extraState?.selectedOption || inputs.connectivity;
+
+    // Basic numeric loads must not be empty
+    if (inputs.load_shear === "" || inputs.load_axial === "") {
+      return { isValid: false, message: UI_STRINGS.PLEASE_INPUT_ALL_FIELDS };
+    }
+
     if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
-      if (!inputs.beam_section || !inputs.column_section || 
-          inputs.beam_section === "Select Section" || 
+      if (!inputs.beam_section || !inputs.column_section ||
+          inputs.beam_section === "Select Section" ||
           inputs.column_section === "Select Section") {
         return { isValid: false, message: UI_STRINGS.PLEASE_INPUT_ALL_FIELDS };
       }
