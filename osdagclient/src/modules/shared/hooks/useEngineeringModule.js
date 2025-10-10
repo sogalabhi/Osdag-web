@@ -479,10 +479,14 @@ export const useEngineeringModule = (moduleConfig) => {
         setModelKey((prev) => prev + 1);
       } else {
         setLoading(false);
+        setIsLoadingModalVisible(false);
+        setLoadingStage("");
       }
     } catch (e) {
       console.error('Error in design/CAD flow:', e);
       setLoading(false);
+      setIsLoadingModalVisible(false);
+      setLoadingStage("");
     }
   };
 

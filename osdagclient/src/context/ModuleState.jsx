@@ -268,12 +268,16 @@ export const ModuleProvider = ({ children }) => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`CAD generation failed: ${response.status} ${response.statusText}`);
-      }
+
 
       const data = await response.json();
+      if (!response.ok) {
+        let message = data.message || "CAD generation failed";
 
+        // eslint-disable-next-line no-alert
+        alert(message + " " + response.status);
+        throw new Error(`CAD generation failed: ${response.status} ${response.statusText}`);
+      }
       if (response.status === 201 && data.status === "success") {
         console.log("✅ [MODULE CONTEXT] CAD Model Generated Successfully" + response.json);
 
