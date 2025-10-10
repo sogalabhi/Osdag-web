@@ -15,7 +15,7 @@ class SeatedAngleInputData(InputDataBase):
 
         try:
             # Connectivity List
-            response['connectivityList'] = ['Column Flange-Beam-Web', 'Column Web-Beam-Web', 'Beam-Beam']
+            response['connectivityList'] = ['Column Flange-Beam-Web', 'Column Web-Beam-Web']
 
             # Column and Beam Lists
             response['columnList'] = list(Columns.objects.values_list('Designation', flat=True))

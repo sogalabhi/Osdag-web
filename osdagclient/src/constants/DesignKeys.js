@@ -84,8 +84,12 @@ export const KEY_NON_DIM_ESR_LTB = 'NDESR.LTB';
 // Additional constants for Flexural Member
 export const KEY_DESIGN_TYPE_FLEXURE = "KEY_DESIGN_TYPE_FLEXURE"; 
 
-// Module Keys
-export const MODULE_KEY_FIN_PLATE = 'Fin-Plate-Connection'; // canonical key for API, state, config
-export const MODULE_KEY_SEAT_PLATE = 'Seated-Angle-Connection'; // canonical key for API, state, config
-export const MODULE_DISPLAY_FIN_PLATE = 'Fin-Plate-Connection'; // display name for UI 
-export const MODULE_DISPLAY_SEAT_PLATE = 'Seated-Angle-Connection'; // display name for UI 
+// Module Keys - FinPlate
+export const MODULE_KEY_FIN_PLATE = 'FinPlateConnection'; // canonical key for API, state, config
+export const MODULE_KEY_SEAT_ANGLE = 'SeatedAngleConnection'; // canonical key for API, state, config
+export const MODULE_DISPLAY_FIN_PLATE = 'FinPlateConnection'; // display name for UI 
+
+// Module Keys - CleatAngle
+export const MODULE_KEY_CLEAT_ANGLE = 'Cleat-Angle-Connection';
+export const MODULE_DISPLAY_CLEAT_ANGLE = 'Cleat-Angle-Connection';
+export const MODULE_DISPLAY_SEAT_ANGLE = 'SeatedAngleConnection'; // display name for UI 

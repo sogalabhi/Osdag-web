@@ -7,7 +7,8 @@ export const UI_STRINGS = {
   CONNECTING_MEMBERS: "Connecting Members",
   FACTORED_LOADS: "Factored Loads",
   BOLT: "Bolt",
-  PLATE: "Plate",
+  // PLATE: "Plate",
+  ANGLE_SECTION: "Angle Section",
   OUTPUT_DOCK: "Output Dock",
 
   // Field Labels
@@ -22,7 +23,9 @@ export const UI_STRINGS = {
   DIAMETER: "Diameter(mm)",
   TYPE: "Type",
   PROPERTY_CLASS: "Property Class",
-  THICKNESS: "Thickness(mm)",
+  // THICKNESS: "Thickness(mm)",
+  SEATEDANGLE: "Seated Angle*",
+  TOPANGLE: "Top Angle*",
 
   // Button Texts
   RESET: "Reset",

@@ -42,7 +42,7 @@ const MODULE_CONFIGS = {
     }
   },
   "Beam-to-Beam End Plate Connection": {
-    connectivityField: "Connectivity *",
+    connectivityField: "Connectivity",
     endPlateField: "EndPlateType",
     connectivityMap: {
       "Flushed - Reversible Moment": "Flushed - Reversible Moment",
@@ -488,9 +488,9 @@ function UnifiedDropdownMenu({
       case "Load Input":
         loadInput();
         break;
-      case "Download Input":
-        downloadInput();
-        break;
+      // case "Download Input":
+      //   downloadInput();
+      //   break;
       case "Save Input":
         saveInput();
         break;

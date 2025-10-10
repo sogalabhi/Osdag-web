@@ -46,6 +46,7 @@ export const EngineeringModule = ({
     boltDiameterList,
     thicknessList,
     propertyClassList,
+    angleList,
     boltTypeList,
     cadModelPaths,
 

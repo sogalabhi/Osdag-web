@@ -1130,7 +1130,8 @@ function SeatedAngle() {
               <h3>Angle Section</h3>
               <div className="component-grid">
                 <div className="component-grid-align">
-                  <h4>Cleat section* </h4>
+                  {/* <h4>Cleat section* </h4> */}
+                  <h4>Seated Angle* </h4>
                   <Select
                     onSelect={handleAllSelectAngle}
                     value={connectorAngleSelect}
@@ -1169,7 +1170,7 @@ function SeatedAngle() {
                 </Modal>
 
                 <div className="component-grid-align">
-                  <h4>Top section* </h4>
+                  <h4>Top Angle* </h4>
                   <Select
                     onSelect={handleAllSelectTopAngle}
                     value={connectorTopSelect}

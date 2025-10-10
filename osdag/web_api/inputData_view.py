@@ -19,10 +19,10 @@ from .inputdata.tension_member_bolted_input import TensionMemberBoltedInputData
 from .inputdata.simply_supported_beam_input import SimplySupportedBeamInputData
 
 INPUT_DATA_FACTORY = {
-    'Fin-Plate-Connection': FinPlateInputData(),
+    'FinPlateConnection': FinPlateInputData(),
     'Cleat-Angle-Connection': CleatAngleInputData(),
     'End-Plate-Connection': EndPlateInputData(),
-    'Seated-Angle-Connection': SeatedAngleInputData(),
+    'SeatedAngleConnection': SeatedAngleInputData(),
     'Cover-Plate-Bolted-Connection': CoverPlateBoltedInputData(),
     'Beam-Beam-End-Plate-Connection': BeamBeamEndPlateInputData(),
     'Cover-Plate-Welded-Connection': CoverPlateWeldedInputData(),
