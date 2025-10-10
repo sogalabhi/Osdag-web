@@ -28,6 +28,8 @@ from osdag_api.errors import MissingKeyError, InvalidInputTypeError
 from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
 import osdag_api.modules.shear_connection_common as scc
 from OCC.Core import BRepTools
+from OCC.Core.TopoDS import TopoDS_Compound
+from OCC.Core.BRep import BRep_Builder
 from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
@@ -43,6 +45,7 @@ import os
 import typing
 from typing import Dict, Any, List
 import traceback
+import json
 
 old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
@@ -321,20 +324,25 @@ def create_module() -> FinPlateConnection:
 def create_from_input(input_values: Dict[str, Any]) -> FinPlateConnection:
     """Create an instance of the beam beam end plate connection module design class from input values."""
     # validate_input(input_values)
-    try : 
+    module = None
+    try:
         module = create_module()  # Create module instance.
-    except Exception as e : 
-        print('e in create_module : ' , e) 
+    except Exception as e:
+        print('e in create_module : ', e)
         print('error in creating module')
+        raise
     
     # Set the input values on the module instance.
-    try : 
+    try:
         print(input_values)
+        if module is None:
+            raise RuntimeError('Module instance was not created')
         module.set_input_values(input_values)
-    except Exception as e : 
+    except Exception as e:
         traceback.print_exc()
-        print('e in set_input_values : ' , e)
+        print('e in set_input_values : ', e)
         print('error in setting the input values')
+        raise
 
     return module
 
@@ -439,9 +447,46 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 
     # The section of the module that will be generated.
     cld.component = section
-    
-    try : 
-        model = cld.create2Dcad()  # Generate CAD Model.
+
+    # When section == "Model", also ensure per-part shapes exist and prepare a compound
+    part_names = ["Beam", "Column", "Plate"]
+    part_files = {}
+    compound_model = None
+
+    try:
+        if section == "Model":
+            # Build compound by adding each part shape without fusing
+            builder = BRep_Builder()
+            compound = TopoDS_Compound()
+            builder.MakeCompound(compound)
+
+            for part in part_names:
+                try:
+                    # Generate shape for this part
+                    cld.component = part
+                    part_shape = cld.create2Dcad()
+                    if part_shape is None:
+                        continue
+
+                    # Add to compound
+                    builder.Add(compound, part_shape)
+
+                    # Ensure per-part BREP file exists (write or overwrite)
+                    part_file_name = f"{session}_{part}.brep"
+                    part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
+                    BRepTools.breptools.Write(part_shape, part_file_path_rel, Message_ProgressRange())
+                    part_files[part] = part_file_path_rel
+                except Exception as e:
+                    print(f"Failed to build/write part {part}: {e}")
+
+            # Reset component to Model and set compound as the model to write
+            cld.component = section
+            compound_model = compound
+        # Generate model for non-Model sections (or fallback)
+        if compound_model is not None:
+            model = compound_model
+        else:
+            model = cld.create2Dcad()
     except Exception as e :
         print('Error in cld.create2Dcad() e : ' , e)
         return False
@@ -460,9 +505,25 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 
     try : 
         BRepTools.breptools.Write(model, file_path, Message_ProgressRange()) # Generate CAD Model
-        
-        # Only if it's 'Model' section, save extra formats
+
+        # If it's 'Model' section, write a manifest referencing per-part breps and save extra formats
         if section == "Model":
+            try:
+                manifest = {
+                    "session": session,
+                    "mergedBrep": file_path,
+                    "parts": [
+                        {"name": name, "brepPath": part_files.get(name)} for name in part_names if part_files.get(name)
+                    ]
+                }
+                manifest_path = file_path.replace(".brep", ".parts.json")
+                full_manifest_path = os.path.join(os.getcwd(), manifest_path)
+                with open(full_manifest_path, "w", encoding="utf-8") as mf:
+                    json.dump(manifest, mf)
+                print(f"Parts manifest saved at {full_manifest_path}")
+            except Exception as me:
+                print(f"Warning: Failed to write manifest: {me}")
+
             # Save STEP
             step_writer = STEPControl_Writer()
             step_writer.Transfer(model, STEPControl_AsIs)
