@@ -2318,6 +2318,12 @@ class CommonDesignLogic(object):
             elif self.component == "Plate":
                 cadlist = [self.connectivityObj.weldModelLeft, self.connectivityObj.weldModelRight,
                            self.connectivityObj.plateModel] + self.connectivityObj.nut_bolt_array.get_models()
+            elif self.component == "Weld" or self.component == "Welds":
+                # Only weld models (left and right) for separate export
+                cadlist = [self.connectivityObj.weldModelLeft, self.connectivityObj.weldModelRight]
+            elif self.component == "Bolt" or self.component == "Bolts":
+                # Only nut/bolt array models for separate export
+                cadlist = self.connectivityObj.nut_bolt_array.get_models()
             elif self.component == "cleatAngle":
                 cadlist = [self.connectivityObj.angleModel, self.connectivityObj.angleLeftModel] + \
                           self.connectivityObj.nut_bolt_array.get_models()
