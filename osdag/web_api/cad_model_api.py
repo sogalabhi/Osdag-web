@@ -143,9 +143,15 @@ class CADGeneration(View):
                     continue
                     
                 output_obj_path = path_to_file.replace(".brep", ".obj")
+                manifest_path = None
+                if section == "Model":
+                    manifest_path = path_to_file.replace(".brep", ".parts.json")
 
                 # Convert .brep to .obj using FreeCAD
-                command_with_arg = f'{command} {macro_path} {path_to_file} {output_obj_path}'
+                if manifest_path and os.path.exists(manifest_path):
+                    command_with_arg = f'{command} {macro_path} {path_to_file} {output_obj_path} {manifest_path}'
+                else:
+                    command_with_arg = f'{command} {macro_path} {path_to_file} {output_obj_path}'
                 process = subprocess.Popen(command_with_arg.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = process.communicate()
 

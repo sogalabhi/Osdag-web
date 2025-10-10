@@ -4,6 +4,7 @@ from ...utils.common.component import *
 from ...utils.common.material import *
 from ...Report_functions import *
 from ...custom_logger import CustomLogger
+import logging
 
 
 class FinPlateConnection(ShearConnection):
@@ -149,7 +150,7 @@ class FinPlateConnection(ShearConnection):
         self.logger = logging.getLogger('Osdag')
 
         if not isinstance(self.logger, CustomLogger):
-            logging.getLogger('Osdag', None).manager.loggerDict.pop('Osdag', None)
+            logging.getLogger('Osdag').manager.loggerDict.pop('Osdag', None)
             # clear any existing handlers
             self.logger = logging.getLogger('Osdag')
         

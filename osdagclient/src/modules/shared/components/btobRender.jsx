@@ -27,6 +27,30 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
             return [key, loader.parse(objData)];
           })
         );
+        // Debug: log parsed object keys and hierarchy for Model
+        try {
+          console.log('[btobRender] Parsed model keys:', Object.keys(parsedData));
+          const modelObj = parsedData?.Model;
+          if (modelObj) {
+            console.log('[btobRender] Model root:', modelObj);
+            console.log('[btobRender] Model children count:', modelObj.children?.length || 0);
+            const nodes = [];
+            modelObj.traverse((node) => {
+              if (node) {
+                nodes.push({
+                  name: node.name,
+                  type: node.type,
+                  isMesh: !!node.isMesh,
+                  material: node.material?.name || null,
+                  geomType: node.geometry?.type || null,
+                });
+              }
+            });
+            console.log('[btobRender] Model traverse nodes:', nodes);
+          }
+        } catch (e) {
+          console.warn('[btobRender] Error while logging parsed Model structure:', e);
+        }
 
         setParsedModels(parsedData);
       } catch (error) {
@@ -39,6 +63,15 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
     let g;
     obj.traverse((c) => {
       if (c.type === "Mesh") {
+        // Debug: log each mesh encountered in traversal
+        try {
+          console.log('[btobRender] Found mesh in traversal:', {
+            name: c.name,
+            type: c.type,
+            material: c.material?.name || null,
+            geomType: c.geometry?.type || null,
+          });
+        } catch (e) {}
         c.material.map = texture;
         c.material.needsUpdate = true;
         g = c.geometry;
@@ -48,11 +81,37 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
     return g;
   };
 
+  // Extract all meshes under an object; used for Model where we want per-part colors
+  const getMeshes = (obj) => {
+    const meshes = [];
+    if (!obj) return meshes;
+    obj.traverse((c) => {
+      if (c.type === "Mesh" && c.geometry) {
+        meshes.push({ name: c.name || "", geometry: c.geometry });
+      }
+    });
+    if (meshes.length === 0) console.warn("No meshes found in object:", obj);
+    return meshes;
+  };
+
   // All geometry definitions
   const geometryModel = useMemo(
     () => (parsedModels?.Model ? getGeometry(parsedModels.Model) : null),
     [parsedModels, texture]
   );
+  const modelMeshes = useMemo(
+    () => (parsedModels?.Model ? getMeshes(parsedModels.Model) : []),
+    [parsedModels]
+  );
+  // Part color map (dark mode hex values provided)
+  const partColors = useMemo(() => ({
+    Beam: "#868664",
+    Column: "#484836",
+    Plate: "#2f2f23",
+    Weld: "#ff0000",
+    weld_left: "#ff0000",
+    weld_right: "#ff0000",
+  }), []);
   const geometryBeam = useMemo(
     () => (parsedModels?.Beam ? getGeometry(parsedModels.Beam) : null),
     [parsedModels, texture]
@@ -106,41 +165,53 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
       <AxisHelperWidget orthographicView={orthographicView} />
       <primitive object={new THREE.AxesHelper(5)} />
 
-      {/* Model Section - Blue Solid Material */}
-      {selectedView === "Model" && geometryModel && (
+      {/* Model Section - render each subpart with its own color */}
+      {selectedView === "Model" && modelMeshes.length > 0 && (
         <>
-          <mesh
-            geometry={geometryModel}
-            scale={modelScale}
-            rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
-            position={modelPosition}
-          >
-            <meshPhysicalMaterial
-              attach="material"
-              color="#2E5A87"
-              metalness={0.3}
-              roughness={0.4}
-              opacity={1.0}
-              transparent={false}
-              clearcoat={0.8}
-              clearcoatRoughness={0.2}
-            />
-          </mesh>
-          <primitive
-            object={
-              new THREE.LineSegments(
-                new THREE.EdgesGeometry(geometryModel, 15),
-                new THREE.LineBasicMaterial({ color: "black" })
-              )
+          {modelMeshes.map((m, idx) => {
+            const name = m.name || "";
+            const lower = name.toLowerCase();
+            let color = partColors[name] || partColors[lower] || "#6b7280";
+            if (!partColors[name] && !partColors[lower] && lower.startsWith("weld")) {
+              color = partColors.Weld;
             }
-            scale={modelScale}
-            rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
-            position={modelPosition}
-          />
+            return (
+              <group key={`${name}-${idx}`}>
+                <mesh
+                  geometry={m.geometry}
+                  scale={modelScale}
+                  rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
+                  position={modelPosition}
+                >
+                  <meshPhysicalMaterial
+                    attach="material"
+                    color={color}
+                    metalness={0.3}
+                    roughness={0.4}
+                    opacity={1.0}
+                    transparent={false}
+                    clearcoat={0.8}
+                    clearcoatRoughness={0.2}
+                  />
+                </mesh>
+                <primitive
+                  object={
+                    new THREE.LineSegments(
+                      new THREE.EdgesGeometry(m.geometry, 15),
+                      new THREE.LineBasicMaterial({ color: "black" })
+                    )
+                  }
+                  scale={modelScale}
+                  rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
+                  position={modelPosition}
+                />
+              </group>
+            );
+          })}
         </>
       )}
 
-      {/* Beam Section - Keep existing material */}
+      {/* Beam Section */}
       {selectedView === "Beam" && geometryBeam && (
         <>
           <mesh
@@ -150,7 +221,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
             rotation={[Math.PI / -2, 0, 0]}
           >
             <meshPhysicalMaterial
-              color="#808080"
+              color={partColors.Beam}
               attach="material"
               metalness={0.25}
               roughness={0.3}
@@ -175,7 +246,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
         </>
       )}
 
-      {/* Column Section - Keep existing material */}
+      {/* Column Section */}
       {selectedView === "Column" && geometryColumn && (
         <>
           <mesh
@@ -185,7 +256,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
             rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
           >
             <meshPhysicalMaterial
-              color="#594100"
+              color={partColors.Column}
               attach="material"
               metalness={0.25}
               roughness={0.3}
@@ -210,7 +281,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
         </>
       )}
 
-      {/* Plate Section - Blue Solid Material */}
+      {/* Plate Section */}
       {selectedView === "Plate" && geometryPlate && (
         <>
           <mesh
@@ -221,7 +292,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
           >
             <meshPhysicalMaterial
               attach="material"
-              color="#2E5A87"
+              color={partColors.Plate}
               metalness={0.3}
               roughness={0.4}
               opacity={1.0}
