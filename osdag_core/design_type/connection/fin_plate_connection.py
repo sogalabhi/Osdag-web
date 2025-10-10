@@ -149,7 +149,7 @@ class FinPlateConnection(ShearConnection):
         self.logger = logging.getLogger('Osdag')
 
         if not isinstance(self.logger, CustomLogger):
-            logging.getLogger('Osdag').manager.loggerDict.pop('Osdag', None)
+            logging.getLogger('Osdag', None).manager.loggerDict.pop('Osdag', None)
             # clear any existing handlers
             self.logger = logging.getLogger('Osdag')
         

@@ -39,7 +39,7 @@ from ...Report_functions import *
 from ...Common import *
 from ...utils.common.load import Load
 import logging
-from importlib_resources  import files
+from importlib.resources import files
 
 
 class SeatedAngleConnection(ShearConnection):
