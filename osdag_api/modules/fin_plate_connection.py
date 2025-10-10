@@ -449,7 +449,8 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     cld.component = section
 
     # When section == "Model", also ensure per-part shapes exist and prepare a compound
-    part_names = ["Beam", "Column", "Plate"]
+    # Try to include additional subparts like Welds and Bolts if available
+    part_names = ["Beam", "Column", "Plate", "Weld", "Welds", "Bolt", "Bolts"]
     part_files = {}
     compound_model = None
 
