@@ -11,7 +11,7 @@ export const finPlateConfig = {
   defaultInputs: {
     bolt_diameter: [],
     bolt_grade: [],
-    bolt_type: "Bearing Bolt",
+    bolt_type: "Bearing_Bolt",
     connector_material: "E 250 (Fe 410 W)A",
     load_shear: "70",
     load_axial: "30",
@@ -196,8 +196,8 @@ export const finPlateConfig = {
           label: UI_STRINGS.TYPE,
           type: "select",
           options: [
-            { value: "Bearing_Bolt", label: UI_STRINGS.TYPE + " (Bearing Bolt)" },
-            { value: "Friction_Grip_Bolt", label: UI_STRINGS.TYPE + " (Friction Grip Bolt)" }
+            { value: "Bearing_Bolt", label: "Bearing Bolt" },
+            { value: "Friction_Grip_Bolt", label: "Friction Grip Bolt" }
           ]
         },
         {

@@ -17,6 +17,7 @@ export default (state, action) => {
         boltDiameterList = [],
         thicknessList = [],
         propertyClassList = [],
+        boltTypeList = [],
         connectivityList = [],
         beamList = [],
         columnList = [],
@@ -42,6 +43,7 @@ export default (state, action) => {
         boltDiameterList,
         thicknessList,
         propertyClassList,
+        boltTypeList,
         connectivityList,
         
         // Structural elements

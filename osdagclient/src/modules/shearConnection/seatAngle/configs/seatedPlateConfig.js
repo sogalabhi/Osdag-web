@@ -11,7 +11,7 @@ export const seatedPlateConfig = {
   defaultInputs: {
     bolt_diameter: [],
     bolt_grade: [],
-    bolt_type: "Bearing Bolt",
+    bolt_type: "Bearing_Bolt",
     connector_material: "E 250 (Fe 410 W)A",
     load_shear: "70",
     load_axial: "30",
