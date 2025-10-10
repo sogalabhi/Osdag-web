@@ -23,6 +23,7 @@ let initialValue = {
   boltDiameterList: [],
   thicknessList: [],
   propertyClassList: [],
+  boltTypeList: [],
 
   // Structural elements
   beamList: [],
@@ -558,6 +559,7 @@ export const ModuleProvider = ({ children }) => {
         boltDiameterList: state.boltDiameterList,
         thicknessList: state.thicknessList,
         propertyClassList: state.propertyClassList,
+        boltTypeList: state.boltTypeList,
 
         // Structural elements
         beamList: state.beamList,

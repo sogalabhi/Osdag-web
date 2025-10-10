@@ -36,6 +36,20 @@ export const InputSection = ({
     }),
   };
 
+  // Helper to normalize lists into react-select option shape
+  const toSelectOptions = (list = []) => {
+    if (!list || list.length === 0) return [];
+    if (typeof list[0] === 'object' && list[0] !== null) {
+      // Supports objects shaped like { Grade, ... } or { value, label }
+      if ('value' in list[0] && 'label' in list[0]) {
+        return list;
+      }
+      return list.map(item => ({ value: item.Grade, label: item.Grade }));
+    }
+    return list.map(item => ({ value: item, label: item }));
+  };
+
+
   useEffect(() => {
     if (extraState.selectedOption) {
       const imageMap = {
@@ -45,6 +59,60 @@ export const InputSection = ({
       setImageSource(imageMap[extraState.selectedOption] || ErrorImg);
     }
   }, [extraState.selectedOption]);
+
+  // Set default selected values when lists/options arrive
+  useEffect(() => {
+    // Set defaults for regular selects
+    section.fields.forEach((field) => {
+      if (field.type !== 'select') return;
+
+      // Resolve options: either a provided array on the field or a fetched list from context
+      const rawList = Array.isArray(field.options)
+        ? field.options
+        : safeContextData[field.options];
+
+      if (!rawList || rawList.length === 0) return;
+
+      // Skip multi-selects managed via customizable selector
+      const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options);
+      if (isMulti) return;
+
+      // Determine first option value
+      const first = rawList[0];
+      const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
+        : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
+
+      const current = safeInputs[field.key];
+      const currentExistsInOptions = Array.isArray(rawList)
+        ? (Array.isArray(field.options) ? rawList : toSelectOptions(rawList)).some(opt => {
+            const val = Array.isArray(field.options) ? opt.value : opt.value;
+            return val === current;
+          })
+        : false;
+
+      if (current === undefined || current === null || current === '' || !currentExistsInOptions) {
+        setInputs((prev) => ({ ...prev, [field.key]: firstValue }));
+      }
+    });
+
+    // Set default for connectivity / endplate dropdowns
+    const connectivityField = section.fields.find(
+      (f) => f.type === 'connectivitySelect' || f.type === 'endPlateSelect'
+    );
+    const list = connectivityField?.type === 'connectivitySelect'
+      ? (safeContextData.connectivityList || [])
+      : [
+          'Flushed - Reversible Moment',
+          'Extended One Way - Irreversible Moment',
+          'Extended Both Ways - Reversible Moment',
+        ];
+    if (connectivityField && !extraState.selectedOption && list && list.length > 0) {
+      const first = list[0];
+      const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
+        : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
+      setExtraState((prev) => ({ ...prev, selectedOption: firstValue }));
+    }
+  }, [safeContextData, section.fields]);
 
   const handleCustomizableSelect = (field, value) => {
     const getAllValuesForInputKey = (inputKey) => {
@@ -71,18 +139,11 @@ export const InputSection = ({
   const renderField = (field) => {
     if (field.conditionalDisplay && !field.conditionalDisplay(extraState)) return null;
 
-    const toSelectOptions = (list = []) => {
-      if (!list || list.length === 0) return [];
-      if (typeof list[0] === 'object' && list[0] !== null) {
-        return list.map(item => ({ value: item.Grade, label: item.Grade }));
-      }
-      return list.map(item => ({ value: item, label: item }));
-    };
-
     switch (field.type) {
       case 'select': {
         const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options);
-        const options = toSelectOptions(safeContextData[field.options]);
+        const rawList = Array.isArray(field.options) ? field.options : safeContextData[field.options];
+        const options = Array.isArray(field.options) ? field.options : toSelectOptions(rawList);
 
         if (isMulti) {
           const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
@@ -117,7 +178,23 @@ export const InputSection = ({
           );
         }
 
-        const value = options.find(opt => opt.value === safeInputs[field.key]);
+        // If options are empty or not yet loaded, render disabled with placeholder
+        if (!rawList || (Array.isArray(rawList) && rawList.length === 0)) {
+          return (
+            <Select
+              isDisabled={true}
+              placeholder="No data available"
+              styles={customSelectStyles}
+              classNamePrefix="react-select"
+              className="w-[60%]"
+            />
+          );
+        }
+
+        const value = Array.isArray(field.options)
+          ? options.find(opt => opt.value === safeInputs[field.key])
+          : options.find(opt => opt.value === safeInputs[field.key]);
+
         return (
           <Select
             options={options}
@@ -197,7 +274,7 @@ export const InputSection = ({
             <div className="flex w-full justify-between items-center mb-3">
               <h4 className="w-[40%] text-sm font-medium text-osdag-text-primary dark:text-white">
                 {field.label}
-              </h4>
+            </h4>
               {renderField(field)}
             </div>
             {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (

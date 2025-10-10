@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { ModuleContext } from "../../../context/ModuleState";
+import { MODULE_KEY_FIN_PLATE } from "../../../constants/DesignKeys";
 
 export const useEngineeringModule = (moduleConfig) => {
   const navigate = useNavigate();
@@ -89,7 +90,7 @@ export const useEngineeringModule = (moduleConfig) => {
 
   // Initialize extraState based on module type
   const getInitialExtraState = () => {
-    if (moduleConfig.cameraKey === "FinPlateConnection") {
+    if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
       return {
         selectedOption: "Column Flange-Beam-Web", // Default for FinPlate
       };
@@ -326,7 +327,7 @@ export const useEngineeringModule = (moduleConfig) => {
   // Get supported data when member designation changes (BeamBeamEndPlate) - Using simplified API
   useEffect(() => {
     const loadSupportedData = async () => {
-      if (inputs.member_designation && moduleConfig.cameraKey !== "FinPlateConnection" && moduleConfig.cameraKey !== "CleatAngle" && manageDesignPreferences) {
+      if (inputs.member_designation && moduleConfig.cameraKey !== MODULE_KEY_FIN_PLATE && moduleConfig.cameraKey !== MODULE_KEY_CLEAT_ANGLE && manageDesignPreferences) {
         try {
           console.log('Loading supported data for:', inputs.member_designation);
 
@@ -351,7 +352,7 @@ export const useEngineeringModule = (moduleConfig) => {
   // Get design preferences data for FinPlate and CleatAngle - Using simplified API
   useEffect(() => {
     const loadDesignPreferences = async () => {
-      if ((moduleConfig.cameraKey === "FinPlateConnection" || moduleConfig.cameraKey === "CleatAngle") && manageDesignPreferences) {
+      if ((moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE || moduleConfig.cameraKey === MODULE_KEY_CLEAT_ANGLE) && manageDesignPreferences) {
         const conn_map = {
           "Column Flange-Beam-Web": "Column Flange-Beam Web",
           "Column Web-Beam-Web": "Column Web-Beam Web",
