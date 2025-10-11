@@ -91,6 +91,7 @@ const MainContent = () => {
       'Beam-Beam-End-Plate-Connection': 'Beam-Beam End Plate',
       'Beam-to-Column-End-Plate-Connection': 'Beam-Column End Plate',
       'Tension-Member-Bolted-Design': 'Tension Member Bolted',
+      'Tension-Member-Welded-Design': 'Tension Member Welded',
       'Simply-Supported-Beam': 'Simply Supported Beam'
     };
     return moduleNames[moduleId] || moduleId;
