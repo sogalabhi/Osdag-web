@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import yaml from 'js-yaml';
+import { useNavigate } from 'react-router-dom';
+import { MODULE_ROUTES, MODULE_NAME_TO_KEY } from '../../constants/modules';
 import { isGuestUser } from '../../utils/auth';
 
 const Header = ({ setshowSideBar, active }) => {
@@ -7,6 +10,8 @@ const Header = ({ setshowSideBar, active }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showResourcesDropdown, setShowResourcesDropdown] = useState(false);
   const [showAboutDropdown, setShowAboutDropdown] = useState(false);
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   // Check if user is a guest
   const isGuest = isGuestUser();
@@ -111,6 +116,54 @@ const Header = ({ setshowSideBar, active }) => {
 
   return (
     <div className="border-osdag-border dark:border-gray-700">
+      {/* Hidden file input for OSI import */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".osi,.yaml,.yml,text/yaml,text/x-yaml,application/x-yaml"
+        className="hidden"
+        onChange={async (e) => {
+          try {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const text = await file.text();
+            const uiObj = yaml.load(text) || {};
+            const moduleField = uiObj.Module || uiObj["Module"] || uiObj.module || uiObj["module"];
+            if (!moduleField || typeof moduleField !== 'string') {
+              alert('Unsupported or invalid OSI file: Module not found.');
+              e.target.value = '';
+              return;
+            }
+            const normalizedModule = moduleField.trim();
+            // Resolve moduleKey and route
+            let moduleKey = null;
+            let route = MODULE_ROUTES[normalizedModule] || null;
+            if (route) {
+              moduleKey = normalizedModule;
+            } else {
+              moduleKey = MODULE_NAME_TO_KEY[normalizedModule] || null;
+              route = moduleKey ? MODULE_ROUTES[moduleKey] : null;
+            }
+            if (!route) {
+              alert(`Unsupported module in OSI: ${normalizedModule}`);
+              e.target.value = '';
+              return;
+            }
+            // Store raw uiObj for Phase 2 prefill
+            try {
+              if (moduleKey) {
+                sessionStorage.setItem(`prefill:${moduleKey}`, JSON.stringify(uiObj));
+              }
+            } catch (_) {}
+            navigate(route);
+          } catch (err) {
+            console.error('Failed to import OSI:', err);
+            alert('Failed to import OSI. Please ensure the file is valid.');
+          } finally {
+            if (e?.target) e.target.value = '';
+          }
+        }}
+      />
       {/* Main Header */}
       <div className="px-4 sm:px-8 md:px-12 pb-8">
         <div className="flex items-center justify-between py-4 md:py-0">
@@ -326,7 +379,7 @@ const Header = ({ setshowSideBar, active }) => {
             </div>
             {/* Documents Button */}
             <div className="relative group">
-              <button className="p-3 text-black dark:text-white hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6">
+              <button className="p-3 text-black dark:text-white hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
                 <div className="flex items-center space-x-2">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -337,7 +390,7 @@ const Header = ({ setshowSideBar, active }) => {
                     />
                   </svg>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
-                    Import Input
+                    Import
                   </span>
                 </div>
               </button>

@@ -93,3 +93,14 @@ export const MODULE_ROUTES = {
     BoltedToEndGusset: "/design/tension-member/bolted_to_end_gusset",
     // Add other needed routes
 };
+
+// Mapping from .osi Module names (desktop) → web module keys used above
+// Extend as more modules are supported
+export const MODULE_NAME_TO_KEY = {
+    "Shear Connection - Fin Plate": "FinPlateConnection",
+    "Shear Connection - End Plate": "EndPlate",
+    "Shear Connection - Cleat Angle": "CleatAngle",
+    "Shear Connection - Seated Angle": "SeatedAngle",
+    // Tension Members
+    "Tension Member Bolted Design": "BoltedToEndGusset",
+};

@@ -46,6 +46,83 @@ export const useEngineeringModule = (moduleConfig) => {
 
   // Sync local output/logs/display with context design results
   useEffect(() => {
+    // Prefill inputs from sessionStorage if available
+    try {
+      const moduleKey = moduleConfig.cameraKey || moduleConfig.moduleKey || moduleConfig.designType;
+      if (moduleKey) {
+        const raw = sessionStorage.getItem(`prefill:${moduleKey}`);
+        if (raw) {
+          const uiObj = JSON.parse(raw);
+          // Optional: allow per-module mapping via moduleConfig.osiKeyMap
+          const baseDefaults = moduleConfig.defaultInputs || {};
+          const osiKeyMap = moduleConfig.osiKeyMap || {};
+
+          // Build normalized inputs: only keys present in defaults
+          const normalized = {};
+          const addIfPresent = (inputKey, value) => {
+            if (value === undefined || value === null) return;
+            // Array handling: take first element
+            const val = Array.isArray(value) ? (value.length ? value[0] : undefined) : value;
+            if (val === undefined) return;
+            // Coerce to string for number/text fields as this UI primarily holds strings
+            normalized[inputKey] = typeof val === 'string' ? val : String(val);
+          };
+
+          // Iterate default input keys and try to find corresponding values in uiObj
+          for (const inputKey of Object.keys(baseDefaults)) {
+            // 1) Mapped key from .osi if provided
+            const mappedOsiKey = osiKeyMap[inputKey];
+            if (mappedOsiKey && Object.prototype.hasOwnProperty.call(uiObj, mappedOsiKey)) {
+              addIfPresent(inputKey, uiObj[mappedOsiKey]);
+              continue;
+            }
+            // 2) Heuristic: Dot-notated keys in .osi sometimes match with space/different casing
+            // Try direct exact match
+            if (Object.prototype.hasOwnProperty.call(uiObj, inputKey)) {
+              addIfPresent(inputKey, uiObj[inputKey]);
+              continue;
+            }
+            // 3) Simple aliases for common fields
+            const aliases = {
+              bolt_hole_type: 'Bolt.Bolt_Hole_Type',
+              bolt_diameter: 'Bolt.Diameter',
+              bolt_grade: 'Bolt.Grade',
+              bolt_slip_factor: 'Bolt.Slip_Factor',
+              bolt_type: 'Bolt.Type',
+              connector_material: 'Connector.Material',
+              design_method: 'Design.Design_Method',
+              detailing_edge_type: 'Detailing.Edge_type',
+              detailing_gap: 'Detailing.Gap',
+              detailing_corr_status: 'Detailing.Corrosive_Influences',
+              load_axial: 'Load.Axial',
+              load_shear: 'Load.Shear',
+              plate_thickness: 'Connector.Plate.Thickness_List',
+              beam_section: 'Member.Supported_Section.Designation',
+              column_section: 'Member.Supporting_Section.Designation',
+              supported_material: 'Member.Supported_Section.Material',
+              supporting_material: 'Member.Supporting_Section.Material',
+            };
+            const aliasKey = aliases[inputKey];
+            if (aliasKey && Object.prototype.hasOwnProperty.call(uiObj, aliasKey)) {
+              addIfPresent(inputKey, uiObj[aliasKey]);
+              continue;
+            }
+          }
+
+          if (Object.keys(normalized).length > 0) {
+            setInputs({ ...baseDefaults, ...normalized });
+          }
+          // Clear the prefill once read
+          sessionStorage.removeItem(`prefill:${moduleKey}`);
+        }
+      }
+    } catch (e) {
+      console.warn('Prefill from OSI failed:', e);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (designData && Object.keys(designData).length > 0) {
       console.log("[useEngineeringModule] useEffect output::", designData);
       setOutput(designData);
