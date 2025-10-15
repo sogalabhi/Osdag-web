@@ -65,3 +65,5 @@ file_storage/cad_models/*.step
 
 osifiles/*.osisettings.py
 osdag_core/data/ResourceFiles/**/__init__.py
+osdag_core/__init__.py
+osdag_core/data/__init__.py
