@@ -31,6 +31,55 @@ import subprocess
 import json
 import time
 import uuid
+import re
+
+# Helper: filter LaTeX content based on selected sections (section or section/subsection)
+def filter_latex_content(latex_content: str, selected_sections):
+    if not selected_sections or not isinstance(selected_sections, (list, tuple)):
+        return latex_content
+
+    lines = latex_content.split('\n')
+    filtered_lines = []
+    current_section = None
+    current_subsection = None
+    include_content = True
+    section_started = False
+
+    for line in lines:
+        section_match = re.search(r'\\section\{([^}]+)\}', line)
+        if section_match:
+            current_section = section_match.group(1).strip()
+            current_subsection = None
+            section_started = True
+            include_content = (
+                current_section in selected_sections or
+                any(sel.startswith(f"{current_section}/") for sel in selected_sections)
+            )
+
+        subsection_match = re.search(r'\\subsection\{([^}]+)\}', line)
+        if subsection_match and current_section:
+            current_subsection = subsection_match.group(1).strip()
+            subsection_key = f"{current_section}/{current_subsection}"
+            include_content = (
+                current_section in selected_sections or
+                subsection_key in selected_sections
+            )
+
+        if (
+            include_content or
+            not section_started or
+            line.startswith('\\documentclass') or
+            line.startswith('\\usepackage') or
+            line.startswith('\\title') or
+            line.startswith('\\author') or
+            line.startswith('\\date') or
+            line.startswith('\\begin{document}') or
+            line.startswith('\\maketitle') or
+            line.startswith('\\end{document}')
+        ):
+            filtered_lines.append(line)
+
+    return '\n'.join(filtered_lines)
 
 class CreateDesignReport(APIView):
 
@@ -41,6 +90,9 @@ class CreateDesignReport(APIView):
         input_values = request.data.get('input_values') 
         design_status = request.data.get('design_status', True)
         logs = request.data.get('logs', [])
+        # Optional: sections to include (from UI customization popup) and other customization
+        sections = request.data.get('sections')  # e.g., ["Introduction", "Inputs", "Outputs/Spacing"]
+        customization = request.data.get('customization')  # generic dict for future options
         
         print('metadata:', metadata)
         print('module_id:', module_id)
@@ -48,7 +100,7 @@ class CreateDesignReport(APIView):
         
         # Map module IDs to their respective create_from_input functions
         module_function_map = {
-            'Fin-Plate-Connection': fin_plate_create_from_input,
+            'FinPlateConnection': fin_plate_create_from_input,
             'End-Plate-Connection': end_plate_create_from_input,
             'Cleat-Angle-Connection': cleat_angle_create_from_input,
             'Seated-Angle-Connection': seated_angle_create_from_input,
@@ -96,7 +148,7 @@ class CreateDesignReport(APIView):
             }
             # generate a random string for report id
             report_id = get_random_string(length=16)
-            file_path = "file_storage/design_report/" + report_id
+            file_path = os.path.join(os.getcwd(), "file_storage", "design_report", report_id)
 
             # appenend the file path in the meta data
             metadata_final = {
@@ -105,17 +157,37 @@ class CreateDesignReport(APIView):
                 metadata_final[key] = metadata_other[key]
 
             metadata_final['does_design_exist'] = design_status
-            metadata_final['logger_messages'] = logs
+            # Convert logs to string format for LaTeX
+            if logs and isinstance(logs, list):
+                logger_string = '\n'.join([f"{log.get('timestamp', '')} - {log.get('type', 'INFO')} - {log.get('message', '')}" for log in logs])
+            else:
+                logger_string = "No logs available"
+            metadata_final['logger_messages'] = logger_string
+            # Attach optional UI customization
+            if sections:
+                metadata_final['selected_sections'] = sections
+            if customization:
+                metadata_final['customization'] = customization
             print('metadata final : ', json.dumps(metadata_final, indent=4))
 
         else : 
             # generate a random string for report id
             report_id = get_random_string(length=16)
-            file_path = "file_storage/design_report/" + report_id
+            file_path = os.path.join(os.getcwd(), "file_storage", "design_report", report_id)
             metadata_final = metadata
             metadata_final['does_design_exist'] = design_status
-            metadata_final['logger_messages'] = logs
+            # Convert logs to string format for LaTeX
+            if logs and isinstance(logs, list):
+                logger_string = '\n'.join([f"{log.get('timestamp', '')} - {log.get('type', 'INFO')} - {log.get('message', '')}" for log in logs])
+            else:
+                logger_string = "No logs available"
+            metadata_final['logger_messages'] = logger_string
             metadata_final['filename'] = file_path
+            # Attach optional UI customization
+            if sections:
+                metadata_final['selected_sections'] = sections
+            if customization:
+                metadata_final['customization'] = customization
             print('metadata final : ' , metadata_final)
             # print('LogoFullPath : ' , metadata_final['CompanyLogo'])
 
@@ -156,11 +228,24 @@ class CreateDesignReport(APIView):
         if (resultBoolean):
             print("**")
             print('inside sleep')
-            # time.sleep(10)
-            isExists = os.path.exists(f'{os.getcwd()}/file_storage/design_report/{report_id}.tex')
-            print('report path : ' , f'{os.getcwd()}/{report_id}.tex')
+            time.sleep(10)
+            isExists = os.path.exists(f'{file_path}.tex')
+            print('report path : ' , f'{file_path}.tex')
             print('isExists : ' , isExists)
-            # open and read the file contents
+            # If sections provided, post-filter LaTeX file to include only selected sections
+            try:
+                if sections:
+                    tex_path = f'{file_path}.tex'
+                    with open(tex_path, 'r', encoding='utf-8') as rf:
+                        original_tex = rf.read()
+                    filtered_tex = filter_latex_content(original_tex, sections)
+                    with open(tex_path, 'w', encoding='utf-8') as wf:
+                        wf.write(filtered_tex)
+                    print('Applied section filtering to LaTeX file')
+            except Exception as e:
+                print('WARN: Failed to apply section filtering:', e)
+
+            # open and read the file contents (for debug only)
             f = open(f'{os.getcwd()}/file_storage/design_report/{report_id}.tex', 'rb')
 
             return Response({'success': 'Design report created', 'report_id': report_id, 'fileContents : ': f}, status=status.HTTP_201_CREATED)

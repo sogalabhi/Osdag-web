@@ -2,6 +2,7 @@
   "dependencies": {
     "base-64": "^1.0.0",
     "file-saver": "^2.0.5",
+    "react-color": "^2.19.3",
     "react-cookie": "^4.1.1"
   }
 }

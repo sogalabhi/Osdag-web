@@ -21,7 +21,7 @@ design_dict = {
     "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
     "Member.Supporting_Section.Designation": "HB 150",
     "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
-    "Module": "Fin-Plate-Connection",
+    "Module": "FinPlateConnection",
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": '410',
     "Connector.Plate.Thickness_List":['8','10','12','14','16','18','20','22','25','28','32','36','40','45','50','56','63','75','80','90','100','110','120']

@@ -71,6 +71,11 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
     [parsedModels, texture]
   );
 
+  const geometryCleatAngle = useMemo(
+    () => (parsedModels?.cleatAngle ? getGeometry(parsedModels.cleatAngle) : null),
+    [parsedModels, texture]
+  );
+
   // Tension Member specific geometries
   const geometryMember = useMemo(
     () => (parsedModels?.Member ? getGeometry(parsedModels.Member) : null),
@@ -78,6 +83,10 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
   );
   const geometryEndplate = useMemo(
     () => (parsedModels?.EndPlate ? getGeometry(parsedModels.EndPlate) : null),
+    [parsedModels, texture]
+  );
+  const geometrySeatedAngle = useMemo(
+    () => (parsedModels?.SeatedAngle ? getGeometry(parsedModels.SeatedAngle) : null),
     [parsedModels, texture]
   );
 
@@ -235,7 +244,75 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
         </>
       )}
 
-      {/* Connector Section - Blue Solid Material */}
+      {/* FIXED: CleatAngle Section - Blue Solid Material */}
+      {selectedView === "CleatAngle" && geometryCleatAngle && (
+        <>
+          <mesh
+            geometry={geometryCleatAngle}
+            scale={modelScale}
+            position={[modelPosition[0], modelPosition[1], modelPosition[2] + 1]} // Slightly offset
+            rotation={[Math.PI / -2, 0, 0]}
+          >
+            <meshPhysicalMaterial
+              attach="material"
+              color="#2E5A87"
+              metalness={0.3}
+              roughness={0.4}
+              opacity={1.0}
+              transparent={false}
+              clearcoat={0.8}
+              clearcoatRoughness={0.2}
+            />
+          </mesh>
+          <primitive
+            object={
+              new THREE.LineSegments(
+                new THREE.EdgesGeometry(geometryCleatAngle, 15),
+                new THREE.LineBasicMaterial({ color: "black" })
+              )
+            }
+            scale={modelScale}
+            rotation={[Math.PI / -2, 0, 0]}
+            position={[modelPosition[0], modelPosition[1], modelPosition[2] + 1]}
+          />
+        </>
+      )}
+
+      {/* FIXED: SeatedAngle Section - Blue Solid Material */}
+      {selectedView === "SeatedAngle" && geometrySeatedAngle && (
+        <>
+          <mesh
+            geometry={geometrySeatedAngle}
+            scale={modelScale}
+            position={[modelPosition[0], modelPosition[1], modelPosition[2] + 1]} // Slightly offset
+            rotation={[Math.PI / -2, 0, 0]}
+          >
+            <meshPhysicalMaterial
+              attach="material"
+              color="#2E5A87"
+              metalness={0.3}
+              roughness={0.4}
+              opacity={1.0}
+              transparent={false}
+              clearcoat={0.8}
+              clearcoatRoughness={0.2}
+            />
+          </mesh>
+          <primitive
+            object={
+              new THREE.LineSegments(
+                new THREE.EdgesGeometry(geometrySeatedAngle, 15),
+                new THREE.LineBasicMaterial({ color: "black" })
+              )
+            }
+            scale={modelScale}
+            rotation={[Math.PI / -2, 0, 0]}
+            position={[modelPosition[0], modelPosition[1], modelPosition[2] + 1]}
+          />
+        </>
+      )}
+
+      {/* Connector Section - Blue Solid Material (fallback for other modules) */}
       {selectedView === "Connector" && geometryConnector && (
         <>
           <mesh

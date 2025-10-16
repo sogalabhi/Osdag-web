@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import ProjectCard from './ProjectCard';
 import RecentProjects from '../../components/RecentProjects';
 // import { recentModules } from '../data/mockData'; // Remove mockData import
-import { isGuestUser, getCurrentUserEmail } from '../../utils/auth';
-import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../../constants/DesignKeys';
+import { isGuestUser, getCurrentUserEmail, getAccessToken } from '../../utils/auth';
+import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE, MODULE_KEY_SEAT_ANGLE, MODULE_DISPLAY_SEAT_ANGLE } from '../../constants/DesignKeys';
 
 const MainContent = () => {
   const isGuest = isGuestUser();
@@ -23,11 +23,15 @@ const MainContent = () => {
   const fetchRecentProjects = async () => {
     setLoading(true);
     try {
-      const url = `http://localhost:8000/api/projects/?user_email=${encodeURIComponent(userEmail)}`;
-      const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+      const url = `http://localhost:8000/api/projects/`;
+      const token = getAccessToken();
+      console.log('[fetchRecentProjects] using access token (first 20 chars):', (token || '').slice(0, 20));
+      const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
       const data = await response.json();
       if (data.success) {
         setProjects(data.projects);
+      } else {
+        console.log('[fetchRecentProjects] failed with response:', data);
       }
     } catch (e) {
       // handle error
@@ -38,9 +42,10 @@ const MainContent = () => {
   // Add a handler to delete a project and refresh the list
   const handleDeleteProject = async (projectId) => {
     try {
-      await fetch(`http://localhost:8000/api/projects/${projectId}/?user_email=${encodeURIComponent(userEmail)}`, {
+      const token = getAccessToken();
+      await fetch(`http://localhost:8000/api/projects/${projectId}/`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       });
       // Refresh the list after deletion
       fetchRecentProjects();
@@ -69,10 +74,10 @@ const MainContent = () => {
 
   function getModuleDisplayName(moduleId) {
     const moduleNames = {
-      'fp': 'Fin-Plate-Connection',
+      'fp': 'FinPlateConnection',
       'ca': 'Cleat Angle Connection',
       'ep': 'End Plate Connection',
-      'sa': 'Seated Angle Connection',
+      'sa': 'SeatedAngleConnection',
       'cpb': 'Cover Plate Bolted',
       'cpw': 'Cover Plate Welded',
       'boltedtoendplate': 'Tension Member Bolted',
@@ -81,7 +86,8 @@ const MainContent = () => {
       [MODULE_KEY_FIN_PLATE]: MODULE_DISPLAY_FIN_PLATE,
       'End-Plate-Connection': 'End Plate Connection',
       'Cleat-Angle-Connection': 'Cleat Angle Connection',
-      'Seated-Angle-Connection': 'Seated Angle Connection',
+      // 'Seated-Angle-Connection': 'Seated Angle Connection',
+      [MODULE_KEY_SEAT_ANGLE]: MODULE_DISPLAY_SEAT_ANGLE,
       'Cover-Plate-Bolted-Connection': 'Cover Plate Bolted',
       'Cover-Plate-Welded-Connection': 'Cover Plate Welded',
       'Beam-Beam-End-Plate-Connection': 'Beam-Beam End Plate',
@@ -97,7 +103,7 @@ const MainContent = () => {
       <div className="max-w-7xl mx-auto h-full">
         <div className={`grid grid-cols-1 ${isGuest ? 'xl:grid-cols-1' : 'xl:grid-cols-2'} gap-8 h-full`}>
           {/* Recent Projects Card */}
-          <div className=" rounded-lg shadow-sm border border-osdag-border dark:border-gray-700 p-6">
+          <div className=" rounded-lg shadow-sm  p-6">
             <RecentProjects projects={projects} loading={loading} onDeleteProject={handleDeleteProject} />
           </div>
           

@@ -4,6 +4,8 @@ import { useContext, useRef, useState, useEffect } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { UserContext } from "../../../context/UserState";
 import { MODULE_KEY_FIN_PLATE } from '../../../constants/DesignKeys';
+import { message } from 'antd';
+import { useLocation } from 'react-router-dom';
 
 // Module-specific configurations
 const MODULE_CONFIGS = {
@@ -76,15 +78,15 @@ function UnifiedDropdownMenu({
   inputs,
   allSelected,
   setInputs,
-  setAllSelected,
+  setAllSelected = () => {},
   logs,
   setCreateDesignReportBool,
-  setDisplaySaveInputPopup,
   setSaveInputFileName,
   triggerScreenshotCapture,
   selectedOption = null,
-  setSelectedOption = () => {},
-  moduleType, // "finplate" | "endplate" | "coverplate"
+  setSelectedOption = () => { },
+  moduleType, // "FinPlateConnection" | "endplate" | "coverplate"
+  currentProjectId,
 }) {
   const {
     boltDiameterList,
@@ -94,8 +96,17 @@ function UnifiedDropdownMenu({
     topAngleList,
     downloadCADModel,
   } = useContext(ModuleContext);
-  
+
   const { SaveInputValueFile } = useContext(UserContext);
+  const BASE_URL = 'http://localhost:8000/api/';
+  const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
+  const location = useLocation();
+  const getProjectIdFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const pid = params.get('projectId');
+    return pid ? parseInt(pid, 10) : null;
+  };
+
 
   const [isOpen, setIsOpen] = useState(false);
   const parentRef = useRef(null);
@@ -113,219 +124,41 @@ function UnifiedDropdownMenu({
   const loadInput = () => {
     let element = document.createElement("input");
     element.setAttribute("type", "file");
+    element.accept = ".osi,application/json";
     parentRef.current.appendChild(element);
     element.click();
 
-    element.addEventListener("change", (e) => {
+    element.addEventListener("change", async (e) => {
       const file = e.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = function (event) {
-        const fileContent = event.target.result;
-        const fileArr = fileContent.split("\n");
-        let inputFromFileObj = {};
-        let boltDiameterIndex = -1;
-        let boltGradeIndex = -1;
-        let plateThicknessIndex = -1;
-        let flangePlateThicknessIndex = -1;
-        let webPlateThicknessIndex = -1;
-        let angleListIndex = -1;
-        let topAngleIndex = -1;
-        let moduleName = "";
-
-        // Parse file content
-        for (let i = 0; i < fileArr.length; i++) {
-          const item = fileArr[i];
-          const arr = item.split(":");
-          arr[0] = arr[0].trim();
-
-          // Find array field indices
-          if (arr[0].includes("Bolt.Diameter")) {
-            boltDiameterIndex = i;
-            continue;
-          }
-          if (arr[0].includes("Bolt.Grade")) {
-            boltGradeIndex = i;
-            continue;
-          }
-          if (arr[0].includes("Connector.Plate.Thickness_List")) {
-            plateThicknessIndex = i;
-            continue;
-          }
-          if (arr[0].includes("Connector.Flange_Plate.Thickness_list")) {
-            flangePlateThicknessIndex = i;
-            continue;
-          }
-          if (arr[0].includes("Connector.Web_Plate.Thickness_List")) {
-            webPlateThicknessIndex = i;
-            continue;
-          }
-          if (arr[0].includes("Angle_List")) {
-            angleListIndex = i;
-            continue;
-          }
-          if (arr[0].includes("Top_Angle")) {
-            topAngleIndex = i;
-            continue;
-          }
-
-          if (arr.length <= 1) continue;
-
-          let val = arr[1].trim();
-          
-          // Parse basic fields
-          switch (arr[0]) {
-            case "Bolt.Bolt_Hole_Type":
-              inputFromFileObj.bolt_hole_type = val;
-              break;
-            case "Bolt.Slip_Factor":
-              inputFromFileObj.bolt_slip_factor = val;
-              break;
-            case "Bolt.TensionType":
-              inputFromFileObj.bolt_tension_type = val;
-              break;
-            case "Bolt.Type":
-              inputFromFileObj.bolt_type = val;
-              break;
-            case "Connectivity":
-              const config = MODULE_CONFIGS[MODULE_KEY_FIN_PLATE];
-              if (config?.connectivityMapInverse) {
-                setSelectedOption(config.connectivityMapInverse[val]);
-              }
-              break;
-            case "Connectivity *":
-              inputFromFileObj.connectivity = val;
-              break;
-            case "EndPlateType":
-              const endPlateConfig = MODULE_CONFIGS["Beam-to-Beam End Plate Connection"];
-              if (endPlateConfig?.connectivityMap) {
-                setSelectedOption(Object.keys(endPlateConfig.connectivityMap).find(key => 
-                  endPlateConfig.connectivityMap[key] === val
-                ));
-              }
-              break;
-            case "Connector.Material":
-              inputFromFileObj.connector_material = val;
-              break;
-            case "Design.Design_Method":
-              inputFromFileObj.design_method = val;
-              break;
-            case "Detailing.Corrosive_Influences":
-              inputFromFileObj.detailing_corr_status = val;
-              break;
-            case "Detailing.Edge_type":
-              inputFromFileObj.detailing_edge_type = val;
-              break;
-            case "Detailing.Gap":
-              inputFromFileObj.detailing_gap = val;
-              break;
-            case "Load.Axial":
-              inputFromFileObj.load_axial = val;
-              break;
-            case "Load.Shear":
-              inputFromFileObj.load_shear = val;
-              break;
-            case "Load.Moment":
-              inputFromFileObj.load_moment = val;
-              break;
-            case "Material":
-              inputFromFileObj.material = val;
-              break;
-            case "Module":
-              inputFromFileObj.module = val;
-              moduleName = val;
-              break;
-            case "Weld.Fab":
-              inputFromFileObj.weld_fab = val;
-              break;
-            case "Weld.Material_Grade_OverWrite":
-              inputFromFileObj.weld_material_grade = val;
-              break;
-            case "Weld.Type":
-              inputFromFileObj.weld_type = val;
-              break;
-            case "Member.Designation":
-              inputFromFileObj.member_designation = val;
-              break;
-            case "Member.Material":
-              inputFromFileObj.member_material = val;
-              break;
-            case "Member.Supported_Section.Designation":
-              if (moduleName === MODULE_KEY_FIN_PLATE) {
-                if (selectedOption === "Beam-Beam") {
-                  inputFromFileObj.secondary_beam = val;
-                } else {
-                  inputFromFileObj.beam_section = val;
-                }
-              } else {
-                inputFromFileObj.supported_designation = val;
-              }
-              break;
-            case "Member.Supported_Section.Material":
-              inputFromFileObj.supported_material = val;
-              break;
-            case "Member.Supporting_Section.Designation":
-              if (moduleName === MODULE_KEY_FIN_PLATE) {
-                if (selectedOption === "Beam-Beam") {
-                  inputFromFileObj.primary_beam = val;
-                } else {
-                  inputFromFileObj.column_section = val;
-                }
-              }
-              break;
-            case "Member.Supporting_Section.Material":
-              inputFromFileObj.supporting_material = val;
-              break;
-            case "Connector.Flange_Plate.Preferences":
-              inputFromFileObj.flange_plate_preferences = val;
-              break;
-          }
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch(`${BASE_URL}open-osi/`, {
+          method: 'POST',
+          // headers: {
+          //   'Authorization': `Bearer ${getAccessToken()}`,
+          // },
+          body: formData,
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          // data.inputs follows the backend schema — pass through
+          setInputs(data.inputs || {});
+          // reset flags conservatively
+          setAllSelected({});
+          message.success('Input loaded from OSI');
+        } else {
+          message.error(data.error || 'Failed to open OSI');
         }
-
-        // Parse array fields
-        if (boltDiameterIndex !== -1) {
-          inputFromFileObj.bolt_diameter = getFormatedArrayFields(fileArr, boltDiameterIndex);
+      } catch (err) {
+        message.error('Failed to open OSI');
+      } finally {
+        // Ensure we remove the temporary input element after handling the file
+        if (parentRef.current && element && parentRef.current.contains(element)) {
+          parentRef.current.removeChild(element);
         }
-        if (boltGradeIndex !== -1) {
-          inputFromFileObj.bolt_grade = getFormatedArrayFields(fileArr, boltGradeIndex);
-        }
-        if (plateThicknessIndex !== -1) {
-          inputFromFileObj.plate_thickness = getFormatedArrayFields(fileArr, plateThicknessIndex);
-        }
-        if (flangePlateThicknessIndex !== -1) {
-          inputFromFileObj.flange_plate_thickness = getFormatedArrayFields(fileArr, flangePlateThicknessIndex);
-        }
-        if (webPlateThicknessIndex !== -1) {
-          inputFromFileObj.web_plate_thickness = getFormatedArrayFields(fileArr, webPlateThicknessIndex);
-        }
-        if (angleListIndex !== -1) {
-          inputFromFileObj.angle_list = getFormatedArrayFields(fileArr, angleListIndex);
-        }
-        if (topAngleIndex !== -1) {
-          inputFromFileObj.topangle_list = getFormatedArrayFields(fileArr, topAngleIndex);
-        }
-
-        setInputs(inputFromFileObj);
-        
-        // Reset all selected states based on what fields were loaded
-        const resetStates = {
-          bolt_diameter: false,
-          bolt_grade: false,
-        };
-        
-        if (plateThicknessIndex !== -1) resetStates.plate_thickness = false;
-        if (flangePlateThicknessIndex !== -1) resetStates.flange_plate_thickness = false;
-        if (webPlateThicknessIndex !== -1) resetStates.web_plate_thickness = false;
-        if (angleListIndex !== -1) resetStates.angle_list = false;
-        if (topAngleIndex !== -1) resetStates.topangle_list = false;
-        
-        setAllSelected(resetStates);
-      };
-
-      reader.readAsText(file);
+      }
     });
-
-    parentRef.current.removeChild(element);
   };
 
   const buildContentString = () => {
@@ -437,18 +270,66 @@ function UnifiedDropdownMenu({
     parentRef.current.removeChild(element);
   };
 
-  const saveInput = () => {
-    const content = buildContentString();
-
-    if (localStorage.getItem("userType") === "guest") {
+  const saveInput = async () => {
+    if (localStorage.getItem("userType") !== "user") {
       alert("Cannot save, user is not logged in");
-    } else if (localStorage.getItem("userType") === "user") {
-      SaveInputValueFile(content).then((response) => {
-        setDisplaySaveInputPopup(response.saveInputStatus);
-        setSaveInputFileName(response.saveInputFileName);
+      return;
+    }
+    // Determine module_id; try inputs.module or selected module key
+    const module_id = inputs?.module || MODULE_KEY_FIN_PLATE;
+    // Ensure projectId is present to link OSI to project
+    const pid = getProjectIdFromUrl();
+    if (!pid) {
+      message.warning('No active project. Open or create a project first.');
+      return;
+    }
+    try {
+      const res = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAccessToken()}`,
+        },
+        body: JSON.stringify({ name: (inputs?.project_name || inputs?.name || 'project'), module_id, inputs }),
       });
-    } else {
-      // userType not matched
+      const data = await res.json();
+      if (res.ok && data.success) {
+        // setDisplaySaveInputPopup(true);
+        const savedName = (inputs?.project_name || inputs?.name || 'project');
+        setSaveInputFileName(data?.data?.id ? `${savedName}.osi` : savedName);
+        message.success('Saved OSI and project created');
+        console.log('[saveInput] data:', data);
+        console.log('[saveInput] pid:', pid);
+        console.log('[saveInput] data.url:', data.url);
+        // Update project's osi_file_path via projectId from URL
+        if (pid && data.url) {
+          try {
+            const upd = await fetch(`${BASE_URL}projects/${pid}/`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getAccessToken()}`,
+              },
+              body: JSON.stringify({ osi_file_path: data.url }),
+            });
+            const updData = await upd.json();
+
+            if (!upd.ok || !updData.success) {
+              message.warning('Saved OSI, but failed to link to project');
+              console.log('[saveInput] updData:', updData);
+            }
+            setIsOpen(false);
+          } catch (_e) {
+            message.warning('Saved OSI, but failed to link to project');
+            console.log('[saveInput] error linking project:', _e);
+          }
+        }
+      } else {
+        message.error(data.error || 'Failed to save OSI');
+      }
+    } catch (err) {
+      message.error('Failed to save OSI');
+      console.log('[saveInput] err:', err);
     }
   };
 
@@ -481,6 +362,7 @@ function UnifiedDropdownMenu({
     parentRef.current.appendChild(element);
     element.click();
     parentRef.current.removeChild(element);
+    console.log('[saveLogMessages] content:', content);
   };
 
   const handleClick = (option) => {
@@ -524,7 +406,7 @@ function UnifiedDropdownMenu({
               ],
               suggestedName: "3dmodel",
             };
-            
+
             const handle = await window.showSaveFilePicker(options);
             const fileExtension = handle.name.split(".").pop();
             const blob = await downloadCADModel(fileExtension);

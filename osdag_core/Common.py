@@ -10,6 +10,8 @@ import logging
 from importlib.resources import files
 
 PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
+# PDFLATEX = files("osdag_core.data.ResourceFiles.osdag-latex-env.bin.windows").joinpath("pdflatex.exe")
+PDFLATEX = "pdflatex"
 
 import sqlite3
 
@@ -2504,7 +2506,12 @@ KEY_LEN_OPPLINE = 'Total length opp line with tension'
 KEY_DISP_LEN_OPPLINE = 'Total Length opp line with tension'
 
 
-VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
+# VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
+try:
+  VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
+except Exception as e:
+    print(f"Warning: Could not load Angles from database: {e}")
+    VALUES_ANGLESEC_CUSTOMIZED = []
 
 def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer"):
 

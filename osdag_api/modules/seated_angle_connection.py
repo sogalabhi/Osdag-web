@@ -252,13 +252,13 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
         validate_arr(key[0], key[1])
 
 def create_module() -> SeatedAngleConnection:
-    """Create an instance of the Fin-Plate-Connection module design class and set it up for use"""
+    """Create an instance of the FinPlateConnection module design class and set it up for use"""
     module = SeatedAngleConnection()  # Create an instance of the FinPlateConnection
     module.set_osdaglogger(None)
     return module
 
 def create_from_input(input_values: Dict[str, Any]) -> SeatedAngleConnection:
-    """Create an instance of the Fin-Plate-Connection module design class from input values."""
+    """Create an instance of the FinPlateConnection module design class from input values."""
     # validate_input(input_values)
     try : 
         module = create_module()  # Create module instance.
@@ -267,7 +267,8 @@ def create_from_input(input_values: Dict[str, Any]) -> SeatedAngleConnection:
         print('error in creating module')
     
     # Set the input values on the module instance.
-    try : 
+    try :
+        print('setting input values : ' , input_values) 
         module.set_input_values(input_values)
     except Exception as e : 
         traceback.print_exc()

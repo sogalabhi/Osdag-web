@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Select } from 'antd';
+import Select from 'react-select'; // Re-integrated react-select
 import FRM from "../../../assets/flush_ep.png";
 import EOWIM from "../../../assets/owe_ep.png";
 import EBWRM from "../../../assets/extended.png";
@@ -20,483 +20,197 @@ export const InputSection = ({
   extraState = {},
   setExtraState = () => { }
 }) => {
-  // console.group('[ENG MODULE] ContextData');
-  // console.log('connectivityList', contextData.connectivityList?.length, contextData.connectivityList?.slice(0, 5));
-  // console.log('materialList', contextData.materialList?.length, contextData.materialList?.slice?.(0, 3));
-  // console.log('beamList', contextData.beamList?.length, contextData.beamList?.slice(0, 3));
-  // console.log('columnList', contextData.columnList?.length, contextData.columnList?.slice(0, 3));
-  // console.log('boltDiameterList', contextData.boltDiameterList?.length, contextData.boltDiameterList?.slice?.(0, 5));
-  // console.log('thicknessList', contextData.thicknessList?.length, contextData.thicknessList?.slice?.(0, 5));
-  // console.log('propertyClassList', contextData.propertyClassList?.length, contextData.propertyClassList?.slice?.(0, 5));
-  // console.groupEnd();
-
-  // Full dump (be careful: can be large)
-  // console.log('[ENG MODULE] ContextData JSON:', JSON.stringify(contextData, null, 2));
-  // Ensure inputs and contextData are always defined
   const safeInputs = inputs || {};
   const safeContextData = contextData || {};
   const [imageSource, setImageSource] = useState("");
 
-  // Debug logging for context data
-  // useEffect(() => {
-  //   console.log("🎯 [INPUT SECTION] Context data received:", {
-  //     connectivityList: safeContextData.connectivityList?.length || 0,
-  //     materialList: safeContextData.materialList?.length || 0,
-  //     beamList: safeContextData.beamList?.length || 0,
-  //     columnList: safeContextData.columnList?.length || 0,
-  //     boltDiameterList: safeContextData.boltDiameterList?.length || 0,
-  //     thicknessList: safeContextData.thicknessList?.length || 0,
-  //     propertyClassList: safeContextData.propertyClassList?.length || 0
-  //   });
-  // }, [safeContextData]);
+  // Styling object for react-select to fix z-index and other container issues
+  const customSelectStyles = {
+    menuPortal: base => ({ ...base, zIndex: 9999 }),
+    control: (base) => ({
+      ...base,
+      borderColor: '#000',
+      '&:hover': {
+        borderColor: '#91B014',
+      },
+    }),
+  };
 
-  const { Option } = Select;
-
-  // Handle connectivity selection with image (for FinePlate)
   useEffect(() => {
     if (extraState.selectedOption) {
-      const connectivityImageMap = {
-        "Column Flange-Beam-Web": CFBW,
-        "Column Web-Beam-Web": CWBW,
-        "Beam-Beam": BB,
+      const imageMap = {
+        "Column Flange-Beam-Web": CFBW, "Column Web-Beam-Web": CWBW, "Beam-Beam": BB,
+        "Flushed - Reversible Moment": FRM, "Extended One Way - Irreversible Moment": EOWIM, "Extended Both Ways - Reversible Moment": EBWRM,
       };
-
-      const endPlateImageMap = {
-        "Flushed - Reversible Moment": FRM,
-        "Extended One Way - Irreversible Moment": EOWIM,
-        "Extended Both Ways - Reversible Moment": EBWRM,
-      };
-
-      // Check if it's a connectivity or end plate selection
-      if (connectivityImageMap[extraState.selectedOption]) {
-        setImageSource(connectivityImageMap[extraState.selectedOption]);
-      } else if (endPlateImageMap[extraState.selectedOption]) {
-        setImageSource(endPlateImageMap[extraState.selectedOption]);
-      } else {
-        setImageSource(ErrorImg);
-      }
+      setImageSource(imageMap[extraState.selectedOption] || ErrorImg);
     }
   }, [extraState.selectedOption]);
 
   const handleCustomizableSelect = (field, value) => {
     const getAllValuesForInputKey = (inputKey) => {
-      switch (inputKey) {
-        case 'bolt_diameter':
-          return Array.isArray(safeContextData.boltDiameterList) ? safeContextData.boltDiameterList : [];
-        case 'bolt_grade':
-          return Array.isArray(safeContextData.propertyClassList) ? safeContextData.propertyClassList : [];
-        case 'plate_thickness':
-          return Array.isArray(safeContextData.thicknessList) ? safeContextData.thicknessList : [];
-        default:
-          return [];
-      }
+      const keyMap = {
+        'bolt_diameter': 'boltDiameterList', 'bolt_grade': 'propertyClassList',
+        'plate_thickness': 'thicknessList', 'angle_list': 'angleList',
+      };
+      const listName = keyMap[inputKey];
+      return Array.isArray(safeContextData[listName]) ? safeContextData[listName] : [];
     };
 
     if (value === "Customized") {
-      const current = Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [];
-      setInputs({ ...safeInputs, [field.key]: current });
+      setInputs({ ...safeInputs, [field.key]: [] });
       updateSelectionState(field.selectionKey, "Customized");
-      toggleAllSelected(field.key, false);
       updateModalState(field.modalKey, true);
     } else {
       const allValues = getAllValuesForInputKey(field.key);
       setInputs({ ...safeInputs, [field.key]: allValues });
       updateSelectionState(field.selectionKey, "All");
-      toggleAllSelected(field.key, true);
       updateModalState(field.modalKey, false);
     }
   };
 
   const renderField = (field) => {
-    // Check conditional display
-    if (field.conditionalDisplay && !field.conditionalDisplay(extraState)) {
-      return null;
-    }
+    if (field.conditionalDisplay && !field.conditionalDisplay(extraState)) return null;
+
+    const toSelectOptions = (list = []) => {
+      if (!list || list.length === 0) return [];
+      if (typeof list[0] === 'object' && list[0] !== null) {
+        return list.map(item => ({ value: item.Grade, label: item.Grade }));
+      }
+      return list.map(item => ({ value: item, label: item }));
+    };
 
     switch (field.type) {
       case 'select': {
-        let optionsArr = [];
-        if (field.options === 'beamList') {
-          const beamOptions = contextData.beamList?.map(item => ({ value: item, label: item })) || [];
-          const currentValue = inputs[field.key] || contextData.beamList[2];
-          const selectedOption = beamOptions.find(option => option.value === currentValue);
+        const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options);
+        const options = toSelectOptions(safeContextData[field.options]);
 
-          return (
-            <Select
-              value={safeInputs[field.key] || (safeContextData.beamList?.[2] || '')}
-              onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
-            >
-              {(safeContextData.beamList || []).map((item, index) => (
-                <Option key={index} value={item}>
-                  {item}
-                </Option>
-              ))}
-            </Select>
-          );
-        } else if (field.options === 'columnList') {
-          const columnOptions = contextData.columnList?.map(item => ({ value: item, label: item })) || [];
-          const currentValue = inputs[field.key] || contextData.columnList[0];
-          const selectedOption = columnOptions.find(option => option.value === currentValue);
-
-          return (
-            <Select
-              value={safeInputs[field.key] || (safeContextData.columnList?.[0] || '')}
-              onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
-            >
-              {(safeContextData.columnList || []).map((item, index) => (
-                <Option key={index} value={item}>
-                  {item}
-                </Option>
-              ))}
-            </Select>
-          );
-        } else if (field.options === 'boltDiameterList') {
-          const list = safeContextData.boltDiameterList || [];
+        if (isMulti) {
           const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
           if (!isCustomized) {
             return (
-              <Select value={"All"} disabled>
-                <Option value="All">All</Option>
-              </Select>
+              <Select
+                value={{ label: "All", value: "All" }}
+                isDisabled={true}
+                styles={customSelectStyles}
+                classNamePrefix="react-select"
+                className="w-[60%]"
+              />
             );
           }
-          const value = Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [];
-          return (
-            <Select
-              mode="multiple"
-              value={value}
-              onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
-            >
-              {list.map((item, index) => (
-                <Option key={index} value={item}>{item}</Option>
-              ))}
-            </Select>
-          );
-        } else if (field.options === 'thicknessList') {
-          const list = safeContextData.thicknessList || [];
-          const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
-          if (!isCustomized) {
-            return (
-              <Select value={"All"} disabled>
-                <Option value="All">All</Option>
-              </Select>
-            );
-          }
-          const value = Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [];
-          return (
-            <Select
-              mode="multiple"
-              value={value}
-              onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
-            >
-              {list.map((item, index) => (
-                <Option key={index} value={item}>{item}</Option>
-              ))}
-            </Select>
-          );
-        } else if (field.options === 'propertyClassList') {
-          const list = safeContextData.propertyClassList || [];
-          const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
-          if (!isCustomized) {
-            return (
-              <Select value={"All"} disabled>
-                <Option value="All">All</Option>
-              </Select>
-            );
-          }
-          const value = Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [];
-          return (
-            <Select
-              mode="multiple"
-              value={value}
-              onChange={(next) => setInputs({ ...safeInputs, [field.key]: next })}
-            >
-              {list.map((item, index) => (
-                <Option key={index} value={item}>{item}</Option>
-              ))}
-            </Select>
-          );
-        } else if (field.options === 'boltTypeList') {
-          const list = safeContextData.boltTypeList || [];
-          return (
-            <Select
-              value={safeInputs[field.key]}
-              onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
-            >
-              {list.map((item, index) => (
-                <Option key={index} value={item}>{item}</Option>
-              ))}
-            </Select>
-          );
-        } else if (field.options === 'materialList') {
-
-          // Check for duplicates in materialList
-          const grades =
-            safeContextData.materialList?.map((item) => item.Grade) || [];
-          const duplicateGrades = grades.filter(
-            (grade, index) => grades.indexOf(grade) !== index
-          );
-          if (duplicateGrades.length > 0) {
-            console.warn(`Duplicate grades found in materialList:`, duplicateGrades);
-          }
-
-          const selectedMaterialGrade = safeInputs[field.key] || (safeContextData.materialList?.[0]?.Grade || '');
+          const currentValue = (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [])
+            .map(val => ({ value: val, label: val }));
 
           return (
             <Select
-              value={selectedMaterialGrade}
-              onSelect={(value) => {
-                if (field.onChange) {
-                  field.onChange(
-                    value,
-                    safeInputs,
-                    setInputs,
-                    safeContextData.materialList
-                  );
-                } else {
-                  setInputs({ ...safeInputs, [field.key]: value });
-                }
+              isMulti
+              options={options}
+              value={currentValue}
+              onChange={(selectedOptions) => {
+                const newValues = selectedOptions.map(opt => opt.value);
+                setInputs({ ...safeInputs, [field.key]: newValues });
               }}
-            >
-              {(safeContextData.materialList || []).map((item, index) => (
-                <Option key={`${item.id}-${index}`} value={item.Grade}>
-                  {item.Grade}
-                </Option>
-              ))}
-            </Select>
-          );
-        } else {
-          const options = field.options?.map(option => ({
-            value: option.value || option,
-            label: option.label || option,
-            isDisabled: option.disabled
-          })) || [];
-          const selectedOption = options.find(option => option.value === inputs[field.key]);
-
-          return (
-            <Select
-              value={safeInputs[field.key]}
-              onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
-            >
-              {field.options.map((option, index) => (
-                <Option
-                  key={index}
-                  value={option.value || option}
-                  disabled={option.disabled}
-                >
-                  {option.label || option}
-                </Option>
-              ))}
-            </Select>
+              menuPortalTarget={document.body}
+              styles={customSelectStyles}
+              classNamePrefix="react-select"
+              className="w-[60%]"
+            />
           );
         }
-        // If loaded value is not in options, add it as a custom option
-        const selectValue = safeInputs[field.key];
-        const displayOptions = optionsArr.includes(selectValue) || selectValue === undefined ? optionsArr : [selectValue, ...optionsArr];
+
+        const value = options.find(opt => opt.value === safeInputs[field.key]);
         return (
           <Select
-            value={selectValue}
-            onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
-            className="w-full"
-            placeholder={field.placeholder || `Select ${field.label}`}
-          >
-            {displayOptions.map((option, index) => (
-              <Option key={index} value={option}>{option}</Option>
-            ))}
-          </Select>
+            options={options}
+            value={value}
+            onChange={(selected) => setInputs({ ...safeInputs, [field.key]: selected.value })}
+            menuPortalTarget={document.body}
+            styles={customSelectStyles}
+            classNamePrefix="react-select"
+            className="w-[60%]"
+          />
         );
       }
+
       case 'connectivitySelect':
-        const connectivityOptions = (contextData.connectivityList || []).map(item => ({ value: item, label: item }));
-        const connectivityValue = extraState.selectedOption || inputs.connectivity;
-        const selectedConnectivity = connectivityOptions.find(option => option.value === connectivityValue);
-
-        return (
-          <div className="w-full">
-            <Select
-              value={connectivityValue}
-              onSelect={(value) => {
-                if (field.onChange) {
-                  field.onChange(
-                    value,
-                    safeInputs,
-                    setInputs,
-                    safeContextData,
-                    extraState,
-                    setExtraState
-                  );
-                } else {
-                  setInputs({ ...safeInputs, [field.key]: value });
-                }
-              }}
-              className="w-full h-11"
-              placeholder={field.placeholder || `Select ${field.label}`}
-            >
-              {(safeContextData.connectivityList || []).map((connectivity, index) => (
-                <Option key={index} value={connectivity}>
-                  <div className="flex items-center justify-between py-1">
-                    <span>{connectivity}</span>
-                    {imageSource && (
-                      <img
-                        src={imageSource}
-                        alt="Connectivity"
-                        className="w-8 h-8 rounded border border-gray-200 ml-2 object-cover"
-                      />
-                    )}
-                  </div>
-                </Option>
-              ))}
-            </Select>
-          </div>
-        );
-      case 'endPlateSelect':
-        const conn_map = {
-          "Flushed - Reversible Moment": "Flushed - Reversible Moment",
-          "Extended One Way - Irreversible Moment": "Extended One Way - Irreversible Moment",
-          "Extended Both Ways - Reversible Moment": "Extended Both Ways - Reversible Moment",
-        };
-        const endPlateOptions = Object.keys(conn_map).map(item => ({ value: item, label: conn_map[item] }));
-        const selectedEndPlate = endPlateOptions.find(option => option.value === extraState.selectedOption);
-
+      case 'endPlateSelect': {
+        const list = field.type === 'connectivitySelect' ? (safeContextData.connectivityList || []) : Object.keys({
+          "Flushed - Reversible Moment": "", "Extended One Way - Irreversible Moment": "", "Extended Both Ways - Reversible Moment": ""
+        });
+        const options = toSelectOptions(list);
+        const value = options.find(opt => opt.value === extraState.selectedOption);
         return (
           <Select
-            onSelect={(value) => {
-              setExtraState({ ...extraState, selectedOption: value });
+            options={options}
+            value={value}
+            onChange={(selected) => {
+              setExtraState({ ...extraState, selectedOption: selected.value });
               setInputs({ ...safeInputs, output: null });
             }}
-            isSearchable={false}
             menuPortalTarget={document.body}
-            styles={selectStyles}
+            styles={customSelectStyles}
+            classNamePrefix="react-select"
+            className="w-[60%]"
           />
         );
-      case 'number':
-        return (
-          <Input
-            type="number"
-            value={safeInputs[field.key] ?? ""}
-            onChange={(event) =>
-              setInputs({ ...safeInputs, [field.key]: event.target.value })
-            }
-            placeholder={field.placeholder || `ex. ${field.label}`}
-            className="w-full h-11 border border-gray-300 rounded-lg px-3 text-sm bg-white transition-all duration-200 hover:border-gray-400 focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 focus:outline-none placeholder:text-gray-400"
-          />
-        );
-      case 'customizable':
-        const customizableOptions = [
-          { value: "Customized", label: "Customized" },
-          { value: "All", label: "All" }
-        ];
-        const selectedCustomizable = customizableOptions.find(option => option.value === selectionStates[field.selectionKey]);
+      }
 
+      case 'customizable': {
+        const options = [{ value: "All", label: "All" }, { value: "Customized", label: "Customized" }];
+        const value = options.find(opt => opt.value === (selectionStates?.[field.selectionKey] || "All"));
         return (
           <Select
-            value={selectionStates?.[field.selectionKey] || "All"}
-            onSelect={(value) => handleCustomizableSelect(field, value)}
-            className="w-full h-11"
-            placeholder={field.placeholder || `Select ${field.label}`}
-          >
-            <Option value="All">All</Option>
-            <Option value="Customized">Customized</Option>
-          </Select>
-        );
-      case 'sectionProfileSelect':
-        return (
-          <Select
-            value={safeInputs[field.key]}
-            onSelect={(value) => {
-              if (field.onChange) {
-                field.onChange(
-                  value,
-                  safeInputs,
-                  setInputs,
-                  safeContextData,
-                  extraState,
-                  setExtraState
-                );
-              } else {
-                setInputs({ ...safeInputs, [field.key]: value });
-              }
-            }}
-            className="w-full h-11"
-            placeholder={field.placeholder || `Select ${field.label}`}
-          >
-            {(safeContextData.sectionProfileList || []).map((profile, index) => (
-              <Option key={index} value={profile}>
-                {profile}
-              </Option>
-            ))}
-          </Select>
-        );
-      case 'dynamicSelect':
-        const options = field.getOptions ? field.getOptions(inputs, extraState) : [];
-        return (
-          <Select
-            value={safeInputs[field.key]}
-            onSelect={(value) => setInputs({ ...safeInputs, [field.key]: value })}
-            className="w-full h-11"
-            placeholder={field.placeholder || `Select ${field.label}`}
-          >
-            {options.map((option, index) => (
-              <Option key={index} value={option.value}>
-                {option.label}
-              </Option>
-            ))}
-          </Select>
-        );
-      case 'image':
-        const imageUrl = field.imageSource ? field.imageSource(extraState) : null;
-        return imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={field.label || "Section Profile"}
-            height={field.height || "100px"}
-            width={field.width || "100px"}
-            className="rounded border border-gray-200"
+            options={options}
+            value={value}
+            onChange={(selected) => handleCustomizableSelect(field, selected.value)}
+            menuPortalTarget={document.body}
+            styles={customSelectStyles}
+            classNamePrefix="react-select"
+            className="w-[60%]"
           />
-        ) : null;
+        );
+      }
+
+      case 'number':
       default:
         return (
-          <Input
-            value={safeInputs[field.key] ?? ""}
-            onChange={(event) =>
-              setInputs({ ...safeInputs, [field.key]: event.target.value })
-            }
-            placeholder={field.placeholder || `ex. ${field.label}`}
-            className="w-full h-11 border border-gray-300 rounded-lg px-3 text-sm bg-white transition-all duration-200 hover:border-gray-400 focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 focus:outline-none placeholder:text-gray-400"
-          />
+          <div className="w-[60%]">
+            <input
+              type={field.type === 'number' ? 'number' : 'text'}
+              value={safeInputs[field.key] ?? ""}
+              onChange={(e) => setInputs({ ...safeInputs, [field.key]: e.target.value })}
+              placeholder={field.placeholder || `ex. ${field.label}`}
+              className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none"
+            />
+          </div>
         );
     }
   };
 
   return (
-    <div className="cards">
-      <h3>{section.title}</h3>
-      <div className="component-grid">
-        {section.fields.map((field, index) => {
-          // Check conditional display again for the entire field container
-          if (field.conditionalDisplay && !field.conditionalDisplay(extraState)) {
-            return null;
-          }
-          return (
-            <div key={index}>
-              <div className="component-grid-align">
-                <h4>{field.label}</h4>
-                {renderField(field)}
-              </div>
-              {/* Render image separately for connectivity and endPlateSelect types */}
-              {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (
-                <div className="connectionimg">
-                  <img
-                    src={imageSource}
-                    alt="Component"
-                    height="100px"
-                    width="100px"
-                  />
-                </div>
-              )}
+    <div className="bg-white dark:bg-osdag-dark-color/90 border-2 border-osdag-green rounded-xl mb-5 mx-4 shadow-sm relative pt-4">
+      <h3 className="text-base font-bold text-osdag-text-primary dark:text-white bg-white dark:bg-osdag-dark-color px-1 absolute -top-4 left-4">
+        {section.title}
+      </h3>
+      <div className="flex flex-col w-full p-4 pt-2">
+        {section.fields.map((field, index) => (
+          <div key={index}>
+            <div className="flex w-full justify-between items-center mb-3">
+              <h4 className="w-[40%] text-sm font-medium text-osdag-text-primary dark:text-white">
+                {field.label}
+              </h4>
+              {renderField(field)}
             </div>
-          );
-        })}
+            {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (
+              <div className="flex justify-center">
+                <img
+                  src={imageSource}
+                  alt="Connection type"
+                  className="w-[100px] h-[100px] object-contain"
+                />
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

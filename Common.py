@@ -329,10 +329,10 @@ KEY_MODULE_STATUS = 'Module.Status'
 
 TYPE_MODULE = 'Window Title'
 
-KEY_DISP_FINPLATE = 'Fin-Plate-Connection'
+KEY_DISP_FINPLATE = 'FinPlateConnection'
 KEY_DISP_ENDPLATE = 'End Plate Connection'
 KEY_DISP_CLEATANGLE = 'Cleat Angle Connection'
-KEY_DISP_SEATED_ANGLE = 'Seated Angle Connection'
+KEY_DISP_SEATED_ANGLE = 'SeatedAngleConnection'
 KEY_DISP_BASE_PLATE = 'Base Plate Connection'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam-to-Beam Cover Plate Bolted Connection'

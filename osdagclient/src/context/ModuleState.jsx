@@ -93,7 +93,7 @@ export const ModuleProvider = ({ children }) => {
    * Universal function to get all module data in one API call
    * Replaces: getConnectivityList, getColumnBeamMaterialList, getBeamMaterialList, 
    *          getBoltDiameterList, getThicknessList, getPropertyClassList, etc.
-   * @param {string} moduleName - Module identifier (e.g., 'Fin-Plate-Connection')
+   * @param {string} moduleName - Module identifier (e.g., 'FinPlateConnection')
    * @param {Object} options - Optional parameters
    * @param {string} options.connectivity - Connection type filter
    * @param {Object} options.filters - Additional filters for data
@@ -273,6 +273,10 @@ export const ModuleProvider = ({ children }) => {
 
       const data = await response.json();
 
+          // 🟩 Add this log to check what the backend sent
+      console.log("📦 [MODULE CONTEXT] CAD API Response:", data);
+      console.log("📁 [MODULE CONTEXT] CAD File Names from backend:", data.files);
+
       if (response.status === 201 && data.status === "success") {
         console.log("✅ [MODULE CONTEXT] CAD Model Generated Successfully" + response.json);
 
@@ -396,6 +400,7 @@ export const ModuleProvider = ({ children }) => {
         case 'design_report': {
           // Use external API for design report generation
           const { moduleId, inputValues, designStatus = true, logs = [] } = params;
+          console.log("🛠️ [MODULE CONTEXT] Generating design report with params:", params);
           return apiCreateDesignReport(params, moduleId, inputValues, designStatus, logs, uploadCompanyLogo, generateReport);
         }
 

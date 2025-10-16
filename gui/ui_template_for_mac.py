@@ -2840,7 +2840,7 @@ class Window(QMainWindow):
         self.actionAbout_Osdag.setText(_translate("MainWindow", "About Osdag"))
         self.actionBeam.setText(_translate("MainWindow", "Beam"))
         self.actionColumn.setText(_translate("MainWindow", "Column"))
-        self.actionFinplate.setText(_translate("MainWindow", "Finplate"))
+        self.actionFinplate.setText(_translate("MainWindow", "FinPlateConnection"))
         self.actionBolt.setText(_translate("MainWindow", "Bolt"))
         self.action2D_view.setText(_translate("MainWindow", "2D view"))
         self.actionZoom_in.setText(_translate("MainWindow", "Zoom in"))

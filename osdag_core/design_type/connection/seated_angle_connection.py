@@ -39,7 +39,7 @@ from ...Report_functions import *
 from ...Common import *
 from ...utils.common.load import Load
 import logging
-from importlib_resources  import files
+from importlib.resources import files
 from ...custom_logger import CustomLogger
 
 
@@ -49,6 +49,8 @@ class SeatedAngleConnection(ShearConnection):
 
         super(SeatedAngleConnection, self).__init__()
         self.design_status = False
+        # To capture all the hover labels required
+        self.hover_dict = {}
 
     ###############################################
     # Design Preference Functions Start
@@ -357,9 +359,9 @@ class SeatedAngleConnection(ShearConnection):
         list1.append(t4)
         return list1
 
-    def fn_conn_suptngsec_lbl(self):
+    def fn_conn_suptngsec_lbl(self, input):
 
-        conn = self[0]
+        conn = input[0]
         if conn in VALUES_CONN_1:
             return KEY_DISP_COLSEC
         # elif self in VALUES_CONN_2:
@@ -367,9 +369,9 @@ class SeatedAngleConnection(ShearConnection):
         else:
             return ''
 
-    def fn_conn_suptdsec_lbl(self):
+    def fn_conn_suptdsec_lbl(self, input):
 
-        conn = self[0]
+        conn = input[0]
         if conn in VALUES_CONN_1:
             return KEY_DISP_BEAMSEC
         # elif self in VALUES_CONN_2:
@@ -377,9 +379,9 @@ class SeatedAngleConnection(ShearConnection):
         else:
             return ''
 
-    def fn_conn_suptngsec(self):
+    def fn_conn_suptngsec(self, input):
 
-        conn = self[0]
+        conn = input[0]
         if conn in VALUES_CONN_1:
             return VALUES_COLSEC
         # elif self in VALUES_CONN_2:
@@ -387,9 +389,9 @@ class SeatedAngleConnection(ShearConnection):
         else:
             return []
 
-    def fn_conn_suptdsec(self):
+    def fn_conn_suptdsec(self, input):
 
-        conn = self[0]
+        conn = input[0]
         if conn in VALUES_CONN_1:
             return VALUES_SECBM
         # elif self in VALUES_CONN_2:
@@ -397,8 +399,8 @@ class SeatedAngleConnection(ShearConnection):
         else:
             return []
 
-    def fn_conn_image(self):
-        conn = self[0]
+    def fn_conn_image(self, input):
+        conn = input[0]
         if conn == VALUES_CONN[0]:
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cf_bw.png"))
         elif conn == VALUES_CONN[1]:
@@ -521,7 +523,11 @@ class SeatedAngleConnection(ShearConnection):
 
         """     Top Angle Properties: End     """
         """"""""""""""""""""""""""""""""""""""""""""""""""""""
-
+        # Populate hover dict
+        self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {self.bolt.bolts_required if flag else ''}"
+        
+        self.hover_dict["Angle"]= f"Angle: {self.seated_angle.designation if flag else ''}"
+        
         return out_list
 
     def top_spacing_col(self, flag):
@@ -1396,7 +1402,7 @@ class SeatedAngleConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self, popup_summary):
-        super(SeatedAngleConnection, self).save_design(self)
+        super(SeatedAngleConnection, self).save_design()
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
 
@@ -1835,7 +1841,7 @@ class SeatedAngleConnection(ShearConnection):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
-
+    
     def get_3d_components(self):
         components = []
 
@@ -1854,11 +1860,11 @@ class SeatedAngleConnection(ShearConnection):
         return components
 
     def call_3DPlate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
+        from PySide6.QtWidgets import QCheckBox
+        from PySide6.QtCore import Qt
+        for chkbox in ui.cad_comp_widget.children():
             if chkbox.objectName() == 'Seated Angle':
                 continue
             if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("SeatAngle", bgcolor)

@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Input, Modal, Button } from "antd";
 import Select from 'react-select';
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
@@ -27,6 +27,7 @@ import Logsvg from "../../../assets/Logsvg.svg";
 import ArrowDownsvg from "../../../assets/ArrowDownsvg.svg";
 import Homesvg from "../../../assets/Homesvg.svg";
 import GridSelector from "../utils/GridSelector";
+import { message, Modal as AntdModal } from 'antd';
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -114,7 +115,45 @@ export const EngineeringModule = ({
   const [isGridActive, setIsGridActive] = useState(false);
   const [orthographicView, setOrthographicView] = useState(null); // New state for orthographic view
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
-  const [selectedSection, setSelectedSection] = useState("Section Details");
+  const [selectedSection, setSelectedSection] = useState("Additional Inputs");
+  // Auth helpers
+  const BASE_URL = 'http://localhost:8000/api/';
+  const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
+  const isGuest = () => (localStorage.getItem('userType') === 'guest');
+  const location = useLocation();
+
+  const getProjectIdFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const pid = params.get('projectId');
+    return pid ? parseInt(pid, 10) : null;
+  };
+
+  // Enforce project presence for authenticated users
+  useEffect(() => {
+    if (isGuest()) return; // guests can open without a project
+    const projectId = getProjectIdFromUrl();
+    if (!projectId || Number.isNaN(projectId)) {
+      message.warning('No active project. Redirecting to home.');
+      navigate('/');
+      return;
+    }
+    (async () => {
+      try {
+        const res = await fetch(`${BASE_URL}projects/${projectId}/`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${getAccessToken()}` },
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          message.warning('Project not found. Redirecting to home.');
+          navigate('/');
+        }
+      } catch (_e) {
+        message.warning('Cannot verify project. Redirecting to home.');
+        navigate('/');
+      }
+    })();
+  }, [location.search]);
 
   // Only change dock visibility after design is complete
   useEffect(() => {
@@ -217,13 +256,15 @@ export const EngineeringModule = ({
   };
 
   const handleColorChange = (color) => {
+    console.log("Current bgColor:", bgColor);
     setBgColor(color);
     console.log("Background color changed to:", color);
   };
+  // console.log("Current bgColor:", bgColor);
 
-  // Get connectivity for FinPlate module
+  // Get connectivity for FinPlateConnection module
   const getConnectivity = () => {
-    if (moduleConfig.cameraKey === "FinPlate") {
+    if (moduleConfig.cameraKey === "FinPlateConnection") {
       return extraState?.selectedOption || inputs?.connectivity;
     }
     return null;
@@ -246,20 +287,27 @@ export const EngineeringModule = ({
   // Determine view options based on module
   const getViewOptions = () => {
     console.log("🔍 [ENGINEERING MODULE] getViewOptions called with cameraKey:", moduleConfig.cameraKey);
-    
-    if (moduleConfig.cameraKey === "FinPlate") {
+
+    if (moduleConfig.cameraKey === "FinPlateConnection") {
       console.log("📋 [ENGINEERING MODULE] Returning FinPlate view options");
       return ["Model", "Beam", "Column", "Plate"];
+    }
+    else if (moduleConfig.cameraKey === "CleatAngle") {
+      return ["Model", "Beam", "Column", "CleatAngle"]; // FIXED: Use CleatAngle instead of Connector
     }
     else if (moduleConfig.cameraKey === "EndPlate") {
       console.log("📋 [ENGINEERING MODULE] Returning EndPlate view options");
       return ["Model", "Beam", "Column", "EndPlate"];
+    }
+    else if (moduleConfig.cameraKey === "SeatedAngle") {
+      return ["Model", "Beam", "Column", "SeatedAngle"]; // FIXED: Use SeatedAngle instead of Connector
     }
     console.log("📋 [ENGINEERING MODULE] Returning default view options");
     return ["Model", "Beam", "Connector"];
   };
 
   const options = getViewOptions();
+
   
   console.log("🔍 [ENGINEERING MODULE] Module Config:", {
     sessionName: moduleConfig.sessionName,
@@ -269,6 +317,7 @@ export const EngineeringModule = ({
   });
   console.log("🔍 [ENGINEERING MODULE] Final view options:", options);
 
+  // FIXED: Include angleList in contextData 
   const contextData = {
     beamList,
     columnList,
@@ -277,8 +326,11 @@ export const EngineeringModule = ({
     boltDiameterList,
     thicknessList,
     propertyClassList,
+    angleList, // FIXED: Added angleList to context data
     boltTypeList,
   };
+
+  console.log("CadModelPaths*************", cadModelPaths);
 
   const triggerScreenshotCapture = () => {
     setScreenshotTrigger(true);
@@ -357,9 +409,9 @@ export const EngineeringModule = ({
       >
         {/* Left - Input Dock - Only show if showInputDock is true */}
         {showInputDock && (
-          <div className="InputDock">
+          <div className="w-[400px] bg-white dark:bg-osdag-dark-color">
             <div className="flex justify-between inputRow">
-              <span>Input Dock</span>
+              <span className="flex justify-center items-center w-32 my-2 ml-4 py-1 px-1 text-sm text-center rounded-xl font-medium bg-osdag-green text-white flex-shrink-0">Input Dock</span>
               <Select
                 value={{ value: selectedSection, label: selectedSection }}
                 onChange={(option) => {
@@ -371,18 +423,16 @@ export const EngineeringModule = ({
                   }
                 }}
                 options={[
+                  { value: "Additional Inputs", label: "Additional Inputs" },
                   { value: "Section Details", label: "Section Details" },
-                  { value: "Design Preferences", label: "Design Preferences" },
-                  { value: "Additional Inputs", label: "Additional Inputs" }
+                  { value: "Design Preferences", label: "Design Preferences" }
                 ]}
                 classNamePrefix="section-select"
                 isSearchable={false}
               />
             </div>
-            <div className="subMainBody scroll-data">
-
-
-              {selectedSection !== "Additional Inputs" &&
+            <div className="subMainBody scroll-data dark:bg-osdag-dark-color bg-white">
+              {selectedSection !== "Section Details" &&
                 moduleConfig.inputSections.map((section, index) => (
                   <InputSection
                     key={index}
@@ -393,45 +443,35 @@ export const EngineeringModule = ({
                     updateSelectionState={updateSelectionState}
                     updateModalState={updateModalState}
                     toggleAllSelected={toggleAllSelected}
-                    contextData={contextData}
+                    contextData={contextData} // FIXED: This now includes angleList
                     extraState={extraState}
                     setExtraState={setExtraState}
                   />
                 ))
               }
 
-              {selectedSection === "Additional Inputs" && (
-                <div className="additional-inputs-content">
-                  {/* Add your additional inputs content here */}
-                  <p>Additional Inputs Content</p>
-                </div>
-              )}
             </div>
 
-            <div className="inputdock-btn">
-              <button onClick={handleSubmitEnhanced}>
-                <img src={Designsvg} alt="Design" />
+            <div className="flex items-center justify-between w-full gap-x-4 px-4">
+
+              {/* Design Button */}
+              <button
+                onClick={handleSubmitEnhanced}
+                className="flex flex-1 items-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-2 rounded-lg shadow-md"
+              >
+                <img src={Designsvg} alt="Design icon" className="w-5 h-5" />
                 Design
               </button>
 
+              {/* Reset Button */}
               <button
-                className="arrow-down-btn"
-                onClick={toggleResetButton}
-                title="Toggle Reset Options"
+                onClick={handleResetEnhanced}
+                className="flex flex-1 items-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-2 rounded-lg shadow-md"
               >
-                <img
-                  src={ArrowDownsvg}
-                  alt="Toggle Reset"
-                  className={`arrow-icon ${showResetButton ? "rotated" : ""}`}
-                />
+                <img src={Resetsvg} alt="Reset icon" className="w-5 h-5" />
+                Reset
               </button>
 
-              {showResetButton && (
-                <button onClick={handleResetEnhanced} className="reset-btn">
-                  <img src={Resetsvg} alt="Reset" />
-                  Reset
-                </button>
-              )}
             </div>
           </div>
         )}
@@ -473,7 +513,7 @@ export const EngineeringModule = ({
                 <p>{isRedesigning ? "Updating Model..." : "Loading Model..."}</p>
               </div>
             ) : renderBoolean ? (
-              <div className="cadModel">
+              <div className="cadModel relative" style={{ backgroundColor: bgColor }}>
                 {/* Existing background color picker - left side */}
                 <div className="absolute top-2 left-2 flex items-center gap-2 bg-white/90 dark:bg-osdag-dark-color/90 px-3 py-1.5 rounded-lg shadow-md z-10">
                   <label htmlFor="bgColorPicker" className="text-xs font-medium text-black dark:text-white mr-1">
@@ -483,7 +523,7 @@ export const EngineeringModule = ({
                     type="color"
                     id="bgColorPicker"
                     value={bgColor}
-                    onChange={(e) => setBgColor(e.target.value)}
+                    onChange={(e) => handleColorChange(e.target.value)}
                     className="bg-color-picker"
                     title="Change Background Color"
                   />
@@ -546,16 +586,24 @@ export const EngineeringModule = ({
         {showOutputDock && isDesignComplete && (
           <div className="superMain_right">
             <div className="OutputDock">
-              <OutputDockComponent output={output} extraState={extraState} />
-              <div className="inputdock-btn">
-                <Button onClick={handleCreateDesignReport}>
-                  <img src={Reportsvg} alt="Report" />
+              <OutputDockComponent output={output} extraState={{...extraState, cadModelPaths, renderCadModel: renderBoolean}} />
+              <div className="flex justify-end flex-col items-center gap-y-3 mt-2">
+                <div
+                  onClick={handleCreateDesignReport}
+                  className="cursor-pointer flex items-center gap-x-2 bg-osdag-green text-white font-semibold p-4 rounded-lg shadow-md duration-200"
+                >
+                  <img src={Reportsvg} alt="Report icon" className="w-5 h-5" />
                   Generate Report
-                </Button>
-                <Button onClick={saveOutput}>
-                  <img src={Outputsvg} alt="Output" />
+                </div>
+
+                <div
+                  onClick={saveOutput}
+                  className="cursor-pointer flex items-center gap-x-2 bg-osdag-green text-white font-semibold p-3 mb-1 rounded-lg shadow-md duration-200"
+                >
+                  <img src={Outputsvg} alt="Save icon" className="w-5 h-5" />
                   Save Output
-                </Button>
+                </div>
+
               </div>
             </div>
           </div>
@@ -570,6 +618,16 @@ export const EngineeringModule = ({
         designReportInputs={designReportInputs}
         setDesignReportInputs={setDesignReportInputs}
         output={output}
+        moduleId={moduleConfig?.designType}
+        inputValues={inputs}
+        logs={logs}
+        moduleConfig={moduleConfig}
+        boltDiameterList={boltDiameterList}
+        propertyClassList={propertyClassList}
+        thicknessList={thicknessList}
+        angleList={angleList}
+        allSelected={allSelected}
+        extraState={extraState}
       />
 
       {/* Customization Modals */}
@@ -579,7 +637,7 @@ export const EngineeringModule = ({
           isOpen={modalStates[modal.key]}
           onClose={() => updateModalState(modal.key, false)}
           title="Customized"
-          dataSource={contextData[modal.dataSource] || []}
+          dataSource={contextData[modal.dataSource] || []} // FIXED: This now includes angleList
           selectedItems={selectedItems[modal.inputKey]}
           onTransferChange={(nextTargetKeys) =>
             updateSelectedItems(modal.inputKey, nextTargetKeys)

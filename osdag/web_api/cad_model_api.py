@@ -52,10 +52,10 @@ class CADGeneration(View):
             
             # Determine session type from module_id
             module_type_mapping = {
-                "Fin-Plate-Connection": "FinPlate",
+                "FinPlateConnection": "FinPlateConnection",
                 "Cleat-Angle-Connection": "CleatAngle", 
                 "End-Plate-Connection": "EndPlate",
-                "Seated-Angle-Connection": "SeatedAngle",
+                "SeatedAngleConnection": "SeatedAngleConnection",
                 "Cover-Plate-Bolted-Connection": "CoverPlateBolted",
                 "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
                 "Cover-Plate-Welded-Connection": "CoverPlateWelded",
@@ -73,9 +73,10 @@ class CADGeneration(View):
             return JsonResponse({"status": "error", "message": f"Error parsing request: {str(e)}"}, status=500)
         
         # Check for FreeCAD availability
-        command = shutil.which("FreeCADCmd")
+        # command = shutil.which("FreeCADCmd")
+        command = "/usr/bin/freecad" 
         print(f"Detected FreeCADCmd path: {command}")
-        command = "D:\\Program Files\\FreeCAD 1.0\\bin\\freecadcmd.exe"
+        # command = "D:\\Program Files\\FreeCAD 1.0\\bin\\freecadcmd.exe"
 
         if not command:
             return JsonResponse({"status": "error", "message": "FreeCAD is not installed or not in system PATH."}, status=500)
@@ -86,13 +87,13 @@ class CADGeneration(View):
         macro_path = os.path.join(parent_dir, 'freecad_utils/open_brep_file.FCMacro')
     
         # Determine sections based on the session type and what each backend module expects
-        if session_type == "FinPlate":
+        if session_type == "FinPlateConnection":
             sections = ["Model", "Beam", "Column", "Plate"]
         elif session_type == "CleatAngle":
-            sections = ["Model", "Beam", "Column", "CleatAngle"]
+            sections = ["Model", "Beam", "Column", "cleatAngle"]
         elif session_type == "EndPlate":
             sections = ["Model", "Beam", "Column", "Plate"]
-        elif session_type == "SeatedAngle":
+        elif session_type == "SeatedAngleConnection":
             sections = ["Model", "Beam", "Column", "SeatedAngle"]
         elif session_type == "CoverPlateBolted":
             sections = ["Model", "Beam", "Plate"]

@@ -40,7 +40,7 @@ from osdag.models import Columns, Beams, Bolt, Bolt_fy_fu, Material
         "Member.Supported_Section.Material" : "E 250 (Fe 410 W)A",
         "Member.Supporting_Section.Designation" : "JB 150",
         "Member.Supporting_Section.Material" : "E 250 (Fe 410 W)A",
-        "Module" : "Fin-Plate-Connection",
+        "Module" : "FinPlateConnection",
         "Weld.Fab" : "Shop Weld",
         "Weld.Material_Grade_OverWrite" : "410",
         "Connector.Plate.Thickness_List" : ["10" , "12" , "16" , "18" , "20"],
@@ -58,7 +58,7 @@ class OutputData(APIView):
 
         # Get input values and module from request
         input_values = request.data
-        module_name = input_values.get('Module', 'Fin-Plate-Connection')
+        module_name = input_values.get('Module', 'FinPlateConnection')
         
         print('Module name:', module_name)
         print('Input values received:', input_values)

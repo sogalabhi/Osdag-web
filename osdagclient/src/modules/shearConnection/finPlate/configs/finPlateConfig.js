@@ -5,7 +5,7 @@ export const finPlateConfig = {
   sessionName: MODULE_DISPLAY_FIN_PLATE,
   routePath: "/design/connections/shear/fin_plate",
   designType: MODULE_KEY_FIN_PLATE,
-  cameraKey: "FinPlate",
+  cameraKey: "FinPlateConnection",
   cadOptions: ["Model", "Beam", "Column", "Plate"],
   
   defaultInputs: {
@@ -156,26 +156,6 @@ export const finPlateConfig = {
           conditionalDisplay: (extraState) => {
             const connectivity = extraState?.selectedOption;
             return connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web";
-          }
-        },
-        {
-          key: "primary_beam",
-          label: UI_STRINGS.PRIMARY_BEAM,
-          type: "select", 
-          options: "beamList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
-            return connectivity === "Beam-Beam";
-          }
-        },
-        {
-          key: "secondary_beam",
-          label: UI_STRINGS.SECONDARY_BEAM,
-          type: "select",
-          options: "beamList", 
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
-            return connectivity === "Beam-Beam";
           }
         },
         {

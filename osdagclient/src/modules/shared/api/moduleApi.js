@@ -45,11 +45,40 @@ export const createDesign = async (param, module_id, onCADSuccess = null, dispat
   }
 };
 
-export const createDesignReport = async (params, moduleId = null, inputValues = null, designStatus = true, logs = [], fetchCompanyLogo, getPDF) => {
+export const createDesignReport = async (params, moduleId = null, inputValues = null, designStatus = true, logs = [], fetchCompanyLogo) => {
   const logoFullPath = params.companyLogo
     ? await fetchCompanyLogo(params.companyLogo, params.companyLogoName)
     : "";
   try {
+    const sanitizedInputs = inputValues ? JSON.parse(JSON.stringify(inputValues)) : null;
+    const sanitizedLogs = Array.isArray(logs) ? JSON.parse(JSON.stringify(logs)) : [];
+    const normalizedModuleId = moduleId || null;
+
+    const requestBody = {
+      metadata: {
+        ProfileSummary: {
+          CompanyName: params.companyName,
+          CompanyLogo: logoFullPath ? logoFullPath : "",
+          "Group/TeamName": params.groupTeamName,
+          Designer: params.designer,
+        },
+        ProjectTitle: params.projectTitle,
+        Subtitle: params.subtitle,
+        JobNumber: params.jobNumber,
+        AdditionalComments: params.additionalComments,
+        Client: params.client,
+      },
+      module_id: normalizedModuleId,
+      input_values: sanitizedInputs,
+      design_status: designStatus,
+      logs: sanitizedLogs,
+    };
+
+    console.log("Request JSON body:", requestBody);
+
+    // Then stringify for sending
+    const body = JSON.stringify(requestBody);
+
     const response = await fetch(`${BASE_URL}generate-report`, {
       method: "POST",
       mode: "cors",
@@ -57,32 +86,42 @@ export const createDesignReport = async (params, moduleId = null, inputValues = 
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({
-        metadata: {
-          ProfileSummary: {
-            CompanyName: params.companyName,
-            CompanyLogo: logoFullPath ? logoFullPath : "",
-            "Group/TeamName": params.groupTeamName,
-            Designer: params.designer,
-          },
-          ProjectTitle: params.projectTitle,
-          Subtitle: params.subtitle,
-          JobNumber: params.jobNumber,
-          AdditionalComments: params.additionalComments,
-          Client: params.client,
-        },
-        module_id: moduleId,
-        input_values: inputValues,
-        design_status: designStatus,
-        logs: logs,
-      }),
+      body: body,
     });
     const jsonResponse = await response?.json();
-    if (response.status == 201) {
-      getPDF && getPDF({ report_id: jsonResponse.report_id });
+    if (response.status == 201 && jsonResponse?.report_id) {
+      console.log("jsonResponse : ", jsonResponse);
+      // Download the PDF directly from backend without opening a new tab
+      try {
+        const pdfUrl = `${BASE_URL}getPDF?report_id=${jsonResponse.report_id}`;
+        const pdfRes = await fetch(pdfUrl, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'include'
+        });
+        if (!pdfRes.ok) {
+          throw new Error(`PDF fetch failed: ${pdfRes.status} ${pdfRes.statusText}`);
+        }
+        const blob = await pdfRes.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `osdag_report_${jsonResponse.report_id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (e) {
+        console.warn('PDF direct download failed, exposing report_id to caller.', e);
+      }
+      return { success: true, report_id: jsonResponse.report_id };
     }
+    const errorMsg = jsonResponse?.message || 'Report generation failed';
+    console.log("errorMsg : ", errorMsg);
+    return { success: false, error: errorMsg };
   } catch (error) {
     console.log("error : ", error);
+    return { success: false, error: error?.message || 'Network error' };
   }
 };
 
@@ -124,7 +163,7 @@ export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => 
     payload
   });
   if (designRes.status === 201 && (designData.data || designData)) {
-    const cadRes = await fetch(`${BASE_URL}design/cad`, {
+    const cadRes = await fetch(`${BASE_URL}design/cad/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ module_id: moduleKey, input_values: inputParams }),

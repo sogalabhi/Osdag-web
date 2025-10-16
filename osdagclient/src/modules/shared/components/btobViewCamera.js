@@ -86,7 +86,6 @@ export default function useViewCamera(moduleName, selectedView, connectivity = n
         Beam: { position: [9, 7, 9], fov: 40 },
         Column: { position: [8, 6, 8], fov: 42 },
         CleatAngle: { position: [-8, 6, -8], fov: 38 },
-        Connector: { position: [-8, 6, -8], fov: 38 },
       },
       EndPlate: {
         Model: { position: [10, 8, 10], fov: 40 },
@@ -126,7 +125,7 @@ export default function useViewCamera(moduleName, selectedView, connectivity = n
   const moduleSettings = cameraSettings[moduleName] || cameraSettings.default;
   
   // Handle FinPlate connectivity-specific settings
-  if (moduleName === "FinPlate" && connectivity && moduleSettings.connectivitySettings) {
+  if (moduleName === "FinPlateConnection" && connectivity && moduleSettings.connectivitySettings) {
     const connectivitySettings = moduleSettings.connectivitySettings[connectivity];
     
     if (connectivitySettings) {

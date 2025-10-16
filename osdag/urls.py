@@ -12,6 +12,7 @@ from osdag.web_api.user_view import SignupView, ForgetPasswordView, LogoutView, 
 from osdag.web_api.jwt_api import JWTHomeView
 from osdag.web_api.google_sso_api import GoogleSSOView
 from osdag.web_api.project_api import ProjectAPI, ProjectDetailAPI, ProjectByNameAPI
+from osdag.web_api.osi_api import SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes
 from . import views
 from osdag.web_api.endplate_outputView import EndPLateOutputData
 from osdag.web_api.cleatangle_outputView import CleatAngleOutputData
@@ -81,6 +82,8 @@ urlpatterns = [
     path('user/checkemail/' , CheckEmailView.as_view()),
     path('user/saveinput/' , SaveInputFileView.as_view()),
     path('user/obtain-input-file/' , ObtainInputFileView.as_view()),
+    # osi upload via DRF (multipart form-data)
+    path('api/save-osi/', SaveInputFileView.as_view()),
     path('user/set-refresh/' , SetRefreshTokenCookieView.as_view()),
 
     # project management urls
@@ -88,9 +91,15 @@ urlpatterns = [
     path('api/projects/<int:project_id>/', ProjectDetailAPI.as_view(), name='project-detail'),
     path('api/projects/by-name/<str:project_name>/', ProjectByNameAPI.as_view(), name='project-by-name'),
 
+    # osi endpoints
+    path('api/save-osi-from-inputs/', SaveOsiFromInputs.as_view()),
+    path('api/open-osi/', OpenOsiUpload.as_view()),
+    path('api/open-osi/<int:osifile_id>/', OpenOsiById.as_view()),
+    path('api/module-routes/', ModuleRoutes.as_view()),
+
     # output generation from input
-    path('calculate-output/Fin-Plate-Connection',
-         OutputData.as_view(), name='Fin-Plate-Connection'),
+    path('calculate-output/FinPlateConnection',
+         OutputData.as_view(), name='FinPlateConnection'),
 
     path('calculate-output/End-Plate-Connection',
          EndPLateOutputData.as_view(), name='End-Plate-Connection'),

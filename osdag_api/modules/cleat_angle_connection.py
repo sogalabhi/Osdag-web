@@ -422,9 +422,9 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 #we do not have plate in just like in finplate case, we have cleatAngle which is combination of angle & nutbolts
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Beam", "Column", "CleatAngle"):  # Error checking: If section is valid.
+    if section not in ("Model", "Beam", "Column", "cleatAngle"):  # Error checking: If section is valid.
         raise InvalidInputTypeError(
-            "section", "'Model', 'Beam', 'Column' or 'CleatAngle'")
+            "section", "'Model', 'Beam', 'Column' or 'cleatAngle'")
     
     # First check if we have valid output before attempting CAD generation
     try:

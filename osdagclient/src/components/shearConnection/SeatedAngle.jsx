@@ -333,6 +333,7 @@ function SeatedAngle() {
         alert("Please input all the fields");
         return;
       }
+
       param = {
         "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
         "Bolt.Diameter": allSelected.bolt_diameter

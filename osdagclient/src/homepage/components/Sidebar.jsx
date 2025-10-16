@@ -124,7 +124,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
         <div className="flex items-center justify-center relative">
           <div className="flex items-center justify-center flex-col">
             <img
-              src={osdagLogo}
+              src="/images/Osdag_logo.svg"
               alt="osdag-logo"
               className="w-20 h-20 mx-6 my-3"
             />

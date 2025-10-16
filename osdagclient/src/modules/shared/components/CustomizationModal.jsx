@@ -10,6 +10,7 @@ export const CustomizationModal = ({
   onTransferChange
 }) => {
   return (
+    console.log("Rendering CustomizationModal with props:", { isOpen, title, dataSource, selectedItems }),
     <Modal
       open={isOpen}
       onCancel={onClose}

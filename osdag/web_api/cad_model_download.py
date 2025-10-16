@@ -8,7 +8,8 @@ class CADDownload(APIView):
     def post(self, request):
         try:
             # Parse format, section, and request_id from JSON body
-            data = JSONParser().parse(request)
+            # data = JSONParser().parse(request)
+            data = request.data
             format_type = data.get('format')
             section = data.get('section')
             request_id = data.get('request_id')  # Use request_id instead of session

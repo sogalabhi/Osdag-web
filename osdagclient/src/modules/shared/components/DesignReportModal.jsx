@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Modal, Row, Col, Input, Button, Upload } from 'antd';
+import { Modal, Row, Col, Input, Button, Upload, Spin, message } from 'antd';
+import { ReportCustomizationModal } from './ReportCustomizationModal';
+import { BASE_URL } from "../api/moduleApi";
 
 export const DesignReportModal = ({
   isOpen,
@@ -7,10 +9,27 @@ export const DesignReportModal = ({
   onOk,
   designReportInputs,
   setDesignReportInputs,
-  output
+  output,
+  moduleId,
+  inputValues,
+  designStatus = true,
+  logs = [],
+  moduleConfig,
+  boltDiameterList = [],
+  propertyClassList = [],
+  thicknessList = [],
+  angleList = [],
+  allSelected = {},
+  extraState = {}
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
-  
+  const [loading, setLoading] = useState(false);
+  const [showCustomization, setShowCustomization] = useState(false);
+  const [reportId, setReportId] = useState(null);
+  const [sections, setSections] = useState({});
+  const [selectedSections, setSelectedSections] = useState([]);
+  const [loadingSections, setLoadingSections] = useState(false);
+
   const handleFieldChange = (field, value) => {
     setDesignReportInputs(prev => ({
       ...prev,
@@ -21,7 +40,7 @@ export const DesignReportModal = ({
   const handleFileChange = (event) => {
     const imageFile = event.target.files[0];
     const imageFileName = event.target.files[0]?.name || "";
-    
+
     setDesignReportInputs(prev => ({
       ...prev,
       companyLogo: imageFile,
@@ -86,21 +105,194 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
     URL.revokeObjectURL(url);
   };
 
-  const handleOkClick = () => {
+  const handleGenerateInitialReport = async () => {
+    console.log('[DesignReportModal] handleGenerateInitialReport:start', {
+      hasOutput: !!output,
+      moduleId,
+      hasInputValues: !!inputValues,
+      designStatus,
+    });
     if (!output) {
-      alert("Please submit the design first.");
+      message.error("Please submit the design first.");
       return;
     }
-    onOk();
+
+    setLoading(true);
+    try {
+      console.log('[DesignReportModal] inputValues before transformation:', inputValues);
+      console.log('[DesignReportModal] allSelected state:', allSelected);
+      console.log('[DesignReportModal] extraState:', extraState);
+      console.log('[DesignReportModal] lists:', { boltDiameterList, propertyClassList, thicknessList, angleList });
+      
+      // Transform input values using the same logic as design calculation
+      const transformedInputValues = moduleConfig?.buildSubmissionParams ? 
+        moduleConfig.buildSubmissionParams(inputValues, allSelected, {
+          boltDiameterList,
+          propertyClassList,
+          thicknessList,
+          angleList,
+        }, extraState) : inputValues;
+      
+      console.log('[DesignReportModal] transformed input values:', transformedInputValues);
+      
+      // Prepare request data
+      const requestData = {
+        metadata: {
+          ProfileSummary: {
+            CompanyName: designReportInputs.companyName,
+            CompanyLogo: designReportInputs.companyLogo ? designReportInputs.companyLogoName : "",
+            "Group/TeamName": designReportInputs.groupTeamName,
+            Designer: designReportInputs.designer,
+          },
+          ProjectTitle: designReportInputs.projectTitle,
+          Subtitle: designReportInputs.subtitle,
+          JobNumber: designReportInputs.jobNumber,
+          AdditionalComments: designReportInputs.additionalComments,
+          Client: designReportInputs.client,
+        },
+        module_id: moduleId,
+        input_values: transformedInputValues,
+        design_status: designStatus,
+        logs: logs,
+      };
+
+      console.log('[DesignReportModal] generate-initial:request', requestData);
+      // Generate initial LaTeX report
+      const response = await fetch(`${BASE_URL}api/report/generate-initial/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(requestData),
+      });
+
+      const result = await response.json();
+      console.log('[DesignReportModal] generate-initial:response', { ok: response.ok, status: response.status, result });
+
+      if (result.success) {
+        setReportId(result.report_id);
+        setSections(result.sections);
+
+        // Select all sections by default
+        const allSections = [];
+        Object.keys(result.sections).forEach(section => {
+          allSections.push(section);
+          if (result.sections[section] && result.sections[section].length > 0) {
+            result.sections[section].forEach(subsection => {
+              allSections.push(`${section}/${subsection}`);
+            });
+          }
+        });
+        setSelectedSections(allSections);
+
+        // Show customization modal
+        setShowCustomization(true);
+        message.success("Report generated successfully! Please customize sections.");
+      } else {
+        message.error(result.error || "Failed to generate report");
+      }
+    } catch (error) {
+      console.error('[DesignReportModal] generate-initial:error', error);
+      message.error("Error generating report. Please try again.");
+    } finally {
+      console.log('[DesignReportModal] handleGenerateInitialReport:end');
+      setLoading(false);
+    }
+  };
+
+  const handleOpenPDF = async (selectedSections) => {
+    console.log('[DesignReportModal] handleOpenPDF:start', { reportId, selectedSectionsCount: selectedSections?.length });
+    try {
+      // Generate customized PDF and open in new tab
+      const response = await fetch(`${BASE_URL}api/report/customize/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          report_id: reportId,
+          selected_sections: selectedSections,
+        }),
+      });
+
+      if (response.ok) {
+        // Open PDF in new tab
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank', 'noopener,noreferrer');
+
+        message.success("PDF opened in new tab!");
+      } else {
+        const errorData = await response.json();
+        message.error(errorData.error || "Failed to generate PDF");
+      }
+    } catch (error) {
+      console.error('[DesignReportModal] handleOpenPDF:error', error);
+      message.error("Error opening PDF. Please try again.");
+    }
+  };
+
+  const handleSavePDF = async (selectedSections) => {
+    console.log('[DesignReportModal] handleSavePDF:start', { reportId, selectedSectionsCount: selectedSections?.length });
+    try {
+      // Generate customized PDF and download
+      const response = await fetch(`${BASE_URL}api/report/customize/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          report_id: reportId,
+          selected_sections: selectedSections,
+        }),
+      });
+
+      if (response.ok) {
+        // Download the PDF
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Osdag_Custom_Report_${reportId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+        message.success("Customized report saved successfully!");
+        setShowCustomization(false);
+        onOk && onOk();
+      } else {
+        const errorData = await response.json();
+        message.error(errorData.error || "Failed to generate customized report");
+      }
+    } catch (error) {
+      console.error('[DesignReportModal] handleSavePDF:error', error);
+      message.error("Error saving PDF. Please try again.");
+    }
+  };
+
+  const handleSectionsChange = (newSelectedSections) => {
+    console.log('[DesignReportModal] sections:update', { count: newSelectedSections?.length });
+    setSelectedSections(newSelectedSections);
+  };
+
+  const handleCancelCustomization = () => {
+    setShowCustomization(false);
   };
 
   return (
+    <>
     <Modal
       open={isOpen}
       onCancel={onCancel}
       footer={null}
       className="designModal"
       title="Design Report Summary"
+        width={600}
     >
       <div className="design-report-form">
         {/* Company Name */}
@@ -261,9 +453,9 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
         </Row>
 
         {/* Action Buttons */}
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "flex-end", 
+        <div style={{
+          display: "flex",
+          justifyContent: "flex-end",
           gap: "10px",
           marginTop: "20px",
           paddingTop: "15px",
@@ -272,11 +464,29 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           <Button type="default" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="primary" onClick={handleOkClick}>
-            Generate Report
+            <Button
+              type="primary"
+              onClick={handleGenerateInitialReport}
+              loading={loading}
+            >
+              {loading ? "Generating..." : "Generate Report"}
           </Button>
         </div>
       </div>
     </Modal>
+
+      {/* Report Customization Modal */}
+      <ReportCustomizationModal
+        isOpen={showCustomization}
+        onCancel={handleCancelCustomization}
+        onOpenPDF={handleOpenPDF}
+        onSavePDF={handleSavePDF}
+        reportId={reportId}
+        sections={sections}
+        selectedSections={selectedSections}
+        onSectionsChange={handleSectionsChange}
+        loading={loadingSections}
+      />
+    </>
   );
 };

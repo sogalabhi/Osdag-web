@@ -12,7 +12,7 @@ function FinPlate() {
       moduleConfig={finPlateConfig}
       OutputDockComponent={FinPlateOutputDock}
       menuItems={menuItems}
-      title={UI_STRINGS.CONNECTING_MEMBERS}
+      title={UI_STRINGS.CONNECTING_MEMBERS} 
     />
   );
 }

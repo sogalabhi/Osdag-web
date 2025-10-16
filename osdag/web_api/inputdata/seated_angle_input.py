@@ -37,6 +37,7 @@ class SeatedAngleInputData(InputDataBase):
             boltList = list(Bolt.objects.values_list('Bolt_diameter', flat=True))
             boltList.sort()
             response['boltDiameterList'] = boltList
+            response['boltTypeList'] = ['Bearing Bolt', 'Friction Grip Bolt']
 
             # Property Class List
             response['propertyClassList'] = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
