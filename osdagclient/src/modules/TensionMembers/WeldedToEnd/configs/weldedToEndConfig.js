@@ -83,10 +83,24 @@ export const weldedToEndConfig = {
 
     // Helper function to get section list based on profile
     getDynamicSectionList: (profile, angleList, channelList) => {
-        if (profile && profile.includes("Angle")) {
-            return angleList || [];
-        }
-        return channelList || [];
+        // if (profile && profile.includes("Angle")) {
+        //     return angleList || [];
+        // }
+        // return channelList || [];
+
+        // Until the section designations are returned from the backend, the list is hardcoded
+        return ['20 x 20 x 3', '20 x 20 x 4', '25 x 25 x 3', '25 x 25 x 4', '25 x 25 x 5', '30 x 30 x 3', '30 x 30 x 4',
+            '30 x 30 x 5', '35 x 35 x 3', '35 x 35 x 4', '35 x 35 x 5', '35 x 35 x 6', '40 x 40 x 3', '40 x 40 x 4',
+            '40 x 40 x 5', '40 x 40 x 6', '45 x 45 x 3', '45 x 45 x 4', '45 x 45 x 5', '45 x 45 x 6', '50 x 50 x 3',
+            '50 x 50 x 4', '50 x 50 x 5', '50 x 50 x 6', '55 x 55 x 4', '55 x 55 x 5', '55 x 55 x 6', '55 x 55 x 8',
+            '60 x 60 x 4', '60 x 60 x 5', '60 x 60 x 6', '60 x 60 x 8', '65 x 65 x 4', '65 x 65 x 5', '65 x 65 x 6',
+            '65 x 65 x 8', '70 x 70 x 5', '70 x 70 x 6', '70 x 70 x 8', '70 x 70 x 10', '75 x 75 x 5', '75 x 75 x 6',
+            '75 x 75 x 8', '75 x 75 x 10', '80 x 80 x 6', '80 x 80 x 8', '80 x 80 x 10', '80 x 80 x 12', '90 x 90 x 6',
+            '90 x 90 x 8', '90 x 90 x 10', '90 x 90 x 12', '100 x 100 x 6', '100 x 100 x 8', '100 x 100 x 10', '100 x 100 x 12',
+            '110 x 110 x 8', '110 x 110 x 10', '110 x 110 x 12', '110 x 110 x 16', '130 x 130 x 8', '130 x130 x 10', '130 x130 x 12',
+            '130 x130 x 16', '150 x 150 x 10', '150 x 150 x 12', '150 x 150 x 16', '150 x 150 x 20', '200 x 200 x 12', '200 x 200 x 16',
+            '200 x 200 x 20', '200 x 200 x 25', '50 x 50 x 7', '50 x 50 x 8', '55 x 55 x 10', '60 x 60 x 10', '65 x 65 x 10', '70 x 70 x 7', '100 x 100 x 7', '100 x 100 x 15', '120 x 120 x 8', '120 x 120 x 10', '120 x 120 x 12', '120 x 120 x 15', '130 x 130 x 9', '150 x 150 x 15', '150 x 150 x 18', '180 x 180 x 15', '180 x 180 x 18', '180 x 180 x 20', '200 x 200 x 24', '30 x 20 x 3', '30 x 20 x 4', '30 x 20 x 5', '40 x 25 x 3', '40 x 25 x 4', '40 x 25 x 5', '40 x 25 x 6', '45 x 30 x 3', '45 x 30 x 4', '45 x 30 x 5', '45 x 30 x 6', '50 x 30 x 3', '50 x 30 x 4', '50 x 30 x 5', '50 x 30 x 6', '60 x 40 x 5', '60 x 40 x 6', '60 x 40 x 8', '65 x 45 x 5', '65 x 45 x 6', '65 x 45 x 8', '70 x 45 x 5', '70 x 45 x 6', '70 x 45 x 8', '70 x 45 x 10', '75 x 50 x 5', '75 x 50 x 6', '75 x 50 x 8', '75 x 50 x 10', '80 x 50 x 5', '80 x 50 x 6', '80 x 50 x 8', '80 x 50 x 10', '90 x 60 x 6', '90 x 60 x 8', '90 x 60 x 10', '90 x 60 x 12', '100 x 65 x 6', '100 x 65 x 8', '100 x 65 x 10', '100 x 75 x 6', '100 x 75 x 8', '100 x 75 x 10', '100 x 75 x 12', '125 x 75 x 6', '125 x 75 x 8', '125 x 75 x 10', '125 x 95 x 6', '125 x 95 x 8', '125 x 95 x 10', '125 x 95 x 12', '150 x 115 x 8', '150 x 115 x 10', '150 x 115 x 12', '150 x 115 x 16', '200 x 100 x 10', '200 x 100 x 12', '200 x 100 x 16', '200 x 150 x 10', '200 x 150 x 12', '200 x 150 x 16', '200 x 150 x 20', '40 x 20 x 3', '40 x 20 x 4', '40 x 20 x 5', '60 x 30 x 5', '60 x 30 x 6', '60 x 40 x 7', '65 x 50 x 5', '65 x 50 x 6', '65 x 50 x 7', '65 x 50 x 8', '70 x 50 x 5', '70 x 50 x 6', '70 x 50 x 7', '70 x 50 x 8', '75 x 50 x 7', '80 x 40 x 5', '80 x 40 x 6', '80 x 40 x 7', '80 x 40 x 8', '80 x 60 x 6', '80 x 60 x 7', '80 x 60 x 8', '90 x 65 x 6', '90 x 65 x 7', '90 x 65 x 8', '90 x 65 x 10', '100 x 50 x 6', '100 x 50 x 7', '100 x 50 x 8', '100 x 50 x 10', '100 x 65 x 7', '120 x 80 x 8', '120 x 80 x 10', '120 x 80 x 12', '125 x 75 x 12', '135 x 65 x 8', '135 x 65 x 10', '135 x 65 x 12', '150 x 75 x 9', '150 x 75 x 15', '150 x 90 x 10', '150 x 90 x 12', '150 x 90 x 15', '200 x 100 x 15', '200 x 150 x 15', '200 x 150 x 18'];
+
     },
 
     validateInputs: (inputs) => {
@@ -127,11 +141,7 @@ export const weldedToEndConfig = {
             [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
             [KEY_DP_DETAILING_GAP]: String(inputs.detailing_gap),
             [KEY_AXIAL]: String(inputs.axial_force),
-            [KEY_SECSIZE]: allSelected.section_designation
-                ? dynamicSectionList  // Entire list if "All" selected
-                : (Array.isArray(inputs.section_designation)
-                    ? inputs.section_designation
-                    : [inputs.section_designation || ""]),
+            [KEY_SECSIZE]: dynamicSectionList,
             [KEY_LENGTH]: String(inputs.length),
             [KEY_SEC_PROFILE]: String(inputs.section_profile),
             [KEY_LOCATION]: String(inputs.location),
