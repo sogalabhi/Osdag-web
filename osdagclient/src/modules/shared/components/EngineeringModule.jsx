@@ -485,11 +485,13 @@ export const EngineeringModule = ({
           {showOptionsContainer && (
             <div className="options-container">
               <div className="view-options">
-                {options.map((option) => (
+                {/* {options.map((option) => (
+                  console.log("Selected option:", option),
                   <div
                     key={option}
                     className="option-wrapper"
                     onClick={() => {
+                      console.log("Selected option111:", option);
                       setSelectedView(option);
                       setOrthographicView(null);
                     }}
@@ -502,7 +504,23 @@ export const EngineeringModule = ({
                     ></div>
                     <span className="option-label dark:text-white">{option}</span>
                   </div>
-                ))}
+                ))} */}
+                {options.map((option) => {
+                  console.log("Rendering option:", option); // runs during render
+                  return (
+                    <div
+                      key={option}
+                      className="option-wrapper"
+                      onClick={() => {
+                        console.log("Selected option111:", option); // runs when clicked
+                        setSelectedView(option);
+                        setOrthographicView(null);
+                      }}
+                    >
+                      {option}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
