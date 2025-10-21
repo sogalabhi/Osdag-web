@@ -24,6 +24,7 @@ from osdag.web_api.beam_to_column_endplate_output import BeamToColumnEndPlateOut
 from osdag.web_api.tensionmemberbolted_outputView import TensionMemberBoltedOutputData
 from osdag.web_api.simplysupportedbeam_outputView import SimplySupportedBeamOutputData
 from osdag.web_api.report_customization_api import ParseReportSections, CustomizeReport, GenerateInitialReport
+from django.urls import path, include
 # temporary
 app_name = 'osdag-web/'
 
@@ -61,6 +62,7 @@ urlpatterns = [
          views.get_base_plate, name='base-plate'),
     path('osdag-web/tension-member',
          views.get_tension_member, name='tension-member'),
+      path('api/compression-member/', include('osdag.web_api.urls_compression')),
 
     # New APIs
     path('populate', InputData.as_view()),
