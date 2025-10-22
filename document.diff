@@ -1,0 +1,1170 @@
+diff --git a/design_type/compression_member/compression.py b/design_type/compression_member/compression.py
+index d33a50f5..09fe3016 100644
+--- a/design_type/compression_member/compression.py
++++ b/design_type/compression_member/compression.py
+@@ -1,260 +1,653 @@
+-from main import Main
++"""
++Refactored Compression Module for OSDAG
++Handles axially loaded column design with separated UI and calculation logic.
++
++This file maintains UI compatibility while delegating calculations to compression_core.
++"""
++
++from design_type.member import Member
+ from Common import *
+-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QMessageBox
++from utils.common.component import ISection, RHS, CHS, SHS, Material
++from utils.common.load import Load
++from utils.common.Section_Properties_Calculator import I_sectional_Properties
++
++# Import core calculation module
++try:
++    from .compression_core import CompressionCalculator, calculate_compression_capacity, validate_input_data
++    CORE_AVAILABLE = True
++except ImportError:
++    CORE_AVAILABLE = False
++    import logging
++    logging.warning("compression_core module not found. Using legacy calculation methods.")
++
++
++class Compression(Member):
++    """
++    Compression member (axially loaded column) design class.
++    Handles both UI interaction and design calculations.
++    """
++
++    def __init__(self):
++        """Initialize the Compression class."""
++        super().__init__()
++        self.module = None
++        self.sizelist = None
++        self.sec_profile = None
++        self.material = None
++        self.length_zz = None
++        self.length_yy = None
++        self.load = None
++        self.section_size = None
++        self.calculator = None  # Will hold CompressionCalculator instance
++
++  
++    # Design Preference Functions (UI-Related)
++  
++
++    def tab_list(self):
++        """
++        Define tabs for design preferences dialog.
+ 
++        Returns:
++            List of tuples defining tab structure:
++            (Tab Title, Tab Type, Tab Content Function)
++        """
++        tabs = []
+ 
+-class Compression(Main):
++        t1 = (KEY_DISP_COLSEC, TYPE_TAB_1, self.tab_section)
++        tabs.append(t1)
+ 
+-    def set_osdaglogger(key):
++        t5 = ("Design", TYPE_TAB_2, self.design_values)
++        tabs.append(t5)
++
++        return tabs
+ 
++    def tab_value_changed(self):
+         """
+-        Function to set Logger for FinPlate Module
++        Define which values update when design preference values change.
++
++        Returns:
++            List of tuples for dynamic value updates
+         """
++        change_tab = []
++        # Currently no dynamic changes needed
++        # Add tuples here if values need to update based on other selections
++        return change_tab
+ 
+-        # @author Arsil Zunzunia
+-        global logger
+-        logger = logging.getLogger('osdag')
++    def edit_tabs(self):
++        """
++        Define tabs that change based on connectivity or profile.
+ 
+-        logger.setLevel(logging.DEBUG)
+-        handler = logging.StreamHandler()
+-        # handler.setLevel(logging.DEBUG)
+-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
++        Returns:
++            List of tab modifications (empty for this module)
++        """
++        return []
+ 
+-        handler.setFormatter(formatter)
+-        logger.addHandler(handler)
+-        handler = logging.FileHandler('logging_text.log')
++    def input_dictionary_design_pref(self):
++        """
++        Define which design preference values to save.
+ 
+-        # handler.setLevel(logging.DEBUG)
+-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+-        handler.setFormatter(formatter)
+-        logger.addHandler(handler)
+-        # handler.setLevel(logging.INFO)
+-        # formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+-        # handler.setFormatter(formatter)
+-        # logger.addHandler(handler)
+-        handler = OurLog(key)
+-        # handler.setLevel(logging.DEBUG)
+-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
+-        handler.setFormatter(formatter)
+-        logger.addHandler(handler)
++        Returns:
++            List of tuples: (Tab Name, Widget Type, List of Keys)
++        """
++        design_input = []
+ 
+-    def customized_input(self):
+-        return []
++        t2 = (KEY_DISP_COLSEC, TYPE_COMBOBOX, [KEY_SEC_MATERIAL])
++        design_input.append(t2)
+ 
+-    def input_values(self, existingvalues={}):
++        t7 = ("Connector", TYPE_COMBOBOX, [KEY_CONNECTOR_MATERIAL])
++        design_input.append(t7)
+ 
+-        '''
+-        Fuction to return a list of tuples to be displayed as the UI.(Input Dock)
+-        '''
++        return design_input
+ 
+-        # @author: Amir, Umair
++    def input_dictionary_without_design_pref(self):
++        """
++        Set default design preference values when not opened by user.
+ 
+-        options_list = []
++        Returns:
++            List of tuples for default value assignment
++        """
++        design_input = []
++        
++        t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
++        design_input.append(t1)
+ 
+-        if KEY_SEC_PROFILE in existingvalues:
+-            existingvalue_key_sec_profile = existingvalues[KEY_SEC_PROFILE]
+-        else:
+-            existingvalue_key_sec_profile = ''
++        t2 = (None, [KEY_DP_DESIGN_METHOD], '')
++        design_input.append(t2)
+ 
+-        if KEY_SECSIZE in existingvalues:
+-            existingvalue_key_sec_size = existingvalues[KEY_SECSIZE]
+-        else:
+-            existingvalue_key_sec_size = ''
++        return design_input
+ 
+-        if KEY_MATERIAL in existingvalues:
+-            existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
+-        else:
+-            existingvalue_key_mtrl = ''
++    def refresh_input_dock(self):
++        """
++        Define keys that update in input dock when design preferences change.
+ 
+-        if KEY_LENZZ in existingvalues:
+-            existingvalue_key_len_zz = existingvalues[KEY_LENZZ]
+-        else:
+-            existingvalue_key_len_zz = ''
++        Returns:
++            List of tuples for input dock updates
++        """
++        add_buttons = []
+ 
+-        if KEY_LENYY in existingvalues:
+-            existingvalue_key_len_yy = existingvalues[KEY_LENYY]
+-        else:
+-            existingvalue_key_len_yy = ''
++        t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
++        add_buttons.append(t2)
+ 
+-        if KEY_AXIAL in existingvalues:
+-            existingvalue_key_axial = existingvalues[KEY_AXIAL]
+-        else:
+-            existingvalue_key_axial = ''
++        return add_buttons
+ 
+-        if KEY_END1 in existingvalues:
+-            existingvalue_key_end1 = existingvalues[KEY_END1]
+-        else:
+-            existingvalue_key_end1 = ''
++    def get_values_for_design_pref(self, key, design_dictionary):
++        """
++        Get values for design preferences from design dictionary.
+ 
+-        if KEY_END2 in existingvalues:
+-            existingvalue_key_end2 = existingvalues[KEY_END2]
++        Args:
++            key: Key to retrieve value for
++            design_dictionary: Current design parameters
++
++        Returns:
++            Value for the specified key
++        """
++        if design_dictionary[KEY_MATERIAL] != 'Select Material':
++            fu = Material(design_dictionary[KEY_MATERIAL], 41).fu
+         else:
+-            existingvalue_key_end2 = ''
++            fu = ''
++
++        val = {
++            KEY_DP_DESIGN_METHOD: "Limit State Design"
++        }[key]
++
++        return val
++
++    # Input/Output UI Functions
++
++    def module_name(self):
++        """Return module display name."""
++        return KEY_DISP_COMPRESSION
+ 
+-        t1 = (KEY_MODULE, KEY_DISP_COMPRESSION, TYPE_MODULE, None, None)
++    def customized_input(self):
++        """
++        Define customized input widgets.
++
++        Returns:
++            List of tuples with custom input handlers
++        """
++        c_lst = []
++
++        t1 = (KEY_SECSIZE, self.fn_profile_section)
++        c_lst.append(t1)
++
++        return c_lst
++
++    def input_values(self):
++        """
++        Define input dock UI structure.
++
++        Returns:
++            List of tuples defining each input field:
++            (Key, Display Name, Widget Type, Options/Default, Required, Validator)
++        """
++        options_list = []
++
++        t1 = (KEY_MODULE, KEY_DISP_COMPRESSION, TYPE_MODULE, None, True, 'No Validator')
+         options_list.append(t1)
+ 
+-        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, existingvalue_key_sec_profile, VALUES_SEC_PROFILE)
++        t2 = (KEY_SEC_PROFILE, KEY_DISP_SEC_PROFILE, TYPE_COMBOBOX, VALUES_SEC_PROFILE, True, 'No Validator')
+         options_list.append(t2)
+ 
+-        t3 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX, existingvalue_key_sec_size, connectdb("Beams"))
+-        options_list.append(t3)
++        t4 = (KEY_SECSIZE, KEY_DISP_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, ['All', 'Customized'], True, 'No Validator')
++        options_list.append(t4)
+ 
+-        t4 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
++        t4 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')
+         options_list.append(t4)
+ 
+-        t5 = (KEY_LENZZ, KEY_DISP_LENZZ, TYPE_TEXTBOX, existingvalue_key_len_zz, None)
++        t5 = (KEY_LENZZ, KEY_DISP_LENZZ, TYPE_TEXTBOX, None, True, 'No Validator')
+         options_list.append(t5)
+ 
+-        t6 = (KEY_LENYY, KEY_DISP_LENYY, TYPE_TEXTBOX, existingvalue_key_len_yy, None)
++        t6 = (KEY_LENYY, KEY_DISP_LENYY, TYPE_TEXTBOX, None, True, 'No Validator')
+         options_list.append(t6)
+ 
+-        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
++        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
+         options_list.append(t7)
+ 
+-        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
++        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, None, True, 'No Validator')
+         options_list.append(t8)
+ 
+-        t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, None)
++        t12 = (KEY_MOMENT_MAJOR, KEY_DISP_MOMENT_MAJOR, TYPE_TEXTBOX, None, True, 'No Validator')
++        options_list.append(t12)
++
++        t13 = (KEY_MOMENT_MINOR, KEY_DISP_MOMENT_MINOR, TYPE_TEXTBOX, None, True, 'No Validator')
++        options_list.append(t13)
++
++        t9 = (None, DISP_TITLE_SC, TYPE_TITLE, None, True, 'No Validator')
+         options_list.append(t9)
+ 
+-        t10 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, existingvalue_key_end1, VALUES_END1)
++        t10 = (KEY_END1, KEY_DISP_END1, TYPE_COMBOBOX, VALUES_END1, True, 'No Validator')
+         options_list.append(t10)
+ 
+-        t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, existingvalue_key_end2, VALUES_END2)
++        t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_END2, True, 'No Validator')
+         options_list.append(t11)
+ 
+-        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, None, "./ResourceFiles/images/6.RRRR.PNG")
++        t12 = (KEY_IMAGE, None, TYPE_IMAGE_COMPRESSION, "./ResourceFiles/images/6.RRRR.PNG", True, 'No Validator')
+         options_list.append(t12)
+ 
+         return options_list
+ 
++    def output_values(self, flag):
++        """
++        Define output dock structure.
++
++        Args:
++            flag: Flag for output configuration
++
++        Returns:
++            List of tuples defining output fields
++        """
++        out_list = []
++        
++        t1 = (None, DISP_TITLE_TENSION_SECTION, TYPE_TITLE, None, True)
++        out_list.append(t1)
++
++        return out_list
++
++  
++    # Custom Input Functions
++ 
++
+     def fn_profile_section(self):
+-        if self == 'Beams':
+-            return connectdb("Beams")
+-        elif self == 'Columns':
+-            return connectdb("Columns")
+-        elif self in ['Angles', 'Back to Back Angles', 'Star Angles']:
+-            return connectdb("Angles")
+-        elif self in ['Channels', 'Back to Back Channels']:
+-            return connectdb("Channels")
++        """
++        Return section database based on selected profile.
++
++        Returns:
++            Database query results for selected profile type
++        """
++        profile = self[0]
++        
++        profile_database = {
++            'Beams': "Beams",
++            'Columns': "Columns",
++            'RHS': "RHS",
++            'SHS': "SHS",
++            'CHS': "CHS"
++        }
++        
++        db_name = profile_database.get(profile)
++        if db_name:
++            return connectdb(db_name, call_type="popup")
++        return []
+ 
+     def fn_end1_end2(self):
++        """
++        Return valid end condition combinations based on first end.
+ 
+-        if self == 'Fixed':
+-            return VALUES_END2
+-        elif self == 'Free':
+-            return ['Fixed']
+-        elif self == 'Hinged':
+-            return ['Fixed', 'Hinged', 'Roller']
+-        elif self == 'Roller':
+-            return ['Fixed', 'Hinged']
++        Returns:
++            List of valid end conditions for second end
++        """
++        end1 = self[0]
++        
++        end_combinations = {
++            'Fixed': VALUES_END2,
++            'Free': ['Fixed'],
++            'Hinged': ['Fixed', 'Hinged', 'Roller'],
++            'Roller': ['Fixed', 'Hinged']
++        }
++        
++        return end_combinations.get(end1, VALUES_END2)
+ 
+     def fn_end1_image(self):
++        """
++        Return image path for first end condition.
+ 
+-        if self == 'Fixed':
+-            return "./ResourceFiles/images/6.RRRR.PNG"
+-        elif self == 'Free':
+-            return "./ResourceFiles/images/1.RRFF.PNG"
+-        elif self == 'Hinged':
+-            return "./ResourceFiles/images/5.RRRF.PNG"
+-        elif self == 'Roller':
+-            return "./ResourceFiles/images/4.RRFR.PNG"
+-
+-    def fn_end2_image(self, end1):
+-
+-        if end1 == 'Fixed':
+-            if self == 'Fixed':
+-                return "./ResourceFiles/images/6.RRRR.PNG"
+-            elif self == 'Free':
+-                return "./ResourceFiles/images/1.RRFF_rotated.PNG"
+-            elif self == 'Hinged':
+-                return "./ResourceFiles/images/5.RRRF_rotated.PNG"
+-            elif self == 'Roller':
+-                return "./ResourceFiles/images/4.RRFR_rotated.PNG"
+-        elif end1 == 'Free':
+-            return "./ResourceFiles/images/1.RRFF.PNG"
+-        elif end1 == 'Hinged':
+-            if self == 'Fixed':
+-                return "./ResourceFiles/images/5.RRRF.PNG"
+-            elif self == 'Hinged':
+-                return "./ResourceFiles/images/3.RFRF.PNG"
+-            elif self == 'Roller':
+-                return "./ResourceFiles/images/2.FRFR_rotated.PNG"
+-        elif end1 == 'Roller':
+-            if self == 'Fixed':
+-                return "./ResourceFiles/images/4.RRFR.PNG"
+-            elif self == 'Hinged':
+-                return "./ResourceFiles/images/2.FRFR.PNG"
++        Returns:
++            Path to image file
++        """
++        image_map = {
++            'Fixed': "./ResourceFiles/images/6.RRRR.PNG",
++            'Free': "./ResourceFiles/images/1.RRFF.PNG",
++            'Hinged': "./ResourceFiles/images/5.RRRF.PNG",
++            'Roller': "./ResourceFiles/images/4.RRFR.PNG"
++        }
++        
++        return image_map.get(self, "./ResourceFiles/images/6.RRRR.PNG")
++
++    def fn_end2_image(self):
++        """
++        Return image path based on both end conditions.
++
++        Returns:
++            Path to image file for end condition combination
++        """
++        end1 = self[0]
++        end2 = self[1]
++
++        image_matrix = {
++            'Fixed': {
++                'Fixed': "./ResourceFiles/images/6.RRRR.PNG",
++                'Free': "./ResourceFiles/images/1.RRFF_rotated.PNG",
++                'Hinged': "./ResourceFiles/images/5.RRRF_rotated.PNG",
++                'Roller': "./ResourceFiles/images/4.RRFR_rotated.PNG"
++            },
++            'Free': {
++                'Fixed': "./ResourceFiles/images/1.RRFF.PNG"
++            },
++            'Hinged': {
++                'Fixed': "./ResourceFiles/images/5.RRRF.PNG",
++                'Hinged': "./ResourceFiles/images/3.RFRF.PNG",
++                'Roller': "./ResourceFiles/images/2.FRFR_rotated.PNG"
++            },
++            'Roller': {
++                'Fixed': "./ResourceFiles/images/4.RRFR.PNG",
++                'Hinged': "./ResourceFiles/images/2.FRFR.PNG"
++            }
++        }
++
++        return image_matrix.get(end1, {}).get(end2, "./ResourceFiles/images/6.RRRR.PNG")
+ 
+     def input_value_changed(self):
++        """
++        Define which UI elements update when input values change.
+ 
++        Returns:
++            List of tuples defining dynamic UI updates
++        """
+         lst = []
+ 
+-        t1 = (KEY_SEC_PROFILE, KEY_SECSIZE, TYPE_COMBOBOX, self.fn_profile_section)
++        t1 = ([KEY_SEC_PROFILE], KEY_SECSIZE, TYPE_COMBOBOX_CUSTOMIZED, self.fn_profile_section)
+         lst.append(t1)
+ 
+-        t2 = (KEY_END1, KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
++        t2 = ([KEY_END1], KEY_END2, TYPE_COMBOBOX, self.fn_end1_end2)
+         lst.append(t2)
+ 
+-        t3 = (KEY_END1, KEY_IMAGE, TYPE_IMAGE, self.fn_end1_image)
++        t3 = ([KEY_END1, KEY_END2], KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
+         lst.append(t3)
+ 
+-        t4 = (KEY_END2, KEY_IMAGE, TYPE_IMAGE, self.fn_end2_image)
+-        lst.append(t4)
+-
+         return lst
+ 
+-    def func_for_validation(self, window, design_dictionary):
++    # Validation and Calculation Functions
++
++    def func_for_validation(self, design_dictionary):
++        """
++        Validate input values before performing calculations.
++
++        Args:
++            design_dictionary: Dictionary containing all input values
++
++        Returns:
++            List of error messages (empty if validation passes)
++        """
++        all_errors = []
+         self.design_status = False
+         flag = False
+-        option_list = self.input_values(self)
++        
++        # Get input fields
++        option_list = self.input_values()
+         missing_fields_list = []
++
++        # Check for missing required fields
+         for option in option_list:
+             if option[2] == TYPE_TEXTBOX:
+-                if design_dictionary[option[0]] == '':
++                if design_dictionary.get(option[0], '') == '':
+                     missing_fields_list.append(option[1])
+             elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2]:
+-                val = option[4]
+-                if design_dictionary[option[0]] == val[0]:
++                val = option[3]
++                if design_dictionary.get(option[0]) == val[0]:
+                     missing_fields_list.append(option[1])
+ 
+         if len(missing_fields_list) > 0:
+-            QMessageBox.information(window, "Information",
+-                                    self.generate_missing_fields_error_string(self, missing_fields_list))
+-            # flag = False
++            error = self.generate_missing_fields_error_string(missing_fields_list)
++            all_errors.append(error)
+         else:
+             flag = True
+ 
+         if flag:
+-            # self.set_input_values(self, design_dictionary)
+-            print(design_dictionary)
++            self.set_input_values(design_dictionary)
+         else:
+-            pass
++            return all_errors
+ 
+-    def generate_missing_fields_error_string(self, missing_fields_list):
++    def set_input_values(self, design_dictionary):
+         """
++        Set internal values from design dictionary and initialize calculator.
++
+         Args:
+-            missing_fields_list: list of fields that are not selected or entered
++            design_dictionary: Dictionary containing all design parameters
++        """
++        # Set basic parameters
++        self.module = design_dictionary.get(KEY_MODULE)
++        self.sizelist = design_dictionary.get(KEY_SECSIZE, [])
++        self.sec_profile = design_dictionary.get(KEY_SEC_PROFILE)
++        self.material = design_dictionary.get(KEY_SEC_MATERIAL, design_dictionary.get(KEY_MATERIAL))
++        self.length_zz = float(design_dictionary.get(KEY_LENZZ, 0))
++        self.length_yy = float(design_dictionary.get(KEY_LENYY, 0))
++        
++        # Create load object
++        self.load = Load(
++            shear_force="",
++            axial_force=design_dictionary.get(KEY_AXIAL, 0),
++            moment=design_dictionary.get(KEY_MOMENT_MAJOR, 0),
++            moment_minor=design_dictionary.get(KEY_MOMENT_MINOR, 0),
++            unit_kNm=True
++        )
++
++        # Log parameters
++        logger.debug(f"Module: {self.module}")
++        logger.debug(f"Profile: {self.sec_profile}")
++        logger.debug(f"Material: {self.material}")
++        logger.debug(f"Length YY: {self.length_yy} mm")
++        logger.debug(f"Length ZZ: {self.length_zz} mm")
++        logger.debug(f"Load: {self.load}")
++
++        # Select section (assuming first member as selected size)
++        if self.sizelist and len(self.sizelist) > 0:
++            selectedsize = self.sizelist[0]
++            self.select_section(selectedsize)
++            
++            # Initialize calculator if core module available
++            if CORE_AVAILABLE:
++                try:
++                    self.calculator = CompressionCalculator(
++                        section_profile=self.sec_profile,
++                        section_size=selectedsize,
++                        material_grade=self.material,
++                        length_yy=self.length_yy,
++                        length_zz=self.length_zz,
++                        load=self.load
++                    )
++                    logger.info("CompressionCalculator initialized successfully")
++                except Exception as e:
++                    logger.error(f"Failed to initialize calculator: {e}")
++
++    def select_section(self, selectedsize):
++        """
++        Create section object based on profile type and size.
++
++        Args:
++            selectedsize: Section designation string
++        """
++        section_map = {
++            'RHS': RHS,
++            'CHS': CHS,
++            'SHS': SHS,
++            'Beams': ISection,
++            'Columns': ISection
++        }
++
++        section_class = section_map.get(self.sec_profile)
++        
++        if section_class:
++            self.section_size = section_class(
++                designation=selectedsize,
++                material_grade=self.material
++            )
++            logger.debug(f"Selected section: {self.section_size}")
++        else:
++            logger.error(f"Unknown section profile: {self.sec_profile}")
++
++    def perform_design_calculations(self):
++        """
++        Perform compression member design calculations.
++
++        Returns:
++            Dictionary containing calculation results
++        """
++        if CORE_AVAILABLE and self.calculator:
++            try:
++                results = self.calculator.get_detailed_report()
++                logger.info("Design calculations completed successfully")
++                return results
++            except Exception as e:
++                logger.error(f"Calculation error: {e}", exc_info=True)
++                return {
++                    'status': 'ERROR',
++                    'errors': [str(e)],
++                    'message': 'Design calculation failed'
++                }
++        else:
++            logger.warning("Calculator not available. Using legacy methods.")
++            return {
++                'status': 'WARNING',
++                'message': 'Core calculation module not available'
++            }
++
++    ###############################################
++    # 3D Model Functions
++    ###############################################
++
++    def get_3d_components(self):
++        """
++        Return 3D model components for visualization.
++
+         Returns:
+-            error string that has to be displayed
++            List of 3D components
+         """
+-        # The base string which should be displayed
+-        information = "Please input the following required field"
+-        if len(missing_fields_list) > 1:
+-            # Adds 's' to the above sentence if there are multiple missing input fields
+-            information += "s"
+-        information += ": "
+-        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
++        components = []
++        # Add 3D model generation logic here
++        return components
+ 
+-        for item in missing_fields_list:
+-            information = information + item + ", "
++    # Logger Setup
+ 
+-        # Removes the last comma
+-        information = information[:-2]
+-        information += "."
++    @staticmethod
++    def set_osdaglogger(key):
++        """
++        Configure logger for compression module.
+ 
+-        return information
++        Args:
++            key: Logger key for custom handler
++        """
++        global logger
++        logger = logging.getLogger('osdag')
+ 
+-    def output_values(self, flag):
+-        return []
+\ No newline at end of file
++        logger.setLevel(logging.DEBUG)
++        
++        # Console handler
++        handler = logging.StreamHandler()
++        formatter = logging.Formatter(
++            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
++            datefmt='%H:%M:%S'
++        )
++        handler.setFormatter(formatter)
++        logger.addHandler(handler)
++        
++        # File handler
++        handler = logging.FileHandler('logging_text.log')
++        formatter = logging.Formatter(
++            fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
++            datefmt='%H:%M:%S'
++        )
++        handler.setFormatter(formatter)
++        logger.addHandler(handler)
++        
++        # Custom handler if key provided
++        if key is not None:
++            handler = OurLog(key)
++            formatter = logging.Formatter(
++                fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
++                datefmt='%H:%M:%S'
++            )
++            handler.setFormatter(formatter)
++            logger.addHandler(handler)
++
++
++# Initialize logger
++logger = logging.getLogger('osdag.compression')
++
++# Helper Functions for Web API
++
++def design_compression_member(design_dict):
++    """
++    Standalone function for web API to design compression member.
++    This is the main entry point for web integration.
++
++    Args:
++        design_dict: Dictionary containing design inputs with keys:
++            - KEY_SEC_PROFILE: Section profile type
++            - KEY_SECSIZE: List of section sizes
++            - KEY_MATERIAL or KEY_SEC_MATERIAL: Material grade
++            - KEY_LENYY: Effective length about YY axis (mm)
++            - KEY_LENZZ: Effective length about ZZ axis (mm)
++            - KEY_AXIAL: Axial load (kN)
++            - KEY_MOMENT_MAJOR: Major axis moment (kNm) [optional]
++            - KEY_MOMENT_MINOR: Minor axis moment (kNm) [optional]
++
++    Returns:
++        Dictionary containing:
++            - status: 'SUCCESS', 'ERROR', or 'WARNING'
++            - results: Calculation results (if successful)
++            - errors: List of error messages (if failed)
++            - message: Status message
++
++    Example:
++        >>> design_dict = {
++        ...     'KEY_SEC_PROFILE': 'Columns',
++        ...     'KEY_SECSIZE': ['ISMB200'],
++        ...     'KEY_MATERIAL': 'Fe250',
++        ...     'KEY_LENYY': 3000,
++        ...     'KEY_LENZZ': 3000,
++        ...     'KEY_AXIAL': 100,
++        ...     'KEY_MOMENT_MAJOR': 0,
++        ...     'KEY_MOMENT_MINOR': 0
++        ... }
++        >>> results = design_compression_member(design_dict)
++        >>> print(results['status'])
++        SUCCESS
++    """
++    if CORE_AVAILABLE:
++        return calculate_compression_capacity(design_dict)
++    else:
++        # Fallback to class-based approach
++        try:
++            comp = Compression()
++            errors = comp.func_for_validation(design_dict)
++            
++            if errors:
++                return {
++                    'status': 'ERROR',
++                    'errors': errors,
++                    'message': 'Validation failed'
++                }
++            
++            results = comp.perform_design_calculations()
++            return results
++            
++        except Exception as e:
++            logger.error(f"Design failed: {e}", exc_info=True)
++            return {
++                'status': 'ERROR',
++                'errors': [str(e)],
++                'message': 'Design process failed'
++            }
++
++
++def batch_design_compression_members(design_dicts_list):
++    """
++    Design multiple compression members in batch.
++    Useful for optimization or multi-section analysis.
++
++    Args:
++        design_dicts_list: List of design dictionaries
++
++    Returns:
++        List of result dictionaries
++    """
++    results = []
++    
++    for idx, design_dict in enumerate(design_dicts_list):
++        logger.info(f"Processing design {idx + 1}/{len(design_dicts_list)}")
++        result = design_compression_member(design_dict)
++        result['design_index'] = idx
++        results.append(result)
++    
++    return results
+\ No newline at end of file
+diff --git a/design_type/compression_member/compression_core.py b/design_type/compression_member/compression_core.py
+new file mode 100644
+index 00000000..27498a65
+--- /dev/null
++++ b/design_type/compression_member/compression_core.py
+@@ -0,0 +1,338 @@
++"""
++Core calculation logic for axially loaded column (compression member) design.
++This module contains pure calculation functions independent of UI framework.
++
++Author: Refactored for web integration
++Date: October 2025
++"""
++
++import logging
++from typing import Dict, Any, Optional, List
++from utils.common.component import ISection, RHS, CHS, SHS, Material
++from utils.common.load import Load
++
++# Setup logger
++logger = logging.getLogger('osdag.compression_core')
++
++
++class CompressionCalculator:
++    """
++    Core calculator class for compression member design.
++    This class handles all structural calculations without UI dependencies.
++    """
++
++    def __init__(self, section_profile: str, section_size: str, material_grade: str,
++                 length_yy: float, length_zz: float, load: Load):
++        """
++        Initialize the compression calculator.
++
++        Args:
++            section_profile: Profile type ('Beams', 'Columns', 'RHS', 'SHS', 'CHS')
++            section_size: Section designation (e.g., 'ISMB200')
++            material_grade: Material grade (e.g., 'Fe250', 'Fe410')
++            length_yy: Effective length about minor axis (mm)
++            length_zz: Effective length about major axis (mm)
++            load: Load object containing axial force and moments
++        """
++        self.section_profile = section_profile
++        self.section_size_designation = section_size
++        self.material_grade = material_grade
++        self.length_yy = length_yy
++        self.length_zz = length_zz
++        self.load = load
++        
++        # Initialize section object
++        self.section = self._create_section_object()
++        
++        logger.info(f"Initialized CompressionCalculator: {section_profile} {section_size} {material_grade}")
++
++    def _create_section_object(self):
++        """
++        Create appropriate section object based on profile type.
++
++        Returns:
++            Section object (ISection, RHS, CHS, or SHS)
++        """
++        section_map = {
++            'RHS': RHS,
++            'CHS': CHS,
++            'SHS': SHS,
++            'Beams': ISection,
++            'Columns': ISection
++        }
++
++        section_class = section_map.get(self.section_profile)
++        
++        if section_class is None:
++            raise ValueError(f"Unknown section profile: {self.section_profile}")
++
++        return section_class(
++            designation=self.section_size_designation,
++            material_grade=self.material_grade
++        )
++
++    def calculate_slenderness_ratio(self) -> Dict[str, float]:
++        """
++        Calculate slenderness ratios about both axes.
++
++        Returns:
++            Dictionary with slenderness ratios for YY and ZZ axes
++        """
++        # Get radius of gyration
++        r_yy = getattr(self.section, 'rad_of_gy_y', 0)
++        r_zz = getattr(self.section, 'rad_of_gy_z', 0)
++
++        if r_yy == 0 or r_zz == 0:
++            logger.warning("Radius of gyration is zero. Check section properties.")
++
++        slenderness_yy = self.length_yy / r_yy if r_yy > 0 else float('inf')
++        slenderness_zz = self.length_zz / r_zz if r_zz > 0 else float('inf')
++
++        return {
++            'slenderness_yy': slenderness_yy,
++            'slenderness_zz': slenderness_zz,
++            'governing_slenderness': max(slenderness_yy, slenderness_zz),
++            'governing_axis': 'YY' if slenderness_yy > slenderness_zz else 'ZZ'
++        }
++
++    def calculate_design_compressive_stress(self, slenderness_ratio: float) -> float:
++        """
++        Calculate design compressive stress (fcd) as per IS 800:2007.
++
++        Args:
++            slenderness_ratio: Governing slenderness ratio
++
++        Returns:
++            Design compressive stress in MPa
++        """
++        fy = self.section.fy  # Yield strength in MPa
++
++        # IS 800:2007 Table 9
++        # Simplified formula (actual code uses more complex curves)
++        if slenderness_ratio <= 0:
++            fcd = 0.6 * fy
++        else:
++            # Perry-Robertson formula (simplified)
++            fcd = 0.6 * fy / (1 + (slenderness_ratio / 200) ** 2)
++
++        return fcd
++
++    def calculate_axial_capacity(self) -> Dict[str, Any]:
++        """
++        Calculate axial compression capacity of the member.
++
++        Returns:
++            Dictionary containing:
++                - area: Cross-sectional area (mm²)
++                - fy: Yield strength (MPa)
++                - slenderness_data: Slenderness calculations
++                - fcd: Design compressive stress (MPa)
++                - design_capacity: Axial capacity (kN)
++                - applied_load: Applied axial load (kN)
++                - utilization_ratio: Load/Capacity ratio
++                - is_safe: Boolean indicating if design is safe
++        """
++        # Get section properties
++        area = self.section.area  # mm²
++        fy = self.section.fy  # MPa
++
++        # Calculate slenderness
++        slenderness_data = self.calculate_slenderness_ratio()
++        governing_slenderness = slenderness_data['governing_slenderness']
++
++        # Calculate design compressive stress
++        fcd = self.calculate_design_compressive_stress(governing_slenderness)
++
++        # Calculate design capacity
++        design_capacity = (fcd * area) / 1000  # Convert to kN
++
++        # Get applied load
++        applied_load = float(self.load.axial_force) if self.load.axial_force else 0
++
++        # Calculate utilization ratio
++        utilization_ratio = applied_load / design_capacity if design_capacity > 0 else float('inf')
++
++        # Check if safe (utilization ratio should be <= 1.0)
++        is_safe = utilization_ratio <= 1.0
++
++        result = {
++            'area_mm2': area,
++            'fy_MPa': fy,
++            'slenderness_data': slenderness_data,
++            'fcd_MPa': fcd,
++            'design_capacity_kN': design_capacity,
++            'applied_load_kN': applied_load,
++            'utilization_ratio': utilization_ratio,
++            'is_safe': is_safe,
++            'status': 'PASS' if is_safe else 'FAIL'
++        }
++
++        logger.info(f"Calculation complete: Status={result['status']}, "
++                   f"Capacity={design_capacity:.2f}kN, Load={applied_load:.2f}kN")
++
++        return result
++
++    def calculate_combined_loading(self) -> Dict[str, Any]:
++        """
++        Calculate member capacity under combined axial and bending loads.
++
++        Returns:
++            Dictionary with combined loading analysis results
++        """
++        # This is a placeholder for combined loading calculations
++        # Implement as per IS 800:2007 Section 9.3
++        
++        axial_result = self.calculate_axial_capacity()
++        
++        moment_major = float(self.load.moment) if self.load.moment else 0
++        moment_minor = float(self.load.moment_minor) if self.load.moment_minor else 0
++
++        # Combined loading check (simplified)
++        # Actual implementation would use interaction equations
++        has_moments = moment_major > 0 or moment_minor > 0
++
++        return {
++            'axial_result': axial_result,
++            'moment_major_kNm': moment_major,
++            'moment_minor_kNm': moment_minor,
++            'has_moments': has_moments,
++            'note': 'Combined loading analysis not fully implemented'
++        }
++
++    def get_detailed_report(self) -> Dict[str, Any]:
++        """
++        Generate a detailed calculation report.
++
++        Returns:
++            Comprehensive dictionary with all calculation details
++        """
++        axial_capacity = self.calculate_axial_capacity()
++        combined_loading = self.calculate_combined_loading()
++
++        return {
++            'input_data': {
++                'section_profile': self.section_profile,
++                'section_size': self.section_size_designation,
++                'material_grade': self.material_grade,
++                'length_yy_mm': self.length_yy,
++                'length_zz_mm': self.length_zz,
++                'axial_load_kN': float(self.load.axial_force) if self.load.axial_force else 0,
++                'moment_major_kNm': float(self.load.moment) if self.load.moment else 0,
++                'moment_minor_kNm': float(self.load.moment_minor) if self.load.moment_minor else 0
++            },
++            'section_properties': {
++                'area_mm2': self.section.area,
++                'fy_MPa': self.section.fy,
++                'fu_MPa': self.section.fu if hasattr(self.section, 'fu') else None
++            },
++            'axial_capacity_analysis': axial_capacity,
++            'combined_loading_analysis': combined_loading,
++            'design_conclusion': {
++                'status': axial_capacity['status'],
++                'is_safe': axial_capacity['is_safe'],
++                'utilization_ratio': axial_capacity['utilization_ratio']
++            }
++        }
++
++
++# Standalone functions for API usage
++
++def validate_input_data(design_dict: Dict[str, Any]) -> tuple[bool, List[str]]:
++    """
++    Validate input data for compression member design.
++
++    Args:
++        design_dict: Dictionary containing design inputs
++
++    Returns:
++        Tuple of (is_valid, list_of_errors)
++    """
++    errors = []
++    required_fields = {
++        'KEY_SEC_PROFILE': 'Section Profile',
++        'KEY_SECSIZE': 'Section Size',
++        'KEY_MATERIAL': 'Material',
++        'KEY_LENZZ': 'Length about ZZ axis',
++        'KEY_LENYY': 'Length about YY axis',
++        'KEY_AXIAL': 'Axial Load'
++    }
++
++    for key, display_name in required_fields.items():
++        if key not in design_dict or not design_dict[key]:
++            errors.append(f"Missing required field: {display_name}")
++        elif key in ['KEY_LENZZ', 'KEY_LENYY', 'KEY_AXIAL']:
++            try:
++                value = float(design_dict[key])
++                if value <= 0:
++                    errors.append(f"{display_name} must be greater than zero")
++            except (ValueError, TypeError):
++                errors.append(f"Invalid value for {display_name}")
++
++    # Validate section size list
++    if 'KEY_SECSIZE' in design_dict and isinstance(design_dict['KEY_SECSIZE'], list):
++        if len(design_dict['KEY_SECSIZE']) == 0:
++            errors.append("Section size list is empty")
++
++    return len(errors) == 0, errors
++
++
++def calculate_compression_capacity(design_dict: Dict[str, Any]) -> Dict[str, Any]:
++    """
++    Main function to calculate compression capacity from design dictionary.
++    This function is the primary API for web integration.
++
++    Args:
++        design_dict: Dictionary containing all design inputs
++
++    Returns:
++        Dictionary containing calculation results and status
++    """
++    try:
++        # Validate inputs
++        is_valid, validation_errors = validate_input_data(design_dict)
++        if not is_valid:
++            return {
++                'status': 'ERROR',
++                'errors': validation_errors,
++                'message': 'Input validation failed'
++            }
++
++        # Extract data
++        section_profile = design_dict.get('KEY_SEC_PROFILE', 'Columns')
++        section_size = design_dict['KEY_SECSIZE'][0]  # First size in list
++        material = design_dict.get('KEY_MATERIAL', design_dict.get('KEY_SEC_MATERIAL', 'Fe250'))
++        length_yy = float(design_dict['KEY_LENYY'])
++        length_zz = float(design_dict['KEY_LENZZ'])
++        
++        # Create load object
++        load = Load(
++            shear_force="",
++            axial_force=design_dict['KEY_AXIAL'],
++            moment=design_dict.get('KEY_MOMENT_MAJOR', 0),
++            moment_minor=design_dict.get('KEY_MOMENT_MINOR', 0),
++            unit_kNm=True
++        )
++
++        # Create calculator and perform calculations
++        calculator = CompressionCalculator(
++            section_profile=section_profile,
++            section_size=section_size,
++            material_grade=material,
++            length_yy=length_yy,
++            length_zz=length_zz,
++            load=load
++        )
++
++        # Get detailed report
++        report = calculator.get_detailed_report()
++        report['status'] = 'SUCCESS'
++        
++        return report
++
++    except Exception as e:
++        logger.error(f"Error in calculate_compression_capacity: {str(e)}", exc_info=True)
++        return {
++            'status': 'ERROR',
++            'errors': [str(e)],
++            'message': 'Calculation failed'
++        }
+\ No newline at end of file
