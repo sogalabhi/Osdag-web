@@ -172,7 +172,7 @@ DATABASES = {
         'USER': 'osdagdeveloper',
         'PASSWORD': 'osdag',
         'HOST': 'localhost',  # This should be the name of the service
-        'PORT': '5434',
+        'PORT': '5432',
     }
 }
 # Password validation
