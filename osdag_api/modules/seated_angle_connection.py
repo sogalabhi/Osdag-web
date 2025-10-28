@@ -13,6 +13,13 @@ import sys
 import os
 from typing import Dict, Any, List
 import traceback
+from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
+from OCC.Core.StlAPI import StlAPI_Writer
+try:
+    from OCC.Core.RWGltf import RWGltf_CafWriter
+    HAS_GLB = True
+except Exception:
+    HAS_GLB = False
 
 old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
@@ -234,7 +241,7 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
             print('string key passed  : ' , key )
 
     # Validate for keys that are numbers
-    num_keys = [("Bolt.Slip_Factor", True)  # List of all parameters that are numbers (key, is_float)
+    num_keys = [("Bolt.Slip_Factor", True),  # List of all parameters that are numbers (key, is_float)
                 ("Detailing.Gap", False),
                 ("Load.Shear", False),
                 ("Weld.Material_Grade_OverWrite", False)]
@@ -380,45 +387,81 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         print('Error in cld.create2Dcad() e : ' , e)
         return False
 
-    # check if the cad_models folder exists or not 
-    # if no, then create one 
-    if(not os.path.exists(os.path.join(os.getcwd() , "file_storage/cad_models/"))) :
-        print('path does not exists cad_models , creating one')
-        os.mkdir(os.path.join(os.getcwd() , "file_storage/cad_models/"))
-      
+    # Ensure output directory exists
+    cad_models_dir = os.path.join(os.getcwd(), "file_storage", "cad_models")
+    print("CAD - ensuring cad_models dir:", cad_models_dir)
+    try:
+        os.makedirs(cad_models_dir, exist_ok=True)
+    except Exception as e:
+        print(f"Error creating directory {cad_models_dir}: {e}")
+        return False
+
     print('2d model : ' , model)
-    # os.system("clear")  # clear the terminal
-    file_name = session + "_" + section + ".brep"
-    file_path = "file_storage/cad_models/" + file_name
-    print('brep file path in create_cad_model : ' , file_path)
+    file_base = f"{session}_{section}"
 
-    try : 
-        BRepTools.breptools.Write(model, file_path, Message_ProgressRange())
-        
-        # when section is model, then save some extra type of files
-        if section == "Model":
-            # Save STEP
-            step_writer = STEPControl_Writer()
-            step_writer.Transfer(model, STEPControl_AsIs)
-            step_file_path = file_path.replace(".brep", ".step")
-            full_step_file_path = os.path.join(os.getcwd(), step_file_path)
-            if step_writer.Write(full_step_file_path) == 1:
-                print(f"STEP file saved at {full_step_file_path}")
-            else:
-                print("Warning: Failed to save STEP file!")
-
-            # Save IGES
-            iges_writer = IGESControl_Writer()
-            iges_writer.AddShape(model)
-            iges_file_path = file_path.replace(".brep", ".iges")
-            full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
-            if iges_writer.Write(full_iges_file_path) == 1:
-                print(f"IGES file saved at {full_iges_file_path}")
-            else:
-                print("Warning: Failed to save IGES file!")
-
-    except Exception as e : 
+    # Optional: still write BREP for archival (API will consume GLB)
+    brep_rel = os.path.join("file_storage", "cad_models", file_base + ".brep")
+    print("CAD - writing optional BREP:", brep_rel)
+    try:
+        BRepTools.breptools.Write(model, brep_rel, Message_ProgressRange())
+    except Exception as e:
         print('Writing to BREP file failed e : ' , e)
-    
-    return file_path
+
+    glb_rel = os.path.join("file_storage", "cad_models", file_base + ".glb")
+    glb_abs = os.path.join(os.getcwd(), glb_rel)
+
+    # Prefer native OCCT GLB export
+    print("CAD - exporter: RWGltf available ->", HAS_GLB)
+    if HAS_GLB:
+        try:
+            from OCC.Core.XCAFApp import XCAFApp_Application
+            from OCC.Core.TDocStd import TDocStd_Document
+            from OCC.Core.TCollection import TCollection_ExtendedString
+            from OCC.Core.XCAFDoc import XCAFDoc_DocumentTool
+            from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
+            from OCC.Core.TDataStd import TDataStd_Name
+
+            app = XCAFApp_Application.GetApplication()
+            doc = TDocStd_Document(TCollection_ExtendedString("XmlXCAF"))
+            app.NewDocument(TCollection_ExtendedString("MDTV-CAF"), doc)
+            root = doc.Main()
+            shape_tool = XCAFDoc_DocumentTool.ShapeTool(root)
+            color_tool = XCAFDoc_DocumentTool.ColorTool(root)
+
+            # For now, export the overall shape as one part; subparts can be added later
+            lbl = shape_tool.NewShape()
+            shape_tool.SetShape(lbl, model)
+            TDataStd_Name.Set(lbl, TCollection_ExtendedString(section))
+            color_tool.SetColor(lbl, Quantity_Color(0.7, 0.7, 0.7, Quantity_TOC_RGB), 0)
+
+            print("CAD - RWGltf performing to:", glb_abs)
+            writer = RWGltf_CafWriter(glb_abs, True)
+            ok = writer.Perform(doc, None)
+            if ok:
+                print("CAD - GLB written (RWGltf):", glb_rel)
+                return glb_rel
+            else:
+                print("glTF export failed with RWGltf_CafWriter, falling back to trimesh")
+        except Exception as e:
+            print(f"RWGltf_CafWriter error: {e}. Falling back to trimesh")
+
+    # Fallback: triangulate and export STL -> GLB via trimesh
+    try:
+        print("CAD - fallback: meshing OCC -> STL")
+        BRepMesh_IncrementalMesh(model, 0.5, True, 0.5, True)
+        stl_rel = os.path.join("file_storage", "cad_models", file_base + ".stl")
+        stl_abs = os.path.join(os.getcwd(), stl_rel)
+        print("CAD - writing STL:", stl_rel)
+        StlAPI_Writer().Write(model, stl_abs)
+
+        import trimesh
+        print("CAD - loading STL in trimesh")
+        mesh = trimesh.load_mesh(stl_abs)
+        print("CAD - exporting GLB via trimesh:", glb_rel)
+        mesh.export(glb_abs)
+        print("CAD - GLB written (fallback):", glb_rel)
+        return glb_rel
+    except Exception as e:
+        print(f"STL/GLB fallback export failed: {e}")
+        return False
 

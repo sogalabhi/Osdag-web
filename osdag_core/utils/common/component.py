@@ -1970,8 +1970,8 @@ class Angle(Material):
                     and operator.eq(t, t_min):
                 # print("appended", designation)
                 available_angles.append(designation)
-            else:
-                print("popped", designation)
+            # else:
+                # print("popped", designation)
         return available_angles
 
     def tension_member_yielding(self, A_g, F_y):

@@ -72,22 +72,9 @@ class CADGeneration(View):
         except Exception as e:
             return JsonResponse({"status": "error", "message": f"Error parsing request: {str(e)}"}, status=500)
         
-        # Check for FreeCAD availability
-        # command = shutil.which("FreeCADCmd")
-        command = "/usr/bin/freecad" 
-        print(f"Detected FreeCADCmd path: {command}")
-        # command = "D:\\Program Files\\FreeCAD 1.0\\bin\\freecadcmd.exe"
-
-        if not command:
-            # Service unavailable: dependency missing
-            return JsonResponse({"status": "error", "message": "FreeCAD is not installed or not available on server."}, status=503)
-        
         # Directory setup
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.dirname(os.path.dirname(current_dir))
-        macro_path = os.path.join(parent_dir, 'freecad_utils/open_brep_file.FCMacro')
-        if not os.path.exists(macro_path):
-            return JsonResponse({"status": "error", "message": f"Required macro not found at: {macro_path}"}, status=500)
     
         # Determine sections based on the session type and what each backend module expects
         if session_type == "FinPlateConnection":
@@ -134,39 +121,23 @@ class CADGeneration(View):
                 
                 print(f'{section} generated successfully')
 
-                # Convert and store file paths
+                # Consume GLB produced by module
                 path_to_file = os.path.join(parent_dir, path)
                 if not os.path.exists(path_to_file):
                     msg = f'Generated file for {section} does not exist at: {path_to_file}'
                     print(msg)
                     error_details.append({"section": section, "error": msg})
                     continue
-                    
-                output_obj_path = path_to_file.replace(".brep", ".obj")
-                manifest_path = None
-                if section == "Model":
-                    manifest_path = path_to_file.replace(".brep", ".parts.json")
 
-                # Convert .brep to .obj using FreeCAD
-                if manifest_path and os.path.exists(manifest_path):
-                    command_with_arg = f'{command} {macro_path} {path_to_file} {output_obj_path} {manifest_path}'
-                else:
-                    command_with_arg = f'{command} {macro_path} {path_to_file} {output_obj_path}'
-                process = subprocess.Popen(command_with_arg.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                stdout, stderr = process.communicate()
-
-                if process.returncode != 0:
-                    err_msg = stderr.decode().strip() or "Unknown FreeCAD conversion error"
-                    print(f"FreeCAD conversion failed for {section}: {err_msg}")
-                    error_details.append({"section": section, "error": f"FreeCAD conversion failed: {err_msg}"})
+                import base64
+                try:
+                    with open(path_to_file, "rb") as glb_file:
+                        b64 = base64.b64encode(glb_file.read()).decode("ascii")
+                    output_files[section] = b64
+                except Exception as e:
+                    print(f"Failed reading GLB for {section}: {e}")
+                    error_details.append({"section": section, "error": f"Failed reading GLB: {str(e)}"})
                     continue
-                
-                # Read the generated .obj file into BytesIO
-                output_obj = BytesIO() # create an in-memory buffer
-                with open(output_obj_path, "rb") as obj_file:
-                    output_obj.write(obj_file.read()) # Store the file inside memory
-                
-                output_files[section] = output_obj.getvalue().decode("utf-8") # Converts the file's content into a readable string for json
                 
             except Exception as e:
                 print(f"Exception while generating {section}: {e}")
