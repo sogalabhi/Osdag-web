@@ -18,7 +18,8 @@ export const InputSection = ({
   toggleAllSelected,
   contextData,
   extraState = {},
-  setExtraState = () => { }
+  setExtraState = () => { },
+  updateSelectedItems = () => { }
 }) => {
   const safeInputs = inputs || {};
   const safeContextData = contextData || {};
@@ -125,12 +126,36 @@ export const InputSection = ({
     };
 
     if (value === "Customized") {
-      setInputs({ ...safeInputs, [field.key]: [] });
+      // Get all available values
+      const allValues = getAllValuesForInputKey(field.key);
+      // Convert to array of keys/strings for Transfer component
+      const allKeys = allValues.map(val => {
+        // Handle different data formats (object with value/Grade property, or plain string/number)
+        if (typeof val === 'object' && val !== null) {
+          return val.value || val.Grade || val.toString();
+        }
+        return val.toString();
+      });
+      
+      // Set all items as selected (moved to right side) - this populates the Transfer component
+      updateSelectedItems(field.key, allKeys);
+      // Also update inputs with all values
+      setInputs({ ...safeInputs, [field.key]: allKeys });
       updateSelectionState(field.selectionKey, "Customized");
       updateModalState(field.modalKey, true);
     } else {
+      // "All" option - get all values and set them in inputs
       const allValues = getAllValuesForInputKey(field.key);
-      setInputs({ ...safeInputs, [field.key]: allValues });
+      // Convert to array format if needed
+      const allValuesArray = allValues.map(val => {
+        if (typeof val === 'object' && val !== null) {
+          return val.value || val.Grade || val.toString();
+        }
+        return val.toString();
+      });
+      setInputs({ ...safeInputs, [field.key]: allValuesArray });
+      // Clear selectedItems since we're using "All" (not managed via Transfer)
+      updateSelectedItems(field.key, []);
       updateSelectionState(field.selectionKey, "All");
       updateModalState(field.modalKey, false);
     }

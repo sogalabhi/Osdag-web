@@ -132,46 +132,26 @@ export const ReportCustomizationModal = ({
       style={{
         border: '1px solid #90af13',
       }}
-      styles={{
-        header: {
-          backgroundColor: '#90af13',
-          color: 'white',
-          borderBottom: '1px solid #90af13',
-        }
-      }}
+      className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
     >
-      <div style={{ marginBottom: 16 }}>
-        <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: '10px 0', color: '#333' }}>
+      <div className="mb-4">
+        <h3 className="py-2">
           Customize Report Sections
         </h3>
-        <p style={{ marginBottom: 12, color: '#666' }}>
+        <p className="mb-2 text-sm text-gray-500">
           Select which sections to include in your customized report:
         </p>
-        <div style={{ marginBottom: 12 }}>
+        <div className="mb-3">
           <Button 
-            size="small" 
+            className="mr-2 text-sm font-medium text-white bg-osdag-green rounded-lg hover:bg-osdag-dark-green transition-colors"
             onClick={handleSelectAll} 
-            style={{ 
-              marginRight: 8,
-              backgroundColor: 'white',
-              color: 'black',
-              fontWeight: 'bold',
-              borderRadius: '5px',
-              border: '1px solid black',
-            }}
           >
             Select All
           </Button>
           <Button 
             size="small" 
             onClick={handleSelectNone}
-            style={{
-              backgroundColor: 'white',
-              color: 'black',
-              fontWeight: 'bold',
-              borderRadius: '5px',
-              border: '1px solid black',
-            }}
+            className="text-sm font-medium text-black bg-white rounded-lg border border-black hover:bg-osdag-dark-green transition-colors"
           >
             Select None
           </Button>
@@ -179,18 +159,12 @@ export const ReportCustomizationModal = ({
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
+        <div className="flex flex-col items-center justify-center p-5">
           <Spin size="large" />
           <p>Loading sections...</p>
         </div>
       ) : (
-        <div style={{ 
-          border: '1px solid #a6a6a6',
-          borderRadius: '6px',
-          backgroundColor: 'white',
-          padding: '8px',
-          marginBottom: 16
-        }}>
+        <div className="border border-gray-400 rounded-md bg-white p-2 mb-4">
           <Tree
             checkable
             onExpand={onExpand}
@@ -198,43 +172,25 @@ export const ReportCustomizationModal = ({
             autoExpandParent={autoExpandParent}
             onCheck={onCheck}
             checkedKeys={checkedKeys}
-            style={{ 
-              maxHeight: 300, 
-              overflowY: 'auto',
-              backgroundColor: 'white',
-            }}
+            className="max-h-[300px] overflow-y-auto bg-white"
           >
             {renderTreeNodes(sections)}
           </Tree>
         </div>
       )}
 
-      <div style={{ marginBottom: 16, padding: 12, backgroundColor: '#f5f5f5', borderRadius: 4 }}>
-        <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>
+      <div className="mb-4 p-3 bg-gray-100 rounded-md">
+        <p className="m-0 text-sm text-gray-500">
           <strong>Selected sections:</strong> {checkedKeys.length} of {Object.keys(sections).length + Object.values(sections).flat().length} total
         </p>
       </div>
 
       {/* Action Buttons - Matching Desktop Layout */}
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginTop: "20px",
-        paddingTop: "15px",
-        borderTop: "1px solid #f0f0f0"
-      }}>
+      <div className="flex justify-between items-center mt-5 pt-4 border-t border-gray-200">
         <Button 
           onClick={handleOpenPDF}
           loading={compilingPDF}
-          style={{
-            backgroundColor: 'white',
-            color: 'black',
-            fontWeight: 'bold',
-            borderRadius: '5px',
-            border: '1px solid black',
-            padding: '5px 14px',
-          }}
+          className="text-sm font-medium text-black bg-white rounded-lg border border-black hover:bg-osdag-dark-green transition-colors p-2"
         >
           Open PDF
         </Button>

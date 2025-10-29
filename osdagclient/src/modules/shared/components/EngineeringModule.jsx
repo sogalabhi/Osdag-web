@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Input, Modal, Button } from "antd";
-import Select from 'react-select';
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
 import { InputSection } from "../components/InputSection";
 import { CustomizationModal } from "../components/CustomizationModal";
@@ -115,7 +114,6 @@ export const EngineeringModule = ({
   const [isGridActive, setIsGridActive] = useState(false);
   const [orthographicView, setOrthographicView] = useState(null); // New state for orthographic view
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
-  const [selectedSection, setSelectedSection] = useState("Additional Inputs");
   // Auth helpers
   const BASE_URL = 'http://localhost:8000/api/';
   const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
@@ -262,6 +260,113 @@ export const EngineeringModule = ({
   };
   // console.log("Current bgColor:", bgColor);
 
+  // Save inputs to OSI file
+  const handleSaveInputs = async () => {
+    const userIsGuest = isGuest();
+
+    // For authenticated users: require project ID
+    if (!userIsGuest) {
+      const projectId = getProjectIdFromUrl();
+      if (!projectId || Number.isNaN(projectId)) {
+        message.warning('No active project. Open or create a project first.');
+        return;
+      }
+    }
+
+    // Determine module_id - use designType from moduleConfig, or fallback to inputs.module
+    const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || 'SeatedAngleConnection';
+
+    // Get project name from inputs or use default
+    const projectName = inputs?.project_name || inputs?.name || moduleConfig?.sessionName || 'project';
+
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      // Only add auth header if user is logged in (not guest)
+      if (!userIsGuest) {
+        headers['Authorization'] = `Bearer ${getAccessToken()}`;
+      }
+
+      const response = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          name: projectName,
+          module_id: module_id,
+          inputs: inputs,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Handle guest user: download OSI file
+        if (data.is_guest || userIsGuest) {
+          try {
+            // Decode base64 content
+            const binaryString = atob(data.content_base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            const blob = new Blob([bytes], { type: 'text/plain' });
+
+            // Create download link
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = data.filename || `${projectName}.osi`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            message.success('OSI file downloaded successfully');
+          } catch (err) {
+            console.error('Error downloading OSI file:', err);
+            message.error('Failed to download OSI file');
+          }
+          return;
+        }
+
+        // Handle authenticated user: save to DB and link to project
+        const savedName = projectName;
+        setSaveInputFileName(data?.data?.id ? `${savedName}.osi` : savedName);
+        setDisplaySaveInputPopup(true);
+        message.success('Inputs saved successfully');
+
+        // Update project's osi_file_path if project ID and URL are available
+        const projectId = getProjectIdFromUrl();
+        if (projectId && data.url) {
+          try {
+            const updateResponse = await fetch(`${BASE_URL}projects/${projectId}/`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getAccessToken()}`,
+              },
+              body: JSON.stringify({ osi_file_path: data.url }),
+            });
+
+            const updateData = await updateResponse.json();
+            if (!updateResponse.ok || !updateData.success) {
+              console.warn('Saved OSI, but failed to link to project:', updateData);
+            }
+          } catch (err) {
+            console.warn('Error linking OSI to project:', err);
+          }
+        }
+      } else {
+        message.error(data.error || 'Failed to save inputs');
+      }
+    } catch (err) {
+      console.error('Error saving inputs:', err);
+      message.error('Failed to save inputs');
+    }
+  };
+
   // Get connectivity for FinPlateConnection module
   const getConnectivity = () => {
     if (moduleConfig.cameraKey === "FinPlateConnection") {
@@ -308,7 +413,7 @@ export const EngineeringModule = ({
 
   const options = getViewOptions();
 
-  
+
   console.log("🔍 [ENGINEERING MODULE] Module Config:", {
     sessionName: moduleConfig.sessionName,
     designType: moduleConfig.designType,
@@ -367,32 +472,16 @@ export const EngineeringModule = ({
 
         <div className="element">
           {/* All 4 buttons together with same styling */}
-          <img
-            src={showInputDock ? InputDockVisiblesvg : InputDockHiddensvg}
-            alt="Toggle Input Dock"
-            className="navbar-control-icon"
-            onClick={toggleInputDock}
-            title="Toggle Input Dock"
-          />
-          <img
-            src={showOutputDock ? OutputDockVisiblesvg : OutputDockHiddensvg}
-            alt="Toggle Output Dock"
-            className={`navbar-control-icon ${!isDesignComplete ? "disabled" : ""
-              }`}
-            onClick={isDesignComplete ? toggleOutputDock : undefined}
-            style={{
-              opacity: isDesignComplete ? 1 : 0.5,
-              cursor: isDesignComplete ? "pointer" : "not-allowed",
-            }}
-            title="Toggle Output Dock"
-          />
-          <img
-            src={Logsvg}
-            alt="Toggle Logs"
-            className="navbar-control-icon"
-            onClick={toggleLogs}
-            title="Toggle Logs"
-          />
+          <button onClick={toggleInputDock}>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm120-80v-560H200v560h120Zm80 0h360v-560H400v560Zm-80 0H200h120Z" /></svg>
+          </button>
+          <button onClick={toggleLogs}>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-200v120h560v-120H200Zm0-80h560v-360H200v360Zm0 80v120-120Z" /></svg>
+          </button>
+          <button
+            onClick={isDesignComplete ? toggleOutputDock : undefined} >
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm440-80h120v-560H640v560Zm-80 0v-560H200v560h360Zm80 0h120-120Z" /></svg>
+          </button>
           <img
             src={Homesvg}
             alt="Home"
@@ -412,65 +501,55 @@ export const EngineeringModule = ({
           <div className="w-[400px] bg-white dark:bg-osdag-dark-color">
             <div className="flex justify-between inputRow">
               <span className="flex justify-center items-center w-32 my-2 ml-4 py-1 px-1 text-sm text-center rounded-xl font-medium bg-osdag-green text-white flex-shrink-0">Input Dock</span>
-              <Select
-                value={{ value: selectedSection, label: selectedSection }}
-                onChange={(option) => {
-                  setSelectedSection(option.value);
-
-                  // Open design preferences modal if that option is selected
-                  if (option.value === "Design Preferences") {
-                    setDesignPrefModalStatus(true);
-                  }
-                }}
-                options={[
-                  { value: "Additional Inputs", label: "Additional Inputs" },
-                  { value: "Section Details", label: "Section Details" },
-                  { value: "Design Preferences", label: "Design Preferences" }
-                ]}
-                classNamePrefix="section-select"
-                isSearchable={false}
-              />
+              <button
+                onClick={() => setDesignPrefModalStatus(true)}
+                className="flex items-center justify-center px-4 py-1 my-2 mr-4 text-sm font-medium text-white bg-osdag-green rounded-lg hover:bg-osdag-dark-green transition-colors"
+                title="Open Additional Preferences"
+              >
+                Additional Preferences
+              </button>
             </div>
             <div className="subMainBody scroll-data dark:bg-osdag-dark-color bg-white">
-              {selectedSection !== "Section Details" &&
-                moduleConfig.inputSections.map((section, index) => (
-                  <InputSection
-                    key={index}
-                    section={section}
-                    inputs={inputs}
-                    setInputs={setInputs}
-                    selectionStates={selectionStates}
-                    updateSelectionState={updateSelectionState}
-                    updateModalState={updateModalState}
-                    toggleAllSelected={toggleAllSelected}
-                    contextData={contextData} // FIXED: This now includes angleList
-                    extraState={extraState}
-                    setExtraState={setExtraState}
-                  />
-                ))
-              }
+              {moduleConfig.inputSections.map((section, index) => (
+                <InputSection
+                  key={index}
+                  section={section}
+                  inputs={inputs}
+                  setInputs={setInputs}
+                  selectionStates={selectionStates}
+                  updateSelectionState={updateSelectionState}
+                  updateModalState={updateModalState}
+                  toggleAllSelected={toggleAllSelected}
+                  contextData={contextData} // FIXED: This now includes angleList
+                  extraState={extraState}
+                  setExtraState={setExtraState}
+                  updateSelectedItems={updateSelectedItems}
+                />
+              ))}
 
             </div>
 
             <div className="flex items-center justify-between w-full gap-x-4 px-4">
-
+              {/* Save Inputs Button */}
+              <button
+                onClick={handleSaveInputs}
+                className="flex flex-1 items-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition-opacity"
+                disabled={!inputs || Object.keys(inputs).length === 0}
+                title={isGuest() ? "Download OSI file (guest users cannot save to database)" : "Save current inputs to OSI file"}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M840-680v480q0 33-23.5 56.5T760-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h480l160 160Zm-80 34L646-760H200v560h560v-446ZM480-240q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35ZM240-560h360v-160H240v160Zm-40-86v446-560 114Z" /></svg>
+                {isGuest() ? "Download OSI" : "Save Inputs"}
+              </button>
               {/* Design Button */}
               <button
                 onClick={handleSubmitEnhanced}
                 className="flex flex-1 items-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-2 rounded-lg shadow-md"
               >
-                <img src={Designsvg} alt="Design icon" className="w-5 h-5" />
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="m352-522 86-87-56-57-44 44-56-56 43-44-45-45-87 87 159 158Zm328 329 87-87-45-45-44 43-56-56 43-44-57-56-86 86 158 159Zm24-567 57 57-57-57ZM290-120H120v-170l175-175L80-680l200-200 216 216 151-152q12-12 27-18t31-6q16 0 31 6t27 18l53 54q12 12 18 27t6 31q0 16-6 30.5T816-647L665-495l215 215L680-80 465-295 290-120Zm-90-80h56l392-391-57-57-391 392v56Zm420-419-29-29 57 57-28-28Z" /></svg>
                 Design
               </button>
 
-              {/* Reset Button */}
-              <button
-                onClick={handleResetEnhanced}
-                className="flex flex-1 items-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-2 rounded-lg shadow-md"
-              >
-                <img src={Resetsvg} alt="Reset icon" className="w-5 h-5" />
-                Reset
-              </button>
+
 
             </div>
           </div>
@@ -604,21 +683,19 @@ export const EngineeringModule = ({
         {showOutputDock && isDesignComplete && (
           <div className="superMain_right">
             <div className="OutputDock">
-              <OutputDockComponent output={output} extraState={{...extraState, cadModelPaths, renderCadModel: renderBoolean}} />
-              <div className="flex justify-end flex-col items-center gap-y-3 mt-2">
+              <OutputDockComponent output={output} extraState={{ ...extraState, cadModelPaths, renderCadModel: renderBoolean }} />
+              <div className="flex flex-row justify-between mx-5 items-center gap-y-3 mt-2">
                 <div
                   onClick={handleCreateDesignReport}
-                  className="cursor-pointer flex items-center gap-x-2 bg-osdag-green text-white font-semibold p-4 rounded-lg shadow-md duration-200"
-                >
-                  <img src={Reportsvg} alt="Report icon" className="w-5 h-5" />
+                  className="cursor-pointer flex items-center gap-x-2 bg-osdag-green text-white font-semibold p-3 rounded-lg shadow-md duration-200"
+                ><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm200-190q13 0 21.5-8.5T510-820q0-13-8.5-21.5T480-850q-13 0-21.5 8.5T450-820q0 13 8.5 21.5T480-790ZM200-200v-560 560Z" /></svg>
                   Generate Report
                 </div>
 
                 <div
                   onClick={saveOutput}
                   className="cursor-pointer flex items-center gap-x-2 bg-osdag-green text-white font-semibold p-3 mb-1 rounded-lg shadow-md duration-200"
-                >
-                  <img src={Outputsvg} alt="Save icon" className="w-5 h-5" />
+                ><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg>
                   Save Output
                 </div>
 
@@ -649,41 +726,46 @@ export const EngineeringModule = ({
       />
 
       {/* Customization Modals */}
-      {moduleConfig.modalConfig.map((modal) => (
-        <CustomizationModal
-          key={modal.key}
-          isOpen={modalStates[modal.key]}
-          onClose={() => updateModalState(modal.key, false)}
-          title="Customized"
-          dataSource={contextData[modal.dataSource] || []} // FIXED: This now includes angleList
-          selectedItems={selectedItems[modal.inputKey]}
-          onTransferChange={(nextTargetKeys) =>
-            updateSelectedItems(modal.inputKey, nextTargetKeys)
-          }
-        />
-      ))}
+      {
+        moduleConfig.modalConfig.map((modal) => (
+          <CustomizationModal
+            key={modal.key}
+            isOpen={modalStates[modal.key]}
+            onClose={() => updateModalState(modal.key, false)}
+            title="Customized"
+            dataSource={contextData[modal.dataSource] || []} // FIXED: This now includes angleList
+            selectedItems={selectedItems[modal.inputKey]}
+            onTransferChange={(nextTargetKeys) =>
+              updateSelectedItems(modal.inputKey, nextTargetKeys)
+            }
+          />
+        ))
+      }
 
       {/* Design Preferences Modal */}
-      {designPrefModalStatus && (
-        <Modal
-          open={designPrefModalStatus}
-          onCancel={() => setConfirmationModal(true)}
-          footer={null}
-          minWidth={1200}
-          width={1400}
-          maxHeight={1200}
-          maskClosable={false}
-        >
-          <DesignPrefSections
-            module={moduleConfig.sessionName}
-            inputs={inputs}
-            setInputs={setInputs}
-            setDesignPrefModalStatus={setDesignPrefModalStatus}
-            confirmationModal={confirmationModal}
-            setConfirmationModal={setConfirmationModal}
-          />
-        </Modal>
-      )}
+      {
+        designPrefModalStatus && (
+          <Modal
+            open={designPrefModalStatus}
+            onCancel={() => setConfirmationModal(true)}
+            footer={null}
+            minWidth={1200}
+            width={1400}
+            maxHeight={1200}
+            maskClosable={false}
+            className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
+          >
+            <DesignPrefSections
+              module={moduleConfig.sessionName}
+              inputs={inputs}
+              setInputs={setInputs}
+              setDesignPrefModalStatus={setDesignPrefModalStatus}
+              confirmationModal={confirmationModal}
+              setConfirmationModal={setConfirmationModal}
+            />
+          </Modal>
+        )
+      }
 
       {/* Reset Confirmation Modal */}
       <Modal
@@ -715,6 +797,7 @@ export const EngineeringModule = ({
           </Button>,
         ]}
         width={500}
+        className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
       >
         <div>
           <p>
@@ -766,6 +849,6 @@ export const EngineeringModule = ({
           }
         }
       `}</style>
-    </div>
+    </div >
   );
 };

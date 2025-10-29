@@ -16,19 +16,42 @@ from osdag.models import Project
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SaveOsiFromInputs(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]  # Allow guests to generate OSI for download
 
     def post(self, request):
         try:
-            # Guests not allowed to persist
-            if hasattr(request, 'auth') and isinstance(request.auth, dict) and request.auth.get('is_guest') is True:
-                return JsonResponse({'success': False, 'error': 'Guest users cannot save OSI files'}, safe=False, status=403)
-
             name = request.data.get('name')
             module_id = request.data.get('module_id')
             inputs = request.data.get('inputs')
 
             payload = build_osi_payload(name=name, module_id=module_id, inputs=inputs or {})
+            
+            # Check if user is guest
+            is_guest = False
+            if hasattr(request, 'auth') and isinstance(request.auth, dict):
+                is_guest = request.auth.get('is_guest', False)
+            # Also check if no auth at all (completely unauthenticated)
+            if not hasattr(request, 'user') or not request.user.is_authenticated:
+                is_guest = True
+
+            # For guests: return OSI content for download (no DB save)
+            if is_guest:
+                import base64
+                content_file = make_osifile_contentfile(payload)
+                content_bytes = content_file.read()
+                content_base64 = base64.b64encode(content_bytes).decode('ascii')
+                safe_name = (name or 'project').replace(' ', '_')[:50]
+                filename = f"{safe_name}_{module_id}.osi"
+                
+                return JsonResponse({
+                    'success': True,
+                    'is_guest': True,
+                    'filename': filename,
+                    'content_base64': content_base64,
+                    'message': 'OSI file generated. Download available.'
+                }, safe=False, status=200)
+
+            # For authenticated users: save to database
             content_file = make_osifile_contentfile(payload)
 
             # Determine owner email from JWT or user
@@ -50,7 +73,12 @@ class SaveOsiFromInputs(APIView):
 
             serializer = OsiFileSerializer(osifile)
             # Do not create a Project here. Frontend will update existing project with this URL.
-            return JsonResponse({'success': True, 'data': serializer.data, 'url': osifile.file.url}, safe=False, status=201)
+            return JsonResponse({
+                'success': True,
+                'is_guest': False,
+                'data': serializer.data,
+                'url': osifile.file.url
+            }, safe=False, status=201)
         except Exception as e:
             print('Error in SaveOsiFromInputs:', e)
             return JsonResponse({'success': False, 'error': str(e)}, safe=False, status=400)

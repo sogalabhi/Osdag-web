@@ -260,6 +260,7 @@ export const BaseOutputDock = ({
           footer={null}
           width={config.width || "50%"}
           title={config.title}
+          className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
         >
           {renderModalContent(modalType, activeSections[modalType], output)}
         </Modal>

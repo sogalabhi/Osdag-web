@@ -1055,6 +1055,7 @@ function SeatedAngle() {
                   footer={null}
                   width={500}
                   height={500}
+                  className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
                 >
                   <div className="popUp">
                     <h3>Customized</h3>
@@ -1107,6 +1108,7 @@ function SeatedAngle() {
                   footer={null}
                   width={500}
                   height={500}
+                  className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
                 >
                   <div className="popUp">
                     <h3>Customized</h3>
@@ -1148,6 +1150,7 @@ function SeatedAngle() {
                   footer={null}
                   width={500}
                   height={500}
+                  className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
                 >
                   <div className="popUp">
                     <h3>Customized</h3>
@@ -1187,6 +1190,7 @@ function SeatedAngle() {
                   footer={null}
                   width={500}
                   height={500}
+                  className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
                 >
                   <div className="popUp">
                     <h3>Customized</h3>
@@ -1287,13 +1291,19 @@ function SeatedAngle() {
           {/* Right */}
           <div className="superMain_right">
             {<SeatedAngleOutputDock output={output} />}
-            <div className="outputdock-btn">
+            <div className="flex flex-col gap-4 p-[10px] mx-[20%]">
               <Input
                 type="button"
                 value="Create Design Report"
                 onClick={handleCreateDesignReport}
+                className="bg-osdag-green hover:bg-osdag-light-green text-white font-medium py-3 px-4 rounded-lg cursor-pointer transition-all duration-200"
               />
-              <Input type="button" value="Save Output" onClick={saveOutput} />
+              <Input
+                type="button"
+                value="Save Output"
+                onClick={saveOutput}
+                className="bg-osdag-green hover:bg-osdag-light-green text-white font-medium py-3 px-4 rounded-lg cursor-pointer transition-all duration-200"
+              />
 
               <Modal
                 open={CreateDesignReportBool}

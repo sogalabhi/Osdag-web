@@ -17,9 +17,10 @@ export const CustomizationModal = ({
       footer={null}
       width={500}
       height={500}
+      className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
     >
-      <div className="popUp">
-        <h3>{title}</h3>
+      <div className="popUp ">
+        <h3 className="py-2">{title}</h3>
         <Transfer
           dataSource={dataSource
             .sort((a, b) => Number(a) - Number(b))

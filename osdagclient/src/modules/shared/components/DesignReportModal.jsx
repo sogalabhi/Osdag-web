@@ -290,7 +290,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
       open={isOpen}
       onCancel={onCancel}
       footer={null}
-      className="designModal"
+      className="designModal [&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
       title="Design Report Summary"
         width={600}
     >

@@ -959,9 +959,6 @@
   @apply w-[100px] h-[100px] object-contain;
 }
 
-.outputdock-btn Input {
-  @apply bg-osdag-green hover:bg-osdag-light-green text-white font-medium py-3 px-4 rounded-lg cursor-pointer transition-all duration-200;
-}
 
 .superMainBody_left {
   @apply grid grid-cols-2 gap-5 m-5;
@@ -1099,14 +1096,6 @@
   padding: 10px
 } */
 
-.outputdock-btn {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 10px;
-  margin-left: 20%;
-  margin-right: 20%;
-}
 
 /* .subMainBody h3 {
   font-size: 16px;
