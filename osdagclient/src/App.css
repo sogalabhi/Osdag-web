@@ -396,9 +396,6 @@
   cursor: pointer;
 } */
 
-.module_nav {
-  @apply flex flex-row bg-[#d2d4d2] pl-4 gap-4 w-full text-sm h-[25px] flex-shrink-0;
-}
 
 .element {
   @apply flex items-center gap-[15px] ml-auto mr-[10vh] text-sm py-[2px] px-0;

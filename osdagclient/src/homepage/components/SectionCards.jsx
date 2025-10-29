@@ -3,9 +3,6 @@ const SectionCards = ({ section, onModuleClick }) => (
     key={section.label}
     className="flex-1 min-w-[380px] border-2 border-osdag-border rounded-xl mb-8 px-4 py-4 shadow-card dark:text-white"
   >
-    {section.label && (
-      <div className="mb-4 px-2 flex justify-center items-center text-xl font-semibold">{section.label}</div>
-    )}
     <div className="flex flex-col items-center justify-center sm:flex-col md:flex-row lg:flex-row gap-6">
       {section.options.map((opt) => (
         <div

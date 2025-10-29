@@ -337,9 +337,9 @@ export const EngineeringModule = ({
   };
 
   return (
-    <div className="module_base">
+    <div className="w-full h-screen flex flex-col overflow-hidden">
       {/* Navigation */}
-      <div className="module_nav">
+      <div className="flex flex-row bg-[#d2d4d2] pl-4 gap-4 w-full text-sm  flex-shrink-0">
         {menuItems.map((item, index) => (
           <UnifiedDropdownMenu
             key={index}

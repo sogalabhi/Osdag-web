@@ -78,7 +78,7 @@ function UnifiedDropdownMenu({
   inputs,
   allSelected,
   setInputs,
-  setAllSelected = () => {},
+  setAllSelected = () => { },
   logs,
   setCreateDesignReportBool,
   setSaveInputFileName,
@@ -481,15 +481,18 @@ function UnifiedDropdownMenu({
   }, []);
 
   return (
-    <div className="dropdown" ref={parentRef}>
-      <div className="dropdown-label" onClick={handleToggle}>
+    <div className="relative flex justify-center items-center hover:bg-[#91b014] hover:text-white p-1" ref={parentRef}>
+      <div
+        className="font-medium  cursor-pointer"
+        onClick={handleToggle}
+      >
         {label}
       </div>
       {isOpen && (
-        <div className="dropdown-menu">
+        <div className="absolute top-full left-0 bg-white border border-[#ccc] border-t-0 min-w-[350px] z-[1]">
           {dropdown.map((option, index) => (
             <div
-              className="dropdown-items"
+              className="flex w-full justify-between text-sm text-black hover:text-white hover:bg-osdag-green cursor-pointer p-1"
               key={index}
               onClick={() => handleClick(option)}
             >
@@ -502,6 +505,7 @@ function UnifiedDropdownMenu({
         </div>
       )}
     </div>
+
   );
 }
 
