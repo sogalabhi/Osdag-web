@@ -360,17 +360,6 @@
 
 /* <button class="button-28" role="button">Button 28</button> */
 
-
-.sidebar-container .sidebar-item button:disabled {
-  pointer-events: none;
-}
-
-.sidebar-container .sidebar-item button:active {
-  box-shadow: none;
-  transform: translateY(0);
-}
-
-
 /* Fine Plate */
 /* 
 .module_nav {
@@ -788,10 +777,6 @@
 
 .component-grid h4 {
   @apply w-[40%] text-sm font-medium text-osdag-text-primary dark:text-white;
-}
-
-.component-grid-align {
-  @apply flex w-full justify-between items-center mb-3;
 }
 
 .react-select-container {
@@ -1231,11 +1216,6 @@
   font-size: 12px;
 }
 
-.spacing-left-body-align {
-  display: flex;
-  justify-content: space-around;
-  margin: 1rem 0rem;
-}
 
 .spacing-right-body {
 	display: flex;

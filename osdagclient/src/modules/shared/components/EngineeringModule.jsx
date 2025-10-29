@@ -108,7 +108,6 @@ export const EngineeringModule = ({
   const [showInputDock, setShowInputDock] = useState(true);
   const [showOutputDock, setShowOutputDock] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
-  const [bgColor, setBgColor] = useState("#666666"); // Gray default background
   const [isDesignComplete, setIsDesignComplete] = useState(false);
   const [showOptionsContainer, setShowOptionsContainer] = useState(false); // New state for options container
   const [isGridActive, setIsGridActive] = useState(false);
@@ -252,14 +251,6 @@ export const EngineeringModule = ({
     setOrthographicView(null); // Reset orthographic view
     setIsRedesigning(false); // Reset redesigning state
   };
-
-  const handleColorChange = (color) => {
-    console.log("Current bgColor:", bgColor);
-    setBgColor(color);
-    console.log("Background color changed to:", color);
-  };
-  // console.log("Current bgColor:", bgColor);
-
   // Save inputs to OSI file
   const handleSaveInputs = async () => {
     const userIsGuest = isGuest();
@@ -490,6 +481,54 @@ export const EngineeringModule = ({
             title="Home"
           />
         </div>
+        {/* Dark/Light Mode Toggle */}
+        <button
+          onClick={() => {
+            // Toggle a "dark" class on the <body> (simple theme swap)
+            const current = document.body.classList.contains('dark');
+            if (current) {
+              document.body.classList.remove('dark');
+              localStorage.setItem('osdag-theme', 'light');
+            } else {
+              document.body.classList.add('dark');
+              localStorage.setItem('osdag-theme', 'dark');
+            }
+          }}
+          title="Toggle dark/light mode"
+          className="ml-2 text-black dark:text-white"
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            outline: "none",
+            height: "32px",
+            width: "32px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          {
+            document.body.classList.contains('dark')
+              ? (
+                // Light icon (sun)
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000"><path d="M440-760v-160h80v160h-80Zm266 110-55-55 112-115 56 57-113 113Zm54 210v-80h160v80H760ZM440-40v-160h80v160h-80ZM254-652 140-763l57-56 113 113-56 54Zm508 512L651-255l54-54 114 110-57 59ZM40-440v-80h160v80H40Zm157 300-56-57 112-112 29 27 29 28-114 114Zm283-100q-100 0-170-70t-70-170q0-100 70-170t170-70q100 0 170 70t70 170q0 100-70 170t-170 70Zm0-80q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160Z" /></svg>
+              ) : (
+                // Dark icon (moon)
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000"><path d="M484-80q-84 0-157.5-32t-128-86.5Q144-253 112-326.5T80-484q0-146 93-257.5T410-880q-18 99 11 193.5T521-521q71 71 165.5 100T880-410q-26 144-138 237T484-80Zm0-80q88 0 163-44t118-121q-86-8-163-43.5T464-465q-61-61-97-138t-43-163q-77 43-120.5 118.5T160-484q0 135 94.5 229.5T484-160Zm-20-305Z" /></svg>
+              )
+          }
+        </button>
+
+        {/* Initial theme detection, run once per mount */}
+        {React.useEffect(() => {
+          const saved = localStorage.getItem('osdag-theme');
+          if (saved === 'dark') {
+            document.body.classList.add('dark');
+          } else if (saved === 'light') {
+            document.body.classList.remove('dark');
+          }
+        }, [])}
       </div>
 
       <div
@@ -589,7 +628,7 @@ export const EngineeringModule = ({
                   return (
                     <div
                       key={option}
-                      className="option-wrapper"
+                      className="option-wrapper text-black dark:text-white hover:text-osdag-green"
                       onClick={() => {
                         console.log("Selected option111:", option); // runs when clicked
                         setSelectedView(option);
@@ -610,9 +649,9 @@ export const EngineeringModule = ({
                 <p>{isRedesigning ? "Updating Model..." : "Loading Model..."}</p>
               </div>
             ) : renderBoolean ? (
-              <div className="cadModel relative" style={{ backgroundColor: bgColor }}>
+              <div className="cadModel relative   bg-gradient-to-b from-[#FFFFFF] to-[#7E7E7E] dark:from-[#535353] dark:to-[#000000]">
                 {/* Existing background color picker - left side */}
-                <div className="absolute top-2 left-2 flex items-center gap-2 bg-white/90 dark:bg-osdag-dark-color/90 px-3 py-1.5 rounded-lg shadow-md z-10">
+                {/* <div className="absolute top-2 left-2 flex items-center gap-2 bg-white/90 dark:bg-osdag-dark-color/90 px-3 py-1.5 rounded-lg shadow-md z-10">
                   <label htmlFor="bgColorPicker" className="text-xs font-medium text-black dark:text-white mr-1">
                     Background:
                   </label>
@@ -624,16 +663,15 @@ export const EngineeringModule = ({
                     className="bg-color-picker"
                     title="Change Background Color"
                   />
-                </div>
+                </div> */}
 
                 {/* Grid selector - right side */}
                 <GridSelector onViewChange={handleOrthographicViewChange} />
 
                 <Canvas
-                  gl={{ antialias: true, preserveDrawingBuffer: true }}
-                  style={{ width: "100%", height: "100%" }}
+                  gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
+                  style={{ width: "100%", height: "100%", background: 'transparent' }}
                 >
-                  <color attach="background" args={[bgColor]} />
                   <PerspectiveCamera
                     ref={cameraRef}
                     makeDefault
@@ -695,7 +733,7 @@ export const EngineeringModule = ({
                 <div
                   onClick={saveOutput}
                   className="cursor-pointer flex items-center gap-x-2 bg-osdag-green text-white font-semibold p-3 mb-1 rounded-lg shadow-md duration-200"
-                ><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/></svg>
+                ><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z" /></svg>
                   Save Output
                 </div>
 

@@ -46,6 +46,16 @@ export const BaseOutputDock = ({
     }
   };
 
+  // Read-only value box styled like input (transparent bg, grey border)
+  const ValueBox = ({ value }) => (
+    <div
+      className="w-full px-2 py-1 rounded-md border border-gray-400/60 bg-transparent text-sm text-black dark:text-white leading-6"
+      style={{ minHeight: 32 }}
+    >
+      {value !== undefined && value !== null && value !== '' ? String(value) : ' '}
+    </div>
+  );
+
   const getImageForModal = (imageType, selectedOption) => {
     const imageMap = {
       stiffener: {
@@ -108,12 +118,7 @@ export const BaseOutputDock = ({
               {fieldsData.map(({ key, label }, idx) => (
                 <div key={idx} className="spacing-left-body-align">
                   <h4>{label}</h4>
-                  <Input
-                    type="text"
-                    value={getOutputValue(key, output)}
-                    disabled
-                    className='text-black dark:text-white'
-                  />
+                  <ValueBox value={getOutputValue(key, output)} />
                 </div>
               ))}
             </div>
@@ -152,16 +157,7 @@ export const BaseOutputDock = ({
                     {sectionFields.map(({ key, label }, idx) => (
                       <div key={idx} className="Capacity-left-body-align">
                         <p>{label}</p>
-                        <Input
-                          type="text"
-                          value={getOutputValue(key, output)}
-                          disabled
-                          style={{
-                            color: "rgb(0 0 0 / 67%)",
-                            fontSize: "12px",
-                            fontWeight: "500",
-                          }}
-                        />
+                        <ValueBox value={getOutputValue(key, output)} />
                       </div>
                     ))}
                   </div>
@@ -195,12 +191,7 @@ export const BaseOutputDock = ({
             {fieldsData.map(({ key, label }, idx) => (
               <div key={idx} className="details-main-body-align">
                 <h4 dangerouslySetInnerHTML={{ __html: label }} />
-                <Input
-                  type="text"
-                  value={getOutputValue(key, output)}
-                  disabled
-                  className='text-black dark:text-white'
-                />
+                <ValueBox value={getOutputValue(key, output)} />
               </div>
             ))}
           </div>
@@ -215,7 +206,7 @@ export const BaseOutputDock = ({
     const fieldValue = getOutputValue(field.key, output);
 
     return (
-      <div key={index} className="component-grid-align">
+      <div key={index} className="flex my-1">
         <h4>{field.label}</h4>
         {isModalTrigger ? (
           <Input
@@ -226,12 +217,7 @@ export const BaseOutputDock = ({
             onClick={() => handleDialog(field.key)}
           />
         ) : (
-          <Input
-            type="text"
-            value={fieldValue}
-            disabled
-            className='text-black dark:text-white'
-          />
+          <ValueBox value={fieldValue} />
         )}
       </div>
     );
