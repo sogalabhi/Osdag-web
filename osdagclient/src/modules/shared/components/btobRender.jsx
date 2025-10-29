@@ -1,5 +1,6 @@
 import { OrbitControls, useTexture } from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import { useEffect, useState, useMemo } from "react";
 import * as THREE from "three";
 import AxisHelperWidget from "../utils/AxisHelperWidget";
@@ -19,43 +20,78 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
   const isColumnWebBeamWeb = connectivity === "Column Web-Beam-Web";
 
   useEffect(() => {
-    if (modelPaths) {
-      try {
-        const loader = new OBJLoader();
-        const parsedData = Object.fromEntries(
-          Object.entries(modelPaths).map(([key, objData]) => {
-            return [key, loader.parse(objData)];
-          })
-        );
-        // Debug: log parsed object keys and hierarchy for Model
+    if (!modelPaths) return;
+    try {
+      const stlLoader = new STLLoader();
+      const parsedData = {};
+      const partsGroup = new THREE.Group();
+      const partKeys = new Set(["Beam", "Column", "Plate", "Weld", "Welds", "Bolt", "Bolts", "cleatAngle"]);
+
+      Object.entries(modelPaths).forEach(([key, dataUrl]) => {
         try {
-          console.log('[btobRender] Parsed model keys:', Object.keys(parsedData));
-          const modelObj = parsedData?.Model;
-          if (modelObj) {
-            console.log('[btobRender] Model root:', modelObj);
-            console.log('[btobRender] Model children count:', modelObj.children?.length || 0);
-            const nodes = [];
-            modelObj.traverse((node) => {
-              if (node) {
-                nodes.push({
-                  name: node.name,
-                  type: node.type,
-                  isMesh: !!node.isMesh,
-                  material: node.material?.name || null,
-                  geomType: node.geometry?.type || null,
-                });
-              }
+          if (typeof dataUrl === 'string' && dataUrl.startsWith('data:application/octet-stream;base64,')) {
+            const base64 = dataUrl.split(',')[1];
+            const binary = atob(base64);
+            const arrayBuffer = new ArrayBuffer(binary.length);
+            const bytes = new Uint8Array(arrayBuffer);
+            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+            const geometry = stlLoader.parse(arrayBuffer);
+            const colorMap = {
+              // requested colors
+              beam: '#868664',
+              column: '#484836',
+              plate: '#2f2f23',
+              weld_left: '#ff0000',
+              weld_right: '#ff0000',
+              // map to canonical keys used by sections
+              Beam: '#868664',
+              Column: '#484836',
+              Plate: '#2f2f23',
+              Weld: '#ff0000',
+              Welds: '#ff0000',
+              // fallbacks/others
+              Bolt: '#996633',
+              Bolts: '#996633',
+              cleatAngle: '#2f2f23',
+              Model: '#999999',
+            };
+            const material = new THREE.MeshStandardMaterial({
+              color: colorMap[key] ?? colorMap[key?.toLowerCase?.()] ?? '#888888',
+              metalness: 0.3,
+              roughness: 0.5,
+              side: THREE.DoubleSide,
             });
-            console.log('[btobRender] Model traverse nodes:', nodes);
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.name = key;
+            parsedData[key] = mesh;
+
+            // Accumulate per-part meshes into a single group (exclude merged Model)
+            if (partKeys.has(key)) {
+              partsGroup.add(mesh);
+            }
+          } else if (typeof dataUrl === 'string' && dataUrl.includes('v ')) {
+            // Fallback: legacy OBJ text
+            const objLoader = new OBJLoader();
+            parsedData[key] = objLoader.parse(dataUrl);
           }
         } catch (e) {
-          console.warn('[btobRender] Error while logging parsed Model structure:', e);
+          console.warn(`[btobRender] Failed to load section ${key}:`, e);
         }
+      });
 
-        setParsedModels(parsedData);
-      } catch (error) {
-        console.error("Error parsing .obj data:", error);
+      // If we have a merged Model and also per-part meshes, show parts in place of Model
+      if (parsedData.Model && partsGroup.children.length > 0) {
+        // Prefer per-part colored group for Model view
+        parsedData.Model = partsGroup;
+      } else if (!parsedData.Model && partsGroup.children.length > 0) {
+        // If no merged Model exists, still expose parts under Model key for existing render paths
+        parsedData.Model = partsGroup;
       }
+
+      setParsedModels(parsedData);
+    } catch (error) {
+      console.error('Error parsing model data:', error);
     }
   }, [modelPaths]);
 

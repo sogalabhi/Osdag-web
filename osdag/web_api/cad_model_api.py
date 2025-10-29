@@ -121,7 +121,7 @@ class CADGeneration(View):
                 
                 print(f'{section} generated successfully')
 
-                # Consume GLB produced by module
+                # Prefer STL; fall back to BREP
                 path_to_file = os.path.join(parent_dir, path)
                 if not os.path.exists(path_to_file):
                     msg = f'Generated file for {section} does not exist at: {path_to_file}'
@@ -129,14 +129,22 @@ class CADGeneration(View):
                     error_details.append({"section": section, "error": msg})
                     continue
 
+                stl_path = path_to_file.replace(".brep", ".stl")
                 import base64
                 try:
-                    with open(path_to_file, "rb") as glb_file:
-                        b64 = base64.b64encode(glb_file.read()).decode("ascii")
-                    output_files[section] = b64
+                    if os.path.exists(stl_path):
+                        with open(stl_path, "rb") as f:
+                            b64 = base64.b64encode(f.read()).decode("ascii")
+                        output_files[section] = f"data:application/octet-stream;base64,{b64}"
+                        print(f"Loaded STL for {section}")
+                    else:
+                        with open(path_to_file, "rb") as f:
+                            b64 = base64.b64encode(f.read()).decode("ascii")
+                        output_files[section] = f"data:application/octet-stream;base64,{b64}"
+                        print(f"Loaded BREP for {section}")
                 except Exception as e:
-                    print(f"Failed reading GLB for {section}: {e}")
-                    error_details.append({"section": section, "error": f"Failed reading GLB: {str(e)}"})
+                    print(f"Failed reading model file for {section}: {e}")
+                    error_details.append({"section": section, "error": f"Failed reading file: {str(e)}"})
                     continue
                 
             except Exception as e:
