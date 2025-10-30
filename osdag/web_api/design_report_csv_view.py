@@ -196,7 +196,7 @@ class CreateDesignReport(APIView):
         cwd = os.path.join(os.getcwd() , "file_storage/design_report/")
         print('cwd_path : ' , cwd)
         print("****")
-        if(not os.path.exists) :
+        if(not os.path.exists):
             print('path does not exists, creating one : ', cwd)
             os.mkdir(cwd) 
 
@@ -228,7 +228,7 @@ class CreateDesignReport(APIView):
         if (resultBoolean):
             print("**")
             print('inside sleep')
-            time.sleep(10)
+            time.sleep(3)
             isExists = os.path.exists(f'{file_path}.tex')
             print('report path : ' , f'{file_path}.tex')
             print('isExists : ' , isExists)

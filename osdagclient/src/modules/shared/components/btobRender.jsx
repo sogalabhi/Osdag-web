@@ -11,7 +11,11 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
   texture.needsUpdate = true;
 
   // Get model position, scale, orthographic view, and connectivity from camera settings
-  const modelPosition = cameraSettings?.modelPosition || [0, -4, 0];
+  const GRID_VIEWS = [
+    "XY", "YZ", "ZX", "ANGLE1", "ANGLE2", "ANGLE3", "ANGLE4", "ANGLE5", "ANGLE6"
+  ];
+  const useGridCenteredPosition = GRID_VIEWS.includes(selectedView);
+  const modelPosition = useGridCenteredPosition ? [0, 0, 0] : (cameraSettings?.modelPosition || [0, -4, 0]);
   const modelScale = cameraSettings?.modelScale || 0.008;
   const orthographicView = cameraSettings?.orthographicView || null;
   const connectivity = cameraSettings?.connectivity || null;
@@ -196,7 +200,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
       <primitive object={new THREE.AxesHelper(5)} />
 
       {/* Model Section - render each subpart with its own color */}
-      {selectedView === "Model" && modelMeshes.length > 0 && (
+      {(selectedView === "Model" || GRID_VIEWS.includes(selectedView)) && modelMeshes.length > 0 && (
         <>
           {modelMeshes.map((m, idx) => {
             const name = m.name || "";

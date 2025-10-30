@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Input, Modal, Button } from "antd";
+import { Modal, Button } from "antd";
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
 import { InputSection } from "../components/InputSection";
 import { CustomizationModal } from "../components/CustomizationModal";
@@ -14,16 +14,6 @@ import Logs from "../../../components/Logs";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import ScreenshotCapture from "../../../components/ScreenShotCapture";
 import DesignPrefSections from "../../../components/DesignPrefSections";
-import Designsvg from "../../../assets/Designsvg.svg";
-import Resetsvg from "../../../assets/Resetsvg.svg";
-import Outputsvg from "../../../assets/Outputsvg.svg";
-import Reportsvg from "../../../assets/Reportsvg.svg";
-import InputDockHiddensvg from "../../../assets/InputDockHiddensvg.svg";
-import InputDockVisiblesvg from "../../../assets/InputDockVisiblesvg.svg";
-import OutputDockHiddensvg from "../../../assets/OutputDockhiddensvg.svg";
-import OutputDockVisiblesvg from "../../../assets/OutputDockVisiblesvg.svg";
-import Logsvg from "../../../assets/Logsvg.svg";
-import ArrowDownsvg from "../../../assets/ArrowDownsvg.svg";
 import Homesvg from "../../../assets/Homesvg.svg";
 import GridSelector from "../utils/GridSelector";
 import { message, Modal as AntdModal } from 'antd';
@@ -111,8 +101,9 @@ export const EngineeringModule = ({
   const [isDesignComplete, setIsDesignComplete] = useState(false);
   const [showOptionsContainer, setShowOptionsContainer] = useState(false); // New state for options container
   const [isGridActive, setIsGridActive] = useState(false);
-  const [orthographicView, setOrthographicView] = useState(null); // New state for orthographic view
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
+  const [selectedSection, setSelectedSection] = useState("Model");
+  const [selectedCameraView, setSelectedCameraView] = useState("Model");
   // Auth helpers
   const BASE_URL = 'http://localhost:8000/api/';
   const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
@@ -173,7 +164,7 @@ export const EngineeringModule = ({
 
   // Handle orthographic view changes from GridSelector
   const handleOrthographicViewChange = (viewType) => {
-    setOrthographicView(viewType);
+    setSelectedCameraView(viewType);
   };
 
   const handleSubmitEnhanced = async () => {
@@ -186,8 +177,8 @@ export const EngineeringModule = ({
       setShowOutputDock(false);
       setShowLogs(false);
       setShowOptionsContainer(false);
-      setOrthographicView(null);
-      setSelectedView("Model");
+      setSelectedSection("Model");
+      setSelectedCameraView("Model");
 
       // Reset all the data that controls model rendering
       await performReset();
@@ -243,7 +234,8 @@ export const EngineeringModule = ({
     setIsDesignComplete(false);
     setShowLogs(false); // Reset logs visibility
     setShowOptionsContainer(false); // Hide options container on reset
-    setOrthographicView(null); // Reset orthographic view
+    setSelectedSection("Model"); // Reset selected section
+    setSelectedCameraView("Model"); // Reset selected camera view
     setIsRedesigning(false); // Reset redesigning state
   };
   // Save inputs to OSI file
@@ -363,14 +355,12 @@ export const EngineeringModule = ({
 
   const cameraSettings = useViewCamera(
     moduleConfig.cameraKey,
-    selectedView,
-    getConnectivity(),
-    orthographicView
+    selectedCameraView,
+    getConnectivity()
   );
 
   const {
     position: cameraPos,
-    fov,
     modelPosition,
     modelScale,
   } = cameraSettings;
@@ -604,10 +594,7 @@ export const EngineeringModule = ({
                     <div
                       key={option}
                       className="option-wrapper text-black dark:text-white hover:text-osdag-green"
-                      onClick={() => {
-                        setSelectedView(option);
-                        setOrthographicView(null);
-                      }}
+                      onClick={() => setSelectedSection(option)}
                     >
                       {option}
                     </div>
@@ -650,7 +637,7 @@ export const EngineeringModule = ({
                     ref={cameraRef}
                     makeDefault
                     position={cameraPos}
-                    fov={fov}
+                    fov={13}
                     near={0.1}
                     far={1000}
                   />
@@ -663,7 +650,7 @@ export const EngineeringModule = ({
                   >
                     <Model
                       modelPaths={cadModelPaths}
-                      selectedView={selectedView}
+                      selectedView={selectedSection}
                       cameraSettings={{
                         ...cameraSettings,
                         connectivity: getConnectivity(), // Add connectivity info
@@ -673,7 +660,7 @@ export const EngineeringModule = ({
                     <ScreenshotCapture
                       screenshotTrigger={screenshotTrigger}
                       setScreenshotTrigger={setScreenshotTrigger}
-                      selectedView={selectedView}
+                      selectedView={selectedSection}
                     />
                   </Suspense>
                 </Canvas>

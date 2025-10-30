@@ -1220,7 +1220,7 @@ function SeatedAngle() {
                   style={{ background: "#ADD8E6" }}
                   camera={{
                     position: [10, 0, 10],
-                    fov: 50,
+                    fov: 30,
                     near: 0.1,
                     far: 1000,
                   }}

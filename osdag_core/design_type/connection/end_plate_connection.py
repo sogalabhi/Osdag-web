@@ -44,7 +44,7 @@ from .shear_connection import ShearConnection
 from ...utils.common.component import *
 from ...utils.common.material import *
 from ...Common import *
-from ...design_report.reportGenerator_latex import CreateLatex
+from osdag_core.design_report.reportGenerator_latex import CreateLatex
 from ...Report_functions import *
 import logging
 from importlib_resources import files
@@ -1751,8 +1751,8 @@ class EndPlateConnection(ShearConnection):
         rel_path = os.path.abspath(".") # TEMP
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
-        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+        popup_summary['logger_messages'] = self.logger.logs
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
 
     def get_plate_status(self):
         if self.plate.plate_moment < self.plate.plate_moment_capacity \
