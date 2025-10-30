@@ -986,6 +986,7 @@ class FinPlateConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self,popup_summary):
+        self.module = KEY_DISP_FINPLATE 
         super(FinPlateConnection,self).save_design()
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
 
