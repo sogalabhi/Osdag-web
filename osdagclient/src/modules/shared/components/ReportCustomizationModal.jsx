@@ -21,7 +21,6 @@ export const ReportCustomizationModal = ({
 
   // Initialize checked keys when sections change
   useEffect(() => {
-    console.log('[ReportCustomizationModal] sections:received', { sectionsKeys: Object.keys(sections || {}) });
     if (sections && Object.keys(sections).length > 0) {
       const allKeys = [];
       Object.keys(sections).forEach(section => {
@@ -38,7 +37,6 @@ export const ReportCustomizationModal = ({
   }, [sections]);
 
   const onCheck = (checkedKeysValue, info) => {
-    console.log('[ReportCustomizationModal] onCheck', { count: checkedKeysValue?.length });
     setCheckedKeys(checkedKeysValue);
     onSectionsChange && onSectionsChange(checkedKeysValue);
   };
@@ -89,7 +87,6 @@ export const ReportCustomizationModal = ({
   };
 
   const handleOpenPDF = async () => {
-    console.log('[ReportCustomizationModal] handleOpenPDF', { reportId });
     if (selectedSections.length === 0) {
       message.error("Please select at least one section to include.");
       return;
@@ -105,8 +102,7 @@ export const ReportCustomizationModal = ({
     }
   };
 
-  const handleSavePDF = async () => {
-    console.log('[ReportCustomizationModal] handleSavePDF', { reportId });
+  const handleSavePDF = async () => {   
     if (selectedSections.length === 0) {
       message.error("Please select at least one section to include.");
       return;

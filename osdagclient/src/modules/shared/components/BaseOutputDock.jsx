@@ -17,8 +17,6 @@ export const BaseOutputDock = ({
   title = "Output Dock",
   extraState = {}
 }) => {
-  console.log("🧩 [BaseOutputDock] extraState received:", extraState);
-  // Debug: Log the props received
   const normalizedOutput = output && output.data ? output.data : output;
 
   // Shared state management
@@ -222,7 +220,6 @@ export const BaseOutputDock = ({
       </div>
     );
   };
-  console.log("output", output);
   return (
     <>
       <p>{title}</p>

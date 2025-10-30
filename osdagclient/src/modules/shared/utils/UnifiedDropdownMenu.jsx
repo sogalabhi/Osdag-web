@@ -298,9 +298,6 @@ function UnifiedDropdownMenu({
         const savedName = (inputs?.project_name || inputs?.name || 'project');
         setSaveInputFileName(data?.data?.id ? `${savedName}.osi` : savedName);
         message.success('Saved OSI and project created');
-        console.log('[saveInput] data:', data);
-        console.log('[saveInput] pid:', pid);
-        console.log('[saveInput] data.url:', data.url);
         // Update project's osi_file_path via projectId from URL
         if (pid && data.url) {
           try {
@@ -316,12 +313,10 @@ function UnifiedDropdownMenu({
 
             if (!upd.ok || !updData.success) {
               message.warning('Saved OSI, but failed to link to project');
-              console.log('[saveInput] updData:', updData);
             }
             setIsOpen(false);
           } catch (_e) {
             message.warning('Saved OSI, but failed to link to project');
-            console.log('[saveInput] error linking project:', _e);
           }
         }
       } else {
@@ -329,7 +324,6 @@ function UnifiedDropdownMenu({
       }
     } catch (err) {
       message.error('Failed to save OSI');
-      console.log('[saveInput] err:', err);
     }
   };
 
@@ -361,8 +355,7 @@ function UnifiedDropdownMenu({
     element.style.display = "none";
     parentRef.current.appendChild(element);
     element.click();
-    parentRef.current.removeChild(element);
-    console.log('[saveLogMessages] content:', content);
+    parentRef.current.removeChild(element);   
   };
 
   const handleClick = (option) => {

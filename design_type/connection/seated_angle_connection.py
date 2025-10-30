@@ -1871,7 +1871,7 @@ class SeatedAngleConnection(ShearConnection):
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("SeatAngle", bgcolor)
+        ui.commLogicObj.display_3DModel("SeatedAngle", bgcolor)
 
     def __call__(self):
         return self

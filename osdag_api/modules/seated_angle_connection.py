@@ -358,7 +358,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    """Generate the CAD model from input values as a BREP file. Return file path."""
+    from osdag_api.modules.mesh_export import write_stl
+    from OCC.Core.BRep import BRep_Builder
+    from OCC.Core.TopoDS import TopoDS_Compound
+    from OCC.Core.Message import Message_ProgressRange
+    
     if section not in ("Model", "Beam", "Column", "SeatedAngle"):  # Error checking: If section is valid.
         raise InvalidInputTypeError(
             "section", "'Model', 'Beam', 'Column' or 'SeatedAngle'")
@@ -366,7 +370,6 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     print('module from input values : ' , module)
     # Object that will create the CAD model.
     try : 
-        print(module.module)
         cld = CommonDesignLogic(None, '', module.module , module.mainmodule)
     except Exception as e : 
         print('error in cld e : ' , e)
@@ -375,93 +378,77 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         # Setup the calculations object for generating CAD model.
         scc.setup_for_cad(cld, module)
     except Exception as e : 
+        import traceback
         traceback.print_exc()
         print('Error in setting up cad e : ' , e)
 
-    # The section of the module that will be generated.
     cld.component = section
-    
-    try : 
-        model = cld.create2Dcad()  # Generate CAD Model.
-    except Exception as e :
-        print('Error in cld.create2Dcad() e : ' , e)
-        return False
 
-    # Ensure output directory exists
-    cad_models_dir = os.path.join(os.getcwd(), "file_storage", "cad_models")
-    print("CAD - ensuring cad_models dir:", cad_models_dir)
+    part_names = ["Beam", "Column", "SeatedAngle", "Weld", "Welds", "Bolt", "Bolts"]
     try:
-        os.makedirs(cad_models_dir, exist_ok=True)
-    except Exception as e:
-        print(f"Error creating directory {cad_models_dir}: {e}")
-        return False
+        if section == "Model":
+            # Build compound by adding each part shape without fusing
+            builder = BRep_Builder()
+            compound = TopoDS_Compound()
+            builder.MakeCompound(compound)
+            for part in part_names:
+                try:
+                    cld.component = part
+                    part_shape = cld.create2Dcad()
+                    if part_shape is None:
+                        continue
+                    builder.Add(compound, part_shape)
+                    part_file_name = f"{session}_{part}.brep"
+                    part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
+                    full_brep_path = os.path.join(os.getcwd(), part_file_path_rel)
+                    from OCC.Core import BRepTools
+                    BRepTools.breptools.Write(part_shape, full_brep_path, Message_ProgressRange())
+                    # STL as well
+                    part_stl_file = part_file_path_rel.replace(".brep", ".stl")
+                    try:
+                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_file))
+                    except Exception as e:
+                        print(f"Failed to write STL for part {part} (SeatedAngle):", e)
+                except Exception as e:
+                    print(f"Failed generating cad part {part} in SeatedAngle: {e}")
 
-    print('2d model : ' , model)
-    file_base = f"{session}_{section}"
-
-    # Optional: still write BREP for archival (API will consume GLB)
-    brep_rel = os.path.join("file_storage", "cad_models", file_base + ".brep")
-    print("CAD - writing optional BREP:", brep_rel)
-    try:
-        BRepTools.breptools.Write(model, brep_rel, Message_ProgressRange())
-    except Exception as e:
-        print('Writing to BREP file failed e : ' , e)
-
-    glb_rel = os.path.join("file_storage", "cad_models", file_base + ".glb")
-    glb_abs = os.path.join(os.getcwd(), glb_rel)
-
-    # Prefer native OCCT GLB export
-    print("CAD - exporter: RWGltf available ->", HAS_GLB)
-    if HAS_GLB:
-        try:
-            from OCC.Core.XCAFApp import XCAFApp_Application
-            from OCC.Core.TDocStd import TDocStd_Document
-            from OCC.Core.TCollection import TCollection_ExtendedString
-            from OCC.Core.XCAFDoc import XCAFDoc_DocumentTool
-            from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
-            from OCC.Core.TDataStd import TDataStd_Name
-
-            app = XCAFApp_Application.GetApplication()
-            doc = TDocStd_Document(TCollection_ExtendedString("XmlXCAF"))
-            app.NewDocument(TCollection_ExtendedString("MDTV-CAF"), doc)
-            root = doc.Main()
-            shape_tool = XCAFDoc_DocumentTool.ShapeTool(root)
-            color_tool = XCAFDoc_DocumentTool.ColorTool(root)
-
-            # For now, export the overall shape as one part; subparts can be added later
-            lbl = shape_tool.NewShape()
-            shape_tool.SetShape(lbl, model)
-            TDataStd_Name.Set(lbl, TCollection_ExtendedString(section))
-            color_tool.SetColor(lbl, Quantity_Color(0.7, 0.7, 0.7, Quantity_TOC_RGB), 0)
-
-            print("CAD - RWGltf performing to:", glb_abs)
-            writer = RWGltf_CafWriter(glb_abs, True)
-            ok = writer.Perform(doc, None)
-            if ok:
-                print("CAD - GLB written (RWGltf):", glb_rel)
-                return glb_rel
-            else:
-                print("glTF export failed with RWGltf_CafWriter, falling back to trimesh")
-        except Exception as e:
-            print(f"RWGltf_CafWriter error: {e}. Falling back to trimesh")
-
-    # Fallback: triangulate and export STL -> GLB via trimesh
-    try:
-        print("CAD - fallback: meshing OCC -> STL")
-        BRepMesh_IncrementalMesh(model, 0.5, True, 0.5, True)
-        stl_rel = os.path.join("file_storage", "cad_models", file_base + ".stl")
-        stl_abs = os.path.join(os.getcwd(), stl_rel)
-        print("CAD - writing STL:", stl_rel)
-        StlAPI_Writer().Write(model, stl_abs)
-
-        import trimesh
-        print("CAD - loading STL in trimesh")
-        mesh = trimesh.load_mesh(stl_abs)
-        print("CAD - exporting GLB via trimesh:", glb_rel)
-        mesh.export(glb_abs)
-        print("CAD - GLB written (fallback):", glb_rel)
-        return glb_rel
-    except Exception as e:
-        print(f"STL/GLB fallback export failed: {e}")
+            # Now write the compound as the Model
+            cld.component = "Model"
+            model = compound
+            compound_file_name = f"{session}_Model.brep"
+            compound_file_path_rel = os.path.join("file_storage", "cad_models", compound_file_name)
+            from OCC.Core import BRepTools
+            BRepTools.breptools.Write(model, os.path.join(os.getcwd(), compound_file_path_rel), Message_ProgressRange())
+            # Compound/model STL (for completeness, not loaded in UI)
+            compound_stl_file = compound_file_path_rel.replace(".brep", ".stl")
+            try:
+                write_stl(model, os.path.join(os.getcwd(), compound_stl_file))
+            except Exception as e:
+                print("Failed to write Model STL for SeatedAngle:", e)
+            return compound_file_path_rel
+        else:
+            try :
+                model = cld.create2Dcad()  # Generate CAD Model.
+            except Exception as e :
+                print('Error in cld.create2Dcad() e : ' , e)
+                return False
+            if(not os.path.exists(os.path.join(os.getcwd() , "file_storage/cad_models/"))) :
+                print('path does not exists cad_models , creating one')
+                os.mkdir(os.path.join(os.getcwd() , "file_storage/cad_models/"))
+            print('2d model : ' , model)
+            file_name = session + "_" + section + ".brep"
+            file_path = "file_storage/cad_models/" + file_name
+            print('brep file path in create_cad_model : ' , file_path)
+            try :
+                from OCC.Core import BRepTools
+                BRepTools.breptools.Write(model, os.path.join(os.getcwd(), file_path), Message_ProgressRange())
+                # Write STL too
+                stl_file_path = file_path.replace(".brep", ".stl")
+                write_stl(model, os.path.join(os.getcwd(), stl_file_path))
+            except Exception as e :
+                print('Writing to BREP or STL file failed e : ' , e)
+            return file_path
+    except Exception as top_e:
+        print('Top-level error in SeatedAngle create_cad_model:', top_e)
         return False
 

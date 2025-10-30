@@ -154,7 +154,6 @@ export const EngineeringModule = ({
 
   // Only change dock visibility after design is complete
   useEffect(() => {
-    console.log("[EngineeringModule] useEffect output:", output);
     if (!loading && !isRedesigning && output && renderBoolean) {
       setIsDesignComplete(true);
       setShowOptionsContainer(true); // Show options container after design is complete
@@ -170,19 +169,16 @@ export const EngineeringModule = ({
 
   const handleGridToggle = () => {
     setIsGridActive(!isGridActive);
-    console.log("Grid toggled:", !isGridActive);
   };
 
   // Handle orthographic view changes from GridSelector
   const handleOrthographicViewChange = (viewType) => {
-    console.log("Switching to orthographic view:", viewType);
     setOrthographicView(viewType);
   };
 
   const handleSubmitEnhanced = async () => {
     // If there's already an existing design, completely reset everything
     if (isDesignComplete || renderBoolean || output) {
-      console.log("Resetting existing design...");
 
       // Immediately hide current model and output
       setIsRedesigning(true);
@@ -205,7 +201,6 @@ export const EngineeringModule = ({
       await handleSubmit();
       setShowResetButton(true);
     } catch (error) {
-      console.error("Design submission failed:", error);
     } finally {
       // Reset the redesigning state after completion
       setIsRedesigning(false);
@@ -382,37 +377,22 @@ export const EngineeringModule = ({
 
   // Determine view options based on module
   const getViewOptions = () => {
-    console.log("🔍 [ENGINEERING MODULE] getViewOptions called with cameraKey:", moduleConfig.cameraKey);
-
     if (moduleConfig.cameraKey === "FinPlateConnection") {
-      console.log("📋 [ENGINEERING MODULE] Returning FinPlate view options");
       return ["Model", "Beam", "Column", "Plate"];
     }
     else if (moduleConfig.cameraKey === "CleatAngle") {
       return ["Model", "Beam", "Column", "CleatAngle"]; // FIXED: Use CleatAngle instead of Connector
     }
     else if (moduleConfig.cameraKey === "EndPlate") {
-      console.log("📋 [ENGINEERING MODULE] Returning EndPlate view options");
-      return ["Model", "Beam", "Column", "EndPlate"];
+      return ["Model", "Beam", "Column", "Plate"];
     }
     else if (moduleConfig.cameraKey === "SeatedAngle") {
       return ["Model", "Beam", "Column", "SeatedAngle"]; // FIXED: Use SeatedAngle instead of Connector
     }
-    console.log("📋 [ENGINEERING MODULE] Returning default view options");
     return ["Model", "Beam", "Connector"];
   };
 
   const options = getViewOptions();
-
-
-  console.log("🔍 [ENGINEERING MODULE] Module Config:", {
-    sessionName: moduleConfig.sessionName,
-    designType: moduleConfig.designType,
-    cameraKey: moduleConfig.cameraKey,
-    cadOptions: moduleConfig.cadOptions
-  });
-  console.log("🔍 [ENGINEERING MODULE] Final view options:", options);
-
   // FIXED: Include angleList in contextData 
   const contextData = {
     beamList,
@@ -425,8 +405,6 @@ export const EngineeringModule = ({
     angleList, // FIXED: Added angleList to context data
     boltTypeList,
   };
-
-  console.log("CadModelPaths*************", cadModelPaths);
 
   const triggerScreenshotCapture = () => {
     setScreenshotTrigger(true);
@@ -604,12 +582,10 @@ export const EngineeringModule = ({
             <div className="options-container">
               <div className="view-options">
                 {/* {options.map((option) => (
-                  console.log("Selected option:", option),
                   <div
                     key={option}
                     className="option-wrapper"
                     onClick={() => {
-                      console.log("Selected option111:", option);
                       setSelectedView(option);
                       setOrthographicView(null);
                     }}
@@ -624,13 +600,11 @@ export const EngineeringModule = ({
                   </div>
                 ))} */}
                 {options.map((option) => {
-                  console.log("Rendering option:", option); // runs during render
                   return (
                     <div
                       key={option}
                       className="option-wrapper text-black dark:text-white hover:text-osdag-green"
                       onClick={() => {
-                        console.log("Selected option111:", option); // runs when clicked
                         setSelectedView(option);
                         setOrthographicView(null);
                       }}
@@ -717,7 +691,6 @@ export const EngineeringModule = ({
         </div>
 
         {/* Right - Output Dock - Only show if showOutputDock is true and design is complete */}
-        {console.log("Output: " + output)}
         {showOutputDock && isDesignComplete && (
           <div className="superMain_right">
             <div className="OutputDock">

@@ -124,7 +124,6 @@ export const useEngineeringModule = (moduleConfig) => {
 
   useEffect(() => {
     if (designData && Object.keys(designData).length > 0) {
-      console.log("[useEngineeringModule] useEffect output::", designData);
       setOutput(designData);
       setDisplayOutput(true);
     }
@@ -186,32 +185,22 @@ export const useEngineeringModule = (moduleConfig) => {
   // On mount: Load module data using simplified API with enhanced error handling
   useEffect(() => {
     const loadModuleData = async () => {
-      console.log('📋 [ENGINEERING MODULE] Loading module data for:', moduleConfig?.designType);
-
       if (!moduleConfig?.designType) {
-        console.warn('⚠️ [ENGINEERING MODULE] No moduleConfig or designType available');
         return;
       }
 
       if (!getModuleData) {
-        console.error('❌ [ENGINEERING MODULE] getModuleData function not available');
         return;
       }
 
       try {
-        console.log('🚀 [ENGINEERING MODULE] Calling getModuleData with simplified API');
-
         // Use the new simplified API which returns { success, data, error }
         const result = await getModuleData(moduleConfig.designType);
 
         if (result && result.success) {
-          console.log('✅ [ENGINEERING MODULE] Module data loaded successfully');
-          console.log('✅ [ENGINEERING MODULE] Data keys:', Object.keys(result.data || {}));
         } else {
-          console.error('❌ [ENGINEERING MODULE] Failed to load module data:', result?.error || 'Unknown error');
         }
       } catch (error) {
-        console.error('❌ [ENGINEERING MODULE] Exception while loading module data:', error);
       }
     };
 
@@ -327,7 +316,6 @@ export const useEngineeringModule = (moduleConfig) => {
         setConfirmationType("navigation");
         setNavigationSource("back");
         setShowResetConfirmation(true);
-        console.log("BACK BUTTON: Prevented navigation due to unsaved work");
       }
     };
 
@@ -352,8 +340,7 @@ export const useEngineeringModule = (moduleConfig) => {
     if (displayOutput) {
       try {
         setLogs(designLogs);
-      } catch (error) {
-        console.log(error);
+      } catch (error) { 
         setOutput(null);
       }
     } else {
@@ -379,7 +366,6 @@ export const useEngineeringModule = (moduleConfig) => {
 
         setOutput(formatedOutput);
       } catch (error) {
-        console.log(error);
         setOutput(null);
       }
     }
@@ -406,19 +392,15 @@ export const useEngineeringModule = (moduleConfig) => {
     const loadSupportedData = async () => {
       if (inputs.member_designation && moduleConfig.cameraKey !== MODULE_KEY_FIN_PLATE && moduleConfig.cameraKey !== MODULE_KEY_CLEAT_ANGLE && manageDesignPreferences) {
         try {
-          console.log('Loading supported data for:', inputs.member_designation);
 
           const result = await manageDesignPreferences('get', {
             supported_section: inputs.member_designation,
           });
 
           if (result && result.success) {
-            console.log('Supported data loaded successfully');
           } else {
-            console.error('Failed to load supported data:', result?.error);
           }
         } catch (error) {
-          console.error('Exception loading supported data:', error);
         }
       }
     };
@@ -460,18 +442,14 @@ export const useEngineeringModule = (moduleConfig) => {
           }
 
           if (params) {
-            console.log('Loading design preferences for', moduleConfig.cameraKey, ':', params);
 
             const result = await manageDesignPreferences('get', params);
 
             if (result && result.success) {
-              console.log('Design preferences loaded successfully');
             } else {
-              console.error('Failed to load design preferences:', result?.error);
             }
           }
         } catch (error) {
-          console.error('Exception loading design preferences:', error);
         }
       }
     };
@@ -528,7 +506,15 @@ export const useEngineeringModule = (moduleConfig) => {
   };
 
   const handleSubmit = async () => {
-    const validationResult = moduleConfig.validateInputs(inputs, extraState);
+    // Debug: print input state for All/Customized cleat section problems
+    console.log('[HandleSubmit: params for validation]', {
+      inputs,
+      selectionStates,
+      allSelected,
+      angleList,
+      extraState,
+    });
+    const validationResult = moduleConfig.validateInputs(inputs, extraState, { angleList, boltDiameterList, propertyClassList, thicknessList }, selectionStates);
     if (!validationResult.isValid) {
       alert(validationResult.message);
       return;
@@ -560,8 +546,7 @@ export const useEngineeringModule = (moduleConfig) => {
         setLoadingStage("");
       }
     } catch (e) {
-      console.error('Error in design/CAD flow:', e);
-      setLoading(false);
+        setLoading(false);
       setIsLoadingModalVisible(false);
       setLoadingStage("");
     }
@@ -584,7 +569,6 @@ export const useEngineeringModule = (moduleConfig) => {
 
   const performReset = () => {
     if (confirmationType === "navigation") {
-      console.log(`USER CONFIRMED NAVIGATION - source: ${navigationSource}`);
 
       setAllowNavigation(true);
       setShowResetConfirmation(false);
@@ -594,10 +578,8 @@ export const useEngineeringModule = (moduleConfig) => {
         resetToDefaultState();
 
         if (navigationSource === "home") {
-          console.log("Navigating to home");
           navigate("/home");
         } else if (navigationSource === "back") {
-          console.log("Navigating to connections page");
           navigate("/design-type/connections");
         }
 
@@ -605,11 +587,9 @@ export const useEngineeringModule = (moduleConfig) => {
         setNavigationSource(null);
       }, 100);
     } else {
-      console.log("USER CONFIRMED RESET - starting targeted reset");
       resetToDefaultState();
       setShowResetConfirmation(false);
       setConfirmationType("reset");
-      console.log("RESET: User confirmed - targeted reset completed");
     }
   };
 
@@ -672,7 +652,6 @@ export const useEngineeringModule = (moduleConfig) => {
     }
 
     try {
-      console.log('Generating design report with simplified API');
 
       // Build the same submission params used for calculate-output
       const submissionParams = moduleConfig.buildSubmissionParams(
@@ -704,15 +683,12 @@ export const useEngineeringModule = (moduleConfig) => {
       const result = await generateReport('design_report', payload);
 
       if (result && result.success) {
-        console.log('Design report generated successfully');
         // Optionally show success message or further user feedback
       } else {
-        console.error('Failed to generate design report:', result?.error);
         alert(`Failed to generate design report: ${result?.error || 'Unknown error'}`);
       }
 
     } catch (error) {
-      console.error('Exception generating design report:', error);
       alert(`Error generating design report: ${error.message}`);
     }
 

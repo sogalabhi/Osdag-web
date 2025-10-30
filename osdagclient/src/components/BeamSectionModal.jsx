@@ -29,9 +29,6 @@ const BeamSectionModal = ({
     );
     getMaterialDetails({ data: material[0], type: "supported" });
   }, []);
-
-  console.log(supportedSectionData);
-
   return (
     <>
       <div className="col-beam-cont">

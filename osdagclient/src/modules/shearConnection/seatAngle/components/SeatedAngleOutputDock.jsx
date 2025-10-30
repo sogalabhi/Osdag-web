@@ -4,7 +4,6 @@ import { seatedAngleOutputConfig } from "../configs/seatedAngleOutputConfig";
 import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 const SeatedAngleOutputDock = ({ output, extraState }) => {
-  console.log("SeatedAngleOutputDock received:", { output, extraState });
   return (
     <BaseOutputDock
       output={output}

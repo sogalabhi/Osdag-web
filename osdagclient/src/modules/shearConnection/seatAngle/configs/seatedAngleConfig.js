@@ -48,6 +48,7 @@ export const seatedAngleConfig = {
     { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
     { key: "angleListSelect", inputKey: "angle_list", defaultValue: "All" },
     { key: "topAngleSelect", inputKey: "topangle_list", defaultValue: "All" },
+    { key: "secondaryBeamSelect", inputKey: "secondary_beam", defaultValue: "All" },
   ],
 
   validateInputs: (inputs) => {

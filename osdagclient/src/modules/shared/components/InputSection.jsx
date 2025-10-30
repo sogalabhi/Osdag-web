@@ -118,8 +118,11 @@ export const InputSection = ({
   const handleCustomizableSelect = (field, value) => {
     const getAllValuesForInputKey = (inputKey) => {
       const keyMap = {
-        'bolt_diameter': 'boltDiameterList', 'bolt_grade': 'propertyClassList',
-        'plate_thickness': 'thicknessList', 'angle_list': 'angleList',
+        'bolt_diameter': 'boltDiameterList',
+        'bolt_grade': 'propertyClassList',
+        'plate_thickness': 'thicknessList',
+        'angle_list': 'angleList',
+        'cleat_section': 'angleList', // <-- PATCHED: point to angleList for cleat_section
       };
       const listName = keyMap[inputKey];
       return Array.isArray(safeContextData[listName]) ? safeContextData[listName] : [];
@@ -144,7 +147,7 @@ export const InputSection = ({
       updateSelectionState(field.selectionKey, "Customized");
       updateModalState(field.modalKey, true);
     } else {
-      // "All" option - get all values and set them in inputs
+      // "All" option - get all values and set them in inputs 
       const allValues = getAllValuesForInputKey(field.key);
       // Convert to array format if needed
       const allValuesArray = allValues.map(val => {
@@ -294,25 +297,29 @@ export const InputSection = ({
         {section.title}
       </h3>
       <div className="flex flex-col w-full p-4 pt-2">
-        {section.fields.map((field, index) => (
-          <div key={index}>
-            <div className="flex w-full justify-between items-center mb-3">
-              <h4 className="w-[40%] text-sm font-medium text-osdag-text-primary dark:text-white">
-                {field.label}
-            </h4>
-              {renderField(field)}
-            </div>
-            {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (
-              <div className="flex justify-center">
-                <img
-                  src={imageSource}
-                  alt="Connection type"
-                  className="w-[100px] h-[100px] object-contain"
-                />
+        {section.fields.map((field, index) => {
+          // Entire label+input row is hidden if conditionalDisplay fails
+          if (field.conditionalDisplay && !field.conditionalDisplay(extraState)) return null;
+          return (
+            <div key={index}>
+              <div className="flex w-full justify-between items-center mb-3">
+                <h4 className="w-[40%] text-sm font-medium text-osdag-text-primary dark:text-white">
+                  {field.label}
+                </h4>
+                {renderField(field)}
               </div>
-            )}
-          </div>
-        ))}
+              {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (
+                <div className="flex justify-center">
+                  <img
+                    src={imageSource}
+                    alt="Connection type"
+                    className="w-[100px] h-[100px] object-contain"
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

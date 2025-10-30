@@ -135,7 +135,6 @@ export default (state, action) => {
     // DESIGN & CAD ACTIONS - Consolidated and simplified
     // ===================================================================
     case "SET_DESIGN_DATA_AND_LOGS":
-      console.log("[SET_DESIGN_DATA_AND_LOGS] action.payload:", action.payload);
       return {
         ...state,
         designData: action.payload.data || {},

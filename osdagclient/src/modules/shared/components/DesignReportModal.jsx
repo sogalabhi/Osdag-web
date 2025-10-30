@@ -106,12 +106,6 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
   };
 
   const handleGenerateInitialReport = async () => {
-    console.log('[DesignReportModal] handleGenerateInitialReport:start', {
-      hasOutput: !!output,
-      moduleId,
-      hasInputValues: !!inputValues,
-      designStatus,
-    });
     if (!output) {
       message.error("Please submit the design first.");
       return;
@@ -119,11 +113,6 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
 
     setLoading(true);
     try {
-      console.log('[DesignReportModal] inputValues before transformation:', inputValues);
-      console.log('[DesignReportModal] allSelected state:', allSelected);
-      console.log('[DesignReportModal] extraState:', extraState);
-      console.log('[DesignReportModal] lists:', { boltDiameterList, propertyClassList, thicknessList, angleList });
-      
       // Transform input values using the same logic as design calculation
       const transformedInputValues = moduleConfig?.buildSubmissionParams ? 
         moduleConfig.buildSubmissionParams(inputValues, allSelected, {
@@ -132,8 +121,6 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           thicknessList,
           angleList,
         }, extraState) : inputValues;
-      
-      console.log('[DesignReportModal] transformed input values:', transformedInputValues);
       
       // Prepare request data
       const requestData = {
@@ -156,7 +143,6 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
         logs: logs,
       };
 
-      console.log('[DesignReportModal] generate-initial:request', requestData);
       // Generate initial LaTeX report
       const response = await fetch(`${BASE_URL}api/report/generate-initial/`, {
         method: 'POST',
@@ -168,7 +154,6 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
       });
 
       const result = await response.json();
-      console.log('[DesignReportModal] generate-initial:response', { ok: response.ok, status: response.status, result });
 
       if (result.success) {
         setReportId(result.report_id);
@@ -196,13 +181,11 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
       console.error('[DesignReportModal] generate-initial:error', error);
       message.error("Error generating report. Please try again.");
     } finally {
-      console.log('[DesignReportModal] handleGenerateInitialReport:end');
       setLoading(false);
     }
   };
 
   const handleOpenPDF = async (selectedSections) => {
-    console.log('[DesignReportModal] handleOpenPDF:start', { reportId, selectedSectionsCount: selectedSections?.length });
     try {
       // Generate customized PDF and open in new tab
       const response = await fetch(`${BASE_URL}api/report/customize/`, {
@@ -235,7 +218,6 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
   };
 
   const handleSavePDF = async (selectedSections) => {
-    console.log('[DesignReportModal] handleSavePDF:start', { reportId, selectedSectionsCount: selectedSections?.length });
     try {
       // Generate customized PDF and download
       const response = await fetch(`${BASE_URL}api/report/customize/`, {
@@ -276,7 +258,6 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
   };
 
   const handleSectionsChange = (newSelectedSections) => {
-    console.log('[DesignReportModal] sections:update', { count: newSelectedSections?.length });
     setSelectedSections(newSelectedSections);
   };
 

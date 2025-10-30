@@ -101,10 +101,8 @@ export const ModuleProvider = ({ children }) => {
    */
   const getModuleData = useCallback(async (moduleName, options = {}) => {
     try {
-      // console.log("🚀 [MODULE CONTEXT] getModuleData called:", { moduleName, options });
 
       if (!moduleName) {
-        // console.error("❌ [MODULE CONTEXT] No module name provided");
         dispatch({ type: "SET_ERR_MSG", payload: "Module name is required" });
         return { success: false, error: "Module name is required" };
       }
@@ -122,9 +120,6 @@ export const ModuleProvider = ({ children }) => {
       if (email) {
         url += `&email=${encodeURIComponent(email)}`;
       }
-
-      // console.log("🌐 [MODULE CONTEXT] API Request:", url);
-
       const response = await fetch(url, {
         method: "GET",
         mode: "cors",
@@ -136,14 +131,11 @@ export const ModuleProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      // console.log("✅ [MODULE CONTEXT] Data received:", Object.keys(data));
-
       // Dispatch comprehensive data update
       dispatch({ type: "SET_ALL_MODULE_DATA", payload: data });
 
       return { success: true, data };
     } catch (error) {
-      // console.error("❌ [MODULE CONTEXT] Error loading module data:", error);
       dispatch({ type: "SET_ERR_MSG", payload: "Failed to load module data" });
       return { success: false, error: error.message };
     }
@@ -165,7 +157,6 @@ export const ModuleProvider = ({ children }) => {
    */
   const manageCustomMaterials = useCallback(async (action, data = {}) => {
     try {
-      console.log("🔧 [MODULE CONTEXT] manageCustomMaterials:", { action, data });
 
       switch (action) {
         case 'add': {
@@ -225,7 +216,6 @@ export const ModuleProvider = ({ children }) => {
           return { success: false, error: "Invalid action specified" };
       }
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error managing custom materials:", error);
       return { success: false, error: error.message };
     }
   }, [getModuleData, dispatch, state.currentModuleName]);
@@ -254,7 +244,6 @@ export const ModuleProvider = ({ children }) => {
    */
   const createCADModel = useCallback(async (inputData, moduleId, onCADSuccess = null) => {
     try {
-      console.log("🎯 [MODULE CONTEXT] Creating CAD model:", { moduleId, hasInputData: !!inputData });
 
       const response = await fetch(`${BASE_URL}design/cad`, {
         method: "POST",
@@ -280,7 +269,6 @@ export const ModuleProvider = ({ children }) => {
       }
 
       if (response.status === 201 && data.status === "success") {
-        console.log("✅ [MODULE CONTEXT] CAD Model Generated Successfully" + response.json);
 
         // Store CAD data and trigger rendering
         dispatch({ type: "SET_CAD_MODEL_PATHS", payload: data.files });
@@ -290,9 +278,7 @@ export const ModuleProvider = ({ children }) => {
         if (onCADSuccess && typeof onCADSuccess === 'function') {
           try {
             await onCADSuccess();
-            console.log("✅ [MODULE CONTEXT] CAD success callback executed");
           } catch (error) {
-            console.error("❌ [MODULE CONTEXT] Error in CAD success callback:", error);
           }
         }
 
@@ -301,7 +287,6 @@ export const ModuleProvider = ({ children }) => {
         throw new Error(`CAD generation failed: ${data.message || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error in createCADModel:", error);
       dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
       return { success: false, error: error.message };
     }
@@ -313,7 +298,6 @@ export const ModuleProvider = ({ children }) => {
    */
   const downloadCADModel = useCallback(async (format) => {
     try {
-      console.log("📥 [MODULE CONTEXT] Downloading CAD model in format:", format);
 
       const response = await fetch(`${BASE_URL}design/downloadCad/`, {
         method: "POST",
@@ -333,10 +317,8 @@ export const ModuleProvider = ({ children }) => {
       }
 
       const blob = await response.blob();
-      console.log("✅ [MODULE CONTEXT] CAD file downloaded successfully");
       return { success: true, blob };
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error downloading CAD model:", error);
       return { success: false, error: error.message };
     }
   }, []);
@@ -352,7 +334,6 @@ export const ModuleProvider = ({ children }) => {
    */
   const generateReport = useCallback(async (type, params = {}) => {
     try {
-      console.log("📄 [MODULE CONTEXT] Generating report:", { type, params });
 
       switch (type.toLowerCase()) {
         case 'pdf': {
@@ -380,7 +361,6 @@ export const ModuleProvider = ({ children }) => {
             link.click();
             link.remove();
 
-            console.log("✅ [MODULE CONTEXT] PDF downloaded successfully");
             return { success: true, message: "PDF downloaded successfully" };
           } else {
             throw new Error(`PDF generation failed: ${response.status} ${response.statusText}`);
@@ -395,14 +375,12 @@ export const ModuleProvider = ({ children }) => {
           });
 
           const result = await response.json();
-          console.log("✅ [MODULE CONTEXT] CSV generated successfully");
           return { success: true, data: result };
         }
 
         case 'design_report': {
           // Use external API for design report generation
           const { moduleId, inputValues, designStatus = true, logs = [] } = params;
-          console.log("🛠️ [MODULE CONTEXT] Generating design report with params:", params);
           return apiCreateDesignReport(params, moduleId, inputValues, designStatus, logs, uploadCompanyLogo, generateReport);
         }
 
@@ -410,7 +388,6 @@ export const ModuleProvider = ({ children }) => {
           throw new Error(`Unsupported report type: ${type}`);
       }
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error generating report:", error);
       return { success: false, error: error.message };
     }
   }, []);
@@ -422,7 +399,6 @@ export const ModuleProvider = ({ children }) => {
    */
   const uploadCompanyLogo = useCallback(async (companyLogo, companyLogoName) => {
     try {
-      console.log("🏢 [MODULE CONTEXT] Uploading company logo:", companyLogoName);
 
       // Store in localStorage for caching
       if (companyLogo && companyLogoName) {
@@ -449,13 +425,11 @@ export const ModuleProvider = ({ children }) => {
 
       if (response.status === 201) {
         const result = await response.json();
-        console.log("✅ [MODULE CONTEXT] Logo uploaded successfully");
         return { success: true, logoPath: result.logoFullPath };
       } else {
         throw new Error(`Logo upload failed: ${response.status}`);
       }
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error uploading logo:", error);
       return { success: false, error: error.message };
     }
   }, []);
@@ -471,7 +445,6 @@ export const ModuleProvider = ({ children }) => {
    */
   const manageDesignPreferences = useCallback(async (action, params = {}) => {
     try {
-      console.log("⚙️ [MODULE CONTEXT] Managing design preferences:", { action, params });
 
       switch (action) {
         case 'get': {
@@ -491,7 +464,6 @@ export const ModuleProvider = ({ children }) => {
           const data = await response.json();
           dispatch({ type: "SAVE_DESIGN_PREF_DATA", payload: data });
 
-          console.log("✅ [MODULE CONTEXT] Design preferences loaded");
           return { success: true, data };
         }
 
@@ -506,7 +478,6 @@ export const ModuleProvider = ({ children }) => {
             dispatch({ type: "SAVE_STM_DETAILS", payload: [materialData] });
           }
 
-          console.log("✅ [MODULE CONTEXT] Material details updated");
           return { success: true, message: "Material details updated" };
         }
 
@@ -519,15 +490,13 @@ export const ModuleProvider = ({ children }) => {
             dispatch({ type: "UPDATE_SUPPORTED_ST_DATA", payload: materialValue });
           }
 
-          console.log("✅ [MODULE CONTEXT] Section data updated");
           return { success: true, message: "Section data updated" };
         }
 
         default:
           throw new Error(`Unsupported preference action: ${action}`);
       }
-    } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error managing design preferences:", error);
+    } catch (error) {   
       return { success: false, error: error.message };
     }
   }, [dispatch]);

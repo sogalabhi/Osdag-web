@@ -421,7 +421,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 #we do not have plate in just like in finplate case, we have cleatAngle which is combination of angle & nutbolts
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    """Generate the CAD model from input values as a BREP file. Return file path."""
+    from osdag_api.modules.mesh_export import write_stl
+    from OCC.Core.BRep import BRep_Builder
+    from OCC.Core.TopoDS import TopoDS_Compound
+    from OCC.Core.Message import Message_ProgressRange
+    
     if section not in ("Model", "Beam", "Column", "cleatAngle"):  # Error checking: If section is valid.
         raise InvalidInputTypeError(
             "section", "'Model', 'Beam', 'Column' or 'cleatAngle'")
@@ -429,13 +433,9 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     # First check if we have valid output before attempting CAD generation
     try:
         output, logs = generate_output(input_values)
-        print(f'CleatAngle CAD - Checking output before CAD generation: {len(output)} keys')
-        
         if not output or len(output) == 0:
             print('CleatAngle CAD - No valid output found. Cannot generate CAD model.')
             raise ValueError("Cannot generate CAD model: No valid design output found. Please ensure the design calculation completed successfully.")
-            
-        print('CleatAngle CAD - Valid output found, proceeding with CAD generation')
     except Exception as e:
         print(f'CleatAngle CAD - Error checking output: {e}')
         raise ValueError(f"Cannot generate CAD model: Design calculation failed - {str(e)}")
@@ -444,7 +444,6 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     print('module from input values : ' , module)
     # Object that will create the CAD model.
     try : 
-        print(module.module)
         cld = CommonDesignLogic(None, '', module.module , module.mainmodule)
     except Exception as e : 
         print('error in cld e : ' , e)
@@ -453,57 +452,78 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         # Setup the calculations object for generating CAD model.
         scc.setup_for_cad(cld, module)
     except Exception as e : 
+        import traceback
         traceback.print_exc()
         print('Error in setting up cad e : ' , e)
 
-    # The section of the module that will be generated.
     cld.component = section
-    
-    try : 
-        model = cld.create2Dcad()  # Generate CAD Model.
-    except Exception as e :
-        print('Error in cld.create2Dcad() e : ' , e)
-        return False
 
-    # check if the cad_models folder exists or not 
-    # if no, then create one 
-    if(not os.path.exists(os.path.join(os.getcwd() , "file_storage/cad_models/"))) :
-        print('path does not exists cad_models , creating one')
-        os.mkdir(os.path.join(os.getcwd() , "file_storage/cad_models/"))
-      
-    print('2d model : ' , model)
-    # os.system("clear")  # clear the terminal
-    file_name = session + "_" + section + ".brep"
-    file_path = "file_storage/cad_models/" + file_name
-    print('brep file path in create_cad_model : ' , file_path)
-
-    try : 
-        BRepTools.breptools.Write(model, file_path, Message_ProgressRange()) # Generate CAD Model
-        
+    part_names = ["Beam", "Column", "cleatAngle", "Weld", "Welds", "Bolt", "Bolts"]
+    try:
         if section == "Model":
-            # Save STEP
-            step_writer = STEPControl_Writer()
-            step_writer.Transfer(model, STEPControl_AsIs)
-            step_file_path = file_path.replace(".brep", ".step")
-            full_step_file_path = os.path.join(os.getcwd(), step_file_path)
-            if step_writer.Write(full_step_file_path) == 1:
-                print(f"STEP file saved at {full_step_file_path}")
-            else:
-                print("Warning: Failed to save STEP file!")
+            # Build compound by adding each part shape without fusing
+            builder = BRep_Builder()
+            compound = TopoDS_Compound()
+            builder.MakeCompound(compound)
+            for part in part_names:
+                try:
+                    cld.component = part
+                    part_shape = cld.create2Dcad()
+                    if part_shape is None:
+                        continue
+                    builder.Add(compound, part_shape)
+                    part_file_name = f"{session}_{part}.brep"
+                    part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
+                    full_brep_path = os.path.join(os.getcwd(), part_file_path_rel)
+                    from OCC.Core import BRepTools
+                    BRepTools.breptools.Write(part_shape, full_brep_path, Message_ProgressRange())
+                    # STL as well
+                    part_stl_file = part_file_path_rel.replace(".brep", ".stl")
+                    try:
+                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_file))
+                    except Exception as e:
+                        print(f"Failed to write STL for part {part} (CleatAngle):", e)
+                except Exception as e:
+                    print(f"Failed generating cad part {part} in CleatAngle: {e}")
 
-            # Save IGES
-            iges_writer = IGESControl_Writer()
-            iges_writer.AddShape(model)
-            iges_file_path = file_path.replace(".brep", ".iges")
-            full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
-            if iges_writer.Write(full_iges_file_path) == 1:
-                print(f"IGES file saved at {full_iges_file_path}")
-            else:
-                print("Warning: Failed to save IGES file!")
-        
-    except Exception as e : 
-        print('Writing to BREP file failed e : ' , e)
-    
-    return file_path
+            # Now write the compound as the Model
+            cld.component = "Model"
+            model = compound
+            compound_file_name = f"{session}_Model.brep"
+            compound_file_path_rel = os.path.join("file_storage", "cad_models", compound_file_name)
+            from OCC.Core import BRepTools
+            BRepTools.breptools.Write(model, os.path.join(os.getcwd(), compound_file_path_rel), Message_ProgressRange())
+            # Compound/model STL (for completeness, not loaded in UI)
+            compound_stl_file = compound_file_path_rel.replace(".brep", ".stl")
+            try:
+                write_stl(model, os.path.join(os.getcwd(), compound_stl_file))
+            except Exception as e:
+                print("Failed to write Model STL for CleatAngle:", e)
+            return compound_file_path_rel
+        else:
+            try :
+                model = cld.create2Dcad()  # Generate CAD Model.
+            except Exception as e :
+                print('Error in cld.create2Dcad() e : ' , e)
+                return False
+            if(not os.path.exists(os.path.join(os.getcwd() , "file_storage/cad_models/"))) :
+                print('path does not exists cad_models , creating one')
+                os.mkdir(os.path.join(os.getcwd() , "file_storage/cad_models/"))
+            print('2d model : ' , model)
+            file_name = session + "_" + section + ".brep"
+            file_path = "file_storage/cad_models/" + file_name
+            print('brep file path in create_cad_model : ' , file_path)
+            try :
+                from OCC.Core import BRepTools
+                BRepTools.breptools.Write(model, os.path.join(os.getcwd(), file_path), Message_ProgressRange())
+                # Write STL too
+                stl_file_path = file_path.replace(".brep", ".stl")
+                write_stl(model, os.path.join(os.getcwd(), stl_file_path))
+            except Exception as e :
+                print('Writing to BREP or STL file failed e : ' , e)
+            return file_path
+    except Exception as top_e:
+        print('Top-level error in CleatAngle create_cad_model:', top_e)
+        return False
 
 

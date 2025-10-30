@@ -25,8 +25,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
       const stlLoader = new STLLoader();
       const parsedData = {};
       const partsGroup = new THREE.Group();
-      const partKeys = new Set(["Beam", "Column", "Plate", "Weld", "Welds", "Bolt", "Bolts", "cleatAngle"]);
-
+      const partKeys = new Set(["Beam", "Column", "Plate", "Weld", "Welds", "Bolt", "Bolts", "cleatAngle", "SeatedAngle"]);
       Object.entries(modelPaths).forEach(([key, dataUrl]) => {
         try {
           if (typeof dataUrl === 'string' && dataUrl.startsWith('data:application/octet-stream;base64,')) {
@@ -55,6 +54,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
               Bolts: '#996633',
               cleatAngle: '#2f2f23',
               Model: '#999999',
+              seatedAngle: '#2f2f23',
             };
             const material = new THREE.MeshStandardMaterial({
               color: colorMap[key] ?? colorMap[key?.toLowerCase?.()] ?? '#888888',
@@ -101,13 +101,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
       if (c.type === "Mesh") {
         // Debug: log each mesh encountered in traversal
         try {
-          console.log('[btobRender] Found mesh in traversal:', {
-            name: c.name,
-            type: c.type,
-            material: c.material?.name || null,
-            geomType: c.geometry?.type || null,
-          });
-        } catch (e) {}
+        } catch (e) { }
         c.material.map = texture;
         c.material.needsUpdate = true;
         g = c.geometry;

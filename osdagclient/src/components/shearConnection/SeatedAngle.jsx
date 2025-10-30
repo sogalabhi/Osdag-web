@@ -170,7 +170,7 @@ function SeatedAngle() {
   const [modelKey, setModelKey] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectedView, setSelectedView] = useState("Model");
-  const options = ["Model", "Beam", "Column", "SeatAngle"];
+  const options = ["Model", "Beam", "Column", "SeatedAngle"];
   const [screenshotTrigger, setScreenshotTrigger] = useState(false);
   const triggerScreenshotCapture = () => {
     setScreenshotTrigger(true);
@@ -287,7 +287,6 @@ function SeatedAngle() {
       try {
         setLogs(designLogs);
       } catch (error) {
-        console.log(error);
         setOutput(null);
       }
     }
@@ -309,9 +308,7 @@ function SeatedAngle() {
         }
 
         setOutput(formatedOutput);
-        console.log("formated Output", formatedOutput);
       } catch (error) {
-        console.log(error);
         setOutput(null);
       }
     }
@@ -319,7 +316,6 @@ function SeatedAngle() {
 
   const handleSubmit = async () => {
     let param = {};
-    console.log(allSelected, boltDiameterList);
     if (
       selectedOption === "Column Flange-Beam-Web" ||
       selectedOption === "Column Web-Beam-Web"
@@ -403,8 +399,6 @@ function SeatedAngle() {
     //       connectorTopSelect == "All" ? topAngleList : inputs.topangle_list,
     //   };
     // }
-
-    console.log("Final Params: ", param);
 
     try {
       await createDesign(param, "Seated-Angle-Connection");
@@ -492,7 +486,6 @@ function SeatedAngle() {
 
   useEffect(() => {
     if (renderCadModel && cadModelPaths) {
-      console.log("Received raw .obj data:", cadModelPaths);
       setRenderBoolean(true);
       setLoading(false);
     } else {
@@ -522,7 +515,6 @@ function SeatedAngle() {
       alert("Please submit the design first.");
       return;
     }
-    console.log("designreportInputs : ", designReportInputs);
     createDesignReport(designReportInputs);
     handleCancelProfile();
   };
@@ -810,35 +802,6 @@ function SeatedAngle() {
     inputs.secondary_beam,
     selectedOption,
   ]);
-
-  const obtainStoredCompanyLogoImages = () => {
-    console.log("obtain stored company logo images");
-
-    // obtaining the companyLogo
-    if (
-      localStorage.getItem("companyLogo") &&
-      localStorage.getItem("companyLogoName")
-    ) {
-      let storedCompanyLogo = localStorage.getItem("companyLogo");
-      storedCompanyLogo = JSON.parse(storedCompanyLogo);
-      // stored CompanyLogo is an array, it comtains the actual file
-      // the file is encoded. decode it as given below
-      // let companyLogo = base64_decode(storedCompanyLogo[0])
-
-      let storedCompanyLogoName = localStorage.getItem("companyLogoName");
-      storedCompanyLogoName = JSON.parse(storedCompanyLogoName);
-      // stored companylogoName is an array, it contains the name of the files
-      // the fileNaeme is encoded. decode it as given belows
-      // let companyLogoName = base64_decode(storedCompanyLogoName[0])
-
-      // an image consists of 2 parts, the companyLogo and the companyLogoName
-      // so the 0th index image will be formed by ( storedCompanyLogo[0] and storedCompanyLogoName[0] )
-      // the 1st index image will be formed by ( storedCompanyLogo[1] and storedCompanyLogoName[1] )
-    }
-  };
-
-  // console.log(angleList);
-  // console.log("topAngleList:", topAngleList);
   const navigate = useNavigate();
   return (
     <>
@@ -996,7 +959,6 @@ function SeatedAngle() {
                       const material = materialList.find(
                         (item) => item.id === value
                       );
-                      console.log(material);
                       setInputs({
                         ...inputs,
                         connector_material: material.Grade,
