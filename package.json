@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "dev": "npm --prefix osdagclient run dev"
+  },
   "dependencies": {
     "base-64": "^1.0.0",
     "file-saver": "^2.0.5",
