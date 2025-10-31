@@ -122,7 +122,7 @@ export const InputSection = ({
         'bolt_grade': 'propertyClassList',
         'plate_thickness': 'thicknessList',
         'angle_list': 'angleList',
-        'cleat_section': 'angleList', // <-- PATCHED: point to angleList for cleat_section
+        'cleat_section': 'angleList',
       };
       const listName = keyMap[inputKey];
       return Array.isArray(safeContextData[listName]) ? safeContextData[listName] : [];

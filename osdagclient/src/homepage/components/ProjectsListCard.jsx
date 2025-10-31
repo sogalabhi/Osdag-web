@@ -1,5 +1,16 @@
 import React from 'react';
 import { Button, Popconfirm, message, Spin, Empty } from 'antd';
+import { DesignReportModal } from '../../modules/shared/components/DesignReportModal';
+import { finPlateConfig } from '../../modules/shearConnection/finPlate/configs/finPlateConfig';
+import { endPlateConfig } from '../../modules/shearConnection/endPlate/configs/endPlateConfig';
+import { cleatAngleConfig } from '../../modules/shearConnection/cleatAngle/configs/cleatAngleConfig';
+import { seatedAngleConfig } from '../../modules/shearConnection/seatAngle/configs/seatedAngleConfig';
+import { coverPlateBoltedConfig } from '../../modules/coverPlateBolted/configs/coverPlateBoltedConfig';
+import { coverPlateWeldedConfig } from '../../modules/coverPlateWelded/configs/coverPlateWeldedConfig';
+import { beamBeamEndPlateConfig } from '../../modules/beamBeamEndPlate/configs/beamBeamEndPlateConfig';
+import { beamToColumnEndPlateConfig } from '../../modules/beamToColumnEndPlate/configs/beamToColumnEndPlateConfig';
+import { boltedToEndConfig } from '../../modules/TensionMembers/BoltedToEnd/configs/boltedToEndConfig';
+import { simplySupportedBeamConfig } from '../../modules/flexuralMember/simplySupportedBeam/configs/simplySupportedBeamConfig';
 import { ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { isGuestUser, getCurrentUserEmail } from '../../utils/auth';
@@ -9,6 +20,25 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   const [projects, setProjects] = React.useState(projectsProp);
   const [loading, setLoading] = React.useState(loadingProp);
   const [deletingProject, setDeletingProject] = React.useState(null);
+  const [reportProject, setReportProject] = React.useState(null);
+  const [reportModalOpen, setReportModalOpen] = React.useState(false);
+  const [designReportInputs, setDesignReportInputs] = React.useState({
+    companyName: "Your company",
+    groupTeamName: "Your team",
+    designer: "You",
+    projectTitle: "",
+    subtitle: "",
+    jobNumber: "1",
+    client: "Someone else",
+    additionalComments: "No comments",
+    companyLogo: null,
+    companyLogoName: "",
+  });
+  const [reportInputValues, setReportInputValues] = React.useState({});
+  const [reportModuleId, setReportModuleId] = React.useState(null);
+  const [reportModuleConfig, setReportModuleConfig] = React.useState(null);
+  const [reportAllSelected, setReportAllSelected] = React.useState({});
+  const [reportExtraState, setReportExtraState] = React.useState({});
   const navigate = useNavigate();
 
   const BASE_URL = 'http://localhost:8000/api/';
@@ -60,6 +90,58 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
     setDeletingProject(projectId);
     if (onDeleteProject) await onDeleteProject(projectId);
     setDeletingProject(null);
+  };
+
+  const handleGenerateReportClick = async (project) => {
+    try {
+      const detail = await fetchProjectDetail(project.id);
+      setReportProject(project);
+      setReportInputValues(detail?.inputs_json || {});
+      const modId = detail?.submodule || detail?.module || 'FinPlateConnection';
+      setReportModuleId(modId);
+      // Resolve moduleConfig to reuse DesignReportModal logic
+      const resolver = {
+        'FinPlateConnection': finPlateConfig,
+        'End-Plate-Connection': endPlateConfig,
+        'Cleat-Angle-Connection': cleatAngleConfig,
+        'Seated-Angle-Connection': seatedAngleConfig,
+        'Cover-Plate-Bolted-Connection': coverPlateBoltedConfig,
+        'Beam-Beam-End-Plate-Connection': beamBeamEndPlateConfig,
+        'Cover-Plate-Welded-Connection': coverPlateWeldedConfig,
+        'Beam-to-Column-End-Plate-Connection': beamToColumnEndPlateConfig,
+        'Tension-Member-Bolted-Design': boltedToEndConfig,
+        'Simply-Supported-Beam': simplySupportedBeamConfig,
+      };
+      const cfg = resolver[modId] || null;
+      setReportModuleConfig(cfg);
+      // allSelected: set all to false so saved arrays are used as-is
+      if (cfg && Array.isArray(cfg.selectionConfig)) {
+        const initSel = cfg.selectionConfig.reduce((acc, s) => { acc[s.inputKey] = false; return acc; }, {});
+        setReportAllSelected(initSel);
+      } else {
+        setReportAllSelected({});
+      }
+      // extraState: carry connectivity for FinPlate (or default)
+      const defaultConnectivity = 'Column Flange-Beam-Web';
+      const selectedOption = (detail?.inputs_json && detail.inputs_json.connectivity) || defaultConnectivity;
+      setReportExtraState({ selectedOption });
+      setReportModalOpen(true);
+    } catch (e) {
+      message.error(e.message || 'Failed to load project');
+    }
+  };
+
+  const fetchProjectDetail = async (projectId) => {
+    const res = await fetch(`${BASE_URL}projects/${projectId}/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAccessToken()}`,
+      },
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Failed to load project');
+    return data.project;
   };
 
   const handleOpenProject = async (project) => {
@@ -202,7 +284,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-all duration-300 max-h-0 group-hover:max-h-20 overflow-hidden">
                   <Button type="default" size="small" className="px-3 py-1.5 text-xs font-medium" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleOpenProject(project); }}>Open Project</Button>
-                  <Button type="default" size="small" disabled className="px-3 py-1.5 text-xs font-medium" icon={<FileTextOutlined />}>Generate Report</Button>
+                  <Button type="default" size="small" className="px-3 py-1.5 text-xs font-medium" icon={<FileTextOutlined />} onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleGenerateReportClick(project); }}>Download Report</Button>
                   <Button type="default" size="small" className="px-3 py-1.5 text-xs font-medium" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadOsi(project); }}>Download OSI</Button>
                   <Popconfirm title="Are you sure you want to delete this project?" onConfirm={() => handleDeleteProject(project.id)} okText="Yes" cancelText="No">
                     <Button type="text" danger>Delete</Button>
@@ -213,6 +295,21 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
           </div>
         </div>
       ))}
+
+      <DesignReportModal
+        isOpen={reportModalOpen}
+        onCancel={() => { setReportModalOpen(false); setReportProject(null); }}
+        onOk={() => { setReportModalOpen(false); setReportProject(null); }}
+        designReportInputs={designReportInputs}
+        setDesignReportInputs={setDesignReportInputs}
+        output={{}} /* truthy to satisfy modal precondition */
+        moduleId={reportModuleId}
+        inputValues={reportInputValues}
+        logs={[]}
+        moduleConfig={reportModuleConfig}
+        allSelected={reportAllSelected}
+        extraState={reportExtraState}
+      />
     </>
   );
 };

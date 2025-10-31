@@ -33,79 +33,9 @@ export const createDesign = async (param, module_id, onCADSuccess = null, dispat
   }
 };
 
-export const createDesignReport = async (params, moduleId = null, inputValues = null, designStatus = true, logs = [], fetchCompanyLogo) => {
-  const logoFullPath = params.companyLogo
-    ? await fetchCompanyLogo(params.companyLogo, params.companyLogoName)
-    : "";
-  try {
-    const sanitizedInputs = inputValues ? JSON.parse(JSON.stringify(inputValues)) : null;
-    const sanitizedLogs = Array.isArray(logs) ? JSON.parse(JSON.stringify(logs)) : [];
-    const normalizedModuleId = moduleId || null;
-
-    const requestBody = {
-      metadata: {
-        ProfileSummary: {
-          CompanyName: params.companyName,
-          CompanyLogo: logoFullPath ? logoFullPath : "",
-          "Group/TeamName": params.groupTeamName,
-          Designer: params.designer,
-        },
-        ProjectTitle: params.projectTitle,
-        Subtitle: params.subtitle,
-        JobNumber: params.jobNumber,
-        AdditionalComments: params.additionalComments,
-        Client: params.client,
-      },
-      module_id: normalizedModuleId,
-      input_values: sanitizedInputs,
-      design_status: designStatus,
-      logs: sanitizedLogs,
-    };
-
-    // Then stringify for sending
-    const body = JSON.stringify(requestBody);
-
-    const response = await fetch(`${BASE_URL}generate-report`, {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: body,
-    });
-    const jsonResponse = await response?.json();
-    if (response.status == 201 && jsonResponse?.report_id) {
-      // Download the PDF directly from backend without opening a new tab
-      try {
-        const pdfUrl = `${BASE_URL}getPDF?report_id=${jsonResponse.report_id}`;
-        const pdfRes = await fetch(pdfUrl, {
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'include'
-        });
-        if (!pdfRes.ok) {
-          throw new Error(`PDF fetch failed: ${pdfRes.status} ${pdfRes.statusText}`);
-        }
-        const blob = await pdfRes.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `osdag_report_${jsonResponse.report_id}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(url);
-      } catch (e) {
-        console.warn('PDF direct download failed, exposing report_id to caller.', e);
-      }
-      return { success: true, report_id: jsonResponse.report_id };
-    }
-    const errorMsg = jsonResponse?.message || 'Report generation failed';
-    return { success: false, error: errorMsg };
-  } catch (error) {
-    return { success: false, error: error?.message || 'Network error' };
-  }
+// Deprecated: legacy design-report flow removed. Use the 3-step flow in DesignReportModal instead.
+export const createDesignReport = async () => {
+  return { success: false, error: 'Legacy design-report flow removed. Use generate-initial/parse-sections/customize.' };
 };
 
 export const getModuleData = async (moduleName) => {

@@ -337,34 +337,7 @@ export const ModuleProvider = ({ children }) => {
 
       switch (type.toLowerCase()) {
         case 'pdf': {
-          const { report_id } = params;
-          if (!report_id) {
-            throw new Error("Report ID is required for PDF generation");
-          }
-
-          const response = await fetch(`${BASE_URL}getPDF?report_id=${report_id}`, {
-            method: "GET",
-            mode: "cors",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "Cache-Control": "no-cache",
-              Pragma: "no-cache",
-            },
-          });
-
-          if (response.ok) {
-            // Auto-download the PDF
-            const link = document.createElement("a");
-            link.href = response.url;
-            link.setAttribute("download", `osdag_report_${report_id}.pdf`);
-            link.click();
-            link.remove();
-
-            return { success: true, message: "PDF downloaded successfully" };
-          } else {
-            throw new Error(`PDF generation failed: ${response.status} ${response.statusText}`);
-          }
+          return { success: false, error: 'Legacy PDF endpoint removed. Use the in-app report modal (generate-initial → parse-sections → customize).' };
         }
 
         case 'csv': {
@@ -379,9 +352,7 @@ export const ModuleProvider = ({ children }) => {
         }
 
         case 'design_report': {
-          // Use external API for design report generation
-          const { moduleId, inputValues, designStatus = true, logs = [] } = params;
-          return apiCreateDesignReport(params, moduleId, inputValues, designStatus, logs, uploadCompanyLogo, generateReport);
+          return { success: false, error: 'Legacy design-report flow removed. Use the in-app report modal.' };
         }
 
         default:

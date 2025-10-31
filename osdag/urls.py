@@ -65,8 +65,9 @@ urlpatterns = [
     # New APIs
     path('populate', InputData.as_view()),
     path('design', DesignView.as_view()),
-    path('generate-report' , CreateDesignReport.as_view()),
-    path('getPDF' , GetPDF.as_view()),
+#     Legacy
+#     path('generate-report' , CreateDesignReport.as_view()),
+#     path('getPDF' , GetPDF.as_view()),
     path('design-preferences/', DesignPreference.as_view(), name="design-pref"),
     path('materialDetails/', MaterialDetails.as_view()),
     path('company-logo/' , CompanyLogoView.as_view()),

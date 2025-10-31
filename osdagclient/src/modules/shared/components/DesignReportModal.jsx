@@ -219,7 +219,6 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
 
   const handleSavePDF = async (selectedSections) => {
     try {
-      // Generate customized PDF and download
       const response = await fetch(`${BASE_URL}api/report/customize/`, {
         method: 'POST',
         headers: {
@@ -232,9 +231,23 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
         }),
       });
 
-      if (response.ok) {
-        // Download the PDF
-        const blob = await response.blob();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        message.error(errorData.error || "Failed to generate customized report");
+        return;
+      }
+
+      const blob = await response.blob();
+
+      if (window.showSaveFilePicker) {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: `Osdag_Custom_Report_${reportId}.pdf`,
+          types: [{ description: 'PDF', accept: { 'application/pdf': ['.pdf'] } }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+      } else {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -243,14 +256,11 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
         link.click();
         link.remove();
         window.URL.revokeObjectURL(url);
-
-        message.success("Customized report saved successfully!");
-        setShowCustomization(false);
-        onOk && onOk();
-      } else {
-        const errorData = await response.json();
-        message.error(errorData.error || "Failed to generate customized report");
       }
+
+      message.success("Customized report saved successfully!");
+      setShowCustomization(false);
+      onOk && onOk();
     } catch (error) {
       console.error('[DesignReportModal] handleSavePDF:error', error);
       message.error("Error saving PDF. Please try again.");
