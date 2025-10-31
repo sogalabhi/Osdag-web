@@ -23,6 +23,12 @@ class SaveOsiFromInputs(APIView):
             name = request.data.get('name')
             module_id = request.data.get('module_id')
             inputs = request.data.get('inputs')
+            inline = False
+            try:
+                # allow caller to force inline/base64 response even for authenticated users
+                inline = bool(request.data.get('inline')) or bool(request.GET.get('inline'))
+            except Exception:
+                inline = False
 
             payload = build_osi_payload(name=name, module_id=module_id, inputs=inputs or {})
             
@@ -34,8 +40,8 @@ class SaveOsiFromInputs(APIView):
             if not hasattr(request, 'user') or not request.user.is_authenticated:
                 is_guest = True
 
-            # For guests: return OSI content for download (no DB save)
-            if is_guest:
+            # For guests OR when inline flag is set: return OSI content for download (no DB save)
+            if is_guest or inline:
                 import base64
                 content_file = make_osifile_contentfile(payload)
                 content_bytes = content_file.read()
@@ -99,7 +105,17 @@ class OpenOsiUpload(APIView):
 
             content = uploaded.read().decode('utf-8', errors='replace')
             module_id, name, inputs = parse_osi(content)
-            return JsonResponse({'success': True, 'module_id': module_id, 'name': name, 'inputs': inputs}, safe=False)
+            # Map to new response contract as well
+            mapped = {
+                'success': True,
+                'module_id': module_id,
+                'name': name,
+                'inputs': inputs,
+                'module': None,
+                'submodule': module_id,
+                'inputs_json': inputs,
+            }
+            return JsonResponse(mapped, safe=False)
         except Exception as e:
             print('Error in OpenOsiUpload:', e)
             return JsonResponse({'success': False, 'error': str(e)}, safe=False, status=400)
@@ -121,7 +137,7 @@ class OpenOsiById(APIView):
                 return JsonResponse({'success': False, 'error': 'Access denied'}, safe=False, status=403)
             content = osifile.file.read().decode('utf-8', errors='replace')
             module_id, name, inputs = parse_osi(content)
-            return JsonResponse({'success': True, 'module_id': module_id, 'name': name, 'inputs': inputs, 'url': osifile.file.url}, safe=False)
+            return JsonResponse({'success': True, 'module_id': module_id, 'name': name, 'inputs': inputs, 'module': None, 'submodule': module_id, 'inputs_json': inputs, 'url': osifile.file.url}, safe=False)
         except OsiFile.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'OSI file not found'}, safe=False, status=404)
         except Exception as e:
@@ -145,4 +161,40 @@ class ModuleRoutes(APIView):
         }
         return JsonResponse({'success': True, 'routes': routes}, safe=False)
 
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ProjectOsiDownload(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, project_id):
+        try:
+            # Determine requester email
+            requester_email = getattr(request.user, 'email', None)
+            if not requester_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
+                requester_email = request.auth.get('email')
+
+            project = Project.objects.get(id=project_id, user_email=requester_email)
+
+            inputs = getattr(project, 'inputs_json', None) or {}
+            if inputs is None:
+                inputs = {}
+
+            # Choose module identifier for OSI payload (prefer submodule, fallback to module)
+            module_id = getattr(project, 'submodule', None) or getattr(project, 'module', None) or 'FinPlateConnection'
+
+            payload = build_osi_payload(name=project.name or 'project', module_id=module_id, inputs=inputs)
+            content_file = make_osifile_contentfile(payload)
+
+            safe_name = (project.name or 'project').replace(' ', '_')[:50]
+            filename = f"{safe_name}.osi"
+
+            from django.http import HttpResponse
+            resp = HttpResponse(content_file.read(), content_type='text/plain')
+            resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return resp
+        except Project.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Project not found or access denied'}, safe=False, status=404)
+        except Exception as e:
+            print('Error generating OSI for project:', e)
+            return JsonResponse({'success': False, 'error': str(e)}, safe=False, status=400)
 

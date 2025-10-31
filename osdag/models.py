@@ -17,6 +17,11 @@ osi_file_storage = FileSystemStorage(
 class Project(models.Model):
     """Project object to store minimal project info and file location."""
     name = models.CharField(max_length=200)
+    # Optional module and submodule identifiers for routing/reporting
+    module = models.CharField(max_length=200, blank=True, null=True)
+    submodule = models.CharField(max_length=200, blank=True, null=True)
+    # Canonical inputs persisted as JSON
+    inputs_json = models.JSONField(blank=True, null=True)
     osi_file_path = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

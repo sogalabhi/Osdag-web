@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import ProjectCard from './ProjectCard';
-import RecentProjects from '../../components/RecentProjects';
-// import { recentModules } from '../data/mockData'; // Remove mockData import
+import DashboardSectionCard from './DashboardSectionCard';
+import ProjectsListCard from './ProjectsListCard';
+import ModulesListCard from './ModulesListCard';
 import { isGuestUser, getCurrentUserEmail, getAccessToken } from '../../utils/auth';
 import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE, MODULE_KEY_SEAT_ANGLE, MODULE_DISPLAY_SEAT_ANGLE } from '../../constants/DesignKeys';
 
@@ -100,19 +100,15 @@ const MainContent = () => {
     <div className=" flex-1 px-12 pb-6">
       <div className="max-w-7xl mx-auto h-full">
         <div className={`grid grid-cols-1 ${isGuest ? 'xl:grid-cols-1' : 'xl:grid-cols-2'} gap-8 h-full`}>
-          {/* Recent Projects Card */}
-          <div className=" rounded-lg shadow-sm  p-6">
-            <RecentProjects projects={projects} loading={loading} onDeleteProject={handleDeleteProject} />
-          </div>
-          
-          {/* Recently used Modules Card - Hidden for guests */}
-          {!isGuest && (
-            <ProjectCard 
-              title="Recently used Modules"
-              items={recentModules}
-              type="module"
-            />
-          )}
+          {/* Recent Projects */}
+          <DashboardSectionCard title="Recent Projects">
+            <ProjectsListCard projects={projects} loading={loading} onDeleteProject={handleDeleteProject} />
+          </DashboardSectionCard>
+
+          {/* Recently used Modules */}
+          <DashboardSectionCard title="Recently used Modules">
+            <ModulesListCard items={recentModules} />
+          </DashboardSectionCard>
         </div>
       </div>
     </div>

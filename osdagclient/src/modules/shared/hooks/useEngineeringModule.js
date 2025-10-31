@@ -164,6 +164,45 @@ export const useEngineeringModule = (moduleConfig) => {
     }, {})
   );
 
+  // Initialize inputs arrays when default is "All" and arrays are empty
+  useEffect(() => {
+    const keyToFullListMap = {
+      bolt_diameter: boltDiameterList,
+      bolt_grade: propertyClassList,
+      plate_thickness: thicknessList,
+      flange_plate_thickness: thicknessList,
+      web_plate_thickness: thicknessList,
+      angle_list: angleList,
+      topangle_list: angleList,
+      cleat_section: angleList,
+    };
+
+    const nextInputs = { ...inputs };
+    let changed = false;
+
+    Object.entries(keyToFullListMap).forEach(([inputKey, fullList]) => {
+      if (!allSelected?.[inputKey]) return;
+      const current = inputs?.[inputKey];
+      const isEmptyArray = Array.isArray(current) ? current.length === 0 : !current;
+      if (!isEmptyArray) return;
+
+      const normalized = Array.isArray(fullList)
+        ? fullList.map((val) => {
+            if (typeof val === 'object' && val !== null) {
+              return val.value || val.Grade || String(val);
+            }
+            return String(val);
+          })
+        : [];
+      nextInputs[inputKey] = normalized;
+      changed = true;
+    });
+
+    if (changed) {
+      setInputs(nextInputs);
+    }
+  }, [boltDiameterList, propertyClassList, thicknessList, angleList, allSelected]);
+
   // Initialize extraState based on module type
   const getInitialExtraState = () => {
     if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {

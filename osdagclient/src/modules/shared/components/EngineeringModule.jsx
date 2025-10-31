@@ -135,6 +135,15 @@ export const EngineeringModule = ({
         if (!res.ok || !data.success) {
           message.warning('Project not found. Redirecting to home.');
           navigate('/');
+          return;
+        }
+        // Prefill inputs from saved project when opening by id
+        if (data.project && data.project.inputs_json) {
+          try {
+            setInputs(data.project.inputs_json);
+          } catch (_ignored) {
+            // ignore parse issues; user can overwrite via UI
+          }
         }
       } catch (_e) {
         message.warning('Cannot verify project. Redirecting to home.');
@@ -191,6 +200,25 @@ export const EngineeringModule = ({
     try {
       await handleSubmit();
       setShowResetButton(true);
+
+      // Persist latest inputs to project after design
+      if (!isGuest()) {
+        const pid = getProjectIdFromUrl();
+        if (pid && !Number.isNaN(pid)) {
+          try {
+            await fetch(`${BASE_URL}projects/${pid}/`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getAccessToken()}`,
+              },
+              body: JSON.stringify({ inputs_json: inputs }),
+            });
+          } catch (_e) {
+            // ignore persistence errors; UI will still show outputs
+          }
+        }
+      }
     } catch (error) {
     } finally {
       // Reset the redesigning state after completion
@@ -238,60 +266,60 @@ export const EngineeringModule = ({
     setSelectedCameraView("Model"); // Reset selected camera view
     setIsRedesigning(false); // Reset redesigning state
   };
-  // Save inputs to OSI file
+  // Save inputs to OSI file / Project (JSON-first)
   const handleSaveInputs = async () => {
     const userIsGuest = isGuest();
 
-    // For authenticated users: require project ID
-    if (!userIsGuest) {
-      const projectId = getProjectIdFromUrl();
-      if (!projectId || Number.isNaN(projectId)) {
-        message.warning('No active project. Open or create a project first.');
-        return;
-      }
-    }
-
     // Determine module_id - use designType from moduleConfig, or fallback to inputs.module
     const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || 'SeatedAngleConnection';
-
-    // Get project name from inputs or use default
     const projectName = inputs?.project_name || inputs?.name || moduleConfig?.sessionName || 'project';
 
     try {
-      const headers = {
-        'Content-Type': 'application/json',
+      // Expand inputs for any multi-selects where "All" is selected so arrays are populated
+      const expandAllSelectedInputs = (baseInputs) => {
+        const keyToFullListMap = {
+          bolt_diameter: boltDiameterList,
+          bolt_grade: propertyClassList,
+          plate_thickness: thicknessList,
+          flange_plate_thickness: thicknessList,
+          web_plate_thickness: thicknessList,
+          angle_list: angleList,
+          topangle_list: angleList,
+          cleat_section: angleList,
+        };
+        const expanded = { ...baseInputs };
+        Object.keys(keyToFullListMap).forEach((inputKey) => {
+          if (allSelected?.[inputKey]) {
+            const fullList = keyToFullListMap[inputKey] || [];
+            // Normalize values to strings like the UI does
+            expanded[inputKey] = Array.isArray(fullList)
+              ? fullList.map((val) => {
+                  if (typeof val === 'object' && val !== null) {
+                    return val.value || val.Grade || String(val);
+                  }
+                  return String(val);
+                })
+              : [];
+          }
+        });
+        return expanded;
       };
 
-      // Only add auth header if user is logged in (not guest)
-      if (!userIsGuest) {
-        headers['Authorization'] = `Bearer ${getAccessToken()}`;
-      }
-
-      const response = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({
-          name: projectName,
-          module_id: module_id,
-          inputs: inputs,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // Handle guest user: download OSI file
-        if (data.is_guest || userIsGuest) {
+      const inputsForSave = expandAllSelectedInputs(inputs);
+      if (userIsGuest) {
+        // Guest: existing OSI download flow
+        const response = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: projectName, module_id: module_id, inputs: inputsForSave }),
+        });
+        const data = await response.json();
+        if (response.ok && data.success && data.is_guest) {
           try {
-            // Decode base64 content
             const binaryString = atob(data.content_base64);
             const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-              bytes[i] = binaryString.charCodeAt(i);
-            }
+            for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
             const blob = new Blob([bytes], { type: 'text/plain' });
-
-            // Create download link
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -300,7 +328,6 @@ export const EngineeringModule = ({
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-
             message.success('OSI file downloaded successfully');
           } catch (err) {
             console.error('Error downloading OSI file:', err);
@@ -308,36 +335,57 @@ export const EngineeringModule = ({
           }
           return;
         }
-
-        // Handle authenticated user: save to DB and link to project
-        const savedName = projectName;
-        setSaveInputFileName(data?.data?.id ? `${savedName}.osi` : savedName);
-        setDisplaySaveInputPopup(true);
-        message.success('Inputs saved successfully');
-
-        // Update project's osi_file_path if project ID and URL are available
-        const projectId = getProjectIdFromUrl();
-        if (projectId && data.url) {
-          try {
-            const updateResponse = await fetch(`${BASE_URL}projects/${projectId}/`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getAccessToken()}`,
-              },
-              body: JSON.stringify({ osi_file_path: data.url }),
-            });
-
-            const updateData = await updateResponse.json();
-            if (!updateResponse.ok || !updateData.success) {
-              console.warn('Saved OSI, but failed to link to project:', updateData);
-            }
-          } catch (err) {
-            console.warn('Error linking OSI to project:', err);
-          }
-        }
-      } else {
         message.error(data.error || 'Failed to save inputs');
+        return;
+      }
+
+      // Authenticated: persist inputs_json to project
+      const projectId = getProjectIdFromUrl();
+      if (!projectId || Number.isNaN(projectId)) {
+        message.warning('No active project. Open or create a project first.');
+        return;
+      }
+      const updateResponse = await fetch(`${BASE_URL}projects/${projectId}/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAccessToken()}`,
+        },
+        body: JSON.stringify({ inputs_json: inputsForSave }),
+      });
+      const upd = await updateResponse.json();
+      if (!updateResponse.ok || !upd.success) {
+        message.error(upd.error || 'Failed to save inputs');
+        return;
+      }
+
+      // Also provide a local OSI download for logged-in users (same as guest)
+      try {
+        const saveRes = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getAccessToken()}` },
+          body: JSON.stringify({ name: projectName, module_id, inputs: inputsForSave, inline: true }),
+        });
+        const data = await saveRes.json();
+        if (saveRes.ok && data.success && data.content_base64) {
+          const binaryString = atob(data.content_base64);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+          const blob = new Blob([bytes], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = data.filename || `${projectName}.osi`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          message.success('Inputs saved and OSI downloaded');
+        } else {
+          message.success('Inputs saved');
+        }
+      } catch (_e) {
+        message.success('Inputs saved');
       }
     } catch (err) {
       console.error('Error saving inputs:', err);

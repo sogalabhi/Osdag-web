@@ -36,6 +36,10 @@ class ProjectAPI(APIView):
                 project_list.append({
                     'id': project.id,
                     'name': project.name,
+                    'module': getattr(project, 'module', None),
+                    'submodule': getattr(project, 'submodule', None),
+                    # keep legacy field for existing frontend behavior
+                    'module_id': getattr(project, 'submodule', None),
                     'osi_file_path': project.osi_file_path,
                     'created_at': project.created_at.isoformat(),
                     'updated_at': project.updated_at.isoformat(),
@@ -87,6 +91,9 @@ class ProjectAPI(APIView):
             # Create new project with user email
             project = Project.objects.create(
                 name=data['name'],
+                module=data.get('module'),
+                submodule=data.get('submodule') or data.get('module_id'),
+                inputs_json=data.get('inputs_json'),
                 osi_file_path=data.get('osi_file_path'),
                 user_email=user_email
             )
@@ -131,6 +138,10 @@ class ProjectDetailAPI(APIView):
                 'project': {
                     'id': project.id,
                     'name': project.name,
+                    'module': getattr(project, 'module', None),
+                    'submodule': getattr(project, 'submodule', None),
+                    'module_id': getattr(project, 'submodule', None),
+                    'inputs_json': getattr(project, 'inputs_json', None),
                     'osi_file_path': project.osi_file_path,
                     'created_at': project.created_at.isoformat(),
                     'updated_at': project.updated_at.isoformat()
@@ -151,7 +162,7 @@ class ProjectDetailAPI(APIView):
             }, safe=False, status=400)
     
     def put(self, request, project_id):
-        """Update project data (name, osi_file_path)"""
+        """Update project data (name, inputs_json, osi_file_path)"""
         try:
             # if not request.user or not request.user.is_authenticated:
             #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
@@ -176,6 +187,12 @@ class ProjectDetailAPI(APIView):
             # Update fields if provided
             if 'name' in data:
                 project.name = data['name']
+            if 'module' in data:
+                project.module = data['module']
+            if 'submodule' in data or 'module_id' in data:
+                project.submodule = data.get('submodule') or data.get('module_id')
+            if 'inputs_json' in data:
+                project.inputs_json = data['inputs_json']
             if 'osi_file_path' in data:
                 project.osi_file_path = data['osi_file_path']
             

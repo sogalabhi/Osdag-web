@@ -12,7 +12,7 @@ from osdag.web_api.user_view import SignupView, ForgetPasswordView, LogoutView, 
 from osdag.web_api.jwt_api import JWTHomeView
 from osdag.web_api.google_sso_api import GoogleSSOView
 from osdag.web_api.project_api import ProjectAPI, ProjectDetailAPI, ProjectByNameAPI
-from osdag.web_api.osi_api import SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes
+from osdag.web_api.osi_api import SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload
 from . import views
 from osdag.web_api.endplate_outputView import EndPLateOutputData
 from osdag.web_api.cleatangle_outputView import CleatAngleOutputData
@@ -97,6 +97,7 @@ urlpatterns = [
     path('api/open-osi/', OpenOsiUpload.as_view()),
     path('api/open-osi/<int:osifile_id>/', OpenOsiById.as_view()),
     path('api/module-routes/', ModuleRoutes.as_view()),
+    path('api/projects/<int:project_id>/osi', ProjectOsiDownload.as_view()),
 
     # output generation from input
     path('calculate-output/FinPlateConnection',
