@@ -31,6 +31,11 @@ class Tension_welded(Member):
         self.design_status = False
         self.logs = []
 
+
+        self.module = KEY_DISP_TENSION_WELDED
+        self.mainmodule = 'Member'
+        self.connection = "Welded"
+
     ###############################################
     # Design Preference Functions Start
     ###############################################
@@ -385,9 +390,6 @@ class Tension_welded(Member):
         '''
 
         # @author: Amir, Umair
-        self.module = KEY_DISP_TENSION_WELDED
-        self.mainmodule = 'Member'
-        self.connection = "Welded"
 
         options_list = []
 

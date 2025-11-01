@@ -36,102 +36,102 @@ def get_required_keys() -> List[str]:
         "Conn_Location",          # KEY_LOCATION
         "Module"                  # KEY_MODULE
     ]
-    print("in welded_tension_memer.py: get_required_keys called, returning:", req_keys)
+    print("in welded_tension_member.py: get_required_keys called, returning:", req_keys)
     return req_keys
 
 def validate_input(input_values: Dict[str, Any]) -> None:
-    print("in welded_tension_memer.py: validate_input called with input_values:", input_values)
+    print("in welded_tension_member.py: validate_input called with input_values:", input_values)
     required_keys = get_required_keys()
-    print("in welded_tension_memer.py: Required keys:", required_keys)
+    print("in welded_tension_member.py: Required keys:", required_keys)
     missing_keys = contains_keys(input_values, required_keys)
-    print("in welded_tension_memer.py: Missing keys:", missing_keys)
+    print("in welded_tension_member.py: Missing keys:", missing_keys)
     if missing_keys is not None:
-        print("in welded_tension_memer.py: Missing key detected:", missing_keys[0])
+        print("in welded_tension_member.py: Missing key detected:", missing_keys[0])
         raise MissingKeyError(missing_keys[0])
 
     # Validate Connector.Material
-    print("in welded_tension_memer.py: Validating Connector.Material")
+    print("in welded_tension_member.py: Validating Connector.Material")
     if not isinstance(input_values["Connector.Material"], str):
-        print("in welded_tension_memer.py: Invalid type for Connector.Material")
+        print("in welded_tension_member.py: Invalid type for Connector.Material")
         raise InvalidInputTypeError("Connector.Material", "str")
 
     # Validate Design.Design_Method
-    print("in welded_tension_memer.py: Validating Design.Design_Method")
+    print("in welded_tension_member.py: Validating Design.Design_Method")
     if not isinstance(input_values["Design.Design_Method"], str):
-        print("in welded_tension_memer.py: Invalid type for Design.Design_Method")
+        print("in welded_tension_member.py: Invalid type for Design.Design_Method")
         raise InvalidInputTypeError("Design.Design_Method", "str")
 
     # Validate Detailing.Corrosive_Influences
-    print("in welded_tension_memer.py: Validating Detailing.Corrosive_Influences")
+    print("in welded_tension_member.py: Validating Detailing.Corrosive_Influences")
     if not is_yes_or_no(input_values["Detailing.Corrosive_Influences"]):
-        print("in welded_tension_memer.py: Invalid value for Detailing.Corrosive_Influences")
+        print("in welded_tension_member.py: Invalid value for Detailing.Corrosive_Influences")
         raise InvalidInputTypeError("Detailing.Corrosive_Influences", "'Yes' or 'No'")
 
     # Validate Detailing.Edge_type
-    print("in welded_tension_memer.py: Validating Detailing.Edge_type")
+    print("in welded_tension_member.py: Validating Detailing.Edge_type")
     if not isinstance(input_values["Detailing.Edge_type"], str):
-        print("in welded_tension_memer.py: Invalid type for Detailing.Edge_type")
+        print("in welded_tension_member.py: Invalid type for Detailing.Edge_type")
         raise InvalidInputTypeError("Detailing.Edge_type", "str")
 
     # Validate Detailing.Gap
-    print("in welded_tension_memer.py: Validating Detailing.Gap")
+    print("in welded_tension_member.py: Validating Detailing.Gap")
     detailing_gap = input_values["Detailing.Gap"]
     if (not isinstance(detailing_gap, str)
             or not int_able(detailing_gap)):
-        print("in welded_tension_memer.py: Invalid type for Detailing.Gap")
+        print("in welded_tension_member.py: Invalid type for Detailing.Gap")
         raise InvalidInputTypeError("Detailing.Gap", "str where str can be converted to int")
 
     # Validate Load.Axial
-    print("in welded_tension_memer.py: Validating Load.Axial")
+    print("in welded_tension_member.py: Validating Load.Axial")
     load_axial = input_values["Load.Axial"]
     if (not isinstance(load_axial, str)
             or not int_able(load_axial)):
-        print("in welded_tension_memer.py: Invalid type for Load.Axial")
+        print("in welded_tension_member.py: Invalid type for Load.Axial")
         raise InvalidInputTypeError("Load.Axial", "str where str can be converted to int")
 
     # Validate Material
-    print("in welded_tension_memer.py: Validating Material")
+    print("in welded_tension_member.py: Validating Material")
     if not isinstance(input_values["Material"], str):
-        print("in welded_tension_memer.py: Invalid type for Material")
+        print("in welded_tension_member.py: Invalid type for Material")
         raise InvalidInputTypeError("Material", "str")
 
     # Validate Member.Profile
-    print("in welded_tension_memer.py: Validating Member.Profile")
+    print("in welded_tension_member.py: Validating Member.Profile")
     if not isinstance(input_values["Member.Profile"], str):
-        print("in welded_tension_memer.py: Invalid type for Member.Profile")
+        print("in welded_tension_member.py: Invalid type for Member.Profile")
         raise InvalidInputTypeError("Member.Profile", "str")
 
     # Validate Member.Designation
-    print("in welded_tension_memer.py: Validating Member.Designation")
+    print("in welded_tension_member.py: Validating Member.Designation")
     if not isinstance(input_values["Member.Designation"], str):
-        print("in welded_tension_memer.py: Invalid type for Member.Designation")
+        print("in welded_tension_member.py: Invalid type for Member.Designation")
         raise InvalidInputTypeError("Member.Designation", "str")
 
     # Validate Member.Length
-    print("in welded_tension_memer.py: Validating Member.Length")
+    print("in welded_tension_member.py: Validating Member.Length")
     if not isinstance(input_values["Member.Length"], str):
-        print("in welded_tension_memer.py: Invalid type for Member.Length")
+        print("in welded_tension_member.py: Invalid type for Member.Length")
         raise InvalidInputTypeError("Member.Length", "str")
 
     # Validate Conn_Location
-    print("in welded_tension_memer.py: Validating Conn_Location")
+    print("in welded_tension_member.py: Validating Conn_Location")
     if not isinstance(input_values["Conn_Location"], str):
-        print("in welded_tension_memer.py: Invalid type for Conn_Location")
+        print("in welded_tension_member.py: Invalid type for Conn_Location")
         raise InvalidInputTypeError("Conn_Location", "str")
 
     # Validate Module
-    print("in welded_tension_memer.py: Validating Module")
+    print("in welded_tension_member.py: Validating Module")
     if not isinstance(input_values["Module"], str):
-        print("in welded_tension_memer.py: Invalid type for Module")
+        print("in welded_tension_member.py: Invalid type for Module")
         raise InvalidInputTypeError("Module", "str")
 
     # Validate Connector.Plate.Thickness_List
-    print("in welded_tension_memer.py: Validating Connector.Plate.Thickness_List")
+    print("in welded_tension_member.py: Validating Connector.Plate.Thickness_List")
     connector_plate_thicknesslist = input_values["Connector.Plate.Thickness_List"]
     if (not isinstance(connector_plate_thicknesslist, list)
             or not validate_list_type(connector_plate_thicknesslist, str)
             or not custom_list_validation(connector_plate_thicknesslist, int_able)):
-        print("in welded_tension_memer.py: Invalid type for Connector.Plate.Thickness_List")
+        print("in welded_tension_member.py: Invalid type for Connector.Plate.Thickness_List")
         raise InvalidInputTypeError("Connector.Plate.Thickness_List", "List[str] where all items can be converted to int")
 
 def validate_input_new(input_values: Dict[str, Any]) -> None:
