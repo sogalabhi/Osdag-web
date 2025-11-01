@@ -38,6 +38,9 @@ export const EngineeringModule = ({
     propertyClassList,
     angleList,
     boltTypeList,
+    sectionProfileList,
+    channelList,
+    sectionDesignation,
     cadModelPaths,
 
     // State
@@ -69,6 +72,8 @@ export const EngineeringModule = ({
     setScreenshotTrigger,
     extraState,
     setExtraState,
+    modalDynamicSrc,
+    setModalDynamicSrc,
 
     // Navigation and Reset states
     showResetConfirmation,
@@ -442,6 +447,9 @@ export const EngineeringModule = ({
     propertyClassList,
     angleList, // FIXED: Added angleList to context data
     boltTypeList,
+    sectionProfileList,
+    channelList,
+    sectionDesignation
   };
 
   const triggerScreenshotCapture = () => {
@@ -579,6 +587,7 @@ export const EngineeringModule = ({
                   extraState={extraState}
                   setExtraState={setExtraState}
                   updateSelectedItems={updateSelectedItems}
+                  setModalDynamicSrc={setModalDynamicSrc}
                 />
               ))}
 
@@ -779,7 +788,7 @@ export const EngineeringModule = ({
             isOpen={modalStates[modal.key]}
             onClose={() => updateModalState(modal.key, false)}
             title="Customized"
-            dataSource={contextData[modal.dataSource] || []} // FIXED: This now includes angleList
+            dataSource={contextData[modal.dataSource] || (modalDynamicSrc[modal.inputKey] || [])} // FIXED: This now includes angleList
             selectedItems={selectedItems[modal.inputKey]}
             onTransferChange={(nextTargetKeys) =>
               updateSelectedItems(modal.inputKey, nextTargetKeys)
