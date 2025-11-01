@@ -134,7 +134,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
         "SeatedAngle",
         "Connector"
       ]);
-
+      
       Object.entries(modelPaths).forEach(([key, dataUrl]) => {
         try {
           if (typeof dataUrl === 'string' && dataUrl.startsWith('data:application/octet-stream;base64,')) {
