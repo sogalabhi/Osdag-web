@@ -104,7 +104,7 @@ class CreateDesignReport(APIView):
             'FinPlateConnection': fin_plate_create_from_input,
             'End-Plate-Connection': end_plate_create_from_input,
             'Cleat-Angle-Connection': cleat_angle_create_from_input,
-            'Seated-Angle-Connection': seated_angle_create_from_input,
+            'SeatedAngleConnection': seated_angle_create_from_input,
             'Cover-Plate-Bolted-Connection': cover_plate_bolted_create_from_input,
             'Beam-Beam-End-Plate-Connection': beam_beam_end_plate_create_from_input,
             'Cover-Plate-Welded-Connection': cover_plate_welded_create_from_input,

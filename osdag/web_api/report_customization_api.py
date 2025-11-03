@@ -305,7 +305,8 @@ class CustomizeReport(APIView):
                 print(f'[report_customization_api] CustomizeReport:stderr: {result.stderr[:200]}')
                 
                 # Check if PDF was generated successfully
-                if result.returncode == 0 and os.path.exists(pdf_path):
+                # if result.returncode == 0 and os.path.exists(pdf_path):
+                if os.path.exists(pdf_path):
                     print('[report_customization_api] CustomizeReport:pdflatex:success', { 'report_id': report_id, 'pdf_path': pdf_path })
                     # Return PDF file
                     response = FileResponse(
