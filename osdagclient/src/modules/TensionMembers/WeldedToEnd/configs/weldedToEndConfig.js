@@ -5,8 +5,7 @@ import CHANNELS from "../../../../assets/TensionMember/Channels.png";
 import ErrorImg from "../../../../assets/notSelected.png";
 import {
     KEY_MODULE, KEY_SEC_PROFILE, KEY_LOCATION, KEY_SECSIZE, KEY_MATERIAL,
-    KEY_LENGTH, KEY_AXIAL, KEY_D, KEY_TYP, KEY_GRD, KEY_DP_BOLT_HOLE_TYPE,
-    KEY_DP_BOLT_SLIP_FACTOR, KEY_CONNECTOR_MATERIAL, KEY_DP_DETAILING_EDGE_TYPE,
+    KEY_LENGTH, KEY_AXIAL, KEY_CONNECTOR_MATERIAL, KEY_DP_DETAILING_EDGE_TYPE,
     KEY_DP_DETAILING_GAP, KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
     KEY_DP_DESIGN_METHOD, KEY_PLATETHK, KEY_SEC_MATERIAL
 } from "../../../../constants/DesignKeys";
@@ -19,9 +18,6 @@ export const weldedToEndConfig = {
     cadOptions: ["Model", "Member", "Plate", "Endplate"],
 
     defaultInputs: {
-        bolt_diameter: [],
-        bolt_grade: [],
-        bolt_type: "Bearing Bolt",
         connector_material: "E 250 (Fe 410 W)A",
         section_profile: "Back to Back Angles",
         location: "Long Leg",
@@ -31,8 +27,6 @@ export const weldedToEndConfig = {
         plate_thickness: [],
         section_designation: [],
         material: "E 250 (Fe 410 W)A",
-        bolt_hole_type: "Standard",
-        bolt_slip_factor: "0.3",
         member_designation: "All",
         detailing_edge_type: "Rolled, machine-flame cut, sawn and planed",
         detailing_gap: "10",

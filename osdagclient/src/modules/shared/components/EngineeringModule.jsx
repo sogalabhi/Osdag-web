@@ -299,11 +299,11 @@ export const EngineeringModule = ({
             // Normalize values to strings like the UI does
             expanded[inputKey] = Array.isArray(fullList)
               ? fullList.map((val) => {
-                  if (typeof val === 'object' && val !== null) {
-                    return val.value || val.Grade || String(val);
-                  }
-                  return String(val);
-                })
+                if (typeof val === 'object' && val !== null) {
+                  return val.value || val.Grade || String(val);
+                }
+                return String(val);
+              })
               : [];
           }
         });
@@ -894,7 +894,7 @@ export const EngineeringModule = ({
       </Modal>
 
       {/* CSS for spinner animation */}
-      <style jsx>{`
+      <style>{`
         @keyframes spin {
           0% {
             transform: rotate(0deg);

@@ -1,16 +1,16 @@
 import React from "react";
 import { BaseOutputDock } from "../../../shared/components/BaseOutputDock";
 import { weldedToEndOutputConfig } from "../configs/weldedToEndOutputConfig";
+import { UI_STRINGS } from '../../../../constants/UIStrings';
 
-function WeldedToEndOutputDock({ output }) {
+function WeldedToEndOutputDock({ output, extraState }) {
   return (
-    <div className="OutputDock">
-      <BaseOutputDock 
-        output={output} 
-        outputConfig={weldedToEndOutputConfig}
-        title="Output Dock"
-      />
-    </div>
+    <BaseOutputDock
+      output={output}
+      outputConfig={weldedToEndOutputConfig}
+      title={UI_STRINGS.OUTPUT_DOCK}
+      extraState={extraState}
+    />
   );
 }
 
