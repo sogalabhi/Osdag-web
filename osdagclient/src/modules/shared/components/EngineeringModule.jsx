@@ -39,6 +39,7 @@ export const EngineeringModule = ({
     angleList,
     boltTypeList,
     cadModelPaths,
+    hoverDict: ctxHoverDict,
 
     // State
     inputs,
@@ -104,6 +105,9 @@ export const EngineeringModule = ({
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
   const [selectedSection, setSelectedSection] = useState("Model");
   const [selectedCameraView, setSelectedCameraView] = useState("Model");
+  // Hover tooltip state for 3D parts
+  const [hoverText, setHoverText] = useState("");
+  const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
   // Auth helpers
   const BASE_URL = 'http://localhost:8000/api/';
   const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
@@ -448,6 +452,42 @@ export const EngineeringModule = ({
     setScreenshotTrigger(true);
   };
 
+  // Default hover dictionary mapping per-part names to labels
+  const hoverDict = {
+    Beam: "Beam",
+    Column: "Column",
+    Plate: "Plate",
+    Weld: "Weld",
+    Welds: "Welds",
+    Bolt: "Bolt",
+    Bolts: "Bolts",
+    cleatAngle: "Cleat Angle",
+    SeatedAngle: "Seated Angle",
+    Connector: "Connector",
+    EndPlate: "End Plate",
+    Member: "Member",
+    ...(ctxHoverDict || {}),
+  };
+
+  // If backend provided bolt details but no separate Bolt mesh exists,
+  // enrich the Plate hover to include bolt info as a fallback.
+  const hasBoltMesh = Boolean(cadModelPaths?.Bolt || cadModelPaths?.Bolts);
+  if (!hasBoltMesh && (ctxHoverDict && ctxHoverDict.Bolt)) {
+    const boltText = String(ctxHoverDict.Bolt).replace(/<br\s*\/?>/gi, ' ');
+    hoverDict.Plate = hoverDict.Plate ? `${hoverDict.Plate}: ${boltText}` : boltText;
+  }
+
+  const handleHoverLabel = (label, clientX, clientY) => {
+    if (!label) return;
+    if (typeof clientX === 'number' && typeof clientY === 'number') {
+      setHoverPos({ x: clientX + 12, y: clientY + 12 });
+    }
+    setHoverText(label);
+  };
+  const handleHoverEnd = () => {
+    setHoverText("");
+  };
+
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       {/* Navigation */}
@@ -703,6 +743,9 @@ export const EngineeringModule = ({
                         ...cameraSettings,
                         connectivity: getConnectivity(), // Add connectivity info
                       }}
+                      hoverDict={hoverDict}
+                      onHoverLabel={handleHoverLabel}
+                      onHoverEnd={handleHoverEnd}
                       key={modelKey}
                     />
                     <ScreenshotCapture
@@ -895,6 +938,26 @@ export const EngineeringModule = ({
           }
         }
       `}</style>
+
+      {/* Hover tooltip overlay */}
+      {hoverText && (
+        <div
+          style={{
+            position: 'fixed',
+            left: hoverPos.x,
+            top: hoverPos.y,
+            background: 'rgba(0,0,0,0.75)',
+            color: '#fff',
+            padding: '4px 8px',
+            borderRadius: 6,
+            pointerEvents: 'none',
+            fontSize: 12,
+            zIndex: 1000,
+          }}
+        >
+          {hoverText}
+        </div>
+      )}
     </div >
   );
 };

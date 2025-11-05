@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from "react";
 import * as THREE from "three";
 import AxisHelperWidget from "../utils/AxisHelperWidget";
 
-function Model({ modelPaths, selectedView, cameraSettings }) {
+function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHoverLabel, onHoverEnd }) {
   const [parsedModels, setParsedModels] = useState(null);
   const texture = useTexture("/texture.png");
   texture.needsUpdate = true;
@@ -68,6 +68,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
             });
             const mesh = new THREE.Mesh(geometry, material);
             mesh.name = key;
+            // Attach hover label metadata
+            mesh.userData.hoverLabel = hoverDict?.[key] || hoverDict?.[key?.toLowerCase?.()] || key;
             parsedData[key] = mesh;
 
             // Accumulate per-part meshes into a single group (exclude merged Model)
@@ -121,7 +123,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
     if (!obj) return meshes;
     obj.traverse((c) => {
       if (c.type === "Mesh" && c.geometry) {
-        meshes.push({ name: c.name || "", geometry: c.geometry });
+        const label = c.userData?.hoverLabel || c.name || "";
+        meshes.push({ name: c.name || "", geometry: c.geometry, hoverLabel: label });
       }
     });
     if (meshes.length === 0) console.warn("No meshes found in object:", obj);
@@ -216,6 +219,20 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
                   scale={modelScale}
                   rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
                   position={modelPosition}
+                  userData={{ hoverLabel: m.hoverLabel || (hoverDict?.[name] || hoverDict?.[lower]) || name }}
+                  onPointerMove={(e) => {
+                    const label = e.object?.userData?.hoverLabel || name;
+                    const nx = e?.nativeEvent?.clientX;
+                    const ny = e?.nativeEvent?.clientY;
+                    if (onHoverLabel && typeof onHoverLabel === 'function') {
+                      onHoverLabel(label, nx, ny);
+                    }
+                  }}
+                  onPointerOut={() => {
+                    if (onHoverEnd && typeof onHoverEnd === 'function') {
+                      onHoverEnd();
+                    }
+                  }}
                 >
                   <meshPhysicalMaterial
                     attach="material"
