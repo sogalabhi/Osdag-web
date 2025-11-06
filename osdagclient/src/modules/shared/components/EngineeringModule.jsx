@@ -482,7 +482,8 @@ export const EngineeringModule = ({
     else if (moduleConfig.cameraKey === "BeamToColumnEndPlate") {
       return ["Model", "Beam", "Column", "End Plate"];
     }
-    return moduleConfig.cadOptions;
+
+    return  moduleConfig.cadOptions || ["Model", "Beam", "Connector"];
   };
 
   const options = getViewOptions();
