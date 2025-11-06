@@ -29,7 +29,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
       const stlLoader = new STLLoader();
       const parsedData = {};
       const partsGroup = new THREE.Group();
-      const partKeys = new Set(["Beam", "Column", "Plate", "Weld", "Welds", "Bolt", "Bolts", "cleatAngle", "SeatedAngle"]);
+      const partKeys = new Set(["Beam", "Column", "Plate", "Weld", "Welds", "Bolt", "Bolts", "cleatAngle", "SeatedAngle", "Connector"]);
       Object.entries(modelPaths).forEach(([key, dataUrl]) => {
         try {
           if (typeof dataUrl === 'string' && dataUrl.startsWith('data:application/octet-stream;base64,')) {
@@ -418,7 +418,7 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
       )}
 
       {/* Connector Section - Blue Solid Material (fallback for other modules) */}
-      {selectedView === "Connector" && geometryConnector && (
+      {(selectedView === "Connector" || selectedView === "End Plate") && geometryConnector && (
         <>
           <mesh
             geometry={geometryConnector}
