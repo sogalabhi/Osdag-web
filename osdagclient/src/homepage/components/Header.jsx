@@ -128,7 +128,7 @@ const Header = ({ setshowSideBar, active }) => {
             if (!file) return;
             const text = await file.text();
             const uiObj = yaml.load(text) || {};
-            const moduleField = uiObj.Module || uiObj["Module"] || uiObj.module || uiObj["module"];
+            const moduleField = uiObj.Module || uiObj["Module"] || uiObj.module || uiObj["module"] || uiObj.inputs?.module || uiObj.inputs?.Module || uiObj.module_id;
             if (!moduleField || typeof moduleField !== 'string') {
               alert('Unsupported or invalid OSI file: Module not found.');
               e.target.value = '';
