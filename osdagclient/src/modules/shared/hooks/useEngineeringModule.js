@@ -213,6 +213,10 @@ export const useEngineeringModule = (moduleConfig) => {
       return {
         selectedOption: "Column Flange-Beam-Web", // Default for EndPlate
       };
+    } else if (moduleConfig.cameraKey === "BeamToColumnEndPlate") {
+      return {
+        selectedOption: "Flushed - Reversible Moment", // Default for BeamColumnEndPlate
+      };
     }
     return {
       selectedOption: "Column Flange-Beam-Web", // FIXED: Default for CleatAngle (changed from endplate default)

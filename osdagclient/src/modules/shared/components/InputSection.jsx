@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select'; // Re-integrated react-select
-import FRM from "../../../assets/flush_ep.png";
-import EOWIM from "../../../assets/owe_ep.png";
-import EBWRM from "../../../assets/extended.png";
-import CFBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cf_bw.png";
-import CWBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cw_bw.png";
-import BB from "../../../assets/ShearConnection/sc_fin_plate/fin_beam_beam.png";
+import BC_CF_BW_FLUSH from "../../../assets/BC_CF-BW-Flush.png";
+import BC_CF_BW_EOW from "../../../assets/BC_CF-BW-EOW.png";
+import BC_CF_BW_EBW from "../../../assets/BC_CF-BW-EBW.png";
+import BC_CW_BW_FLUSH from "../../../assets/BC_CW-BW-Flush.png";
+import BC_CW_BW_EOW from "../../../assets/BC_CW-BW-EOW.png";
+import BC_CW_BW_EBW from "../../../assets/BC_CW-BW-EBW.png";
 import ErrorImg from "../../../assets/notSelected.png";
 
 export const InputSection = ({
@@ -28,6 +28,7 @@ export const InputSection = ({
   // Styling object for react-select to fix z-index and other container issues
   const customSelectStyles = {
     menuPortal: base => ({ ...base, zIndex: 9999 }),
+    option: base => ({ ...base,minHeight: 35, lineHeight: '1' }),
     control: (base) => ({
       ...base,
       borderColor: '#000',
@@ -53,13 +54,26 @@ export const InputSection = ({
 
   useEffect(() => {
     if (extraState.selectedOption) {
+      const conn = safeInputs.connectivity;
+      const epType = extraState.selectedOption;
+      console.log(conn + "  " + epType);
       const imageMap = {
-        "Column Flange-Beam-Web": CFBW, "Column Web-Beam-Web": CWBW, "Beam-Beam": BB,
-        "Flushed - Reversible Moment": FRM, "Extended One Way - Irreversible Moment": EOWIM, "Extended Both Ways - Reversible Moment": EBWRM,
+        "Column-Flange-Beam-Web": {
+          "Flushed - Reversible Moment": BC_CF_BW_FLUSH,
+          "Extended One Way - Irreversible Moment": BC_CF_BW_EOW,
+          "Extended Both Ways - Reversible Moment": BC_CF_BW_EBW,
+        },
+        "Column-Web-Beam-Web": {
+          "Flushed - Reversible Moment": BC_CW_BW_FLUSH,
+          "Extended One Way - Irreversible Moment": BC_CW_BW_EOW,
+          "Extended Both Ways - Reversible Moment": BC_CW_BW_EBW,
+        },
       };
-      setImageSource(imageMap[extraState.selectedOption] || ErrorImg);
+
+      const selectedImage = imageMap[conn]?.[epType] || ErrorImg;
+      setImageSource(selectedImage);
     }
-  }, [extraState.selectedOption]);
+  }, [extraState.selectedOption, safeInputs.connectivity]);
 
   // Set default selected values when lists/options arrive
   useEffect(() => {
