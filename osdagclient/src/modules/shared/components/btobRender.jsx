@@ -7,6 +7,7 @@ import AxisHelperWidget from "../utils/AxisHelperWidget";
 
 function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHoverLabel, onHoverEnd }) {
   const [parsedModels, setParsedModels] = useState(null);
+  const [hoveredMeshId, setHoveredMeshId] = useState(null);
   const texture = useTexture("/texture.png");
   texture.needsUpdate = true;
 
@@ -200,7 +201,6 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
       <pointLight position={[-10, -10, -10]} intensity={1.5} />
       <spotLight position={[0, 10, 0]} angle={0.3} penumbra={1} intensity={1.0} />
       <AxisHelperWidget orthographicView={orthographicView} />
-      <primitive object={new THREE.AxesHelper(5)} />
 
       {/* Model Section - render each subpart with its own color */}
       {(selectedView === "Model" || GRID_VIEWS.includes(selectedView)) && modelMeshes.length > 0 && (
@@ -212,8 +212,10 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
             if (!partColors[name] && !partColors[lower] && lower.startsWith("weld")) {
               color = partColors.Weld;
             }
+            const meshId = `${name}-${idx}`;
+            const isHovered = hoveredMeshId === meshId;
             return (
-              <group key={`${name}-${idx}`}>
+              <group key={meshId}>
                 <mesh
                   geometry={m.geometry}
                   scale={modelScale}
@@ -227,11 +229,15 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
                     if (onHoverLabel && typeof onHoverLabel === 'function') {
                       onHoverLabel(label, nx, ny);
                     }
+                    if (hoveredMeshId !== meshId) {
+                      setHoveredMeshId(meshId);
+                    }
                   }}
                   onPointerOut={() => {
                     if (onHoverEnd && typeof onHoverEnd === 'function') {
                       onHoverEnd();
                     }
+                    setHoveredMeshId(null);
                   }}
                 >
                   <meshPhysicalMaterial
@@ -243,13 +249,16 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
                     transparent={false}
                     clearcoat={0.8}
                     clearcoatRoughness={0.2}
+                    emissive={isHovered ? "#8cc480" : undefined}
+                    emissiveIntensity={isHovered ? 0.2 : 0}
+                    depthWrite={!isHovered}
                   />
                 </mesh>
                 <primitive
                   object={
                     new THREE.LineSegments(
                       new THREE.EdgesGeometry(m.geometry, 15),
-                      new THREE.LineBasicMaterial({ color: "black" })
+                      new THREE.LineBasicMaterial({ color: isHovered ? "#9fda90" : "black", linewidth: isHovered ? 2 : 1 })
                     )
                   }
                   scale={modelScale}

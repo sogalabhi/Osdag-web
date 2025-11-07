@@ -751,6 +751,17 @@ export const useEngineeringModule = (moduleConfig) => {
     setCreateDesignReportBool(false);
   };
 
+  const clearDesignResults = () => {
+    setDisplayOutput(false);
+    setOutput(null);
+    setLogs(null);
+    setRenderBoolean(false);
+    setModelKey((prev) => prev + 1);
+    setLoading(false);
+    setIsLoadingModalVisible(false);
+    setLoadingStage("");
+  };
+
   return {
     // ===================================================================
     // CONTEXT DATA - Module state variables
@@ -840,5 +851,6 @@ export const useEngineeringModule = (moduleConfig) => {
     handleCreateDesignReport,
     handleOkDesignReport,
     handleCancelDesignReport,
+    clearDesignResults,
   };
 };
