@@ -154,7 +154,7 @@ const Header = ({ setshowSideBar, active }) => {
               if (moduleKey) {
                 sessionStorage.setItem(`prefill:${moduleKey}`, JSON.stringify(uiObj));
               }
-            } catch (_) {}
+            } catch (_) { }
             navigate(route);
           } catch (err) {
             console.error('Failed to import OSI:', err);
@@ -183,21 +183,15 @@ const Header = ({ setshowSideBar, active }) => {
           {/* Logo and Branding */}
           <div className="flex-1 flex flex-col items-center lg:items-start md:flex-row md:items-end md:space-x-8">
             <div className="flex flex-col items-center lg:items-start">
-              <picture>
-                {/* This source will be used if the user is in dark mode */}
-                <source srcset="/images/Osdag_label_dark.svg" media="(prefers-color-scheme: dark)" />
+              {/* Osdag Label - Light mode */}
+              <img src="/images/Osdag_label.svg" alt="Osdag Logo" className="h-20 mt-2 dark:hidden" />
+              {/* Osdag Label - Dark mode */}
+              <img src="/images/Osdag_label_dark.svg" alt="Osdag Logo" className="h-20 mt-2 hidden dark:block" />
+              {/* Osdag Tagline - Light mode */}
+              <img src="/images/Osdag_tagline.svg" alt="Osdag Tagline" className="h-8 dark:hidden" />
+              {/* Osdag Tagline - Dark mode */}
+              <img src="/images/Osdag_tagline_dark.svg" alt="Osdag Tagline" className="h-8 hidden dark:block" />
 
-                {/* This is the default image for light mode and for browsers that don't support the picture tag */}
-                <img src="/images/Osdag_label.svg" alt="Osdag Logo" className="h-20 mt-6" />
-              </picture>
-              <picture>
-                {/* This source will be used if the user is in dark mode */}
-                <source srcset="/images/Osdag_tagline_dark.svg" media="(prefers-color-scheme: dark)" />
-
-                {/* This is the default image for light mode and for browsers that don't support the picture tag */}
-                <img src="/images/Osdag_tagline.svg" alt="Osdag Tagline" className="h-8" />
-              </picture>
-              
             </div>
             {/* Icons (Mobile/Tablet: below logo, Desktop: right side) */}
             <div className="flex md:hidden mt-4 space-x-2">

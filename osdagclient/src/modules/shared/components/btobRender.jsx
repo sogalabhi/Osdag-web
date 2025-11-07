@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from "react";
 import * as THREE from "three";
 import AxisHelperWidget from "../utils/AxisHelperWidget";
 
-function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHoverLabel, onHoverEnd }) {
+function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings, hoverDict = {}, onHoverLabel, onHoverEnd }) {
   const [parsedModels, setParsedModels] = useState(null);
   const [hoveredMeshId, setHoveredMeshId] = useState(null);
   const texture = useTexture("/texture.png");
@@ -15,7 +15,10 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
   const GRID_VIEWS = [
     "XY", "YZ", "ZX", "ANGLE1", "ANGLE2", "ANGLE3", "ANGLE4", "ANGLE5", "ANGLE6"
   ];
-  const useGridCenteredPosition = GRID_VIEWS.includes(selectedView);
+  // Use selectedViews array if provided, otherwise use selectedView as single item
+  const activeViews = selectedViews && Array.isArray(selectedViews) ? selectedViews : [selectedView];
+  const primaryView = activeViews[0] || selectedView;
+  const useGridCenteredPosition = GRID_VIEWS.includes(primaryView);
   const modelPosition = useGridCenteredPosition ? [0, 0, 0] : (cameraSettings?.modelPosition || [0, -4, 0]);
   const modelScale = cameraSettings?.modelScale || 0.008;
   const orthographicView = cameraSettings?.orthographicView || null;
@@ -23,6 +26,34 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
 
   // Check if we're in the specific FinPlate Column Web-Beam-Web case
   const isColumnWebBeamWeb = connectivity === "Column Web-Beam-Web";
+
+  // Helper function to check if a part should be shown based on selected views
+  const shouldShowPart = (partName) => {
+    // If Model is selected, show all parts
+    if (activeViews.includes("Model")) {
+      return true;
+    }
+    // Map view names to part names
+    const viewToPartMap = {
+      "Beam": ["Beam"],
+      "Column": ["Column"],
+      "Plate": ["Plate"],
+      "Connector": ["Connector", "cleatAngle", "SeatedAngle", "EndPlate"],
+      "CleatAngle": ["cleatAngle"],
+      "SeatedAngle": ["SeatedAngle"],
+      "EndPlate": ["EndPlate"],
+      "Member": ["Member"],
+    };
+    
+    // Check if any selected view maps to this part
+    for (const view of activeViews) {
+      const mappedParts = viewToPartMap[view] || [];
+      if (mappedParts.includes(partName) || mappedParts.some(p => partName.toLowerCase().includes(p.toLowerCase()))) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   useEffect(() => {
     if (!modelPaths) return;
@@ -202,12 +233,16 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
       <spotLight position={[0, 10, 0]} angle={0.3} penumbra={1} intensity={1.0} />
       <AxisHelperWidget orthographicView={orthographicView} />
 
-      {/* Model Section - render each subpart with its own color */}
-      {(selectedView === "Model" || GRID_VIEWS.includes(selectedView)) && modelMeshes.length > 0 && (
+      {/* Model Section - render each subpart with its own color (used for Model view or multi-select) */}
+      {((activeViews.includes("Model") || GRID_VIEWS.includes(primaryView) || activeViews.length > 1) && modelMeshes.length > 0) && (
         <>
           {modelMeshes.map((m, idx) => {
             const name = m.name || "";
             const lower = name.toLowerCase();
+            // Filter: only show parts that match selected views
+            if (!shouldShowPart(name)) {
+              return null;
+            }
             let color = partColors[name] || partColors[lower] || "#6b7280";
             if (!partColors[name] && !partColors[lower] && lower.startsWith("weld")) {
               color = partColors.Weld;
@@ -271,8 +306,8 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
         </>
       )}
 
-      {/* Beam Section */}
-      {selectedView === "Beam" && geometryBeam && (
+      {/* Beam Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("Beam") && !activeViews.includes("Model") && activeViews.length === 1 && geometryBeam && (
         <>
           <mesh
             geometry={geometryBeam}
@@ -306,8 +341,8 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
         </>
       )}
 
-      {/* Column Section */}
-      {selectedView === "Column" && geometryColumn && (
+      {/* Column Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("Column") && !activeViews.includes("Model") && activeViews.length === 1 && geometryColumn && (
         <>
           <mesh
             geometry={geometryColumn}
@@ -341,8 +376,8 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
         </>
       )}
 
-      {/* Plate Section */}
-      {selectedView === "Plate" && geometryPlate && (
+      {/* Plate Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("Plate") && !activeViews.includes("Model") && activeViews.length === 1 && geometryPlate && (
         <>
           <mesh
             geometry={geometryPlate}
@@ -375,8 +410,8 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
         </>
       )}
 
-      {/* FIXED: CleatAngle Section - Blue Solid Material */}
-      {selectedView === "CleatAngle" && geometryCleatAngle && (
+      {/* FIXED: CleatAngle Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("CleatAngle") && !activeViews.includes("Model") && activeViews.length === 1 && geometryCleatAngle && (
         <>
           <mesh
             geometry={geometryCleatAngle}
@@ -409,8 +444,8 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
         </>
       )}
 
-      {/* FIXED: SeatedAngle Section - Blue Solid Material */}
-      {selectedView === "SeatedAngle" && geometrySeatedAngle && (
+      {/* FIXED: SeatedAngle Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("SeatedAngle") && !activeViews.includes("Model") && activeViews.length === 1 && geometrySeatedAngle && (
         <>
           <mesh
             geometry={geometrySeatedAngle}
@@ -443,8 +478,8 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
         </>
       )}
 
-      {/* Connector Section - Blue Solid Material (fallback for other modules) */}
-      {selectedView === "Connector" && geometryConnector && (
+      {/* Connector Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("Connector") && !activeViews.includes("Model") && activeViews.length === 1 && geometryConnector && (
         <>
           <mesh
             geometry={geometryConnector}
@@ -477,8 +512,8 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
         </>
       )}
 
-      {/* Member Section - For Tension Members */}
-      {selectedView === "Member" && geometryMember && (
+      {/* Member Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("Member") && !activeViews.includes("Model") && activeViews.length === 1 && geometryMember && (
         <>
           <mesh
             geometry={geometryMember}
@@ -513,8 +548,8 @@ function Model({ modelPaths, selectedView, cameraSettings, hoverDict = {}, onHov
         </>
       )}
 
-      {/* EndPlate Section - For Beam-Beam End Plate and Tension Members */}
-      {(selectedView === "EndPlate" || selectedView === "Endplate") && geometryEndplate && (
+      {/* EndPlate Section - only show if single selection (not multi-select) */}
+      {(activeViews.includes("EndPlate") || activeViews.includes("Endplate")) && !activeViews.includes("Model") && activeViews.length === 1 && geometryEndplate && (
         <>
           <mesh
             geometry={geometryEndplate}

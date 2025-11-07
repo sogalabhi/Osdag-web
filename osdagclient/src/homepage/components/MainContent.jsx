@@ -99,16 +99,21 @@ const MainContent = () => {
   return (
     <div className=" flex-1 px-12 pb-6">
       <div className="max-w-7xl mx-auto h-full">
-        <div className={`grid grid-cols-1 ${isGuest ? 'xl:grid-cols-1' : 'xl:grid-cols-2'} gap-8 h-full`}>
+        <div className={`flex flex-row gap-8 h-full`}>
           {/* Recent Projects */}
-          <DashboardSectionCard title="Recent Projects">
-            <ProjectsListCard projects={projects} loading={loading} onDeleteProject={handleDeleteProject} />
-          </DashboardSectionCard>
+          <div className="flex-1">
+            <DashboardSectionCard title="Recent Projects">
+              <ProjectsListCard projects={projects} loading={loading} onDeleteProject={handleDeleteProject} />
+            </DashboardSectionCard>
+          </div>
 
           {/* Recently used Modules */}
-          <DashboardSectionCard title="Recently used Modules">
-            <ModulesListCard items={recentModules} />
-          </DashboardSectionCard>
+          {isGuest ? null : (<div className="flex-1">
+            <DashboardSectionCard title="Recently used Modules">
+              <ModulesListCard items={recentModules} />
+            </DashboardSectionCard>
+          </div>
+          )}
         </div>
       </div>
     </div>

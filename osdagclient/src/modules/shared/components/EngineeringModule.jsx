@@ -105,7 +105,7 @@ export const EngineeringModule = ({
   const [showOptionsContainer, setShowOptionsContainer] = useState(false); // New state for options container
   const [isGridActive, setIsGridActive] = useState(false);
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
-  const [selectedSection, setSelectedSection] = useState("Model");
+  const [selectedSection, setSelectedSection] = useState(["Model"]);
   const [selectedCameraView, setSelectedCameraView] = useState("Model");
   // Hover tooltip state for 3D parts
   const [hoverText, setHoverText] = useState("");
@@ -195,7 +195,7 @@ export const EngineeringModule = ({
       setShowOutputDock(false);
       setShowLogs(false);
       setShowOptionsContainer(false);
-      setSelectedSection("Model");
+      setSelectedSection(["Model"]);
       setSelectedCameraView("Model");
 
       // Reset all the data that controls model rendering
@@ -257,7 +257,7 @@ export const EngineeringModule = ({
       setShowOptionsContainer(false);
       setShowOutputDock(false);
       setShowLogs(false);
-      setSelectedSection("Model");
+      setSelectedSection(["Model"]);
       setSelectedCameraView("Model");
       setShowResetButton(false);
       setHoverText("");
@@ -722,7 +722,8 @@ export const EngineeringModule = ({
                   </div>
                 ))} */}
                 {options.map((option) => {
-                  const isChecked = selectedSection === option;
+                  const isChecked = selectedSection.includes(option);
+                  const isModel = option === "Model";
                   return (
                     <label
                       key={option}
@@ -733,13 +734,45 @@ export const EngineeringModule = ({
                         className="h-4 w-4 rounded border-gray-400 text-osdag-green focus:ring-osdag-green"
                         checked={isChecked}
                         onChange={(event) => {
-                          if (!event.target.checked) {
-                            event.preventDefault();
-                            return;
+                          if (isModel) {
+                            // If Model is selected, clear all others and select only Model
+                            if (event.target.checked) {
+                              setSelectedSection(["Model"]);
+                              setSelectedView("Model");
+                              setSelectedCameraView("Model");
+                            } else {
+                              // Don't allow unchecking Model if it's the only one
+                              if (selectedSection.length === 1 && selectedSection[0] === "Model") {
+                                return;
+                              }
+                            }
+                          } else {
+                            // If a non-Model option is selected
+                            if (event.target.checked) {
+                              // Remove Model from selection and add this option
+                              const newSelection = selectedSection.filter(s => s !== "Model");
+                              if (!newSelection.includes(option)) {
+                                newSelection.push(option);
+                              }
+                              setSelectedSection(newSelection);
+                              // Use first selected for camera/view if needed
+                              setSelectedView(newSelection[0]);
+                              setSelectedCameraView(newSelection[0]);
+                            } else {
+                              // Uncheck: remove this option
+                              const newSelection = selectedSection.filter(s => s !== option);
+                              // If nothing left, default to Model
+                              if (newSelection.length === 0) {
+                                setSelectedSection(["Model"]);
+                                setSelectedView("Model");
+                                setSelectedCameraView("Model");
+                              } else {
+                                setSelectedSection(newSelection);
+                                setSelectedView(newSelection[0]);
+                                setSelectedCameraView(newSelection[0]);
+                              }
+                            }
                           }
-                          setSelectedSection(option);
-                          setSelectedView(option);
-                          setSelectedCameraView(option);
                         }}
                       />
                       <span>{option}</span>
@@ -796,7 +829,8 @@ export const EngineeringModule = ({
                   >
                     <Model
                       modelPaths={cadModelPaths}
-                      selectedView={selectedSection}
+                      selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
+                      selectedViews={selectedSection}
                       cameraSettings={{
                         ...cameraSettings,
                         connectivity: getConnectivity(), // Add connectivity info
@@ -809,7 +843,7 @@ export const EngineeringModule = ({
                     <ScreenshotCapture
                       screenshotTrigger={screenshotTrigger}
                       setScreenshotTrigger={setScreenshotTrigger}
-                      selectedView={selectedSection}
+                      selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
                     />
                   </Suspense>
                 </Canvas>
