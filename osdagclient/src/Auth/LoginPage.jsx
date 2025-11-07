@@ -5,6 +5,10 @@ import icon from '../assets/logo-osdag.png';
 import { UserContext } from '../context/UserState';
 import { Modal, Button, Alert, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
+// import google from '../../../ResourceFiles/images/google.png'
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "./firebase";
+import axios from "axios";
 
 const generateRandomString = (length) => {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -294,6 +298,48 @@ const LoginPage = () => {
         }
     };
 
+    // 🔹 Google Sign-In logic
+  const googleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+
+      // Step 1️⃣: Sign in with Firebase popup
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Step 2️⃣: Get Firebase ID token
+      const idToken = await user.getIdToken();
+
+      // Step 3️⃣: Send token to Django backend for verification
+    //   const host = window.location.origin;
+      const host = "http://localhost:8000"; // Django backend
+      const response = await axios.post(`${host}/api/auth/firebase-login/`, {
+        token: idToken,
+      });
+
+    //   if ([200, 201, 204].includes(response.status)) {
+    //     console.log("✅ Firebase Login Successful:", response.data);
+
+    //     // Optional: Save user info to localStorage or Context
+    //     localStorage.setItem("user", JSON.stringify(response.data));
+    //     setIsLoggedIn(true);
+
+    //     // Navigate after login
+    //     navigate("/dashboard");
+    //   } else {
+    //     console.error("❌ Firebase Login Failed:", response.data);
+    //   }
+        console.log("✅ Backend Response:", response.data);
+        alert("Login successful!");
+        navigate("/home");
+    } catch (error) {
+      console.error("🔥 Firebase Google Login Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+};
+
 
     return (
         <>
@@ -326,10 +372,6 @@ const LoginPage = () => {
                     )}
 
                     <div className='flex flex-row gap-4 mb-4'>
-                        {/*<button className="google-signin-button" onClick={handleGoogleSignIn}>
-                    <img className="google-logo" src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" />
-                    Sign in with Google
-                </button> */}
                         <button
                             className="inline-block px-5 py-3 text-base font-bold text-white bg-osdag-green border border-black rounded cursor-pointer transition-colors duration-300 hover:bg-osdag-dark-green focus:outline-none active:bg-osdag-dark-green disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                             onClick={handleGuestSignIn}
@@ -411,6 +453,28 @@ const LoginPage = () => {
                                 </p>
                             )
                         }
+                        
+                        <Button
+                            onClick={googleLogin}
+                            disabled={isLoading}
+                            variant="contained"
+                            sx={{
+                            backgroundColor: "#4285F4",
+                            color: "white",
+                            fontWeight: 500,
+                            textTransform: "none",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            }}
+                        >
+                            <img
+                            src="https://developers.google.com/identity/images/g-logo.png"
+                            alt="Google Logo"
+                            style={{ width: "20px", height: "20px" }}
+                            />
+                            {isLoading ? "Signing in..." : "Sign in with Google"}
+                        </Button>
                     </form>
                     <p>
                         {isSignup ? 'Already have an account?' : "Don't have an account?"}

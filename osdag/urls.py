@@ -14,6 +14,7 @@ from osdag.web_api.google_sso_api import GoogleSSOView
 from osdag.web_api.project_api import ProjectAPI, ProjectDetailAPI, ProjectByNameAPI
 from osdag.web_api.osi_api import SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload
 from . import views
+# from .views import FirebaseLoginView
 from osdag.web_api.endplate_outputView import EndPLateOutputData
 from osdag.web_api.cleatangle_outputView import CleatAngleOutputData
 from osdag.web_api.seatedangle_outputView import SeatedAngleOutputData
@@ -76,6 +77,7 @@ urlpatterns = [
     # authentications nad authorozation URL mappings
     path('jwt/home' , JWTHomeView.as_view()),     # view for testing purpose
     path('googlesso/' , GoogleSSOView.as_view()),
+#     path('firebase-login/', FirebaseLoginView.as_view(), name="firebase_login"),
 
     # user urls 
     path('user/signup/' , SignupView.as_view()),
