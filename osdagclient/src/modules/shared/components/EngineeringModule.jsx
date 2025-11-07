@@ -613,9 +613,51 @@ export const EngineeringModule = ({
       </div>
 
       <div
-        className={`superMainBody ${!showInputDock ? "no-input-dock" : ""} ${!showOutputDock ? "no-output-dock" : ""
+        className={`superMainBody relative ${!showInputDock ? "no-input-dock" : ""} ${!showOutputDock ? "no-output-dock" : ""
           }`}
       >
+        {/* Input Dock Toggle Button - Fixed to left, shows when dock is closed */}
+        {!showInputDock && (
+          <button
+            onClick={toggleInputDock}
+            className="absolute left-0 top-0 h-full w-8 bg-white dark:bg-osdag-dark-color border-r border-gray-300 dark:border-osdag-border flex items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
+            title="Open Input Dock"
+            type="button"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="currentColor">
+              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+            </svg>
+          </button>
+        )}
+
+        {/* Output Dock Toggle Button - Fixed to right, shows when dock is closed and design is complete */}
+        {!showOutputDock && isDesignComplete && (
+          <button
+            onClick={toggleOutputDock}
+            className="absolute right-0 top-0 h-full w-8 bg-white dark:bg-osdag-dark-color border-l border-gray-300 dark:border-gray-700 flex items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
+            title="Open Output Dock"
+            type="button"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="currentColor">
+              <path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6 1.41 1.41z" />
+            </svg>
+          </button>
+        )}
+
+        {/* Input Dock Close Button - Right side, outside dock, pointing left */}
+        {showInputDock && (
+          <button
+            onClick={toggleInputDock}
+            className="absolute left-[400px] top-1/2 -translate-y-1/2 w-[30px] h-[30px] bg-white dark:bg-osdag-dark-color border border-gray-300 dark:border-gray-700 rounded flex items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
+            title="Close Input Dock"
+            type="button"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-gray-600 dark:text-gray-300" fill="currentColor">
+              <path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6 1.41 1.41z" />
+            </svg>
+          </button>
+        )}
+
         {/* Left - Input Dock - Only show if showInputDock is true */}
         {showInputDock && (
           <div className="w-[400px] bg-white dark:bg-osdag-dark-color">
@@ -854,11 +896,25 @@ export const EngineeringModule = ({
           </div>
 
           {showLogs && (
-            <div className="logs-container">
+            <div className={`logs-container ${!showInputDock ? 'pl-[30px]' : ''} ${!showOutputDock && isDesignComplete ? 'pr-[30px]' : ''} `}>
               <Logs logs={logs} />
             </div>
           )}
         </div>
+
+        {/* Output Dock Close Button - Left side, outside dock, pointing right */}
+        {showOutputDock && isDesignComplete && (
+          <button
+            onClick={toggleOutputDock}
+            className="absolute right-[25%] top-1/2 -translate-y-1/2 w-[30px] h-[30px] bg-white dark:bg-osdag-dark-color border border-gray-300 dark:border-gray-700 rounded flex items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
+            title="Close Output Dock"
+            type="button"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-gray-600 dark:text-gray-300" fill="currentColor">
+              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+            </svg>
+          </button>
+        )}
 
         {/* Right - Output Dock - Only show if showOutputDock is true and design is complete */}
         {showOutputDock && isDesignComplete && (
