@@ -916,6 +916,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
           />
         </>
       )}
+
       {/* Connector Section - only show if single selection (not multi-select) */}
       {activeViews.includes("Connector") && !activeViews.includes("Model") && activeViews.length === 1 && geometryConnector && (
         <>
