@@ -94,7 +94,7 @@ class CADGeneration(View):
         elif session_type == "CoverPlateWelded":
             sections = ["Model", "Beam", "Plate"]
         elif session_type == "BeamToColumnEndPlate":
-            sections = ["Model", "Beam", "Column", "EndPlate"]
+            sections = ["Model", "Beam", "Column", "Connector"]
         elif session_type == "TensionMember":
             sections = ["Model", "Member", "Plate", "Endplate"]
         else:
@@ -144,6 +144,35 @@ class CADGeneration(View):
                             b64 = base64.b64encode(f.read()).decode("ascii")
                         output_files[section] = f"data:application/octet-stream;base64,{b64}"
                         print(f"Loaded BREP for {section}")
+
+                    # If this is the merged Model, also try to include per-part STLs from manifest
+                    if section == "Model":
+                        try:
+                            manifest_path = path_to_file.replace(".brep", ".parts.json")
+                            if os.path.exists(manifest_path):
+                                import json as _json
+                                with open(manifest_path, "r", encoding="utf-8") as mf:
+                                    manifest = _json.load(mf)
+                                parts = manifest.get("parts", [])
+                                for entry in parts:
+                                    name = entry.get("name")
+                                    stl_rel = entry.get("stlPath")
+                                    brep_rel = entry.get("brepPath")
+                                    if not name:
+                                        continue
+                                    # Prefer STL
+                                    part_file_abs = None
+                                    if stl_rel and os.path.exists(os.path.join(parent_dir, stl_rel)):
+                                        part_file_abs = os.path.join(parent_dir, stl_rel)
+                                    elif brep_rel and os.path.exists(os.path.join(parent_dir, brep_rel)):
+                                        part_file_abs = os.path.join(parent_dir, brep_rel)
+                                    if part_file_abs and name not in output_files:
+                                        with open(part_file_abs, "rb") as pf:
+                                            b64p = base64.b64encode(pf.read()).decode("ascii")
+                                        output_files[name] = f"data:application/octet-stream;base64,{b64p}"
+                                        print(f"Loaded part {name} from manifest")
+                        except Exception as me:
+                            print(f"Failed to load parts from manifest: {me}")
                 except Exception as e:
                     print(f"Failed reading model file for {section}: {e}")
                     error_details.append({"section": section, "error": f"Failed reading file: {str(e)}"})
@@ -157,9 +186,41 @@ class CADGeneration(View):
             # Unprocessable due to inputs or environment; include details to aid debugging
             return JsonResponse({"status": "error", "message": "No CAD models were generated.", "errors": error_details}, status=422)
                 
+        # Build hover_dict if possible using module APIs (e.g., FinPlateConnection)
+        hover_dict = {}
+        try:
+            if hasattr(module_api, 'create_from_input') and callable(module_api.create_from_input):
+                mdl = module_api.create_from_input(input_values)
+                cand = getattr(mdl, 'hover_dict', None)
+                if isinstance(cand, dict) and len(cand) > 0:
+                    hover_dict = cand
+                else:
+                    # Minimal fallback for Bolt info when detailed dict is not available
+                    bolt_grade = None
+                    bolt_dia = None
+                    try:
+                        grades = input_values.get('Bolt.Grade') or []
+                        dias = input_values.get('Bolt.Diameter') or []
+                        if isinstance(grades, list) and grades:
+                            bolt_grade = grades[-1]
+                        if isinstance(dias, list) and dias:
+                            bolt_dia = dias[-1]
+                    except Exception:
+                        pass
+                    if bolt_grade or bolt_dia:
+                        parts = []
+                        if bolt_grade:
+                            parts.append(f"Grade: {bolt_grade}")
+                        if bolt_dia:
+                            parts.append(f"Diameter: {bolt_dia} mm")
+                        hover_dict['Bolt'] = ' '.join(parts)
+        except Exception as _e:
+            # Ignore hover_dict build failures; not critical
+            pass
         return JsonResponse({
             "status": "success",
             "files": output_files,
             "message": "CAD models generated successfully",
-            "warnings": error_details  # include any partial failures
+            "warnings": error_details,  # include any partial failures
+            "hover_dict": hover_dict
         }, status=201)

@@ -154,6 +154,12 @@ export default (state, action) => {
         cadModelPaths: action.payload || {},
       };
 
+    case "SET_HOVER_DICT":
+      return {
+        ...state,
+        hoverDict: action.payload || {},
+      };
+
     // ===================================================================
     // REPORT ACTIONS - Consolidated
     // ===================================================================

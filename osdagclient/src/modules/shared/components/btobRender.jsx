@@ -5,8 +5,9 @@ import { useEffect, useState, useMemo } from "react";
 import * as THREE from "three";
 import AxisHelperWidget from "../utils/AxisHelperWidget";
 
-function Model({ modelPaths, selectedView, cameraSettings }) {
+function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings, hoverDict = {}, onHoverLabel, onHoverEnd }) {
   const [parsedModels, setParsedModels] = useState(null);
+  const [hoveredMeshId, setHoveredMeshId] = useState(null);
   const texture = useTexture("/texture.png");
   texture.needsUpdate = true;
 
@@ -14,7 +15,10 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
   const GRID_VIEWS = [
     "XY", "YZ", "ZX", "ANGLE1", "ANGLE2", "ANGLE3", "ANGLE4", "ANGLE5", "ANGLE6"
   ];
-  const useGridCenteredPosition = GRID_VIEWS.includes(selectedView);
+  // Use selectedViews array if provided, otherwise use selectedView as single item
+  const activeViews = selectedViews && Array.isArray(selectedViews) ? selectedViews : [selectedView];
+  const primaryView = activeViews[0] || selectedView;
+  const useGridCenteredPosition = GRID_VIEWS.includes(primaryView);
   const modelPosition = useGridCenteredPosition ? [0, 0, 0] : (cameraSettings?.modelPosition || [0, -4, 0]);
   const modelScale = cameraSettings?.modelScale || 0.008;
   const orthographicView = cameraSettings?.orthographicView || null;
@@ -23,13 +27,55 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
   // Check if we're in the specific FinPlate Column Web-Beam-Web case
   const isColumnWebBeamWeb = connectivity === "Column Web-Beam-Web";
 
+  // Helper function to check if a part should be shown based on selected views
+  const shouldShowPart = (partName) => {
+    // If Model is selected, show all parts
+    if (activeViews.includes("Model")) {
+      return true;
+    }
+    // Map view names to part names
+    const viewToPartMap = {
+      "Beam": ["Beam"],
+      "Column": ["Column"],
+      "Plate": ["Plate"],
+      "Connector": ["Connector", "cleatAngle", "SeatedAngle", "EndPlate"],
+      "CleatAngle": ["cleatAngle"],
+      "SeatedAngle": ["SeatedAngle"],
+      "EndPlate": ["EndPlate"],
+      "Member": ["Member"],
+    };
+    
+    // Check if any selected view maps to this part
+    for (const view of activeViews) {
+      const mappedParts = viewToPartMap[view] || [];
+      if (mappedParts.includes(partName) || mappedParts.some(p => partName.toLowerCase().includes(p.toLowerCase()))) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   useEffect(() => {
     if (!modelPaths) return;
     try {
       const stlLoader = new STLLoader();
       const parsedData = {};
       const partsGroup = new THREE.Group();
-      const partKeys = new Set(["Member", "Endplate", "Beam", "Column", "Plate", "Weld", "Welds", "Bolt", "Bolts", "cleatAngle", "SeatedAngle"]);
+      const partKeys = new Set([
+        "Member",
+        "Endplate",
+        "Beam",
+        "Column",
+        "Plate",
+        "Weld",
+        "Welds",
+        "Bolt",
+        "Bolts",
+        "cleatAngle",
+        "SeatedAngle",
+        "Connector"
+      ]);
+
       Object.entries(modelPaths).forEach(([key, dataUrl]) => {
         try {
           if (typeof dataUrl === 'string' && dataUrl.startsWith('data:application/octet-stream;base64,')) {
@@ -70,6 +116,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
             });
             const mesh = new THREE.Mesh(geometry, material);
             mesh.name = key;
+            // Attach hover label metadata
+            mesh.userData.hoverLabel = hoverDict?.[key] || hoverDict?.[key?.toLowerCase?.()] || key;
             parsedData[key] = mesh;
 
             // Accumulate per-part meshes into a single group (exclude merged Model)
@@ -123,7 +171,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
     if (!obj) return meshes;
     obj.traverse((c) => {
       if (c.type === "Mesh" && c.geometry) {
-        meshes.push({ name: c.name || "", geometry: c.geometry });
+        const label = c.userData?.hoverLabel || c.name || "";
+        meshes.push({ name: c.name || "", geometry: c.geometry, hoverLabel: label });
       }
     });
     if (meshes.length === 0) console.warn("No meshes found in object:", obj);
@@ -201,25 +250,48 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
       <pointLight position={[-10, -10, -10]} intensity={1.5} />
       <spotLight position={[0, 10, 0]} angle={0.3} penumbra={1} intensity={1.0} />
       <AxisHelperWidget orthographicView={orthographicView} />
-      <primitive object={new THREE.AxesHelper(5)} />
 
-      {/* Model Section - render each subpart with its own color */}
-      {(selectedView === "Model" || GRID_VIEWS.includes(selectedView)) && modelMeshes.length > 0 && (
+      {/* Model Section - render each subpart with its own color (used for Model view or multi-select) */}
+      {((activeViews.includes("Model") || GRID_VIEWS.includes(primaryView) || activeViews.length > 1) && modelMeshes.length > 0) && (
         <>
           {modelMeshes.map((m, idx) => {
             const name = m.name || "";
             const lower = name.toLowerCase();
+            // Filter: only show parts that match selected views
+            if (!shouldShowPart(name)) {
+              return null;
+            }
             let color = partColors[name] || partColors[lower] || "#6b7280";
             if (!partColors[name] && !partColors[lower] && lower.startsWith("weld")) {
               color = partColors.Weld;
             }
+            const meshId = `${name}-${idx}`;
+            const isHovered = hoveredMeshId === meshId;
             return (
-              <group key={`${name}-${idx}`}>
+              <group key={meshId}>
                 <mesh
                   geometry={m.geometry}
                   scale={modelScale}
                   rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
                   position={modelPosition}
+                  userData={{ hoverLabel: m.hoverLabel || (hoverDict?.[name] || hoverDict?.[lower]) || name }}
+                  onPointerMove={(e) => {
+                    const label = e.object?.userData?.hoverLabel || name;
+                    const nx = e?.nativeEvent?.clientX;
+                    const ny = e?.nativeEvent?.clientY;
+                    if (onHoverLabel && typeof onHoverLabel === 'function') {
+                      onHoverLabel(label, nx, ny);
+                    }
+                    if (hoveredMeshId !== meshId) {
+                      setHoveredMeshId(meshId);
+                    }
+                  }}
+                  onPointerOut={() => {
+                    if (onHoverEnd && typeof onHoverEnd === 'function') {
+                      onHoverEnd();
+                    }
+                    setHoveredMeshId(null);
+                  }}
                 >
                   <meshPhysicalMaterial
                     attach="material"
@@ -230,13 +302,16 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
                     transparent={false}
                     clearcoat={0.8}
                     clearcoatRoughness={0.2}
+                    emissive={isHovered ? "#8cc480" : undefined}
+                    emissiveIntensity={isHovered ? 0.2 : 0}
+                    depthWrite={!isHovered}
                   />
                 </mesh>
                 <primitive
                   object={
                     new THREE.LineSegments(
                       new THREE.EdgesGeometry(m.geometry, 15),
-                      new THREE.LineBasicMaterial({ color: "black" })
+                      new THREE.LineBasicMaterial({ color: isHovered ? "#9fda90" : "black", linewidth: isHovered ? 2 : 1 })
                     )
                   }
                   scale={modelScale}
@@ -249,8 +324,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
         </>
       )}
 
-      {/* Beam Section */}
-      {selectedView === "Beam" && geometryBeam && (
+      {/* Beam Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("Beam") && !activeViews.includes("Model") && activeViews.length === 1 && geometryBeam && (
         <>
           <mesh
             geometry={geometryBeam}
@@ -284,8 +359,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
         </>
       )}
 
-      {/* Column Section */}
-      {selectedView === "Column" && geometryColumn && (
+      {/* Column Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("Column") && !activeViews.includes("Model") && activeViews.length === 1 && geometryColumn && (
         <>
           <mesh
             geometry={geometryColumn}
@@ -319,8 +394,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
         </>
       )}
 
-      {/* Plate Section */}
-      {selectedView === "Plate" && geometryPlate && (
+      {/* Plate Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("Plate") && !activeViews.includes("Model") && activeViews.length === 1 && geometryPlate && (
         <>
           <mesh
             geometry={geometryPlate}
@@ -353,8 +428,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
         </>
       )}
 
-      {/* FIXED: CleatAngle Section - Blue Solid Material */}
-      {selectedView === "CleatAngle" && geometryCleatAngle && (
+      {/* FIXED: CleatAngle Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("CleatAngle") && !activeViews.includes("Model") && activeViews.length === 1 && geometryCleatAngle && (
         <>
           <mesh
             geometry={geometryCleatAngle}
@@ -387,8 +462,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
         </>
       )}
 
-      {/* FIXED: SeatedAngle Section - Blue Solid Material */}
-      {selectedView === "SeatedAngle" && geometrySeatedAngle && (
+      {/* FIXED: SeatedAngle Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("SeatedAngle") && !activeViews.includes("Model") && activeViews.length === 1 && geometrySeatedAngle && (
         <>
           <mesh
             geometry={geometrySeatedAngle}
@@ -420,9 +495,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
           />
         </>
       )}
-
-      {/* Connector Section - Blue Solid Material (fallback for other modules) */}
-      {selectedView === "Connector" && geometryConnector && (
+      {/* Connector Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("Connector") && !activeViews.includes("Model") && activeViews.length === 1 && geometryConnector && (
         <>
           <mesh
             geometry={geometryConnector}
@@ -455,8 +529,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
         </>
       )}
 
-      {/* Member Section - For Tension Members */}
-      {selectedView === "Member" && geometryMember && (
+      {/* Member Section - only show if single selection (not multi-select) */}
+      {activeViews.includes("Member") && !activeViews.includes("Model") && activeViews.length === 1 && geometryMember && (
         <>
           <mesh
             geometry={geometryMember}
@@ -491,8 +565,8 @@ function Model({ modelPaths, selectedView, cameraSettings }) {
         </>
       )}
 
-      {/* EndPlate Section - For Beam-Beam End Plate and Tension Members */}
-      {(selectedView === "EndPlate" || selectedView === "Endplate") && geometryEndplate && (
+      {/* EndPlate Section - only show if single selection (not multi-select) */}
+      {(activeViews.includes("EndPlate") || activeViews.includes("Endplate")) && !activeViews.includes("Model") && activeViews.length === 1 && geometryEndplate && (
         <>
           <mesh
             geometry={geometryEndplate}

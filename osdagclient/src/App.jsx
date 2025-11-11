@@ -39,6 +39,7 @@ import CoverPlateBolted from "./modules/coverPlateBolted/CoverPlateBolted";
 import CoverPlateWelded from "./modules/coverPlateWelded/CoverPlateWelded";
 
 import "./App.css";
+import BeamToColumnEndPlate from "./modules/beamToColumnEndPlate/BeamToColumnEndPlate";
 
 let renderedOnce = false;
 
@@ -64,6 +65,7 @@ function App() {
         <Route path="/design/:designType/simply_supported_beam/:projectId?" element={<SimplySupportedBeam />} />
         <Route path="/design/:designType/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
         <Route path="/design/:designType/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
+        <Route path="/design/:designType/column-beam/:projectId?" element={<BeamToColumnEndPlate />} />
       </Route>
     )
   );

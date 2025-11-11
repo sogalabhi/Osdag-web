@@ -224,6 +224,10 @@ export const useEngineeringModule = (moduleConfig) => {
       return {
         selectedOption: "Column Flange-Beam-Web", // Default for EndPlate
       };
+    } else if (moduleConfig.cameraKey === "BeamToColumnEndPlate") {
+      return {
+        selectedOption: "Flushed - Reversible Moment", // Default for BeamColumnEndPlate
+      };
     }
     return {
       selectedOption: "Column Flange-Beam-Web", // FIXED: Default for CleatAngle (changed from endplate default)
@@ -763,6 +767,17 @@ export const useEngineeringModule = (moduleConfig) => {
     setCreateDesignReportBool(false);
   };
 
+  const clearDesignResults = () => {
+    setDisplayOutput(false);
+    setOutput(null);
+    setLogs(null);
+    setRenderBoolean(false);
+    setModelKey((prev) => prev + 1);
+    setLoading(false);
+    setIsLoadingModalVisible(false);
+    setLoadingStage("");
+  };
+
   return {
     // ===================================================================
     // CONTEXT DATA - Module state variables
@@ -857,5 +872,6 @@ export const useEngineeringModule = (moduleConfig) => {
     handleCreateDesignReport,
     handleOkDesignReport,
     handleCancelDesignReport,
+    clearDesignResults,
   };
 };
