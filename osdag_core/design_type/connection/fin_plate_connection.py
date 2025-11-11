@@ -446,7 +446,7 @@ class FinPlateConnection(ShearConnection):
         self.hover_dict["Plate"]= f"Plate: {float(self.plate.length) if flag else ''} x {float(self.plate.height) if flag else ''} x {self.plate.thickness_provided if flag else ''}"
             
         self.hover_dict["Weld"]= f"Weld: {self.weld.size if flag else ''} mm"
-
+        print("hover_dict:", self.hover_dict)
         return out_list
 
     ####################################

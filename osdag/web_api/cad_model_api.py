@@ -187,14 +187,31 @@ class CADGeneration(View):
             return JsonResponse({"status": "error", "message": "No CAD models were generated.", "errors": error_details}, status=422)
                 
         # Build hover_dict if possible using module APIs (e.g., FinPlateConnection)
+        # hover_dict is populated in output_details() which is called from output_values()
         hover_dict = {}
         try:
             if hasattr(module_api, 'create_from_input') and callable(module_api.create_from_input):
                 mdl = module_api.create_from_input(input_values)
+                
+                # Call output_values() to populate hover_dict (output_details is called internally)
+                # This ensures hover_dict is populated before we try to access it
+                if hasattr(mdl, 'output_values') and callable(mdl.output_values):
+                    try:
+                        # Call output_values with flag=True to populate hover_dict
+                        mdl.output_values(True)
+                        print(f"[cad_model_api] Called output_values(), hover_dict populated: {getattr(mdl, 'hover_dict', None)}")
+                    except Exception as output_err:
+                        print(f"[cad_model_api] Error calling output_values(): {output_err}")
+                        import traceback
+                        traceback.print_exc()
+                
+                # Now get hover_dict after it's been populated
                 cand = getattr(mdl, 'hover_dict', None)
                 if isinstance(cand, dict) and len(cand) > 0:
                     hover_dict = cand
+                    print(f"[cad_model_api] Retrieved hover_dict: {hover_dict}")
                 else:
+                    print(f"[cad_model_api] hover_dict is empty or not a dict: {cand}")
                     # Minimal fallback for Bolt info when detailed dict is not available
                     bolt_grade = None
                     bolt_dia = None
@@ -215,8 +232,10 @@ class CADGeneration(View):
                             parts.append(f"Diameter: {bolt_dia} mm")
                         hover_dict['Bolt'] = ' '.join(parts)
         except Exception as _e:
-            # Ignore hover_dict build failures; not critical
-            pass
+            # Log the error but don't fail the request
+            print(f"[cad_model_api] Error building hover_dict: {_e}")
+            import traceback
+            traceback.print_exc()
         return JsonResponse({
             "status": "success",
             "files": output_files,

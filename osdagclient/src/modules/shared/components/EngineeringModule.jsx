@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
@@ -492,21 +492,40 @@ export const EngineeringModule = ({
   };
 
   // Default hover dictionary mapping per-part names to labels
-  const hoverDict = {
-    Beam: "Beam",
-    Column: "Column",
-    Plate: "Plate",
-    Weld: "Weld",
-    Welds: "Welds",
-    Bolt: "Bolt",
-    Bolts: "Bolts",
-    cleatAngle: "Cleat Angle",
-    SeatedAngle: "Seated Angle",
-    Connector: "Connector",
-    EndPlate: "End Plate",
-    Member: "Member",
-    ...(ctxHoverDict || {}),
-  };
+  // Prioritize ctxHoverDict values from backend over defaults
+  // Use useMemo to recalculate when ctxHoverDict changes
+  const hoverDict = useMemo(() => {
+    const defaults = {
+      // Defaults (fallback if backend doesn't provide)
+      Beam: "Beam",
+      Column: "Column",
+      Plate: "Plate",
+      Weld: "Weld",
+      Welds: "Welds",
+      Bolt: "Bolt",
+      Bolts: "Bolts",
+      cleatAngle: "Cleat Angle",
+      SeatedAngle: "Seated Angle",
+      Connector: "Connector",
+      EndPlate: "End Plate",
+      Member: "Member",
+      Angle: "Angle",
+    };
+    
+    // Backend hover_dict values override defaults
+    const final = {
+      ...defaults,
+      ...(ctxHoverDict || {}),
+    };
+    
+    // Debug: log hoverDict to see what we have
+    if (ctxHoverDict && Object.keys(ctxHoverDict).length > 0) {
+      console.log('[EngineeringModule] ctxHoverDict:', ctxHoverDict);
+      console.log('[EngineeringModule] Final hoverDict:', final);
+    }
+    
+    return final;
+  }, [ctxHoverDict]);
 
   // If backend provided bolt details but no separate Bolt mesh exists,
   // enrich the Plate hover to include bolt info as a fallback.
@@ -1112,17 +1131,19 @@ export const EngineeringModule = ({
             position: 'fixed',
             left: hoverPos.x,
             top: hoverPos.y,
-            background: 'rgba(0,0,0,0.75)',
+            background: 'rgba(0,0,0,0.85)',
             color: '#fff',
-            padding: '4px 8px',
+            padding: '6px 10px',
             borderRadius: 6,
             pointerEvents: 'none',
             fontSize: 12,
             zIndex: 1000,
+            maxWidth: '250px',
+            lineHeight: '1.4',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
           }}
-        >
-          {hoverText}
-        </div>
+          dangerouslySetInnerHTML={{ __html: hoverText }}
+        />
       )}
     </div >
   );

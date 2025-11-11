@@ -28,6 +28,7 @@ export const useEngineeringModule = (moduleConfig) => {
     displayPDF,
     renderCadModel,
     cadModelPaths,
+    hoverDict,
 
     // NEW SIMPLIFIED API - 8 Core Functions Only
     getModuleData,              // Universal data fetcher
@@ -587,10 +588,13 @@ export const useEngineeringModule = (moduleConfig) => {
     setLoadingStage("Generating design calculations...");
 
     try {
+      console.log('🔵 [useEngineeringModule] handleSubmit - calling createDesign');
       await createDesign(param, moduleConfig.designType, null);
       // Auto-trigger CAD after successful design
+      console.log('🔵 [useEngineeringModule] Design complete, calling createCADModel');
       setLoadingStage("Generating 3D model...");
       const cadResult = await createCADModel(param, moduleConfig.designType, null);
+      console.log('🔵 [useEngineeringModule] createCADModel result:', cadResult);
       if (cadResult?.success) {
         setDisplayOutput(true);
         setLoading(false);
@@ -795,10 +799,13 @@ export const useEngineeringModule = (moduleConfig) => {
     sectionDesignation,
     channelList,
     displayPDF,
+    designLogs,
+    designData,
     renderCadModel,
     cadModelPaths,
+    hoverDict,
 
-    // ===================================================================
+    // NEW SIMPLIFIED API - 8 Core Functions Only
     // SIMPLIFIED API ACCESS - Expose core functions for advanced usage
     // ===================================================================
     getModuleData,              // Universal data fetcher

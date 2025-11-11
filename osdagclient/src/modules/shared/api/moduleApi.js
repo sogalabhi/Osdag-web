@@ -97,8 +97,31 @@ export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => 
       return { design: designData, cad: null, error: message };
     }
     const cadData = await cadRes.json();
+    
+    // Log the API response to debug hover_dict
+    console.log('=== [moduleApi] CAD API Response ===');
+    console.log('[moduleApi] Response status:', cadRes.status);
+    console.log('[moduleApi] Response data keys:', Object.keys(cadData));
+    console.log('[moduleApi] cadData.hover_dict:', cadData.hover_dict);
+    console.log('[moduleApi] cadData.hover_dict type:', typeof cadData.hover_dict);
+    if (cadData.hover_dict && typeof cadData.hover_dict === 'object') {
+      console.log('[moduleApi] hover_dict keys:', Object.keys(cadData.hover_dict));
+      console.log('[moduleApi] hover_dict entries:', Object.entries(cadData.hover_dict));
+      console.log('[moduleApi] hover_dict JSON:', JSON.stringify(cadData.hover_dict, null, 2));
+    }
+    
     if (cadRes.status === 201 && cadData.status === "success") {
       dispatch({ type: "SET_CAD_MODEL_PATHS", payload: cadData.files });
+      
+      // Log before dispatching hover_dict
+      console.log('[moduleApi] Before dispatch - cadData.hover_dict:', cadData.hover_dict);
+      if (cadData.hover_dict) {
+        console.log('[moduleApi] Dispatching SET_HOVER_DICT with:', cadData.hover_dict);
+        dispatch({ type: "SET_HOVER_DICT", payload: cadData.hover_dict });
+      } else {
+        console.warn('[moduleApi] cadData.hover_dict is missing or empty!');
+      }
+      
       dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: true });
       return { design: designData, cad: cadData, error: null };
     } else {
