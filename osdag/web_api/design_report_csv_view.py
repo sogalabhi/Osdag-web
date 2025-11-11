@@ -13,6 +13,7 @@ from osdag_api.modules.beam_beam_end_plate_connection import create_from_input a
 from osdag_api.modules.cover_plate_welded_connection import create_from_input as cover_plate_welded_create_from_input
 from osdag_api.modules.beam_column_end_plate import create_from_input as beam_to_column_end_plate_create_from_input
 from osdag_api.modules.bolted_tension_member import create_from_input as tension_member_bolted_create_from_input
+from osdag_api.modules.welded_tension_member import create_from_input as tension_member_welded_create_from_input
 # importing models
 from osdag.models import Design
 
@@ -108,7 +109,8 @@ class CreateDesignReport(APIView):
             'Beam-Beam-End-Plate-Connection': beam_beam_end_plate_create_from_input,
             'Cover-Plate-Welded-Connection': cover_plate_welded_create_from_input,
             'Beam-to-Column-End-Plate-Connection': beam_to_column_end_plate_create_from_input,
-            'Tension-Member-Bolted-Design': tension_member_bolted_create_from_input
+            'Tension-Member-Bolted-Design': tension_member_bolted_create_from_input,
+            'Tension-Member-Welded-Design': tension_member_welded_create_from_input
         }
         
         if not module_id or module_id not in module_function_map:

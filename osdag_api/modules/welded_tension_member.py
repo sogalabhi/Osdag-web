@@ -1,4 +1,4 @@
-from Common import KEY_DISP_TENSION_BOLTED
+from Common import KEY_DISP_TENSION_WELDED
 from osdag_api.validation_utils import validate_arr, validate_num, validate_string
 from osdag_api.errors import MissingKeyError, InvalidInputTypeError
 from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
@@ -11,7 +11,7 @@ from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
 from cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
-from design_type.tension_member.tension_bolted import Tension_bolted
+from design_type.tension_member.tension_welded import Tension_welded
 import sys
 import os
 import typing
@@ -19,23 +19,18 @@ from typing import Dict, Any, List
 import json
 import traceback
 from osdag_api.modules.mesh_export import write_stl
-old_stdout = sys.stdout  # Backup log
+old_stdout = sys.stdout  # Backup logs
 sys.stdout = open(os.devnull, "w")  # redirect stdout
 sys.stdout = old_stdout  # Reset log
 
 def get_required_keys() -> List[str]:
     # Using the same KEY constants as backend for consistency
-    abhisogal_keys = [
+    req_keys = [
         "Member.Profile",           # KEY_SEC_PROFILE
         "Member.Designation",       # KEY_SECSIZE
         "Material",                 # KEY_MATERIAL
         "Member.Material",          # KEY_SEC_MATERIAL
         "Connector.Plate.Thickness_List",  # KEY_PLATETHK
-        "Bolt.Diameter",            # KEY_D
-        "Bolt.Grade",              # KEY_GRD
-        "Bolt.Type",               # KEY_TYP
-        "Bolt.Bolt_Hole_Type",     # KEY_DP_BOLT_HOLE_TYPE
-        "Bolt.Slip_Factor",        # KEY_DP_BOLT_SLIP_FACTOR
         "Connector.Material",      # KEY_CONNECTOR_MATERIAL
         "Design.Design_Method",    # KEY_DP_DESIGN_METHOD
         "Detailing.Corrosive_Influences",  # KEY_DP_DETAILING_CORROSIVE_INFLUENCES
@@ -46,140 +41,102 @@ def get_required_keys() -> List[str]:
         "Conn_Location",          # KEY_LOCATION
         "Module"                  # KEY_MODULE
     ]
-    print("in boltedtensionmember.py: get_required_keys called, returning:", abhisogal_keys)
-    return abhisogal_keys
+    print("in welded_tension_member.py: get_required_keys called, returning:", req_keys)
+    return req_keys
 
 def validate_input(input_values: Dict[str, Any]) -> None:
-    print("in boltedtensionmember.py: validate_input called with input_values:", input_values)
+    print("in welded_tension_member.py: validate_input called with input_values:", input_values)
     required_keys = get_required_keys()
-    print("in boltedtensionmember.py: Required keys:", required_keys)
+    print("in welded_tension_member.py: Required keys:", required_keys)
     missing_keys = contains_keys(input_values, required_keys)
-    print("in boltedtensionmember.py: Missing keys:", missing_keys)
+    print("in welded_tension_member.py: Missing keys:", missing_keys)
     if missing_keys is not None:
-        print("in boltedtensionmember.py: Missing key detected:", missing_keys[0])
+        print("in welded_tension_member.py: Missing key detected:", missing_keys[0])
         raise MissingKeyError(missing_keys[0])
 
-    # Validate Bolt.Bolt_Hole_Type
-    print("in boltedtensionmember.py: Validating Bolt.Bolt_Hole_Type")
-    if not isinstance(input_values["Bolt.Bolt_Hole_Type"], str):
-        print("in boltedtensionmember.py: Invalid type for Bolt.Bolt_Hole_Type")
-        raise InvalidInputTypeError("Bolt.Bolt_Hole_Type", "str")
-
-    # Validate Bolt.Diameter
-    print("in boltedtensionmember.py: Validating Bolt.Diameter")
-    bolt_diameter = input_values["Bolt.Diameter"]
-    if (not isinstance(bolt_diameter, list)
-            or not validate_list_type(bolt_diameter, str)
-            or not custom_list_validation(bolt_diameter, int_able)):
-        print("in boltedtensionmember.py: Invalid type for Bolt.Diameter")
-        raise InvalidInputTypeError("Bolt.Diameter", "non empty List[str] where all items can be converted to int")
-
-    # Validate Bolt.Grade
-    print("in boltedtensionmember.py: Validating Bolt.Grade")
-    bolt_grade = input_values["Bolt.Grade"]
-    if (not isinstance(bolt_grade, list)
-            or not validate_list_type(bolt_grade, str)
-            or not custom_list_validation(bolt_grade, float_able)):
-        print("in boltedtensionmember.py: Invalid type for Bolt.Grade")
-        raise InvalidInputTypeError("Bolt.Grade", "non empty List[str] where all items can be converted to float")
-
-    # Validate Bolt.Slip_Factor
-    print("in boltedtensionmember.py: Validating Bolt.Slip_Factor")
-    bolt_slipfactor = input_values["Bolt.Slip_Factor"]
-    if (not isinstance(bolt_slipfactor, str)
-            or not float_able(bolt_slipfactor)):
-        print("in boltedtensionmember.py: Invalid type for Bolt.Slip_Factor")
-        raise InvalidInputTypeError("Bolt.Slip_Factor", "str where str can be converted to float")
-
-    # Validate Bolt.Type
-    print("in boltedtensionmember.py: Validating Bolt.Type")
-    if not isinstance(input_values["Bolt.Type"], str):
-        print("in boltedtensionmember.py: Invalid type for Bolt.Type")
-        raise InvalidInputTypeError("Bolt.Type", "str")
-
     # Validate Connector.Material
-    print("in boltedtensionmember.py: Validating Connector.Material")
+    print("in welded_tension_member.py: Validating Connector.Material")
     if not isinstance(input_values["Connector.Material"], str):
-        print("in boltedtensionmember.py: Invalid type for Connector.Material")
+        print("in welded_tension_member.py: Invalid type for Connector.Material")
         raise InvalidInputTypeError("Connector.Material", "str")
 
     # Validate Design.Design_Method
-    print("in boltedtensionmember.py: Validating Design.Design_Method")
+    print("in welded_tension_member.py: Validating Design.Design_Method")
     if not isinstance(input_values["Design.Design_Method"], str):
-        print("in boltedtensionmember.py: Invalid type for Design.Design_Method")
+        print("in welded_tension_member.py: Invalid type for Design.Design_Method")
         raise InvalidInputTypeError("Design.Design_Method", "str")
 
     # Validate Detailing.Corrosive_Influences
-    print("in boltedtensionmember.py: Validating Detailing.Corrosive_Influences")
+    print("in welded_tension_member.py: Validating Detailing.Corrosive_Influences")
     if not is_yes_or_no(input_values["Detailing.Corrosive_Influences"]):
-        print("in boltedtensionmember.py: Invalid value for Detailing.Corrosive_Influences")
+        print("in welded_tension_member.py: Invalid value for Detailing.Corrosive_Influences")
         raise InvalidInputTypeError("Detailing.Corrosive_Influences", "'Yes' or 'No'")
 
     # Validate Detailing.Edge_type
-    print("in boltedtensionmember.py: Validating Detailing.Edge_type")
+    print("in welded_tension_member.py: Validating Detailing.Edge_type")
     if not isinstance(input_values["Detailing.Edge_type"], str):
-        print("in boltedtensionmember.py: Invalid type for Detailing.Edge_type")
+        print("in welded_tension_member.py: Invalid type for Detailing.Edge_type")
         raise InvalidInputTypeError("Detailing.Edge_type", "str")
 
     # Validate Detailing.Gap
-    print("in boltedtensionmember.py: Validating Detailing.Gap")
+    print("in welded_tension_member.py: Validating Detailing.Gap")
     detailing_gap = input_values["Detailing.Gap"]
     if (not isinstance(detailing_gap, str)
             or not int_able(detailing_gap)):
-        print("in boltedtensionmember.py: Invalid type for Detailing.Gap")
+        print("in welded_tension_member.py: Invalid type for Detailing.Gap")
         raise InvalidInputTypeError("Detailing.Gap", "str where str can be converted to int")
 
     # Validate Load.Axial
-    print("in boltedtensionmember.py: Validating Load.Axial")
+    print("in welded_tension_member.py: Validating Load.Axial")
     load_axial = input_values["Load.Axial"]
     if (not isinstance(load_axial, str)
             or not int_able(load_axial)):
-        print("in boltedtensionmember.py: Invalid type for Load.Axial")
+        print("in welded_tension_member.py: Invalid type for Load.Axial")
         raise InvalidInputTypeError("Load.Axial", "str where str can be converted to int")
 
     # Validate Material
-    print("in boltedtensionmember.py: Validating Material")
+    print("in welded_tension_member.py: Validating Material")
     if not isinstance(input_values["Material"], str):
-        print("in boltedtensionmember.py: Invalid type for Material")
+        print("in welded_tension_member.py: Invalid type for Material")
         raise InvalidInputTypeError("Material", "str")
 
     # Validate Member.Profile
-    print("in boltedtensionmember.py: Validating Member.Profile")
+    print("in welded_tension_member.py: Validating Member.Profile")
     if not isinstance(input_values["Member.Profile"], str):
-        print("in boltedtensionmember.py: Invalid type for Member.Profile")
+        print("in welded_tension_member.py: Invalid type for Member.Profile")
         raise InvalidInputTypeError("Member.Profile", "str")
 
     # Validate Member.Designation
-    print("in boltedtensionmember.py: Validating Member.Designation")
+    print("in welded_tension_member.py: Validating Member.Designation")
     if not isinstance(input_values["Member.Designation"], str):
-        print("in boltedtensionmember.py: Invalid type for Member.Designation")
+        print("in welded_tension_member.py: Invalid type for Member.Designation")
         raise InvalidInputTypeError("Member.Designation", "str")
 
     # Validate Member.Length
-    print("in boltedtensionmember.py: Validating Member.Length")
+    print("in welded_tension_member.py: Validating Member.Length")
     if not isinstance(input_values["Member.Length"], str):
-        print("in boltedtensionmember.py: Invalid type for Member.Length")
+        print("in welded_tension_member.py: Invalid type for Member.Length")
         raise InvalidInputTypeError("Member.Length", "str")
 
     # Validate Conn_Location
-    print("in boltedtensionmember.py: Validating Conn_Location")
+    print("in welded_tension_member.py: Validating Conn_Location")
     if not isinstance(input_values["Conn_Location"], str):
-        print("in boltedtensionmember.py: Invalid type for Conn_Location")
+        print("in welded_tension_member.py: Invalid type for Conn_Location")
         raise InvalidInputTypeError("Conn_Location", "str")
 
     # Validate Module
-    print("in boltedtensionmember.py: Validating Module")
+    print("in welded_tension_member.py: Validating Module")
     if not isinstance(input_values["Module"], str):
-        print("in boltedtensionmember.py: Invalid type for Module")
+        print("in welded_tension_member.py: Invalid type for Module")
         raise InvalidInputTypeError("Module", "str")
 
     # Validate Connector.Plate.Thickness_List
-    print("in boltedtensionmember.py: Validating Connector.Plate.Thickness_List")
+    print("in welded_tension_member.py: Validating Connector.Plate.Thickness_List")
     connector_plate_thicknesslist = input_values["Connector.Plate.Thickness_List"]
     if (not isinstance(connector_plate_thicknesslist, list)
             or not validate_list_type(connector_plate_thicknesslist, str)
             or not custom_list_validation(connector_plate_thicknesslist, int_able)):
-        print("in boltedtensionmember.py: Invalid type for Connector.Plate.Thickness_List")
+        print("in welded_tension_member.py: Invalid type for Connector.Plate.Thickness_List")
         raise InvalidInputTypeError("Connector.Plate.Thickness_List", "List[str] where all items can be converted to int")
 
 def validate_input_new(input_values: Dict[str, Any]) -> None:
@@ -199,12 +156,7 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
     # Validate key types using loops.
 
     # Validate all strings.
-    str_keys = ["Bolt.Bolt_Hole_Type",  # List of all parameters that are strings
-                "Bolt.TensionType",
-                "Bolt.Type",
-                "Bolt.Connectivity",
-                "Bolt.Connector_Material",
-                "Design.Design_Method",
+    str_keys = ["Design.Design_Method",  # List of all parameters that are strings
                 "Detailing.Edge_type",
                 "Material",
                 "Member.Supported_Section.Designation",
@@ -223,42 +175,38 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
             print('string key passed  : ' , key )
 
     # Validate for keys that are numbers
-    num_keys = [("Bolt.Slip_Factor", True),  # List of all parameters that are numbers (key, is_float)
-                ("Detailing.Gap", False),
+    num_keys = [("Detailing.Gap", False),  # List of all parameters that are numbers (key, is_float)
                 ("Load.Axial", False),
-                ("Load.Shear", False),
-                ("Weld.Material_Grade_OverWrite", False)]
+                ("Load.Shear", False),]
     for key in num_keys:  # Loop through all keys.
         # Check if key is a number. If not, raise error.
         print('validating num keys')
         validate_num(key[0], key[1])
 
     # Validate for keys that are arrays
-    arr_keys = [("Bolt.Diameter", False),  # List of all parameters that can be converted to numbers (key, is_float)
-                ("Bolt.Grade", True),
-                ("Connector.Plate.Thickness_List", False)]
+    arr_keys = [("Connector.Plate.Thickness_List", False)]  # List of all parameters that can be converted to numbers (key, is_float)
     for key in arr_keys:
         print('validating arr key')
         # Check if key is a list where all items can be converted to numbers. If not, raise error.
         validate_arr(key[0], key[1])
 
 
-def create_module() -> Tension_bolted:
-    print("in bolted_tension_member.py: create_module called")
-    module = Tension_bolted()
-    print("in bolted_tension_member.py: Tension_bolted instance created:", module)
+def create_module() -> Tension_welded:
+    print("in welded_tension_member.py: create_module called")
+    module = Tension_welded()
+    print("in welded_tension_member.py: Tension_welded instance created:", module)
     module.set_osdaglogger(None)
-    print("in bolted_tension_member.py: set_osdaglogger called with None")
+    print("in welded_tension_member.py: set_osdaglogger called with None")
     return module
 
 
-def create_from_input(input_values: Dict[str, Any]) -> Tension_bolted:
+def create_from_input(input_values: Dict[str, Any]) -> Tension_welded:
     try:
         module = create_module()
-        print("in bolted_tension_member.py: Module created successfully")
+        print("in welded_tension_member.py: Module created successfully")
     except Exception as e:
-        print("in bolted_tension_member.py: Exception in create_module:", e)
-        print("in bolted_tension_member.py: Error in creating module")
+        print("in welded_tension_member.py: Exception in create_module:", e)
+        print("in welded_tension_member.py: Error in creating module")
     # Plate.Thickness expects a list, take the first value if present, else ""
     if isinstance(input_values.get("Connector.Plate.Thickness_List", None), list) and input_values["Connector.Plate.Thickness_List"]:
         input_values["Plate.Thickness"] = input_values["Connector.Plate.Thickness_List"][0]
@@ -267,36 +215,39 @@ def create_from_input(input_values: Dict[str, Any]) -> Tension_bolted:
 
     # Now call set_input_values with the updated dictionary
     try:
+        input_values["Weld.Material_Grade_OverWrite"] = "410"
+        input_values["Weld.Fab"] = "Shop Weld"
         module.set_input_values(input_values)
-        print("in bolted_tension_member.py: set_input_values called successfully")
+        print("in welded_tension_member.py: set_input_values called successfully")
     except Exception as e:
-        print("in bolted_tension_member.py: Exception in set_input_values:", e)
-        print("in bolted_tension_member.py: Error in setting the input values")
+        print(type(e))
+        print("in welded_tension_member.py: Exception in set_input_values:", e)
+        print("in welded_tension_member.py: Error in setting the input values")
     
     return module
 
 
 
 def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
-    print("in bolted_tension_member.py: generate_output called with input_values:", input_values)
+    print("in welded_tension_member.py: generate_output called with input_values:", input_values)
     output = {}
     module = create_from_input(input_values)
-    print("in bolted_tension_member.py: Module after create_from_input:", module)
-    print("in bolted_tension_member.py: type of module:", type(module))
+    print("in welded_tension_member.py: Module after create_from_input:", module)
+    print("in welded_tension_member.py: type of module:", type(module))
     raw_output_text = module.output_values(True)
-    print("in bolted_tension_member.py: raw_output_text:", raw_output_text)
+    print("in welded_tension_member.py: raw_output_text:", raw_output_text)
     raw_output_spacing = module.spacing(True)
-    print("in bolted_tension_member.py: raw_output_spacing:", raw_output_spacing)
+    print("in welded_tension_member.py: raw_output_spacing:", raw_output_spacing)
     # raw_output_capacities = module.capacities(True)
-    # print("in bolted_tension_member.py: raw_output_capacities:", raw_output_capacities)
+    # print("in welded_tension_member.py: raw_output_capacities:", raw_output_capacities)
     # raw_output_bolt_capacity = module.bolt_capacity_details(True)
-    # print("in bolted_tension_member.py: raw_output_bolt_capacity:", raw_output_bolt_capacity)
+    # print("in welded_tension_member.py: raw_output_bolt_capacity:", raw_output_bolt_capacity)
     logs = module.logs
-    print("in bolted_tension_member.py: logs:", logs)
+    print("in welded_tension_member.py: logs:", logs)
     raw_output = raw_output_spacing + raw_output_text
-    print("in bolted_tension_member.py: raw_output combined:", raw_output)
+    print("in welded_tension_member.py: raw_output combined:", raw_output)
     for param in raw_output:
-        print("in bolted_tension_member.py: Processing param:", param)
+        print("in welded_tension_member.py: Processing param:", param)
         if param[2] == "TextBox":
             key = param[0]
             label = param[1]
@@ -306,10 +257,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "label": label,
                 "val": value  # Changed from "value" to "val" to match frontend expectations
             }
-            print(f"in bolted_tension_member.py: Added output[{key}] = {output[key]}")
-    print("in bolted_tension_member.py: Final output dict:", output)
-    print("in bolted_tension_member.py: Output keys:", list(output.keys()))
-    print("in bolted_tension_member.py: Returning logs:", logs)
+            print(f"in welded_tension_member.py: Added output[{key}] = {output[key]}")
+    print("in welded_tension_member.py: Final output dict:", output)
+    print("in welded_tension_member.py: Output keys:", list(output.keys()))
+    print("in welded_tension_member.py: Returning logs:", logs)
     return output, logs
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
@@ -321,7 +272,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     print('module from input values : ' , module)
     # Object that will create the CAD model.
     try: 
-        cld = CommonDesignLogic(None, '', KEY_DISP_TENSION_BOLTED , module.mainmodule)
+        cld = CommonDesignLogic(None, '', KEY_DISP_TENSION_WELDED , module.mainmodule)
     except Exception as e : 
         print('error in cld e : ' , e)
     

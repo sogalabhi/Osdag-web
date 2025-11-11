@@ -487,10 +487,10 @@ export const ModuleProvider = ({ children }) => {
     dispatch({ type: "RESET_MODULE_STATE" });
   }, [dispatch]);
 
-  useEffect(() => {
-    // Initialize with FinPlate module for backward compatibility
-    populateModule(MODULE_KEY_FIN_PLATE, dispatch);
-  }, []);
+  // useEffect(() => {
+  //   // Initialize with FinPlate module for backward compatibility
+  //   populateModule(MODULE_KEY_FIN_PLATE, dispatch);
+  // }, []);
 
   return (
     <ModuleContext.Provider
@@ -518,6 +518,7 @@ export const ModuleProvider = ({ children }) => {
         // Tension member specific
         sectionProfileList: state.sectionProfileList,
         channelList: state.channelList,
+        sectionDesignation: state.sectionDesignation,
 
         // Welded connection specific
         weldTypes: state.weldTypes,

@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { ModuleContext } from "../../../context/ModuleState";
-import { MODULE_KEY_FIN_PLATE } from "../../../constants/DesignKeys";
+import { MODULE_KEY_FIN_PLATE, MODULE_KEY_CLEAT_ANGLE } from "../../../constants/DesignKeys";
 
 export const useEngineeringModule = (moduleConfig) => {
   const navigate = useNavigate();
@@ -20,6 +20,9 @@ export const useEngineeringModule = (moduleConfig) => {
     propertyClassList,
     angleList, // FIXED: Added angleList from context
     boltTypeList,
+    sectionProfileList,
+    channelList,
+    sectionDesignation,
     designLogs,
     designData,
     displayPDF,
@@ -136,6 +139,14 @@ export const useEngineeringModule = (moduleConfig) => {
   const [modalStates, setModalStates] = useState(
     moduleConfig.modalConfig.reduce((acc, modal) => {
       acc[modal.key] = false;
+      return acc;
+    }, {})
+  );
+
+  const [modalDynamicSrc, setModalDynamicSrc] = useState(
+    moduleConfig.modalConfig.reduce((acc, modal) => {
+      if(!modal?.dataSource)
+        acc[modal.key] = [];
       return acc;
     }, {})
   );
@@ -568,6 +579,7 @@ export const useEngineeringModule = (moduleConfig) => {
       propertyClassList,
       thicknessList,
       angleList, // FIXED: Added angleList to submission params
+      channelList
     }, extraState);
 
     // Show loading modal
@@ -779,6 +791,9 @@ export const useEngineeringModule = (moduleConfig) => {
     propertyClassList,
     angleList, // FIXED: Added angleList to return object
     boltTypeList,
+    sectionProfileList,
+    sectionDesignation,
+    channelList,
     displayPDF,
     renderCadModel,
     cadModelPaths,
@@ -809,6 +824,8 @@ export const useEngineeringModule = (moduleConfig) => {
     selectedItems,
     extraState,
     setExtraState,
+    modalDynamicSrc,
+    setModalDynamicSrc,
 
     // Report states
     createDesignReportBool,

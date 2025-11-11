@@ -25,7 +25,8 @@ export const InputSection = ({
   contextData,
   extraState = {},
   setExtraState = () => { },
-  updateSelectedItems = () => { }
+  updateSelectedItems = () => { },
+  setModalDynamicSrc,
 }) => {
   const safeInputs = inputs || {};
   const safeContextData = contextData || {};
@@ -147,6 +148,11 @@ export const InputSection = ({
         'cleat_section': 'angleList',
       };
       const listName = keyMap[inputKey];
+      if (field?.getDynamicDataSource) {
+        let options = field.getDynamicDataSource(inputs, contextData)
+        setModalDynamicSrc((modalDynSrc) => ({...modalDynSrc, [field.key]:options}));
+        return options;
+      }
       return Array.isArray(safeContextData[listName]) ? safeContextData[listName] : [];
     };
 
@@ -296,6 +302,45 @@ export const InputSection = ({
           />
         );
       }
+
+      case 'sectionProfileList': {
+        let options = safeContextData[field.type];
+        options = options.map((elem) => { return { value: elem, label: elem } });
+        const value = options.find(opt => opt.value === inputs.section_profile);
+        return (
+          <Select
+            options={options}
+            value={value}
+            onChange={(selected) => field.onChange(selected.value, inputs, setInputs, contextData, extraState, setExtraState)}
+            menuPortalTarget={document.body}
+            styles={customSelectStyles}
+            classNamePrefix="react-select"
+            className="w-[60%]"
+          />);
+      }
+      case 'dynamicSelect': {
+        let options = field.getOptions(inputs);
+        const value = options.find(opt => opt.value === inputs[field.key]);
+        return (
+          <Select
+            options={options}
+            value={value}
+            onChange={(selected) => setInputs({ ...inputs, [field.key]: selected.value })}
+            menuPortalTarget={document.body}
+            styles={customSelectStyles}
+            classNamePrefix="react-select"
+            className="w-[60%]"
+          />
+        );
+      }
+      case 'image':
+        return (<>{field.conditionalDisplay() &&
+          <div className="flex justify-center">
+            <img
+              src={field.imageSource(extraState)}
+              alt="Connection type"
+              className="w-[100px] h-[100px] object-contain"
+            /></div>}</>);
 
       case 'number':
       default:

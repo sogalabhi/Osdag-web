@@ -90,6 +90,8 @@ export const MODULE_ROUTES = {
     CoverPlateWelded: "/design/connections/beam-to-beam-splice/cover_plate_welded",
     BeamBeamEndPlate: "/design/connections/beam-to-beam-splice/end_plate",
     SimplySupportedBeam: "/design/flexure_member/simply_supported_beam",
+    BoltedToEndPlate: "/design/tension-member/bolted_to_end_gusset",
+    WeldedToEndPlate: "/design/tension-member/welded_to_end_gusset",
     BoltedToEndGusset: "/design/tension-member/bolted_to_end_gusset",
     BeamColumnEndPlate: "/design/connections/column-beam/end_plate"
     // Add other needed routes

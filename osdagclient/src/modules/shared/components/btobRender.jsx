@@ -61,7 +61,21 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
       const stlLoader = new STLLoader();
       const parsedData = {};
       const partsGroup = new THREE.Group();
-      const partKeys = new Set(["Beam", "Column", "Plate", "Weld", "Welds", "Bolt", "Bolts", "cleatAngle", "SeatedAngle", "Connector"]);
+      const partKeys = new Set([
+        "Member",
+        "Endplate",
+        "Beam",
+        "Column",
+        "Plate",
+        "Weld",
+        "Welds",
+        "Bolt",
+        "Bolts",
+        "cleatAngle",
+        "SeatedAngle",
+        "Connector"
+      ]);
+
       Object.entries(modelPaths).forEach(([key, dataUrl]) => {
         try {
           if (typeof dataUrl === 'string' && dataUrl.startsWith('data:application/octet-stream;base64,')) {
@@ -80,6 +94,8 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
               weld_left: '#ff0000',
               weld_right: '#ff0000',
               // map to canonical keys used by sections
+              Member: '#808080',
+              Endplate: '#2f2f23',
               Beam: '#868664',
               Column: '#484836',
               Plate: '#2f2f23',
@@ -174,6 +190,8 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
   );
   // Part color map (dark mode hex values provided)
   const partColors = useMemo(() => ({
+    Member: '#808080',
+    Endplate: '#2f2f23',
     Beam: "#868664",
     Column: "#484836",
     Plate: "#2f2f23",
@@ -210,7 +228,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
     [parsedModels, texture]
   );
   const geometryEndplate = useMemo(
-    () => (parsedModels?.EndPlate ? getGeometry(parsedModels.EndPlate) : null),
+    () => (parsedModels?.Endplate ? getGeometry(parsedModels.Endplate) : null),
     [parsedModels, texture]
   );
   const geometrySeatedAngle = useMemo(
