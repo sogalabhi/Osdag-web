@@ -2,19 +2,22 @@
 Input dock widget for Osdag GUI.
 Handles user input forms and group boxes for connection design.
 """
-import sys, time
+import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
-from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QProgressBar
-from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QRect, QThread, Signal
-from PySide6.QtGui import QPixmap, QIcon, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIntValidator
+from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout
+from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication
+from PySide6.QtGui import QPixmap, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIntValidator
 
 from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
 import osdag_gui.resources.resources_rc
 from osdag_gui.ui.components.dialogs.customized_popup import CustomValueSelectPopup
+from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
+from osdag_gui.ui.components.dialogs.bounds_selector import BoundsSelectorDialog
+
 
 from osdag_core.Common import *
 
@@ -39,93 +42,7 @@ def left_aligned_widget(widget):
     layout.setAlignment(widget, Qt.AlignVCenter)  # Optional: vertical center
     return container
 
-def apply_field_style(widget):
-    arrow_down_path = ":/images/down_arrow.png"
-    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-    # Removed setFixedWidth to allow expansion
-    if isinstance(widget, QComboBox):
-        style = f"""
-        QComboBox {{
-            padding: 2px;
-            border: 1px solid black;
-            border-radius: 5px;
-            background-color: white;
-            color: black;
-        }}
-        QComboBox::drop-down {{
-            subcontrol-origin: padding;
-            subcontrol-position: top right;
-            border-left: 0px;
-        }}
-        QComboBox::down-arrow {{
-            image: url("{arrow_down_path}");
-            width: 15px;
-            height: 15px;
-            margin-right: 5px;
-        }}
-        QComboBox QAbstractItemView {{
-            background-color: white;
-            border: 1px solid black;
-            outline: none;
-        }}
-        QComboBox QAbstractItemView::item {{
-            color: black;
-            background-color: white;
-            border: none;
-            border: 1px solid white;
-            border-radius: 0;
-            padding: 2px;
-        }}
-        QComboBox QAbstractItemView::item:hover {{
-            border: 1px solid #90AF13;
-            background-color: #90AF13;
-            color: black;
-        }}
-        QComboBox QAbstractItemView::item:selected {{
-            background-color: #90AF13;
-            color: black;
-            border: 1px solid #90AF13;
-        }}
-        QComboBox QAbstractItemView::item:selected:hover {{
-            background-color: #90AF13;
-            color: black;
-            border: 1px solid #94b816;
-        }}
-        """
-        widget.setStyleSheet(style)
-    elif isinstance(widget, QLineEdit):
-        widget.setStyleSheet("""
-        QLineEdit {
-            padding: 1px 7px;
-            border: 1px solid #070707;
-            border-radius: 6px;
-            background-color: white;
-            color: #000000;
-            font-weight: normal;
-        }
-        """)
-
-def style_main_buttons():
-    return """
-        QPushButton {
-            background-color: #94b816;
-            color: white;
-            font-weight: bold;
-            border-radius: 4px;
-            padding: 6px 18px;
-        }
-        QPushButton:hover {
-            background-color: #7a9a12;
-        }
-        QPushButton:pressed {
-            background-color: #5f7a0e;
-        }
-    """
-
-
 class InputDock(QWidget):
-    # inputDockVisibilityChanged = Signal(bool)
-
     def __init__(self, backend:object, parent):
         super().__init__()
         self.parent = parent
@@ -133,7 +50,7 @@ class InputDock(QWidget):
         self.backend = backend
         self.input_widget = None
 
-        self.setStyleSheet("background: transparent;")
+        self.setObjectName("input_dock")
         self.main_layout = QHBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
@@ -151,28 +68,17 @@ class InputDock(QWidget):
         self.main_layout.addWidget(self.left_container)
 
         self.toggle_strip = QWidget()
-        self.toggle_strip.setStyleSheet("background-color: #94b816;")
         self.toggle_strip.setFixedWidth(6)
+        self.toggle_strip.setObjectName("toggle_strip")
         toggle_layout = QVBoxLayout(self.toggle_strip)
         toggle_layout.setContentsMargins(0, 0, 0, 0)
         toggle_layout.setSpacing(0)
         toggle_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
 
         self.toggle_btn = QPushButton("❮")
+        self.toggle_btn.setObjectName("toggle_strip_button")
         self.toggle_btn.setFixedSize(6, 60)
         self.toggle_btn.setToolTip("Hide panel")
-        self.toggle_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #6c8408;
-                color: white;
-                font-size: 12px;
-                font-weight: bold;
-                border: none;
-            }
-            QPushButton:hover {
-                background-color: #5e7407;
-            }
-        """)
         self.toggle_btn.clicked.connect(self.toggle_input_dock)
         toggle_layout.addStretch()
         toggle_layout.addWidget(self.toggle_btn)
@@ -214,16 +120,17 @@ class InputDock(QWidget):
 
         # --- Main Content Panel (to be scrolled horizontally and vertically) ---
         self.left_panel = QWidget()
-        self.left_panel.setStyleSheet("background-color: white;")
+        self.left_panel.setObjectName("inputs-leftpanel")
         panel_layout = QVBoxLayout(self.left_panel)
         panel_layout.setContentsMargins(5, 5, 5, 5)
-        panel_layout.setSpacing(0)
+        panel_layout.setSpacing(4)
 
         # --- Top Bar (fixed inside scroll area) ---
         top_bar = QHBoxLayout()
         top_bar.setSpacing(10)
         input_dock_btn = QPushButton("Basic Inputs")
-        input_dock_btn.setStyleSheet(style_main_buttons())
+        input_dock_btn.setObjectName("inputs_button")
+        input_dock_btn.setCursor(Qt.CursorShape.ArrowCursor)
         input_dock_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         top_bar.addWidget(input_dock_btn)
         additional_inputs_btn = AdditionalInputsButton()
@@ -237,40 +144,15 @@ class InputDock(QWidget):
 
         # Vertical scroll area for group boxes (vertical only)
         scroll_area = QScrollArea()
+        scroll_area.setObjectName("inputs_vscrollarea")
         scroll_area.setWidgetResizable(True)
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: 1px solid #EFEFEC;
-                background-color: transparent;
-                padding: 3px;
-            }
-            QScrollBar:vertical {
-                background: #E0E0E0;
-                width: 8px;
-                margin: 0px 0px 0px 3px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:vertical {
-                background: #A0A0A0;
-                min-height: 30px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #707070;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-                background: none;
-            }
-        """)
 
         group_container = QWidget()
         self.input_widget = group_container
+        self.input_widget.setObjectName("inputs_container")
         group_container_layout = QVBoxLayout(group_container)
 
         # --- Main Content (group boxes) ---
@@ -285,7 +167,7 @@ class InputDock(QWidget):
             print(f"Option:{field}")
             if type == TYPE_MODULE:
                 # No use of module title will see.
-                continue
+                pass
             elif type == TYPE_TITLE:
                 if track_group:
                     current_group.setLayout(cur_box_form)
@@ -294,24 +176,9 @@ class InputDock(QWidget):
                 
                 # Initialized the group box for current title
                 current_group = QGroupBox(label)
+                print("Group_box: ", label)
                 current_group.setObjectName(label + "_group")
                 track_group = True
-                current_group.setStyleSheet("""
-                    QGroupBox {
-                        border: 1px solid #90AF13;
-                        border-radius: 4px;
-                        margin-top: 0.8em;
-                        font-weight: bold;
-                    }
-                    QGroupBox::title {
-                        subcontrol-origin: content;
-                        subcontrol-position: top left;
-                        left: 10px;
-                        padding: 0 4px;
-                        margin-top: -15px;
-                        background-color: white;
-                    }
-                """)
                 cur_box_form = QFormLayout()
                 cur_box_form.setHorizontalSpacing(5)
                 cur_box_form.setVerticalSpacing(10)
@@ -319,15 +186,14 @@ class InputDock(QWidget):
                 cur_box_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
                 cur_box_form.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-            elif type == TYPE_COMBOBOX or type ==TYPE_COMBOBOX_CUSTOMIZED:
+            elif type == TYPE_COMBOBOX or type == TYPE_COMBOBOX_CUSTOMIZED:
                 # Use monospace font for the label
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
-                # left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
 
                 right = NoScrollComboBox()
                 right.setObjectName(field[0])
-                apply_field_style(right)
+                right.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 option_list = field[3]
                 right.addItems(option_list)
 
@@ -347,11 +213,9 @@ class InputDock(QWidget):
             
             elif type == TYPE_TEXTBOX:
                 left = QLabel(label)
-                left.setObjectName(field[0] + "_label")
-                # left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
-                
+                left.setObjectName(field[0] + "_label")                
                 right = QLineEdit()
-                apply_field_style(right)
+                right.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 right.setObjectName(field[0])
                 right.setEnabled(True if field[4] else False)
                 if field[5] != 'No Validator':
@@ -435,7 +299,6 @@ class InputDock(QWidget):
             for t in updated_list:
                 for key_name in t[0]:
                     key_changed = self.input_widget.findChild(QWidget, key_name)
-                    print(f"~~finding {key_name} get {key_changed} object {key_changed.objectName()}")
                     self.on_change_connect(key_changed, updated_list, self.data, self.backend)                    
                     print(f"key_name{key_name} \n key_changed{key_changed}  \n self.on_change_connect ")
 
@@ -461,38 +324,13 @@ class InputDock(QWidget):
         # --- Horizontal scroll area for all right content ---
         h_scroll_area = QScrollArea()
         h_scroll_area.setWidgetResizable(True)
+        h_scroll_area.setObjectName("inputs_hscrollarea")
         h_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         h_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         h_scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        h_scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: none;
-                background-color: transparent;
-            }
-            QScrollBar:horizontal {
-                background: #E0E0E0;
-                height: 8px;
-                margin: 3px 0px 0px 0px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:horizontal {
-                background: #A0A0A0;
-                min-width: 30px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:horizontal:hover {
-                background: #707070;
-            }
-            QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
-                width: 0px;
-            }
-            QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
-                background: none;
-            }
-        """)
         h_scroll_area.setWidget(self.left_panel)
 
-        left_layout.addWidget(h_scroll_area)
+        left_layout.addWidget(self.left_panel)
 
     def print_widget_tree(self, widget: QWidget, indent: int=0):
         prefix = "  " * (indent*4)
@@ -581,7 +419,6 @@ class InputDock(QWidget):
 
     # To update the label and combobox if Connectivity
     def change(self, k1, new, data, main):
-        print(f"$${new}")
         for tup in new:
             (object_name, k2_key, typ, f) = tup
             print(f"\n object_name:{object_name}")
@@ -597,14 +434,12 @@ class InputDock(QWidget):
                 k2_key = k2_key + "_label"
             if typ == TYPE_NOTE:
                 k2_key = k2_key + "_note"
-
             if typ in [TYPE_OUT_DOCK, TYPE_OUT_LABEL]:
                 k2 = self.input_widget.findChild(QWidget, k2_key)
             elif typ == TYPE_WARNING:
                 k2 = str(k2_key)
             else:
                 k2 = self.input_widget.findChild(QWidget, k2_key)
-
 
             arg_list = []
             for ob_name in object_name:
@@ -651,13 +486,22 @@ class InputDock(QWidget):
                 print("\n\nImg")
                 pixmap1 = QPixmap(val)
                 k2.setPixmap(pixmap1)
+
             elif typ == TYPE_TEXTBOX:
                 print("\n\ntext")
-                if val:
-                    k2.setEnabled(True)
+                if main.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
+                    w = self.get_current_widget_in_layout(k2_key)
+                    if not val and isinstance(w, QLineEdit):  # Show optimization button
+                        self.change_text_to_bound_btn(w, tup)
+                    elif val and isinstance(w, QPushButton):  # Show textbox for customized input
+                        self.change_bound_btn_to_text(w, tup)
                 else:
-                    k2.setDisabled(True)
-                    k2.setText("")
+                    if val:
+                        k2.setEnabled(True)
+                    else: 
+                        k2.setText("")
+                        k2.setDisabled(True)
+
             elif typ == TYPE_COMBOBOX_FREEZE:
                 print("\n\nfreeze_Combo")
                 if val:
@@ -675,6 +519,117 @@ class InputDock(QWidget):
                 else:
                     k2.setVisible(True)
 
+    # For Plate-Girder Module-starts----------------------------------------------------
+    def change_text_to_bound_btn(self, old_widget, tupple):
+        layout = old_widget.parentWidget().layout()
+        if layout is None:
+            print(f"ERROR:: Widget layout not Found for {tupple[1]}")
+            return None
+
+        index = layout.indexOf(old_widget)
+        if index == -1:
+            print(f"ERROR:: Widget not found for {tupple[1]}")
+            return None
+
+        # Create or retrieve button
+        if self.backend.bound_widgets.get(tupple[1], ""):
+            btn = self.backend.bound_widgets.get(tupple[1])[1]
+            print(f"Reusing existing button for {tupple[1]}")
+        else:
+            # Bounds Button
+            btn = QPushButton("Set Bounds")
+            btn.clicked.connect(lambda checked=False, name=tupple[1]: self.choose_bounds(name))
+            self.backend.bound_widgets[tupple[1]] = [old_widget, btn]
+            print(f"Created new button for {tupple[1]}")
+        
+        btn.setObjectName(tupple[1])
+        layout.replaceWidget(old_widget, btn)
+        old_widget.hide()  # Hide the old widget
+        btn.show()  # Show the button
+    
+    def change_bound_btn_to_text(self, old_widget, tupple):
+        layout = old_widget.parentWidget().layout()
+        if layout is None:
+            print(f"ERROR:: Widget layout not Found for {tupple[1]}")
+            return None
+
+        index = layout.indexOf(old_widget)
+        if index == -1:
+            print(f"ERROR:: Widget not found for {tupple[1]}")
+            return None
+
+        # Retrieve or create textbox
+        if self.backend.bound_widgets.get(tupple[1], ""):
+            text_box = self.backend.bound_widgets.get(tupple[1])[0]
+            print(f"Reusing existing LineEdit for {tupple[1]}")
+        else:
+            print(f"Creating new LineEdit for {tupple[1]}")
+            inputs = self.backend.input_values()
+            data_tup = None
+            for tup in inputs:
+                if tup[0] == tupple[1]:
+                    data_tup = tup
+                    break
+            
+            text_box = QLineEdit()
+            text_box.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            if data_tup and data_tup[5] != 'No Validator':
+                text_box.setValidator(self.get_validator(data_tup[5]))
+            self.backend.bound_widgets[tupple[1]] = [text_box, old_widget]
+        
+        text_box.setObjectName(tupple[1])    
+        layout.replaceWidget(old_widget, text_box)
+        old_widget.hide()  # Hide the button
+        text_box.show()  # Show the textbox
+
+    def get_current_widget_in_layout(self, widget_name):
+        """Find the actual widget currently in the layout by objectName"""
+        # Check if we have it stored in bound_widgets
+        if widget_name in self.backend.bound_widgets:
+            stored = self.backend.bound_widgets[widget_name]
+            # Return whichever widget is currently visible/in layout
+            text_box = stored[0]
+            button = stored[1]
+            
+            # Check which one is actually in a layout
+            if text_box.parentWidget() and text_box.parentWidget().layout():
+                layout = text_box.parentWidget().layout()
+                if layout.indexOf(text_box) != -1:
+                    return text_box
+            
+            if button.parentWidget() and button.parentWidget().layout():
+                layout = button.parentWidget().layout()
+                if layout.indexOf(button) != -1:
+                    return button
+
+        return self.input_widget.findChild(QWidget, widget_name)
+
+    def choose_bounds(self, name: str):
+        bounds = None
+        # Get default values
+        if name == KEY_OVERALL_DEPTH_PG:
+            bounds = self.backend.bounds_map.get('D')
+        elif name == KEY_TOP_Bflange_PG:
+            bounds = self.backend.bounds_map.get('bf_top')
+        elif name == KEY_BOTTOM_Bflange_PG:
+            bounds = self.backend.bounds_map.get('bf_bot')
+
+        dialog = BoundsSelectorDialog(name.replace(".", " ") , default=[bounds[0], bounds[1], bounds[2]])
+        result = dialog.exec()
+        
+        if result:
+            print(f"New bounds for {name}: Upper = {result[0]}, Lower = {result[1]}, Step = {result[2]}")
+            # Update Bounds
+            if name == KEY_OVERALL_DEPTH_PG:
+                self.backend.bounds_map['D'] = (result[0], result[1], result[2])
+            elif name == KEY_TOP_Bflange_PG:
+                self.backend.bounds_map['tf'] = (result[0], result[1], result[2])
+            elif name == KEY_BOTTOM_Bflange_PG:
+                self.backend.bounds_map['bf'] = (result[0], result[1], result[2]) 
+        else:
+            print("Dialog was cancelled")
+
+    # For Plate-Girder Module-ends---------------------------------------------------  
 
     def toggle_input_dock(self):
         parent = self.parent
@@ -687,94 +642,158 @@ class InputDock(QWidget):
 
     def new_material_dialog(self):
         dialog = QDialog(self)
+        dialog.setObjectName("custom_material_popup")
+        dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
+        dialog.setAttribute(Qt.WA_StyledBackground, True)
+        dialog.setModal(True)  # Make it modal to ensure it appears on top
+        
         self.material_popup_message = ''
         self.invalid_field = ''
-        dialog.setWindowTitle('Custom Material')
-        layout = QGridLayout(dialog)
+        
+        central_layout = QVBoxLayout()
+        central_layout.setContentsMargins(1, 1, 1, 1)
+        central_layout.setSpacing(0)
+        
+        # Create custom title bar
+        title_bar = CustomTitleBar(parent=dialog)
+        title_bar.setTitle('Custom Material')
+        
+        # Connect close button if CustomTitleBar has one
+        if hasattr(title_bar, 'close_button'):
+            title_bar.close_button.clicked.connect(dialog.close)
+        
+        central_layout.addWidget(title_bar)
+        
+        # Create main content widget
+        content_widget = QWidget()
+        content_layout = QGridLayout()
+        
         # Center the content by adding side stretch columns and margins
-        layout.setContentsMargins(20, 10, 20, 10)
-        layout.setHorizontalSpacing(6)
-        layout.setVerticalSpacing(12)
-        layout.setColumnStretch(0, 1)
-        layout.setColumnStretch(3, 1)
-        widget = QWidget(dialog)
-        widget.setLayout(layout)
-        dialog.setStyleSheet("""
-            QDialog, QWidget {
-                background-color: #ffffff;
-                color: #000000;
-            }
-            QLabel {
-                color: #000000;
-            }
-            QLineEdit {
-                background-color: #ffffff;
-                color: #000000;
-                border: 1px solid #c0c0c0;
-                border-radius: 3px;
-                padding: 2px 4px;
-                selection-background-color: #3875d6;
-                selection-border-color: #90af13;
-            }
-            QPushButton {
-                background-color: #90af13;
-                color: #000000;
-                padding: 4px 10px;
-                border-radius: 3px;
-            }
-            QPushButton:hover {
-                background-color: #5e7407;
-            }
-            QPushButton:pressed {
-                background-color: #7d9710;
-            }
-            """)
+        content_layout.setContentsMargins(20, 10, 20, 10)
+        content_layout.setHorizontalSpacing(6)
+        content_layout.setVerticalSpacing(12)
+        content_layout.setColumnStretch(0, 1)
+        content_layout.setColumnStretch(3, 1)
+        content_widget.setLayout(content_layout)
+        
         _translate = QCoreApplication.translate
         textbox_list = ['Grade', 'Fy_20', 'Fy_20_40', 'Fy_40', 'Fu']
         event_function = ['', self.material_popup_fy_20_event, self.material_popup_fy_20_40_event,
-                          self.material_popup_fy_40_event, self.material_popup_fu_event]
+                        self.material_popup_fy_40_event, self.material_popup_fu_event]
         self.original_focus_event_functions = {}
-
-        i = 0
-        for textbox_name in textbox_list:
-            label = QLabel(widget)
-            label.setObjectName(textbox_name+"_label")
-            label.setText(_translate("MainWindow", "<html><body><p>" + textbox_name + "</p></body></html>"))
+        
+        # Create form fields
+        for i, textbox_name in enumerate(textbox_list):
+            label = QLabel(content_widget)
+            label.setObjectName(textbox_name + "_label")
+            
+            # Format label text
+            display_name = textbox_name.replace('_', ' ')
+            if textbox_name == 'Fy_20':
+                display_name = 'Fy (< 20mm)'
+            elif textbox_name == 'Fy_20_40':
+                display_name = 'Fy (20-40mm)'
+            elif textbox_name == 'Fy_40':
+                display_name = 'Fy (> 40mm)'
+            elif textbox_name == 'Fu':
+                display_name = 'Fu'
+                
+            label.setText(_translate("MainWindow", display_name + ":"))
             label.setFixedSize(100, 30)
-            layout.addWidget(label, i, 1, 1, 1)
-
-            textbox = QLineEdit(widget)
+            content_layout.addWidget(label, i, 1, 1, 1)
+            
+            textbox = QLineEdit(content_widget)
             textbox.setObjectName(textbox_name)
             textbox.setFixedSize(200, 24)
+            
             if textbox_name == 'Grade':
                 textbox.setReadOnly(True)
                 textbox.setText("Cus____")
             else:
                 textbox.setValidator(QIntValidator())
-                # textbox.mousePressEvent = event_function[textbox_list.index(textbox_name)]
-                self.original_focus_event_functions.update({textbox_name: textbox.focusOutEvent})
+                # Store original focus event
+                self.original_focus_event_functions[textbox_name] = textbox.focusOutEvent
                 textbox.focusOutEvent = event_function[textbox_list.index(textbox_name)]
-
-            self.connect_change_popup_material(textbox, widget)
-            layout.addWidget(textbox, i, 2, 1, 1)
-
-            i += 1
-
-        add_button = QPushButton(widget)
+            
+            self.connect_change_popup_material(textbox, content_widget)
+            content_layout.addWidget(textbox, i, 2, 1, 1)
+        
+        # Add buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(10)
+        
+        add_button = QPushButton("Add")
         add_button.setObjectName("material_add")
-        add_button.setText("Add")
-        add_button.clicked.connect(lambda: self.update_material_db_validation(widget))
-        layout.addWidget(add_button, i, 1, 1, 2)
+        add_button.setFixedSize(80, 30)
+        add_button.clicked.connect(lambda: self.update_material_db_validation(content_widget))
+        
+        cancel_button = QPushButton("Cancel")
+        cancel_button.setFixedSize(80, 30)
+        cancel_button.clicked.connect(dialog.reject)
+        
+        button_layout.addWidget(add_button)
+        button_layout.addWidget(cancel_button)
+        
+        content_layout.addLayout(button_layout, len(textbox_list), 1, 1, 2, Qt.AlignCenter)
+        
+        central_layout.addWidget(content_widget)
+        dialog.setLayout(central_layout)
+        
+        # Set dialog size and position
+        dialog.setFixedSize(350, 280)
+        
+        # Show dialog and wait for result
+        result = dialog.exec()
+        
+        # Update material combobox if dialog was accepted (Add button clicked successfully)
+        if result == QDialog.Accepted:
+            try:
+                input_dock_material = self.input_widget.findChild(QWidget, KEY_MATERIAL)
+                if input_dock_material:
+                    current_text = input_dock_material.currentText()
+                    input_dock_material.clear()
+                    for item in connectdb("Material"):
+                        input_dock_material.addItem(item)
+                    # Try to restore previous selection or set to new custom material
+                    index = input_dock_material.findText(current_text)
+                    if index >= 0:
+                        input_dock_material.setCurrentIndex(index)
+                    else:
+                        input_dock_material.setCurrentIndex(input_dock_material.count() - 1)
+            except Exception as e:
+                print(f"Error updating material combobox: {e}")
 
-        dialog.setFixedSize(350, 250)
-        closed = dialog.exec()
-        if closed is not None:
-            input_dock_material = self.input_widget.findChild(QWidget, KEY_MATERIAL)
-            input_dock_material.clear()
-            for item in connectdb("Material"):
-                input_dock_material.addItem(item)
-            input_dock_material.setCurrentIndex(1)
+    def show_material_popup_message(self):
+        """Show validation message for material popup"""
+        if self.material_popup_message:
+            QMessageBox.warning(self, "Validation Error", self.material_popup_message)
 
+    def update_material_db_validation(self, widget):
+        """Validate and update material database"""
+        material = widget.findChild(QLineEdit, 'Grade').text()
+        
+        material_validator = MaterialValidator(material)
+        if material_validator.is_already_in_db():
+            QMessageBox.warning(widget.window(), "Warning", "Material already exists in Database!")
+            return
+        elif not material_validator.is_format_custom():
+            QMessageBox.warning(widget.window(), "Warning", "Please fill all missing parameters!")
+            return
+        elif not material_validator.is_valid_custom():
+            QMessageBox.warning(widget.window(), "Warning", 
+                            f"Please select {material_validator.invalid_value} in valid range!")
+            return
+        
+        try:
+            self.update_material_db(grade=material, material=material_validator)
+            QMessageBox.information(widget.window(), 'Success', 
+                                'Material added successfully to the database.')
+            # Close dialog with accepted status
+            widget.window().accept()
+        except Exception as e:
+            QMessageBox.critical(widget.window(), 'Error', 
+                            f'Failed to add material to database: {str(e)}')
+        
     def material_popup_fy_20_event(self, e):
         self.original_focus_event_functions['Fy_20'](e)
         if self.invalid_field == 'Fy_20':
@@ -821,24 +840,6 @@ class InputDock(QWidget):
             self.invalid_field = ''
         grade.setText(material)
 
-    def update_material_db_validation(self, widget):
-
-        material = widget.findChild(QLineEdit, 'Grade').text()
-
-        material_validator = MaterialValidator(material)
-        if material_validator.is_already_in_db():
-            QMessageBox.about(QMessageBox(), "Information", "Material already exists in Database!")
-            return
-        elif not material_validator.is_format_custom():
-            QMessageBox.about(QMessageBox(), "Information", "Please fill all missing parameters!")
-            return
-        elif not material_validator.is_valid_custom():
-            QMessageBox.about(QMessageBox(), "Information", "Please select "+str(material_validator.invalid_value)+" in valid range!")
-            return
-
-        self.update_material_db(grade=material, material=material_validator)
-        QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
-
     def update_material_db(self, grade, material):
 
         fy_20 = int(material.fy_20)
@@ -867,17 +868,13 @@ class InputDock(QWidget):
         super().resizeEvent(event)
         # Checking hasattr is only meant to prevent errors,
         # while standalone testing of this widget
-        if self.parent and hasattr(self.parent, 'parent') and self.parent.parent:
+        if self.parent:
             if self.width() == 0:
-                if hasattr(self.parent.parent, 'update_docking_icons'):
-                    self.parent.parent.update_docking_icons(input_is_active=False)
-                if hasattr(self.parent, 'update_input_label_state'):
-                    self.parent.update_input_label_state(True)
+                if hasattr(self.parent, 'update_docking_icons'):
+                    self.parent.update_docking_icons(input_is_active=False)
             elif self.width() > 0:
-                if hasattr(self.parent.parent, 'update_docking_icons'):
-                    self.parent.parent.update_docking_icons(input_is_active=True)
-                if hasattr(self.parent, 'update_input_label_state'):
-                    self.parent.update_input_label_state(False)
+                if hasattr(self.parent, 'update_docking_icons'):
+                    self.parent.update_docking_icons(input_is_active=True)
 
 #----------------Standalone-Test-Code--------------------------------
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection

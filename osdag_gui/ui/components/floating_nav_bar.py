@@ -2,38 +2,42 @@
 Floating navigation bar for Osdag GUI.
 Provides quick access to modules and emits tab open signals.
 """
-import os
 import osdag_gui.resources.resources_rc
+from osdag_gui.data.ui_data import Data
 
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QPushButton, QSizePolicy, QSpacerItem, QApplication, QToolTip
+    QWidget, QVBoxLayout, QPushButton, QToolTip, QApplication
 )
 from PySide6.QtGui import QIcon, QCursor
 from PySide6.QtCore import Qt, QSize, QPoint, QTimer, Signal
 
 class SidebarIconButton(QPushButton):
     # Class-level attribute for default hover color
-    default_hover_color = "#d1f16a"
-    selected_color = "#d1f16a"
     BUTTON_MARGIN = 3
     BUTTON_PADDING = 1
 
-    def __init__(self, icon_path, tooltip_text="", selected_icon_path=None, hover_icon_path=None, group=None, parent=None):
+    def __init__(self, icon_path, tooltip_text="", selected_icon_path=None, hover_icon_path=None, dark_icon_path=None, group=None, parent=None):
         super().__init__(parent)
+        self.theme = QApplication.instance().theme_manager
         self.group = group
         self.icon_path = icon_path
         self.selected_icon_path = selected_icon_path
         self.hover_icon_path = hover_icon_path
+        self.setObjectName("floating_btn")
 
         self.is_selected = False
         self.custom_tooltip_text = tooltip_text
 
         # Load icons
-        self.default_icon = self._load_icon(icon_path, "default")
-        self.selected_icon = self._load_icon(selected_icon_path, "selected") if selected_icon_path else self.default_icon
-        self.hover_icon = self._load_icon(hover_icon_path, "hover") if hover_icon_path else self.selected_icon
+        self.default_icon = self._load_icon(icon_path)
+        self.selected_icon = self._load_icon(selected_icon_path)
+        self.hover_icon = self._load_icon(hover_icon_path)
+        self.dark_icon = self._load_icon(dark_icon_path)
 
-        self.setIcon(self.default_icon)
+        if self.theme.is_light():
+            self.setIcon(self.default_icon)
+        else:
+            self.setIcon(self.dark_icon)
         self.setCursor(QCursor(Qt.PointingHandCursor))
         self.setFocusPolicy(Qt.NoFocus)
 
@@ -47,13 +51,24 @@ class SidebarIconButton(QPushButton):
     def _load_icon(self, path, icon_type=""):
         return QIcon(path)
 
+    def paintEvent(self, event):
+        if not self.is_selected:
+            if self.theme.is_light():
+                self.setIcon(self.default_icon)
+            else:
+                self.setIcon(self.dark_icon)
+        return super().paintEvent(event)
+
     def mousePressEvent(self, event):
         if self.group:
             for btn in self.group:
                 if btn != self:
                     btn.is_selected = False
                     btn.set_default_style()
-                    btn.setIcon(btn.default_icon)
+                    if self.theme.is_light():
+                        btn.setIcon(btn.default_icon)
+                    else:
+                        btn.setIcon(btn.dark_icon)
 
         self.is_selected = True
         self.set_selected_style()
@@ -64,15 +79,7 @@ class SidebarIconButton(QPushButton):
 
     def enterEvent(self, event):
         if not self.is_selected:
-            self.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {self.default_hover_color};
-                    border: none;
-                    border-radius: 5px;
-                    margin: {self.BUTTON_MARGIN}px;
-                    padding: {self.BUTTON_PADDING}px;
-                }}
-            """)
+            self.set_selected_style()
             self.setIcon(self.hover_icon)
 
         self.tooltip_show_timer.start()
@@ -81,7 +88,10 @@ class SidebarIconButton(QPushButton):
     def leaveEvent(self, event):
         if not self.is_selected:
             self.set_default_style()
-            self.setIcon(self.default_icon)
+            if self.theme.is_light():
+                self.setIcon(self.default_icon)
+            else:
+                self.setIcon(self.dark_icon)
 
         self.tooltip_show_timer.stop()
         QToolTip.hideText()
@@ -98,26 +108,14 @@ class SidebarIconButton(QPushButton):
         QToolTip.showText(tooltip_pos, self.custom_tooltip_text, self)
 
     def set_default_style(self):
-        self.setStyleSheet(f"""
-            QPushButton {{
-                background-color: white;
-                border: none;
-                border-radius: 5px;
-                margin: {self.BUTTON_MARGIN}px;
-                padding: {self.BUTTON_PADDING}px;
-            }}
-        """)
+        self.setProperty("state", "default")
+        self.style().unpolish(self)
+        self.style().polish(self)
 
     def set_selected_style(self):
-        self.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {self.selected_color};
-                border-radius: 5px;
-                border: none;
-                margin: {self.BUTTON_MARGIN}px;
-                padding: {self.BUTTON_PADDING}px;
-            }}
-        """)
+        self.setProperty("state", "active")
+        self.style().unpolish(self)
+        self.style().polish(self)
 
 class SidebarWidget(QWidget):
     openNewTab = Signal(str)
@@ -129,25 +127,18 @@ class SidebarWidget(QWidget):
         self.layout.setSpacing(0)
         self.button_group = []
         self.button_container = QWidget(self)
+        self.button_container.setObjectName("floating_btn_container")
         self.button_layout = QVBoxLayout(self.button_container)
         self.button_layout.setAlignment(Qt.AlignHCenter)
         self.button_layout.setContentsMargins(0, 0, 0, 0)
         self.button_layout.setSpacing(0)  # spacing between buttons
-        icon_paths = [
-            (":/vectors/default_icon.svg", "Home"),
-            (":/vectors/default_icon.svg", "Connection"),
-            (":/vectors/default_icon.svg", "Tension Member"),
-            (":/vectors/default_icon.svg", "Compression Member"),
-            (":/vectors/default_icon.svg", "Flexural Member"),
-            (":/vectors/default_icon.svg", "Beam Column"),
-            (":/vectors/default_icon.svg", "Truss"),
-            (":/vectors/default_icon.svg", "2D Frame"),
-            (":/vectors/default_icon.svg", "3D Frame"),
-            (":/vectors/default_icon.svg", "Group Design")
-        ]
+
+        dat = Data()
+        navbar_icons = dat.NAVBAR_ICONS
+
         self.icon_size = 48  # px, you can adjust this value as needed
-        for i, (icon_path, tooltip) in enumerate(icon_paths):
-            btn = SidebarIconButton(icon_path, tooltip_text=tooltip, selected_icon_path=":/vectors/clicked_icon.svg", hover_icon_path=":/vectors/clicked_icon.svg" ,group=self.button_group)
+        for tooltip, icons in navbar_icons.items():
+            btn = SidebarIconButton(icons[0], tooltip_text=tooltip, selected_icon_path=icons[1], hover_icon_path=icons[1], dark_icon_path=icons[2] ,group=self.button_group)
             self.button_layout.addWidget(btn)
             self.button_group.append(btn)
             btn.clicked.connect(lambda _,title=tooltip: self.openNewTab.emit(title))
@@ -173,12 +164,3 @@ class SidebarWidget(QWidget):
     def resize_sidebar(self, window_width, window_height):
         # No longer use window size for sidebar sizing
         self.update_sidebar_size()
-        self.setStyleSheet("""
-            QWidget{
-                border: 1px solid #90AF13;
-                border-top-left-radius: 5px;
-                border-top-right-radius: 5px;
-                border-bottom-left-radius: 5px;
-                border-bottom-right-radius: 5px;
-            }
-        """)

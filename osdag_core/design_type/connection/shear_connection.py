@@ -6,7 +6,7 @@ from ...utils.common.load import Load
 from ...utils.common.material import Material
 from ...utils.common.common_calculation import *
 from ...utils.common.is800_2007 import IS800_2007
-from importlib_resources import files
+from importlib.resources import files
 
 
 class ShearConnection(Connection):

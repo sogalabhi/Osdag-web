@@ -5,73 +5,48 @@ Displays output fields and report generation for connection design.
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
-    QPushButton, QLabel, QSizePolicy, QGroupBox, QFrame, QDialog,
-    QFormLayout, QLineEdit, QScrollArea, QTableWidget, QGridLayout,
+    QPushButton, QLabel, QSizePolicy, QGroupBox,
+    QFormLayout, QLineEdit, QScrollArea,
     QFileDialog
 )
-from PySide6.QtGui import QPalette, QColor, QPixmap, QIcon, QPainter
-from PySide6.QtCore import Qt, QPropertyAnimation, QSize, QPoint, QEasingCurve, QCoreApplication
+from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve
 
 from osdag_core.texlive.Design_wrapper import init_display as init_display_off_screen
 
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.custom_buttons import DockCustomButton
-from osdag_gui.ui.components.dialogs.design_summary_popup import DesignSummaryPopup
+from osdag_gui.ui.components.dialogs.design_report import DesignReportDialog
+from osdag_gui.ui.components.dialogs.spacing_dialog import SpacingDialog
+
 from osdag_gui.data.database.database_config import *
 from osdag_core.Common import *
 import osdag_gui.resources.resources_rc
 
+# Importing Core Files
+from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
+from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
+from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
+from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
+
+# Spacing Detail
+from osdag_gui.ui.components.output_details.b2bCoverPlateWelded import B2BCoverPlateWeldedDetails
+from osdag_gui.ui.components.output_details.b2bCoverPlate import B2BCoverPlateDetails
+from osdag_gui.ui.components.output_details.b2bCoverPlateCapacity import B2BCoverPlateCapacityDetails
+from osdag_gui.ui.components.output_details.b2cEndPlate import B2CEndPlateDetails
+from osdag_gui.ui.components.output_details.b2bEndPlateSketch import B2BEndPlateSketch
+from osdag_gui.ui.components.output_details.basePlate import BasePlateDetails
+from osdag_gui.ui.components.output_details.basePlateHollow import BasePlateHollowDetails
+from osdag_gui.ui.components.output_details.c2cEndPlate import C2CEndPlateDetails
+from osdag_gui.ui.components.output_details.finPlateCapacity import FinPlateCapacityDetails #CapacityDetailsWindow
+from osdag_gui.ui.components.output_details.endPlate import EndPlateDetails
+from osdag_gui.ui.components.output_details.boltPattern import BoltPatternGenerator
+from osdag_gui.ui.components.output_details.seatedAngleSpacing import SeatedAngleDetails
+from osdag_gui.ui.components.output_details.cleatAngle import CleatAngleDetails
+
 from osdag_gui.__config__ import CAD_BACKEND
 
 import yaml
-
-def style_line_edit():
-    return """
-        QLineEdit {
-            padding: 2px 7px;
-            border: 1px solid #070707;
-            border-radius: 4px;
-            background-color: white;
-            color: #000000;
-            font-weight: normal;
-            min-width: 100px;
-            max-width: 120px;
-        }
-    """
-
-def style_small_button():
-    return """
-        QPushButton {
-            padding: 2px 7px;
-            background-color: #888;
-            color: white;
-            border-radius: 4px;
-            min-width: 100px;
-            max-width: 120px;
-            font-size: 12px;
-        }
-        QPushButton:disabled {
-            background-color: #cccccc;
-            color: #888888;
-        }
-    """
-
-def style_main_buttons():
-    return """
-        QPushButton {
-            background-color: #94b816;
-            color: white;
-            font-weight: bold;
-            border-radius: 4px;
-            padding: 6px 18px;
-        }
-        QPushButton:hover {
-            background-color: #7a9a12;
-        }
-        QPushButton:pressed {
-            background-color: #5f7a0e;
-        }
-    """
 
 class OutputDock(QWidget):
     def __init__(self, backend:object, parent):
@@ -85,7 +60,7 @@ class OutputDock(QWidget):
         # Tisplays sections that have meaningful content
         self.output_title_fields = {}
 
-        self.setStyleSheet("background-color: #FFF;")
+        self.setObjectName("output_dock")
         self.dock_width = 360
         self.panel_visible = False # Initially hidden
         self.setMinimumWidth(0)
@@ -96,7 +71,7 @@ class OutputDock(QWidget):
 
         # Animation setup
         self.animation = QPropertyAnimation(self, b"pos")
-        self.animation.setDuration(800)
+        self.animation.setDuration(100)
         self.animation.setEasingCurve(QEasingCurve.InOutQuad)
         self.animation.finished.connect(self._on_animation_finished)
         self._animation_callback = None
@@ -106,28 +81,19 @@ class OutputDock(QWidget):
         output_layout.setSpacing(0)
 
         self.toggle_strip = QWidget()
-        self.toggle_strip.setStyleSheet("background-color: #94b816;")
+        self.toggle_strip.setObjectName("toggle_strip")
         self.toggle_strip.setFixedWidth(6)  # Always visible
         toggle_layout = QVBoxLayout(self.toggle_strip)
+
         toggle_layout.setContentsMargins(0, 0, 0, 0)
         toggle_layout.setSpacing(0)
-        toggle_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        toggle_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
 
         self.toggle_btn = QPushButton("❯")  # Show state initially
         self.toggle_btn.setFixedSize(6, 60)
+        self.toggle_btn.setObjectName("toggle_strip_button")
         self.toggle_btn.setToolTip("Show panel")
-        self.toggle_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #6c8408;
-                color: white;
-                font-size: 12px;
-                font-weight: bold;
-                border: none;
-            }
-            QPushButton:hover {
-                background-color: #5e7407;
-            }
-        """)
+
         self.toggle_btn.clicked.connect(self.toggle_output_dock)
         toggle_layout.addStretch()
         toggle_layout.addWidget(self.toggle_btn)
@@ -144,6 +110,7 @@ class OutputDock(QWidget):
 
         # --- Right content (everything except toggle strip) ---
         right_content = QWidget()
+        right_content.setObjectName("outputs-rightpanel")
         self.output_widget = right_content
         right_layout = QVBoxLayout(right_content)
         right_layout.setContentsMargins(5,5,5,5)
@@ -152,7 +119,8 @@ class OutputDock(QWidget):
         # Top button
         top_button_layout = QHBoxLayout()
         output_dock_btn = QPushButton("Output Dock")
-        output_dock_btn.setStyleSheet(style_main_buttons())
+        output_dock_btn.setObjectName("outputs_button")
+        output_dock_btn.setCursor(Qt.CursorShape.ArrowCursor)
         output_dock_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         top_button_layout.addWidget(output_dock_btn)
         top_button_layout.addStretch()
@@ -164,44 +132,21 @@ class OutputDock(QWidget):
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: 1px solid #EFEFEC;
-                background-color: transparent;
-                padding: 3px;
-            }
-            QScrollBar:vertical {
-                background: #E0E0E0;
-                width: 8px;
-                margin: 0px 0px 0px 3px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:vertical {
-                background: #A0A0A0;
-                min-height: 30px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #707070;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-                background: none;
-            }
-        """)
+        scroll_area.setObjectName("outputs_vscrollarea")
 
         # Group container
         group_container = QWidget()
+        group_container.setObjectName("outputs_container")
         group_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         group_container_layout = QVBoxLayout(group_container)
+        group_container_layout.setSpacing(0)
+        group_container_layout.setContentsMargins(5,5,5,5)
 
         # Bring the data instance from `design_type` folder
         field_list = self.backend.output_values(False)
         # To equalize the label length
         # So that they are of equal size
-        field_list = self.equalize_label_length(field_list)
+        # field_list = self.equalize_label_length(field_list)
 
         # Track any group is active or not
         track_group = False
@@ -229,28 +174,12 @@ class OutputDock(QWidget):
                 current_group = QGroupBox(label)
                 current_group.setObjectName(label)
                 track_group = True
-                current_group.setStyleSheet("""
-                    QGroupBox {
-                        border: 1px solid #90AF13;
-                        border-radius: 4px;
-                        margin-top: 0.8em;
-                        font-weight: bold;
-                    }
-                    QGroupBox::title {
-                        subcontrol-origin: content;
-                        subcontrol-position: top left;
-                        left: 10px;
-                        padding: 0 4px;
-                        margin-top: -15px;
-                        background-color: white;
-                    }
-                """)
                 cur_box_form = QFormLayout()
                 cur_box_form.setHorizontalSpacing(5)
                 cur_box_form.setVerticalSpacing(10)
                 cur_box_form.setContentsMargins(10, 10, 10, 10)
-                cur_box_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
-                cur_box_form.setAlignment(Qt.AlignmentFlag.AlignRight)
+                cur_box_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                cur_box_form.setFormAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
                 if key:
                     fields = 0
@@ -264,28 +193,35 @@ class OutputDock(QWidget):
             elif type == TYPE_TEXTBOX:
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
-                # left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
                 
                 right = QLineEdit()
-                right.setStyleSheet(style_line_edit())
                 right.setObjectName(field[0])
                 right.setReadOnly(True)
-                cur_box_form.addRow(left, right)
+                # To Right Align
+                layout = QHBoxLayout()
+                layout.setSpacing(0)
+                layout.setContentsMargins(0,0,0,0)
+                layout.addStretch()
+                layout.addWidget(right)
+                cur_box_form.addRow(left, layout)
                 fields += 1
                 self.output_title_fields[current_key][1] = fields
             
             elif type == TYPE_OUT_BUTTON:
                 left = QLabel(label)
                 left.setObjectName(field[0] + "_label")
-                print("@",label,"@")
-                # left.setStyleSheet("font-family: 'Consolas', 'Courier New', monospace;")
                 
                 right = QPushButton(label.strip())
                 spacing_button_list.append(field)
                 right.setObjectName(field[0])
-                right.setStyleSheet(style_small_button())
                 right.setDisabled(True)
-                cur_box_form.addRow(left, right)
+                # To Right Align
+                layout = QHBoxLayout()
+                layout.setSpacing(0)
+                layout.setContentsMargins(0,0,0,0)
+                layout.addStretch()
+                layout.addWidget(right)
+                cur_box_form.addRow(left, layout)
                 fields += 1
                 self.output_title_fields[current_key][1] = fields
 
@@ -302,7 +238,12 @@ class OutputDock(QWidget):
         if spacing_button_list:
             for tupple in spacing_button_list:
                 button = self.output_widget.findChild(QWidget, tupple[0])
-                self.output_button_connect(spacing_button_list, button)
+                buttonQPush = self.output_widget.findChild(QPushButton, tupple[0])
+
+                if button:
+                    self.output_button_connect(spacing_button_list, button)
+                if buttonQPush and buttonQPush is not button:
+                    self.output_button_connect(spacing_button_list, buttonQPush)
 
         btn_button_layout = QHBoxLayout()
         btn_button_layout.setContentsMargins(0, 20, 0, 0)
@@ -322,36 +263,11 @@ class OutputDock(QWidget):
 
         # --- Horizontal scroll area for all right content ---
         h_scroll_area = QScrollArea()
+        h_scroll_area.setObjectName("outputs_hscrollarea")
         h_scroll_area.setWidgetResizable(True)
         h_scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         h_scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         h_scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        h_scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: none;
-                background-color: transparent;
-            }
-            QScrollBar:horizontal {
-                background: #E0E0E0;
-                height: 8px;
-                margin: 3px 0px 0px 0px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:horizontal {
-                background: #A0A0A0;
-                min-width: 30px;
-                border-radius: 2px;
-            }
-            QScrollBar::handle:horizontal:hover {
-                background: #707070;
-            }
-            QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
-                width: 0px;
-            }
-            QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
-                background: none;
-            }
-        """)
         h_scroll_area.setWidget(right_content)
 
         output_layout.addWidget(h_scroll_area)
@@ -359,9 +275,11 @@ class OutputDock(QWidget):
     # ----------------------------------Save-Design-Report-Start------------------------------------------------------
     
     def open_summary_popup(self, main):
-        print("Testing Custom Logger!!")
+        """Open the unified report dialog instead of separate popups"""
+        print("Testing Unified Report Dialog")
         print(self.backend.logger.logs)
         print('main.module_name', main.module_name())
+        
         if not main.design_button_status:
             CustomMessageBox(
                 title="Warning",
@@ -370,7 +288,7 @@ class OutputDock(QWidget):
             ).exec()
             return
         
-        # Generate 3D images only if design exists and we can create the logic object
+        # Generate 3D images only if design exists
         if main.design_status:
             try:
                 print("Start!")
@@ -422,19 +340,17 @@ class OutputDock(QWidget):
                 image_folder_path = "./ResourceFiles/images"
                 if not os.path.exists(image_folder_path):
                     os.makedirs(image_folder_path)
-
-        # Open the summary popup dialog
-        self.summary_popup = DesignSummaryPopup(main.design_status, loggermsg=self.parent.textEdit.toPlainText())
-        self.summary_popup.setupUi(main, self)
+            
+        # Open Unified report popup dialog
+        self.design_report_dialog = DesignReportDialog(
+            backend=main,
+            module_window=self,
+            design_exist=main.design_status,
+            loggermsg=self.parent.textEdit.toPlainText()
+        )
         
-        # Connect the generate report button to actual report generation
-        if hasattr(self.summary_popup, 'btn_CreateDesignReport'):
-            self.summary_popup.btn_CreateDesignReport.clicked.connect(lambda: self.generate_design_report(main, self.summary_popup))
-        elif hasattr(self.summary_popup, 'buttonBox'):
-            # If using QDialogButtonBox, connect to accepted signal
-            self.summary_popup.buttonBox.accepted.connect(lambda: self.generate_design_report(main, self.summary_popup))
-
-        self.summary_popup.exec()
+        # Execute the dialog
+        self.design_report_dialog.exec()
 
     # ----------------------------------Save-Design-Report-END------------------------------------------------------
 
@@ -581,38 +497,6 @@ class OutputDock(QWidget):
     
     #----------------------create-tex-to-save-project-END----------------------------------------
 
-    def getPopUpInputs(self):
-        """Enhanced method to collect all popup inputs"""
-        input_summary = {}
-        input_summary["ProfileSummary"] = {}
-        
-        # Profile information
-        input_summary["ProfileSummary"]["CompanyName"] = str(self.summary_popup.lineEdit_companyName.text()) if hasattr(self.summary_popup, 'lineEdit_companyName') else "Company Name"
-        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.summary_popup.lbl_browse.text()) if hasattr(self.summary_popup, 'lbl_browse') else ""
-        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.summary_popup.lineEdit_groupName.text()) if hasattr(self.summary_popup, 'lineEdit_groupName') else "Design Team"
-        input_summary["ProfileSummary"]["Designer"] = str(self.summary_popup.lineEdit_designer.text()) if hasattr(self.summary_popup, 'lineEdit_designer') else "Designer"
-
-        # Project information - **CRITICAL**: These are required by reportGenerator
-        input_summary["ProjectTitle"] = str(self.summary_popup.lineEdit_projectTitle.text()) if hasattr(self.summary_popup, 'lineEdit_projectTitle') else "Welded Butt Joint Design"
-        input_summary["Subtitle"] = str(self.summary_popup.lineEdit_subtitle.text()) if hasattr(self.summary_popup, 'lineEdit_subtitle') else "Design Report"
-        input_summary["JobNumber"] = str(self.summary_popup.lineEdit_jobNumber.text()) if hasattr(self.summary_popup, 'lineEdit_jobNumber') else "JOB-001"
-        input_summary["Client"] = str(self.summary_popup.lineEdit_client.text()) if hasattr(self.summary_popup, 'lineEdit_client') else "Client"
-        
-        # Additional comments
-        if hasattr(self.summary_popup, 'txt_additionalComments'):
-            input_summary["AdditionalComments"] = str(self.summary_popup.txt_additionalComments.toPlainText())
-        else:
-            input_summary["AdditionalComments"] = "Design completed successfully"
-        
-        # File and folder settings
-        if hasattr(self.summary_popup, 'lineEdit_fileName'):
-            input_summary["filename"] = str(self.summary_popup.lineEdit_fileName.text())
-        if hasattr(self.summary_popup, 'lineEdit_folder'):
-            input_summary["folder"] = str(self.summary_popup.lineEdit_folder.text())
-
-        return input_summary
-    #----------------------create-tex-to-save-project-END----------------------------------------
-
     # ----------------------------------Save-Outputs-START------------------------------------------------------
     def save_output_to_csv(self, main):
         status = main.design_status
@@ -665,165 +549,130 @@ class OutputDock(QWidget):
 
     # ----------------------------------Save-Outputs-END------------------------------------------------------
 
+    def run_spacing_script(self,cols,rows,generator_class=BoltPatternGenerator , main=None):
+        print("Creating spacing window...")
+        self.spacing_window = generator_class(self.backend,cols=cols,rows=rows,main=main)
+        self.spacing_window.setWindowTitle("Spacing Viewer")
+        self.spacing_window.raise_()
+        self.spacing_window.activateWindow()
+        self.spacing_window.show()
+    
+    def run_capacity_details(self,cols,rows,generator_class=FinPlateCapacityDetails , main=None):
+        print("Creating capacity details window...")
+        print("++++++++++++++++++++++++++++++DEBUG++++++++++++++++++++++++++++++")
+        print(generator_class)
+        print("++++++++++++++++++++++++++++++DEBUG++++++++++++++++++++++++++++++")
+        self.capacity_window = generator_class(self.backend,cols=cols,rows=rows,main=main)
+        self.capacity_window.setWindowTitle("Capacity Details")
+        self.capacity_window.raise_()
+        self.capacity_window.activateWindow()
+        self.capacity_window.show()   
+
     def output_button_connect(self, spacing_button_list, button):
         button.clicked.connect(lambda: self.spacing_dialog(self.backend, spacing_button_list, button))
 
     def spacing_dialog(self, main, button_list, button):
-        dialog = QDialog()
-        dialog.setObjectName("Dialog")
-        layout1 = QVBoxLayout(dialog)
-
-        note_widget = QWidget(dialog)
-        note_layout = QVBoxLayout(note_widget)
-        layout1.addWidget(note_widget)
-
-        tabel_widget = QWidget(dialog)
-        table_layout = QVBoxLayout(tabel_widget)
-        layout1.addWidget(tabel_widget)
-
-        scroll = QScrollArea(dialog)
-        layout1.addWidget(scroll)
-        scroll.setWidgetResizable(True)
-        scroll.horizontalScrollBar().setVisible(False)
-        scroll_content = QWidget(scroll)
-        outer_grid_layout = QGridLayout(scroll_content)
-        inner_grid_widget = QWidget(scroll_content)
-        image_widget = QWidget(scroll_content)
-        image_layout = QVBoxLayout(image_widget)
-        image_layout.setAlignment(Qt.AlignCenter)
-        image_widget.setLayout(image_layout)
-        inner_grid_layout = QGridLayout(inner_grid_widget)
-        inner_grid_widget.setLayout(inner_grid_layout)
-        scroll_content.setLayout(outer_grid_layout)
-        scroll.setWidget(scroll_content)
-
-        dialog_width = 260
-        dialog_height = 300
-        max_image_width = 0
-        max_label_width = 0
-        max_image_height = 0
-
-        section = 0
-        no_note = True
 
         for op in button_list:
-
+            tup = op[3]
+            title = tup[0]
+            fn = tup[1]
             if op[0] == button.objectName():
-                tup = op[3]
-                title = tup[0]
-                fn = tup[1]
-                dialog.setWindowTitle(title)
-                j = 1
-                _translate = QCoreApplication.translate
-                for option in fn(main.design_status):
-                    option_type = option[2]
-                    lable = option[1]
-                    value = option[3]
-                    if option_type in [TYPE_TEXTBOX, TYPE_COMBOBOX]:
-                        l = QLabel(inner_grid_widget)
+                if op[0]==KEY_OUT_SPACING or op[0]==KEY_OUT_SPTING_SPACING:
+                    # print(main)
+                    if main.module_name()==KEY_DISP_FINPLATE:
+                        if hasattr(self.backend, 'spting_leg') and \
+                            hasattr(self.backend.spting_leg, 'bolt_line') and \
+                            hasattr(self.backend.spting_leg, 'bolts_one_line'):
+                                self.run_spacing_script(self.backend.spting_leg.bolts_one_line,self.backend.spting_leg.bolt_line,
+                                                        main=main)
+                        else:
+                                self.run_spacing_script(rows=self.backend.plate.bolts_one_line,cols=self.backend.plate.bolt_line,
+                                                        main=main)
+                    elif main.module_name()==KEY_DISP_CLEATANGLE and op[0]==KEY_OUT_SPACING:
+                        self.run_spacing_script(0,0,CleatAngleDetails,(main,0))
+                    elif op[0] != KEY_OUT_SPACING and main.module_name()==KEY_DISP_CLEATANGLE:
+                        self.run_spacing_script(0,0,CleatAngleDetails,(main,1))
+                    elif main.module_name()==KEY_DISP_ENDPLATE:
+                        self.run_spacing_script(0,0,EndPlateDetails,main)
+                    # return
+                    break
+                
+                elif ((op[0]=='button1' or op[0]=='button2') and op[3][0]==KEY_OUT_DISP_BOLT_IR_DETAILS and main.module_name()==KEY_DISP_FINPLATE) :
+                    if main.module_name()==KEY_DISP_FINPLATE:
+                                if hasattr(self.backend, 'spting_leg') and \
+                                    hasattr(self.backend.spting_leg, 'bolt_line') and \
+                                    hasattr(self.backend.spting_leg, 'bolts_one_line'):
+                                        self.run_capacity_details(self.backend.spting_leg.bolts_one_line,self.backend.spting_leg.bolt_line,
+                                                                main=main)
+                                else:
+                                        self.run_capacity_details(rows=self.backend.plate.bolts_one_line,cols=self.backend.plate.bolt_line,
+                                                                main=main)
+                    break    
 
-                        l.setObjectName(option[0] + "_label")
-                        l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-                        inner_grid_layout.addWidget(l, j, 1, 1, 1)
-                        l.setFixedSize(l.sizeHint().width(), l.sizeHint().height())
-                        max_label_width = max(l.sizeHint().width(), max_label_width)
-                        l.setSizePolicy(QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum))
+                elif op[0].startswith('SeatedAngle') or op[0].startswith('TopAngle'):
+                            if op[0]==KEY_OUT_SEATED_ANGLE_BOLT_COL:
+                                val=3
+                            elif op[0]==KEY_OUT_SEATED_ANGLE_BOLT_BEAM:
+                                val=4
+                            elif op[0]==KEY_OUT_TOP_ANGLE_BOLT_COL:
+                                val=1
+                            else:
+                                val=2
+                            self.run_spacing_script(None,val,SeatedAngleDetails,main)
+                            return
+                elif op[0]==KEY_OUT_DISP_BP_DETAILING_SKETCH and op[1]==KEY_OUT_DISP_BP_DETAILING:
+                            print(f'rows: {self.backend.bolt_row} , cols : {self.backend.bolt_column} , {self.backend.bolt_row_web}')
+                            self.run_spacing_script(0,0,B2CEndPlateDetails,main)
+                            return
+               
+                # Stiffener Sketch
+                elif op[0] == KEY_OUT_STIFFENER_SKETCH and main.module_name() == KEY_DISP_BCENDPLATE:
+                    self.run_capacity_details(cols=1, rows=1, generator_class=B2CEndPlateDetails, main=main)
+                    return
 
-                    if option_type == TYPE_SECTION:
-                        if section != 0:
-                            outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
-                            outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
-                            hl1 = QFrame()
-                            hl1.setFrameShape(QFrame.HLine)
-                            j += 1
-                            outer_grid_layout.addWidget(hl1, j, 1, 1, 2)
+                elif op[0]==KEY_OUT_BP_TYPICAL_DETAILING:
+                    if main.connectivity == 'Moment Base Plate' or main.connectivity=='Welded Column Base':
+                        self.run_spacing_script(0,0,BasePlateDetails,main)
+                    else:
+                        self.run_spacing_script(0,0,BasePlateHollowDetails,main)
+                    return
+                elif op[0]==KEY_WEB_SPACING:
+                    self.run_capacity_details(0,0,B2BCoverPlateDetails,(main,True, KEY_OUT_SPACING))
+                    return
+                elif op[0]==KEY_FLANGE_SPACING:
+                    self.run_capacity_details(0,0,B2BCoverPlateDetails,(main,False, KEY_OUT_SPACING))
+                    return
+                elif op[0]==KEY_WEB_WELD_DETAILS and main.module_name()==KEY_DISP_BEAMCOVERPLATEWELD:
+                    self.run_spacing_script(0,0,B2BCoverPlateWeldedDetails,(main,True))
+                    return
+                elif op[0]==KEY_FLANGE_WELD_DETAILS and main.module_name()==KEY_DISP_BEAMCOVERPLATEWELD:
+                    self.run_spacing_script(0,0,B2BCoverPlateWeldedDetails,(main,False))
+                    return   
 
-                        inner_grid_widget = QWidget(scroll_content)
-                        image_widget = QWidget(scroll_content)
-                        image_layout = QVBoxLayout(image_widget)
-                        image_layout.setAlignment(Qt.AlignCenter)
-                        image_widget.setLayout(image_layout)
-                        inner_grid_layout = QGridLayout(inner_grid_widget)
-                        inner_grid_widget.setLayout(inner_grid_layout)
+                #im working here
+                elif op[0]==KEY_WEB_CAPACITY and main.module_name()==KEY_DISP_BEAMCOVERPLATE:  
+                    self.run_capacity_details(0,0,B2BCoverPlateCapacityDetails,(main,True,"capacity"))
+                    return
+                
+                #im working here
+                elif op[0]==KEY_FLANGE_CAPACITY and main.module_name()==KEY_DISP_BEAMCOVERPLATE:
+                    self.run_capacity_details(0,0,B2BCoverPlateCapacityDetails,(main,False,"capacity"))
+                    return
+                
+                #im working here
+                elif op[0]==KEY_OUT_STIFFENER_SKETCH and op[1]==KEY_OUT_DISP_STIFFENER_SKETCH:
+                    self.run_spacing_script(0,0,B2BEndPlateSketch,main)
+                    return
 
-                        if value is not None and value != "":
-                            im = QLabel(image_widget)
-                            im.setFixedSize(int(value[1]), int(value[2]))
-                            pmap = QPixmap(value[0])
-                            im.setScaledContents(1)
-                            im.setStyleSheet("background-color: white;")
-                            im.setPixmap(pmap)
-                            image_layout.addWidget(im)
-                            caption = QLabel(image_widget)
-                            caption.setAlignment(Qt.AlignCenter)
-                            caption.setText(value[3])
-                            caption.setFixedSize(int(value[1]), caption.sizeHint().height())
-                            image_layout.addWidget(caption)
-                            max_image_width = max(max_image_width, value[1])
-                            max_image_height = max(max_image_height, value[2])
-                        j += 1
-                        q = QLabel(scroll_content)
-                        q.setObjectName("_title")
-                        q.setText(lable)
-                        q.setFixedSize(q.sizeHint().width(), q.sizeHint().height())
-                        q.setSizePolicy(QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum))
-                        outer_grid_layout.addWidget(q, j, 1, 1, 2)
-                        section += 1
-
-                    if option_type == TYPE_TEXTBOX:
-                        r = QLineEdit(inner_grid_widget)
-                        r.setFixedSize(100, 27)
-                        r.setObjectName(option[0])
-                        r.setText(str(value))
-                        inner_grid_layout.addWidget(r, j, 2, 1, 1)
-
-                    if option_type == TYPE_TABLE_OU:
-                        tb = QTableWidget(tabel_widget)
-                        #tb.setAlignment(Qt.AlignCenter)
-                        #tb.setScaledContents(True)
-                        table_layout.addWidget(tb)
-
-                    if option_type == TYPE_IMAGE:
-                        im = QLabel(image_widget)
-                        im.setScaledContents(True)
-                        im.setFixedSize(int(value[1]), int(value[2]))
-                        pmap = QPixmap(value[0])
-                        im.setStyleSheet("background-color: white;")
-                        im.setPixmap(pmap)
-                        image_layout.addWidget(im)
-                        caption = QLabel(image_widget)
-                        caption.setAlignment(Qt.AlignCenter)
-                        caption.setText(value[3])
-                        caption.setFixedSize(int(value[1]), 12)
-                        image_layout.addWidget(caption)
-                        max_image_width = max(max_image_width, value[1])
-                        max_image_height = max(max_image_height, value[2])
-
-                    if option_type == TYPE_NOTE:
-                        note = QLabel(note_widget)
-                        note.setText("Note: "+str(value))
-                        note.setFixedSize(note.sizeHint().width(), note.sizeHint().height())
-                        note_layout.addWidget(note)
-                        no_note = False
-
-                    j = j + 1
-
-                if inner_grid_layout.count() > 0:
-                    outer_grid_layout.addWidget(inner_grid_widget, j, 1, 1, 1)
-                if image_layout.count() > 0:
-                    outer_grid_layout.addWidget(image_widget, j, 2, 1, 1)
-
-                dialog_width += max_label_width
-                dialog_width += max_image_width
-                dialog_height = max(dialog_height, max_image_height+125)
-                if not no_note:
-                    dialog_height += 40
-                dialog.resize(int(dialog_width), int(dialog_height))
-                dialog.setMinimumSize(int(dialog_width), int(dialog_height))
-
-                if no_note:
-                    layout1.removeWidget(note_widget)
-
+                elif op[0]==KEY_BOLT_WEB_SPACING or op[0]==KEY_BOLT_FLANGE_SPACING:
+                    if op[0]==KEY_BOLT_WEB_SPACING:
+                        self.run_spacing_script(0,0,C2CEndPlateDetails,(main,0))
+                    else:
+                        self.run_spacing_script(0,0,C2CEndPlateDetails,(main,1))
+                    break
+        #--------------------------Legacy-dialog----------------------------------------------------------------
+                dialog = SpacingDialog(main, title, fn)
                 dialog.exec()
 
     # To equalize the size of label strings
@@ -878,17 +727,13 @@ class OutputDock(QWidget):
         super().resizeEvent(event)
         # Checking hasattr is only meant to prevent errors,
         # while standalone testing of this widget
-        if self.parent and hasattr(self.parent, 'parent') and self.parent.parent:
+        if self.parent:
             if self.width() == 0:
-                if hasattr(self.parent.parent, 'update_docking_icons'):
-                    self.parent.parent.update_docking_icons(output_is_active=False)
-                if hasattr(self.parent, 'update_input_label_state'):
-                    self.parent.update_output_label_state(True)
+                if hasattr(self.parent, 'update_docking_icons'):
+                    self.parent.update_docking_icons(output_is_active=False)
             elif self.width() > 0:
-                if hasattr(self.parent.parent, 'update_docking_icons'):
-                    self.parent.parent.update_docking_icons(output_is_active=True)
-                if hasattr(self.parent, 'update_input_label_state'):
-                    self.parent.update_output_label_state(False)
+                if hasattr(self.parent, 'update_docking_icons'):
+                    self.parent.update_docking_icons(output_is_active=True)
 
     # Functions for Design
     def output_title_change(self, main):
@@ -951,9 +796,7 @@ class OutputDock(QWidget):
 
         return title_repeat
 
-
 #----------------Standalone-Test-Code--------------------------------
-from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 
 class MyMainWindow(QMainWindow):
     def __init__(self):
@@ -976,4 +819,3 @@ if __name__ == "__main__":
     window = MyMainWindow()
     window.show()
     sys.exit(app.exec()) 
-

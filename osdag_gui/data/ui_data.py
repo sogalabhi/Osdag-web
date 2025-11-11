@@ -6,13 +6,13 @@ class Data:
     # Empty List means "Under Development"
     MODULES = {
         "Home": [],
-        "Connection" : 
+        "Connection" :
         {
             "Shear Connection":
             [
                 ("Fin Plate",":/vectors/shear_fin_plate_connec.svg"),
                 ("Cleat Angle", ":/vectors/shear_cleat_angle_connec.svg"),
-                ("End Plate", ":/vectors/end_plate_connec.svg"),
+                ("Header Plate", ":/vectors/end_plate_connec.svg"),
                 ("Seated Angle", ":/vectors/seated_angle_connec.svg")
             ],
             "Moment Connection": 
@@ -53,7 +53,7 @@ class Data:
         [
             ("Simply Supported Beam", ":/vectors/ss_beam_flexural_mem.svg"),
             ("Cantilever Beam", ":/vectors/cantilever_beam_flexural_mem.svg"),
-            ("Plate Girder", ":/vectors/ss_beam_flexural_mem.svg"),
+            ("Plate Girder", ":/vectors/simple_supported_plate_girder.svg"),
         ],
         "Beam Column": 
         [],
@@ -62,21 +62,19 @@ class Data:
         "2D Frame": 
         [],
         "3D Frame": 
-        [],
-        "Group Design": 
         []
     }
     
     NAVBAR_ICONS = {
-        "connection": ["connection_button.svg", "connection_button_clicked.svg"],
-        "tension_member": ["tension_member_button.svg", "tension_member_button_clicked.svg"],
-        "compression_member": ["compression_member_button.svg", "compression_member_button_clicked.svg"],
-        "flexural_member": ["flexural_member_button.svg", "flexural_member_button_clicked.svg"],
-        "beam_column": ["beam_column_button.svg", "beam_column_button_clicked.svg"],
-        "truss": ["truss_button.svg", "truss_button_clicked.svg"],
-        "2d_frame": ["2d_frame_button.svg", "2d_frame_button_clicked.svg"],
-        "3d_frame": ["3d_frame_button.svg", "3d_frame_button_clicked.svg"],
-        "group_design": ["group_design_button.svg", "group_design_button_clicked.svg"],
+        "Home": [":/vectors/home_default.svg", ":/vectors/home_clicked.svg", ":/vectors/home_default.svg"],
+        "Connection": [":/images/connection.svg", ":/images/connection_clicked.svg", ":/images/connection_dark.svg"],
+        "Tension Member": [":/images/tension_member.svg", ":/images/tension_member_clicked.svg", ":/images/tension_member_dark.svg"],
+        "Compression Member": [":/images/compression_member.svg", ":/images/compression_member_clicked.svg", ":/images/compression_member_dark.svg"],
+        "Flexural Member": [":/images/flexural_member.svg", ":/images/flexural_member_clicked.svg", ":/images/flexural_member_dark.svg"],
+        "Beam Column": [":/images/beam_column.svg", ":/images/beam_column_clicked.svg", ":/images/beam_column_dark.svg"],
+        "Truss": [":/images/truss.svg", ":/images/truss_clicked.svg", ":/images/truss_dark.svg"],
+        "2D Frame": [":/images/2d_frame.svg", ":/images/2d_frame_clicked.svg", ":/images/2d_frame_dark.svg"],
+        "3D Frame": [":/images/3d_frame.svg", ":/images/3d_frame_clicked.svg", ":/images/3d_frame_dark.svg"],
     }
 
     FLOATING_NAVBAR = [
