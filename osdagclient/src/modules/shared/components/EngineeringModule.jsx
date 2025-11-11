@@ -322,11 +322,11 @@ export const EngineeringModule = ({
             // Normalize values to strings like the UI does
             expanded[inputKey] = Array.isArray(fullList)
               ? fullList.map((val) => {
-                  if (typeof val === 'object' && val !== null) {
-                    return val.value || val.Grade || String(val);
-                  }
-                  return String(val);
-                })
+                if (typeof val === 'object' && val !== null) {
+                  return val.value || val.Grade || String(val);
+                }
+                return String(val);
+              })
               : [];
           }
         });
@@ -441,21 +441,9 @@ export const EngineeringModule = ({
     modelScale,
   } = cameraSettings;
 
-  // Determine view options based on module
+  // Determine view options based on module config
   const getViewOptions = () => {
-    if (moduleConfig.cameraKey === "FinPlateConnection") {
-      return ["Model", "Beam", "Column", "Plate"];
-    }
-    else if (moduleConfig.cameraKey === "CleatAngle") {
-      return ["Model", "Beam", "Column", "CleatAngle"]; // FIXED: Use CleatAngle instead of Connector
-    }
-    else if (moduleConfig.cameraKey === "EndPlate") {
-      return ["Model", "Beam", "Column", "Plate"];
-    }
-    else if (moduleConfig.cameraKey === "SeatedAngle") {
-      return ["Model", "Beam", "Column", "SeatedAngle"]; // FIXED: Use SeatedAngle instead of Connector
-    }
-    return ["Model", "Beam", "Connector"];
+    return moduleConfig.cadOptions || ["Model", "Beam", "Connector"];
   };
 
   const options = getViewOptions();

@@ -49,8 +49,7 @@ export const endPlateOutputConfig = {
     spacing: {
       title: "Spacing Details",
       width: "68%",
-      layout: "two-column",
-      hasImage: true,
+      layout: "spacing-diagram",
     },
 
     details: {
@@ -70,24 +69,41 @@ export const endPlateOutputConfig = {
 
   modalData: {
     spacing: {
-      PlateSpacingModal: [
-        {
-          key: "Bolt.Pitch",
-          label: "Pitch Distance (mm)",
+      PlateSpacingModal: {
+        fields: [
+          {
+            key: "Bolt.Pitch",
+            label: "Pitch Distance (mm)",
+          },
+          {
+            key: "Bolt.EndDist",
+            label: "End Distance (mm)",
+          },
+          {
+            key: "Bolt.Gauge",
+            label: "Gauge Distance (mm)",
+          },
+          {
+            key: "Bolt.EdgeDist",
+            label: "Edge Distance (mm)",
+          },
+        ],
+        diagram: {
+          origin: "right",
+          props: {
+            plateWidth: "Plate.Length",
+            plateHeight: "Plate.Height",
+            rows: "Bolt.Rows",
+            cols: "Bolt.Line",
+            end: "Bolt.EndDist",
+            pitch: "Bolt.Pitch",
+            gauge: "Bolt.Gauge",
+            edge: "Bolt.EdgeDist",
+            holeDiameter: "Bolt.Diameter",
+            weldSize: "Weld.Size",
+          },
         },
-        {
-          key: "Bolt.EndDist",
-          label: "End Distance (mm)",
-        },
-        {
-          key: "Bolt.Gauge",
-          label: "Gauge Distance (mm)",
-        },
-        {
-          key: "Bolt.EdgeDist",
-          label: "Edge Distance (mm)",
-        },
-      ],
+      },
     },
 
     capacity: {

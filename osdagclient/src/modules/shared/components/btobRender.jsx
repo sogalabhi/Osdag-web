@@ -1,13 +1,17 @@
 import { OrbitControls, useTexture } from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import * as THREE from "three";
 import AxisHelperWidget from "../utils/AxisHelperWidget";
 
 function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings, hoverDict = {}, onHoverLabel, onHoverEnd }) {
   const [parsedModels, setParsedModels] = useState(null);
   const [hoveredMeshId, setHoveredMeshId] = useState(null);
+  const activeMeshRef = useRef(null); // Track which mesh should be active based on renderOrder
+  const hoveredMeshDataRef = useRef(null); // Store the hover data for the currently hovered mesh
+  const pendingEventsRef = useRef(new Map()); // Track pending events by renderOrder
+  const rafScheduledRef = useRef(false); // Track if we've already scheduled a RAF
   const texture = useTexture("/texture.png");
   texture.needsUpdate = true;
 
@@ -53,6 +57,24 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
       }
     }
     return false;
+  };
+
+  // Helper function to get render order for proper z-indexing
+  const getRenderOrder = (partName) => {
+    const lower = partName.toLowerCase();
+    // Structural members (Beam, Column) render first (lower z-index)
+    if (lower.includes("beam") || lower.includes("column") || lower.includes("member")) {
+      return 0;
+    }
+    // Plates, connectors, and endplates render on top (higher z-index)
+    if (lower.includes("plate") || lower.includes("endplate") || lower.includes("cleat") || lower.includes("seated") || lower.includes("connector")) {
+      return 1;
+    }
+    // Bolts and welds render on top
+    if (lower.includes("bolt") || lower.includes("weld")) {
+      return 2;
+    }
+    return 0;
   };
 
   useEffect(() => {
@@ -249,6 +271,8 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             }
             const meshId = `${name}-${idx}`;
             const isHovered = hoveredMeshId === meshId;
+            const renderOrder = getRenderOrder(name);
+            
             return (
               <group key={meshId}>
                 <mesh
@@ -256,23 +280,92 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
                   scale={modelScale}
                   rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
                   position={modelPosition}
-                  userData={{ hoverLabel: m.hoverLabel || (hoverDict?.[name] || hoverDict?.[lower]) || name }}
+                  renderOrder={renderOrder}
+                  userData={{ 
+                    hoverLabel: m.hoverLabel || (hoverDict?.[name] || hoverDict?.[lower]) || name, 
+                    renderOrder,
+                    meshName: name
+                  }}
                   onPointerMove={(e) => {
+                    e.stopPropagation();
+                    
                     const label = e.object?.userData?.hoverLabel || name;
                     const nx = e?.nativeEvent?.clientX;
                     const ny = e?.nativeEvent?.clientY;
-                    if (onHoverLabel && typeof onHoverLabel === 'function') {
-                      onHoverLabel(label, nx, ny);
+                    
+                    // Store this event with its renderOrder for processing
+                    pendingEventsRef.current.set(renderOrder, {
+                      label,
+                      x: nx,
+                      y: ny,
+                      meshId,
+                      renderOrder,
+                      meshObject: e.object // Store the mesh object
+                    });
+                    
+                    // Update active mesh reference if this has higher priority
+                    const currentActive = activeMeshRef.current;
+                    const currentRenderOrder = currentActive?.userData?.renderOrder ?? -1;
+                    
+                    if (renderOrder > currentRenderOrder || currentActive === null) {
+                      activeMeshRef.current = e.object;
+                      hoveredMeshDataRef.current = { label, x: nx, y: ny };
                     }
-                    if (hoveredMeshId !== meshId) {
-                      setHoveredMeshId(meshId);
+                    
+                    // Use requestAnimationFrame to batch process all events and pick the highest priority
+                    // This ensures that even if multiple meshes fire events in the same frame,
+                    // only the highest priority one will be processed
+                    if (!rafScheduledRef.current) {
+                      rafScheduledRef.current = true;
+                      requestAnimationFrame(() => {
+                        // Find the highest priority event among all pending events
+                        let highestPriority = -1;
+                        let highestPriorityEvent = null;
+                        
+                        pendingEventsRef.current.forEach((eventData, eventRenderOrder) => {
+                          if (eventRenderOrder > highestPriority) {
+                            highestPriority = eventRenderOrder;
+                            highestPriorityEvent = eventData;
+                          }
+                        });
+                        
+                        // Process the highest priority event (regardless of which mesh triggered this frame)
+                        if (highestPriorityEvent) {
+                          if (onHoverLabel && typeof onHoverLabel === 'function') {
+                            onHoverLabel(highestPriorityEvent.label, highestPriorityEvent.x, highestPriorityEvent.y);
+                          }
+                          if (hoveredMeshId !== highestPriorityEvent.meshId) {
+                            setHoveredMeshId(highestPriorityEvent.meshId);
+                          }
+                          // Update active mesh reference to the highest priority mesh
+                          if (highestPriorityEvent.meshObject) {
+                            activeMeshRef.current = highestPriorityEvent.meshObject;
+                          }
+                          hoveredMeshDataRef.current = {
+                            label: highestPriorityEvent.label,
+                            x: highestPriorityEvent.x,
+                            y: highestPriorityEvent.y
+                          };
+                        }
+                        
+                        // Clear processed events and reset RAF flag
+                        pendingEventsRef.current.clear();
+                        rafScheduledRef.current = false;
+                      });
                     }
                   }}
-                  onPointerOut={() => {
-                    if (onHoverEnd && typeof onHoverEnd === 'function') {
-                      onHoverEnd();
+                  onPointerOut={(e) => {
+                    // Only clear if this was the active mesh
+                    if (activeMeshRef.current === e.object) {
+                      activeMeshRef.current = null;
+                      hoveredMeshDataRef.current = null;
+                      if (hoveredMeshId === meshId) {
+                        if (onHoverEnd && typeof onHoverEnd === 'function') {
+                          onHoverEnd();
+                        }
+                        setHoveredMeshId(null);
+                      }
                     }
-                    setHoveredMeshId(null);
                   }}
                 >
                   <meshPhysicalMaterial
@@ -314,6 +407,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             scale={modelScale}
             position={modelPosition}
             rotation={[Math.PI / -2, 0, 0]}
+            renderOrder={0}
           >
             <meshPhysicalMaterial
               color={partColors.Beam}
@@ -349,6 +443,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             scale={modelScale}
             position={modelPosition}
             rotation={isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : [Math.PI / -2, 0, 0]}
+            renderOrder={0}
           >
             <meshPhysicalMaterial
               color={partColors.Column}
@@ -384,6 +479,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             scale={modelScale}
             position={modelPosition}
             rotation={[Math.PI / -2, 0, 0]}
+            renderOrder={1}
           >
             <meshPhysicalMaterial
               attach="material"
@@ -418,6 +514,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             scale={modelScale}
             position={[modelPosition[0], modelPosition[1], modelPosition[2] + 1]} // Slightly offset
             rotation={[Math.PI / -2, 0, 0]}
+            renderOrder={1}
           >
             <meshPhysicalMaterial
               attach="material"
@@ -452,6 +549,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             scale={modelScale}
             position={[modelPosition[0], modelPosition[1], modelPosition[2] + 1]} // Slightly offset
             rotation={[Math.PI / -2, 0, 0]}
+            renderOrder={1}
           >
             <meshPhysicalMaterial
               attach="material"
@@ -486,6 +584,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             scale={modelScale}
             position={[modelPosition[0], modelPosition[1], modelPosition[2] + 1]} // Slightly offset
             rotation={[Math.PI / -2, 0, 0]}
+            renderOrder={1}
           >
             <meshPhysicalMaterial
               attach="material"
@@ -556,6 +655,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             scale={0.008}
             position={[0, 0, 4]}
             rotation={[Math.PI / -2, 0, 0]}
+            renderOrder={1}
           >
             <meshPhysicalMaterial
               attach="material"
