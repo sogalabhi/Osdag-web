@@ -39,7 +39,7 @@ const reversedLogs = [...safeLogs].reverse();
             
             return (
               <div key={index} className="mb-1">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-start space-x-2">
                   <span className={`${
                     logType === 'error' ? 'text-red-400' : 
                     logType === 'warning' ? 'text-yellow-400' : 

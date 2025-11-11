@@ -50,6 +50,7 @@ let initialValue = {
   designData: {},
   renderCadModel: false,
   cadModelPaths: {}, //stores cad files path
+  hoverDict: {},
   displayPDF: false,
   report_id: "",
   blobUrl: "",
@@ -272,6 +273,9 @@ export const ModuleProvider = ({ children }) => {
 
         // Store CAD data and trigger rendering
         dispatch({ type: "SET_CAD_MODEL_PATHS", payload: data.files });
+        if (data.hover_dict) {
+          dispatch({ type: "SET_HOVER_DICT", payload: data.hover_dict });
+        }
         dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: true });
 
         // Execute success callback if provided

@@ -8,7 +8,7 @@ const SectionCards = ({ section, onModuleClick }) => (
         <div
           key={opt.key}
           onClick={() => onModuleClick(opt.key, section.label)}
-          className="cursor-pointer group flex-1 h-40 min-w-[120px] flex flex-col items-center justify-between 
+          className="cursor-pointer group flex-1 h-40 min-w-[120px] max-w-[280px] flex flex-col items-center justify-between 
              border rounded-lg shadow-card transition-all duration-200 bg-white dark:bg-osdag-dark-color/90
              hover:bg-osdag-green dark:hover:hover:bg-osdag-green relative"
         >
