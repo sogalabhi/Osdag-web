@@ -455,6 +455,10 @@ export const EngineeringModule = ({
     else if (moduleConfig.cameraKey === "SeatedAngle") {
       return ["Model", "Beam", "Column", "SeatedAngle"]; // FIXED: Use SeatedAngle instead of Connector
     }
+    else if (moduleConfig.cameraKey === "BeamToColumnEndPlate") {
+      return ["Model", "Beam", "Column", "End Plate"];
+    }
+
     return ["Model", "Beam", "Connector"];
   };
 

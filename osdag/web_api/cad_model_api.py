@@ -92,7 +92,7 @@ class CADGeneration(View):
         elif session_type == "CoverPlateWelded":
             sections = ["Model", "Beam", "Plate"]
         elif session_type == "BeamToColumnEndPlate":
-            sections = ["Model", "Beam", "Column", "EndPlate"]
+            sections = ["Model", "Beam", "Column", "Connector"]
         elif session_type == "TensionMember":
             sections = ["Model", "Member", "Plate", "Endplate"]
         else:
