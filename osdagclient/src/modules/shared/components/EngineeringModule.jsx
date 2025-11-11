@@ -38,6 +38,9 @@ export const EngineeringModule = ({
     propertyClassList,
     angleList,
     boltTypeList,
+    sectionProfileList,
+    channelList,
+    sectionDesignation,
     cadModelPaths,
     hoverDict: ctxHoverDict,
 
@@ -70,6 +73,8 @@ export const EngineeringModule = ({
     setScreenshotTrigger,
     extraState,
     setExtraState,
+    modalDynamicSrc,
+    setModalDynamicSrc,
 
     // Navigation and Reset states
     showResetConfirmation,
@@ -443,7 +448,26 @@ export const EngineeringModule = ({
 
   // Determine view options based on module config
   const getViewOptions = () => {
-    return moduleConfig.cadOptions || ["Model", "Beam", "Connector"];
+    if (moduleConfig.cadOptions) {
+      return moduleConfig.cadOptions || ["Model", "Beam", "Connector"];
+    }
+
+    if (moduleConfig.cameraKey === "FinPlateConnection") {
+      return ["Model", "Beam", "Column", "Plate"];
+    }
+    else if (moduleConfig.cameraKey === "CleatAngle") {
+      return ["Model", "Beam", "Column", "CleatAngle"]; // FIXED: Use CleatAngle instead of Connector
+    }
+    else if (moduleConfig.cameraKey === "EndPlate") {
+      return ["Model", "Beam", "Column", "Plate"];
+    }
+    else if (moduleConfig.cameraKey === "SeatedAngle") {
+      return ["Model", "Beam", "Column", "SeatedAngle"]; // FIXED: Use SeatedAngle instead of Connector
+    }
+    else if (moduleConfig.cameraKey === "BeamToColumnEndPlate") {
+      return ["Model", "Beam", "Column", "End Plate"];
+    }
+    return moduleConfig.cadOptions;
   };
 
   const options = getViewOptions();
@@ -458,6 +482,9 @@ export const EngineeringModule = ({
     propertyClassList,
     angleList, // FIXED: Added angleList to context data
     boltTypeList,
+    sectionProfileList,
+    channelList,
+    sectionDesignation
   };
 
   const triggerScreenshotCapture = () => {
@@ -693,6 +720,7 @@ export const EngineeringModule = ({
                   extraState={extraState}
                   setExtraState={setExtraState}
                   updateSelectedItems={updateSelectedItems}
+                  setModalDynamicSrc={setModalDynamicSrc}
                 />
               ))}
 
@@ -960,7 +988,7 @@ export const EngineeringModule = ({
             isOpen={modalStates[modal.key]}
             onClose={() => updateModalState(modal.key, false)}
             title="Customized"
-            dataSource={contextData[modal.dataSource] || []} // FIXED: This now includes angleList
+            dataSource={contextData[modal.dataSource] || (modalDynamicSrc[modal.inputKey] || [])} // FIXED: This now includes angleList
             selectedItems={selectedItems[modal.inputKey]}
             onTransferChange={(nextTargetKeys) =>
               updateSelectedItems(modal.inputKey, nextTargetKeys)
@@ -1066,7 +1094,7 @@ export const EngineeringModule = ({
       </Modal>
 
       {/* CSS for spinner animation */}
-      <style jsx>{`
+      <style>{`
         @keyframes spin {
           0% {
             transform: rotate(0deg);
