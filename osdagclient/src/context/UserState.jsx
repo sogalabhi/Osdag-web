@@ -270,7 +270,7 @@ export const UserProvider = ({ children }) => {
         },
         body: JSON.stringify({
           // username: username,
-          email: email,
+          username: email,
           password: password,
           isGuest: isGst,
         }),

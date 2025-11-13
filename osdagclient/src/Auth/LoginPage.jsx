@@ -712,9 +712,7 @@ const LoginPage = () => {
                             className="w-full py-2 bg-osdag-green text-white rounded-md font-medium hover:bg-osdag-dark-green transition"
                             disabled={isLoading}
                         >
-                            { console.log("isLoading:", isLoading)}
-                
-                             {/* isLoading ? <Spin size="small" /> : isSignup ? "Sign up" : "Log in11"} */}
+                            {isLoading ? <Spin size="small" /> : isSignup ? "Sign up" : "Log in"}
                         </button>
                 </form>
 
