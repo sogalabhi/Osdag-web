@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 // import { useHistory } from 'react-router-dom';
 import icon from '../assets/logo-osdag.png';
 // import { createJWTToken } from '../../context/ModuleState';
@@ -39,9 +39,15 @@ const LoginPage = () => {
 
     // Form states
     const [isSignup, setIsSignup] = useState(false);
-    const [username, setUsername] = useState('');
+    // const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [captcha, setCaptcha] = useState('');
+    const [captchaInput, setCaptchaInput] = useState('');
+    const canvasRef = useRef(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // Loading states
     const [isLoading, setIsLoading] = useState(false);
@@ -84,16 +90,16 @@ const LoginPage = () => {
     const validateForm = () => {
         const newErrors = {};
 
-        if (!username.trim()) {
-            newErrors.username = 'Username is required';
-        } else if (username.length < 3) {
-            newErrors.username = 'Username must be at least 3 characters long';
-        }
+        // if (!username.trim()) {
+        //     newErrors.username = 'Username is required';
+        // } else if (username.length < 3) {
+        //     newErrors.username = 'Username must be at least 3 characters long';
+        // }
 
-        if (isSignup && !email.trim()) {
+        if (!email.trim()) {
             newErrors.email = 'Email is required';
-        } else if (isSignup && !validateEmail(email)) {
-            newErrors.email = 'Please enter a valid email address';
+        } else if (!validateEmail(email)) {
+            newErrors.email = '1) Please enter a valid email address';
         }
 
         if (!password.trim()) {
@@ -102,15 +108,29 @@ const LoginPage = () => {
             newErrors.password = 'Password must be at least 8 characters long';
         }
 
+        // Confirm Password validation
+        if (!confirmPassword.trim()) {
+            newErrors.confirmPassword = 'Please confirm your password';
+        } else if (confirmPassword !== password) {
+            newErrors.confirmPassword = 'Passwords do not match';
+        }
+
+        if (!captchaInput.trim()) {
+            newErrors.captcha = "Please enter the CAPTCHA";
+        } else if (captchaInput.trim().toLowerCase() !== captcha.toLowerCase()) {
+            newErrors.captcha = "CAPTCHA does not match";
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSwitch = () => {
         setIsSignup(!isSignup);
-        setUsername('');
+        // setUsername('');
         setEmail('');
         setPassword('');
+        setConfirmPassword('');
     };
 
     // Handle EmailVerification
@@ -242,22 +262,25 @@ const LoginPage = () => {
 
         try {
             if (isSignup) {
-                const response = await userSignup(username, email, password, false);
+                const response = await userSignup(email, password, confirmPassword, false);
 
                 if (response && response.success) {
                     setSuccessMessage("Account created successfully! You can now log in.");
                     setIsSignup(false);
-                    setUsername('');
+                    // setUsername('');
                     setEmail('');
                     setPassword('');
+                    setConfirmPassword('');
+                    generateCaptcha(); // reset captcha
                 } else {
                     setGeneralError(response?.message || "Failed to create account");
                 }
             } else {
-                const response = await userLogin(username, password, false);
+                console.log("Logging in with email:", email);
+                const response = await userLogin(email, password, false);
 
                 if (response && response.success) {
-                    localStorage.setItem("username", username);
+                    localStorage.setItem("email", email);
                     if (response.isGuest) {
                         navigate('/home');
                     } else {
@@ -312,176 +335,402 @@ const LoginPage = () => {
       const idToken = await user.getIdToken();
 
       // Step 3️⃣: Send token to Django backend for verification
-    //   const host = window.location.origin;
       const host = "http://localhost:8000"; // Django backend
       const response = await axios.post(`${host}/api/auth/firebase-login/`, {
         token: idToken,
       });
-
-    //   if ([200, 201, 204].includes(response.status)) {
-    //     console.log("✅ Firebase Login Successful:", response.data);
-
-    //     // Optional: Save user info to localStorage or Context
-    //     localStorage.setItem("user", JSON.stringify(response.data));
-    //     setIsLoggedIn(true);
-
-    //     // Navigate after login
-    //     navigate("/dashboard");
-    //   } else {
-    //     console.error("❌ Firebase Login Failed:", response.data);
-    //   }
-        console.log("✅ Backend Response:", response.data);
+        console.log("Backend Response:", response.data);
         alert("Login successful!");
+        localStorage.setItem("access", response.data.access);
+        localStorage.setItem("refresh", response.data.refresh);
+
         navigate("/home");
     } catch (error) {
-      console.error("🔥 Firebase Google Login Error:", error);
+      console.error("Firebase Google Login Error:", error);
+
+      if (error.response) {
+      const backendError = error.response.data.error;
+
+        if (backendError === "Email does not exist. Please register first.") {
+            alert("This email is not registered. Please sign up first.");
+        } else if (backendError === "Invalid Firebase token") {
+            alert("Invalid Google authentication. Please try again.");
+        } else {
+            alert(`Login failed: ${backendError}`);
+        }
+     } else {
+      // Handle network or other errors
+      alert("Something went wrong. Please check your connection and try again.");
+     }
     } finally {
       setIsLoading(false);
     }
-};
+    };
+
+     // Generate random captcha text
+    const generateCaptchaText = () => {
+        const chars =
+        "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+        let text = "";
+        for (let i = 0; i < 6; i++) {
+        text += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return text;
+    };
+    // Draw captcha with noise
+    const drawCaptcha = (text) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return; // ✅ Prevent null access
+        const ctx = canvas.getContext("2d");
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, width, height);
+        gradient.addColorStop(0, "#f3f4f6");
+        gradient.addColorStop(1, "#e5e7eb");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        // Draw curved noise lines
+        for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, Math.random() * height);
+        for (let j = 0; j < width; j += 20) {
+            ctx.lineTo(
+            j,
+            Math.sin(j / 10 + Math.random() * 2 * Math.PI) * 5 + height / 2
+            );
+        }
+        ctx.strokeStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
+            Math.random() * 255
+        }, 0.5)`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        }
+
+        // Draw text (random font, size, rotation)
+        const baseFontSize = 26;
+        const letterSpacing = width / (text.length + 1);
+
+        for (let i = 0; i < text.length; i++) {
+        const x = letterSpacing * (i + 0.8);
+        const y = height / 2 + Math.random() * 10 - 5;
+        const angle = (Math.random() - 0.5) * 0.6;
+        const fontSize = baseFontSize + Math.random() * 6;
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.font = `${fontSize}px monospace`;
+        ctx.fillStyle = `hsl(${Math.random() * 360}, 60%, 30%)`;
+        ctx.fillText(text[i], 0, 0);
+        ctx.restore();
+        }
+
+        // Add heavy random dots
+        for (let i = 0; i < 80; i++) {
+        ctx.fillStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${
+            Math.random() * 255
+        }, 0.4)`;
+        ctx.beginPath();
+        ctx.arc(Math.random() * width, Math.random() * height, 1.3, 0, 2 * Math.PI);
+        ctx.fill();
+        }
+
+        // Add random small text as background noise
+        for (let i = 0; i < 10; i++) {
+        ctx.save();
+        ctx.font = "10px sans-serif";
+        ctx.fillStyle = `rgba(0,0,0,0.05)`;
+        ctx.translate(Math.random() * width, Math.random() * height);
+        ctx.rotate(Math.random() * 2 * Math.PI);
+        ctx.fillText(
+            generateCaptchaText().slice(0, 3),
+            0,
+            0
+        );
+        ctx.restore();
+        }
+
+    };
+    // Generate new captcha
+    const generateCaptcha = () => {
+        const newCaptcha = generateCaptchaText();
+        setCaptcha(newCaptcha);
+        // drawCaptcha(newCaptcha);
+    };
+
+    useEffect(() => {
+        if (captcha && canvasRef.current) {
+        drawCaptcha(captcha);
+        }
+    }, [captcha]);
+
+     // Generate once on mount
+    useEffect(() => {
+        generateCaptcha();
+    }, []);
 
 
     return (
         <>
-            <section className='min-h-screen min-w-screen mx-auto bg-white flex justify-center items-center'>
-                {isSignup && <img src={icon} alt='stack overflow' className='p-5 pr-8' height={180} width={500} />}
-                <div className='min-w-[20%] flex flex-col justify-center items-center rounded-[3rem]'>
-                    {!isSignup && <img src={icon} alt='stack overflow' className='p-5 pr-8' height={110} width={300} />}
+          <section style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', marginLeft: '50px', marginTop: '50px', width: '100%' }}>
+            <div className="w-full max-w-md bg-white rounded-lg p-6">
+            {/* Logo */}
+            <img
+                src={icon}
+                alt="stack overflow"
+                className="mb-8"
+                height={150}
+                width={300}
+                style={{ padding: '0px 0px 0px 60px', marginBottom: '0px' }}  
+            />
 
-                    {/* Display general alerts */}
-                    {generalError && (
-                        <Alert
-                            message={generalError}
-                            type="error"
-                            showIcon
-                            closable
-                            onClose={() => setGeneralError('')}
-                            style={{ marginBottom: '16px', width: '400px' }}
+            {/* Alerts */}
+            <div className="w-full max-w-md space-y-4">
+                {generalError && (
+                <Alert
+                    message={generalError}
+                    type="error"
+                    showIcon
+                    closable
+                    onClose={() => setGeneralError("")}
+                />
+                )}
+                {successMessage && (
+                <Alert
+                    message={successMessage}
+                    type="success"
+                    showIcon
+                    closable
+                    onClose={() => setSuccessMessage("")}
+                />
+                )}
+            </div>
+
+            {/* Login Card */}
+            <div className="w-full max-w-md bg-white rounded-lg p-6">
+                <h2 className="text-center text-lg font-semibold mb-6">
+                {isSignup ? "Create an account" : "Log in to Osdag"}
+                </h2>
+
+                {/* Google buttons */}
+                <div className="space-y-3 mb-6">
+                    {(!isSignup) ? 
+                <Button
+                    onClick={handleGuestSignIn}
+                    disabled={isLoading}
+                    className="w-full flex items-center justify-center gap-3 py-2 bg-white border border-gray-300 rounded-full shadow-sm text-gray-700 font-medium hover:bg-gray-100"
+                >
+                    <span className="w-5 h-5 text-xl">👤</span>
+                    Continue as Guest
+                </Button> : null}
+                <Button
+                    onClick={googleLogin}
+                    disabled={isLoading}
+                    className="w-full flex items-center justify-center gap-3 py-2 bg-white border border-gray-300 rounded-full shadow-sm text-gray-700 font-medium hover:bg-gray-100"
+                    >
+                    <img
+                        src="https://developers.google.com/identity/images/g-logo.png"
+                        alt="Google Logo"
+                        className="w-5 h-5"
+                    />
+                    {isSignup ? "Continue with Google" : "Log in with Google"}
+                </Button>
+
+                    
+                </div>
+
+                <div className="relative flex items-center justify-center my-4">
+                <div className="flex-grow border-t border-gray-300"></div>
+                <span className="mx-3 text-gray-500 text-sm">OR</span>
+                <div className="flex-grow border-t border-gray-300"></div>
+                </div>
+
+                {/* Email & Password Form */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                        Email
+                        </label>
+                        <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className={`mt-1 block w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green ${
+                            errors.email ? "border-red-500" : "border-gray-300"
+                        }`}
                         />
-                    )}
-
-                    {successMessage && (
-                        <Alert
-                            message={successMessage}
-                            type="success"
-                            showIcon
-                            closable
-                            onClose={() => setSuccessMessage('')}
-                            style={{ marginBottom: '16px', width: '400px' }}
-                        />
-                    )}
-
-                    <div className='flex flex-row gap-4 mb-4'>
-                        <button
-                            className="inline-block px-5 py-3 text-base font-bold text-white bg-osdag-green border border-black rounded cursor-pointer transition-colors duration-300 hover:bg-osdag-dark-green focus:outline-none active:bg-osdag-dark-green disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                            onClick={handleGuestSignIn}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? <Spin size="small" /> : 'Guest Mode'}
-                        </button>
+                        {errors.email && (
+                        <span className="text-red-500 text-xs mt-1 block">{errors.email}</span>
+                        )}
                     </div>
-                    <form onSubmit={handleSubmit} className='w-full min-w-[300px] md:min-w-[400px] p-4 md:p-5 bg-white rounded-[10px] flex flex-col justify-evenly shadow-auth m-2 md:m-4'>
-                        {
-                            isSignup && (
-                                <label htmlFor="email" className='flex flex-col'>
-                                    <h4 className='mb-1.5 mt-2.5'>Email *</h4>
-                                    <input
-                                        type="email"
-                                        name='email'
-                                        id='email'
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className={`p-2.5 w-full border border-gray-300 text-sm m-1.5 rounded transition-colors duration-300 focus:outline-none focus:border-osdag-green focus:shadow-[0_0_0_2px_rgba(145,176,20,0.1)] ${errors.email ? 'border-red-500' : ''}`}
-                                    />
-                                    {errors.email && <span className='text-red-500 text-xs mt-1 block'>{errors.email}</span>}
-                                </label>
 
-                            )
-                        }
-                        <label htmlFor='name'>
-                            <h4>Username *</h4>
+                    <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                        Password
+                        </label>
+                        <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className={`mt-1 block w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green ${
+                            errors.password ? "border-red-500" : "border-gray-300"
+                            }`}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                        >
+                            {showPassword ? (
+                                                // Eye Slash SVG
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-5 h-5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18M10.477 10.477a3 3 0 104.243 4.243M9.88 9.88A4.5 4.5 0 0114.12 14.12M6.44 6.44C4.5 8.07 3 10.4 3 12c0 1.6 1.5 3.93 3.44 5.56A11.975 11.975 0 0012 18a11.975 11.975 0 005.56-1.44C19.5 15.93 21 13.6 21 12c0-1.6-1.5-3.93-3.44-5.56A11.975 11.975 0 0012 6c-1.43 0-2.81.26-4.06.72" />
+                                                </svg>
+                                            ) : (
+                                                // Eye SVG
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-5 h-5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.332 4.5 12 4.5c4.668 0 8.577 3.01 9.964 7.183.07.2.07.438 0 .639C20.577 16.49 16.668 19.5 12 19.5c-4.668 0-8.577-3.01-9.964-7.178z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                            )}
+                        </button>
+                        </div>
+                        {errors.password && (
+                        <span className="text-red-500 text-xs mt-1 block">{errors.password}</span>
+                        )}
+                        </div>
+                        {isSignup && (
+                        <div>
+                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                            Confirm Password
+                            </label>
+                            <div className="relative">
+                            <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                id="confirmPassword"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className={`mt-1 block w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green ${
+                                errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                                }`}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                            >
+                                {showConfirmPassword ? (
+                                                    // Eye Slash SVG
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-5 h-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l18 18M10.477 10.477a3 3 0 104.243 4.243M9.88 9.88A4.5 4.5 0 0114.12 14.12M6.44 6.44C4.5 8.07 3 10.4 3 12c0 1.6 1.5 3.93 3.44 5.56A11.975 11.975 0 0012 18a11.975 11.975 0 005.56-1.44C19.5 15.93 21 13.6 21 12c0-1.6-1.5-3.93-3.44-5.56A11.975 11.975 0 0012 6c-1.43 0-2.81.26-4.06.72" />
+                                                    </svg>
+                                                ) : (
+                                                    // Eye SVG
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-5 h-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.332 4.5 12 4.5c4.668 0 8.577 3.01 9.964 7.183.07.2.07.438 0 .639C20.577 16.49 16.668 19.5 12 19.5c-4.668 0-8.577-3.01-9.964-7.178z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                )}
+                            </button>
+                            </div>
+                            {errors.confirmPassword && (
+                            <span className="text-red-500 text-xs mt-1 block">{errors.confirmPassword}</span>
+                            )}
+                        
+                        </div>
+                        )}
+
+                        {isSignup && (
+                            <div className="flex items-center text-sm font-medium text-gray-700">
+                                <input
+                                    type="checkbox"
+                                    id="check"
+                                    className="h-4 w-4 text-osdag-green border-gray-300 rounded focus:ring-osdag-green"
+                                />
+                                <label htmlFor="check" className="ml-2 text-sm font-medium cursor-pointer">
+                                    Terms and Conditions
+                                </label>
+                            </div>
+                        )}    
+                        {/* CAPTCHA */}
+                        {isSignup && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            CAPTCHA
+                            </label>
+                            <canvas
+                            ref={canvasRef}
+                            width={200}
+                            height={60}
+                            className="border border-gray-300 rounded-md mb-2"
+                            ></canvas>
+                            <div className="flex items-center gap-2">
                             <input
                                 type="text"
-                                id='name'
-                                name='name'
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                className={`p-2.5 w-full border border-gray-300 text-sm m-1.5 rounded transition-colors duration-300 focus:outline-none focus:border-osdag-green focus:shadow-[0_0_0_2px_rgba(145,176,20,0.1)] ${errors.username ? 'border-red-500' : ''}`}
+                                value={captchaInput}
+                                onChange={(e) => setCaptchaInput(e.target.value)}
+                                placeholder="Enter CAPTCHA"
+                                className={`flex-grow px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green ${
+                                errors.captcha ? "border-red-500" : "border-gray-300"
+                                }`}
                             />
-                            {errors.username && <span className='text-red-500 text-xs mt-1 block'>{errors.username}</span>}
-                        </label>
-
-                        <label htmlFor='password' className='flex flex-col'>
-                            <div className='flex justify-between'>
-                                <h4 className='mb-1.5 mt-2.5'>Password *</h4>
+                            <button
+                                type="button"
+                                onClick={generateCaptcha}
+                                className="px-3 py-2 bg-osdag-green text-white rounded-md text-sm hover:bg-osdag-dark-green"
+                            >
+                                Refresh
+                            </button>
                             </div>
-                            <input
-                                type="password"
-                                name='password'
-                                id='password'
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className={`p-2.5 w-full border border-gray-300 text-sm m-1.5 rounded transition-colors duration-300 focus:outline-none focus:border-osdag-green focus:shadow-[0_0_0_2px_rgba(145,176,20,0.1)] ${errors.password ? 'border-red-500' : ''}`}
-                            />
-                            {errors.password && <span className='text-red-500 text-xs mt-1 block'>{errors.password}</span>}
-                            {!isSignup && <p className='text-osdag-green text-sm cursor-pointer hover:underline' onClick={handleVerifyEmailModal} >Forgot Password?</p>}
-                        </label>
-                        {isSignup && <p className='text-osdag-text-secondary text-sm'>Passwords must contain at least eight<br />characters, including at least 1 letter and 1<br /> number.</p>}
-                        {
-                            isSignup && (
-                                <div className='flex flex-row items-center'>
-                                    <input
-                                        type="checkbox"
-                                        id="check"
-                                        height={80}
-                                        width={80}
-                                    />
-                                    <label htmlFor="check" className='ml-2'>
-                                        <p className='text-sm m-0'>Terms,<br />And Conditions.</p>
-                                    </label>
-                                </div>
-                            )
-                        }
-                        <button type='submit' className='mt-2.5 py-2.5 px-1.5 bg-osdag-green border border-black text-white rounded cursor-pointer transition-colors duration-200 text-sm font-medium flex items-center justify-center gap-2 hover:bg-osdag-dark-green disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed' disabled={isLoading}>{isLoading ? <Spin size="small" /> : (isSignup ? 'Sign up' : 'Log in')}</button>
-                        {
-                            isSignup && (
-                                <p className='text-osdag-text-secondary text-sm'>
-                                    By clicking "Sign up", you agree to our
-                                    <span className='text-osdag-green'> terms of<br /> service</span>,
-                                    <span className='text-osdag-green'> privacy policy</span> and
-                                    <span className='text-osdag-green'> cookie policy</span>
-                                </p>
-                            )
-                        }
-                        
-                        <Button
-                            onClick={googleLogin}
-                            disabled={isLoading}
-                            variant="contained"
-                            sx={{
-                            backgroundColor: "#4285F4",
-                            color: "white",
-                            fontWeight: 500,
-                            textTransform: "none",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            }}
+                            {errors.captcha && (
+                            <span className="text-red-500 text-xs mt-1 block">{errors.captcha}</span>
+                            )}
+                        </div>
+                        )}  
+                
+                        {!isSignup && (
+                        <p
+                            className="text-osdag-green text-sm cursor-pointer hover:underline mt-1"
+                            onClick={handleVerifyEmailModal}
                         >
-                            <img
-                            src="https://developers.google.com/identity/images/g-logo.png"
-                            alt="Google Logo"
-                            style={{ width: "20px", height: "20px" }}
-                            />
-                            {isLoading ? "Signing in..." : "Sign in with Google"}
-                        </Button>
-                    </form>
-                    <p>
-                        {isSignup ? 'Already have an account?' : "Don't have an account?"}
-                        <button type='button' className='bg-transparent text-osdag-green border-none text-sm cursor-pointer transition-colors duration-200 hover:text-osdag-dark-green hover:underline disabled:text-gray-300 disabled:cursor-not-allowed' onClick={handleSwitch} disabled={isLoading}>{isSignup ? "Log in" : 'sign up'}</button>
+                            Forgot password?
+                        </p>
+                        )}
+                    
+
+                        {/* </div> */}
+
+                        {/* Login / Signup button */}
+                        <button
+                            type="submit"
+                            className="w-full py-2 bg-osdag-green text-white rounded-md font-medium hover:bg-osdag-dark-green transition"
+                            disabled={isLoading}
+                        >
+                            { console.log("isLoading:", isLoading)}
+                
+                             {/* isLoading ? <Spin size="small" /> : isSignup ? "Sign up" : "Log in11"} */}
+                        </button>
+                </form>
+
+                    {/* Toggle login/signup */}
+                    <p className="text-center text-sm text-gray-600 mt-4">
+                    {isSignup ? "Already have an account?" : "Don’t have an account?"}{" "}
+                    <button
+                        type="button"
+                        onClick={handleSwitch}
+                        className="text-osdag-green hover:underline font-medium"
+                        disabled={isLoading}
+                    >
+                        {isSignup ? "Log in" : "Sign up"}
+                    </button>
                     </p>
-                </div>
-            </section>
+            </div>
             {/* Verify Email Popup */}
             <Modal
                 title="Email Verification"
@@ -610,6 +859,14 @@ const LoginPage = () => {
                 </div>
             </Modal>
 
+            {/* Footer */}
+            <p className="text-xs text-gray-400 mt-6 text-center">
+                This site is protected by reCAPTCHA and the Google <br />
+                <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a> and{" "}
+                <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> apply.
+            </p>
+            </div>
+            </section> 
         </>
     );
 };

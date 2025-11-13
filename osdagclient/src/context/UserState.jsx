@@ -78,9 +78,9 @@ export const UserProvider = ({ children }) => {
       console.log("Server error while setting refresh token cookie");
     }
   };
-  const createJWTToken = async (username, password) => {
+  const createJWTToken = async (email, password) => {
     console.log("inside createJWT token ");
-    console.log("username : ", username);
+    console.log("email : ", email);
     console.log("password : ", password);
     try {
       const response = await fetch(`${BASE_URL}api/token/`, {
@@ -91,7 +91,7 @@ export const UserProvider = ({ children }) => {
           "Content-Type": "application/json; charset=UTF-8",
         },
         body: JSON.stringify({
-          username: username,
+          username: email,
           password: password,
         }),
       });
@@ -172,9 +172,9 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  const userSignup = async (username, email, password, isGuest) => {
+  const userSignup = async (email, password, confirmPassword, isGuest) => {
     console.log("inside the user signup thunk");
-    console.log("username : ", username);
+    // console.log("username : ", username);
     try {
       const response = await fetch(`${BASE_URL}user/signup/`, {
         method: "POST",
@@ -183,9 +183,10 @@ export const UserProvider = ({ children }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username,
+          // username: username,
           email: email,
           password: password,
+          confirmPassword: confirmPassword,
           isGuest: isGuest,
         }),
       });
@@ -197,7 +198,8 @@ export const UserProvider = ({ children }) => {
         console.log("user successfully created");
 
         // call the thunk for creating the JWT token
-        createJWTToken(username, password);
+        // createJWTToken(username, password);
+        createJWTToken(email, password);
 
         // call the reducer action to set the Login variable
         dispatch({
@@ -241,9 +243,9 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  const userLogin = async (username, password, isGst, JWTLogin) => {
+  const userLogin = async (email, password, isGst, JWTLogin) => {
     console.log("in userlogin Context - inside user login");
-    console.log("in userlogin Context - username : ", username);
+    // console.log("in userlogin Context - username : ", username);
     console.log("in userlogin Context - isGuest : ", isGst);
 
     if (JWTLogin === true) {
@@ -259,6 +261,7 @@ export const UserProvider = ({ children }) => {
     }
 
     try {
+      console.log("sending the login request to the server");
       const response = await fetch(`${BASE_URL}user/login/`, {
         method: "POST",
         mode: "cors",
@@ -266,7 +269,8 @@ export const UserProvider = ({ children }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username,
+          // username: username,
+          email: email,
           password: password,
           isGuest: isGst,
         }),
@@ -284,9 +288,10 @@ export const UserProvider = ({ children }) => {
         
         // create a new jwt token
         if (isGst === false) {
-          createJWTToken(username, password);
+          // createJWTToken(username, password);
+          createJWTToken(email, password);
           localStorage.setItem("userType", "user");
-          localStorage.setItem("username", username);
+          // localStorage.setItem("username", username);
           localStorage.setItem("email", jsonResponse.email || "");
           localStorage.setItem(
             "allInputValueFilesLength",

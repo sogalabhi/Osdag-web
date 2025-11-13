@@ -5,8 +5,8 @@ from firebase_admin import auth as firebase_auth
 import firebase_admin
 from firebase_admin import credentials
 from django.contrib.auth.models import User
-# from django.contrib.auth import get_user_model
-# from django.views.decorators.csrf import csrf_exempt
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 # import json
 from django.http.response import JsonResponse
@@ -63,6 +63,14 @@ def get_base_plate(request):
 def get_tension_member(request):
     return JsonResponse({'result': tension_member}, safe=False)
 
+@api_view(['GET'])
+def dashboard_view(request):
+    user = request.user
+    return Response({
+        "message": f"Welcome {user.username}!",
+        "email": user.email,
+    })
+
 
 if not firebase_admin._apps:
     cred = credentials.Certificate("./osdag_web/firebase-service-account.json")
@@ -77,47 +85,36 @@ class FirebaseLoginView(APIView):
             decoded = firebase_auth.verify_id_token(token)
             email = decoded.get("email")
             uid = decoded.get("uid")
-            user, _ = User.objects.get_or_create(username=uid, defaults={"email": email})
+            if not email:
+                return Response({"error": "Email not found in token"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # ✅ Check if user already exists by email
+            # try:
+            #     user = User.objects.get(email=email)
+            # except User.DoesNotExist:
+            #     return Response(
+            #         {"error": "Email does not exist. Please register first."},
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
+            try:
+                user = User.objects.filter(email=email).first()
+                if not user:
+                    return Response(
+                        {"error": "Email does not exist. Please register first."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+            # 3️⃣ Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
             return Response(
-                {"message": "Login successful", "email": email, "uid": uid},
+                {"message": "Login successful", "email": email, "uid": uid, "access": access_token,
+                "refresh": str(refresh)},
                 status=status.HTTP_200_OK,
             )
+        except firebase_auth.InvalidIdTokenError:
+            return Response({"error": "Invalid Firebase token"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-# User = get_user_model()
-
-# @csrf_exempt
-# def firebase_login(request):
-#     if request.method != "POST":
-#         return JsonResponse({"error": "Invalid request method"}, status=400)
-
-#     try:
-#         data = json.loads(request.body)
-#         id_token = data.get("token")
-
-#         if not id_token:
-#             return JsonResponse({"error": "Missing Firebase ID token"}, status=400)
-
-#         # ✅ Verify token with Firebase
-#         decoded_token = firebase_auth.verify_id_token(id_token)
-#         uid = decoded_token["uid"]
-#         email = decoded_token.get("email", "")
-#         name = decoded_token.get("name", "")
-
-#         # ✅ Create or get user in your DB
-#         user, created = User.objects.get_or_create(
-#             email=email,
-#             defaults={"username": name or email.split("@")[0]},
-#         )
-
-#         return JsonResponse({
-#             "message": "User authenticated successfully",
-#             "email": email,
-#             "uid": uid,
-#             "user_created": created,
-#         })
-
-#     except firebase_auth.InvalidIdTokenError:
-#         return JsonResponse({"error": "Invalid Firebase ID token"}, status=401)
-#     except Exception as e:
-#         return JsonResponse({"error": str(e)}, status=400)

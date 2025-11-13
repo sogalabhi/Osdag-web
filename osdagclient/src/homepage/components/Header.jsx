@@ -3,6 +3,7 @@ import yaml from 'js-yaml';
 import { useNavigate } from 'react-router-dom';
 import { MODULE_ROUTES, MODULE_NAME_TO_KEY } from '../../constants/modules';
 import { isGuestUser } from '../../utils/auth';
+import axios from "axios";
 
 const Header = ({ setshowSideBar, active }) => {
   const [isDark, setIsDark] = useState(false);
@@ -10,6 +11,8 @@ const Header = ({ setshowSideBar, active }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showResourcesDropdown, setShowResourcesDropdown] = useState(false);
   const [showAboutDropdown, setShowAboutDropdown] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [user, setUser] = useState({ name: "", email: "" });
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -19,6 +22,46 @@ const Header = ({ setshowSideBar, active }) => {
   const toggleTheme = () => {
     setIsDark(!isDark);
     document.documentElement.classList.toggle('dark');
+  };
+
+  // ✅ Fetch user data from Django backend
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("access");
+
+      if (!token) {
+        console.warn("No access token found");
+        setUser({ name: "", email: "" });
+        return;
+      }
+
+      try {
+        const response = await axios.get("http://localhost:8000/api/dashboard/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Django returns: { message: "Welcome suchita!", email: "suchita@example.com" }
+        const { message, email } = response.data;
+        const username = message.replace("Welcome ", "").replace("!", "");
+
+        setUser({ name: username, email: email });
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+        // Optional: redirect to login if token invalid
+        navigate("/");
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  // ✅ Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("access");
+    localStorage.removeItem("user"); // in case Firebase stored it
+    navigate("/");
   };
 
   // Mock data for search
@@ -105,6 +148,9 @@ const Header = ({ setshowSideBar, active }) => {
       }
       if (!e.target.closest('.about-dropdown')) {
         setShowAboutDropdown(false);
+      }
+      if (!e.target.closest('.profile-dropdown')) {
+        setShowProfileDropdown(false);
       }
     };
 
@@ -413,6 +459,43 @@ const Header = ({ setshowSideBar, active }) => {
               </button>
             </div>
           </div>
+          {/* user details, logout */}
+          <div className="relative profile-dropdown group hidden md:flex items-center space-x-1 mb-6 border-black p-2 rounded-lg justify-center">
+            {/* Avatar Button */}
+            <div className="flex items-center justify-center">
+              <button
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-osdag-green text-white"
+              >
+                <span className="font-semibold text-lg">
+                  {user.name ? user.name[0].toUpperCase() : "G"}
+                </span>
+              </button>
+            </div>
+
+
+            {/* Dropdown */}
+            {(showProfileDropdown || false) && (
+              <div className="absolute right-0 top-full mt-2 bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green rounded-xl shadow-lg z-20 min-w-56 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="px-4 py-3 border-b border-gray-100 dark:border-osdag-green/30">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    Welcome, {user.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1) : "Guest"}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {user.email || ""}
+                  </p>
+                </div>
+                {user.name ? 
+                <div className="py-2">
+                  <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
+                    Logout
+                  </button>
+                </div>
+                : ""}
+              </div>
+            )}
+          </div>
+
 
         </div>
       </div>
