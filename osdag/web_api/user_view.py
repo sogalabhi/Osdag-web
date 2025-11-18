@@ -340,6 +340,7 @@ class LoginView(APIView):
                     'access': str(refresh.access_token),
                     'refresh': str(refresh),
                     'email': email,
+                    'username': username,
                     'allInputValueFilesLength': all_input_files_length,
                     'success': True
                 }, status=status.HTTP_200_OK)
