@@ -578,11 +578,52 @@ export const EngineeringModule = ({
         <div className="flex items-center gap-2 ml-auto pr-4 text-black dark:text-white">
           <button
             onClick={toggleInputDock}
-            className={`p-2 rounded-md transition-colors ${showInputDock ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40'}`}
+            className={`group p-2 rounded-md transition-colors ${showInputDock
+      ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
+      : 'hover:bg-black/10 dark:hover:bg-black/40'
+    }`}
             title={`${showInputDock ? 'Hide' : 'Show'} input dock`}
             type="button"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-5 h-5" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm120-80v-560H200v560h120Zm80 0h360v-560H400v560Zm-80 0H200h120Z" /></svg>
+            {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-5 h-5" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm120-80v-560H200v560h120Zm80 0h360v-560H400v560Zm-80 0H200h120Z" /></svg> */}
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 -960 960 960"
+              className="w-5 h-5"
+            >
+              {/* Outer border */}
+              <rect
+                x="120"
+                y="-840"
+                width="720"
+                height="720"
+                // fill="none"
+                stroke="currentColor"
+                strokeWidth="60"
+              />
+
+              {/* LEFT section — highlight only this */}
+              <rect
+                x="200"
+                y="-760"
+                width="120"
+                height="560"
+                fill={showInputDock ? "currentColor" : "transparent"}
+      // className={!showInputDock ? "" : ""}
+              />
+
+              {/* RIGHT SECTION */}
+              <rect
+                x="400"
+                y="-760"
+                width="360"
+                height="560"
+                fill="none"
+                // fill="currentColor"
+                // opacity="0.4"
+              />
+            </svg>
+
           </button>
           <button
             onClick={toggleLogs}
@@ -700,12 +741,14 @@ export const EngineeringModule = ({
               <div className="flex items-center gap-2 mr-4">
                 <button
                   onClick={() => setDesignPrefModalStatus(true)}
-                  className={`flex items-center justify-center px-4 py-1 my-2 text-sm font-medium rounded-lg transition-colors ${isInputLocked ? 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400' : 'bg-osdag-green text-white hover:bg-osdag-dark-green'}`}
+                  className={`flex items-center justify-center px-4 py-1 my-2 text-sm font-medium rounded-lg transition-colors bg-osdag-green text-white hover:bg-osdag-dark-green`}
+                    // ${isInputLocked ? 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400' : 'bg-osdag-green text-white hover:bg-osdag-dark-green'}`}
                   title={isInputLocked ? 'Unlock the dock to edit additional inputs' : 'Open Additional Inputs'}
-                  disabled={isInputLocked}
+                  // disabled={isInputLocked}
                 >
                   Additional Inputs
                 </button>
+
                 <button
                   onClick={handleLockToggle}
                   className={`my-2 p-2 rounded-lg transition-colors ${isInputLocked ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'}`}
@@ -724,7 +767,8 @@ export const EngineeringModule = ({
                 </button>
               </div>
             </div>
-            <div className={`subMainBody scroll-data dark:bg-osdag-dark-color bg-white ${isInputLocked ? 'pointer-events-none opacity-60' : ''}`}>
+            <div className={`subMainBody scroll-data dark:bg-osdag-dark-color bg-white`}>
+              <div className={`${isInputLocked ? 'pointer-events-none opacity-60' : ''}`}>
               {moduleConfig.inputSections.map((section, index) => (
                 <InputSection
                   key={index}
@@ -742,7 +786,7 @@ export const EngineeringModule = ({
                   setModalDynamicSrc={setModalDynamicSrc}
                 />
               ))}
-
+              </div>
             </div>
 
             <div className="flex items-center justify-between w-full gap-x-4 px-4">
@@ -1029,14 +1073,14 @@ export const EngineeringModule = ({
             maskClosable={false}
             className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
           >
-            <DesignPrefSections
-              module={moduleConfig.sessionName}
-              inputs={inputs}
-              setInputs={setInputs}
-              setDesignPrefModalStatus={setDesignPrefModalStatus}
-              confirmationModal={confirmationModal}
-              setConfirmationModal={setConfirmationModal}
-            />
+              <DesignPrefSections
+                module={moduleConfig.sessionName}
+                inputs={inputs}
+                setInputs={setInputs}
+                setDesignPrefModalStatus={setDesignPrefModalStatus}
+                confirmationModal={confirmationModal}
+                setConfirmationModal={setConfirmationModal}
+              />
           </Modal>
         )
       }

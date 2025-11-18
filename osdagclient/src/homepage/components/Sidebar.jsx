@@ -53,7 +53,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
         ),
         active: false,
         link: '/FlexureMember',
-        comingSoon: true,
+        // comingSoon: true,
       },
       {
         name: 'Beam-Column',
@@ -203,9 +203,9 @@ const Sidebar = ({ setshowSideBar, active }) => {
                     className={`font-medium ${comingSoon ? 'text-gray-400 dark:text-gray-500' : 'dark:text-white'}`}
                   >
                     {item.name}
-                    {comingSoon && (
+                    {/* {comingSoon && (
                       <span className="ml-2 text-xs uppercase tracking-wide">(Coming Soon)</span>
-                    )}
+                    )} */}
                   </span>
                 </div>
               </div>

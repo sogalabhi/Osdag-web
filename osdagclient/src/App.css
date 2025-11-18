@@ -5,6 +5,27 @@
 @tailwind utilities;
 
 
+/* Prevent dropdowns from opening */
+.read-only-modal{
+  display: none !important;
+}
+
+/* 🔓 ALLOW clicking tab headers */
+.read-only-modal .ant-tabs-nav,
+.read-only-modal .ant-tabs-tab {
+  pointer-events: auto !important;
+}
+
+
+/* 🔓 ALLOW modal close button & footer buttons */
+.read-only-modal .ant-modal-close,
+.read-only-modal .ant-modal-close-x,
+.read-only-modal .ant-btn,
+.read-only-modal button.modal-close-btn {
+  pointer-events: auto !important;
+}
+
+
 * {
   margin: 0;
   padding: 0;
