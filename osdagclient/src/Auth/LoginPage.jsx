@@ -109,16 +109,19 @@ const LoginPage = () => {
         }
 
         // Confirm Password validation
-        if (!confirmPassword.trim()) {
-            newErrors.confirmPassword = 'Please confirm your password';
-        } else if (confirmPassword !== password) {
-            newErrors.confirmPassword = 'Passwords do not match';
-        }
+        if (isSignup) {
 
-        if (!captchaInput.trim()) {
-            newErrors.captcha = "Please enter the CAPTCHA";
-        } else if (captchaInput.trim().toLowerCase() !== captcha.toLowerCase()) {
-            newErrors.captcha = "CAPTCHA does not match";
+            if (!confirmPassword.trim()) {
+                newErrors.confirmPassword = 'Please confirm your password';
+            } else if (confirmPassword !== password) {
+                newErrors.confirmPassword = 'Passwords do not match';
+            }
+
+            if (!captchaInput.trim()) {
+                newErrors.captcha = "Please enter the CAPTCHA";
+            } else if (captchaInput.trim().toLowerCase() !== captcha.toLowerCase()) {
+                newErrors.captcha = "CAPTCHA does not match";
+            }
         }
 
         setErrors(newErrors);
@@ -279,14 +282,24 @@ const LoginPage = () => {
                 console.log("Logging in with email:", email);
                 const response = await userLogin(email, password, false);
 
+                // if (response && response.success) {
+                //     localStorage.setItem("email", email);
+                //     if (response.isGuest) {
+                //         navigate('/home');
+                //     } else {
+                //         // For regular users, they need email verification
+                //         setVerifyEmailModalVisible(true);
+                //     }
+                // }
                 if (response && response.success) {
+
+                    // Save tokens returned by your backend
+                    if (response.access) localStorage.setItem("access", response.access);
+                    if (response.refresh) localStorage.setItem("refresh", response.refresh);
+                
                     localStorage.setItem("email", email);
-                    if (response.isGuest) {
-                        navigate('/home');
-                    } else {
-                        // For regular users, they need email verification
-                        setVerifyEmailModalVisible(true);
-                    }
+                
+                    navigate('/home');  // 🚀 LOGIN SUCCESS — GO TO DASHBOARD
                 } else {
                     setGeneralError(response?.message || "Login failed");
                 }

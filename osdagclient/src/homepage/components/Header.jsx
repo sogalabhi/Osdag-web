@@ -479,7 +479,7 @@ const Header = ({ setshowSideBar, active }) => {
               <div className="absolute right-0 top-full mt-2 bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green rounded-xl shadow-lg z-20 min-w-56 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="px-4 py-3 border-b border-gray-100 dark:border-osdag-green/30">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    Welcome, {user.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1) : "Guest"}
+                    Welcome, {user.name ? user.name.split("@")[0].replace(/^./, c => c.toUpperCase()) : "Guest"}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                     {user.email || ""}

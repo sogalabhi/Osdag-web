@@ -289,10 +289,12 @@ export const UserProvider = ({ children }) => {
         // create a new jwt token
         if (isGst === false) {
           // createJWTToken(username, password);
-          createJWTToken(email, password);
+          // createJWTToken(email, password);
           localStorage.setItem("userType", "user");
           // localStorage.setItem("username", username);
           localStorage.setItem("email", jsonResponse.email || "");
+          localStorage.setItem("access", jsonResponse.access);
+          localStorage.setItem("refresh", jsonResponse.refresh);
           localStorage.setItem(
             "allInputValueFilesLength",
             jsonResponse.allInputValueFilesLength || 0
