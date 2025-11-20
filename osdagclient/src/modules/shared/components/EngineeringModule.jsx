@@ -26,6 +26,7 @@ export const EngineeringModule = ({
 }) => {
   const navigate = useNavigate();
   const cameraRef = useRef();
+  const lockBtnRef = useRef(null);
 
   const {
     // Context data
@@ -113,6 +114,8 @@ export const EngineeringModule = ({
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
   const [selectedSection, setSelectedSection] = useState(["Model"]);
   const [selectedCameraView, setSelectedCameraView] = useState("Model");
+  const [lockZoom, setLockZoom] = useState(false);
+
   // Hover tooltip state for 3D parts
   const [hoverText, setHoverText] = useState("");
   const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
@@ -809,8 +812,9 @@ export const EngineeringModule = ({
                 </button>
 
                 <button
+                  ref={lockBtnRef}
                   onClick={handleLockToggle}
-                  className={`my-2 p-2 rounded-lg transition-colors ${isInputLocked ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'}`}
+                  className={`my-2 p-2 rounded-lg transition-all duration-200 transition-colors ${lockZoom ? "scale-110" : "scale-100"} ${isInputLocked ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'}`}
                   title={isInputLocked ? 'Unlock input dock' : 'Lock input dock'}
                   type="button"
                 >
@@ -896,7 +900,7 @@ export const EngineeringModule = ({
             <div className="relative subMainBody scroll-data dark:bg-osdag-dark-color bg-white">
 
               {/* 🔒 Overlay when input dock is locked */}
-              {isInputLocked && (
+              {/* {isInputLocked && (
                 <div
                   className="absolute inset-0 z-20 cursor-not-allowed"
                   onClick={(e) => {
@@ -919,7 +923,43 @@ export const EngineeringModule = ({
                     }, 300);
                   }}
                 ></div>
+              )} */}
+              {isInputLocked && (
+                <div
+                  className="absolute inset-0 z-20 cursor-not-allowed"
+                  onClick={() => {
+                    if (!lockBtnRef.current) return;
+                    // 🔥 Trigger zoom-in
+                    setLockZoom(true);
+                    setTimeout(() => setLockZoom(false), 1000); // return to normal
+
+
+                    const rect = lockBtnRef.current.getBoundingClientRect();
+
+                    const tooltip = document.createElement("div");
+                    tooltip.className =
+                      "fixed px-3 py-1 text-sm bg-black text-white rounded-md opacity-0 transition-opacity z-[9999]";
+                    tooltip.textContent = "Unlock to edit";
+
+                    document.body.appendChild(tooltip);
+
+                    // Position tooltip just to the RIGHT of the Lock button
+                    tooltip.style.left = `${rect.right + 8}px`;
+                    tooltip.style.top = `${rect.top + rect.height / 2}px`;
+                    tooltip.style.transform = "translateY(-50%)";
+
+                    requestAnimationFrame(() => {
+                      tooltip.style.opacity = 1;
+                    });
+
+                    setTimeout(() => {
+                      tooltip.style.opacity = 0;
+                      setTimeout(() => tooltip.remove(), 150);
+                    }, 1000);
+                  }}
+                />
               )}
+
 
               {/* your existing container */}
               <div className={`${isInputLocked ? "pointer-events-none opacity-60" : ""}`}>
