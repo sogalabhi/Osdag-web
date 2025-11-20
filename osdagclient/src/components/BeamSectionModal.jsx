@@ -14,6 +14,7 @@ const BeamSectionModal = ({
   supportedSectionData,
   designPrefInputs,
   setDesignPrefInputs,
+  isInputLocked
 }) => {
   const {
     materialList,
@@ -50,9 +51,11 @@ const BeamSectionModal = ({
               <h5>Material</h5>
               <div>
                 <Select
+                  disabled={isInputLocked}
                   style={{ width: "200px", height: "25px", fontSize: "12px" }}
                   value={designPrefInputs.supported_material}
                   onSelect={(value) => {
+                    if (isInputLocked) return;
                     if (value == -1) {
                       setShowModal(true);
                       return;

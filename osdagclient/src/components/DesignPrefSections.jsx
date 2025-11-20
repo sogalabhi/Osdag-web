@@ -18,6 +18,7 @@ const DesignPrefSections = ({
   setDesignPrefModalStatus,
   setConfirmationModal,
   confirmationModal,
+  isInputLocked
 }) => {
   const [activeTab, setActiveTab] = useState(
     module === "Cover Plate Bolted Connection" || module === "Beam Beam End Plate Connection" ? 1 : 0
@@ -146,6 +147,7 @@ const DesignPrefSections = ({
                 ? designPrefData.supporting_section_results[0]
                 : designPrefData?.supporting_section_results ?? []
             }
+            isInputLocked={isInputLocked}
           />
         )}
         {activeTab == 1 && (
@@ -159,7 +161,8 @@ const DesignPrefSections = ({
               (designPrefData?.supported_section_results?.length ?? 0) > 0
                 ? designPrefData.supported_section_results[0]
                 : designPrefData?.supported_section_results ?? []
-            } 
+            }
+            isInputLocked={isInputLocked}
           />
         )}
         {activeTab == 2 && (
@@ -168,6 +171,7 @@ const DesignPrefSections = ({
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
             setDesignPrefInputs={setDesignPrefInputs}
+            isInputLocked={isInputLocked}
           />
         )}
         {activeTab == 3 && (
@@ -176,6 +180,7 @@ const DesignPrefSections = ({
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
             setDesignPrefInputs={setDesignPrefInputs}
+            isInputLocked={isInputLocked}
           />
         )}
         {activeTab == 4 && tabs.find(t => t.name === "Weld") && (
@@ -184,6 +189,7 @@ const DesignPrefSections = ({
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
             setDesignPrefInputs={setDesignPrefInputs}
+            isInputLocked={isInputLocked}
           />
         )}
         {activeTab == 5 && (
@@ -192,6 +198,7 @@ const DesignPrefSections = ({
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
             setDesignPrefInputs={setDesignPrefInputs}
+            isInputLocked={isInputLocked}
           />
         )}
         {activeTab == 6 && (
@@ -200,6 +207,7 @@ const DesignPrefSections = ({
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
             setDesignPrefInputs={setDesignPrefInputs}
+            isInputLocked={isInputLocked}
           />
         )}
       </div>
@@ -216,12 +224,13 @@ const DesignPrefSections = ({
         : 
         null 
         }*/}
+        
       <div className="subDesignPrefFooter subDesignPrefFooter-btn">
-        <Button type="button" onClick={() => setConfirmationModal(true)}>
+        <Button type="button" onClick={() => setConfirmationModal(true)} disabled={isInputLocked} style={isInputLocked ? { opacity: 0.5, cursor: "not-allowed" } : {}}>
           Default
         </Button>
 
-        <Button type="button" onClick={() => saveCoreInputs()}>
+        <Button type="button" onClick={() => saveCoreInputs()} disabled={isInputLocked} style={isInputLocked ? { opacity: 0.5, cursor: "not-allowed" } : {}}>
           Save and Close
         </Button>
       </div>

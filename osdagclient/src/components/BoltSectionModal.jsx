@@ -1,6 +1,6 @@
 import { Select,Input } from 'antd'
 
-const BoltSectionModal = ({ designPrefInputs, setDesignPrefInputs }) => {
+const BoltSectionModal = ({ designPrefInputs, setDesignPrefInputs, isInputLocked }) => {
     const Bolt_discription = `
 IS 800 Table 20 Typical Average Values for Coefficient of Friction (µf)
 
@@ -28,7 +28,7 @@ xii) Red lead painted surface     0.1
                     <div className='input-cont'>
                         <h5>Type</h5>
                         <div>
-                            <Select style={{ width: '200px', height: '25px',fontSize: '12px' }}
+                            <Select disabled={isInputLocked} style={{ width: '200px', height: '25px',fontSize: '12px' }}
                                 value={designPrefInputs.bolt_tension_type}
                                 onSelect={value => setDesignPrefInputs({...designPrefInputs, bolt_tension_type: value})}
                             >
@@ -40,7 +40,7 @@ xii) Red lead painted surface     0.1
                     <div className='input-cont'>
                     <h5>Hole Type</h5>
                         <div>
-                            <Select style={{ width: '200px', height: '25px',fontSize: '12px' }}
+                            <Select disabled={isInputLocked} style={{ width: '200px', height: '25px',fontSize: '12px' }}
                                 value={designPrefInputs.bolt_hole_type}
                                 onSelect={value => setDesignPrefInputs({...designPrefInputs, bolt_hole_type: value})}
                             >
@@ -55,7 +55,7 @@ xii) Red lead painted surface     0.1
                         Slip factor, (mu<span style={{ verticalAlign: 'sub', fontSize: 'smaller' }}>f</span>)
                     </h5>
                         <div>
-                            <Select style={{ width: '200px', height: '25px',fontSize: '12px' }}
+                            <Select disabled={isInputLocked} style={{ width: '200px', height: '25px',fontSize: '12px' }}
                                 value={designPrefInputs.bolt_slip_factor}
                                 onSelect={value => setDesignPrefInputs({...designPrefInputs, bolt_slip_factor: value})}
                             >

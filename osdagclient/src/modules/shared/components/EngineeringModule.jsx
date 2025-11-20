@@ -107,6 +107,7 @@ export const EngineeringModule = ({
   const [showLogs, setShowLogs] = useState(false);
   const [isDesignComplete, setIsDesignComplete] = useState(false);
   const [isInputLocked, setIsInputLocked] = useState(false);
+  const [showUnlockWarning, setShowUnlockWarning] = useState(false);
   const [showOptionsContainer, setShowOptionsContainer] = useState(false); // New state for options container
   const [isGridActive, setIsGridActive] = useState(false);
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
@@ -270,10 +271,21 @@ export const EngineeringModule = ({
       setIsInputLocked(false);
       setShowInputDock(true);
       setIsRedesigning(false);
+      setShowUnlockWarning(true);
     } else {
       setIsInputLocked(true);
       setShowInputDock(false);
     }
+  };
+
+  const confirmUnlock = () => {
+    setIsInputLocked(false);
+    setShowUnlockWarning(false);
+  };
+
+  const cancelUnlock = () => {
+    setShowUnlockWarning(false);
+    setIsInputLocked(true);
   };
 
   const toggleLogs = () => {
@@ -579,60 +591,79 @@ export const EngineeringModule = ({
           <button
             onClick={toggleInputDock}
             className={`group p-2 rounded-md transition-colors ${showInputDock
-      ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
-      : 'hover:bg-black/10 dark:hover:bg-black/40'
-    }`}
+              ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
+              : 'hover:bg-black/10 dark:hover:bg-black/40'
+            }`}
             title={`${showInputDock ? 'Hide' : 'Show'} input dock`}
             type="button"
           >
             {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-5 h-5" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm120-80v-560H200v560h120Zm80 0h360v-560H400v560Zm-80 0H200h120Z" /></svg> */}
-          <svg
+            <svg
               xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 -960 960 960"
+              viewBox="0 0 100 100"
+              className="w-5 h-5"
+              fill="none"
+            >
+              {/* Outer frame */}
+              <rect
+                x="5"
+                y="5"
+                width="90"
+                height="90"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="10"
+              />
+
+              {/* Left panel (filled) */}
+              <rect
+                x="5"
+                y="5"
+                width="30"
+                height="90"
+                fill="currentColor"
+                stroke="none"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={toggleLogs}
+            className={`p-2 rounded-md transition-colors ${
+              showLogs
+                ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
+                : 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40'
+            }`}
+            title={`${showLogs ? 'Hide' : 'Show'} logs`}
+            type="button"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 100 100"
               className="w-5 h-5"
             >
               {/* Outer border */}
               <rect
-                x="120"
-                y="-840"
-                width="720"
-                height="720"
-                // fill="none"
+                x="5"
+                y="5"
+                width="90"
+                height="90"
                 stroke="currentColor"
-                strokeWidth="60"
-              />
-
-              {/* LEFT section — highlight only this */}
-              <rect
-                x="200"
-                y="-760"
-                width="120"
-                height="560"
-                fill={showInputDock ? "currentColor" : "transparent"}
-      // className={!showInputDock ? "" : ""}
-              />
-
-              {/* RIGHT SECTION */}
-              <rect
-                x="400"
-                y="-760"
-                width="360"
-                height="560"
+                strokeWidth="10"
                 fill="none"
-                // fill="currentColor"
-                // opacity="0.4"
+              />
+
+              {/* Bottom section fill */}
+              <rect
+                x="5"
+                y="65"       
+                width="90"
+                height="30"   
+                fill="currentColor"
+                stroke="none"
               />
             </svg>
+          </button>
 
-          </button>
-          <button
-            onClick={toggleLogs}
-            className={`p-2 rounded-md transition-colors ${showLogs ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40'}`}
-            title={`${showLogs ? 'Hide' : 'Show'} logs`}
-            type="button"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-5 h-5" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-200v120h560v-120H200Zm0-80h560v-360H200v360Zm0 80v120-120Z" /></svg>
-          </button>
           <button
             onClick={toggleOutputDock}
             className={`p-2 rounded-md transition-colors ${showOutputDock ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : isDesignComplete ? 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40' : 'opacity-40 cursor-not-allowed'}`}
@@ -640,8 +671,36 @@ export const EngineeringModule = ({
             type="button"
             disabled={!isDesignComplete}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-5 h-5" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm440-80h120v-560H640v560Zm-80 0v-560H200v560h360Zm80 0h120-120Z" /></svg>
+            {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-5 h-5" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm440-80h120v-560H640v560Zm-80 0v-560H200v560h360Zm80 0h120-120Z" /></svg> */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 100 100"
+              className="w-5 h-5"
+              stroke="currentColor"
+              fill="none"
+            >
+              {/* Outer frame */}
+              <rect
+                x="5"
+                y="5"
+                width="90"
+                height="90"
+                strokeWidth="10"
+              />
+
+              {/* RIGHT panel — filled when showOutputDock is true */}
+              <rect
+                x="50"
+                y="3"
+                width="47"
+                height="134"
+                fill="currentColor"
+                stroke="none"
+                strokeWidth="10"
+              />
+            </svg>
           </button>
+
           <button
             onClick={handleHomeClick}
             className="p-2 rounded-md transition-colors hover:bg-black/10 dark:hover:bg-black/40"
@@ -765,9 +824,55 @@ export const EngineeringModule = ({
                     </svg>
                   )}
                 </button>
+                {/* POPUP WARNING */}
+                {showUnlockWarning && (
+                      <div
+                        style={{
+                          position: "fixed",
+                          inset: 0,
+                          backgroundColor: "rgba(0, 0, 0, 0.7)",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          zIndex: 9999,
+                        }}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: "white",
+                            padding: "20px",
+                            borderRadius: "8px",
+                            width: "300px",
+                            boxShadow: "0 0 10px rgba(0,0,0,0.25)",
+                          }}
+                        >
+                          <h2 className="text-lg font-semibold mb-4">Warning</h2>
+                          <p className="mb-6">
+                            The current designs will be lost.  
+                            You can save them by clicking on <strong>Save Input</strong>.
+                          </p>
+
+                          <div className="flex justify-end gap-3">
+                            <button
+                              onClick={cancelUnlock}
+                              className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
+                            >
+                              Cancel
+                            </button>
+
+                            <button
+                              onClick={confirmUnlock}
+                              className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+                            >
+                              Unlock
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                )}
               </div>
             </div>
-            <div className={`subMainBody scroll-data dark:bg-osdag-dark-color bg-white`}>
+            {/* <div className={`subMainBody scroll-data dark:bg-osdag-dark-color bg-white`}>
               <div className={`${isInputLocked ? 'pointer-events-none opacity-60' : ''}`}>
               {moduleConfig.inputSections.map((section, index) => (
                 <InputSection
@@ -787,6 +892,56 @@ export const EngineeringModule = ({
                 />
               ))}
               </div>
+            </div> */}
+            <div className="relative subMainBody scroll-data dark:bg-osdag-dark-color bg-white">
+
+              {/* 🔒 Overlay when input dock is locked */}
+              {isInputLocked && (
+                <div
+                  className="absolute inset-0 z-20 cursor-not-allowed"
+                  onClick={(e) => {
+                    const tooltip = document.createElement("div");
+                    tooltip.className =
+                      "fixed px-3 py-1 text-sm bg-black text-white rounded-md opacity-0 transition-opacity z-[9999]";
+                    tooltip.textContent = "Unlock to edit";
+
+                    document.body.appendChild(tooltip);
+                    tooltip.style.left = `${e.clientX + 10}px`;
+                    tooltip.style.top = `${e.clientY + 10}px`;
+
+                    requestAnimationFrame(() => {
+                      tooltip.style.opacity = 1;
+                    });
+
+                    setTimeout(() => {
+                      tooltip.style.opacity = 0;
+                      setTimeout(() => tooltip.remove(), 150);
+                    }, 300);
+                  }}
+                ></div>
+              )}
+
+              {/* your existing container */}
+              <div className={`${isInputLocked ? "pointer-events-none opacity-60" : ""}`}>
+                {moduleConfig.inputSections.map((section, index) => (
+                  <InputSection
+                    key={index}
+                    section={section}
+                    inputs={inputs}
+                    setInputs={setInputs}
+                    selectionStates={selectionStates}
+                    updateSelectionState={updateSelectionState}
+                    updateModalState={updateModalState}
+                    toggleAllSelected={toggleAllSelected}
+                    contextData={contextData}
+                    extraState={extraState}
+                    setExtraState={setExtraState}
+                    updateSelectedItems={updateSelectedItems}
+                    setModalDynamicSrc={setModalDynamicSrc}
+                  />
+                ))}
+              </div>
+
             </div>
 
             <div className="flex items-center justify-between w-full gap-x-4 px-4">
@@ -808,8 +963,6 @@ export const EngineeringModule = ({
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="m352-522 86-87-56-57-44 44-56-56 43-44-45-45-87 87 159 158Zm328 329 87-87-45-45-44 43-56-56 43-44-57-56-86 86 158 159Zm24-567 57 57-57-57ZM290-120H120v-170l175-175L80-680l200-200 216 216 151-152q12-12 27-18t31-6q16 0 31 6t27 18l53 54q12 12 18 27t6 31q0 16-6 30.5T816-647L665-495l215 215L680-80 465-295 290-120Zm-90-80h56l392-391-57-57-391 392v56Zm420-419-29-29 57 57-28-28Z" /></svg>
                 Design
               </button>
-
-
 
             </div>
           </div>
@@ -848,8 +1001,19 @@ export const EngineeringModule = ({
                   return (
                     <label
                       key={option}
-                      className={`flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer transition-colors text-sm font-medium ${isChecked ? 'bg-osdag-green/10 text-osdag-green dark:bg-osdag-dark-green/20 dark:text-osdag-green' : 'text-black dark:text-white hover:bg-black/10 dark:hover:bg-black/40'}`}
+                      className={`flex items-center gap-3 px-4 py-2 cursor-pointer text-sm font-medium text-black dark:text-white`}
+                        // rounded-lg cursor-pointer transition-colors text-sm font-medium ${isChecked ? 'bg-osdag-green/10 text-osdag-green dark:bg-osdag-dark-green/20 dark:text-osdag-green' : 'text-black dark:text-white hover:bg-black/10 dark:hover:bg-black/40'}`}
                     >
+                      {/* Checkbox highlight box */}
+                      <div
+                        className={`
+                          rounded-lg p-1 transition-colors
+                          ${isChecked
+                            ? "bg-osdag-green/20 dark:bg-osdag-dark-green/30"
+                            : "bg-transparent"
+                          }
+                        `}
+                      >
                       <input
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-400 text-osdag-green focus:ring-osdag-green"
@@ -896,6 +1060,7 @@ export const EngineeringModule = ({
                           }
                         }}
                       />
+                      </div>
                       <span>{option}</span>
                     </label>
                   );
@@ -1065,7 +1230,12 @@ export const EngineeringModule = ({
         designPrefModalStatus && (
           <Modal
             open={designPrefModalStatus}
-            onCancel={() => setConfirmationModal(true)}
+            // onCancel={() => setConfirmationModal(true)}
+            onCancel={() =>
+              isInputLocked
+                ? setDesignPrefModalStatus(false)   // Directly close
+                : setConfirmationModal(true)        // Ask confirmation
+            }
             footer={null}
             minWidth={1200}
             width={1400}
@@ -1080,6 +1250,7 @@ export const EngineeringModule = ({
                 setDesignPrefModalStatus={setDesignPrefModalStatus}
                 confirmationModal={confirmationModal}
                 setConfirmationModal={setConfirmationModal}
+                isInputLocked={isInputLocked}
               />
           </Modal>
         )

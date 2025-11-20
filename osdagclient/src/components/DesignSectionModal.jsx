@@ -1,6 +1,6 @@
 import { Select,Input } from 'antd'
 
-const DesignSectionModal = ({designPrefInputs, setDesignPrefInputs }) => {
+const DesignSectionModal = ({designPrefInputs, setDesignPrefInputs, isInputLocked }) => {
 
     return (
 <>
@@ -11,7 +11,7 @@ const DesignSectionModal = ({designPrefInputs, setDesignPrefInputs }) => {
                     <div className='input-cont'>
                         <h5>Design Method</h5>
                         <div>
-                            <Select style={{ width: '200px', height: '25px',fontSize: '12px' }}
+                            <Select disabled={isInputLocked} style={{ width: '200px', height: '25px',fontSize: '12px' }}
                                 value={designPrefInputs.design_method}
                                 onSelect={value => setDesignPrefInputs({...designPrefInputs, design_method: value})}
                             >
