@@ -1,9 +1,11 @@
-from osdag_api.validation_utils import validate_arr, validate_num, validate_string
-from osdag_api.errors import MissingKeyError, InvalidInputTypeError
-from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
+from apps.core.utils import (
+    validate_arr, validate_num, validate_string,
+    MissingKeyError, InvalidInputTypeError,
+    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
+    write_stl
+)
 from ..shared import setup_for_cad  # Use moment_connection shared utilities
 from osdag_core.cad.common_logic import CommonDesignLogic
-from osdag_api.modules.mesh_export import write_stl
 from OCC.Core import BRepTools
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder

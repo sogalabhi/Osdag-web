@@ -1,6 +1,8 @@
-from osdag_api.validation_utils import validate_arr, validate_num, validate_string
-from osdag_api.errors import MissingKeyError, InvalidInputTypeError
-from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
+from apps.core.utils import (
+    validate_arr, validate_num, validate_string,
+    MissingKeyError, InvalidInputTypeError,
+    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
+)
 from apps.modules.shear_connection import shared as scc
 from OCC.Core import BRepTools
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
@@ -358,7 +360,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    from osdag_api.modules.mesh_export import write_stl
+    from apps.core.utils import write_stl
     from OCC.Core.BRep import BRep_Builder
     from OCC.Core.TopoDS import TopoDS_Compound
     from OCC.Core.Message import Message_ProgressRange

@@ -11,9 +11,13 @@ urlpatterns = [
     # Moment Connection module
     path('moment-connection/', include('apps.modules.moment_connection.urls')),
     
+    # Tension Member module
+    path('tension-member/', include('apps.modules.tension_member.urls')),
+    
+    # Flexure Member module
+    path('flexure-member/', include('apps.modules.flexure_member.urls')),
+    
     # Future modules will be added here:
-    # path('tension-member/', include('apps.modules.tension_member.urls')),
-    # path('flexure-member/', include('apps.modules.flexure_member.urls')),
     # path('base-plate/', include('apps.modules.base_plate.urls')),
 ]
 

@@ -1,2 +1,4 @@
-# Tension Member module package
-
+"""
+Tension Member Module
+Parent module for tension member design calculations
+"""

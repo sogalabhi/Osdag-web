@@ -1,6 +1,8 @@
-from osdag_api.validation_utils import validate_arr, validate_num, validate_string
-from osdag_api.errors import MissingKeyError, InvalidInputTypeError
-from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
+from apps.core.utils import (
+    validate_arr, validate_num, validate_string,
+    MissingKeyError, InvalidInputTypeError,
+    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
+)
 from ..shared import setup_for_cad  # Use moment_connection shared utilities
 from OCC.Core import BRepTools
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
