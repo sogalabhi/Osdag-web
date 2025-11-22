@@ -3,14 +3,16 @@ Core app URLs - Non-module specific endpoints
 Extracted from osdag/urls.py
 """
 from django.urls import path
-from apps.core.web_api.user_view import SignupView, ForgetPasswordView, LogoutView, LoginView, ObtainInputFileView, CheckEmailView, SaveInputFileView, SetRefreshTokenCookieView
-from apps.core.web_api.jwt_api import JWTHomeView
-from apps.core.web_api.google_sso_api import GoogleSSOView
-from apps.core.web_api.project_api import ProjectAPI, ProjectDetailAPI, ProjectByNameAPI
-from apps.core.web_api.osi_api import SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload
-from apps.core.web_api.report_customization_api import ParseReportSections, CustomizeReport, GenerateInitialReport
-from apps.core.web_api.design_pref_api import DesignPreference, MaterialDetails
-from apps.core.web_api.design_report_csv_view import CompanyLogoView
+# Import from new api structure (using re-exports from __init__.py)
+from apps.core.api import (
+    SignupView, ForgetPasswordView, LogoutView, LoginView,
+    ObtainInputFileView, CheckEmailView, SaveInputFileView, SetRefreshTokenCookieView,
+    JWTHomeView, GoogleSSOView,
+    ProjectAPI, ProjectDetailAPI, ProjectByNameAPI,
+    SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
+    ParseReportSections, CustomizeReport, GenerateInitialReport,
+    DesignPreference, MaterialDetails, CompanyLogoView
+)
 from apps.core import views
 
 app_name = 'core'

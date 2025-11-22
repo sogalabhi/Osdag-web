@@ -78,8 +78,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'osdag',  # Keep temporarily during migration
-    'apps.core',  # New core app
+    # 'osdag',  # Removed - migrated to apps.core
+    'apps.core',  # New core app (replaces osdag)
     'apps.modules.shear_connection',  # Shear connection parent module
     'apps.modules.moment_connection',  # Moment connection parent module
     # cors headers 

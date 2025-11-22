@@ -1,6 +1,6 @@
-from cad.common_logic import CommonDesignLogic
+from osdag_core.cad.common_logic import CommonDesignLogic
 from OCC.Display.backend import *
-from Common import *
+from osdag_core.Common import *
 def setup_for_cad(cdl: CommonDesignLogic, module_class):
     """Sets up the CommonLogicObjct before generating CAD"""
     print('SETTING UP FOR CAD', module_class)

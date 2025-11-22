@@ -6,7 +6,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('osdag', '0007_osifile_remove_project_input_values_and_more'),
+
+        ('core', '0007_osifile_remove_project_input_values_and_more'),
     ]
 
     operations = [

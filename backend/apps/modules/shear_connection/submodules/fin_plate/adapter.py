@@ -36,9 +36,10 @@ from OCC.Core.IGESControl import IGESControl_Writer
 
 # from OCC.Core.StlAPI import StlAPI_Writer
 # from OCC.Core.TopoDS import TopoDS_Solid, TopoDS_Shell
-from cad.common_logic import CommonDesignLogic
+from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+from osdag_core.Common import KEY_DISP_FINPLATE
 from osdag_core.custom_logger import CustomLogger
 import sys
 import os
@@ -359,41 +360,66 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         }
     }
     """
-    print("in fin_plate_connection.py: generate_output called with input_values:", input_values)
+    print("\n" + "=" * 60)
+    print("generate_output() called")
+    print("=" * 60)
+    print(f"Input values keys (first 10): {list(input_values.keys())[:10]}")
+    
     output = {}  # Dictionary for formatted values
-    module = create_from_input(input_values)  # Create module from input.
-    print('in fin_plate_connection.py: module : ' , module)
-    print('in fin_plate_connection.py: type of module : ' , type(module))
+    
+    print("\n[Step 1] Creating module from input...")
+    try:
+        module = create_from_input(input_values)  # Create module from input.
+        print(f"✅ Module created: {type(module).__name__}")
+        print(f"Module object: {module}")
+    except Exception as e:
+        print(f"❌ Failed to create module: {e}")
+        raise
+    
     # Initialize logs variable first
     logs = []
     
     try:
-        # Generate output values in unformatted form.
+        print("\n[Step 2] Calling module.output_values(True)...")
         raw_output_text = module.output_values(True)
-        print('in fin_plate_connection.py: raw_output_text:', raw_output_text)
-        raw_output_spacing = module.spacing(True)
-        print('in fin_plate_connection.py: raw_output_spacing:', raw_output_spacing)
-        raw_output_capacities = module.capacities(True)
-        print('in fin_plate_connection.py: raw_output_capacities:', raw_output_capacities)
-        raw_output_section_capacities = module.section_capacities(True)
-        print('in fin_plate_connection.py: raw_output_section_capacities:', raw_output_section_capacities)
+        print(f"✅ output_values() returned {len(raw_output_text)} parameters")
         
+        print("\n[Step 3] Calling module.spacing(True)...")
+        raw_output_spacing = module.spacing(True)
+        print(f"✅ spacing() returned {len(raw_output_spacing)} parameters")
+        
+        print("\n[Step 4] Calling module.capacities(True)...")
+        raw_output_capacities = module.capacities(True)
+        print(f"✅ capacities() returned {len(raw_output_capacities)} parameters")
+        
+        print("\n[Step 5] Calling module.section_capacities(True)...")
+        raw_output_section_capacities = module.section_capacities(True)
+        print(f"✅ section_capacities() returned {len(raw_output_section_capacities)} parameters")
+        
+        print("\n[Step 6] Retrieving logs from logger...")
         # Get logs from the custom logger
-        if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
-            logs = module.logger.get_logs()
-            print(f'Retrieved {len(logs)} logs from custom logger')
+        if hasattr(module, 'logger'):
+            print(f"Logger exists: {type(module.logger)}")
+            if isinstance(module.logger, CustomLogger):
+                logs = module.logger.get_logs()
+                print(f"✅ Retrieved {len(logs)} logs from custom logger")
+            else:
+                print(f"⚠️ Logger is not CustomLogger instance, type: {type(module.logger)}")
         else:
-            print('Logger is not CustomLogger instance or logger not found')
-            print(f'Logger type: {type(module.logger) if hasattr(module, "logger") else "No logger"}')
+            print("⚠️ Module has no logger attribute")
 
-        # Combine all raw outputs
+        print("\n[Step 7] Combining all raw outputs...")
         raw_output = raw_output_text + raw_output_spacing + raw_output_capacities + raw_output_section_capacities
-        print('in fin_plate_connection.py: raw_output combined length:', len(raw_output))
+        print(f"✅ Combined raw_output length: {len(raw_output)}")
 
+        print("\n[Step 8] Processing parameters into output dict...")
+        processed_count = 0
+        skipped_count = 0
+        
         # Process each parameter with handling for both 4 and 5 element tuples
         for i, param in enumerate(raw_output):
-            print(f"in fin_plate_connection.py: Processing param {i}: {param}")
-            print(f"Param length: {len(param)}")
+            if i < 5 or i % 50 == 0:  # Print first 5 and every 50th
+                print(f"  Processing param {i}/{len(raw_output)}: {param[:2] if len(param) >= 2 else param}")
             
             # Handle both 4-element and 5-element tuples
             if len(param) >= 4:
@@ -401,8 +427,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 label = param[1] 
                 param_type = param[2]
                 value = param[3]
-                
-                print(f"Key: {key}, Label: {label}, Type: {param_type}, Value: {value}")
                 
                 # Check if it's a TextBox type and has a valid key
                 if param_type == "TextBox" and key is not None:
@@ -415,14 +439,45 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                         "label": label,
                         "val": value
                     }
+                    processed_count += 1
+                else:
+                    skipped_count += 1
+                    if i < 5:  # Only print details for first few
+                        print(f"    ⚠️ Skipped: type={param_type}, key={key}")
+        
+        print(f"✅ Processed {processed_count} parameters, skipped {skipped_count}")
     except Exception as e:
-        print(f'Error in generate_output: {e}')
+        print("\n" + "=" * 60)
+        print("❌ ERROR in generate_output()")
+        print("=" * 60)
+        print(f"Exception type: {type(e).__name__}")
+        print(f"Exception message: {str(e)}")
+        print(f"Exception args: {e.args if hasattr(e, 'args') else 'N/A'}")
+        
+        # Check if exception has error attribute
+        if hasattr(e, 'error'):
+            print(f"Exception has 'error' attribute: {e.error}")
+            if e.error is None:
+                print("⚠️ WARNING: Exception.error is None!")
+        
+        print("\nFull traceback:")
         import traceback
         traceback.print_exc()
+        print("=" * 60)
         
-    print("in fin_plate_connection.py: Final output dict: ", output)
-    print("in fin_plate_connection.py: Output keys: ", list(output.keys()))
-    print("in fin_plate_connection.py: Returning logs: **********", logs)
+        # Re-raise the exception so service layer can handle it
+        raise
+    
+    print("\n" + "=" * 60)
+    print("✅ generate_output() completed successfully")
+    print("=" * 60)
+    print(f"Final output dict has {len(output)} keys")
+    print(f"Output keys (first 10): {list(output.keys())[:10]}")
+    print(f"Logs count: {len(logs) if logs else 0}")
+    if logs:
+        print(f"First log entry: {logs[0] if len(logs) > 0 else 'N/A'}")
+    print("=" * 60)
+    
     return output, logs
 
 
@@ -433,11 +488,27 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
             "section", "'Model', 'Beam', 'Column' or 'Plate'")
     module = create_from_input(input_values)  # Create module from input.
     print('module from input values : ' , module)
+    print('module.module value:', repr(module.module))
+    # IMPORTANT: Ensure module.module is set to KEY_DISP_FINPLATE for CAD generation
+    # module.module might be overwritten by input dictionary value
+    if module.module != KEY_DISP_FINPLATE:
+        print(f'WARNING: module.module is {repr(module.module)}, setting to KEY_DISP_FINPLATE')
+        module.module = KEY_DISP_FINPLATE
     # Object that will create the CAD model.
+    # CommonDesignLogic signature: (display, cad_widget, folder, connection, mainmodule)
+    # connection should be KEY_DISP_FINPLATE ('FinPlateConnection') for proper CAD generation
+    # Force use of KEY_DISP_FINPLATE since module.module might be set to input value (e.g., "FinPlateConnection")
+    # instead of the display constant ("FinPlateConnection")
+    connection_key = KEY_DISP_FINPLATE
+    print('Using connection key:', repr(connection_key))
+    print('KEY_DISP_FINPLATE value:', repr(KEY_DISP_FINPLATE))
     try : 
-        cld = CommonDesignLogic(None, '', module.module , module.mainmodule)
+        cld = CommonDesignLogic(None, None, '', connection_key, module.mainmodule)
+        print('CommonDesignLogic created, cdl.connection:', cld.connection)
     except Exception as e : 
         print('error in cld e : ' , e)
+        traceback.print_exc()
+        raise  # Re-raise to prevent using undefined cld
     
     try : 
         # Setup the calculations object for generating CAD model.
@@ -445,9 +516,11 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     except Exception as e : 
         traceback.print_exc()
         print('Error in setting up cad e : ' , e)
+        raise  # Re-raise to prevent using undefined cld
 
     # The section of the module that will be generated.
     cld.component = section
+    print(f'[CAD Adapter] Setting cld.component = {section}')
 
     # When section == "Model", also ensure per-part shapes exist and prepare a compound
     # Try to include additional subparts like Welds and Bolts if available
@@ -493,8 +566,11 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         # Generate model for non-Model sections (or fallback)
         if compound_model is not None:
             model = compound_model
+            print(f'[CAD Adapter] Using compound_model for {section}')
         else:
+            print(f'[CAD Adapter] Generating individual part: cld.component = {cld.component}')
             model = cld.create2Dcad()
+            print(f'[CAD Adapter] Generated model type: {type(model)}')
     except Exception as e :
         print('Error in cld.create2Dcad() e : ' , e)
         return False

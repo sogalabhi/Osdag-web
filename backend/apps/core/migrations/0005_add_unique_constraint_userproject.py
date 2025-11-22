@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('osdag', '0004_userproject_calculation_timestamp_and_more'),
+        ('core', '0004_userproject_calculation_timestamp_and_more'),
     ]
 
     operations = [

@@ -4,10 +4,11 @@ Bridges between API and osdag_core
 """
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 from .adapter import validate_input, generate_output, create_cad_model
+import traceback
 
 
 class FinPlateService:
-    """Service class for Fin Plate Connection module"""
+    """Service class for FinPlateConnection module"""
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:
@@ -23,22 +24,59 @@ class FinPlateService:
         Returns:
             Dictionary with 'data' (results) and 'logs' (calculation logs)
         """
-        # Validate inputs
-        validate_input(inputs)
+        print("=" * 60)
+        print("FinPlateService.calculate() called")
+        print("=" * 60)
+        print(f"Inputs received: {list(inputs.keys())[:10]}...")  # Print first 10 keys
         
-        # Instantiate and run calculation
-        model = FinPlateConnection()
-        model.set_input_values(inputs)
-        model.hard_values()  # Performs the actual engineering math
-        
-        # Generate formatted output
-        output, logs = generate_output(inputs)
-        
-        return {
-            'data': output,
-            'logs': logs,
-            'success': True
-        }
+        try:
+            # Validate inputs
+            print("\n[1/3] Validating inputs...")
+            validate_input(inputs)
+            print("✅ Input validation passed")
+            
+            # Generate formatted output (this handles module creation and calculation)
+            print("\n[2/3] Generating output (creates module and runs calculation)...")
+            output, logs = generate_output(inputs)
+            print(f"✅ Output generated: {len(output)} output parameters")
+            print(f"✅ Logs retrieved: {len(logs) if logs else 0} log entries")
+            
+            print("\n[3/3] Preparing response...")
+            result = {
+                'data': output,
+                'logs': logs or [],  # Ensure logs is always a list
+                'success': True
+            }
+            print("✅ Response prepared successfully")
+            print("=" * 60)
+            
+            return result
+            
+        except Exception as e:
+            print("\n" + "=" * 60)
+            print("❌ ERROR in FinPlateService.calculate()")
+            print("=" * 60)
+            print(f"Exception type: {type(e).__name__}")
+            print(f"Exception message: {str(e)}")
+            
+            # Safely extract error message
+            error_msg = str(e)
+            if hasattr(e, 'error') and e.error is not None:
+                error_msg = str(e.error)
+            elif hasattr(e, 'args') and len(e.args) > 0:
+                error_msg = str(e.args[0])
+            
+            print(f"Final error message: {error_msg}")
+            print("\nFull traceback:")
+            traceback.print_exc()
+            print("=" * 60)
+            
+            return {
+                'data': {},
+                'logs': [],
+                'success': False,
+                'error': error_msg
+            }
     
     @staticmethod
     def get_cad_model(inputs: dict, section: str, session: str) -> str:

@@ -14,9 +14,12 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('osdag.urls')),  # Keep old URLs temporarily
-    path('api/modules/shear-connection/', include('apps.modules.shear_connection.urls')),  # New structure
-    path('api/modules/moment-connection/', include('apps.modules.moment_connection.urls')),  # New structure
+    path('', include('apps.core.urls')),  # Core app URLs (replaces osdag.urls)
+    path('', include('osdag_old.urls')),  # Keep old URLs temporarily for:
+    # - Non-migrated modules (Tension-Member, Simply-Supported-Beam)
+    # - Legacy calculate-output endpoints (will be removed after frontend migration)
+    # - Other legacy endpoints that haven't been migrated yet
+    path('api/modules/', include('apps.modules.urls')),  # All module URLs aggregated here
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

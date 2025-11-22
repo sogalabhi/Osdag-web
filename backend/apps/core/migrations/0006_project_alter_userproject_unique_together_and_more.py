@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('osdag', '0005_add_unique_constraint_userproject'),
+        ('core', '0005_add_unique_constraint_userproject'),
     ]
 
     operations = [

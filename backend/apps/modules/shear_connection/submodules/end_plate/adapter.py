@@ -5,7 +5,7 @@ from apps.modules.shear_connection import shared as scc
 from OCC.Core import BRepTools
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
-from cad.common_logic import CommonDesignLogic
+from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection

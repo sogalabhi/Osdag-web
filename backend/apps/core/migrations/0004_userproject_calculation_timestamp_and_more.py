@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('osdag', '0003_userproject_input_fields_userproject_last_opened'),
+        ('core', '0003_userproject_input_fields_userproject_last_opened'),
     ]
 
     operations = [

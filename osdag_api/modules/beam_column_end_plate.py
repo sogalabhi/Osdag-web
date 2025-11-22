@@ -2,7 +2,7 @@ from osdag_api.validation_utils import validate_arr, validate_num, validate_stri
 from osdag_api.errors import MissingKeyError, InvalidInputTypeError
 from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
 import osdag_api.modules.moment_connection_common as scc
-from cad.common_logic import CommonDesignLogic
+from osdag_core.cad.common_logic import CommonDesignLogic
 from osdag_api.modules.mesh_export import write_stl
 from OCC.Core import BRepTools
 from OCC.Core.TopoDS import TopoDS_Compound

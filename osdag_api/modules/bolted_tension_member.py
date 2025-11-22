@@ -1,4 +1,4 @@
-from Common import KEY_DISP_TENSION_BOLTED
+from osdag_core.Common import KEY_DISP_TENSION_BOLTED
 from osdag_api.validation_utils import validate_arr, validate_num, validate_string
 from osdag_api.errors import MissingKeyError, InvalidInputTypeError
 from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
@@ -9,9 +9,9 @@ from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
-from cad.common_logic import CommonDesignLogic
+from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
-from design_type.tension_member.tension_bolted import Tension_bolted
+from osdag_core.design_type.tension_member.tension_bolted import Tension_bolted
 import sys
 import os
 import typing
