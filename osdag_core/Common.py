@@ -16,8 +16,8 @@ import sqlite3
 
 from .utils.common.other_standards import *
 # from .utils.common.component import *
-# from design_type.connection.fin_plate_connection import FinPlateConnection
-# from design_type.connection.column_cover_plate import ColumnCoverPlate
+# from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+# from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 
 class OurLog(logging.Handler):
 
