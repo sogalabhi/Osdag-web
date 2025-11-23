@@ -14,7 +14,6 @@ export const cleatAngleConfig = {
     bolt_type: "Bearing Bolt",
     connector_material: "E 250 (Fe 410 W)A",
     load_shear: "20",
-    load_axial: "10",
     beam_section: "MB 300",
     column_section: "HB 150", 
     primary_beam: "MB 300",
@@ -30,14 +29,14 @@ export const cleatAngleConfig = {
     detailing_gap: "10",
     detailing_corr_status: "No",
     design_method: "Limit State Design",
-    angle_list: [],
+    cleat_section: [],
     module: MODULE_KEY_CLEAT_ANGLE,
   },
 
   modalConfig: [
     { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
     { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "angleList", inputKey: "angle_list", dataSource: "angleList" },
+    { key: "cleatSection", inputKey: "cleat_section", dataSource: "angleList" }, // Was cleatSectionList, now use angleList
   ],
 
   selectionConfig: [
@@ -47,30 +46,21 @@ export const cleatAngleConfig = {
       defaultValue: "All",
     },
     { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "angleListSelect", inputKey: "angle_list", defaultValue: "All" },
+    { key: "cleatSectionSelect", inputKey: "cleat_section", defaultValue: "All" },
   ],
 
-  validateInputs: (inputs, extraState) => {
-    // FIXED: Handle connectivity from extraState properly
-    const connectivity = extraState?.selectedOption || inputs.connectivity || "Column Flange-Beam-Web";
-    
-    if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
-      if (!inputs.beam_section || !inputs.column_section || 
-          inputs.beam_section === "Select Section" || 
-          inputs.column_section === "Select Section") {
-        return { isValid: false, message: UI_STRINGS.PLEASE_INPUT_ALL_FIELDS };
-      }
-    } else if (connectivity === "Beam-Beam") {
-      if (!inputs.primary_beam || !inputs.secondary_beam) {
-        return { isValid: false, message: UI_STRINGS.PLEASE_INPUT_ALL_FIELDS };
-      }
+  validateInputs: (inputs, extraState = {}, contextData = {}, selectionStates = {}) => {
+    const allSelected = selectionStates?.cleatSectionSelect === 'All';
+    const optionsList = (contextData && contextData.angleList) || [];
+    const selectedList = Array.isArray(inputs.cleat_section) ? inputs.cleat_section : [];
+
+    // Accept 'All' if the full options list is present and non-empty. Accept Customized if at least one chosen item.
+    if (
+      (allSelected && optionsList.length === 0) ||
+      (!allSelected && selectedList.length === 0)
+    ) {
+      return { isValid: false, message: "Please select at least one section from the cleat section list" };
     }
-    
-    // FIXED: Added validation for angle_list
-    if (!inputs.angle_list || (Array.isArray(inputs.angle_list) && inputs.angle_list.length === 0)) {
-      return { isValid: false, message: "Please select at least one angle from the angle list" };
-    }
-    
     return { isValid: true };
   },
 
@@ -80,9 +70,7 @@ export const cleatAngleConfig = {
       "Column Web-Beam-Web": "Column Web-Beam Web", 
       "Beam-Beam": "Beam-Beam",
     };
-
     const connectivity = extraState?.selectedOption || inputs.connectivity || "Column Flange-Beam-Web";
-    
     // Common parameters
     const baseParams = {
       "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
@@ -97,15 +85,13 @@ export const cleatAngleConfig = {
       "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
       "Detailing.Edge_type": inputs.detailing_edge_type,
       "Detailing.Gap": inputs.detailing_gap,
-      "Load.Axial": inputs.load_axial || "",
       "Load.Shear": inputs.load_shear || "",
       "Material": inputs.connector_material,
       "Module": MODULE_KEY_CLEAT_ANGLE,
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
-      "Connector.Angle_List": allSelected.angle_list ? lists.angleList : inputs.angle_list, // FIXED: Ensure angleList is included
+      "Connector.Angle_List": allSelected.cleat_section ? lists.angleList : inputs.cleat_section,
     };
-
     // Connectivity-specific member assignments
     if (connectivity === "Beam-Beam") {
       return {
@@ -134,7 +120,6 @@ export const cleatAngleConfig = {
           key: "connectivity",
           label: UI_STRINGS.CONNECTIVITY,
           type: "connectivitySelect",
-          // FIXED: Added onChange handler to set extraState
           onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
             setExtraState({ ...extraState, selectedOption: value });
             setInputs({ ...inputs, connectivity: value });
@@ -198,8 +183,7 @@ export const cleatAngleConfig = {
     {
       title: UI_STRINGS.FACTORED_LOADS,
       fields: [
-        { key: "load_shear", label: UI_STRINGS.SHEAR_FORCE, type: "number" },
-        { key: "load_axial", label: UI_STRINGS.AXIAL_FORCE, type: "number" }
+        { key: "load_shear", label: UI_STRINGS.SHEAR_FORCE, type: "number" }
       ]
     },
     {
@@ -236,12 +220,12 @@ export const cleatAngleConfig = {
       title: "Cleat Angle",
       fields: [
         {
-          key: "angle_list",
-          label: "Angle List",
+          key: "cleat_section",
+          label: "Cleat Section",
           type: "customizable",
-          selectionKey: "angleListSelect",
-          modalKey: "angleList",
-          dataSource: "angleList"
+          selectionKey: "cleatSectionSelect",
+          modalKey: "cleatSection",
+          dataSource: "angleList" // Use the same as previous angle_list
         }
       ]
     }

@@ -24,14 +24,15 @@ import SelectModulePage from "./homepage/pages/SelectModulePage";
 import FinPlate from "./modules/shearConnection/finPlate/FinPlate";
 import CleatAngle from "./modules/shearConnection/cleatAngle/CleatAngle";
 import EndPlate from "./modules/shearConnection/endPlate/EndPlate";
+import SeatedAngle from "./modules/shearConnection/seatAngle/SeatedAngle";
 
 // Tension members modules
 import BoltedToEnd from "./modules/TensionMembers/BoltedToEnd/BoltedToEnd";
+import WeldedToEnd from "./modules/TensionMembers/WeldedToEnd/WeldedToEnd";
 
 // Beam modules
 import SimplySupportedBeam from "./modules/flexuralMember/simplySupportedBeam";
 import BeamBeamEndPlate from "./modules/beamBeamEndPlate/BeamBeamEndPlate";
-import SeatedPlate from "./modules/shearConnection/seatAngle/SeatedPlate";
 
 // Cover plate modules
 import CoverPlateBolted from "./modules/coverPlateBolted/CoverPlateBolted";
@@ -41,6 +42,7 @@ import CoverPlateWelded from "./modules/coverPlateWelded/CoverPlateWelded";
 import AxiallyLoadedColumn from "./modules/CompressionMember/axialColumn/AxiallyLoadedColumn";
 
 import "./App.css";
+import BeamToColumnEndPlate from "./modules/beamToColumnEndPlate/BeamToColumnEndPlate";
 
 let renderedOnce = false;
 
@@ -58,7 +60,7 @@ function App() {
         {/* Design routes grouped with dynamic designType */}
         <Route path="/design/:designType/shear/fin_plate/:projectId?" element={<FinPlate />} />
         <Route path="/design/:designType/shear/end_plate/:projectId?" element={<EndPlate />} />
-        {/* <Route path="/design/:designType/shear/seatAngle/:projectId?" element={<SeatedPlate />} /> */}
+        <Route path="/design/:designType/shear/seatAngle/:projectId?" element={<SeatedAngle />} />
         <Route path="/design/:designType/shear/cleat_angle/:projectId?" element={<CleatAngle />} />
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_bolted/:projectId?" element={<CoverPlateBolted />} />
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_welded/:projectId?" element={<CoverPlateWelded />} />
@@ -66,7 +68,9 @@ function App() {
         <Route path="/design/:designType/simply_supported_beam/:projectId?" element={<SimplySupportedBeam />} />
         <Route path="/design/:designType/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
         <Route path="/design/compression_member/axial_column/:projectId?" element={<AxiallyLoadedColumn />} />
-</Route>
+        <Route path="/design/:designType/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
+        <Route path="/design/:designType/column-beam/:projectId?" element={<BeamToColumnEndPlate />} />
+      </Route>
     )
   );
 

@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import yaml from 'js-yaml';
+import { useNavigate } from 'react-router-dom';
+import { MODULE_ROUTES, MODULE_NAME_TO_KEY } from '../../constants/modules';
 import { isGuestUser } from '../../utils/auth';
 
 const Header = ({ setshowSideBar, active }) => {
@@ -7,6 +10,8 @@ const Header = ({ setshowSideBar, active }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showResourcesDropdown, setShowResourcesDropdown] = useState(false);
   const [showAboutDropdown, setShowAboutDropdown] = useState(false);
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   // Check if user is a guest
   const isGuest = isGuestUser();
@@ -111,6 +116,54 @@ const Header = ({ setshowSideBar, active }) => {
 
   return (
     <div className="border-osdag-border dark:border-gray-700">
+      {/* Hidden file input for OSI import */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".osi,.yaml,.yml,text/yaml,text/x-yaml,application/x-yaml"
+        className="hidden"
+        onChange={async (e) => {
+          try {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const text = await file.text();
+            const uiObj = yaml.load(text) || {};
+            const moduleField = uiObj.Module || uiObj["Module"] || uiObj.module || uiObj["module"] || uiObj.inputs?.module || uiObj.inputs?.Module || uiObj.module_id;
+            if (!moduleField || typeof moduleField !== 'string') {
+              alert('Unsupported or invalid OSI file: Module not found.');
+              e.target.value = '';
+              return;
+            }
+            const normalizedModule = moduleField.trim();
+            // Resolve moduleKey and route
+            let moduleKey = null;
+            let route = MODULE_ROUTES[normalizedModule] || null;
+            if (route) {
+              moduleKey = normalizedModule;
+            } else {
+              moduleKey = MODULE_NAME_TO_KEY[normalizedModule] || null;
+              route = moduleKey ? MODULE_ROUTES[moduleKey] : null;
+            }
+            if (!route) {
+              alert(`Unsupported module in OSI: ${normalizedModule}`);
+              e.target.value = '';
+              return;
+            }
+            // Store raw uiObj for Phase 2 prefill
+            try {
+              if (moduleKey) {
+                sessionStorage.setItem(`prefill:${moduleKey}`, JSON.stringify(uiObj));
+              }
+            } catch (_) { }
+            navigate(route);
+          } catch (err) {
+            console.error('Failed to import OSI:', err);
+            alert('Failed to import OSI. Please ensure the file is valid.');
+          } finally {
+            if (e?.target) e.target.value = '';
+          }
+        }}
+      />
       {/* Main Header */}
       <div className="px-4 sm:px-8 md:px-12 pb-8">
         <div className="flex items-center justify-between py-4 md:py-0">
@@ -130,21 +183,15 @@ const Header = ({ setshowSideBar, active }) => {
           {/* Logo and Branding */}
           <div className="flex-1 flex flex-col items-center lg:items-start md:flex-row md:items-end md:space-x-8">
             <div className="flex flex-col items-center lg:items-start">
-              <picture>
-                {/* This source will be used if the user is in dark mode */}
-                <source srcset="/images/Osdag_label_dark.svg" media="(prefers-color-scheme: dark)" />
+              {/* Osdag Label - Light mode */}
+              <img src="/images/Osdag_label.svg" alt="Osdag Logo" className="h-20 mt-2 dark:hidden" />
+              {/* Osdag Label - Dark mode */}
+              <img src="/images/Osdag_label_dark.svg" alt="Osdag Logo" className="h-20 mt-2 hidden dark:block" />
+              {/* Osdag Tagline - Light mode */}
+              <img src="/images/Osdag_tagline.svg" alt="Osdag Tagline" className="h-8 dark:hidden" />
+              {/* Osdag Tagline - Dark mode */}
+              <img src="/images/Osdag_tagline_dark.svg" alt="Osdag Tagline" className="h-8 hidden dark:block" />
 
-                {/* This is the default image for light mode and for browsers that don't support the picture tag */}
-                <img src="/images/Osdag_label.svg" alt="Osdag Logo" className="h-20 mt-6" />
-              </picture>
-              <picture>
-                {/* This source will be used if the user is in dark mode */}
-                <source srcset="/images/Osdag_tagline_dark.svg" media="(prefers-color-scheme: dark)" />
-
-                {/* This is the default image for light mode and for browsers that don't support the picture tag */}
-                <img src="/images/Osdag_tagline.svg" alt="Osdag Tagline" className="h-8" />
-              </picture>
-              
             </div>
             {/* Icons (Mobile/Tablet: below logo, Desktop: right side) */}
             <div className="flex md:hidden mt-4 space-x-2">
@@ -326,7 +373,7 @@ const Header = ({ setshowSideBar, active }) => {
             </div>
             {/* Documents Button */}
             <div className="relative group">
-              <button className="p-3 text-black dark:text-white hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6">
+              <button className="p-3 text-black dark:text-white hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
                 <div className="flex items-center space-x-2">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -337,7 +384,7 @@ const Header = ({ setshowSideBar, active }) => {
                     />
                   </svg>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
-                    Import Input
+                    Import
                   </span>
                 </div>
               </button>
@@ -346,7 +393,7 @@ const Header = ({ setshowSideBar, active }) => {
             <div className="relative group">
               <button
                 onClick={toggleTheme}
-                className="p-2 text-black dark:text-white transition-colors"
+                className="p-2 text-black transition-colors dark:text-white hover:text-osdag-green"
               >
                 {isDark ? (
                   <svg
@@ -354,12 +401,13 @@ const Header = ({ setshowSideBar, active }) => {
                     height="24px"
                     viewBox="0 -960 960 960"
                     width="24px"
+                    fill="currentColor"
                   >
                     <path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M21.64 13.64a1 1 0 00-1.05-.24 8 8 0 01-10-10 1 1 0 00-.24-1.05A1 1 0 008.73 2 10 10 0 1022 15.27a1 1 0 00-.36-1.63z" />
                   </svg>
                 )}
               </button>

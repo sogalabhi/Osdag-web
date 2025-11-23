@@ -50,6 +50,7 @@ let initialValue = {
   designData: {},
   renderCadModel: false,
   cadModelPaths: {}, //stores cad files path
+  hoverDict: {},
   displayPDF: false,
   report_id: "",
   blobUrl: "",
@@ -101,10 +102,8 @@ export const ModuleProvider = ({ children }) => {
    */
   const getModuleData = useCallback(async (moduleName, options = {}) => {
     try {
-      // console.log("🚀 [MODULE CONTEXT] getModuleData called:", { moduleName, options });
 
       if (!moduleName) {
-        // console.error("❌ [MODULE CONTEXT] No module name provided");
         dispatch({ type: "SET_ERR_MSG", payload: "Module name is required" });
         return { success: false, error: "Module name is required" };
       }
@@ -122,9 +121,6 @@ export const ModuleProvider = ({ children }) => {
       if (email) {
         url += `&email=${encodeURIComponent(email)}`;
       }
-
-      // console.log("🌐 [MODULE CONTEXT] API Request:", url);
-
       const response = await fetch(url, {
         method: "GET",
         mode: "cors",
@@ -136,14 +132,11 @@ export const ModuleProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      // console.log("✅ [MODULE CONTEXT] Data received:", Object.keys(data));
-
       // Dispatch comprehensive data update
       dispatch({ type: "SET_ALL_MODULE_DATA", payload: data });
 
       return { success: true, data };
     } catch (error) {
-      // console.error("❌ [MODULE CONTEXT] Error loading module data:", error);
       dispatch({ type: "SET_ERR_MSG", payload: "Failed to load module data" });
       return { success: false, error: error.message };
     }
@@ -165,7 +158,6 @@ export const ModuleProvider = ({ children }) => {
    */
   const manageCustomMaterials = useCallback(async (action, data = {}) => {
     try {
-      console.log("🔧 [MODULE CONTEXT] manageCustomMaterials:", { action, data });
 
       switch (action) {
         case 'add': {
@@ -225,7 +217,6 @@ export const ModuleProvider = ({ children }) => {
           return { success: false, error: "Invalid action specified" };
       }
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error managing custom materials:", error);
       return { success: false, error: error.message };
     }
   }, [getModuleData, dispatch, state.currentModuleName]);
@@ -253,9 +244,12 @@ export const ModuleProvider = ({ children }) => {
    * @param {Function} onCADSuccess - Success callback function
    */
   const createCADModel = useCallback(async (inputData, moduleId, onCADSuccess = null) => {
+    console.log('🚀 [ModuleState] createCADModel CALLED');
+    console.log('[ModuleState] moduleId:', moduleId);
+    console.log('[ModuleState] inputData keys:', inputData ? Object.keys(inputData) : 'N/A');
     try {
-      console.log("🎯 [MODULE CONTEXT] Creating CAD model:", { moduleId, hasInputData: !!inputData });
 
+      console.log('[ModuleState] Making fetch request to:', `${BASE_URL}design/cad`);
       const response = await fetch(`${BASE_URL}design/cad`, {
         method: "POST",
         mode: "cors",
@@ -268,9 +262,21 @@ export const ModuleProvider = ({ children }) => {
         }),
       });
 
-
-
       const data = await response.json();
+      
+      // Log the API response to debug hover_dict
+      console.log('=== [ModuleState] CAD API Response ===');
+      console.log('[ModuleState] Response status:', response.status);
+      console.log('[ModuleState] Response data keys:', Object.keys(data));
+      console.log('[ModuleState] data.hover_dict:', data.hover_dict);
+      console.log('[ModuleState] data.hover_dict type:', typeof data.hover_dict);
+      console.log('[ModuleState] data.hover_dict is object:', data.hover_dict && typeof data.hover_dict === 'object');
+      if (data.hover_dict && typeof data.hover_dict === 'object') {
+        console.log('[ModuleState] hover_dict keys:', Object.keys(data.hover_dict));
+        console.log('[ModuleState] hover_dict entries:', Object.entries(data.hover_dict));
+        console.log('[ModuleState] hover_dict JSON:', JSON.stringify(data.hover_dict, null, 2));
+      }
+      
       if (!response.ok) {
         let message = data.message || "CAD generation failed";
 
@@ -278,20 +284,27 @@ export const ModuleProvider = ({ children }) => {
         alert(message + " " + response.status);
         throw new Error(`CAD generation failed: ${response.status} ${response.statusText}`);
       }
+
       if (response.status === 201 && data.status === "success") {
-        console.log("✅ [MODULE CONTEXT] CAD Model Generated Successfully" + response.json);
 
         // Store CAD data and trigger rendering
         dispatch({ type: "SET_CAD_MODEL_PATHS", payload: data.files });
+        
+        // Log before dispatching hover_dict
+        console.log('[ModuleState] Before dispatch - data.hover_dict:', data.hover_dict);
+        if (data.hover_dict) {
+          console.log('[ModuleState] Dispatching SET_HOVER_DICT with:', data.hover_dict);
+          dispatch({ type: "SET_HOVER_DICT", payload: data.hover_dict });
+        } else {
+          console.warn('[ModuleState] data.hover_dict is missing or empty!');
+        }
         dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: true });
 
         // Execute success callback if provided
         if (onCADSuccess && typeof onCADSuccess === 'function') {
           try {
             await onCADSuccess();
-            console.log("✅ [MODULE CONTEXT] CAD success callback executed");
           } catch (error) {
-            console.error("❌ [MODULE CONTEXT] Error in CAD success callback:", error);
           }
         }
 
@@ -300,7 +313,9 @@ export const ModuleProvider = ({ children }) => {
         throw new Error(`CAD generation failed: ${data.message || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error in createCADModel:", error);
+      console.error('❌ [ModuleState] createCADModel ERROR:', error);
+      console.error('[ModuleState] Error message:', error.message);
+      console.error('[ModuleState] Error stack:', error.stack);
       dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
       return { success: false, error: error.message };
     }
@@ -312,7 +327,6 @@ export const ModuleProvider = ({ children }) => {
    */
   const downloadCADModel = useCallback(async (format) => {
     try {
-      console.log("📥 [MODULE CONTEXT] Downloading CAD model in format:", format);
 
       const response = await fetch(`${BASE_URL}design/downloadCad/`, {
         method: "POST",
@@ -332,10 +346,8 @@ export const ModuleProvider = ({ children }) => {
       }
 
       const blob = await response.blob();
-      console.log("✅ [MODULE CONTEXT] CAD file downloaded successfully");
       return { success: true, blob };
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error downloading CAD model:", error);
       return { success: false, error: error.message };
     }
   }, []);
@@ -351,39 +363,10 @@ export const ModuleProvider = ({ children }) => {
    */
   const generateReport = useCallback(async (type, params = {}) => {
     try {
-      console.log("📄 [MODULE CONTEXT] Generating report:", { type, params });
 
       switch (type.toLowerCase()) {
         case 'pdf': {
-          const { report_id } = params;
-          if (!report_id) {
-            throw new Error("Report ID is required for PDF generation");
-          }
-
-          const response = await fetch(`${BASE_URL}getPDF?report_id=${report_id}`, {
-            method: "GET",
-            mode: "cors",
-            credentials: "include",
-            headers: {
-              Accept: "application/json",
-              "Cache-Control": "no-cache",
-              Pragma: "no-cache",
-            },
-          });
-
-          if (response.ok) {
-            // Auto-download the PDF
-            const link = document.createElement("a");
-            link.href = response.url;
-            link.setAttribute("download", `osdag_report_${report_id}.pdf`);
-            link.click();
-            link.remove();
-
-            console.log("✅ [MODULE CONTEXT] PDF downloaded successfully");
-            return { success: true, message: "PDF downloaded successfully" };
-          } else {
-            throw new Error(`PDF generation failed: ${response.status} ${response.statusText}`);
-          }
+          return { success: false, error: 'Legacy PDF endpoint removed. Use the in-app report modal (generate-initial → parse-sections → customize).' };
         }
 
         case 'csv': {
@@ -394,22 +377,17 @@ export const ModuleProvider = ({ children }) => {
           });
 
           const result = await response.json();
-          console.log("✅ [MODULE CONTEXT] CSV generated successfully");
           return { success: true, data: result };
         }
 
         case 'design_report': {
-          // Use external API for design report generation
-          const { moduleId, inputValues, designStatus = true, logs = [] } = params;
-          console.log("🛠️ [MODULE CONTEXT] Generating design report with params:", params);
-          return apiCreateDesignReport(params, moduleId, inputValues, designStatus, logs, uploadCompanyLogo, generateReport);
+          return { success: false, error: 'Legacy design-report flow removed. Use the in-app report modal.' };
         }
 
         default:
           throw new Error(`Unsupported report type: ${type}`);
       }
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error generating report:", error);
       return { success: false, error: error.message };
     }
   }, []);
@@ -421,7 +399,6 @@ export const ModuleProvider = ({ children }) => {
    */
   const uploadCompanyLogo = useCallback(async (companyLogo, companyLogoName) => {
     try {
-      console.log("🏢 [MODULE CONTEXT] Uploading company logo:", companyLogoName);
 
       // Store in localStorage for caching
       if (companyLogo && companyLogoName) {
@@ -448,13 +425,11 @@ export const ModuleProvider = ({ children }) => {
 
       if (response.status === 201) {
         const result = await response.json();
-        console.log("✅ [MODULE CONTEXT] Logo uploaded successfully");
         return { success: true, logoPath: result.logoFullPath };
       } else {
         throw new Error(`Logo upload failed: ${response.status}`);
       }
     } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error uploading logo:", error);
       return { success: false, error: error.message };
     }
   }, []);
@@ -470,7 +445,6 @@ export const ModuleProvider = ({ children }) => {
    */
   const manageDesignPreferences = useCallback(async (action, params = {}) => {
     try {
-      console.log("⚙️ [MODULE CONTEXT] Managing design preferences:", { action, params });
 
       switch (action) {
         case 'get': {
@@ -490,7 +464,6 @@ export const ModuleProvider = ({ children }) => {
           const data = await response.json();
           dispatch({ type: "SAVE_DESIGN_PREF_DATA", payload: data });
 
-          console.log("✅ [MODULE CONTEXT] Design preferences loaded");
           return { success: true, data };
         }
 
@@ -505,7 +478,6 @@ export const ModuleProvider = ({ children }) => {
             dispatch({ type: "SAVE_STM_DETAILS", payload: [materialData] });
           }
 
-          console.log("✅ [MODULE CONTEXT] Material details updated");
           return { success: true, message: "Material details updated" };
         }
 
@@ -518,15 +490,13 @@ export const ModuleProvider = ({ children }) => {
             dispatch({ type: "UPDATE_SUPPORTED_ST_DATA", payload: materialValue });
           }
 
-          console.log("✅ [MODULE CONTEXT] Section data updated");
           return { success: true, message: "Section data updated" };
         }
 
         default:
           throw new Error(`Unsupported preference action: ${action}`);
       }
-    } catch (error) {
-      console.error("❌ [MODULE CONTEXT] Error managing design preferences:", error);
+    } catch (error) {   
       return { success: false, error: error.message };
     }
   }, [dispatch]);
@@ -542,10 +512,10 @@ export const ModuleProvider = ({ children }) => {
     dispatch({ type: "RESET_MODULE_STATE" });
   }, [dispatch]);
 
-  useEffect(() => {
-    // Initialize with FinPlate module for backward compatibility
-    populateModule(MODULE_KEY_FIN_PLATE, dispatch);
-  }, []);
+  // useEffect(() => {
+  //   // Initialize with FinPlate module for backward compatibility
+  //   populateModule(MODULE_KEY_FIN_PLATE, dispatch);
+  // }, []);
 
   return (
     <ModuleContext.Provider
@@ -573,6 +543,7 @@ export const ModuleProvider = ({ children }) => {
         // Tension member specific
         sectionProfileList: state.sectionProfileList,
         channelList: state.channelList,
+        sectionDesignation: state.sectionDesignation,
 
         // Welded connection specific
         weldTypes: state.weldTypes,
@@ -587,6 +558,7 @@ export const ModuleProvider = ({ children }) => {
         designLogs: state.designLogs,
         renderCadModel: state.renderCadModel,
         cadModelPaths: state.cadModelPaths,
+        hoverDict: state.hoverDict,  // CAD model hover tooltip data
         displayPDF: state.displayPDF,
         blobUrl: state.blobUrl,
         designPrefData: state.designPrefData,

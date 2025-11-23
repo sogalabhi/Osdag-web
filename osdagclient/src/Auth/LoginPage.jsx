@@ -59,13 +59,8 @@ const LoginPage = () => {
     const [fPasswordNewPass, setFPasswordNewPass] = useState('');
 
     useEffect(() => {
-        console.log("inside use effect in login page and isloggedin is:" + isLoggedIn)
-        console.log("Done Action : inside use effect in login page and isloggedin")
-
         if (isLoggedIn) {
-            console.log("isloggedin is true in side if statement of Loginpage")
             navigate('/home');
-            console.log("inside If in login page and isloggedin is:" + isLoggedIn)
         }
     }, [isLoggedIn]);
 
@@ -275,12 +270,6 @@ const LoginPage = () => {
             setIsLoading(false);
         }
     };
-
-    // Google Auth
-    const handleGoogleSignIn = () => {
-        console.log('Google Sign-In button clicked!');
-    };
-    // Guest 
 
     const handleGuestSignIn = async () => {
         setIsLoading(true);

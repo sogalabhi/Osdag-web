@@ -1,5 +1,5 @@
 from . shear_connection import ShearConnection
-from ...design_report.reportGenerator_latex import CreateLatex
+from osdag_core.design_report.reportGenerator_latex import CreateLatex
 from ...utils.common.component import *
 from ...utils.common.material import *
 from ...Report_functions import *
@@ -441,11 +441,12 @@ class FinPlateConnection(ShearConnection):
 
         # Populate hover dict
         self.hover_dict["Bolt"] = f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.plate.bolts_one_line)*int(self.plate.bolt_line) if flag else ''}"
+        self.hover_dict["Bolt"] = f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.plate.bolts_one_line)*int(self.plate.bolt_line) if flag else ''}"
         
         self.hover_dict["Plate"]= f"Plate: {float(self.plate.length) if flag else ''} x {float(self.plate.height) if flag else ''} x {self.plate.thickness_provided if flag else ''}"
             
         self.hover_dict["Weld"]= f"Weld: {self.weld.size if flag else ''} mm"
-
+        print("hover_dict:", self.hover_dict)
         return out_list
 
     ####################################
@@ -986,6 +987,7 @@ class FinPlateConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self,popup_summary):
+        self.module = KEY_DISP_FINPLATE 
         super(FinPlateConnection,self).save_design()
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
 
@@ -1294,8 +1296,8 @@ class FinPlateConnection(ShearConnection):
         rel_path = os.path.abspath(".") # TEMP
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
-        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image,
-                               Disp_3D_image, module=self.module)
+        popup_summary['logger_messages'] = self.logger.logs
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
         return True  
 
     ######################################

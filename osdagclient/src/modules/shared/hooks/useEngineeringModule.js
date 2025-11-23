@@ -20,11 +20,15 @@ export const useEngineeringModule = (moduleConfig) => {
     propertyClassList,
     angleList, // FIXED: Added angleList from context
     boltTypeList,
+    sectionProfileList,
+    channelList,
+    sectionDesignation,
     designLogs,
     designData,
     displayPDF,
     renderCadModel,
     cadModelPaths,
+    hoverDict,
 
     // NEW SIMPLIFIED API - 8 Core Functions Only
     getModuleData,              // Universal data fetcher
@@ -46,8 +50,84 @@ export const useEngineeringModule = (moduleConfig) => {
 
   // Sync local output/logs/display with context design results
   useEffect(() => {
+    // Prefill inputs from sessionStorage if available
+    try {
+      const moduleKey = moduleConfig.cameraKey || moduleConfig.moduleKey || moduleConfig.designType;
+      if (moduleKey) {
+        const raw = sessionStorage.getItem(`prefill:${moduleKey}`);
+        if (raw) {
+          const uiObj = JSON.parse(raw);
+          // Optional: allow per-module mapping via moduleConfig.osiKeyMap
+          const baseDefaults = moduleConfig.defaultInputs || {};
+          const osiKeyMap = moduleConfig.osiKeyMap || {};
+
+          // Build normalized inputs: only keys present in defaults
+          const normalized = {};
+          const addIfPresent = (inputKey, value) => {
+            if (value === undefined || value === null) return;
+            // Array handling: take first element
+            const val = Array.isArray(value) ? (value.length ? value[0] : undefined) : value;
+            if (val === undefined) return;
+            // Coerce to string for number/text fields as this UI primarily holds strings
+            normalized[inputKey] = typeof val === 'string' ? val : String(val);
+          };
+
+          // Iterate default input keys and try to find corresponding values in uiObj
+          for (const inputKey of Object.keys(baseDefaults)) {
+            // 1) Mapped key from .osi if provided
+            const mappedOsiKey = osiKeyMap[inputKey];
+            if (mappedOsiKey && Object.prototype.hasOwnProperty.call(uiObj, mappedOsiKey)) {
+              addIfPresent(inputKey, uiObj[mappedOsiKey]);
+              continue;
+            }
+            // 2) Heuristic: Dot-notated keys in .osi sometimes match with space/different casing
+            // Try direct exact match
+            if (Object.prototype.hasOwnProperty.call(uiObj, inputKey)) {
+              addIfPresent(inputKey, uiObj[inputKey]);
+              continue;
+            }
+            // 3) Simple aliases for common fields
+            const aliases = {
+              bolt_hole_type: 'Bolt.Bolt_Hole_Type',
+              bolt_diameter: 'Bolt.Diameter',
+              bolt_grade: 'Bolt.Grade',
+              bolt_slip_factor: 'Bolt.Slip_Factor',
+              bolt_type: 'Bolt.Type',
+              connector_material: 'Connector.Material',
+              design_method: 'Design.Design_Method',
+              detailing_edge_type: 'Detailing.Edge_type',
+              detailing_gap: 'Detailing.Gap',
+              detailing_corr_status: 'Detailing.Corrosive_Influences',
+              load_axial: 'Load.Axial',
+              load_shear: 'Load.Shear',
+              plate_thickness: 'Connector.Plate.Thickness_List',
+              beam_section: 'Member.Supported_Section.Designation',
+              column_section: 'Member.Supporting_Section.Designation',
+              supported_material: 'Member.Supported_Section.Material',
+              supporting_material: 'Member.Supporting_Section.Material',
+            };
+            const aliasKey = aliases[inputKey];
+            if (aliasKey && Object.prototype.hasOwnProperty.call(uiObj, aliasKey)) {
+              addIfPresent(inputKey, uiObj[aliasKey]);
+              continue;
+            }
+          }
+
+          if (Object.keys(normalized).length > 0) {
+            setInputs({ ...baseDefaults, ...normalized });
+          }
+          // Clear the prefill once read
+          sessionStorage.removeItem(`prefill:${moduleKey}`);
+        }
+      }
+    } catch (e) {
+      console.warn('Prefill from OSI failed:', e);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (designData && Object.keys(designData).length > 0) {
-      console.log("[useEngineeringModule] useEffect output::", designData);
       setOutput(designData);
       setDisplayOutput(true);
     }
@@ -60,6 +140,14 @@ export const useEngineeringModule = (moduleConfig) => {
   const [modalStates, setModalStates] = useState(
     moduleConfig.modalConfig.reduce((acc, modal) => {
       acc[modal.key] = false;
+      return acc;
+    }, {})
+  );
+
+  const [modalDynamicSrc, setModalDynamicSrc] = useState(
+    moduleConfig.modalConfig.reduce((acc, modal) => {
+      if(!modal?.dataSource)
+        acc[modal.key] = [];
       return acc;
     }, {})
   );
@@ -88,6 +176,45 @@ export const useEngineeringModule = (moduleConfig) => {
     }, {})
   );
 
+  // Initialize inputs arrays when default is "All" and arrays are empty
+  useEffect(() => {
+    const keyToFullListMap = {
+      bolt_diameter: boltDiameterList,
+      bolt_grade: propertyClassList,
+      plate_thickness: thicknessList,
+      flange_plate_thickness: thicknessList,
+      web_plate_thickness: thicknessList,
+      angle_list: angleList,
+      topangle_list: angleList,
+      cleat_section: angleList,
+    };
+
+    const nextInputs = { ...inputs };
+    let changed = false;
+
+    Object.entries(keyToFullListMap).forEach(([inputKey, fullList]) => {
+      if (!allSelected?.[inputKey]) return;
+      const current = inputs?.[inputKey];
+      const isEmptyArray = Array.isArray(current) ? current.length === 0 : !current;
+      if (!isEmptyArray) return;
+
+      const normalized = Array.isArray(fullList)
+        ? fullList.map((val) => {
+            if (typeof val === 'object' && val !== null) {
+              return val.value || val.Grade || String(val);
+            }
+            return String(val);
+          })
+        : [];
+      nextInputs[inputKey] = normalized;
+      changed = true;
+    });
+
+    if (changed) {
+      setInputs(nextInputs);
+    }
+  }, [boltDiameterList, propertyClassList, thicknessList, angleList, allSelected]);
+
   // Initialize extraState based on module type
   const getInitialExtraState = () => {
     if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
@@ -97,6 +224,10 @@ export const useEngineeringModule = (moduleConfig) => {
     } else if (moduleConfig.cameraKey === "EndPlate") {
       return {
         selectedOption: "Column Flange-Beam-Web", // Default for EndPlate
+      };
+    } else if (moduleConfig.cameraKey === "BeamToColumnEndPlate") {
+      return {
+        selectedOption: "Flushed - Reversible Moment", // Default for BeamColumnEndPlate
       };
     }
     return {
@@ -109,32 +240,22 @@ export const useEngineeringModule = (moduleConfig) => {
   // On mount: Load module data using simplified API with enhanced error handling
   useEffect(() => {
     const loadModuleData = async () => {
-      console.log('📋 [ENGINEERING MODULE] Loading module data for:', moduleConfig?.designType);
-
       if (!moduleConfig?.designType) {
-        console.warn('⚠️ [ENGINEERING MODULE] No moduleConfig or designType available');
         return;
       }
 
       if (!getModuleData) {
-        console.error('❌ [ENGINEERING MODULE] getModuleData function not available');
         return;
       }
 
       try {
-        console.log('🚀 [ENGINEERING MODULE] Calling getModuleData with simplified API');
-
         // Use the new simplified API which returns { success, data, error }
         const result = await getModuleData(moduleConfig.designType);
 
         if (result && result.success) {
-          console.log('✅ [ENGINEERING MODULE] Module data loaded successfully');
-          console.log('✅ [ENGINEERING MODULE] Data keys:', Object.keys(result.data || {}));
         } else {
-          console.error('❌ [ENGINEERING MODULE] Failed to load module data:', result?.error || 'Unknown error');
         }
       } catch (error) {
-        console.error('❌ [ENGINEERING MODULE] Exception while loading module data:', error);
       }
     };
 
@@ -250,7 +371,6 @@ export const useEngineeringModule = (moduleConfig) => {
         setConfirmationType("navigation");
         setNavigationSource("back");
         setShowResetConfirmation(true);
-        console.log("BACK BUTTON: Prevented navigation due to unsaved work");
       }
     };
 
@@ -275,8 +395,7 @@ export const useEngineeringModule = (moduleConfig) => {
     if (displayOutput) {
       try {
         setLogs(designLogs);
-      } catch (error) {
-        console.log(error);
+      } catch (error) { 
         setOutput(null);
       }
     } else {
@@ -302,7 +421,6 @@ export const useEngineeringModule = (moduleConfig) => {
 
         setOutput(formatedOutput);
       } catch (error) {
-        console.log(error);
         setOutput(null);
       }
     }
@@ -329,19 +447,15 @@ export const useEngineeringModule = (moduleConfig) => {
     const loadSupportedData = async () => {
       if (inputs.member_designation && moduleConfig.cameraKey !== MODULE_KEY_FIN_PLATE && moduleConfig.cameraKey !== MODULE_KEY_CLEAT_ANGLE && manageDesignPreferences) {
         try {
-          console.log('Loading supported data for:', inputs.member_designation);
 
           const result = await manageDesignPreferences('get', {
             supported_section: inputs.member_designation,
           });
 
           if (result && result.success) {
-            console.log('Supported data loaded successfully');
           } else {
-            console.error('Failed to load supported data:', result?.error);
           }
         } catch (error) {
-          console.error('Exception loading supported data:', error);
         }
       }
     };
@@ -383,18 +497,14 @@ export const useEngineeringModule = (moduleConfig) => {
           }
 
           if (params) {
-            console.log('Loading design preferences for', moduleConfig.cameraKey, ':', params);
 
             const result = await manageDesignPreferences('get', params);
 
             if (result && result.success) {
-              console.log('Design preferences loaded successfully');
             } else {
-              console.error('Failed to load design preferences:', result?.error);
             }
           }
         } catch (error) {
-          console.error('Exception loading design preferences:', error);
         }
       }
     };
@@ -451,7 +561,15 @@ export const useEngineeringModule = (moduleConfig) => {
   };
 
   const handleSubmit = async () => {
-    const validationResult = moduleConfig.validateInputs(inputs, extraState);
+    // Debug: print input state for All/Customized cleat section problems
+    console.log('[HandleSubmit: params for validation]', {
+      inputs,
+      selectionStates,
+      allSelected,
+      angleList,
+      extraState,
+    });
+    const validationResult = moduleConfig.validateInputs(inputs, extraState, { angleList, boltDiameterList, propertyClassList, thicknessList }, selectionStates);
     if (!validationResult.isValid) {
       alert(validationResult.message);
       return;
@@ -462,6 +580,7 @@ export const useEngineeringModule = (moduleConfig) => {
       propertyClassList,
       thicknessList,
       angleList, // FIXED: Added angleList to submission params
+      channelList
     }, extraState);
 
     // Show loading modal
@@ -469,10 +588,13 @@ export const useEngineeringModule = (moduleConfig) => {
     setLoadingStage("Generating design calculations...");
 
     try {
+      console.log('🔵 [useEngineeringModule] handleSubmit - calling createDesign');
       await createDesign(param, moduleConfig.designType, null);
       // Auto-trigger CAD after successful design
+      console.log('🔵 [useEngineeringModule] Design complete, calling createCADModel');
       setLoadingStage("Generating 3D model...");
       const cadResult = await createCADModel(param, moduleConfig.designType, null);
+      console.log('🔵 [useEngineeringModule] createCADModel result:', cadResult);
       if (cadResult?.success) {
         setDisplayOutput(true);
         setLoading(false);
@@ -483,8 +605,7 @@ export const useEngineeringModule = (moduleConfig) => {
         setLoadingStage("");
       }
     } catch (e) {
-      console.error('Error in design/CAD flow:', e);
-      setLoading(false);
+        setLoading(false);
       setIsLoadingModalVisible(false);
       setLoadingStage("");
     }
@@ -507,7 +628,6 @@ export const useEngineeringModule = (moduleConfig) => {
 
   const performReset = () => {
     if (confirmationType === "navigation") {
-      console.log(`USER CONFIRMED NAVIGATION - source: ${navigationSource}`);
 
       setAllowNavigation(true);
       setShowResetConfirmation(false);
@@ -517,10 +637,8 @@ export const useEngineeringModule = (moduleConfig) => {
         resetToDefaultState();
 
         if (navigationSource === "home") {
-          console.log("Navigating to home");
           navigate("/home");
         } else if (navigationSource === "back") {
-          console.log("Navigating to connections page");
           navigate("/design-type/connections");
         }
 
@@ -528,11 +646,9 @@ export const useEngineeringModule = (moduleConfig) => {
         setNavigationSource(null);
       }, 100);
     } else {
-      console.log("USER CONFIRMED RESET - starting targeted reset");
       resetToDefaultState();
       setShowResetConfirmation(false);
       setConfirmationType("reset");
-      console.log("RESET: User confirmed - targeted reset completed");
     }
   };
 
@@ -595,7 +711,6 @@ export const useEngineeringModule = (moduleConfig) => {
     }
 
     try {
-      console.log('Generating design report with simplified API');
 
       // Build the same submission params used for calculate-output
       const submissionParams = moduleConfig.buildSubmissionParams(
@@ -627,15 +742,12 @@ export const useEngineeringModule = (moduleConfig) => {
       const result = await generateReport('design_report', payload);
 
       if (result && result.success) {
-        console.log('Design report generated successfully');
         // Optionally show success message or further user feedback
       } else {
-        console.error('Failed to generate design report:', result?.error);
         alert(`Failed to generate design report: ${result?.error || 'Unknown error'}`);
       }
 
     } catch (error) {
-      console.error('Exception generating design report:', error);
       alert(`Error generating design report: ${error.message}`);
     }
 
@@ -659,6 +771,17 @@ export const useEngineeringModule = (moduleConfig) => {
     setCreateDesignReportBool(false);
   };
 
+  const clearDesignResults = () => {
+    setDisplayOutput(false);
+    setOutput(null);
+    setLogs(null);
+    setRenderBoolean(false);
+    setModelKey((prev) => prev + 1);
+    setLoading(false);
+    setIsLoadingModalVisible(false);
+    setLoadingStage("");
+  };
+
   return {
     // ===================================================================
     // CONTEXT DATA - Module state variables
@@ -672,11 +795,17 @@ export const useEngineeringModule = (moduleConfig) => {
     propertyClassList,
     angleList, // FIXED: Added angleList to return object
     boltTypeList,
+    sectionProfileList,
+    sectionDesignation,
+    channelList,
     displayPDF,
+    designLogs,
+    designData,
     renderCadModel,
     cadModelPaths,
+    hoverDict,
 
-    // ===================================================================
+    // NEW SIMPLIFIED API - 8 Core Functions Only
     // SIMPLIFIED API ACCESS - Expose core functions for advanced usage
     // ===================================================================
     getModuleData,              // Universal data fetcher
@@ -702,6 +831,8 @@ export const useEngineeringModule = (moduleConfig) => {
     selectedItems,
     extraState,
     setExtraState,
+    modalDynamicSrc,
+    setModalDynamicSrc,
 
     // Report states
     createDesignReportBool,
@@ -748,5 +879,6 @@ export const useEngineeringModule = (moduleConfig) => {
     handleCreateDesignReport,
     handleOkDesignReport,
     handleCancelDesignReport,
+    clearDesignResults,
   };
 };

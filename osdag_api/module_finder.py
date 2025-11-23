@@ -9,7 +9,8 @@ from osdag_api.modules import (
     beam_column_end_plate,
     bolted_tension_member,
     simply_supported_beam,
-    axial_loaded_column
+    axial_loaded_column,
+    welded_tension_member,
 )
 from types import ModuleType
 import typing
@@ -59,10 +60,12 @@ module_dict: Dict[str, ModuleApiType] = {
     "Cover-Plate-Welded-Connection": cover_plate_welded_connection,
     "Beam-to-Column-End-Plate-Connection": beam_column_end_plate,
     "Tension-Member-Bolted-Design": bolted_tension_member,
+    "Tension-Member-Welded-Design": welded_tension_member,
     "Simply-Supported-Beam": simply_supported_beam,
-    "Axially-Loaded-Column": axial_loaded_column,  #  FIXED name here
+    "Axially-Loaded-Column": axial_loaded_column,
     "axially_loaded_column": axial_loaded_column,
 }
+
 
 
 def get_module_api(module_id: str) -> ModuleApiType:

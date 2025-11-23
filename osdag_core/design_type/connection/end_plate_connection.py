@@ -44,7 +44,7 @@ from .shear_connection import ShearConnection
 from ...utils.common.component import *
 from ...utils.common.material import *
 from ...Common import *
-from ...design_report.reportGenerator_latex import CreateLatex
+from osdag_core.design_report.reportGenerator_latex import CreateLatex
 from ...Report_functions import *
 import logging
 from importlib.resources import files
@@ -195,7 +195,7 @@ class EndPlateConnection(ShearConnection):
     # Design Preference Functions End
     ####################################
 
-    def set_osdaglogger(key):
+    def set_osdaglogger(self, key):
         """
         Function to set Logger for End Plate Module
         """
@@ -301,17 +301,17 @@ class EndPlateConnection(ShearConnection):
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def set_input_values(self, design_dictionary):
-        super(EndPlateConnection,self).set_input_values(self, design_dictionary)
+        super(EndPlateConnection,self).set_input_values(design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
         self.weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O], fabrication=design_dictionary[KEY_DP_WELD_FAB])
         # self.weld = Weld(size=10, length= 100, material_grade=design_dictionary[KEY_MATERIAL])
         print("Input values set to perform preliminary member check(s).")
-        self.member_capacity(self)
+        self.member_capacity()
 
     def member_capacity(self):
-        super(EndPlateConnection, self).member_capacity(self)
+        super(EndPlateConnection, self).member_capacity()
         if self.connectivity == VALUES_CONN_2[0]:
             if self.supported_section.shear_yielding_capacity / 1000 > self.load.shear_force and \
                     self.supported_section.tension_yielding_capacity / 1000 > self.load.axial_force:
@@ -325,7 +325,7 @@ class EndPlateConnection(ShearConnection):
                                                 40.0)
 
                 print("Preliminary member check(s) have passed. Checking available bolt diameter(s).")
-                self.select_bolt_plate_arrangement(self)
+                self.select_bolt_plate_arrangement()
 
             else:
                 self.design_status = False
@@ -351,7 +351,7 @@ class EndPlateConnection(ShearConnection):
                     self.load.shear_force = min(round(0.15 * self.supported_section.shear_yielding_capacity / 1000, 0),
                                                 40.0)
                 print("Preliminary member check(s) have passed. Checking available bolt diameter(s).")
-                self.select_bolt_plate_arrangement(self)
+                self.select_bolt_plate_arrangement()
 
             else:
                 self.design_status = False
@@ -1751,8 +1751,8 @@ class EndPlateConnection(ShearConnection):
         rel_path = os.path.abspath(".") # TEMP
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
-        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
-                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+        popup_summary['logger_messages'] = self.logger.logs
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
 
     def get_plate_status(self):
         if self.plate.plate_moment < self.plate.plate_moment_capacity \

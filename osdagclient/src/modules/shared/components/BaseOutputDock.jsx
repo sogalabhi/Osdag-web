@@ -10,6 +10,7 @@ import Detailing_BWE from "../../../assets/Detailing-BWE.png";
 import Detailing_FP from "../../../assets/Detailing-Flush.png";
 import Detailing_OWE from "../../../assets/Detailing-OWE.png";
 import GrooveImg from "../../../assets/BB-BC-single_bevel_groove.png";
+import SpacingDiagram from "./SpacingDiagram";
 
 export const BaseOutputDock = ({
   output,
@@ -17,7 +18,6 @@ export const BaseOutputDock = ({
   title = "Output Dock",
   extraState = {}
 }) => {
-  // Debug: Log the props received
   const normalizedOutput = output && output.data ? output.data : output;
 
   // Shared state management
@@ -44,6 +44,16 @@ export const BaseOutputDock = ({
       openModal(modalConfig.type, key);
     }
   };
+
+  // Read-only value box styled like input (transparent bg, grey border)
+  const ValueBox = ({ value }) => (
+    <div
+      className="w-full px-2 py-1 rounded-md border border-gray-400/60 bg-transparent text-sm text-black dark:text-white leading-6"
+      style={{ minHeight: 32 }}
+    >
+      {value !== undefined && value !== null && value !== '' ? String(value) : ' '}
+    </div>
+  );
 
   const getImageForModal = (imageType, selectedOption) => {
     const imageMap = {
@@ -90,9 +100,81 @@ export const BaseOutputDock = ({
   };
 
   // JSX Rendering Functions
+  const resolveModalEntry = (modalType, activeSection) => {
+    const modalEntries = outputConfig.modalData?.[modalType] || {};
+    const entry = modalEntries[activeSection];
+
+    if (!entry) {
+      return { fields: [], diagram: null };
+    }
+
+    if (Array.isArray(entry)) {
+      return { fields: entry, diagram: null };
+    }
+
+    return {
+      fields: entry.fields || [],
+      diagram: entry.diagram || null,
+    };
+  };
+
+  const getNumeric = (key, rawOutput) => {
+    const raw = getOutputValue(key, rawOutput);
+    if (raw === undefined || raw === null || raw === " ") {
+      return undefined;
+    }
+    const numeric = Number(raw);
+    return Number.isFinite(numeric) ? numeric : undefined;
+  };
+
+  const resolveDiagramProps = (diagramConfig, rawOutput) => {
+    if (!diagramConfig) {
+      return null;
+    }
+
+    const mapValue = (descriptor) => {
+      if (descriptor === undefined || descriptor === null) {
+        return undefined;
+      }
+      if (Array.isArray(descriptor)) {
+        return descriptor
+          .map((item) => mapValue(item))
+          .filter((value) => value !== undefined);
+      }
+
+      if (typeof descriptor === "number") {
+        return descriptor;
+      }
+
+      return getNumeric(descriptor, rawOutput);
+    };
+
+    const resolved = Object.entries(diagramConfig.props || {}).reduce(
+      (acc, [key, descriptor]) => {
+        const value = mapValue(descriptor);
+        if (value !== undefined && value !== null && value !== "") {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {}
+    );
+
+    if (Object.keys(resolved).length === 0) {
+      return null;
+    }
+
+    if (diagramConfig.origin) {
+      resolved.origin = diagramConfig.origin;
+    }
+
+    return resolved;
+  };
+
   const renderModalContent = (modalType, activeSection, output) => {
     const config = outputConfig.modalTypes[modalType];
-    const fieldsData = outputConfig.modalData[modalType]?.[activeSection] || [];
+    const { fields, diagram } = resolveModalEntry(modalType, activeSection);
+    const diagramProps = resolveDiagramProps(diagram, output);
 
     if (config.layout === "two-column") {
       return (
@@ -104,15 +186,10 @@ export const BaseOutputDock = ({
           )}
           <div className="spacing-main-two">
             <div className="spacing-left-body">
-              {fieldsData.map(({ key, label }, idx) => (
+              {fields.map(({ key, label }, idx) => (
                 <div key={idx} className="spacing-left-body-align">
                   <h4>{label}</h4>
-                  <Input
-                    type="text"
-                    value={getOutputValue(key, output)}
-                    disabled
-                    className='text-black dark:text-white'
-                  />
+                  <ValueBox value={getOutputValue(key, output)} />
                 </div>
               ))}
             </div>
@@ -126,7 +203,7 @@ export const BaseOutputDock = ({
       );
     } else if (config.layout === "capacity-complex") {
       // Complex capacity layout with multiple sections and images
-      const groupedFields = fieldsData.reduce((acc, field) => {
+      const groupedFields = fields.reduce((acc, field) => {
         const section = field.section || 'Default';
         if (!acc[section]) acc[section] = [];
         acc[section].push(field);
@@ -151,16 +228,7 @@ export const BaseOutputDock = ({
                     {sectionFields.map(({ key, label }, idx) => (
                       <div key={idx} className="Capacity-left-body-align">
                         <p>{label}</p>
-                        <Input
-                          type="text"
-                          value={getOutputValue(key, output)}
-                          disabled
-                          style={{
-                            color: "rgb(0 0 0 / 67%)",
-                            fontSize: "12px",
-                            fontWeight: "500",
-                          }}
-                        />
+                        <ValueBox value={getOutputValue(key, output)} />
                       </div>
                     ))}
                   </div>
@@ -187,19 +255,43 @@ export const BaseOutputDock = ({
           {image && <img src={image} alt={`${config.imageType} Image`} />}
         </div>
       );
+    } else if (config.layout === "spacing-diagram") {
+      return (
+        <div className="flex w-full flex-col justify-center border border-gray-300 p-2">
+          {config.note && (
+            <p className="px-5 py-4 text-sm text-gray-600">Note: {config.note}</p>
+          )}
+          <div className="flex w-full flex-col gap-6 md:flex-row">
+            <div className="flex w-full flex-col gap-3 px-4 md:w-1/2">
+              {fields.map(({ key, label }, idx) => (
+                <div key={idx} className="flex items-center justify-between gap-3 text-sm">
+                  <h4 className="font-medium text-gray-700">{label}</h4>
+                  <div className="min-w-[40%]">
+                    <ValueBox value={getOutputValue(key, output)} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex w-full items-center justify-center px-4 pb-4 md:w-1/2 md:pb-0">
+              {diagramProps ? (
+                <SpacingDiagram className="md:max-w-2xl" {...diagramProps} />
+              ) : (
+                <div className="flex w-full min-h-[280px] items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500">
+                  No diagram data available.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
     } else if (config.layout === "single-column") {
       return (
         <div className="details-main-body">
           <div className="details-main-body-inside">
-            {fieldsData.map(({ key, label }, idx) => (
+            {fields.map(({ key, label }, idx) => (
               <div key={idx} className="details-main-body-align">
                 <h4 dangerouslySetInnerHTML={{ __html: label }} />
-                <Input
-                  type="text"
-                  value={getOutputValue(key, output)}
-                  disabled
-                  className='text-black dark:text-white'
-                />
+                <ValueBox value={getOutputValue(key, output)} />
               </div>
             ))}
           </div>
@@ -214,7 +306,7 @@ export const BaseOutputDock = ({
     const fieldValue = getOutputValue(field.key, output);
 
     return (
-      <div key={index} className="component-grid-align">
+      <div key={index} className="flex my-1">
         <h4>{field.label}</h4>
         {isModalTrigger ? (
           <Input
@@ -225,17 +317,11 @@ export const BaseOutputDock = ({
             onClick={() => handleDialog(field.key)}
           />
         ) : (
-          <Input
-            type="text"
-            value={fieldValue}
-            disabled
-            className='text-black dark:text-white'
-          />
+          <ValueBox value={fieldValue} />
         )}
       </div>
     );
   };
-  console.log("output", output);
   return (
     <>
       <p>{title}</p>
@@ -259,6 +345,7 @@ export const BaseOutputDock = ({
           footer={null}
           width={config.width || "50%"}
           title={config.title}
+          className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
         >
           {renderModalContent(modalType, activeSections[modalType], output)}
         </Modal>

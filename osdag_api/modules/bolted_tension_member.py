@@ -1,4 +1,4 @@
-from Common import KEY_DISP_TENSION_BOLTED
+from osdag_core.Common import KEY_DISP_TENSION_BOLTED
 from osdag_api.validation_utils import validate_arr, validate_num, validate_string
 from osdag_api.errors import MissingKeyError, InvalidInputTypeError
 from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
@@ -7,13 +7,18 @@ from OCC.Core import BRepTools
 from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
-from cad.common_logic import CommonDesignLogic
+from OCC.Core.TopoDS import TopoDS_Compound
+from OCC.Core.BRep import BRep_Builder
+from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
-from design_type.tension_member.tension_bolted import Tension_bolted
+from osdag_core.design_type.tension_member.tension_bolted import Tension_bolted
 import sys
 import os
 import typing
 from typing import Dict, Any, List
+import json
+import traceback
+from osdag_api.modules.mesh_export import write_stl
 old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
 sys.stdout = old_stdout  # Reset log
@@ -308,62 +313,151 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     return output, logs
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    if section not in ("Model", "Member", "Plate", "Endplate"):
-        print("in bolted_tension_member.py: Invalid section:", section)
-        raise InvalidInputTypeError("section","Endplate")
-    module = create_from_input(input_values)
-    print("in bolted_tension_member.py: module from input values:", module)
-    # print("in bolted_tension_member.py: Connectivity:", module.connectivity)
-    print("in bolted_tension_member.py: module:", module.module)
-    print("in bolted_tension_member.py: Mainmodule:", module.mainmodule)
-    try:
-        cld = CommonDesignLogic(None, '', KEY_DISP_TENSION_BOLTED, module.mainmodule)
-        cld.module_class = module
-        print("in bolted_tension_member.py: cld.module_class set to:", cld.module_class)
-        cld.TObj = cld.createTensionCAD()
-        print("in bolted_tension_member.py: CommonDesignLogic instance created")
-    except Exception as e:
-        print("in bolted_tension_member.py: error in cld e:", e)
-    try:
+    """Generate the CAD model from input values as a BREP file. Return file path."""
+    if section not in ("Model", "Member", "Plate", "Endplate"):  # Error checking: If section is valid.
+        raise InvalidInputTypeError(
+            "section", "'Model', 'Member', 'Plate', 'Endplate'")
+    module = create_from_input(input_values)  # Create module from input.
+    print('module from input values : ' , module)
+    # Object that will create the CAD model.
+    try: 
+        cld = CommonDesignLogic(None, '', KEY_DISP_TENSION_BOLTED , module.mainmodule)
+    except Exception as e : 
+        print('error in cld e : ' , e)
+    
+    try: 
+        # Setup the calculations object for generating CAD model.
         tbm.setup_for_cad(cld, module)
-        print("in bolted_tension_member.py: setup_for_cad called successfully")
-    except Exception as e:
-        print("in bolted_tension_member.py: Error in setting up cad e:", e)
+    except Exception as e : 
+        traceback.print_exc()
+        print('Error in setting up cad e : ' , e)
+ 
+    # The section of the module that will be generated.
     cld.component = section
-    print("in bolted_tension_member.py: cld.component set to:", section)
+
+    # When section == "Model", also ensure per-part shapes exist and prepare a compound
+    # Try to include additional subparts like Welds and Bolts if available
+    part_names = ["Member", "Plate", "Endplate"]
+    part_files = {}
+    compound_model = None
+
     try:
-        model = cld.create2Dcad()
-        print("in bolted_tension_member.py: create2Dcad called successfully")
-    except Exception as e:
-        print("in bolted_tension_member.py: Error in cld.create2Dcad() e:", e)
+        if section == "Model":
+            # Build compound by adding each part shape without fusing
+            builder = BRep_Builder()
+            compound = TopoDS_Compound()
+            builder.MakeCompound(compound)
+
+            for part in part_names:
+                try:
+                    # Generate shape for this part
+                    cld.component = part
+                    part_shape = cld.create2Dcad()
+                    if part_shape is None:
+                        continue
+
+                    # Add to compound
+                    builder.Add(compound, part_shape)
+
+                    # Ensure per-part BREP file exists (write or overwrite)
+                    part_file_name = f"{session}_{part}.brep"
+                    part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
+                    BRepTools.breptools.Write(part_shape, part_file_path_rel, Message_ProgressRange())
+                    part_files[part] = part_file_path_rel
+                    # Also write STL for this part
+                    try:
+                        part_stl_rel = part_file_path_rel.replace(".brep", ".stl")
+                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_rel))
+                    except Exception as stle:
+                        print(f"Failed to write STL for part {part}: {stle}")
+                except Exception as e:
+                    print(f"Failed to build/write part {part}: {e}")
+
+            # Reset component to Model and set compound as the model to write
+            cld.component = section
+            compound_model = compound
+        # Generate model for non-Model sections (or fallback)
+        if compound_model is not None:
+            model = compound_model
+        else:
+            model = cld.create2Dcad()
+    except Exception as e :
+        print("Error in cld.create2Dcad() e : " , e)
         return False
-    if not os.path.exists(os.path.join(os.getcwd(), "file_storage/cad_models/")):
-        print("in bolted_tension_member.py: path does not exist, creating cad_models folder")
-        os.mkdir(os.path.join(os.getcwd(), "file_storage/cad_models/"))
-    print("in bolted_tension_member.py: 2d model:", model)
+
+    # check if the cad_models folder exists or not 
+    # if no, then create one 
+    if(not os.path.exists(os.path.join(os.getcwd() , "file_storage/cad_models/"))) :
+        print("path does not exists cad_models , creating one")
+        os.mkdir(os.path.join(os.getcwd() , "file_storage/cad_models/"))
+      
+    print("2d model : " , model)
+    # os.system("clear")  # clear the terminal
     file_name = session + "_" + section + ".brep"
     file_path = "file_storage/cad_models/" + file_name
-    print("in bolted_tension_member.py: brep file path in create_cad_model:", file_path)
-    try:
-        BRepTools.breptools.Write(model, file_path, Message_ProgressRange())
-        print("in bolted_tension_member.py: BRepTools.breptools.Write called successfully")
+    print("brep file path in create_cad_model : " , file_path)
+
+    try: 
+        BRepTools.breptools.Write(model, file_path, Message_ProgressRange()) # Generate CAD Model
+
+        # If it's "Model" section, write a manifest referencing per-part breps and save extra formats
         if section == "Model":
+            try:
+                manifest = {
+                    "session": session,
+                    "mergedBrep": file_path,
+                    "parts": [
+                        {"name": name, "brepPath": part_files.get(name)} for name in part_names if part_files.get(name)
+                    ]
+                }
+                # add stlPath for parts
+                for entry in manifest["parts"]:
+                    if entry.get("brepPath"):
+                        entry["stlPath"] = entry["brepPath"].replace(".brep", ".stl")
+                manifest_path = file_path.replace(".brep", ".parts.json")
+                full_manifest_path = os.path.join(os.getcwd(), manifest_path)
+                with open(full_manifest_path, "w", encoding="utf-8") as mf:
+                    json.dump(manifest, mf)
+                print(f"Parts manifest saved at {full_manifest_path}")
+            except Exception as me:
+                print(f"Warning: Failed to write manifest: {me}")
+
+            # Save STEP
             step_writer = STEPControl_Writer()
             step_writer.Transfer(model, STEPControl_AsIs)
             step_file_path = file_path.replace(".brep", ".step")
             full_step_file_path = os.path.join(os.getcwd(), step_file_path)
             if step_writer.Write(full_step_file_path) == 1:
-                print(f"in bolted_tension_member.py: STEP file saved at {full_step_file_path}")
+                print(f"STEP file saved at {full_step_file_path}")
             else:
-                print("in bolted_tension_member.py: Warning: Failed to save STEP file!")
+                print("Warning: Failed to save STEP file!")
+
+            # Save IGES
             iges_writer = IGESControl_Writer()
             iges_writer.AddShape(model)
             iges_file_path = file_path.replace(".brep", ".iges")
             full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
             if iges_writer.Write(full_iges_file_path) == 1:
-                print(f"in bolted_tension_member.py: IGES file saved at {full_iges_file_path}")
+                print(f"IGES file saved at {full_iges_file_path}")
             else:
-                print("in bolted_tension_member.py: Warning: Failed to save IGES file!")
-    except Exception as e:
-        print("in bolted_tension_member.py: Writing to BREP file failed e:", e)
+                print("Warning: Failed to save IGES file!")
+            # Write merged STL for Model
+            try:
+                merged_stl_rel = file_path.replace(".brep", ".stl")
+                write_stl(model, os.path.join(os.getcwd(), merged_stl_rel))
+                print(f"STL file saved at {os.path.join(os.getcwd(), merged_stl_rel)}")
+            except Exception as stle:
+                print(f"Warning: Failed to save merged STL: {stle}")
+    except Exception as e : 
+        print("Writing to BREP file failed e : " , e)
+
+    # For non-Model sections, export single STL next to BREP
+    if section != "Model":
+        try:
+            single_stl_rel = file_path.replace(".brep", ".stl")
+            write_stl(model, os.path.join(os.getcwd(), single_stl_rel))
+            print(f"STL file saved at {os.path.join(os.getcwd(), single_stl_rel)}")
+        except Exception as stle:
+            print(f"Warning: Failed to save STL for {section}: {stle}")
+
     return file_path

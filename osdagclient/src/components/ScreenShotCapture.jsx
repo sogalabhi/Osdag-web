@@ -85,7 +85,6 @@ async function saveImageWithDialog(canvas) {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        console.log(`${format.toUpperCase()} image saved successfully.`);
       } else {
         console.error("Failed to create image blob.");
       }

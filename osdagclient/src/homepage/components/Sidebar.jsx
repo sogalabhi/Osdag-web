@@ -53,6 +53,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
         ),
         active: false,
         link: '/FlexureMember',
+        comingSoon: true,
       },
       {
         name: 'Beam-Column',
@@ -63,6 +64,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
         ),
         active: false,
         link: '/Beam-Column',
+        comingSoon: true,
       },
       {
         name: 'Truss',
@@ -73,6 +75,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
         ),
         active: false,
         link: '/Truss',
+        comingSoon: true,
       },
       {
         name: '2D Frame',
@@ -83,6 +86,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
         ),
         active: false,
         link: '/2DFrame',
+        comingSoon: true,
       },
       {
         name: '3D Frame',
@@ -93,16 +97,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
         ),
         active: false,
         link: '/3DFrame',
-      },
-      {
-        name: 'Group Design',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        ),
-        active: false,
-        link: '/GroupDesign',
+        comingSoon: true,
       },
     ].map(item =>
       item.name === active
@@ -135,7 +130,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
 
           <button
             className="absolute right-5 top-5 md:block lg:hidden xl:hidden 2xl:hidden p-2 rounded transition 
-             hover:bg-gray-200 dark:hover:bg-gray-700"
+             hover:bg-gray-200 dark:hover:bg-osdag-dark-color"
             aria-label="Close sidebar"
             onClick={handleCloseSidebar}
             type="button"
@@ -163,30 +158,55 @@ const Sidebar = ({ setshowSideBar, active }) => {
 
           const isActive = itemKey === paramKey;
 
+          const comingSoon = item.comingSoon;
+
           return (
-            <Link to={item.link} key={index} onClick={handleCloseSidebar}>
+            <Link
+              to={item.link}
+              key={index}
+              onClick={(event) => {
+                if (comingSoon) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  alert('Module under development');
+                  return;
+                }
+                handleCloseSidebar();
+              }}
+            >
               <div
                 className={`
-      mx-4 mb-2 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ease-in-out group
-      ${isActive
-                    ? 'bg-osdag-green text-white dark:bg-osdag-dark-green dark:text-white'
-                    : 'hover:text-osdag-green hover:bg-black/10 dark:hover:bg-black/40 text-black dark:text-white'}
+      mx-4 mb-2 px-4 py-3 rounded-xl transition-all duration-200 ease-in-out group
+      ${comingSoon
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-osdag-dark-color dark:text-gray-500'
+                    : isActive
+                      ? 'bg-osdag-green text-white dark:bg-osdag-dark-green dark:text-white'
+                      : 'cursor-pointer hover:text-osdag-green hover:bg-black/10 dark:hover:bg-black/40 text-black dark:text-white'}
     `}
               >
                 <div className="flex items-center space-x-3">
                   <div
                     className={`
           transition-colors duration-200 flex items-center justify-center h-6 w-6
-          ${isActive
-                        ? 'text-white dark:text-white'
-                        : 'group-hover:text-osdag-green text-black dark:text-osdag-green'}
+          ${comingSoon
+                        ? 'text-gray-400 dark:text-gray-500'
+                        : isActive
+                          ? 'text-white dark:text-white'
+                          : 'group-hover:text-osdag-green text-black dark:text-osdag-green'}
         `}
                   >
                     <span className="h-5 w-5 flex items-center justify-center">
                       {item.icon}
                     </span>
                   </div>
-                  <span className="font-medium dark:text-white">{item.name}</span>
+                  <span
+                    className={`font-medium ${comingSoon ? 'text-gray-400 dark:text-gray-500' : 'dark:text-white'}`}
+                  >
+                    {item.name}
+                    {comingSoon && (
+                      <span className="ml-2 text-xs uppercase tracking-wide">(Coming Soon)</span>
+                    )}
+                  </span>
                 </div>
               </div>
             </Link>

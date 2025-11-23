@@ -142,9 +142,9 @@ const DesignPrefSections = ({
             designPrefInputs={designPrefInputs}
             setDesignPrefInputs={setDesignPrefInputs}
             supportingSectionData={
-              designPrefData.supporting_section_results.length > 0
+              (designPrefData?.supporting_section_results?.length ?? 0) > 0
                 ? designPrefData.supporting_section_results[0]
-                : designPrefData.supporting_section_results
+                : designPrefData?.supporting_section_results ?? []
             }
           />
         )}
@@ -156,10 +156,10 @@ const DesignPrefSections = ({
             designPrefInputs={designPrefInputs}
             setDesignPrefInputs={setDesignPrefInputs}
             supportedSectionData={
-              designPrefData.supported_section_results.length > 0
+              (designPrefData?.supported_section_results?.length ?? 0) > 0
                 ? designPrefData.supported_section_results[0]
-                : designPrefData.supported_section_results
-            }
+                : designPrefData?.supported_section_results ?? []
+            } 
           />
         )}
         {activeTab == 2 && (
