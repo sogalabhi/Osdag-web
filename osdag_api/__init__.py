@@ -5,8 +5,8 @@ developed_modules = [
     "End-Plate-Connection", 
     "Cleat-Angle-Connection",
     "Seated-Angle-Connection",
-    "Cover-Plate-Bolted-Connection",
-    "Cover-Plate-Welded-Connection",
+    "Beam-to-Beam-Cover-Plate-Bolted-Connection",
+    "Beam-to-Beam-Cover-Plate-Welded-Connection",
     "Beam-Beam-End-Plate-Connection",
     "Beam-to-Column-End-Plate-Connection",
     "Tension-Member-Bolted-Design",
@@ -39,7 +39,7 @@ module_dict = [
         "path": "Connection/Shear Connection"
     },
     {
-        "key": "Cover-Plate-Bolted-Connection",
+        "key": "Beam-to-Beam-Cover-Plate-Bolted-Connection",
         "image": "/static/images/modules/cover_plate_bolted_connection.png",
         "name": "Cover Plate Bolted",
         "path": "Connection/Moment Connection"
@@ -51,7 +51,7 @@ module_dict = [
         "path": "Connection/Moment Connection"
     },
     {
-        "key": "Cover-Plate-Welded-Connection",
+        "key": "Beam-to-Beam-Cover-Plate-Welded-Connection",
         "image": "/static/images/modules/cover_plate_welded_connection.png",
         "name": "Cover Plate Welded",
         "path": "Connection/Moment Connection"

@@ -114,14 +114,14 @@ urlpatterns = [
     path('calculate-output/SeatedAngleConnection',
          SeatedAngleOutputData.as_view(),name="SeatedAngleConnection"),
     
-    path('calculate-output/Cover-Plate-Bolted-Connection',
-         CoverPlateBoltedOutputData.as_view(),name="Cover-Plate-Bolted-Connection"),
+    path('calculate-output/Beam-to-Beam-Cover-Plate-Bolted-Connection',
+         CoverPlateBoltedOutputData.as_view(),name="Beam-to-Beam-Cover-Plate-Bolted-Connection"),
     
     path('calculate-output/Beam-Beam-End-Plate-Connection',
          BeamBeamEndPlateOutputData.as_view(),name="Beam-Beam-End-Plate-Connection"),
     
-    path('calculate-output/Cover-Plate-Welded-Connection',
-         CoverPlateWeldedOutputData.as_view(),name="Cover-Plate-Welded-Connection"),
+    path('calculate-output/Beam-to-Beam-Cover-Plate-Welded-Connection',
+         CoverPlateWeldedOutputData.as_view(),name="Beam-to-Beam-Cover-Plate-Welded-Connection"),
     
     path('calculate-output/Beam-to-Column-End-Plate-Connection',
          BeamToColumnEndPlateOutputData.as_view(), name='Beam-to-Column-End-Plate-Connection'),

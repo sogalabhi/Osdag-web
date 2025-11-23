@@ -8,11 +8,11 @@ def setup_for_cad(cdl: CommonDesignLogic, module_class):
     print("******")
     module_object = module_class
     print("********")
-    if module_object.module == "Cover-Plate-Bolted-Connection": # If module is cover plate bolted then'.
+    if module_object.module == "Beam-to-Beam-Cover-Plate-Bolted-Connection": # If module is cover plate bolted then'.
         cdl.CPObj = cdl.createBBCoverPlateCAD() # IDK what this does, I guess it creates the connection object.
     if module_object.module == "Beam-to-Beam End Plate Connection":
         cdl.CPObj = cdl.createBBEndPlateCAD()
-    if module_object.module == "Cover-Plate-Welded-Connection":
+    if module_object.module == "Beam-to-Beam-Cover-Plate-Welded-Connection":
         cdl.CPObj = cdl.createBBCoverPlateCAD()
     if module_object.module == "Beam-to-Column End Plate Connection":
         cdl.CPObj = cdl.createBCEndPlateCAD() # Initialize the CAD object for beam-column end plate

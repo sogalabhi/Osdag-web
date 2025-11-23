@@ -56,9 +56,9 @@ class CADGeneration(View):
                 "Cleat-Angle-Connection": "CleatAngle", 
                 "End-Plate-Connection": "EndPlate",
                 "SeatedAngleConnection": "SeatedAngleConnection",
-                "Cover-Plate-Bolted-Connection": "CoverPlateBolted",
+                "Beam-to-Beam-Cover-Plate-Bolted-Connection": "CoverPlateBolted",
                 "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
-                "Cover-Plate-Welded-Connection": "CoverPlateWelded",
+                "Beam-to-Beam-Cover-Plate-Welded-Connection": "CoverPlateWelded",
                 "Beam-to-Column-End-Plate-Connection": "BeamToColumnEndPlate",
                 "Tension-Member-Bolted-Design": "TensionMember",
                 "Tension-Member-Welded-Design": "TensionMember"
