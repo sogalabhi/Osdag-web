@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { ModuleContext } from "../../../context/ModuleState";
-import { MODULE_KEY_FIN_PLATE } from "../../../constants/DesignKeys";
+import { MODULE_KEY_FIN_PLATE, MODULE_KEY_CLEAT_ANGLE } from "../../../constants/DesignKeys";
 
 export const useEngineeringModule = (moduleConfig) => {
   const navigate = useNavigate();

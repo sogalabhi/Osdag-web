@@ -39,7 +39,7 @@
           { "name": "Reset" }
         ]
       },
-      {
+            {
         "label": "Help",
         "dropdown": [
           { "name": "Video Tutorials" },

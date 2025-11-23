@@ -613,7 +613,7 @@ class ColumnDesign(Member):
 
     # Setting inputs from the input dock GUI
     def set_input_values(self, design_dictionary):
-        super(ColumnDesign, self).set_input_values(self, design_dictionary)
+        super(ColumnDesign, self).set_input_values(design_dictionary)
 
         # section properties
         self.module = design_dictionary[KEY_MODULE]
@@ -634,7 +634,7 @@ class ColumnDesign(Member):
         self.end_2_y = design_dictionary[KEY_END2_Y]
 
         # factored loads
-        self.load = Load(axial_force=design_dictionary[KEY_AXIAL], shear_force="", moment="", moment_minor="", unit_kNm=True)
+        self.load = Load(axial_force=design_dictionary[KEY_AXIAL], shear_force="", moment="", moment_minor=0, unit_kNm=True)
 
         # design preferences
         self.allowable_utilization_ratio = float(design_dictionary[KEY_ALLOW_UR])
@@ -1475,3 +1475,9 @@ class ColumnDesign(Member):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+# Make sure Django can load this class
+try:
+    __all__ = ["ColumnDesign"]
+except:
+    pass
+

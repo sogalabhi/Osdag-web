@@ -10,7 +10,8 @@ developed_modules = [
     "Beam-Beam-End-Plate-Connection",
     "Beam-to-Column-End-Plate-Connection",
     "Tension-Member-Bolted-Design",
-    "Simply-Supported-Beam"
+    "Simply-Supported-Beam",
+    "Axially-Loaded-Column"       
 ]
 
 module_dict = [
@@ -73,5 +74,11 @@ module_dict = [
         "image": "/static/images/modules/simply_supported_beam.png",
         "name": "Simply Supported Beam",
         "path": "Flexural Member/simply_supported_beam"
-    }
+    },
+    {
+        "key": "axially-loaded-column",
+        #"image": "/static/images/modules/axial_loaded_column.png",   # <— ADD THIS IMAGE IN YOUR STATIC FOLDER
+        "name": "Axially Loaded Column",
+        "path": "Compression Member/axial_loaded_column"
+    },
 ]

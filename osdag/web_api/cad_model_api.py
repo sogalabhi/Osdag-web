@@ -60,7 +60,13 @@ class CADGeneration(View):
                 "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
                 "Cover-Plate-Welded-Connection": "CoverPlateWelded",
                 "Beam-to-Column-End-Plate-Connection": "BeamToColumnEndPlate",
-                "Tension-Member-Bolted-Design": "TensionMember"
+                "Tension-Member-Bolted-Design": "TensionMember",
+                'Axially-Loaded-Column': 'ColumnDesign',
+                "Axially-Loaded-Column": "Axially-Loaded-Column",
+                "AxiallyLoadedColumn": "Axially-Loaded-Column",
+                "Axially_Loaded_Column": "Axially-Loaded-Column",
+                "AxialLoadedColumn": "Axially-Loaded-Column",
+
             }
             
             session_type = module_type_mapping.get(module_id)
@@ -107,6 +113,8 @@ class CADGeneration(View):
             sections = ["Model", "Beam", "Column", "EndPlate"]
         elif session_type == "TensionMember":
             sections = ["Model", "Member", "Plate", "Endplate"]
+        elif session_type == "Axially-Loaded-Column":
+            sections = ["Model"]
         else:
             return JsonResponse({"status": "error", "message": "Unknown module type"}, status=400)
         

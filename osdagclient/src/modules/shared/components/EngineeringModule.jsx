@@ -294,8 +294,13 @@ export const EngineeringModule = ({
       return ["Model", "Beam", "Column", "CleatAngle"]; // FIXED: Use CleatAngle instead of Connector
     }
     else if (moduleConfig.cameraKey === "EndPlate") {
-      console.log("📋 [ENGINEERING MODULE] Returning EndPlate view options");
-      return ["Model", "Beam", "Column", "EndPlate"];
+      return ["Model", "Beam", "Column", "Plate"];
+    }
+    else if (moduleConfig.cameraKey === "AxiallyLoadedColumn"){
+      return ["Model", "Column"];
+    }    
+    else if (moduleConfig.cameraKey === "SeatedAngle") {
+      return ["Model", "Beam", "Column", "SeatedAngle"]; // FIXED: Use SeatedAngle instead of Connector
     }
     console.log("📋 [ENGINEERING MODULE] Returning default view options");
     return ["Model", "Beam", "Connector"];

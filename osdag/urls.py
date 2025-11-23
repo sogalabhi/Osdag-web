@@ -23,6 +23,7 @@ from osdag.web_api.cover_plate_weld_output import CoverPlateWeldedOutputData
 from osdag.web_api.beam_to_column_endplate_output import BeamToColumnEndPlateOutputData
 from osdag.web_api.tensionmemberbolted_outputView import TensionMemberBoltedOutputData
 from osdag.web_api.simplysupportedbeam_outputView import SimplySupportedBeamOutputData
+from osdag.web_api.compressionmember_outputView import CompressionMemberOutputData
 from osdag.web_api.report_customization_api import ParseReportSections, CustomizeReport, GenerateInitialReport
 from django.urls import path, include
 # temporary
@@ -129,7 +130,13 @@ urlpatterns = [
          TensionMemberBoltedOutputData.as_view(),name="Tension-Member-Bolted-Design"),
     path('calculate-output/Simply-Supported-Beam',
          SimplySupportedBeamOutputData.as_view(), name="Simply-Supported-Beam"),
-    
+    path("calculate-output/Axially-Loaded-Column",
+         CompressionMemberOutputData.as_view(),name="Axially-Loaded-Column"),
+    path('calculate-output/axial_loaded_column',
+         CompressionMemberOutputData.as_view(), name='axial_loaded_column'),
+    path("calculate-output/Axially-Loaded-Column",
+         CompressionMemberOutputData.as_view(), name="AxiallyLoadedColumn"),
+
     # Report customization API endpoints
     path('api/report/generate-initial/', GenerateInitialReport.as_view(), name='generate-initial-report'),
     path('api/report/parse-sections/', ParseReportSections.as_view(), name='parse-report-sections'),

@@ -37,6 +37,9 @@ import SeatedPlate from "./modules/shearConnection/seatAngle/SeatedPlate";
 import CoverPlateBolted from "./modules/coverPlateBolted/CoverPlateBolted";
 import CoverPlateWelded from "./modules/coverPlateWelded/CoverPlateWelded";
 
+//compression member
+import AxiallyLoadedColumn from "./modules/CompressionMember/axialColumn/AxiallyLoadedColumn";
+
 import "./App.css";
 
 let renderedOnce = false;
@@ -62,7 +65,8 @@ function App() {
         <Route path="/design/:designType/beam-to-beam-splice/end_plate/:projectId?" element={<BeamBeamEndPlate />} />
         <Route path="/design/:designType/simply_supported_beam/:projectId?" element={<SimplySupportedBeam />} />
         <Route path="/design/:designType/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
-      </Route>
+        <Route path="/design/compression_member/axial_column/:projectId?" element={<AxiallyLoadedColumn />} />
+</Route>
     )
   );
 

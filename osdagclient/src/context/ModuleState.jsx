@@ -1,4 +1,4 @@
-import { createContext, useReducer, useState, useEffect, useCallback } from "react";
+import { createContext, useReducer, useState, useEffect, useCallback , useContext } from "react";
 import ModuleReducer from "./ModuleReducer";
 
 // crypto packages
