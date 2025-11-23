@@ -16,8 +16,8 @@ import sqlite3
 
 from .utils.common.other_standards import *
 # from .utils.common.component import *
-# from design_type.connection.fin_plate_connection import FinPlateConnection
-# from design_type.connection.column_cover_plate import ColumnCoverPlate
+# from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+# from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 
 class OurLog(logging.Handler):
 
@@ -340,7 +340,7 @@ TYPE_MODULE = 'Window Title'
 KEY_DISP_FINPLATE = 'Fin Plate Connection'
 KEY_DISP_ENDPLATE = 'End Plate Connection'
 KEY_DISP_CLEATANGLE = 'Cleat Angle Connection'
-KEY_DISP_SEATED_ANGLE = 'Seated Angle Connection'
+KEY_DISP_SEATED_ANGLE = 'SeatedAngleConnection'
 KEY_DISP_BASE_PLATE = 'Base Plate Connection'
 KEY_DISP_TRUSS_BOLTED = 'Truss Connection Bolted'
 
@@ -823,7 +823,7 @@ KEY_DISP_SUPPORT_WIDTH = 'Support Width (mm)'
 # All Input Keys
 ###################################
 KEY_MODULE = 'Module'
-KEY_CONN = 'Connectivity *'
+KEY_CONN = 'Connectivity'
 KEY_TABLE = 'Table'
 KEY_MEMBERS = 'No of Members'
 KEY_LOCATION = 'Conn_Location'
@@ -2570,9 +2570,6 @@ except Exception as e:
     all_angles = []
 
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
-print(all_angles)
-print("customised")
-print(VALUES_CLEAT_CUSTOMIZED)
 
 BOLT_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"

@@ -44,7 +44,7 @@ const MODULE_CONFIGS = {
     }
   },
   "Beam-to-Beam End Plate Connection": {
-    connectivityField: "Connectivity *",
+    connectivityField: "Connectivity",
     endPlateField: "EndPlateType",
     connectivityMap: {
       "Flushed - Reversible Moment": "Flushed - Reversible Moment",
@@ -78,7 +78,7 @@ function UnifiedDropdownMenu({
   inputs,
   allSelected,
   setInputs,
-  setAllSelected = () => {},
+  setAllSelected = () => { },
   logs,
   setCreateDesignReportBool,
   setSaveInputFileName,
@@ -135,9 +135,9 @@ function UnifiedDropdownMenu({
         formData.append('file', file);
         const res = await fetch(`${BASE_URL}open-osi/`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${getAccessToken()}`,
-          },
+          // headers: {
+          //   'Authorization': `Bearer ${getAccessToken()}`,
+          // },
           body: formData,
         });
         const data = await res.json();
@@ -298,9 +298,6 @@ function UnifiedDropdownMenu({
         const savedName = (inputs?.project_name || inputs?.name || 'project');
         setSaveInputFileName(data?.data?.id ? `${savedName}.osi` : savedName);
         message.success('Saved OSI and project created');
-        console.log('[saveInput] data:', data);
-        console.log('[saveInput] pid:', pid);
-        console.log('[saveInput] data.url:', data.url);
         // Update project's osi_file_path via projectId from URL
         if (pid && data.url) {
           try {
@@ -316,12 +313,10 @@ function UnifiedDropdownMenu({
 
             if (!upd.ok || !updData.success) {
               message.warning('Saved OSI, but failed to link to project');
-              console.log('[saveInput] updData:', updData);
             }
             setIsOpen(false);
           } catch (_e) {
             message.warning('Saved OSI, but failed to link to project');
-            console.log('[saveInput] error linking project:', _e);
           }
         }
       } else {
@@ -329,7 +324,6 @@ function UnifiedDropdownMenu({
       }
     } catch (err) {
       message.error('Failed to save OSI');
-      console.log('[saveInput] err:', err);
     }
   };
 
@@ -361,8 +355,7 @@ function UnifiedDropdownMenu({
     element.style.display = "none";
     parentRef.current.appendChild(element);
     element.click();
-    parentRef.current.removeChild(element);
-    console.log('[saveLogMessages] content:', content);
+    parentRef.current.removeChild(element);   
   };
 
   const handleClick = (option) => {
@@ -370,9 +363,9 @@ function UnifiedDropdownMenu({
       case "Load Input":
         loadInput();
         break;
-      case "Download Input":
-        downloadInput();
-        break;
+      // case "Download Input":
+      //   downloadInput();
+      //   break;
       case "Save Input":
         saveInput();
         break;
@@ -435,7 +428,8 @@ function UnifiedDropdownMenu({
         // Default value
         setInputs({
           ...inputs,
-          [inputKey]: option.name,
+          // [inputKey]: option.name,
+          graphicsOption: option.name,
         });
         break;
     }
@@ -480,15 +474,18 @@ function UnifiedDropdownMenu({
   }, []);
 
   return (
-    <div className="dropdown" ref={parentRef}>
-      <div className="dropdown-label" onClick={handleToggle}>
+    <div className="relative flex justify-center items-center hover:bg-[#91b014] hover:text-white p-1" ref={parentRef}>
+      <div
+        className="font-medium  cursor-pointer"
+        onClick={handleToggle}
+      >
         {label}
       </div>
       {isOpen && (
-        <div className="dropdown-menu">
+        <div className="absolute top-full left-0 bg-white border border-[#ccc] border-t-0 min-w-[350px] z-[1]">
           {dropdown.map((option, index) => (
             <div
-              className="dropdown-items"
+              className="flex w-full justify-between text-sm text-black hover:text-white hover:bg-osdag-green cursor-pointer p-1"
               key={index}
               onClick={() => handleClick(option)}
             >
@@ -501,6 +498,7 @@ function UnifiedDropdownMenu({
         </div>
       )}
     </div>
+
   );
 }
 

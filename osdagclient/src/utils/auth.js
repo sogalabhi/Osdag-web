@@ -96,7 +96,6 @@ export const isGuestUser = () => {
  */
 export const getCurrentUserEmail = () => {
   const email = localStorage.getItem('email') || '';
-  console.log('getCurrentUserEmail called, email from localStorage:', email);
   return email;
 };
 

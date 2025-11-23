@@ -29,6 +29,12 @@ class Tension_welded(Member):
 
 
         self.design_status = False
+        self.logs = []
+
+
+        self.module = KEY_DISP_TENSION_WELDED
+        self.mainmodule = 'Member'
+        self.connection = "Welded"
 
     ###############################################
     # Design Preference Functions Start
@@ -217,7 +223,7 @@ class Tension_welded(Member):
     # Design Preference Functions End
     ####################################
 
-    def set_osdaglogger(key):
+    def set_osdaglogger(self,key):
 
         """
         Function to set Logger for Tension Module
@@ -226,6 +232,14 @@ class Tension_welded(Member):
         # @author Arsil Zunzunia
         global logger
         logger = logging.getLogger('Osdag')
+
+        # This function basically adds everything to the logs variable 
+        # whenever something is logged using the logger
+        def add_logs(record):
+            self.logs.append({'msg': record.getMessage()})
+            return True
+        # Checks if it should print the message or not (will always print it as True returned)
+        logger.addFilter(add_logs)
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
@@ -376,9 +390,6 @@ class Tension_welded(Member):
         '''
 
         # @author: Amir, Umair
-        self.module = KEY_DISP_TENSION_WELDED
-        self.mainmodule = 'Member'
-        self.connection = "Welded"
 
         options_list = []
 
@@ -647,7 +658,7 @@ class Tension_welded(Member):
                 pass
 
         if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            error = self.generate_missing_fields_error_string(missing_fields_list)
             all_errors.append(error)
             # flag = False
         else:
@@ -655,7 +666,7 @@ class Tension_welded(Member):
         # print(all_errors, "ysdgh")
         # print(flag, flag1, flag2)
         if flag and flag1 and flag2:
-            self.set_input_values(self, design_dictionary)
+            self.set_input_values(design_dictionary)
             # print(design_dictionary)
         else:
             return all_errors
@@ -705,7 +716,7 @@ class Tension_welded(Member):
 
         "initialisation of components required to design a tension member along with connection"
 
-        super(Tension_welded,self).set_input_values(self, design_dictionary)
+        super(Tension_welded,self).set_input_values(design_dictionary)
         print(design_dictionary,"input values are set. Doing preliminary member checks")
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]
@@ -736,7 +747,7 @@ class Tension_welded(Member):
         self.weld_design_status = False
         self.thick_design_status = False
         self.plate_design_status = False
-        self.initial_member_capacity(self,design_dictionary)
+        self.initial_member_capacity(design_dictionary)
 
 
     def select_section(self, design_dictionary, selectedsize):
@@ -761,7 +772,7 @@ class Tension_welded(Member):
         for section in sizelist:
             if design_dictionary[KEY_SEC_PROFILE] in ['Angles']:
                 self.section = Angle(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-                self.min_rad_gyration_calc(self, designation=section,
+                self.min_rad_gyration_calc(designation=section,
                                            material_grade=design_dictionary[KEY_SEC_MATERIAL],
                                            key=design_dictionary[KEY_SEC_PROFILE],
                                            subkey=design_dictionary[KEY_LOCATION], D_a=self.section.a,
@@ -770,7 +781,8 @@ class Tension_welded(Member):
 
             elif design_dictionary[KEY_SEC_PROFILE] in ['Back to Back Angles', 'Star Angles']:
                 self.section = Angle(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-                self.min_rad_gyration_calc(self, designation=section,
+
+                self.min_rad_gyration_calc(designation=section,
                                            material_grade=design_dictionary[KEY_SEC_MATERIAL],
                                            key=design_dictionary[KEY_SEC_PROFILE],
                                            subkey=design_dictionary[KEY_LOCATION], D_a=self.section.a,
@@ -780,7 +792,7 @@ class Tension_welded(Member):
 
             else:
                 self.section = Channel(designation=section, material_grade=design_dictionary[KEY_SEC_MATERIAL])
-                self.min_rad_gyration_calc(self, designation=section,
+                self.min_rad_gyration_calc(designation=section,
                                            material_grade=design_dictionary[KEY_SEC_MATERIAL],
                                            key=design_dictionary[KEY_SEC_PROFILE],
                                            subkey=design_dictionary[KEY_LOCATION], D_a=self.section.depth,
@@ -814,7 +826,7 @@ class Tension_welded(Member):
             self.section_size_max.tension_member_yielding(A_g=(self.section_size_max.area),
                                                           F_y=self.section_size_max.fy)
             self.max_member_force = self.section_size_max.tension_yielding_capacity
-            self.min_rad_gyration_calc(self, designation=section, material_grade=self.material,
+            self.min_rad_gyration_calc(designation=section, material_grade=self.material,
                                        key=self.sec_profile, subkey=self.loc, D_a=self.section_size_max.a,
                                        B_b=self.section_size_max.b, T_t=self.section_size_max.thickness)
             self.max_length = 400 * self.min_radius_gyration
@@ -824,7 +836,7 @@ class Tension_welded(Member):
             self.section_size_max.tension_member_yielding(A_g=(2 * self.section_size_max.area),
                                                           F_y=self.section_size_max.fy)
             # self.max_member_force = self.section_size_max.tension_yielding_capacity * 2
-            self.min_rad_gyration_calc(self, designation=section, material_grade=self.material,
+            self.min_rad_gyration_calc(designation=section, material_grade=self.material,
                                        key=self.sec_profile, subkey=self.loc, D_a=self.section_size_max.a,
                                        B_b=self.section_size_max.b, T_t=self.section_size_max.thickness)
             self.max_length = 400 * self.min_radius_gyration
@@ -835,7 +847,7 @@ class Tension_welded(Member):
                                                           F_y=self.section_size_max.fy)
 
             self.max_member_force = self.section_size_max.tension_yielding_capacity
-            self.min_rad_gyration_calc(self, designation=section, material_grade=self.material,
+            self.min_rad_gyration_calc(designation=section, material_grade=self.material,
                                        key=self.sec_profile, subkey=self.loc, D_a=self.section_size_max.depth,
                                        B_b=self.section_size_max.flange_width,
                                        T_t=self.section_size_max.flange_thickness,
@@ -848,7 +860,7 @@ class Tension_welded(Member):
             self.section_size_max.tension_member_yielding(A_g=(2 * self.section_size_max.area),
                                                           F_y=self.section_size_max.fy)
             # self.max_member_force = 2 * self.section_size_max.tension_yielding_capacity
-            self.min_rad_gyration_calc(self, designation=section, material_grade=self.material,
+            self.min_rad_gyration_calc(designation=section, material_grade=self.material,
                                        key=self.sec_profile, subkey=self.loc, D_a=self.section_size_max.depth,
                                        B_b=self.section_size_max.flange_width,
                                        T_t=self.section_size_max.flange_thickness,
@@ -920,9 +932,9 @@ class Tension_welded(Member):
         min_yield = 0
 
         if self.count == 0:
-            self.max_section(self, design_dictionary, self.sizelist)
-            [self.force1, self.len1, self.slen1, self.gyr1] = self.max_force_length(self, self.max_area)
-            [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self, self.max_gyr)
+            self.max_section(design_dictionary, self.sizelist)
+            [self.force1, self.len1, self.slen1, self.gyr1] = self.max_force_length(self.max_area)
+            [self.force2, self.len2, self.slen2, self.gyr2] = self.max_force_length(self.max_gyr)
         else:
             pass
 
@@ -938,7 +950,7 @@ class Tension_welded(Member):
 
         for selectedsize in self.sizelist:
             # print(self.sizelist)
-            self.section_size = self.select_section(self,design_dictionary,selectedsize)
+            self.section_size = self.select_section(design_dictionary,selectedsize)
             # print(self.section_size)
 
             if design_dictionary[KEY_SEC_PROFILE] =='Angles' or design_dictionary[KEY_SEC_PROFILE] =='Channels':
@@ -954,12 +966,12 @@ class Tension_welded(Member):
             # print(self.section_size.rad_of_gy_z)
             if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
                 # print(selectedsize)
-                self.min_rad_gyration_calc(self, designation=self.section_size.designation,
+                self.min_rad_gyration_calc(designation=self.section_size.designation,
                                            material_grade=self.material,
                                            key=self.sec_profile, subkey=self.loc, D_a=self.section_size.a,
                                            B_b=self.section_size.b, T_t=self.section_size.thickness)
             else:
-                self.min_rad_gyration_calc(self, designation=self.section_size.designation,
+                self.min_rad_gyration_calc(designation=self.section_size.designation,
                                            material_grade=self.material,
                                            key=self.sec_profile, subkey=self.loc, D_a=self.section_size.depth,
                                            B_b=self.section_size.flange_width, T_t=self.section_size.flange_thickness,
@@ -975,16 +987,16 @@ class Tension_welded(Member):
                 self.member_design_status = True
                 if min_yield == 0:
                     min_yield = min_yield_current
-                    self.section_size_1 = self.select_section(self, design_dictionary, selectedsize)
+                    self.section_size_1 = self.select_section(design_dictionary, selectedsize)
                     self.section_size_1.tension_member_yielding(A_g=self.cross_area, F_y=self.section_size.fy)
                     if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-                        self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                        self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                                    material_grade=self.material,
                                                    key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
                                                    B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
 
                     else:
-                        self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                        self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                                    material_grade=self.material,
                                                    key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
                                                    B_b=self.section_size_1.flange_width,
@@ -996,15 +1008,15 @@ class Tension_welded(Member):
 
                 elif min_yield_current < min_yield:
                     min_yield = min_yield_current
-                    self.section_size_1 = self.select_section(self, design_dictionary, selectedsize)
+                    self.section_size_1 = self.select_section(design_dictionary, selectedsize)
                     self.section_size_1.tension_member_yielding(A_g=self.cross_area, F_y=self.section_size.fy)
                     if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-                        self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                        self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                                    material_grade=self.material,
                                                    key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
                                                    B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
                     else:
-                        self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                        self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                                    material_grade=self.material,
                                                    key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
                                                    B_b=self.section_size_1.flange_width,
@@ -1050,7 +1062,7 @@ class Tension_welded(Member):
         if self.member_design_status == True:
             print("pass")
             self.design_status = True
-            self.initial_plate_check(self, design_dictionary)
+            self.initial_plate_check(design_dictionary)
         else:
             self.design_status = False
             logger.error(": Design is unsafe. \n ")
@@ -1102,7 +1114,7 @@ class Tension_welded(Member):
 
             if tension_capacity > self.res_force:
                 break
-
+        
         if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels',"Star Angles"]:
             self.max_tension_yield = 400*self.plate.fy*self.last_thk/1.1
         else:
@@ -1114,15 +1126,15 @@ class Tension_welded(Member):
             print(self.plate.thickness_provided)
             self.thick_design_status = True
             self.design_status = True
-            self.select_weld(self, design_dictionary)
+            self.select_weld(design_dictionary)
 
         else:
             if tension_capacity < self.max_tension_yield and self.res_force < self.max_tension_yield:
-                # self.initial_member_capacity(self, design_dictionary, previous_size=self.section_size_1.designation)
+                # self.initial_member_capacity(design_dictionary, previous_size=self.section_size_1.designation)
                 if len(self.sizelist) >= 2:
                     size = self.section_size_1.designation
                     print("recheck", size)
-                    self.initial_member_capacity(self, design_dictionary, size)
+                    self.initial_member_capacity(design_dictionary, size)
                 else:
                     self.design_status = False
                     logger.warning(":Tension force {} kN exceeds tension capacity of {} kN for maximum available plate thickness of 80 mm.".format(
@@ -1151,19 +1163,19 @@ class Tension_welded(Member):
 
         self.weld.weld_size(plate_thickness = self.plate.thickness_provided, member_thickness= self.thick , edge_type= "Rolled")
 
-        self.get_weld_strength(self,connecting_fu= [self.section_size_1.fu,self.plate.fu,self.weld.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.res_force))
+        self.get_weld_strength(connecting_fu= [self.section_size_1.fu,self.plate.fu,self.weld.fu], weld_fabrication = self.weld.fabrication , t_weld = self.weld.size, force = (self.res_force))
         print (self.weld.effective, "weld eff")
-        self.weld_plate_length(self, design_dictionary)
+        self.weld_plate_length(design_dictionary)
         self.weld.get_weld_stress(weld_shear=0,weld_axial=self.res_force, l_weld=self.weld.length)
         # print(self.plate.length, self.weld.throat, "xfsf")
         if self.plate.length > (150 * self.weld.throat) and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
             logger.info(" To satisfy the long joint limit, weld is provided only on the flanges.")
             self.web_weld_status = False
             self.weld.weld_size(plate_thickness=self.plate.thickness_provided, member_thickness=self.thick_1,edge_type="Rolled")
-            self.get_weld_strength(self, connecting_fu=[self.section_size_1.fu, self.plate.fu, self.weld.fu],
+            self.get_weld_strength(connecting_fu=[self.section_size_1.fu, self.plate.fu, self.weld.fu],
                                    weld_fabrication=self.weld.fabrication, t_weld=self.weld.size,
                                    force=(self.res_force))
-            self.weld_plate_length(self, design_dictionary,"web_weld")
+            self.weld_plate_length(design_dictionary,"web_weld")
             self.weld.get_weld_stress(weld_shear=0,weld_axial=self.res_force, l_weld=self.weld.length)
 
         # "Check for long joint"
@@ -1181,21 +1193,21 @@ class Tension_welded(Member):
             self.weld.get_weld_stress(weld_shear=0,weld_axial = self.res_force, l_weld = self.weld.length)
 
             if self.weld.strength_red> self.weld.stress:
-                self.weld_plate_length(self, design_dictionary)
+                self.weld_plate_length(design_dictionary)
                 break
             else:
                 self.weld.effective = round_up((self.res_force/self.weld.strength),100,1)
-                self.weld_plate_length(self, design_dictionary)
+                self.weld_plate_length(design_dictionary)
 
         # if self.weld.strength < self.weld.stress and Btw <= 0.6:
         #     previous_size = self.section_size_1.designation
-        #     self.initial_member_capacity(self, design_dictionary, previous_size)
+        #     self.initial_member_capacitydesign_dictionary, previous_size)
         # else:
         #     pass
         if self.weld.strength_red > self.weld.stress:
             self.weld_design_status = True
             self.design_status = True
-            self.member_check(self, design_dictionary)
+            self.member_check(design_dictionary)
         else:
             self.design_status = False
             logger.warning(": The member fails in long joint. \n ")
@@ -1337,7 +1349,7 @@ class Tension_welded(Member):
         self.section_size_1.design_check_for_slenderness(K = self.K, L = design_dictionary[KEY_LENGTH], r = self.min_radius_gyration)
         self.section_size_1.tension_capacity = min (self.section_size_1.tension_yielding_capacity, self.section_size_1.tension_rupture_capacity)
 
-        self.member_recheck(self, design_dictionary)
+        self.member_recheck(design_dictionary)
 
     def member_recheck(self,design_dictionary):
 
@@ -1352,16 +1364,16 @@ class Tension_welded(Member):
             self.design_status = True
 
             self.efficiency = round((self.load.axial_force*1000 / self.section_size_1.tension_capacity), 2)
-            self.get_plate_thickness(self,design_dictionary)
+            self.get_plate_thickness(design_dictionary)
 
         else:
             print("recheck")
             # previous_size = self.section_size_1.designation
-            # self.initial_member_capacity(self, design_dictionary, previous_size)
+            # self.initial_member_capacitydesign_dictionary, previous_size)
             if len(self.sizelist) >= 2:
                 size = self.section_size_1.designation
                 print("recheck", size)
-                self.initial_member_capacity(self, design_dictionary, size)
+                self.initial_member_capacity(design_dictionary, size)
             else:
                 self.design_status = False
                 logger.warning(":The factored tension force ({} kN) exceeds the tension capacity of {} kN with respect to the maximum available "
@@ -1432,7 +1444,7 @@ class Tension_welded(Member):
             else:
                 self.plate_design_status = True
                 self.design_status = True
-                self.intermittent_bolt(self, design_dictionary)
+                self.intermittent_bolt(design_dictionary)
 
                 logger.info(":In the case of reverse loading, slenderness value shall be less than 180 [Ref. Table 3, IS 800:2007].")
                 if self.sec_profile not in ["Angles", "Channels"] and self.length > 1000:
@@ -1450,12 +1462,12 @@ class Tension_welded(Member):
                 logger.info(" :=========End Of design===========")
 
                 if design_dictionary[KEY_SEC_PROFILE] in ['Angles', 'Star Angles', 'Back to Back Angles']:
-                    self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                    self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                                material_grade=self.material,
                                                key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.a,
                                                B_b=self.section_size_1.b, T_t=self.section_size_1.thickness)
                 else:
-                    self.min_rad_gyration_calc(self, designation=self.section_size_1.designation,
+                    self.min_rad_gyration_calc(designation=self.section_size_1.designation,
                                                material_grade=self.material,
                                                key=self.sec_profile, subkey=self.loc, D_a=self.section_size_1.depth,
                                                B_b=self.section_size_1.flange_width,
@@ -1631,10 +1643,10 @@ class Tension_welded(Member):
             gyration = self.min_radius_gyration
         else:
             if self.max_limit_status_2 == True:
-                [member_yield_kn, l, slenderness, gyration] = self.max_force_length(self, self.max_gyr)
+                [member_yield_kn, l, slenderness, gyration] = self.max_force_length(self.max_gyr)
                 member_yield_kn = round(member_yield_kn / 1000,2)
             else:
-                [member_yield_kn, l, slenderness, gyration] = self.max_force_length(self, self.max_area)
+                [member_yield_kn, l, slenderness, gyration] = self.max_force_length(self.max_area)
                 member_yield_kn = round(member_yield_kn / 1000,2)
 
         if self.sec_profile == "Channels":

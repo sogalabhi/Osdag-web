@@ -450,7 +450,7 @@ class CommonDesignLogic(object):
         #     angle_r2 = float(str(self.dictangledata["R2"]))
         #
         # elif self.connection == 'SeatedAngle':
-        #     seat_length = self.resultObj['SeatAngle']['Length (mm)']
+        #     seat_length = self.resultObj['SeatedAngle']['Length (mm)']
         #     seat_thick = float(self.dictangledata["t"])
         #     seat_legsizes = str(self.dictangledata["AXB"])
         #     seatangle_A = int(seat_legsizes.split('x')[0])
@@ -458,7 +458,7 @@ class CommonDesignLogic(object):
         #     seatangle_r1 = float(str(self.dictangledata["R1"]))
         #     seatangle_r2 = float(str(self.dictangledata["R2"]))
         #
-        #     topangle_length = self.resultObj['SeatAngle']['Length (mm)']
+        #     topangle_length = self.resultObj['SeatedAngle']['Length (mm)']
         #     topangle_thick = float(self.dicttopangledata["t"])
         #     top_legsizes = str(self.dicttopangledata["AXB"])
         #     topangle_A = int(top_legsizes.split('x')[0])
@@ -1752,7 +1752,7 @@ class CommonDesignLogic(object):
                 for nutbolt in nutboltlist:
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
-            elif component == "SeatAngle":
+            elif component == "SeatedAngle":
                 osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=Quantity_NOC_BLUE1,
                                     update=True)
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
@@ -2294,7 +2294,7 @@ class CommonDesignLogic(object):
             elif self.component == "cleatAngle":
                 cadlist = [self.connectivityObj.angleModel, self.connectivityObj.angleLeftModel] + \
                           self.connectivityObj.nut_bolt_array.get_models()
-            elif self.component == "SeatAngle":
+            elif self.component == "SeatedAngle":
                 cadlist = [self.connectivityObj.topclipangleModel, self.connectivityObj.angleModel] + \
                           self.connectivityObj.nut_bolt_array.get_models()
             else:

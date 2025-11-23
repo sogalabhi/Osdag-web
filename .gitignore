@@ -61,9 +61,6 @@ file_storage/cad_models/*.brep
 file_storage/cad_models/*.obj
 file_storage/cad_models/*.iges
 file_storage/cad_models/*.step
-
-
-osifiles/*.osisettings.py
-osdag_core/data/ResourceFiles/**/__init__.py
-osdag_core/__init__.py
-osdag_core/data/__init__.py
+file_storage/cad_models/*.stp
+file_storage/cad_models/*.glb
+file_storage/

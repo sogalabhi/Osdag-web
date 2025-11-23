@@ -5,7 +5,6 @@ import { cleatAngleOutputConfig } from "../configs/cleatAngleOutputConfig";
 import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 const CleatAngleOutputDock = ({ output, extraState }) => {
-  console.log("CleatAngleOutputDock received:", { output, extraState });
   return (
     <BaseOutputDock
       output={output}

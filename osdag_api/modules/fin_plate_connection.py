@@ -36,7 +36,7 @@ from OCC.Core.IGESControl import IGESControl_Writer
 
 # from OCC.Core.StlAPI import StlAPI_Writer
 # from OCC.Core.TopoDS import TopoDS_Solid, TopoDS_Shell
-from cad.common_logic import CommonDesignLogic
+from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 from osdag_core.custom_logger import CustomLogger
@@ -46,6 +46,7 @@ import typing
 from typing import Dict, Any, List
 import traceback
 import json
+from osdag_api.modules.mesh_export import write_stl
 
 old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
@@ -477,6 +478,12 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
                     part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
                     BRepTools.breptools.Write(part_shape, part_file_path_rel, Message_ProgressRange())
                     part_files[part] = part_file_path_rel
+                    # Also write STL for this part
+                    try:
+                        part_stl_rel = part_file_path_rel.replace(".brep", ".stl")
+                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_rel))
+                    except Exception as stle:
+                        print(f"Failed to write STL for part {part}: {stle}")
                 except Exception as e:
                     print(f"Failed to build/write part {part}: {e}")
 
@@ -517,6 +524,10 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
                         {"name": name, "brepPath": part_files.get(name)} for name in part_names if part_files.get(name)
                     ]
                 }
+                # add stlPath for parts
+                for entry in manifest["parts"]:
+                    if entry.get("brepPath"):
+                        entry["stlPath"] = entry["brepPath"].replace(".brep", ".stl")
                 manifest_path = file_path.replace(".brep", ".parts.json")
                 full_manifest_path = os.path.join(os.getcwd(), manifest_path)
                 with open(full_manifest_path, "w", encoding="utf-8") as mf:
@@ -544,18 +555,23 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
                 print(f"IGES file saved at {full_iges_file_path}")
             else:
                 print("Warning: Failed to save IGES file!")
-
-            # stl_writer = StlAPI_Writer()
-            # stl_file_path = file_path.replace(".brep", ".stl")
-            # full_stl_file_path = os.path.join(os.getcwd(), stl_file_path)
-
-            # # Only save STL if model is solid or shell
-            # if isinstance(model, (TopoDS_Solid, TopoDS_Shell)):
-            #     stl_writer.Write(model, full_stl_file_path)
-            #     print(f"STL file saved at {full_stl_file_path}")
-            # else:
-            #     print(" STL not saved because model is not a Solid or Shell.")
+            # Write merged STL for Model
+            try:
+                merged_stl_rel = file_path.replace(".brep", ".stl")
+                write_stl(model, os.path.join(os.getcwd(), merged_stl_rel))
+                print(f"STL file saved at {os.path.join(os.getcwd(), merged_stl_rel)}")
+            except Exception as stle:
+                print(f"Warning: Failed to save merged STL: {stle}")
     except Exception as e : 
         print('Writing to BREP file failed e : ' , e)
-    
+
+    # For non-Model sections, export single STL next to BREP
+    if section != "Model":
+        try:
+            single_stl_rel = file_path.replace(".brep", ".stl")
+            write_stl(model, os.path.join(os.getcwd(), single_stl_rel))
+            print(f"STL file saved at {os.path.join(os.getcwd(), single_stl_rel)}")
+        except Exception as stle:
+            print(f"Warning: Failed to save STL for {section}: {stle}")
+
     return file_path

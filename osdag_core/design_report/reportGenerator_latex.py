@@ -482,17 +482,35 @@ class CreateLatex(Document):
 
         with doc.create(Section('Design Log')):
             doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
-            logger_msgs=reportsummary['logger_messages'].split('\n')
-            for msg in logger_msgs:
-                if('WARNING' in msg):
-                    colour='blue'
-                elif('INFO' in msg):
-                    colour='OsdagGreen'
-                elif('ERROR' in msg):
-                    colour='red'
+            logger_msgs = reportsummary.get('logger_messages', [])
+            if isinstance(logger_msgs, str):
+                logger_msgs = logger_msgs.split('\n')
+            elif not isinstance(logger_msgs, list):
+                logger_msgs = [str(logger_msgs)]
+            for idx, log_entry in enumerate(logger_msgs):
+                if isinstance(log_entry, dict):
+                    msg = log_entry.get('message', '')
+                    log_type = log_entry.get('type', '').upper()
+                    if log_type == 'WARNING':
+                        colour = 'blue'
+                    elif log_type == 'INFO':
+                        colour = 'OsdagGreen'
+                    elif log_type == 'ERROR':
+                        colour = 'red'
+                    else:
+                        colour = 'black'
+                    doc.append(TextColor(colour, '\n' + msg))
                 else:
-                    continue
-                doc.append(TextColor(colour,'\n'+msg))
+                    # Fall back for plain string messages
+                    if 'WARNING' in str(log_entry):
+                        colour = 'blue'
+                    elif 'INFO' in str(log_entry):
+                        colour = 'OsdagGreen'
+                    elif 'ERROR' in str(log_entry):
+                        colour = 'red'
+                    else:
+                        colour = 'black'
+                    doc.append(TextColor(colour, '\n' + str(log_entry)))
         try:
             script_dir = os.path.dirname(os.path.abspath(__file__))
 

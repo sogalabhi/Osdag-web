@@ -135,7 +135,6 @@ export default (state, action) => {
     // DESIGN & CAD ACTIONS - Consolidated and simplified
     // ===================================================================
     case "SET_DESIGN_DATA_AND_LOGS":
-      console.log("[SET_DESIGN_DATA_AND_LOGS] action.payload:", action.payload);
       return {
         ...state,
         designData: action.payload.data || {},
@@ -153,6 +152,18 @@ export default (state, action) => {
       return {
         ...state,
         cadModelPaths: action.payload || {},
+      };
+
+    case "SET_HOVER_DICT":
+      console.log('[ModuleReducer] SET_HOVER_DICT action received');
+      console.log('[ModuleReducer] action.payload:', action.payload);
+      console.log('[ModuleReducer] action.payload type:', typeof action.payload);
+      console.log('[ModuleReducer] action.payload keys:', action.payload ? Object.keys(action.payload) : 'N/A');
+      const newHoverDict = action.payload || {};
+      console.log('[ModuleReducer] Setting hoverDict to:', newHoverDict);
+      return {
+        ...state,
+        hoverDict: newHoverDict,
       };
 
     // ===================================================================

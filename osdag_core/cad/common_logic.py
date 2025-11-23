@@ -159,8 +159,8 @@ from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
 # from Connections.Shear.cleatAngle.reportGenerator import save_html as cleat_save_html
 # from Connections.Shear.SeatedAngle.design_report_generator import ReportGenerator
 # ----------------------------------------- from reportGenerator import save_html
-from osdag.cad.items.plate import Plate
-from osdag.cad.items.angle import Angle
+from osdag_core.cad.items.plate import Plate
+from osdag_core.cad.items.angle import Angle
 from ..utils.common.component import ISection as ISectionComponent
 from ..utils.common.component import Column
 from ..utils.common.component import Beam
@@ -254,6 +254,8 @@ class CommonDesignLogic(object):
         '''
         boltHeadDia = {5: 8, 6: 10, 8: 13, 10: 16, 12: 18, 14: 21, 16: 24, 18: 27, 20: 30, 22: 34, 24: 36, 27: 41,
                        30: 46, 33: 50, 36: 55, 39: 60, 42: 65, 45: 70, 48: 75, 52: 80, 56: 85, 60: 90, 64: 95, 72: 110}
+        if boltDia not in boltHeadDia:
+            raise ValueError(f"Invalid bolt diameter: {boltDia}")
         return boltHeadDia[boltDia]
 
     def boltLength_Calculation(self, boltDia):
@@ -472,7 +474,7 @@ class CommonDesignLogic(object):
         #     angle_r2 = float(str(self.dictangledata["R2"]))
         #
         # elif self.connection == 'SeatedAngle':
-        #     seat_length = self.resultObj['SeatAngle']['Length (mm)']
+        #     seat_length = self.resultObj['SeatedAngle']['Length (mm)']
         #     seat_thick = float(self.dictangledata["t"])
         #     seat_legsizes = str(self.dictangledata["AXB"])
         #     seatangle_A = int(seat_legsizes.split('x')[0])
@@ -480,7 +482,7 @@ class CommonDesignLogic(object):
         #     seatangle_r1 = float(str(self.dictangledata["R1"]))
         #     seatangle_r2 = float(str(self.dictangledata["R2"]))
         #
-        #     topangle_length = self.resultObj['SeatAngle']['Length (mm)']
+        #     topangle_length = self.resultObj['SeatedAngle']['Length (mm)']
         #     topangle_thick = float(self.dicttopangledata["t"])
         #     top_legsizes = str(self.dicttopangledata["AXB"])
         #     topangle_A = int(top_legsizes.split('x')[0])
@@ -2124,7 +2126,7 @@ class CommonDesignLogic(object):
                 for nutbolt in nutboltlist:
                     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
-            elif component == "SeatAngle":
+            elif component == "SeatedAngle":
                 osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=Quantity_NOC_BLUE1, update=True)
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
                 nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
@@ -2791,7 +2793,7 @@ class CommonDesignLogic(object):
             elif self.component == "cleatAngle":
                 cadlist = [self.connectivityObj.angleModel, self.connectivityObj.angleLeftModel] + \
                           self.connectivityObj.nut_bolt_array.get_models()
-            elif self.component == "SeatAngle":
+            elif self.component == "SeatedAngle":
                 cadlist = [self.connectivityObj.topclipangleModel, self.connectivityObj.angleModel] + \
                           self.connectivityObj.nut_bolt_array.get_models()
             else:

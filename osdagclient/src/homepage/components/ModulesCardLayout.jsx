@@ -18,13 +18,26 @@ const TabbedModulePage = () => {
 
   const submodules = MODULE_SUBMODULES[moduleName] || [];
   const [activeSubmodule, setActiveSubmodule] = useState(submodules[0]?.key);
-
+  const [activeSubSubmodule, setActiveSubSubmodule] = useState("");
   const [selectedModule, setSelectedModule] = useState(null);
   const [showProjectModal, setShowProjectModal] = useState(false);
 
+  // Update activeSubmodule when moduleName or submodules change
   useEffect(() => {
     setActiveSubmodule(submodules[0]?.key);
   }, [moduleName, submodules]);
+
+  // Derive content based on activeSubmodule
+  const content =
+    moduleName === "Connections"
+      ? CONNECTIONS_TAB_CONTENT[activeSubmodule] || []
+      : GENERIC_SUBMODULE_CONTENT[activeSubmodule] || [];
+
+  // Sync activeSubSubmodule to first section label when activeSubmodule or content changes
+  useEffect(() => {
+    const firstLabel = content[0]?.label || "";
+    setActiveSubSubmodule(firstLabel);
+  }, [activeSubmodule, content]);
 
   // Improved route resolver for EndPlate and moment cases
   const getRoute = (optionKey, sectionLabel) => {
@@ -101,10 +114,8 @@ const TabbedModulePage = () => {
     return <div className="p-8">Module not found</div>;
   }
 
-  const content =
-    moduleName === "Connections"
-      ? CONNECTIONS_TAB_CONTENT[activeSubmodule] || []
-      : GENERIC_SUBMODULE_CONTENT[activeSubmodule] || [];
+  // Filter content to show only the section matching activeSubSubmodule
+  const filteredContent = content.filter((section) => section.label === activeSubSubmodule);
 
   return (
     <div className="w-full p-4 sm:p-8 dark:text-gray-300">
@@ -124,16 +135,30 @@ const TabbedModulePage = () => {
         ))}
       </div>
 
-      {/* Section Cards */}
-      <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row flex-wrap gap-4 justify-center md:justify-start">
-        {content.map((section) => (
-          <SectionCards
-            key={section.label}
-            section={section}
-            onModuleClick={handleModuleClick}
-          />
+      {/* Sub-SubModules Tabs */}
+      {activeSubmodule==="Moment" && <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2">
+        {content.map(({ label }) => (
+          <button
+            key={label}
+            onClick={() => setActiveSubSubmodule(label)}
+            className={`flex-shrink-0 flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border-2 rounded-xl transition-colors duration-150 ${activeSubSubmodule === label
+                ? "bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green"
+                : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300 dark:hover:text-osdag-green"
+              }`}
+          >
+            {label}
+          </button>
         ))}
-      </div>
+      </div>}
+
+      {/* Section Cards */}
+      {selectedModule !== "Moment Connection" && (
+        <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row flex-wrap gap-4 justify-center md:justify-start">
+          {filteredContent.map((section) => (
+            <SectionCards key={section.label} section={section} onModuleClick={handleModuleClick} />
+          ))}
+        </div>
+      )}
 
       {/* Project Modal */}
       <ProjectNameModal
@@ -148,7 +173,6 @@ const TabbedModulePage = () => {
       />
     </div>
   );
-
 };
 
 export default TabbedModulePage;

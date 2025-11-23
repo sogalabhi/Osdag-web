@@ -15,12 +15,13 @@ export const menuItems = [
     label: "File",
     dropdown: [
       { name: "Load Input", shortcut: "Ctrl+L" },
-      { name: "Save Input", shortcut: "Alt+N" },
-      { name: "Download Input", shortcut: "Alt+D" },
+      { name: "Save Input", shortcut: "Ctrl+S" },
+      // { name: "Download Input", shortcut: "Alt+D" },
       { name: "Save Log Messages", shortcut: "Alt+M" },
       { name: "Create Design Report", shortcut: "Alt+C" },
       { name: "Save 3D Model", shortcut: "Alt+3" },
-      { name: "Save Cad Image", shortcut: "Alt+1" },
+      { name: "Save Cad Image", shortcut: "Alt+I" },
+      { name: "Quit", shortcut: "Shift+Q" }
     ],
   },
   {
@@ -34,9 +35,13 @@ export const menuItems = [
       { name: "Zoom Out", shortcut: "Ctrl+O" },
       { name: "Pan", shortcut: "Ctrl+P" },
       { name: "Rotate 3D Model", shortcut: "Ctrl+R" },
+      { name: "Show front view", shortcut: "Alt+Shift+F" },
+      { name: "Show top view", shortcut: "Alt+Shift+T" },
+      { name: "Show side view", shortcut: "Alt+Shift+S" },
       { name: "Model" },
       { name: "Beam" },
       { name: "Column" },
+      { name: "Seated Angle" },
       { name: "Change Background" },
     ],
   },
@@ -54,6 +59,7 @@ export const menuItems = [
       { name: "Design Examples" },
       { name: "Ask us a question" },
       { name: "About Osdag" },
+      { name: "Check For Update" }
     ],
   },
 ];

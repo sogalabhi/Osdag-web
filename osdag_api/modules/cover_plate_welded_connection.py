@@ -33,8 +33,8 @@ from OCC.Core import BRepTools
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.Message import Message_ProgressRange
-from cad.common_logic import CommonDesignLogic
-from design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
+from osdag_core.cad.common_logic import CommonDesignLogic
+from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 import sys
 import os
 import typing

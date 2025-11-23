@@ -3,7 +3,7 @@ export const endPlateConfig = {
   routePath: "/design/connections/shear/end_plate",
   designType: "End-Plate-Connection",
   cameraKey: "EndPlate",
-  cadOptions: ["Model", "Beam", "Column", "EndPlate"],
+  cadOptions: ["Model", "Beam", "Column", "Plate"],
 
   // IMPROVEMENT: Removed hardcoded defaults for API-driven lists (e.g., beam_section).
   // Defaults should be set dynamically after fetching data to prevent mismatches.
