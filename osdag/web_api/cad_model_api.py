@@ -88,11 +88,11 @@ class CADGeneration(View):
         elif session_type == "SeatedAngleConnection":
             sections = ["Model", "Beam", "Column", "SeatedAngle"]
         elif session_type == "CoverPlateBolted":
-            sections = ["Model", "Beam", "Plate"]
+            sections = ["Model", "Beam", "Connector"]
         elif session_type == "BeamBeamEndPlate":
             sections = ["Model", "Beam", "EndPlate"]
         elif session_type == "CoverPlateWelded":
-            sections = ["Model", "Beam", "Plate"]
+            sections = ["Model", "Beam", "Connector"]
         elif session_type == "BeamToColumnEndPlate":
             sections = ["Model", "Beam", "Column", "Connector"]
         elif session_type == "TensionMember":

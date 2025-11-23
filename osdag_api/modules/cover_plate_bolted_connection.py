@@ -6,9 +6,11 @@ from OCC.Core import BRepTools
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.Message import Message_ProgressRange
+from osdag_api.modules.mesh_export import write_stl
+import json
 from cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
-from design_type.connection.beam_cover_plate import BeamCoverPlate
+from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
 import sys
 import os
 from typing import Dict, Any, List
@@ -265,6 +267,7 @@ def create_module() -> BeamCoverPlate:
 def create_from_input(input_values: Dict[str, Any]) -> BeamCoverPlate:
     """Create an instance of the FinPlateConnection module design class from input values."""
     # validate_input(input_values)
+    module = None
     try : 
         module = create_module()  # Create module instance.
     except Exception as e : 
@@ -299,6 +302,18 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     module = create_from_input(input_values)  # Create module from input.
     print('module : ' , module)
     print('type of module : ' , type(module))
+
+    # --- LOGGER EXTRACTION ---
+    logs = []
+
+    try:
+        if hasattr(module, "logger") and hasattr(module.logger, "get_logs"):
+            logs = module.logger.get_logs()
+        else:
+            logs = []
+    except Exception as e:
+        print("Error extracting logs:", e)
+        logs = []
 
     # Generate output values in unformatted form.
     raw_output_text = module.output_values(True)
@@ -351,7 +366,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         for visible in [rest[0] if rest else True]
     ]
     
-    logs = module.logs
     raw_output = ( 
         raw_output_text +
         raw_member_capacity + 
@@ -379,72 +393,168 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Beam", "CoverPlate"):  # Error checking: If section is valid.
-        raise InvalidInputTypeError(
-            "section", "'Model', 'Beam' or 'CoverPlate'")
-    module = create_from_input(input_values)  # Create module from input.
-    print('module from input values : ' , module)
-    # Object that will create the CAD model.
-    try : 
-        cld = CommonDesignLogic(None, '', module.module , module.mainmodule)
-    except Exception as e : 
-        print('error in cld e : ' , e)
-    
-    try : 
-        # Setup the calculations object for generating CAD model.
-        mcc.setup_for_cad(cld, module)
-    except Exception as e : 
-        traceback.print_exc()
-        print('Error in setting up cad e : ' , e)
 
-    # The section of the module that will be generated.
-    cld.component = section
-    
-    try : 
-        model = cld.create2Dcad()  # Generate CAD Model.
-    except Exception as e :
-        print('Error in cld.create2Dcad() e : ' , e)
+    # Valid sections
+    if section not in ("Model", "Beam", "Connector"):
+        raise InvalidInputTypeError(
+            "section", "'Model', 'Beam', 'Plate'"
+        )
+
+    # Create module from JSON input
+    module = create_from_input(input_values)
+    print("module from input values:", module)
+
+    # CAD logic object
+    try:
+        cld = CommonDesignLogic(None, "", module.module, module.mainmodule)
+    except Exception as e:
+        print("error in cld:", e)
+
+    # Setup design logic for CAD generation
+    try:
+        mcc.setup_for_cad(cld, module)
+    except Exception as e:
+        traceback.print_exc()
+        print("Error in setting up CAD:", e)
+
+    part_names = ["Model", "Beam", "CoverPlate"]
+    part_files = {}
+    compound_model = None
+
+    try:
+        if section == "Model":
+            from OCC.Core.BRep import BRep_Builder
+            from OCC.Core.TopoDS import TopoDS_Compound
+
+            builder = BRep_Builder()
+            compound = TopoDS_Compound()
+            builder.MakeCompound(compound)
+
+            for part in part_names:
+                try:
+                    cld.component = part
+                    part_shape = cld.create2Dcad()
+                    if part_shape is None:
+                        continue
+
+                    # Add to combined model
+                    builder.Add(compound, part_shape)
+
+                    # Save per-part BREP
+                    part_file_name = f"{session}_{part}.brep"
+                    part_rel_path = os.path.join(
+                        "file_storage", "cad_models", part_file_name
+                    )
+                    BRepTools.breptools.Write(
+                        part_shape, part_rel_path, Message_ProgressRange()
+                    )
+                    part_files[part] = part_rel_path
+
+                    # Also write per-part STL
+                    try:
+                        part_stl_rel = part_rel_path.replace(".brep", ".stl")
+                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_rel))
+                    except Exception as stle:
+                        print(f"Failed to write STL for {part}: {stle}")
+
+                except Exception as e:
+                    print(f"Failed to build/write part {part}: {e}")
+
+            cld.component = section
+            compound_model = compound
+
+        if compound_model is not None:
+            model = compound_model
+        else:
+            cld.component = section
+            model = cld.create2Dcad()
+
+    except Exception as e:
+        print("Error in cld.create2Dcad():", e)
         return False
 
-    # check if the cad_models folder exists or not 
-    # if no, then create one 
-    if(not os.path.exists(os.path.join(os.getcwd() , "file_storage/cad_models/"))) :
-        print('path does not exists cad_models , creating one')
-        os.mkdir(os.path.join(os.getcwd() , "file_storage/cad_models/"))
-      
-    print('2d model : ' , model)
-    # os.system("clear")  # clear the terminal
+    # Ensure output folder exists
+    cad_dir = os.path.join(os.getcwd(), "file_storage", "cad_models")
+    if not os.path.exists(cad_dir):
+        print("cad_models folder missing → creating it")
+        os.makedirs(cad_dir, exist_ok=True)
+
     file_name = session + "_" + section + ".brep"
-    file_path = "file_storage/cad_models/" + file_name
-    print('brep file path in create_cad_model : ' , file_path)
+    file_path = os.path.join("file_storage", "cad_models", file_name)
 
-    try : 
-        BRepTools.breptools.Write(model, file_path, Message_ProgressRange()) # Generate CAD Model
-        
+    print("Saving BREP to:", file_path)
+
+    try:
+        BRepTools.breptools.Write(model, file_path, Message_ProgressRange())
+
         if section == "Model":
-            # Save STEP
-            step_writer = STEPControl_Writer()
-            step_writer.Transfer(model, STEPControl_AsIs)
-            step_file_path = file_path.replace(".brep", ".step")
-            full_step_file_path = os.path.join(os.getcwd(), step_file_path)
-            if step_writer.Write(full_step_file_path) == 1:
-                print(f"STEP file saved at {full_step_file_path}")
-            else:
-                print("Warning: Failed to save STEP file!")
+            try:
+                manifest = {
+                    "session": session,
+                    "mergedBrep": file_path,
+                    "parts": [
+                        {"name": name, "brepPath": part_files.get(name)}
+                        for name in part_names if part_files.get(name)
+                    ]
+                }
 
-            # Save IGES
-            iges_writer = IGESControl_Writer()
-            iges_writer.AddShape(model)
-            iges_file_path = file_path.replace(".brep", ".iges")
-            full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
-            if iges_writer.Write(full_iges_file_path) == 1:
-                print(f"IGES file saved at {full_iges_file_path}")
-            else:
-                print("Warning: Failed to save IGES file!")
-        
-    except Exception as e : 
-        print('Writing to BREP file failed e : ' , e)
-    
+                for entry in manifest["parts"]:
+                    if entry.get("brepPath"):
+                        entry["stlPath"] = entry["brepPath"].replace(".brep", ".stl")
+
+                manifest_path = file_path.replace(".brep", ".parts.json")
+                full_manifest_path = os.path.join(os.getcwd(), manifest_path)
+
+                with open(full_manifest_path, "w", encoding="utf-8") as mf:
+                    json.dump(manifest, mf)
+
+                print(f"Parts manifest saved at {full_manifest_path}")
+
+            except Exception as me:
+                print("Warning: Failed to write manifest:", me)
+
+            try:
+                step_writer = STEPControl_Writer()
+                step_writer.Transfer(model, STEPControl_AsIs)
+                step_out = os.path.join(
+                    os.getcwd(), file_path.replace(".brep", ".step")
+                )
+                if step_writer.Write(step_out) == 1:
+                    print("STEP saved:", step_out)
+            except Exception as e:
+                print("STEP export failed:", e)
+
+            try:
+                iges_writer = IGESControl_Writer()
+                iges_writer.AddShape(model)
+                iges_out = os.path.join(
+                    os.getcwd(), file_path.replace(".brep", ".iges")
+                )
+                if iges_writer.Write(iges_out) == 1:
+                    print("IGES saved:", iges_out)
+            except Exception as e:
+                print("IGES export failed:", e)
+
+            try:
+                merged_stl = os.path.join(
+                    os.getcwd(), file_path.replace(".brep", ".stl")
+                )
+                write_stl(model, merged_stl)
+                print("Merged STL saved:", merged_stl)
+            except Exception as e:
+                print("Merged STL export failed:", e)
+
+    except Exception as e:
+        print("Writing BREP failed:", e)
+
+    if section != "Model":
+        try:
+            stl_path = os.path.join(
+                os.getcwd(), file_path.replace(".brep", ".stl")
+            )
+            write_stl(model, stl_path)
+            print("STL saved:", stl_path)
+        except Exception as stle:
+            print(f"Warning: STL save failed for {section}: {stle}")
+
     return file_path
-
-
