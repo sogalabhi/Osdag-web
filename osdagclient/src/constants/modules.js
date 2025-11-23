@@ -108,7 +108,7 @@ export const MODULE_NAME_TO_KEY = {
     "Tension Member Bolted Design": "BoltedToEndGusset",
     // Moment Connection
     "Beam-to-Column End Plate Connection": "BeamColumnEndPlate",
-    "Beam-to-Beam Cover Plate Bolted Connection": "CoverPlateBolted",
+    "Beam-to-Beam-Cover-Plate-Bolted-Connection": "CoverPlateBolted",
     "Beam-to-Beam-Cover-Plate-Welded-Connection": "CoverPlateWelded",
     "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
 };
