@@ -335,6 +335,7 @@ const LoginPage = () => {
     };
 
     // 🔹 Google Sign-In logic
+    
   const googleLogin = async () => {
     setIsLoading(true);
     try {
@@ -666,9 +667,39 @@ const LoginPage = () => {
                                     id="check"
                                     className="h-4 w-4 text-osdag-green border-gray-300 rounded focus:ring-osdag-green"
                                 />
-                                <label htmlFor="check" className="ml-2 text-sm font-medium cursor-pointer">
+                                {/* <label htmlFor="check" className="ml-2 text-sm font-medium cursor-pointer">
                                     Terms and Conditions
-                                </label>
+                                </label> */}
+                                <label
+                                    htmlFor="check"
+                                    className="ml-2 text-sm font-medium cursor-pointer underline"
+                                    onClick={() => {
+                                        const width = 500;
+                                        const height = 300;
+                                        const left = window.screenX + (window.outerWidth - width) / 2;
+                                        const top = window.screenY + (window.outerHeight - height) / 2;
+
+                                        const popup = window.open(
+                                        "",
+                                        "TermsAndConditions",
+                                        `width=${width},height=${height},left=${left},top=${top}`
+                                        );
+
+                                        popup.document.write(`
+                                        <html>
+                                            <head>
+                                            <title>Terms & Conditions</title>
+                                            </head>
+                                            <body style="font-family: Arial; text-align:center; margin-top:50px;">
+                                            <h2>🚧 Under Development 🚧</h2>
+                                            </body>
+                                        </html>
+                                        `);
+                                    }}
+                                    >
+                                    Terms and Conditions
+                                    </label>
+
                             </div>
                         )}    
                         {/* CAPTCHA */}

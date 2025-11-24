@@ -88,29 +88,23 @@ class FirebaseLoginView(APIView):
             if not email:
                 return Response({"error": "Email not found in token"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # ✅ Check if user already exists by email
-            # try:
-            #     user = User.objects.get(email=email)
-            # except User.DoesNotExist:
-            #     return Response(
-            #         {"error": "Email does not exist. Please register first."},
-            #         status=status.HTTP_400_BAD_REQUEST
-            #     )
+            # ✅ AUTO-CREATE USER IF NOT EXISTS
             try:
-                user = User.objects.filter(email=email).first()
-                if not user:
-                    return Response(
-                        {"error": "Email does not exist. Please register first."},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-            except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                user = User.objects.get(email=email)
+                created = False
+            except User.DoesNotExist:
+                user = User.objects.create(
+                    email=email,
+                    username=email.split("@")[0]
+                )
+                created = True
+            print(f"User {email} logged in successfully.")
 
             # 3️⃣ Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
             return Response(
-                {"message": "Login successful", "email": email, "uid": uid, "access": access_token,
+                {"message": "Login successful", "email": email, "uid": uid, "created": created, "access": access_token,
                 "refresh": str(refresh)},
                 status=status.HTTP_200_OK,
             )
