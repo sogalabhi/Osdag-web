@@ -29,9 +29,6 @@ from ...utils.common.load import Load
 import logging
 
 import math
-
-from PyQt5.QtCore import Qt
-
 class ButtJointWelded(MomentConnection):
     def __init__(self):
         super(ButtJointWelded, self).__init__()
@@ -402,6 +399,7 @@ class ButtJointWelded(MomentConnection):
         return KEY_DISP_BUTTJOINTWELDED
 
     def call_3DColumn(self, ui, bgcolor):
+        from PyQt5.QtCore import Qt
         # status = self.resultObj['Bolt']['status']
         # if status is True:
         #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
