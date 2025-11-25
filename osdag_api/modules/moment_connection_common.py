@@ -1,6 +1,6 @@
-from cad.common_logic import CommonDesignLogic
+from osdag_core.cad.common_logic import CommonDesignLogic  # Changed to osdag_core as ButtJointedBoltedCad is present there.
 from OCC.Display.backend import *
-from Common import *
+from osdag_core.Common import *
 def setup_for_cad(cdl: CommonDesignLogic, module_class):
     """Sets up the CommonLogicObjct before generating CAD"""
     print('SETTING UP FOR CAD', module_class)
@@ -16,3 +16,5 @@ def setup_for_cad(cdl: CommonDesignLogic, module_class):
         cdl.CPObj = cdl.createBBCoverPlateCAD()
     if module_object.module == "Beam-to-Column End Plate Connection":
         cdl.CPObj = cdl.createBCEndPlateCAD() # Initialize the CAD object for beam-column end plate
+    if module_object.module == KEY_DISP_BUTTJOINTBOLTED:
+        cdl.ButtJointBoltedObj = cdl.createButtJointBoltedCAD()

@@ -9,6 +9,8 @@ developed_modules = [
     "Cover-Plate-Welded-Connection",
     "Beam-Beam-End-Plate-Connection",
     "Beam-to-Column-End-Plate-Connection",
+    "Butt-Joint-Welded",
+    "Butt-Joint-Bolted",
     "Tension-Member-Bolted-Design",
     "Simply-Supported-Beam"
 ]
@@ -60,6 +62,18 @@ module_dict = [
         "key": "Beam-to-Column-End-Plate-Connection",
         "image": "/static/images/modules/beam_to_column_end_plate_connection.png",
         "name": "Beam-to-Column End Plate",
+        "path": "Connection/Moment Connection"
+    },
+    {
+        "key": "Butt-Joint-Welded",
+        "image": "/static/images/modules/butt_joint_welded.png",
+        "name": "Butt Joint Welded",
+        "path": "Connection/Moment Connection"
+    },
+    {
+        "key": "Butt-Joint-Bolted",
+        "image": "/static/images/modules/butt_joint_bolted.png",
+        "name": "Butt Joint Bolted",
         "path": "Connection/Moment Connection"
     },
     {
