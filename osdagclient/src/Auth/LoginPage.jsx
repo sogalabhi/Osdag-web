@@ -479,7 +479,7 @@ const LoginPage = () => {
         if (captcha && canvasRef.current) {
         drawCaptcha(captcha);
         }
-    }, [captcha]);
+    }, [captcha, canvasRef.current]);
 
      // Generate once on mount
     useEffect(() => {
@@ -901,12 +901,7 @@ const LoginPage = () => {
                 </div>
             </Modal>
 
-            {/* Footer */}
-            <p className="text-xs text-gray-400 mt-6 text-center">
-                This site is protected by reCAPTCHA and the Google <br />
-                <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a> and{" "}
-                <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> apply.
-            </p>
+            
             </div>
             </section> 
         </>
