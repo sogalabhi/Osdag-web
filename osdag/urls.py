@@ -21,6 +21,8 @@ from osdag.web_api.coverplatebolted_outputView import CoverPlateBoltedOutputData
 from osdag.web_api.beambeamendplate_outputView import BeamBeamEndPlateOutputData
 from osdag.web_api.cover_plate_weld_output import CoverPlateWeldedOutputData
 from osdag.web_api.beam_to_column_endplate_output import BeamToColumnEndPlateOutputData
+from osdag.web_api.butt_joint_bolted_output import ButtJointBoltedOutputView
+from osdag.web_api.butt_joint_welded_output import ButtJointWeldedOutputView
 from osdag.web_api.tensionmemberbolted_outputView import TensionMemberBoltedOutputData
 from osdag.web_api.tensionmemberwelded_outputView import TensionMemberWeldedOutputData
 from osdag.web_api.simplysupportedbeam_outputView import SimplySupportedBeamOutputData
@@ -125,6 +127,10 @@ urlpatterns = [
     
     path('calculate-output/Beam-to-Column-End-Plate-Connection',
          BeamToColumnEndPlateOutputData.as_view(), name='Beam-to-Column-End-Plate-Connection'),
+    path('calculate-output/Butt-Joint-Welded',
+         ButtJointWeldedOutputView.as_view(), name='Butt-Joint-Welded'),
+    path('calculate-output/Butt-Joint-Bolted',
+         ButtJointBoltedOutputView.as_view(), name='Butt-Joint-Bolted'),
     
     path('calculate-output/Tension-Member-Bolted-Design',
          TensionMemberBoltedOutputData.as_view(),name="Tension-Member-Bolted-Design"),
