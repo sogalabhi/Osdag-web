@@ -4053,5 +4053,5 @@ class BeamCoverPlate(MomentConnection):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
-
+        return True
 # def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_3d_image):
