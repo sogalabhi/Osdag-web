@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "./firebase";
 import axios from "axios";
+import { clearAuthStorage } from "../utils/auth";
 
 const generateRandomString = (length) => {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -32,6 +33,7 @@ const LoginPage = () => {
         ForgetPassword,
         isLoggedIn,
         setIsLoggedIn,
+        setJWTLogin,
         LoginMessage,
         SignupMessage,
         OTPMessage
@@ -316,6 +318,7 @@ const LoginPage = () => {
         setGeneralError('');
 
         try {
+            clearAuthStorage();
             let guestEmail = `GUEST.${generateRandomString(10)}@gmail.com`;
             const guestPassword = generateRandomString(12);
 
@@ -353,10 +356,24 @@ const LoginPage = () => {
       const response = await axios.post(`${host}/api/auth/firebase-login/`, {
         token: idToken,
       });
-        console.log("Backend Response:", response.data);
-        alert("Login successful!");
-        localStorage.setItem("access", response.data.access);
-        localStorage.setItem("refresh", response.data.refresh);
+        const { data } = response;
+        clearAuthStorage();
+        const resolvedEmail = data?.email || user.email || "";
+        const resolvedUsername =
+          data?.email?.split("@")[0] || user.displayName || "GoogleUser";
+
+        localStorage.setItem("access", data.access);
+        localStorage.setItem("refresh", data.refresh);
+        localStorage.setItem("userType", "user");
+        localStorage.setItem("email", resolvedEmail);
+        localStorage.setItem("username", resolvedUsername);
+
+        // keep context state in sync with storage
+        if (typeof setJWTLogin === "function") {
+          await setJWTLogin(true);
+        } else {
+          setIsLoggedIn(true);
+        }
 
         navigate("/home");
     } catch (error) {

@@ -45,6 +45,13 @@ export const clearTokens = () => {
 };
 
 /**
+ * Clear every auth-related value to avoid stale state across login modes
+ */
+export const clearAuthStorage = () => {
+  clearTokens();
+};
+
+/**
  * Check if token is valid and not expired
  */
 export const isTokenValid = (token) => {

@@ -133,7 +133,10 @@ export const EngineeringModule = ({
 
   // Enforce project presence for authenticated users
   useEffect(() => {
-    if (isGuest()) return; // guests can open without a project
+    if (isGuest()) {
+      console.info('[EngineeringModule] Guest mode detected: skipping project enforcement');
+      return; // guests can open without a project
+    }
     const projectId = getProjectIdFromUrl();
     if (!projectId || Number.isNaN(projectId)) {
       message.warning('No active project. Redirecting to home.');

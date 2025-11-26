@@ -1,6 +1,7 @@
 import { createContext, useEffect, useReducer } from "react";
 import UserReducer from "./UserReducer";
 import jwt_decode from 'jwt-decode';
+import { clearAuthStorage } from "../utils/auth";
 
 // crypto packages
 import { decode as base64_decode, encode as base64_encode } from "base-64";
@@ -285,6 +286,8 @@ export const UserProvider = ({ children }) => {
         console.log("isloggedin inside logging below if response 200" + state.isLoggedIn);
 
         console.log("Line number 194 inside status 200 way to create token...");
+
+        clearAuthStorage();
         
         // create a new jwt token
         if (isGst === false) {
