@@ -184,9 +184,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres_Intg_osdag',
         'USER': 'osdagdeveloper',
-        'PASSWORD': 'osdag',
+        'PASSWORD': 'password',
         'HOST': 'localhost',  # This should be the name of the service
-        'PORT': '5434',
+        'PORT': '5432',
     }
 }
 # Password validation

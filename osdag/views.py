@@ -73,7 +73,7 @@ def dashboard_view(request):
 
 
 if not firebase_admin._apps:
-    cred = credentials.Certificate("./osdag_web/firebase-service-account.json")
+    cred = credentials.Certificate("file_storage/osdag_web/firebase-service-account.json")
     firebase_admin.initialize_app(cred)
 
 class FirebaseLoginView(APIView):

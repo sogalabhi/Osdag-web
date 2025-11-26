@@ -7,7 +7,7 @@ from psycopg import sql
 
 
 conn = psycopg.connect(dbname='postgres_Intg_osdag', host='localhost',
-                        user='osdagdeveloper', password='osdag', port='5434')
+                        user='osdagdeveloper', password='password', port='5432')
 cursor = conn.cursor()
 file = open("ResourceFiles/Database/postgres_Intg_osdag.sql", "r+")
 
