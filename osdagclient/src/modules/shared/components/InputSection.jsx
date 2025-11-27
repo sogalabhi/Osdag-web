@@ -197,7 +197,8 @@ export const InputSection = ({
 
     switch (field.type) {
       case 'select': {
-        const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options);
+        // workaround for simple connections
+        const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options) && !(field.key.includes("plate1") || field.key.includes("plate2"));
         const rawList = Array.isArray(field.options) ? field.options : safeContextData[field.options];
         const options = Array.isArray(field.options) ? field.options : toSelectOptions(rawList);
 
