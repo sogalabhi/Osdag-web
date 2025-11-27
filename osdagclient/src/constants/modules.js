@@ -1,5 +1,6 @@
 export const MODULE_SUBMODULES = {
     Connections: [
+        { key: "Simple", "label": "Simple Connections" },
         { key: "Shear", label: "Shear Connection" },
         { key: "Moment", label: "Moment Connection" },
         { key: "BasePlate", label: "Base Plate" },
@@ -11,6 +12,15 @@ export const MODULE_SUBMODULES = {
 };
 
 export const CONNECTIONS_TAB_CONTENT = {
+    Simple: [
+        {
+            label: "Simple Connections",
+            options: [
+                { key: "ButtJointWelded", label: "Butt Joint Welded", img: "shear_fin_plate_connec.svg" },
+                { key: "ButtJointBolted", label: "Butt Joint Bolted", img: "shear_fin_plate_connec.svg" },
+            ],
+        },
+    ],
     Shear: [
         {
             label: "Shear Connections",
@@ -89,6 +99,8 @@ export const MODULE_ROUTES = {
     CoverPlateBolted: "/design/connections/beam-to-beam-splice/cover_plate_bolted",
     CoverPlateWelded: "/design/connections/beam-to-beam-splice/cover_plate_welded",
     BeamBeamEndPlate: "/design/connections/beam-to-beam-splice/end_plate",
+    ButtJointWelded: "/design/connections/simple/butt_joint_welded",
+    ButtJointBolted: "/design/connections/simple/butt_joint_bolted",
     SimplySupportedBeam: "/design/flexure_member/simply_supported_beam",
     BoltedToEndPlate: "/design/tension-member/bolted_to_end_gusset",
     WeldedToEndPlate: "/design/tension-member/welded_to_end_gusset",
