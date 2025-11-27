@@ -29,6 +29,7 @@ let initialValue = {
   beamList: [],
   columnList: [],
   connectivityList: [],
+  coverPlateList: [],
 
   // Angle-specific (cleat angle, seated angle)
   angleList: [],
@@ -41,6 +42,7 @@ let initialValue = {
   // Welded connection specific
   weldTypes: [],
   weldFab: [],
+  weldSizeList: [],
 
   // End plate specific
   endPlateTypeList: [],
@@ -265,7 +267,7 @@ export const ModuleProvider = ({ children }) => {
 
 
       const data = await response.json();
-      
+
       // Log the API response to debug hover_dict
       console.log('=== [ModuleState] CAD API Response ===');
       console.log('[ModuleState] Response status:', response.status);
@@ -278,7 +280,7 @@ export const ModuleProvider = ({ children }) => {
         console.log('[ModuleState] hover_dict entries:', Object.entries(data.hover_dict));
         console.log('[ModuleState] hover_dict JSON:', JSON.stringify(data.hover_dict, null, 2));
       }
-      
+
       if (!response.ok) {
         let message = data.message || "CAD generation failed";
 
@@ -291,7 +293,7 @@ export const ModuleProvider = ({ children }) => {
 
         // Store CAD data and trigger rendering
         dispatch({ type: "SET_CAD_MODEL_PATHS", payload: data.files });
-        
+
         // Log before dispatching hover_dict
         console.log('[ModuleState] Before dispatch - data.hover_dict:', data.hover_dict);
         if (data.hover_dict) {
@@ -498,7 +500,7 @@ export const ModuleProvider = ({ children }) => {
         default:
           throw new Error(`Unsupported preference action: ${action}`);
       }
-    } catch (error) {   
+    } catch (error) {
       return { success: false, error: error.message };
     }
   }, [dispatch]);
@@ -527,6 +529,8 @@ export const ModuleProvider = ({ children }) => {
         // ===================================================================
         // Common fields for all modules
         materialList: state.materialList,
+        coverPlateList: state.coverPlateList,
+        weldSizeList: state.weldSizeList,
         currentModuleName: state.currentModuleName,
         boltDiameterList: state.boltDiameterList,
         thicknessList: state.thicknessList,
