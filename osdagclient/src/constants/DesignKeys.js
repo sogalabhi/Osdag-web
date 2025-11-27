@@ -35,6 +35,18 @@ export const KEY_DP_DETAILING_GAP = 'Detailing.Gap';
 export const KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'Detailing.Corrosive_Influences';
 export const KEY_DP_DESIGN_METHOD = 'Design.Design_Method';
 
+export const KEY_DP_WELD_FAB = 'Weld.Fab';
+export const KEY_DP_WELD_MATERIAL_G_O = 'Weld.Material_Grade_OverWrite';
+export const KEY_DP_WELD_TYPE = 'Weld.Type';
+export const KEY_DP_DETAILING_PACKING_PLATE = 'Detailing.Packing_Plate';
+
+// Plate and Weld Properties
+export const KEY_WELD_SIZE = 'Weld.Size';
+export const KEY_PLATE1_THICKNESS = "Plate1Thickness";
+export const KEY_PLATE2_THICKNESS = "Plate2Thickness";
+export const KEY_PLATE_WIDTH = "PlateWidth";
+export const KEY_COVER_PLATE = "ButtJoint.CoverPlate";
+
 // Display Keys (for labels)
 export const KEY_DISP_MODULE = 'Module';
 export const KEY_DISP_CONN = 'Connectivity';
@@ -58,6 +70,11 @@ export const KEY_DISP_DETAILING_EDGE_TYPE = 'Edge Type';
 export const KEY_DISP_DETAILING_GAP = 'Detailing Gap';
 export const KEY_DISP_DETAILING_CORROSIVE_INFLUENCES = 'Corrosive Influences';
 export const KEY_DISP_DESIGN_METHOD = 'Design Method';
+export const KEY_DISP_PLATE1_THICKNESS = "Thickness of Plate-1 (mm) *";
+export const KEY_DISP_PLATE2_THICKNESS = "Thickness of Plate-2 (mm) *";
+export const KEY_DISP_PLATE_WIDTH = "Width of Plate (mm) *";
+export const KEY_DISP_WELD_SIZE = 'Weld Size';
+export const KEY_DISP_COVER_PLT = 'Cover Plate *';
 
 // Flexural Member Constants - Must match exactly with Common.py backend constants
 export const KEY_ALLOW_CLASS = 'Design.Allowable_Class';
@@ -82,7 +99,7 @@ export const KEY_SR_FACTOR_LTB = 'SR.LTB';
 export const KEY_NON_DIM_ESR_LTB = 'NDESR.LTB';
 
 // Additional constants for Flexural Member
-export const KEY_DESIGN_TYPE_FLEXURE = "KEY_DESIGN_TYPE_FLEXURE"; 
+export const KEY_DESIGN_TYPE_FLEXURE = "KEY_DESIGN_TYPE_FLEXURE";
 
 // Module Keys - FinPlate
 export const MODULE_KEY_FIN_PLATE = 'FinPlateConnection'; // canonical key for API, state, config
