@@ -20,6 +20,7 @@ class ButtJointWeldedInputData(InputDataBase):
             materialList += custom_material
         materialList.append({"id": -1, "Grade": 'Custom'})
         response['materialList'] = materialList
+        response['coverPlateList'] = ['Single-Cover', 'Double-Cover']
 
         # Thickness
         response['thicknessList'] = [

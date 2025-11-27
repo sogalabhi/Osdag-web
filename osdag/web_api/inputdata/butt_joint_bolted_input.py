@@ -19,7 +19,8 @@ class ButtJointBoltedInputData(InputDataBase):
             materialList += custom_material
         materialList.append({"id": -1, "Grade": 'Custom'})
         response['materialList'] = materialList
-
+        response['coverPlateList'] = ['Single-Cover', 'Double-Cover']
+        
         # Bolts
         boltList = list(Bolt.objects.values_list('Bolt_diameter', flat=True))
         boltList.sort()
