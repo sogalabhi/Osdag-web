@@ -18,6 +18,8 @@ from .inputdata.beam_to_column_end_plate_input import BeamToColumnEndPlateInputD
 from .inputdata.tension_member_bolted_input import TensionMemberBoltedInputData
 from .inputdata.tension_member_welded_input import TensionMemberWeldedInputData
 from .inputdata.simply_supported_beam_input import SimplySupportedBeamInputData
+from .inputdata.butt_joint_welded_input import ButtJointWeldedInputData
+from .inputdata.butt_joint_bolted_input import ButtJointBoltedInputData
 
 INPUT_DATA_FACTORY = {
     'FinPlateConnection': FinPlateInputData(),
@@ -30,7 +32,9 @@ INPUT_DATA_FACTORY = {
     'Beam-to-Column-End-Plate-Connection': BeamToColumnEndPlateInputData(),
     'Tension-Member-Bolted-Design': TensionMemberBoltedInputData(),
     'Tension-Member-Welded-Design': TensionMemberWeldedInputData(),
-    'Simply-Supported-Beam': SimplySupportedBeamInputData()
+    'Simply-Supported-Beam': SimplySupportedBeamInputData(),
+    'Butt-Joint-Welded': ButtJointWeldedInputData(),
+    'Butt-Joint-Bolted': ButtJointBoltedInputData(),
 }
 
 
