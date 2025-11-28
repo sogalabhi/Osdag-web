@@ -215,6 +215,7 @@ def create_from_input(input_values: Dict[str, Any]) -> ButtJointWelded:
     try:
         input_values["Weld.Material_Grade_OverWrite"] = "410"
         input_values["Weld.Fab"] = "Shop Weld"
+        input_values["Weld.Type"] = "Shop Weld"
         module.set_input_values(input_values)
         print("in butt_joint_welded.py: set_input_values called successfully")
     except Exception as e:
@@ -232,15 +233,15 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     print("in butt_joint_welded.py: type of module:", type(module))
     raw_output_text = module.output_values(True)
     print("in butt_joint_welded.py: raw_output_text:", raw_output_text)
-    raw_output_spacing = module.spacing(True)
-    print("in butt_joint_welded.py: raw_output_spacing:", raw_output_spacing)
+    # raw_output_spacing = module.spacing(True)
+    # print("in butt_joint_welded.py: raw_output_spacing:", raw_output_spacing)
     # raw_output_capacities = module.capacities(True)
     # print("in butt_joint_welded.py: raw_output_capacities:", raw_output_capacities)
     # raw_output_bolt_capacity = module.bolt_capacity_details(True)
     # print("in butt_joint_welded.py: raw_output_bolt_capacity:", raw_output_bolt_capacity)
     logs = module.logs
     print("in butt_joint_welded.py: logs:", logs)
-    raw_output = raw_output_spacing + raw_output_text
+    raw_output = raw_output_text
     print("in butt_joint_welded.py: raw_output combined:", raw_output)
     for param in raw_output:
         print("in butt_joint_welded.py: Processing param:", param)

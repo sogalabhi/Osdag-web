@@ -45,6 +45,7 @@ class ButtJointWelded(MomentConnection):
         self.weld_fabrication = None
         self.weld_angle = None
         self.weld_length_effective = None
+        self.logs = []
 
 
     ###############################################
@@ -216,7 +217,7 @@ class ButtJointWelded(MomentConnection):
     # Design Preference Functions End
     ####################################
 
-    def set_osdaglogger(key):
+    def set_osdaglogger(self, key):
 
         """
         Function to set Logger for Tension Module
@@ -225,6 +226,12 @@ class ButtJointWelded(MomentConnection):
         # @author Arsil Zunzunia
         global logger
         logger = logging.getLogger('Osdag')
+
+        def add_logs(record):
+            self.logs.append({'msg': record.getMessage()})
+            return True
+        # Checks if it should print the message or not (will always print it as True returned)
+        logger.addFilter(add_logs)
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
@@ -499,7 +506,7 @@ class ButtJointWelded(MomentConnection):
             design_dictionary_with_defaults[KEY_MOMENT] = 0.0  # Default moment value if not provided
         
         # Call parent class method correctly
-        super(ButtJointWelded, self).set_input_values(self,design_dictionary_with_defaults)
+        super(ButtJointWelded, self).set_input_values(design_dictionary_with_defaults)
         print(design_dictionary,"input values are set. Doing preliminary member checks")
         self.module = design_dictionary[KEY_MODULE]
         self.mainmodule = "Butt Joint Welded Connection"
@@ -529,7 +536,6 @@ class ButtJointWelded(MomentConnection):
                             width=design_dictionary[KEY_PLATE_WIDTH])
         
         self.weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
-                         type=design_dictionary[KEY_DP_WELD_TYPE],
                          fabrication=design_dictionary.get(KEY_DP_FAB_SHOP, KEY_DP_FAB_SHOP))
         # Set weld size after creating the weld object
         self.weld.size = design_dictionary[KEY_WELD_SIZE]
@@ -601,7 +607,7 @@ class ButtJointWelded(MomentConnection):
         self.cover_plate = design_dictionary[KEY_COVER_PLATE]
         
         # Start design process
-        self.design_of_weld(self,design_dictionary)
+        self.design_of_weld(design_dictionary)
     
     #========================DESIGN OF WELD==================================================================
     def design_of_weld(self, design_dictionary):
@@ -681,11 +687,11 @@ class ButtJointWelded(MomentConnection):
         else:
             self.gamma_mw = 1.50
         self.weld_design_strength = self.fu / (math.sqrt(3) * self.gamma_mw)
-        self.weld_length(self,design_dictionary)
-        self.weld_strength_verification(self,design_dictionary)
-        self.long_joint_reduction_factor(self)
-        self.check_base_metal_strength(self,design_dictionary)
-        self.calculate_final_utilization_ratio(self)
+        self.weld_length(design_dictionary)
+        self.weld_strength_verification(design_dictionary)
+        self.long_joint_reduction_factor()
+        self.check_base_metal_strength(design_dictionary)
+        self.calculate_final_utilization_ratio()
 
     def weld_length(self, design_dictionary):
         self.plates_width = float(design_dictionary[KEY_PLATE_WIDTH])
