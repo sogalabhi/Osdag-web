@@ -20,7 +20,8 @@ from .inputdata.tension_member_welded_input import TensionMemberWeldedInputData
 from .inputdata.simply_supported_beam_input import SimplySupportedBeamInputData
 from .inputdata.butt_joint_welded_input import ButtJointWeldedInputData
 from .inputdata.butt_joint_bolted_input import ButtJointBoltedInputData
-
+from .inputdata.lap_joint_welded_input import LapJointWeldedInputData
+from .inputdata.lap_joint_bolted_input import LapJointBoltedInputData
 INPUT_DATA_FACTORY = {
     'FinPlateConnection': FinPlateInputData(),
     'Cleat-Angle-Connection': CleatAngleInputData(),
@@ -35,6 +36,8 @@ INPUT_DATA_FACTORY = {
     'Simply-Supported-Beam': SimplySupportedBeamInputData(),
     'Butt-Joint-Welded': ButtJointWeldedInputData(),
     'Butt-Joint-Bolted': ButtJointBoltedInputData(),
+    'Lap-Joint-Welded': LapJointWeldedInputData(),
+    'Lap-Joint-Bolted': LapJointBoltedInputData(),
 }
 
 
