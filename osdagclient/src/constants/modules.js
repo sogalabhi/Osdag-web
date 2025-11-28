@@ -18,6 +18,8 @@ export const CONNECTIONS_TAB_CONTENT = {
             options: [
                 { key: "ButtJointWelded", label: "Butt Joint Welded", img: "shear_fin_plate_connec.svg" },
                 { key: "ButtJointBolted", label: "Butt Joint Bolted", img: "shear_fin_plate_connec.svg" },
+                { key: "LapJointWelded", label: "Lap Joint Welded", img: "shear_fin_plate_connec.svg" },
+                { key: "LapJointBolted", label: "Lap Joint Bolted", img: "shear_fin_plate_connec.svg" },
             ],
         },
     ],
@@ -101,6 +103,8 @@ export const MODULE_ROUTES = {
     BeamBeamEndPlate: "/design/connections/beam-to-beam-splice/end_plate",
     ButtJointWelded: "/design/connections/simple/butt_joint_welded",
     ButtJointBolted: "/design/connections/simple/butt_joint_bolted",
+    LapJointWelded: "/design/connections/simple/lap_joint_welded",
+    LapJointBolted: "/design/connections/simple/lap_joint_bolted",
     SimplySupportedBeam: "/design/flexure_member/simply_supported_beam",
     BoltedToEndPlate: "/design/tension-member/bolted_to_end_gusset",
     WeldedToEndPlate: "/design/tension-member/welded_to_end_gusset",
