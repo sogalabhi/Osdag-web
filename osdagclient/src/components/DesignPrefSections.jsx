@@ -91,6 +91,7 @@ const DesignPrefSections = ({
         detailing_gap: inputs.detailing_gap,
         detailing_corr_status: inputs.detailing_corr_status,
         design_method: inputs.design_method,
+        design_for: inputs.design_for,
       };
     }
   });

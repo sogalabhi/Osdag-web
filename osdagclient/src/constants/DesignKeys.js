@@ -24,6 +24,7 @@ export const KEY_TYP = 'Bolt.Type';
 export const KEY_GRD = 'Bolt.Grade';
 export const KEY_DP_BOLT_HOLE_TYPE = 'Bolt.Bolt_Hole_Type';
 export const KEY_DP_BOLT_SLIP_FACTOR = 'Bolt.Slip_Factor';
+export const KEY_DP_BOLT_TYPE = 'Bolt.TensionType';
 
 // Connector Properties
 export const KEY_CONNECTOR_MATERIAL = 'Connector.Material';
@@ -34,6 +35,7 @@ export const KEY_DP_DETAILING_EDGE_TYPE = 'Detailing.Edge_type';
 export const KEY_DP_DETAILING_GAP = 'Detailing.Gap';
 export const KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'Detailing.Corrosive_Influences';
 export const KEY_DP_DESIGN_METHOD = 'Design.Design_Method';
+export const KEY_DESIGN_FOR = 'Design.For';
 
 export const KEY_DP_WELD_FAB = 'Weld.Fab';
 export const KEY_DP_WELD_MATERIAL_G_O = 'Weld.Material_Grade_OverWrite';
