@@ -6,6 +6,7 @@ export const buttJointWeldedOutputConfig = {
             { key: "Weld.Strength", label: "Strength (N/mm2)" },
             { key: "Weld.EffLength", label: "Eff.Length (mm)" },
             { key: "Design For", label: "Design For" },
+            { key: "Bolt.ConnLength", label: "Length of Connection (mm)" }
             // { key: "bolt.long_joint", label: "Long Joint Red.Factor" },
             // { key: "Weld.Strength_red", label: "Red.Strength(N/mm)" },
             // { key: "Weld.Stress", label: "Stress (N/mm" },
