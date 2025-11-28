@@ -26,6 +26,9 @@ class ButtJointBoltedInputData(InputDataBase):
         boltList.sort()
         response['boltDiameterList'] = boltList
 
+        # Property classes
+        response['propertyClassList'] = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+
         # Thickness
         response['thicknessList'] = [
             '8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50',

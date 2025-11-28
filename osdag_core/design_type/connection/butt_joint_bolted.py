@@ -36,10 +36,10 @@ class ButtJointBolted(MomentConnection):
         self.base_metal_capacity_kN = None
         self.utilization_breakdown = {}
         self.design_error = ''
-        self.spacing = None
         self.packing_plate_thickness = 0.0
         self.beta_pkg = 1.0
         self.calculated_cover_plate_thickness = 0.0
+        self.logs = []
         # Create placeholder files on initialization
         self.create_placeholder_files()
 
@@ -182,7 +182,7 @@ class ButtJointBolted(MomentConnection):
 
         return design
 
-    def set_osdaglogger(key):
+    def set_osdaglogger(self, key):
 
         """
         Function to set Logger for Tension Module
@@ -191,6 +191,12 @@ class ButtJointBolted(MomentConnection):
         # @author Arsil Zunzunia
         global logger
         logger = logging.getLogger('Osdag')
+        
+        def add_logs(record):
+            self.logs.append({'msg': record.getMessage()})
+            return True
+        # Checks if it should print the message or not (will always print it as True returned)
+        logger.addFilter(add_logs)
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
@@ -505,14 +511,14 @@ class ButtJointBolted(MomentConnection):
 
 
         if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            error = self.generate_missing_fields_error_string(missing_fields_list)
             all_errors.append(error)
         else:
             flag = True
 
         print(f'flag = {flag}, flag1 = {flag1}, flag2 = {flag2}')
         if flag  and flag1 and flag2:
-            self.set_input_values(self, design_dictionary)
+            self.set_input_values(design_dictionary)
         else:
             return all_errors
 
@@ -524,7 +530,7 @@ class ButtJointBolted(MomentConnection):
             if key not in design_dictionary_with_defaults:
                 design_dictionary_with_defaults[key] = 0.0
 
-        super(ButtJointBolted, self).set_input_values(self, design_dictionary_with_defaults)
+        super(ButtJointBolted, self).set_input_values(design_dictionary_with_defaults)
 
         self.module = design_dictionary[KEY_MODULE]
         self.mainmodule = "Butt Joint Bolted Connection"
@@ -631,7 +637,7 @@ class ButtJointBolted(MomentConnection):
         self.cover_plate = design_dictionary[KEY_COVER_PLATE]
 
         # Start bolt selection process
-        self.select_bolt_dia_and_grade(self,design_dictionary)
+        self.select_bolt_dia_and_grade(design_dictionary)
 
     def select_bolt_dia_and_grade(self,design_dictionary):
         self.dia_available = False
@@ -708,7 +714,7 @@ class ButtJointBolted(MomentConnection):
                                                   p=float(self.bolt.min_pitch_round))
 
                         num_bolts = float(self.tensile_force) / ( self.bolt.bolt_capacity / 1000)
-                        
+                        self.number_bolts = num_bolts
                         #if num_bolts <= 2:
                         #    self.bolt_dia_grade_status = True
                         #    break
@@ -743,7 +749,7 @@ class ButtJointBolted(MomentConnection):
             self.bolt.bolt_bearing_capacity = round(float(self.bolt.bolt_bearing_capacity),2)
         self.bolt.bolt_shear_capacity = round(float(self.bolt.bolt_shear_capacity),2)
         self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)
-        self.number_r_c_bolts(self, design_dictionary,0,0)
+        self.number_r_c_bolts(design_dictionary,0,0)
 
     def number_r_c_bolts(self,design_dictionary,count=0,hit=0):
         # Add maximum iteration limit
@@ -808,10 +814,10 @@ class ButtJointBolted(MomentConnection):
 
         if self.number_bolts >= 2 and count == 0:
             self.design_status = True
-            self.check_capacity_reduction_1(self, design_dictionary)
+            self.check_capacity_reduction_1(design_dictionary)
         elif self.number_bolts>=2 and count == 1:
             self.design_status = True
-            self.final_formatting(self,design_dictionary)
+            self.final_formatting(design_dictionary)
         else:
             self.design_status = False
             logger.error(": Number of min bolts not satisfied. \n ")
@@ -836,7 +842,7 @@ class ButtJointBolted(MomentConnection):
                 self.bolt.bolt_capacity = self.slip_res
 
         self.design_status = True
-        self.check_capacity_reduction_2(self,design_dictionary)
+        self.check_capacity_reduction_2(design_dictionary)
 
     def check_capacity_reduction_2(self,design_dictionary):
         """Large grip reduction as per Cl. 10.3.3.2 of IS 800:2007"""
@@ -858,10 +864,10 @@ class ButtJointBolted(MomentConnection):
                 self.bolt.bolt_capacity = self.slip_res
 
             # Continue design with reduced capacity - recursion limit handled in number_r_c_bolts
-            self.number_r_c_bolts(self,design_dictionary,1,0)
+            self.number_r_c_bolts(design_dictionary,1,0)
         else:
             self.design_status = True
-            self.final_formatting(self,design_dictionary)
+            self.final_formatting(design_dictionary)
 
     def final_formatting(self,design_dictionary):
         """Final checks and formatting as per IS 800:2007"""
@@ -883,7 +889,7 @@ class ButtJointBolted(MomentConnection):
                 enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
                 if enddist > self.bolt.max_end_dist_round:
                     self.design_status = False
-                    self.number_r_c_bolts(self,design_dictionary,0,1)
+                    self.number_r_c_bolts(design_dictionary,0,1)
                 else:
                     self.final_end_dist = enddist
                     self.final_edge_dist = enddist
@@ -894,7 +900,7 @@ class ButtJointBolted(MomentConnection):
                 enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
                 if enddist > self.bolt.max_end_dist_round:
                     self.design_status = False
-                    self.number_r_c_bolts(self,design_dictionary,0,1)
+                    self.number_r_c_bolts(design_dictionary,0,1)
                 else:
                     self.final_end_dist = enddist
                     self.final_edge_dist = enddist
