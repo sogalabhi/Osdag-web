@@ -4,6 +4,7 @@ import {
     KEY_COVER_PLATE, KEY_DISP_COVER_PLT, KEY_DP_DETAILING_PACKING_PLATE,
     KEY_DISP_PLATE1_THICKNESS, KEY_DISP_PLATE_WIDTH, KEY_DP_BOLT_SLIP_FACTOR,
     KEY_DISP_PLATE2_THICKNESS, KEY_D, KEY_TYP, KEY_GRD, KEY_DP_BOLT_HOLE_TYPE,
+    KEY_DP_BOLT_TYPE, KEY_DESIGN_FOR,
 } from "../../../../constants/DesignKeys";
 
 export const buttJointBoltedConfig = {
@@ -27,7 +28,10 @@ export const buttJointBoltedConfig = {
         material: "E 250 (Fe 410 W)A",
         detailing_edge_type: "Sheared or hand flame cut",
         cover_plate: "Single-Cover",
-        design_method: "Limit State Design",
+        bolt_tension_type: "Non Pre-tensioned",
+        bolt_hole_type: "Standard",
+        bolt_slip_factor: "0.3",
+        design_for: "Tension",
     },
 
     modalConfig: [
@@ -94,6 +98,11 @@ export const buttJointBoltedConfig = {
             [KEY_GRD]: getArrayParam(allSelected.bolt_grade, lists.propertyClassList, inputs.bolt_grade),
             [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
             [KEY_TYP]: String(inputs.bolt_type),
+            [KEY_DP_BOLT_HOLE_TYPE]: String(inputs.bolt_hole_type),
+            [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
+            [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
+            [KEY_DP_BOLT_TYPE]: String(inputs.bolt_tension_type),
+            [KEY_DESIGN_FOR]: String(inputs.design_for),
         };
     },
 

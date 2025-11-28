@@ -3,7 +3,8 @@ import {
     KEY_PLATE1_THICKNESS, KEY_PLATE2_THICKNESS, KEY_PLATE_WIDTH, KEY_WELD_SIZE,
     KEY_COVER_PLATE, KEY_DISP_COVER_PLT, KEY_DP_DETAILING_PACKING_PLATE,
     KEY_DISP_WELD_SIZE, KEY_DISP_PLATE1_THICKNESS, KEY_DISP_PLATE_WIDTH,
-    KEY_DISP_PLATE2_THICKNESS
+    KEY_DISP_PLATE2_THICKNESS,
+    KEY_DESIGN_FOR
 } from "../../../../constants/DesignKeys";
 
 export const lapJointWeldedConfig = {
@@ -23,7 +24,7 @@ export const lapJointWeldedConfig = {
         material: "E 250 (Fe 410 W)A",
         detailing_edge_type: "Sheared or hand flame cut",
         cover_plate: "Single-Cover",
-        design_method: "Limit State Design",
+        design_for: "Tension",
     },
 
     modalConfig: [
@@ -69,6 +70,7 @@ export const lapJointWeldedConfig = {
             [KEY_COVER_PLATE]: String(inputs.cover_plate),
             [KEY_AXIAL]: String(inputs.axial_force),
             [KEY_WELD_SIZE]: getArrayParam(allSelected.weld_size, lists.weldSizeList, inputs.weld_size),
+            [KEY_DESIGN_FOR]: String(inputs.design_for),
         };
     },
 

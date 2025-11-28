@@ -23,7 +23,7 @@ export const buttJointWeldedConfig = {
         material: "E 250 (Fe 410 W)A",
         detailing_edge_type: "Sheared or hand flame cut",
         cover_plate: "Single-Cover",
-        design_method: "Limit State Design",
+        design_for: "Tension",
     },
 
     modalConfig: [
@@ -69,6 +69,7 @@ export const buttJointWeldedConfig = {
             [KEY_COVER_PLATE]: String(inputs.cover_plate),
             [KEY_AXIAL]: String(inputs.axial_force),
             [KEY_WELD_SIZE]: getArrayParam(allSelected.weld_size, lists.weldSizeList, inputs.weld_size),
+            [KEY_DESIGN_FOR]: String(inputs.design_for),
         };
     },
 
