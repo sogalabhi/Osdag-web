@@ -41,6 +41,8 @@ class LapJointWelded(MomentConnection):
         self.weld_fabrication = None
         self.weld_angle = None
         self.weld_length_effective = None
+        self.logs = []
+
 
     ###############################################
     # Design Preference Functions Start
@@ -156,18 +158,27 @@ class LapJointWelded(MomentConnection):
         weld.append(t2)
         return weld
 
-    def set_osdaglogger(key):
+    def set_osdaglogger(self, key):
         global logger
         logger = logging.getLogger('Osdag')
+        
+        def add_logs(record):
+            self.logs.append({'msg': record.getMessage()})
+            return True
+        # Checks if it should print the message or not (will always print it as True returned)
+        logger.addFilter(add_logs)
+
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+        
         handler = logging.FileHandler('logging_text.log')
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+        
         if key is not None:
             handler = OurLog(key)
             formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -305,13 +316,13 @@ class LapJointWelded(MomentConnection):
                 pass
 
         if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            error = self.generate_missing_fields_error_string(missing_fields_list)
             all_errors.append(error)
         else:
             flag = True
 
         if flag and flag1 and flag2:
-            self.set_input_values(self, design_dictionary)
+            self.set_input_values(design_dictionary)
         else:
             return all_errors
 
@@ -324,7 +335,7 @@ class LapJointWelded(MomentConnection):
         if KEY_MOMENT not in design_dictionary_with_defaults:
             design_dictionary_with_defaults[KEY_MOMENT] = 0.0
 
-        super(LapJointWelded, self).set_input_values(self, design_dictionary_with_defaults)
+        super(LapJointWelded, self).set_input_values(design_dictionary_with_defaults)
         self.module = design_dictionary[KEY_MODULE]
         self.mainmodule = "Lap Joint Welded Connection"
         self.main_material = design_dictionary[KEY_MATERIAL]
@@ -352,20 +363,20 @@ class LapJointWelded(MomentConnection):
                          type=design_dictionary[KEY_DP_WELD_TYPE],
                          fabrication=design_dictionary.get(KEY_DP_FAB_SHOP, KEY_DP_FAB_SHOP))
         self.weld.size = design_dictionary[KEY_WELD_SIZE]
-        self.design_of_weld(self, design_dictionary)
+        self.design_of_weld(design_dictionary)
 
     def design_of_weld(self, design_dictionary):
         logger.info(": =========== Design of Lap Joint Welded Connection ==========")
         logger.info(": Design Approach: IS 800:2007 Clause 10.5")
         self.utilization_ratios = {}
 
-        if not self.weld_size_check(self, design_dictionary):
+        if not self.weld_size_check(design_dictionary):
             return
 
-        self.calculate_weld_strength(self, design_dictionary)
+        self.calculate_weld_strength(design_dictionary)
         self.calculate_weld_length(self)
         self.check_long_joint(self)
-        self.check_base_metal_strength(self, design_dictionary)
+        self.check_base_metal_strength(design_dictionary)
         self.calculate_final_utilization_ratio(self)
 
     def weld_size_check(self, design_dictionary):

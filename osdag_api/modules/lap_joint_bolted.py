@@ -310,7 +310,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     print('module from input values : ' , module)
     # Object that will create the CAD model.
     try: 
-        cdl = CommonDesignLogic(None, '', KEY_DISP_BUTTJOINTBOLTED , module.mainmodule)
+        cdl = CommonDesignLogic(None, '', KEY_DISP_LAPJOINTBOLTED , module.mainmodule)
     except Exception as e : 
         print('error in cdl e : ' , e)
     

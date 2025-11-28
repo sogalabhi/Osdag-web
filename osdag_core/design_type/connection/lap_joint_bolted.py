@@ -35,6 +35,7 @@ class LapJointBolted(MomentConnection):
         self.base_metal_capacity_kN = None
         self.utilization_breakdown = {}
         self.design_error = ''
+        self.logs = []
         
         # self.spacing = None
 
@@ -143,11 +144,17 @@ class LapJointBolted(MomentConnection):
     ####################################
     # Design Preference Functions End
     ####################################
-    def set_osdaglogger(key):
+    def set_osdaglogger(self, key):
 
         """Function to set Logger for Tension Module"""
         global logger
         logger = logging.getLogger('Osdag')
+
+        def add_logs(record):
+            self.logs.append({'msg': record.getMessage()})
+            return True
+        # Checks if it should print the message or not (will always print it as True returned)
+        logger.addFilter(add_logs)
 
         logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
@@ -369,12 +376,12 @@ class LapJointBolted(MomentConnection):
 
 
         if len(missing_fields_list) > 0:
-            error = self.generate_missing_fields_error_string(self, missing_fields_list)
+            error = self.generate_missing_fields_error_string(missing_fields_list)
             all_errors.append(error)
         else:
             flag = True
         if flag  and flag1 and flag2:
-            self.set_input_values(self, design_dictionary)
+            self.set_input_values(design_dictionary)
         else:
             return all_errors
         
@@ -387,7 +394,7 @@ class LapJointBolted(MomentConnection):
             if key not in design_dictionary_with_defaults:
                 design_dictionary_with_defaults[key] = 0.0
 
-        super(LapJointBolted, self).set_input_values(self, design_dictionary_with_defaults)
+        super(LapJointBolted, self).set_input_values(design_dictionary_with_defaults)
 
         self.module = design_dictionary[KEY_MODULE]
         self.mainmodule = "Lap Joint Bolted Connection"
@@ -442,7 +449,7 @@ class LapJointBolted(MomentConnection):
         self.base_metal_capacity_kN = None
         self.utilization_breakdown = {}
         self.design_error = ''
-        self.select_bolt_dia_and_grade(self,design_dictionary)
+        self.select_bolt_dia_and_grade(design_dictionary)
 
     def select_bolt_dia_and_grade(self,design_dictionary):
         self.dia_available = False
@@ -529,7 +536,7 @@ class LapJointBolted(MomentConnection):
         #     self.bolt.bolt_shear_capacity = round(float(self.bolt.bolt_shear_capacity),2)
         #     self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)       
         #     print(self.bolt)
-        #     self.number_r_c_bolts(self, design_dictionary)
+        #     self.number_r_c_bolts(design_dictionary)
 
         
         else:
@@ -539,7 +546,7 @@ class LapJointBolted(MomentConnection):
             self.bolt.bolt_shear_capacity = round(float(self.bolt.bolt_shear_capacity),2)
             self.bolt.bolt_capacity = round(float(self.bolt.bolt_capacity),2)       
             # print(self.bolt)
-            self.number_r_c_bolts(self, design_dictionary,0,0)
+            self.number_r_c_bolts(design_dictionary,0,0)
 
 
     def number_r_c_bolts(self,design_dictionary,count=0,hit=0):
@@ -590,10 +597,10 @@ class LapJointBolted(MomentConnection):
         if self.number_bolts >= 2 and count == 0:
             self.design_status = True
             # print("Num bolts leaving",self.number_bolts)
-            self.check_capacity_reduction_1(self, design_dictionary)
+            self.check_capacity_reduction_1(design_dictionary)
         elif self.number_bolts>=2 and count == 1:
             self.design_status = True
-            self.final_formatting(self,design_dictionary)
+            self.final_formatting(design_dictionary)
         else:
             self.design_status = False
             logger.error(": Number of min bolts not satisfied. \n ")
@@ -618,7 +625,7 @@ class LapJointBolted(MomentConnection):
 
 
         self.design_status = True
-        self.check_capacity_reduction_2(self,design_dictionary)
+        self.check_capacity_reduction_2(design_dictionary)
 
     def check_capacity_reduction_2(self,design_dictionary):
         self.cap_red = False
@@ -636,13 +643,13 @@ class LapJointBolted(MomentConnection):
                 self.slip_res = self.bolt.bolt_shear_capacity
                 self.bolt.bolt_capacity = self.slip_res
             
-            self.number_r_c_bolts(self,design_dictionary,1,0)
+            self.number_r_c_bolts(design_dictionary,1,0)
         
         if self.cap_red == False:
             self.design_status = True
             # print("Going to formatting")
             # print("After checks 2 numbolts",self.number_bolts)
-            self.final_formatting(self,design_dictionary)
+            self.final_formatting(design_dictionary)
 
 
 
@@ -657,7 +664,7 @@ class LapJointBolted(MomentConnection):
             enddist = (float(self.width) - ((self.rows - 1) * self.final_gauge)) / 2
             if enddist > self.bolt.max_end_dist_round:
                 self.design_status = False
-                self.number_r_c_bolts(self, design_dictionary, 0, 1)
+                self.number_r_c_bolts(design_dictionary, 0, 1)
                 return
             else:
                 self.final_end_dist = enddist
@@ -669,7 +676,7 @@ class LapJointBolted(MomentConnection):
             enddist = (float(self.width) - ((self.rows - 1) * self.final_gauge)) / 2
             if enddist > self.bolt.max_end_dist_round:
                 self.design_status = False
-                self.number_r_c_bolts(self, design_dictionary, 0, 1)
+                self.number_r_c_bolts(design_dictionary, 0, 1)
                 return
             else:
                 self.final_end_dist = enddist
