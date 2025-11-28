@@ -174,7 +174,7 @@ export const EngineeringModule = ({
 
   // Only change dock visibility after design is complete
   useEffect(() => {
-    if (!loading && !isRedesigning && output && renderBoolean) {
+    if (!loading && !isRedesigning && output) {
       setIsDesignComplete(true);
       setShowOptionsContainer(true); // Show options container after design is complete
       // Auto-switch to output dock only after design is complete
@@ -493,7 +493,6 @@ export const EngineeringModule = ({
 
   const options = getViewOptions();
   // FIXED: Include angleList in contextData 
-  console.log(weldSizeList);
   const contextData = {
     beamList,
     columnList,

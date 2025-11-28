@@ -174,6 +174,7 @@ export const InputSection = ({
       setInputs({ ...safeInputs, [field.key]: allKeys });
       updateSelectionState(field.selectionKey, "Customized");
       updateModalState(field.modalKey, true);
+      toggleAllSelected(field.key, false);
     } else {
       // "All" option - get all values and set them in inputs 
       const allValues = getAllValuesForInputKey(field.key);
@@ -189,6 +190,7 @@ export const InputSection = ({
       updateSelectedItems(field.key, []);
       updateSelectionState(field.selectionKey, "All");
       updateModalState(field.modalKey, false);
+      toggleAllSelected(field.key, true); // fix allSelected flag not triggering
     }
   };
 
