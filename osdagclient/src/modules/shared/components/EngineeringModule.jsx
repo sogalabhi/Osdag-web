@@ -174,7 +174,7 @@ export const EngineeringModule = ({
 
   // Only change dock visibility after design is complete
   useEffect(() => {
-    if (!loading && !isRedesigning && output) {
+    if (!loading && !isRedesigning && output && renderBoolean) {
       setIsDesignComplete(true);
       setShowOptionsContainer(true); // Show options container after design is complete
       // Auto-switch to output dock only after design is complete
