@@ -16,5 +16,3 @@ def setup_for_cad(cdl: CommonDesignLogic, module_class):
         cdl.CPObj = cdl.createBBCoverPlateCAD()
     if module_object.module == "Beam-to-Column End Plate Connection":
         cdl.CPObj = cdl.createBCEndPlateCAD() # Initialize the CAD object for beam-column end plate
-    if module_object.module == KEY_DISP_BUTTJOINTBOLTED:
-        cdl.ButtJointBoltedObj = cdl.createButtJointBoltedCAD()

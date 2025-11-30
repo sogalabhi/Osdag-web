@@ -2,7 +2,7 @@ from osdag_core.Common import *
 from osdag_api.validation_utils import validate_arr, validate_num, validate_string
 from osdag_api.errors import MissingKeyError, InvalidInputTypeError
 from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
-import osdag_api.modules.moment_connection_common as mcc
+import osdag_api.modules.simple_connection_common as scc
 from OCC.Core import BRepTools
 from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
@@ -275,7 +275,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     
     try: 
         # Setup the calculations object for generating CAD model.
-        mcc.setup_for_cad(cdl, module)
+        scc.setup_for_cad(cdl, module)
     except Exception as e : 
         traceback.print_exc()
         print('Error in setting up cad e : ' , e)
