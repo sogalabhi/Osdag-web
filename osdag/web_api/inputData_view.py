@@ -28,6 +28,8 @@ INPUT_DATA_FACTORY = {
     'Cover-Plate-Welded-Connection': CoverPlateWeldedInputData(),
     'Beam-to-Column-End-Plate-Connection': BeamToColumnEndPlateInputData(),
     'Tension-Member-Bolted-Design': TensionMemberBoltedInputData(),
+    # Use the same input-data provider as tension member so we get angleList/materialList
+    'Compression-Member-Design': TensionMemberBoltedInputData(),
     'Simply-Supported-Beam': SimplySupportedBeamInputData()
 }
 

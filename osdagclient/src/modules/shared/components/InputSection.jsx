@@ -6,6 +6,9 @@ import EBWRM from "../../../assets/extended.png";
 import CFBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cf_bw.png";
 import CWBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cw_bw.png";
 import BB from "../../../assets/ShearConnection/sc_fin_plate/fin_beam_beam.png";
+import ANGLE_SECTION from "../../../assets/TensionMember/com1_1.png";
+import BACK_TO_BACK_ANGLES_SAME_SIDE from "../../../assets/TensionMember/com1_2.png";
+import BACK_TO_BACK_ANGLES_OPPOSITE_SIDE from "../../../assets/TensionMember/com1_3.png";
 import ErrorImg from "../../../assets/notSelected.png";
 
 export const InputSection = ({
@@ -34,6 +37,16 @@ export const InputSection = ({
         borderColor: '#91B014',
       },
     }),
+    option: (base) => ({
+      ...base,
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    }),
+    menu: (base) => ({
+      ...base,
+      minWidth: 'max-content',
+    }),
   };
 
   // Helper to normalize lists into react-select option shape
@@ -51,14 +64,35 @@ export const InputSection = ({
 
 
   useEffect(() => {
+    // Check for section profile first (takes priority)
+    const sectionProfileField = section.fields.find(
+      (f) => f.type === 'sectionProfileSelect'
+    );
+    if (sectionProfileField) {
+      const profileValue = extraState.selectedProfile || safeInputs[sectionProfileField.key] || sectionProfileField.defaultValue;
+      if (profileValue) {
+        const sectionProfileMap = {
+          "Angles": ANGLE_SECTION,
+          "Back to Back Angles - Same side of gusset": BACK_TO_BACK_ANGLES_SAME_SIDE,
+          "Back to Back Angles - Opposite side of gusset": BACK_TO_BACK_ANGLES_OPPOSITE_SIDE,
+        };
+        setImageSource(sectionProfileMap[profileValue] || ErrorImg);
+        return; // Exit early if section profile is found
+      }
+    }
+
+    // Handle connectivity/endplate images
     if (extraState.selectedOption) {
       const imageMap = {
         "Column Flange-Beam-Web": CFBW, "Column Web-Beam-Web": CWBW, "Beam-Beam": BB,
         "Flushed - Reversible Moment": FRM, "Extended One Way - Irreversible Moment": EOWIM, "Extended Both Ways - Reversible Moment": EBWRM,
       };
       setImageSource(imageMap[extraState.selectedOption] || ErrorImg);
+    } else {
+      // Clear image if no selection
+      setImageSource("");
     }
-  }, [extraState.selectedOption]);
+  }, [extraState.selectedOption, extraState.selectedProfile, safeInputs, section.fields]);
 
   // Set default selected values when lists/options arrive
   useEffect(() => {
@@ -111,6 +145,17 @@ export const InputSection = ({
       const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
         : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
       setExtraState((prev) => ({ ...prev, selectedOption: firstValue }));
+    }
+
+    // Set default for section profile dropdowns
+    const sectionProfileField = section.fields.find(
+      (f) => f.type === 'sectionProfileSelect'
+    );
+    if (sectionProfileField && !extraState.selectedProfile) {
+      const currentValue = safeInputs[sectionProfileField.key] || sectionProfileField.defaultValue;
+      if (currentValue) {
+        setExtraState((prev) => ({ ...prev, selectedProfile: currentValue }));
+      }
     }
   }, [safeContextData, section.fields]);
 
@@ -166,6 +211,7 @@ export const InputSection = ({
               isMulti
               options={options}
               value={currentValue}
+              isSearchable={false}
               onChange={(selectedOptions) => {
                 const newValues = selectedOptions.map(opt => opt.value);
                 setInputs({ ...safeInputs, [field.key]: newValues });
@@ -199,6 +245,7 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isSearchable={false}
             onChange={(selected) => setInputs({ ...safeInputs, [field.key]: selected.value })}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
@@ -219,9 +266,35 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isSearchable={false}
             onChange={(selected) => {
               setExtraState({ ...extraState, selectedOption: selected.value });
               setInputs({ ...safeInputs, output: null });
+            }}
+            menuPortalTarget={document.body}
+            styles={customSelectStyles}
+            classNamePrefix="react-select"
+            className="w-[60%]"
+          />
+        );
+      }
+
+      case 'sectionProfileSelect': {
+        const options = Array.isArray(field.options) ? field.options : toSelectOptions(field.options);
+        const currentValue = safeInputs[field.key] || field.defaultValue;
+        const value = options.find(opt => opt.value === currentValue);
+        return (
+          <Select
+            options={options}
+            value={value}
+            isSearchable={false}
+            onChange={(selected) => {
+              setExtraState({ ...extraState, selectedProfile: selected.value });
+              if (field.onChange) {
+                field.onChange(selected.value, safeInputs, setInputs, safeContextData, extraState, setExtraState);
+              } else {
+                setInputs({ ...safeInputs, [field.key]: selected.value });
+              }
             }}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
@@ -238,6 +311,7 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isSearchable={false}
             onChange={(selected) => handleCustomizableSelect(field, selected.value)}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
@@ -277,11 +351,11 @@ export const InputSection = ({
             </h4>
               {renderField(field)}
             </div>
-            {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (
-              <div className="flex justify-center">
+            {((field.type === 'connectivitySelect' || field.type === 'endPlateSelect' || field.type === 'sectionProfileSelect') && imageSource) && (
+              <div className="flex justify-center mb-4">
                 <img
                   src={imageSource}
-                  alt="Connection type"
+                  alt={field.type === 'sectionProfileSelect' ? "Section profile" : "Connection type"}
                   className="w-[100px] h-[100px] object-contain"
                 />
               </div>

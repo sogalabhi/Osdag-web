@@ -28,6 +28,9 @@ import EndPlate from "./modules/shearConnection/endPlate/EndPlate";
 // Tension members modules
 import BoltedToEnd from "./modules/TensionMembers/BoltedToEnd/BoltedToEnd";
 
+// Compression members modules
+import CompressionMember from "./modules/compressionMember/CompressionMember";
+
 // Beam modules
 import SimplySupportedBeam from "./modules/flexuralMember/simplySupportedBeam";
 import BeamBeamEndPlate from "./modules/beamBeamEndPlate/BeamBeamEndPlate";
@@ -62,6 +65,7 @@ function App() {
         <Route path="/design/:designType/beam-to-beam-splice/end_plate/:projectId?" element={<BeamBeamEndPlate />} />
         <Route path="/design/:designType/simply_supported_beam/:projectId?" element={<SimplySupportedBeam />} />
         <Route path="/design/:designType/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
+        <Route path="/design/:designType/compression_member/struts_in_trusses/:projectId?" element={<CompressionMember />} />
       </Route>
     )
   );

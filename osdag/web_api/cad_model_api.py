@@ -60,7 +60,10 @@ class CADGeneration(View):
                 "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
                 "Cover-Plate-Welded-Connection": "CoverPlateWelded",
                 "Beam-to-Column-End-Plate-Connection": "BeamToColumnEndPlate",
-                "Tension-Member-Bolted-Design": "TensionMember"
+                "Tension-Member-Bolted-Design": "TensionMember",
+                # Compression member design shares the same API pattern but currently has no CAD implementation.
+                # We still map it here so the endpoint recognises the module_id and can short-circuit gracefully.
+                "Compression-Member-Design": "CompressionMember",
             }
             
             session_type = module_type_mapping.get(module_id)
@@ -80,6 +83,14 @@ class CADGeneration(View):
         if not command:
             # Service unavailable: dependency missing
             return JsonResponse({"status": "error", "message": "FreeCAD is not installed or not available on server."}, status=503)
+        
+        # If compression member CAD is not yet implemented, return a graceful success response
+        if session_type == "CompressionMember":
+            return JsonResponse({
+                "status": "success",
+                "files": {},
+                "message": "CAD generation for Compression Member is not implemented yet; skipping CAD."
+            }, status=201)
         
         # Directory setup
         current_dir = os.path.dirname(os.path.abspath(__file__))

@@ -23,7 +23,7 @@ import logging
 
 import math
 import os
-from importlib.resources import files
+from importlib_resources import files
 
 
 class ButtJointBolted(MomentConnection):
