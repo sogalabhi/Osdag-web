@@ -63,4 +63,5 @@ file_storage/cad_models/*.iges
 file_storage/cad_models/*.step
 file_storage/cad_models/*.stp
 file_storage/cad_models/*.glb
-file_storage/
+file_storage/osdag_web/firebase-service-account.json
+key

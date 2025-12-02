@@ -53,24 +53,25 @@ def convert_to_32_bytes(input_string) :
 class SignupView(APIView):
     def post(self, request):
         try:
-            username = request.data.get("username")
+
+            # username = request.data.get("username")
             password = request.data.get("password")
             email = request.data.get('email')
             isGuest = request.data.get('isGuest')
 
             # Validate required fields
-            if not username or not password or not email:
+            if not password or not email:
                 return Response({
-                    'message': 'Username, email, and password are required',
+                    'message': 'Email and password are required',
                     'error_type': 'validation_error'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Validate username
-            if len(username) < 3:
-                return Response({
-                    'message': 'Username must be at least 3 characters long',
-                    'error_type': 'validation_error'
-                }, status=status.HTTP_400_BAD_REQUEST)
+            # if len(username) < 3:
+            #     return Response({
+            #         'message': 'Username must be at least 3 characters long',
+            #         'error_type': 'validation_error'
+            #     }, status=status.HTTP_400_BAD_REQUEST)
 
             # Validate password
             if len(password) < 8:
@@ -84,16 +85,16 @@ class SignupView(APIView):
             email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             if not re.match(email_regex, email):
                 return Response({
-                    'message': 'Please enter a valid email address',
+                    'message': '2) Please enter a valid email address',
                     'error_type': 'validation_error'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Check if username already exists
-            if User.objects.filter(username=username).exists():
-                return Response({
-                    'message': 'Username already exists. Please choose a different username.',
-                    'error_type': 'duplicate_username'
-                }, status=status.HTTP_400_BAD_REQUEST)
+            # if User.objects.filter(username=username).exists():
+            #     return Response({
+            #         'message': 'Username already exists. Please choose a different username.',
+            #         'error_type': 'duplicate_username'
+            #     }, status=status.HTTP_400_BAD_REQUEST)
 
             # Check if email already exists
             if User.objects.filter(email=email).exists():
@@ -103,11 +104,11 @@ class SignupView(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Create Django user with hashed password
-            user = User.objects.create_user(username=username, email=email, password=password)
+            user = User.objects.create_user(username=email, email=email, password=password)
             user.save()
 
             tempData = {
-                'username': username,
+                'username': email,
                 'email': email,
                 'allInputValueFiles': ['']
             }
@@ -160,7 +161,7 @@ class ForgetPasswordView(APIView):
             email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             if not re.match(email_regex, email):
                 return Response({
-                    'message': 'Please enter a valid email address',
+                    'message': '3) Please enter a valid email address',
                     'error_type': 'validation_error'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -207,6 +208,7 @@ class CheckEmailView(APIView):
 
             # obtain the email 
             email = request.data.get('email')
+            print('email11 : ' , email)
 
             # Validate email
             if not email:
@@ -220,13 +222,13 @@ class CheckEmailView(APIView):
             email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             if not re.match(email_regex, email):
                 return Response({
-                    'message': 'Please enter a valid email address',
+                    'message': '4) Please enter a valid email address',
                     'error_type': 'validation_error'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # check if the email exists in the database or not 
             try: 
-                emailobject = User.objects.get(email=email)
+                emailobject = User.objects.filter(email=email)
                 print('emailObject:', emailobject)
             except User.DoesNotExist: 
                 # the email is not present in the database 
@@ -338,6 +340,7 @@ class LoginView(APIView):
                     'access': str(refresh.access_token),
                     'refresh': str(refresh),
                     'email': email,
+                    'username': username,
                     'allInputValueFilesLength': all_input_files_length,
                     'success': True
                 }, status=status.HTTP_200_OK)

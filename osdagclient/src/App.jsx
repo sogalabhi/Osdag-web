@@ -88,4 +88,5 @@ function App() {
 const Root = () => {
   return <Outlet />;
 };
+
 export default App;

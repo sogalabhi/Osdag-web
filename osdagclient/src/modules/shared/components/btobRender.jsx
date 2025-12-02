@@ -134,7 +134,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
         "SeatedAngle",
         "Connector"
       ]);
-
+      
       Object.entries(modelPaths).forEach(([key, dataUrl]) => {
         try {
           if (typeof dataUrl === 'string' && dataUrl.startsWith('data:application/octet-stream;base64,')) {
@@ -916,6 +916,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
           />
         </>
       )}
+
       {/* Connector Section - only show if single selection (not multi-select) */}
       {(activeViews.includes("Connector") || activeViews.includes("EndPlate") || activeViews.includes("CoverPlate")) && !activeViews.includes("Model") && activeViews.length === 1 && geometryConnector && (
         <>

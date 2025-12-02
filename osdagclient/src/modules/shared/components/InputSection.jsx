@@ -211,6 +211,7 @@ export const InputSection = ({
                 styles={customSelectStyles}
                 classNamePrefix="react-select"
                 className="w-[60%]"
+                isSearchable={false}
               />
             );
           }
@@ -230,6 +231,7 @@ export const InputSection = ({
               styles={customSelectStyles}
               classNamePrefix="react-select"
               className="w-[60%]"
+              isSearchable={false}
             />
           );
         }
@@ -243,6 +245,7 @@ export const InputSection = ({
               styles={customSelectStyles}
               classNamePrefix="react-select"
               className="w-[60%]"
+              isSearchable={false}
             />
           );
         }
@@ -260,6 +263,7 @@ export const InputSection = ({
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
+            isSearchable={false}
           />
         );
       }
@@ -283,6 +287,7 @@ export const InputSection = ({
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
+            isSearchable={false}
           />
         );
       }
@@ -299,6 +304,7 @@ export const InputSection = ({
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
+            isSearchable={false}
           />
         );
       }
@@ -316,6 +322,7 @@ export const InputSection = ({
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
+            isSearchable={false}
           />);
       }
       case 'dynamicSelect': {
@@ -330,6 +337,7 @@ export const InputSection = ({
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
+            isSearchable={false}
           />
         );
       }

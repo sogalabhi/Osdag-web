@@ -33,6 +33,7 @@ import json
 import time
 import uuid
 import re
+import shutil
 
 # Helper: filter LaTeX content based on selected sections (section or section/subsection)
 def filter_latex_content(latex_content: str, selected_sections):
@@ -106,6 +107,8 @@ class CreateDesignReport(APIView):
             'Cleat-Angle-Connection': cleat_angle_create_from_input,
             'Seated-Angle-Connection': seated_angle_create_from_input,
             'Beam-to-Beam-Cover-Plate-Bolted-Connection': cover_plate_bolted_create_from_input,
+            'SeatedAngleConnection': seated_angle_create_from_input,
+            'Cover-Plate-Bolted-Connection': cover_plate_bolted_create_from_input,
             'Beam-Beam-End-Plate-Connection': beam_beam_end_plate_create_from_input,
             'Beam-to-Beam-Cover-Plate-Welded-Connection': cover_plate_welded_create_from_input,
             'Beam-to-Column-End-Plate-Connection': beam_to_column_end_plate_create_from_input,
@@ -275,12 +278,21 @@ class GetPDF(APIView):
 
         # change the working directory
         path = os.getcwd()
+        report_dir = os.path.join(path, 'file_storage', 'design_report')
         print('pdf path : ' , pdf_filename)
-        os.chdir(path)
-        print('current path after chdir : ' , path)
-        pdfFilePath = f'{os.getcwd()}/file_storage/design_report/{report_id}.pdf'
-        print('pdfFilePath : ' , pdfFilePath)
-
+        # os.chdir(path)
+        os.chdir(report_dir)
+        # Copy images first
+        images_target_dir = os.path.join(report_dir, 'images')
+        shutil.copytree(
+            '/home/spoken/Desktop/testrun/Osdag-web/ResourceFiles/images',
+            images_target_dir,
+            dirs_exist_ok=True
+        )
+        # print('current path after chdir : ' , path)
+        # pdfFilePath = f'{os.getcwd()}/file_storage/design_report/{report_id}.pdf'
+        # print('pdfFilePath : ' , pdfFilePath)
+        
         # compile TeX file for different operating systems
         if platform.system().lower() == 'windows':
             subprocess.run(['cmd', '/c', 'echo', '%cd%'])
@@ -291,6 +303,9 @@ class GetPDF(APIView):
             subprocess.run(
                 ['pdflatex', '-interaction=nonstopmode', tex_filename])
 
+        pdfFilePath = os.path.join(report_dir, pdf_filename)
+        print("PDF Path:", pdfFilePath)
+        
         # check if PDF is successfully generated
         if not os.path.exists(pdfFilePath):
             raise RuntimeError('PDF output not found')

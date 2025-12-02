@@ -7,7 +7,7 @@ const readOnlyFontStyle = {
     color: 'rgb(0 0 0 / 67%)', fontSize: '12px', fontWeight: '600'
 }
 
-const ConnectorSectionModal = ({ designPrefInputs, setDesignPrefInputs }) => {
+const ConnectorSectionModal = ({ designPrefInputs, setDesignPrefInputs, isInputLocked }) => {
 
     const { materialList, conn_material_details, getMaterialDetails } = useContext(ModuleContext)
     const [showModal, setShowModal] = useState(false)
@@ -35,7 +35,7 @@ const ConnectorSectionModal = ({ designPrefInputs, setDesignPrefInputs }) => {
                     <div className='input-cont'>
                         <h5>Material</h5>
                         <div>
-                            <Select style={{ width: '200px', height: '25px',fontSize: '12px' }}
+                            <Select disabled={isInputLocked} style={{ width: '200px', height: '25px',fontSize: '12px' }}
                                 value={designPrefInputs.connector_material}
                                 onSelect={(value) => {
                                     handleMaterialChange(value)
