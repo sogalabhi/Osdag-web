@@ -942,7 +942,7 @@ export const EngineeringModule = ({
 
                     const tooltip = document.createElement("div");
                     tooltip.className =
-                      "fixed px-3 py-1 text-sm bg-black text-white rounded-md opacity-0 transition-opacity z-[9999]";
+                      "fixed px-3 py-1 text-base font-bold bg-black text-white rounded-md opacity-0 transition-opacity z-[9999]";
                     tooltip.textContent = "Unlock to edit";
 
                     document.body.appendChild(tooltip);
@@ -959,7 +959,7 @@ export const EngineeringModule = ({
                     setTimeout(() => {
                       tooltip.style.opacity = 0;
                       setTimeout(() => tooltip.remove(), 150);
-                    }, 1000);
+                    }, 3000);
                   }}
                 />
               )}
