@@ -1,7 +1,7 @@
 export const coverPlateWeldedConfig = {
   sessionName: "Cover Plate Welded Connection",
   routePath: "/design/connections/beam-to-beam-splice/cover_plate_welded",
-  designType: "Cover-Plate-Welded-Connection",
+  designType: "Beam-to-Beam-Cover-Plate-Welded-Connection",
   cameraKey: "CoverPlateWelded",
   cadOptions: ["Model", "Beam", "CoverPlate"],
   
@@ -18,7 +18,7 @@ export const coverPlateWeldedConfig = {
     material: "E 165 (Fe 290)",
     member_designation: "MB 600",
     member_material: "E 165 (Fe 290)",
-    module: "Cover-Plate-Welded-Connection",
+    module: "Beam-to-Beam-Cover-Plate-Welded-Connection",
     weld_fab: "Shop Weld",
     weld_material_grade_overwrite: "290",
     weld_type: "Fillet Weld",
@@ -58,7 +58,7 @@ export const coverPlateWeldedConfig = {
       "Material": inputs.material,
       "Member.Designation": inputs.member_designation,
       "Member.Material": inputs.member_material,
-      "Module": "Cover-Plate-Welded-Connection",
+      "Module": "Beam-to-Beam-Cover-Plate-Welded-Connection",
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade_overwrite,
       "Weld.Type": inputs.weld_type,

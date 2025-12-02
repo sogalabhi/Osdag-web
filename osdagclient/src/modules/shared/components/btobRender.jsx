@@ -918,7 +918,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
       )}
 
       {/* Connector Section - only show if single selection (not multi-select) */}
-      {activeViews.includes("Connector") && !activeViews.includes("Model") && activeViews.length === 1 && geometryConnector && (
+      {(activeViews.includes("Connector") || activeViews.includes("EndPlate") || activeViews.includes("CoverPlate")) && !activeViews.includes("Model") && activeViews.length === 1 && geometryConnector && (
         <>
           <mesh
             geometry={geometryConnector}
@@ -926,7 +926,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             position={[modelPosition[0], modelPosition[1], modelPosition[2] + 1]} // Slightly offset
             rotation={[Math.PI / -2, 0, 0]}
             renderOrder={1}
-          >
+          >    
             <meshPhysicalMaterial
               attach="material"
               color="#2E5A87"

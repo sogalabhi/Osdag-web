@@ -225,6 +225,10 @@ export const useEngineeringModule = (moduleConfig) => {
       return {
         selectedOption: "Column Flange-Beam-Web", // Default for EndPlate
       };
+    } else if (moduleConfig.cameraKey === "BeamBeamEndPlate") {
+      return {
+        selectedOption: "Flushed - Reversible Moment", // Default for BeamBeamEndPlate
+      };
     } else if (moduleConfig.cameraKey === "BeamToColumnEndPlate") {
       return {
         selectedOption: "Flushed - Reversible Moment", // Default for BeamColumnEndPlate

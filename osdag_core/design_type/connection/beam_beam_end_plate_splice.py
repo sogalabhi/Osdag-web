@@ -39,6 +39,7 @@ from ...Report_functions import *
 from ...design_report.reportGenerator_latex import CreateLatex
 from importlib.resources import files
 
+from ...custom_logger import CustomLogger
 import logging
 import math
 import numpy as np
@@ -2093,4 +2094,5 @@ class BeamBeamEndPlateSplice(MomentConnection):
                                Disp_3d_image, module=self.module)
 
         # End of design report
+        return True
         

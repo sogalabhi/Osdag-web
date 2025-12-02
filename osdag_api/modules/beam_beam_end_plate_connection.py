@@ -1,14 +1,20 @@
 from osdag_api.validation_utils import validate_arr, validate_num, validate_string
 from osdag_api.errors import MissingKeyError, InvalidInputTypeError
 from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
-import osdag_api.modules.moment_connection_common as mcc
+import osdag_api.modules.moment_connection_common as scc
 from OCC.Core import BRepTools
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.Message import Message_ProgressRange
+from OCC.Core.TopoDS import TopoDS_Compound
+from OCC.Core.BRep import BRep_Builder
+from osdag_core.custom_logger import CustomLogger
 from cad.common_logic import CommonDesignLogic
+from osdag_api.modules.mesh_export import write_stl
+import json
+import traceback
 # Will log a lot of unnessecary data.
-from design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
+from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 import sys
 import os
 from typing import Dict, Any, List
@@ -17,7 +23,10 @@ import traceback
 old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
 sys.stdout = old_stdout  # Reset log
-
+import logging
+# Configure logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 def get_required_keys() -> List[str]:
     return [
@@ -281,75 +290,142 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
 
 def create_module() -> BeamBeamEndPlateSplice:
     """Create an instance of the beambeam end plate connection module design class and set it up for use"""
-    module = BeamBeamEndPlateSplice()  # Create an instance of the BeamBeamEndPlateConnection
-    module.set_osdaglogger(None)
-    return module
+
+    logger.info("Creating BeamBeamEndPlate module instance")
+    try:
+        module = BeamBeamEndPlateSplice()  # Create an instance of the BeamBeamEndPlate
+        logger.debug("BeamBeamEndPlate instance created successfully")
+        module.set_osdaglogger(None)
+        logger.debug("OSDAGLogger set to None")
+        return module
+    except Exception as e:
+        logger.error(f"Error creating BeamBeamEndPlate module: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
 
 
 def create_from_input(input_values: Dict[str, Any]) -> BeamBeamEndPlateSplice:
     """Create an instance of the beam beam end plate connection module design class from input values."""
-    # validate_input(input_values)
-    try : 
+    logger.info("Creating module from input values")
+    
+    try:
+        logger.debug("Validating input values")
+        validate_input(input_values)
+        logger.debug("Input validation successful")
+    except Exception as e:
+        logger.error(f"Input validation failed: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
+    
+    try:
+        logger.debug("Creating module instance")
         module = create_module()  # Create module instance.
-    except Exception as e : 
-        print('e in create_module : ' , e) 
-        print('error in creating module')
+        logger.debug("Module instance created successfully")
+    except Exception as e:
+        logger.error(f"Error in create_module: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
     
     # Set the input values on the module instance.
-    try : 
-        print("**********", input_values)
-        module.set_input_values(input_values)
-    except Exception as e : 
-        traceback.print_exc()
-        print('e in set_input_values ************ : ' , e)
-        print('error in setting the input values **********')
+    try:
+        logger.debug("Setting input values on module instance")
+        logger.debug(f"Input values: {input_values}")
+        # Fix connectivity key mismatch
+        if "Connectivity" not in input_values and "Connectivity *" in input_values:
+            input_values["Connectivity"] = input_values["Connectivity *"]
 
+        module.set_input_values(input_values)
+        logger.debug("Input values set successfully")
+    except Exception as e:
+        logger.error(f"Error in set_input_values: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
+
+    logger.info("Module created and initialized with input values successfully")
     return module
 
 
 def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Generate, format and return the input values from the given output values.
-    Output format (json): {
-        "Bolt.Pitch": 
+    Generate, format and return the output values for Beam-to-Beam End Plate connection.
+    Output format:
+    {
+        "Bolt.Pitch": {
             "key": "Bolt.Pitch",
-            "label": "Pitch Distance (mm)"
-            "value": 40
+            "label": "Pitch Distance (mm)",
+            "val": 40
         }
     }
     """
-    print("************")
-    output = {}  # Dictionary for formatted values
-    module = create_from_input(input_values)  # Create module from input.
-    print('module : ******' , module)
-    print('type of module : ******** ' , type(module))
-    # Generate output values in unformatted form.
-    raw_output_text = module.output_values(True)
-    stiffener_output = module.stiffener_details(True)
     
-    logs = module.logs
-    raw_output = raw_output_text + stiffener_output
-    
-    # os.system("clear")
-    # Loop over all the text values and add them to ouptut dict.
-    for param in raw_output:
-        if param[2] == "TextBox":  # If the parameter is a text output,
-            key = param[0]  # id/key
-            label = param[1]  # label text.
-            value = param[3]  # Value as string.
-            output[key] = {
-                "key": key,
-                "label": label,
-                "val": value  # Changed from "value" to "val" to match frontend expectations
-            }  # Set label, key and value in output
+    output = {} 
+    module = create_from_input(input_values)
+    print("in endplate_connection.py: module =", module)
+    print("in endplate_connection.py: module type =", type(module))
+
+    logs = []
+
+    try:
+        # --- Collect raw data from module ---
+        raw_output_text = module.output_values(True)
+        print("raw_output_text:", raw_output_text)
+
+        stiffener_output = module.stiffener_details(True)
+        print("stiffener_output:", stiffener_output)
+
+        # --- Extract logs from CustomLogger ---
+        if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
+            logs = module.logger.get_logs()
+            print(f"in endplate_connection.py: Retrieved {len(logs)} logs")
+        else:
+            print("Logger missing or not instance of CustomLogger")
+            print("Logger type:", type(module.logger) if hasattr(module, "logger") else "None")
+
+        # --- Combine all outputs ---
+        raw_output = raw_output_text + stiffener_output
+        print("in endplate_connection.py: combined raw_output length:", len(raw_output))
+
+        # --- Process every tuple ---
+        for i, param in enumerate(raw_output):
+            print(f"Processing param[{i}]: {param}")
+
+            if len(param) >= 4:  
+                key = param[0]
+                label = param[1]
+                param_type = param[2]
+                value = param[3]
+
+                print(f" -> key={key}, label={label}, type={param_type}, value={value}")
+
+                if param_type == "TextBox" and key:
+                    
+                    # handle numpy values
+                    if hasattr(value, "item"):
+                        value = value.item()
+
+                    output[key] = {
+                        "key": key,
+                        "label": label,
+                        "val": value
+                    }
+
+    except Exception as e:
+        print("Error in generate_output:", e)
+        traceback.print_exc()
+
+    print("in endplate_connection.py: Final Output:", output)
+    print("in endplate_connection.py: Output Keys:", list(output.keys()))
+    print("in endplate_connection.py: Returning logs:", logs)
+
     return output, logs
+
 
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Beam", "EndPlate"):  # Error checking: If section is valid.
+    if section not in ("Model", "Beam", "Column", "Connector"):  # Error checking: If section is valid.
         raise InvalidInputTypeError(
-            "section", "'Model', 'Beam' or 'EndPlate'")
+            "'Model', 'Beam', 'Column' or 'Connector'")
     module = create_from_input(input_values)  # Create module from input.
     print('module from input values : ' , module)
     # Object that will create the CAD model.
@@ -360,16 +436,57 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     
     try : 
         # Setup the calculations object for generating CAD model.
-        mcc.setup_for_cad(cld, module)
+        scc.setup_for_cad(cld, module)
     except Exception as e : 
         traceback.print_exc()
         print('Error in setting up cad e : ' , e)
 
     # The section of the module that will be generated.
     cld.component = section
-    
-    try : 
-        model = cld.create2Dcad()  # Generate CAD Model.
+
+    part_names = ["Beam", "Column", "Connector"]
+    part_files = {}
+    compound_model = None
+
+    try:
+        if section == "Model":
+            builder = BRep_Builder()
+            compound = TopoDS_Compound()
+            builder.MakeCompound(compound)
+
+            for part in part_names:
+                try:
+                    # Generate shape for this part
+                    cld.component = part
+                    part_shape = cld.create2Dcad()
+                    if part_shape is None:
+                        continue
+
+                    # Add to compound
+                    builder.Add(compound, part_shape)
+
+                    # Ensure per-part BREP file exists (write or overwrite)
+                    part_file_name = f"{session}_{part}.brep"
+                    part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
+                    BRepTools.breptools.Write(part_shape, part_file_path_rel, Message_ProgressRange())
+                    part_files[part] = part_file_path_rel
+                    # Also write STL for this part
+                    try:
+                        part_stl_rel = part_file_path_rel.replace(".brep", ".stl")
+                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_rel))
+                    except Exception as stle:
+                        print(f"Failed to write STL for part {part}: {stle}")
+                except Exception as e:
+                    print(f"Failed to build/write part {part}: {e}")
+
+            # Reset component to Model and set compound as the model to write
+            cld.component = section
+            compound_model = compound
+        # Generate model for non-Model sections (or fallback)
+        if compound_model is not None:
+            model = compound_model
+        else:
+            model = cld.create2Dcad()
     except Exception as e :
         print('Error in cld.create2Dcad() e : ' , e)
         return False
@@ -388,8 +505,28 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 
     try : 
         BRepTools.breptools.Write(model, file_path, Message_ProgressRange()) # Generate CAD Model
-        
+
         if section == "Model":
+            try:
+                manifest = {
+                    "session": session,
+                    "mergedBrep": file_path,
+                    "parts": [
+                        {"name": name, "brepPath": part_files.get(name)} for name in part_names if part_files.get(name)
+                    ]
+                }
+                # add stlPath for parts
+                for entry in manifest["parts"]:
+                    if entry.get("brepPath"):
+                        entry["stlPath"] = entry["brepPath"].replace(".brep", ".stl")
+                manifest_path = file_path.replace(".brep", ".parts.json")
+                full_manifest_path = os.path.join(os.getcwd(), manifest_path)
+                with open(full_manifest_path, "w", encoding="utf-8") as mf:
+                    json.dump(manifest, mf)
+                print(f"Parts manifest saved at {full_manifest_path}")
+            except Exception as me:
+                print(f"Warning: Failed to write manifest: {me}")
+
             # Save STEP
             step_writer = STEPControl_Writer()
             step_writer.Transfer(model, STEPControl_AsIs)
@@ -409,10 +546,23 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
                 print(f"IGES file saved at {full_iges_file_path}")
             else:
                 print("Warning: Failed to save IGES file!")
-        
+            # Write merged STL for Model
+            try:
+                merged_stl_rel = file_path.replace(".brep", ".stl")
+                write_stl(model, os.path.join(os.getcwd(), merged_stl_rel))
+                print(f"STL file saved at {os.path.join(os.getcwd(), merged_stl_rel)}")
+            except Exception as stle:
+                print(f"Warning: Failed to save merged STL: {stle}")
     except Exception as e : 
         print('Writing to BREP file failed e : ' , e)
-    
+
+    # For non-Model sections, export single STL next to BREP
+    if section != "Model":
+        try:
+            single_stl_rel = file_path.replace(".brep", ".stl")
+            write_stl(model, os.path.join(os.getcwd(), single_stl_rel))
+            print(f"STL file saved at {os.path.join(os.getcwd(), single_stl_rel)}")
+        except Exception as stle:
+            print(f"Warning: Failed to save STL for {section}: {stle}")
+
     return file_path
-
-

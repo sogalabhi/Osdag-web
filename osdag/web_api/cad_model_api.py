@@ -56,9 +56,9 @@ class CADGeneration(View):
                 "Cleat-Angle-Connection": "CleatAngle", 
                 "End-Plate-Connection": "EndPlate",
                 "SeatedAngleConnection": "SeatedAngleConnection",
-                "Cover-Plate-Bolted-Connection": "CoverPlateBolted",
+                "Beam-to-Beam-Cover-Plate-Bolted-Connection": "CoverPlateBolted",
                 "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
-                "Cover-Plate-Welded-Connection": "CoverPlateWelded",
+                "Beam-to-Beam-Cover-Plate-Welded-Connection": "CoverPlateWelded",
                 "Beam-to-Column-End-Plate-Connection": "BeamToColumnEndPlate",
                 "Tension-Member-Bolted-Design": "TensionMember",
                 "Tension-Member-Welded-Design": "TensionMember"
@@ -88,11 +88,11 @@ class CADGeneration(View):
         elif session_type == "SeatedAngleConnection":
             sections = ["Model", "Beam", "Column", "SeatedAngle"]
         elif session_type == "CoverPlateBolted":
-            sections = ["Model", "Beam", "Plate"]
+            sections = ["Model", "Beam", "Connector"]
         elif session_type == "BeamBeamEndPlate":
             sections = ["Model", "Beam", "EndPlate"]
         elif session_type == "CoverPlateWelded":
-            sections = ["Model", "Beam", "Plate"]
+            sections = ["Model", "Beam", "Connector"]
         elif session_type == "BeamToColumnEndPlate":
             sections = ["Model", "Beam", "Column", "Connector"]
         elif session_type == "TensionMember":
