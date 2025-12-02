@@ -93,7 +93,8 @@ export const MODULE_ROUTES = {
     BoltedToEndPlate: "/design/tension-member/bolted_to_end_gusset",
     WeldedToEndPlate: "/design/tension-member/welded_to_end_gusset",
     BoltedToEndGusset: "/design/tension-member/bolted_to_end_gusset",
-    BeamColumnEndPlate: "/design/connections/column-beam/end_plate"
+    BeamColumnEndPlate: "/design/connections/column-beam/end_plate",
+    StrutsInTrusses: "/design/compression_member/compression_member/struts_in_trusses",
     // Add other needed routes
 };
 
@@ -106,5 +107,9 @@ export const MODULE_NAME_TO_KEY = {
     "Shear Connection - Seated Angle": "SeatedAngle",
     // Tension Members
     "Tension Member Bolted Design": "BoltedToEndGusset",
+    // Moment Connection
     "Beam-to-Column End Plate Connection": "BeamColumnEndPlate",
+    "Beam-to-Beam-Cover-Plate-Bolted-Connection": "CoverPlateBolted",
+    "Beam-to-Beam-Cover-Plate-Welded-Connection": "CoverPlateWelded",
+    "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
 };

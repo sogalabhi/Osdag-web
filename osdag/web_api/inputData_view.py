@@ -24,12 +24,14 @@ INPUT_DATA_FACTORY = {
     'Cleat-Angle-Connection': CleatAngleInputData(),
     'End-Plate-Connection': EndPlateInputData(),
     'SeatedAngleConnection': SeatedAngleInputData(),
-    'Cover-Plate-Bolted-Connection': CoverPlateBoltedInputData(),
+    'Beam-to-Beam-Cover-Plate-Bolted-Connection': CoverPlateBoltedInputData(),
     'Beam-Beam-End-Plate-Connection': BeamBeamEndPlateInputData(),
-    'Cover-Plate-Welded-Connection': CoverPlateWeldedInputData(),
+    'Beam-to-Beam-Cover-Plate-Welded-Connection': CoverPlateWeldedInputData(),
     'Beam-to-Column-End-Plate-Connection': BeamToColumnEndPlateInputData(),
     'Tension-Member-Bolted-Design': TensionMemberBoltedInputData(),
     'Tension-Member-Welded-Design': TensionMemberWeldedInputData(),
+    # Use the same input-data provider as tension member so we get angleList/materialList
+    'Compression-Member-Design': TensionMemberBoltedInputData(),
     'Simply-Supported-Beam': SimplySupportedBeamInputData()
 }
 

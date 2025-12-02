@@ -606,7 +606,7 @@ class BeamCoverPlateWeld(MomentConnection):
         return KEY_DISP_BEAMCOVERPLATEWELD
 
     def set_input_values(self, design_dictionary):
-        super(BeamCoverPlateWeld, self).set_input_values(self, design_dictionary)
+        super(BeamCoverPlateWeld, self).set_input_values(design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.preference = design_dictionary[KEY_FLANGEPLATE_PREFERENCES]
 
@@ -785,8 +785,8 @@ class BeamCoverPlateWeld(MomentConnection):
         if self.IR_axial < 0.3 and self.IR_moment < 0.5:
             self.min_axial_load = 0.3 * self.axial_capacity
             self.load_moment_min = 0.5 * self.section.moment_capacity
-           self.logger.info("The Load(s) defined is/are less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
-           self.logger.info("The value of load(s) is/are set at minimum recommended value as per IS 800:2007, Cl.10.7.")
+            self.logger.info("The Load(s) defined is/are less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
+            self.logger.info("The value of load(s) is/are set at minimum recommended value as per IS 800:2007, Cl.10.7.")
 
         elif self.sum_IR <= 1.0 and self.IR_moment < 0.5:
 
@@ -796,8 +796,8 @@ class BeamCoverPlateWeld(MomentConnection):
                 self.load_moment_min = self.load.moment * 1000000 + (
                         (1 - self.sum_IR) * self.section.moment_capacity)
             self.min_axial_load = self.load.axial_force * 1000
-           self.logger.info("The value of bending moment is less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
-           self.logger.info("The value of bending moment is set at {} kNm.".format(round(self.load_moment_min / 1000000, 2)))
+            self.logger.info("The value of bending moment is less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
+            self.logger.info("The value of bending moment is set at {} kNm.".format(round(self.load_moment_min / 1000000, 2)))
 
         elif self.sum_IR <= 1.0 and self.IR_axial < 0.3:
 
@@ -806,8 +806,8 @@ class BeamCoverPlateWeld(MomentConnection):
             else:
                 self.min_axial_load = self.load.axial_force * 1000 + ((1 - self.sum_IR) * self.axial_capacity)
             self.load_moment_min = self.load.moment * 1000000
-           self.logger.info("The value of axial force is less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
-           self.logger.info("The value of axial force is set at {} kN.".format(round(self.min_axial_load / 1000, 2)))
+            self.logger.info("The value of axial force is less than the minimum recommended value [Ref. IS 800:2007, Cl.10.7].")
+            self.logger.info("The value of axial force is set at {} kN.".format(round(self.min_axial_load / 1000, 2)))
         else:
             self.min_axial_load = self.load.axial_force * 1000
             self.load_moment_min = self.load.moment * 1000000
@@ -838,22 +838,22 @@ class BeamCoverPlateWeld(MomentConnection):
                 round(self.axial_capacity / 1000, 2)))
            self.logger.error(" : Design is unsafe. \n ")
            self.logger.info(" :=========End Of design===========")
-            self.member_capacity_status = False
+           self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity1:
                self.logger.warning(' : The value of factored shear load exceeds by 0.6 times the shear capacity of the member, {} kN.'.format(
                     round(self.shear_capacity1 / 1000, 2)))
                self.logger.error(" : Design of members in high shear is not recommended by Osdag. Design is unsafe. \n ")
                self.logger.info(" :=========End Of design===========")
-                self.member_capacity_status = False
+               self.member_capacity_status = False
             else:
                 if self.load_moment > self.section.moment_capacity:
                     self.member_capacity_status = False
 
-                   self.logger.warning(' : The value of bending moment exceeds the moment capacity of the member, i.e. {} kNm.'.format(
-                        round(self.section.moment_capacity / 1000000), 2))
-                   self.logger.error(" : Design is unsafe. \n ")
-                   self.logger.info(" :=========End Of design===========")
+                    self.logger.warning(' : The value of bending moment exceeds the moment capacity of the member, i.e. {} kNm.'.format(
+                            round(self.section.moment_capacity / 1000000), 2))
+                    self.logger.error(" : Design is unsafe. \n ")
+                    self.logger.info(" :=========End Of design===========")
                 else:
                     self.member_capacity_status = True
                     self.initial_pt_thk()
@@ -904,8 +904,8 @@ class BeamCoverPlateWeld(MomentConnection):
                    self.logger.error(" : The flange plate thickness is less than the flange thickness of the section.")
                    self.logger.warning(" : The flange plate thickness should be greater than the thickness of the flange of the section, i.e. {} mm."
                                    .format( self.section.flange_thickness))
-                    self.initial_pt_thk_status =False
-                    self.design_status = False
+                   self.initial_pt_thk_status =False
+                   self.design_status = False
                 else:
                     self.flange_plate.thickness_provided = self.min_thick_based_on_area(tk=self.section.flange_thickness,
                                                                                         width=self.section.flange_width,
@@ -921,16 +921,16 @@ class BeamCoverPlateWeld(MomentConnection):
                             if self.outerwidth < 50:
                                self.logger.error(" : The outer height of the flange plate is less than 50 mm.")
                                self.logger.info(" : Select a wider section.")
-                                self.initial_pt_thk_status = False
-                                self.design_status = False
+                               self.initial_pt_thk_status = False
+                               self.design_status = False
                             else:
                                 if self.flange_plate_crs_sec_area < (self.flange_crs_sec_area * 1.05):
                                    self.logger.error(" : The area of the flange plate is less than the area of the flange.")
                                    self.logger.warning(" : The area of the flange plate should be greater than 1.05 times the area of the flange, i.e. "
                                                    "{} mm2.".format(round(self.Ap, 2)))
                                    self.logger.info(" : Increase the thickness of the plate.")
-                                    self.initial_pt_thk_status = False
-                                    self.design_status = False
+                                   self.initial_pt_thk_status = False
+                                   self.design_status = False
                                 else:
                                     self.initial_pt_thk_status = True
                                     pass
@@ -938,23 +938,23 @@ class BeamCoverPlateWeld(MomentConnection):
                             if self.outerwidth < 50 or self.innerwidth < 50:
                                self.logger.error(" : The height of the flange plates is less than 50 mm.")
                                self.logger.info(" : Select a wider section.")
-                                self.initial_pt_thk_status = False
-                                self.design_status = False
+                               self.initial_pt_thk_status = False
+                               self.design_status = False
                             else:
                                 if self.flange_plate_crs_sec_area < (self.flange_crs_sec_area * 1.05):
                                    self.logger.error(" : The area of flange plates is less than the area of the flange.")
                                    self.logger.warning(" : The area of flange plates should be greater than 1.05 times the area of the flange, i.e. {} "
                                                    "mm2.".format(round(self.Ap, 2)))
                                    self.logger.info(" : Increase the thickness of the flange plate.")
-                                    self.initial_pt_thk_status = False
-                                    self.design_status = False
+                                   self.initial_pt_thk_status = False
+                                   self.design_status = False
                                 else:
                                     self.initial_pt_thk_status = True
                                     pass
                     else:
                         self.initial_pt_thk_status = False
                         self.design_status = False
-                       self.logger.error(" : Provided flange plate thickness is not sufficient.")
+                        self.logger.error(" : Provided flange plate thickness is not sufficient.")
 
                 self.initial_pt_thk_status_web = False
                 # self.webheight_status = False
@@ -962,8 +962,8 @@ class BeamCoverPlateWeld(MomentConnection):
                    self.logger.error(" : The web plate thickness is less than the web thickness of the section.")
                    self.logger.warning(" : The web plate thickness should be greater than the thickness of web of the section, i.e. {} mm."
                                    .format(  self.section.web_thickness))
-                    self.initial_pt_thk_status_web = False
-                    self.design_status = False
+                   self.initial_pt_thk_status_web = False
+                   self.design_status = False
                 else:
 
                     self.web_plate.thickness_provided = self.min_thick_based_on_area(tk=self.section.flange_thickness,
@@ -981,10 +981,10 @@ class BeamCoverPlateWeld(MomentConnection):
                             if self.webplatewidth < self.min_web_plate_height:
                                 self.webheight_status = False
                                 self.design_status = False
-                               self.logger.error(" : Web plate error!")
-                               self.logger.warning(" : The height of the web plate ({} mm) is less than the minimum depth of the plate, i.e. {} mm"
+                                self.logger.error(" : Web plate error!")
+                                self.logger.warning(" : The height of the web plate ({} mm) is less than the minimum depth of the plate, i.e. {} mm"
                                                .format(self.webplatewidth, self.min_web_plate_height))
-                               self.logger.warning("Try a deeper section")
+                                self.logger.warning("Try a deeper section")
                             else:
                                 self.webheight_status = True
                                 if self.web_plate_crs_sec_area < (self.web_crs_area * 1.05):
@@ -992,8 +992,8 @@ class BeamCoverPlateWeld(MomentConnection):
                                    self.logger.warning(" : Area of web plates should be greater than 1.05 times the area of the web, i.e. {} mm2."
                                                    .format(round(self.Wp, 2)))
                                    self.logger.info(" : Increase the thickness of the web plate.")
-                                    self.initial_pt_thk_status_web = False
-                                    self.design_status = False
+                                   self.initial_pt_thk_status_web = False
+                                   self.design_status = False
                                 else:
                                     self.initial_pt_thk_status_web = True
                                     # self.webheight_status = True
@@ -1002,8 +1002,8 @@ class BeamCoverPlateWeld(MomentConnection):
                             if self.webplatewidth < self.min_web_plate_height:
                                 self.webheight_status = False
                                 self.design_status = False
-                               self.logger.error(" : Inner plate error!")
-                               self.logger.warning(" : Decrease the thickness of the inner flange plate or try a wider/deeper section.")
+                                self.logger.error(" : Inner plate error!")
+                                self.logger.warning(" : Decrease the thickness of the inner flange plate or try a wider/deeper section.")
                             else:
                                 self.webheight_status = True
                                 if self.web_plate_crs_sec_area < (self.web_crs_area * 1.05):
@@ -1011,15 +1011,15 @@ class BeamCoverPlateWeld(MomentConnection):
                                    self.logger.warning(" : Area of web plates should be greater than 1.05 times the area of the web, i.e. {} mm2."
                                                    .format(round(self.Wp, 2)))
                                    self.logger.info(" : Increase the thickness of the web plate.")
-                                    self.initial_pt_thk_status_web = False
-                                    self.design_status = False
+                                   self.initial_pt_thk_status_web = False
+                                   self.design_status = False
                                 else:
                                     self.initial_pt_thk_status_web = True
 
                                     pass
                     else:
                         self.initial_pt_thk_status_web = False
-                       self.logger.error(" : Provided flange plate thickness is not sufficient.")
+                        self.logger.error(" : Provided flange plate thickness is not sufficient.")
 
                 if len(self.flange_plate_thickness_possible) == 0:
                     if len(self.flange_plate.thickness) >= 2:
@@ -1043,25 +1043,25 @@ class BeamCoverPlateWeld(MomentConnection):
                 else:
                     self.initial_pt_thk_status = False and self.initial_pt_thk_status_web == False and self.webheight_status == False
                     self.design_status = False
-                   self.logger.error(" : Design is unsafe. \n ")
-                   self.logger.info(" :=========End Of design===========")
+                    self.logger.error(" : Design is unsafe. \n ")
+                    self.logger.info(" :=========End Of design===========")
 
             else:
                 self.initial_pt_thk_status = False
                 self.design_status = False
-               self.logger.warning(" : The tension capacity of the flange is less than the required flange force {} kN."
+                self.logger.warning(" : The tension capacity of the flange is less than the required flange force {} kN."
                                .format(round(self.flange_force/1000, 2)))
-               self.logger.info(" : Select a larger beam section or decrease the applied load.")
-               self.logger.error(" : Design is unsafe. \n ")
-               self.logger.info(" :=========End Of design===========")
+                self.logger.info(" : Select a larger beam section or decrease the applied load.")
+                self.logger.error(" : Design is unsafe. \n ")
+                self.logger.info(" :=========End Of design===========")
         else:
             self.initial_pt_thk_status_web = False
             self.design_status = False
-           self.logger.warning( " : The tension capacity of the web is less than the required axial force, i.e. {} kN."
+            self.logger.warning( " : The tension capacity of the web is less than the required axial force, i.e. {} kN."
                             .format(round(self.axial_force_w/1000, 2)))
-           self.logger.info(" : Select a larger beam section or decrease the applied axial load.")
-           self.logger.error(" : Design is unsafe. \n ")
-           self.logger.info(" :=========End Of design===========")
+            self.logger.info(" : Select a larger beam section or decrease the applied axial load.")
+            self.logger.error(" : Design is unsafe. \n ")
+            self.logger.info(" :=========End Of design===========")
 
 
     def web_plate_weld(self):
@@ -1228,9 +1228,9 @@ class BeamCoverPlateWeld(MomentConnection):
             else:
                 self.flange_plate_weld_status = False
                 self.design_status =False
-               self.logger.warning(" : The weld strength of the flange plate is less than the weld stress of the flange plate.")
-               self.logger.error(" : Design is unsafe.")
-               self.logger.info(" :=========End Of design===========")
+                self.logger.warning(" : The weld strength of the flange plate is less than the weld stress of the flange plate.")
+                self.logger.error(" : Design is unsafe.")
+                self.logger.info(" :=========End Of design===========")
         else:
             ################ OUTSIDE + INSIDE ###############################
             self.Required_weld_flange_length = round(self.flange_force / self.flange_weld.strength,2)
@@ -1241,7 +1241,7 @@ class BeamCoverPlateWeld(MomentConnection):
                 if self.flange_plate.Innerheight < 50:
                     self.flange_plate_weld_status = False
                     self.design_status =False
-                   self.logger.warning(" : Cannot design with inner plate, provide outer plate as input and re-design.")
+                    self.logger.warning(" : Cannot design with inner plate, provide outer plate as input and re-design.")
                 else:
                     pass
             else:
@@ -1307,11 +1307,11 @@ class BeamCoverPlateWeld(MomentConnection):
 
                 if self.flange_plate.thickness_provided > (self.section.root_radius + self.webspace-5) and self.web_plate.thickness_provided > (self.section.root_radius + self.flangespace-5)  :
                     self.design_status = False
-                   self.logger.error(" : The maximum allowable web plate thickness exceeded.")
+                    self.logger.error(" : The maximum allowable web plate thickness exceeded.")
                     #self.logger.warning(" : Maximum possible web plate thickness should not be greater than {} mm, to avoid fouling between plates".format(
                     #         self.max_possible_tk))
-                   self.logger.error(" : Design is unsafe.")
-                   self.logger.info(" :=========End Of design===========")
+                    self.logger.error(" : Design is unsafe.")
+                    self.logger.info(" :=========End Of design===========")
                     self.flange_plate_weld_status = False
                 else:
                     self.flange_plate_weld_status = True
@@ -1321,9 +1321,9 @@ class BeamCoverPlateWeld(MomentConnection):
             else:
                 self.flange_plate_weld_status = False
                 self.design_status = False
-               self.logger.warning(" : The weld strength of the flange plate is less than the weld stress of the flange plate.")
-               self.logger.error(" : Design is unsafe.")
-               self.logger.info(" :=========End Of design===========")
+                self.logger.warning(" : The weld strength of the flange plate is less than the weld stress of the flange plate.")
+                self.logger.error(" : Design is unsafe.")
+                self.logger.info(" :=========End Of design===========")
 
     def flange_plate_capacity_axial(self):  # flange plate capacity check in axial
         self.flange_plate_capacity_axial_status = False
@@ -1344,11 +1344,11 @@ class BeamCoverPlateWeld(MomentConnection):
                 else:
                     self.flange_plate_capacity_axial_status = False
                     self.design_status =False
-                   self.logger.warning(": The tension capacity of flange plate is less than required flange force, i.e. {} kN.".format( round(
-                        self.flange_force / 1000, 2)))
-                   self.logger.info(": Increase the thickness of the flange plate or decrease the applied load")
-                   self.logger.error(" : Design is unsafe.")
-                   self.logger.info(" :=========End Of design===========")
+                    self.logger.warning(": The tension capacity of flange plate is less than required flange force, i.e. {} kN.".format( round(
+                            self.flange_force / 1000, 2)))
+                    self.logger.info(": Increase the thickness of the flange plate or decrease the applied load")
+                    self.logger.error(" : Design is unsafe.")
+                    self.logger.info(" :=========End Of design===========")
             else:
                 self.flange_plate_capacity_axial_status = True
                 self.recheck_flange_capacity_axial()
@@ -1373,11 +1373,11 @@ class BeamCoverPlateWeld(MomentConnection):
                 else:
                     self.flange_plate_capacity_axial_status = False
                     self.design_status = False
-                   self.logger.warning(": The tension capacity of the flange plate is less than required flange force, i.e. {} kN.".format(round(
-                            self.flange_force / 1000, 2)))
-                   self.logger.info(": Increase the thickness of the flange plate or decrease the applied load.")
-                   self.logger.error(" : Design is unsafe.")
-                   self.logger.info(" :=========End Of design===========")
+                    self.logger.warning(": The tension capacity of the flange plate is less than required flange force, i.e. {} kN.".format(round(
+                                self.flange_force / 1000, 2)))
+                    self.logger.info(": Increase the thickness of the flange plate or decrease the applied load.")
+                    self.logger.error(" : Design is unsafe.")
+                    self.logger.info(" :=========End Of design===========")
             else:
                 self.flange_plate_capacity_axial_status = True
                 self.recheck_flange_capacity_axial()
@@ -1396,11 +1396,11 @@ class BeamCoverPlateWeld(MomentConnection):
         if self.section.tension_capacity_flange < self.flange_force:
             self.recheck_flange_capacity_axial_status = False
             self.design_status = False
-           self.logger.warning(": The tension capacity of flange is less than the required flange force, i.e. {} kN.".format( round(
-                self.flange_force / 1000, 2)))
-           self.logger.info(": Select a larger beam section or decrease the applied load.")
-           self.logger.error(" : Design is unsafe.")
-           self.logger.info(" :=========End Of design===========")
+            self.logger.warning(": The tension capacity of flange is less than the required flange force, i.e. {} kN.".format( round(
+                    self.flange_force / 1000, 2)))
+            self.logger.info(": Select a larger beam section or decrease the applied load.")
+            self.logger.error(" : Design is unsafe.")
+            self.logger.info(" :=========End Of design===========")
         else:
             self.recheck_flange_capacity_axial_status = True
             self.web_plate_capacity_axial()
@@ -1422,11 +1422,11 @@ class BeamCoverPlateWeld(MomentConnection):
             else:
                 self.web_plate_capacity_axial_status = False
                 self.design_status = False
-               self.logger.warning(": The tension capacity of the web plate is less than the required axial force, i.e. {} kN.".format( round(
-                    self.axial_force_w / 1000, 2)))
-               self.logger.info(": Increase the thickness of the web plate or decrease the applied axial load.")
-               self.logger.error(" : Design is unsafe.")
-               self.logger.info(" :=========End Of design===========")
+                self.logger.warning(": The tension capacity of the web plate is less than the required axial force, i.e. {} kN.".format( round(
+                        self.axial_force_w / 1000, 2)))
+                self.logger.info(": Increase the thickness of the web plate or decrease the applied axial load.")
+                self.logger.error(" : Design is unsafe.")
+                self.logger.info(" :=========End Of design===========")
 
         else:
             self.web_plate_capacity_axial_status = True
@@ -1446,11 +1446,11 @@ class BeamCoverPlateWeld(MomentConnection):
             else:
                 self.shear_yielding_status = False
                 self.design_status = False
-               self.logger.warning(": The shear capacity of the web plate is less than the required factored shear load, i.e. {} kN.".format(
-                    round(self.fact_shear_load / 1000, 2)))
-               self.logger.info(": Increase the thickness of the web plate or decrease the applied shear load.")
-               self.logger.error(" : Design is unsafe. \n ")
-               self.logger.info(" :=========End Of design===========")
+                self.logger.warning(": The shear capacity of the web plate is less than the required factored shear load, i.e. {} kN.".format(
+                        round(self.fact_shear_load / 1000, 2)))
+                self.logger.info(": Increase the thickness of the web plate or decrease the applied shear load.")
+                self.logger.error(" : Design is unsafe. \n ")
+                self.logger.info(" :=========End Of design===========")
         else:
             self.design_status = True
             self.shear_yielding_status = True
@@ -1466,11 +1466,11 @@ class BeamCoverPlateWeld(MomentConnection):
                 else:
                     self.web_plate_capacity_shear_status = False
                     self.design_status = False
-                   self.logger.warning(": The shear capacity of the web plate is less than the required factored shear load, i.e. {} kN."
-                                   .format(round(self.fact_shear_load/1000, 2)))
-                   self.logger.info(": Increase the thickness of the web plate or decrease the applied shear load.")
-                   self.logger.error(" : Design is unsafe. \n ")
-                   self.logger.info(" :=========End Of design===========")
+                    self.logger.warning(": The shear capacity of the web plate is less than the required factored shear load, i.e. {} kN."
+                                    .format(round(self.fact_shear_load/1000, 2)))
+                    self.logger.info(": Increase the thickness of the web plate or decrease the applied shear load.")
+                    self.logger.error(" : Design is unsafe. \n ")
+                    self.logger.info(" :=========End Of design===========")
             else:
                 self.web_plate_capacity_shear_status = True
                 self.cap_blockcheck_web_axial()
@@ -1512,22 +1512,22 @@ class BeamCoverPlateWeld(MomentConnection):
                                                     self.section.block_shear_capacity_web) ,2)
             if self.section.tension_capacity_web < self.axial_force_w:
                 self.design_status = False
-               self.logger.warning(" : The tension capacity of the web is less than the required axial force, i.e. {} kN.".format(round(
-                    self.axial_force_w / 1000, 2)))
-               self.logger.info(" : Select a larger beam section or decrease the applied axial load.")
-               self.logger.error(" : Design is unsafe.")
-               self.logger.info(" :=========End Of design===========")
+                self.logger.warning(" : The tension capacity of the web is less than the required axial force, i.e. {} kN.".format(round(
+                        self.axial_force_w / 1000, 2)))
+                self.logger.info(" : Select a larger beam section or decrease the applied axial load.")
+                self.logger.error(" : Design is unsafe.")
+                self.logger.info(" :=========End Of design===========")
             else:
                 self.design_status = True
-               self.logger.info(" : Overall beam cover plate welded connection design is safe.")
-               self.logger.info(" :=========End Of design===========")
+                self.logger.info(" : Overall beam cover plate welded connection design is safe.")
+                self.logger.info(" :=========End Of design===========")
         else:
             self.design_status = False
-           self.logger.warning(" : The block shear capacity of the web is less than the required axial force, i.e. {} kN."
-                           .format(round(self.axial_force_w / 1000, 2)))
-           self.logger.info(" : Select a larger beam section or decrease the applied axial load.")
-           self.logger.error(" : Design is unsafe.")
-           self.logger.info(" :=========End Of design===========")
+            self.logger.warning(" : The block shear capacity of the web is less than the required axial force, i.e. {} kN."
+                            .format(round(self.axial_force_w / 1000, 2)))
+            self.logger.info(" : Select a larger beam section or decrease the applied axial load.")
+            self.logger.error(" : Design is unsafe.")
+            self.logger.info(" :=========End Of design===========")
         if self.preference == "Outside":
             self.flange_out_plate_tk = self.flange_plate.thickness_provided
             self.flange_in_plate_tk = 0.0
@@ -2743,6 +2743,7 @@ class BeamCoverPlateWeld(MomentConnection):
         rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image)
+        return True
 
 
 

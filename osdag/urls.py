@@ -24,6 +24,7 @@ from osdag.web_api.beam_to_column_endplate_output import BeamToColumnEndPlateOut
 from osdag.web_api.tensionmemberbolted_outputView import TensionMemberBoltedOutputData
 from osdag.web_api.tensionmemberwelded_outputView import TensionMemberWeldedOutputData
 from osdag.web_api.simplysupportedbeam_outputView import SimplySupportedBeamOutputData
+from osdag.web_api.compression_member_outputView import CompressionMemberOutputData
 from osdag.web_api.report_customization_api import ParseReportSections, CustomizeReport, GenerateInitialReport
 # temporary
 app_name = 'osdag-web/'
@@ -114,14 +115,14 @@ urlpatterns = [
     path('calculate-output/SeatedAngleConnection',
          SeatedAngleOutputData.as_view(),name="SeatedAngleConnection"),
     
-    path('calculate-output/Cover-Plate-Bolted-Connection',
-         CoverPlateBoltedOutputData.as_view(),name="Cover-Plate-Bolted-Connection"),
+    path('calculate-output/Beam-to-Beam-Cover-Plate-Bolted-Connection',
+         CoverPlateBoltedOutputData.as_view(),name="Beam-to-Beam-Cover-Plate-Bolted-Connection"),
     
     path('calculate-output/Beam-Beam-End-Plate-Connection',
          BeamBeamEndPlateOutputData.as_view(),name="Beam-Beam-End-Plate-Connection"),
     
-    path('calculate-output/Cover-Plate-Welded-Connection',
-         CoverPlateWeldedOutputData.as_view(),name="Cover-Plate-Welded-Connection"),
+    path('calculate-output/Beam-to-Beam-Cover-Plate-Welded-Connection',
+         CoverPlateWeldedOutputData.as_view(),name="Beam-to-Beam-Cover-Plate-Welded-Connection"),
     
     path('calculate-output/Beam-to-Column-End-Plate-Connection',
          BeamToColumnEndPlateOutputData.as_view(), name='Beam-to-Column-End-Plate-Connection'),
@@ -132,6 +133,8 @@ urlpatterns = [
          TensionMemberWeldedOutputData.as_view(),name="Tension-Member-Welded-Design"),
     path('calculate-output/Simply-Supported-Beam',
          SimplySupportedBeamOutputData.as_view(), name="Simply-Supported-Beam"),
+    path('calculate-output/Compression-Member-Design',
+         CompressionMemberOutputData.as_view(), name="Compression-Member-Design"),
     
     # Report customization API endpoints
     path('api/report/generate-initial/', GenerateInitialReport.as_view(), name='generate-initial-report'),
