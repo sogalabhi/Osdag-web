@@ -62,7 +62,9 @@ class CADGeneration(View):
                 "Beam-to-Column-End-Plate-Connection": "BeamToColumnEndPlate",
                 "Tension-Member-Bolted-Design": "TensionMember",
                 "Tension-Member-Welded-Design": "TensionMember"
-
+                # Compression member design shares the same API pattern but currently has no CAD implementation.
+                # We still map it here so the endpoint recognises the module_id and can short-circuit gracefully.
+                "Compression-Member-Design": "CompressionMember",
             }
             
             session_type = module_type_mapping.get(module_id)

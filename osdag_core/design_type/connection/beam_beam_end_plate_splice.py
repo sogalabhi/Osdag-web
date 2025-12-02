@@ -37,7 +37,7 @@ from ...utils.common.other_standards import *
 from ...design_report.reportGenerator import save_html
 from ...Report_functions import *
 from ...design_report.reportGenerator_latex import CreateLatex
-from importlib.resources import files
+from importlib_resources import files
 
 from ...custom_logger import CustomLogger
 import logging
