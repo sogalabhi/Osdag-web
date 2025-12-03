@@ -9,10 +9,10 @@ from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
 from osdag_core.custom_logger import CustomLogger
-from cad.common_logic import CommonDesignLogic
 from osdag_api.modules.mesh_export import write_stl
 import json
 import traceback
+from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
 import sys

@@ -36,7 +36,7 @@ from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.BRepTools import breptools_Write
 from osdag_api.modules.mesh_export import write_stl
 import json
-from cad.common_logic import CommonDesignLogic
+from osdag_core.cad.common_logic import CommonDesignLogic
 from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
 import sys
 import os

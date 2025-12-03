@@ -6,7 +6,6 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from osdag_api import get_module_api
 
-
 @method_decorator(csrf_exempt, name='dispatch')
 class CompressionMemberOutputData(APIView):
     def post(self, request):
@@ -44,5 +43,3 @@ class CompressionMemberOutputData(APIView):
         
         print('in compression_member_outputView.py: Returning final response')
         return JsonResponse({"data": output, "logs": new_logs, "success": True}, safe=False, status=201)
-
-

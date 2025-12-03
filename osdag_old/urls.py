@@ -1,31 +1,38 @@
 from django.urls import path
-from osdag.web_api.input_data_api import InputValues
-from osdag.web_api.output_data_api import OutputValues
-from osdag.web_api.cad_model_api import CADGeneration
-from osdag.web_api.cad_model_download import CADDownload
-from osdag.web_api.modules_api import GetModules
-from osdag.web_api.inputData_view import InputData, DesignView
-from osdag.web_api.outputCalc_view import OutputData
-from osdag.web_api.design_report_csv_view import CreateDesignReport, GetPDF, CompanyLogoView
-from osdag.web_api.design_pref_api import DesignPreference, MaterialDetails
-from osdag.web_api.user_view import SignupView, ForgetPasswordView, LogoutView, LoginView, ObtainInputFileView, CheckEmailView, SaveInputFileView, SetRefreshTokenCookieView
-from osdag.web_api.jwt_api import JWTHomeView
-from osdag.web_api.google_sso_api import GoogleSSOView
-from osdag.web_api.project_api import ProjectAPI, ProjectDetailAPI, ProjectByNameAPI
-from osdag.web_api.osi_api import SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload
-from . import views
-from osdag.web_api.endplate_outputView import EndPLateOutputData
-from osdag.web_api.cleatangle_outputView import CleatAngleOutputData
-from osdag.web_api.seatedangle_outputView import SeatedAngleOutputData
-from osdag.web_api.coverplatebolted_outputView import CoverPlateBoltedOutputData
-from osdag.web_api.beambeamendplate_outputView import BeamBeamEndPlateOutputData
-from osdag.web_api.cover_plate_weld_output import CoverPlateWeldedOutputData
-from osdag.web_api.beam_to_column_endplate_output import BeamToColumnEndPlateOutputData
-from osdag.web_api.tensionmemberbolted_outputView import TensionMemberBoltedOutputData
-from osdag.web_api.tensionmemberwelded_outputView import TensionMemberWeldedOutputData
-from osdag.web_api.simplysupportedbeam_outputView import SimplySupportedBeamOutputData
-from osdag.web_api.compression_member_outputView import CompressionMemberOutputData
-from osdag.web_api.report_customization_api import ParseReportSections, CustomizeReport, GenerateInitialReport
+# Import from apps.core for migrated views (avoids osdag.models import)
+from apps.core.api import (
+    DesignPreference, MaterialDetails,
+    SignupView, ForgetPasswordView, LogoutView, LoginView,
+    ObtainInputFileView, CheckEmailView, SaveInputFileView, SetRefreshTokenCookieView,
+    JWTHomeView, GoogleSSOView,
+    ProjectAPI, ProjectDetailAPI, ProjectByNameAPI,
+    SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
+    CompanyLogoView,
+    ParseReportSections, CustomizeReport, GenerateInitialReport,
+    CADGeneration, CADDownload,
+    GetModules
+)
+from apps.core import views
+# Import from apps.core to avoid osdag.models import
+from apps.core.api.legacy.input_data_api import InputValues
+from apps.core.api.legacy.output_data_api import OutputValues
+from apps.core.api.legacy.inputData_view import InputData, DesignView
+# OutputData removed - migrated modules now use apps.modules.* URLs
+# from apps.core.web_api.outputCalc_view import OutputData
+from apps.core.api import CreateDesignReport, GetPDF
+# Import from apps.core to avoid osdag.models import
+# Migrated modules removed - now handled by apps.modules.*
+# from apps.core.web_api.endplate_outputView import EndPLateOutputData
+# from apps.core.web_api.cleatangle_outputView import CleatAngleOutputData
+# from apps.core.web_api.seatedangle_outputView import SeatedAngleOutputData
+# from apps.core.web_api.coverplatebolted_outputView import CoverPlateBoltedOutputData
+# from apps.core.web_api.beambeamendplate_outputView import BeamBeamEndPlateOutputData
+# from apps.core.web_api.cover_plate_weld_output import CoverPlateWeldedOutputData
+# from apps.core.web_api.beam_to_column_endplate_output import BeamToColumnEndPlateOutputData
+# Keep non-migrated modules (legacy endpoints)
+from apps.core.api.legacy.output_views.tensionmemberbolted_outputView import TensionMemberBoltedOutputData
+from apps.core.api.legacy.output_views.tensionmemberwelded_outputView import TensionMemberWeldedOutputData
+from apps.core.api.legacy.output_views.simplysupportedbeam_outputView import SimplySupportedBeamOutputData
 # temporary
 app_name = 'osdag-web/'
 
@@ -103,30 +110,17 @@ urlpatterns = [
     path('api/projects/<int:project_id>/osi', ProjectOsiDownload.as_view()),
 
     # output generation from input
-    path('calculate-output/FinPlateConnection',
-         OutputData.as_view(), name='FinPlateConnection'),
-
-    path('calculate-output/End-Plate-Connection',
-         EndPLateOutputData.as_view(), name='End-Plate-Connection'),
+    # Migrated modules removed - now handled by apps.modules.* URLs:
+    # - FinPlateConnection -> /api/modules/shear-connection/fin-plate/design/
+    # - End-Plate-Connection -> /api/modules/shear-connection/end-plate/design/
+    # - Cleat-Angle-Connection -> /api/modules/shear-connection/cleat-angle/design/
+    # - SeatedAngleConnection -> /api/modules/shear-connection/seated-angle/design/
+    # - Cover-Plate-Bolted-Connection -> /api/modules/moment-connection/cover-plate-bolted/design/
+    # - Beam-Beam-End-Plate-Connection -> /api/modules/moment-connection/beam-beam-end-plate/design/
+    # - Cover-Plate-Welded-Connection -> /api/modules/moment-connection/cover-plate-welded/design/
+    # - Beam-to-Column-End-Plate-Connection -> /api/modules/moment-connection/beam-column-end-plate/design/
     
-    path('calculate-output/Cleat-Angle-Connection',
-         CleatAngleOutputData.as_view(),name="Cleat-Angle-Connection"),
-    
-    path('calculate-output/SeatedAngleConnection',
-         SeatedAngleOutputData.as_view(),name="SeatedAngleConnection"),
-    
-    path('calculate-output/Beam-to-Beam-Cover-Plate-Bolted-Connection',
-         CoverPlateBoltedOutputData.as_view(),name="Beam-to-Beam-Cover-Plate-Bolted-Connection"),
-    
-    path('calculate-output/Beam-Beam-End-Plate-Connection',
-         BeamBeamEndPlateOutputData.as_view(),name="Beam-Beam-End-Plate-Connection"),
-    
-    path('calculate-output/Beam-to-Beam-Cover-Plate-Welded-Connection',
-         CoverPlateWeldedOutputData.as_view(),name="Beam-to-Beam-Cover-Plate-Welded-Connection"),
-    
-    path('calculate-output/Beam-to-Column-End-Plate-Connection',
-         BeamToColumnEndPlateOutputData.as_view(), name='Beam-to-Column-End-Plate-Connection'),
-    
+    # Keep legacy calculate-output URLs for non-migrated modules
     path('calculate-output/Tension-Member-Bolted-Design',
          TensionMemberBoltedOutputData.as_view(),name="Tension-Member-Bolted-Design"),
     path('calculate-output/Tension-Member-Welded-Design',

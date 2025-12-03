@@ -1,4 +1,4 @@
-from Common import KEY_DISP_FLEXURE
+from osdag_core.Common import KEY_DISP_FLEXURE
 from osdag_api.validation_utils import validate_arr, validate_num, validate_string
 from osdag_api.errors import MissingKeyError, InvalidInputTypeError
 from osdag_api.utils import contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
@@ -6,8 +6,8 @@ from OCC.Core import BRepTools
 from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
-from cad.common_logic import CommonDesignLogic
-from design_type.flexural_member.flexure import Flexure
+from osdag_core.cad.common_logic import CommonDesignLogic
+from osdag_core.design_type.flexural_member.flexure import Flexure
 import sys
 import os
 from typing import Dict, Any, List
@@ -79,9 +79,9 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure:
         member_designation = []
     
     # Map input_values to exact keys expected by Flexure.set_input_values
-    # Using the actual constant string values from Common.py
+    # Using the actual constant string values from osdag_core.Common.py
     design_dict = {
-        # Map frontend keys to exact constant values from Common.py
+        # Map frontend keys to exact constant values from osdag_core.Common.py
         'Module': input_values.get('Module', 'Simply-Supported-Beam'),
         'Member.Profile': input_values.get('Member.Profile', ''),
         'Member.Designation': member_designation,  # Use processed array
