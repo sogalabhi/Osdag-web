@@ -345,7 +345,7 @@ KEY_DISP_BASE_PLATE = 'Base Plate Connection'
 KEY_DISP_TRUSS_BOLTED = 'Truss Connection Bolted'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam-to-Beam Cover Plate Bolted Connection'
-KEY_DISP_COLUMNCOVERPLATE = 'Column-to-Column Cover Plate Bolted Connection'
+KEY_DISP_COLUMNCOVERPLATE = 'Column-to-Column-Cover-Plate-Bolted-Connection'
 KEY_DISP_BEAMCOVERPLATEWELD = 'Beam-to-Beam Cover Plate Welded Connection'
 KEY_DISP_COLUMNCOVERPLATEWELD = 'Column-to-Column Cover Plate Welded Connection'
 KEY_DISP_LAPJOINTBOLTED = 'Lap Joint Bolted Connection'

@@ -132,7 +132,8 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
         "Bolts",
         "cleatAngle",
         "SeatedAngle",
-        "Connector"
+        "Connector",
+        "Cover Plate"
       ]);
 
       Object.entries(modelPaths).forEach(([key, dataUrl]) => {
@@ -348,7 +349,10 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
     () => (parsedModels?.SeatedAngle ? getGeometry(parsedModels.SeatedAngle) : null),
     [parsedModels, texture]
   );
-
+  const geometryCoverPlate = useMemo(
+    () => (parsedModels?.["Cover Plate"] ? getGeometry(parsedModels["Cover Plate"]) : null),
+    [parsedModels, texture]
+  );
   if (!parsedModels) {
     return null;
   }
@@ -721,6 +725,48 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
           />
         </>
       )}
+
+      {/* Cover Plate Section */}
+      {activeViews.includes("CoverPlate") &&
+        !activeViews.includes("Model") &&
+        activeViews.length === 1 &&
+        geometryCoverPlate && (
+          <>
+            <mesh
+              geometry={geometryCoverPlate}
+              scale={modelScale}
+              position={modelPosition}
+              rotation={[Math.PI / -2, 0, 0]}  // Change if needed
+              renderOrder={1}
+            >
+              <meshPhysicalMaterial
+                color={partColors.Plate}
+                attach="material"
+                metalness={0.25}
+                roughness={0.3}
+                opacity={1.0}
+                transparent={true}
+                transmission={0.008}
+                clearcoat={1.0}
+                clearcoatRoughness={0.25}
+              />
+            </mesh>
+
+            {/* Outlines */}
+            <primitive
+              object={
+                new THREE.LineSegments(
+                  new THREE.EdgesGeometry(geometryCoverPlate, 15),
+                  new THREE.LineBasicMaterial({ color: "black" })
+                )
+              }
+              scale={modelScale}
+              position={modelPosition}
+              rotation={[Math.PI / -2, 0, 0]}
+            />
+          </>
+      )}
+
 
       {/* Plate Section - show Plate and Bolt as separate parts (for Fin Plate connections) */}
       {activeViews.includes("Plate") && !activeViews.includes("Model") && activeViews.length === 1 && modelMeshes.length > 0 && (

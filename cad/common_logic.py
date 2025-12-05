@@ -1321,7 +1321,7 @@ class CommonDesignLogic(object):
 
         elif self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
 
-            C = self.module_class()
+            C = self.module_class
             columnLenght = (max(float(C.flange_plate.length), float(C.web_plate.length)) + 600) / 2
             column = ISection(B=float(C.section.flange_width), T=float(C.section.flange_thickness),
                               D=float(C.section.depth), t=float(C.section.web_thickness),

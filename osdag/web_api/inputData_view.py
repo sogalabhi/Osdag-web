@@ -13,6 +13,7 @@ from .inputdata.end_plate_input import EndPlateInputData
 from .inputdata.seated_angle_input import SeatedAngleInputData
 from .inputdata.cover_plate_bolted_input import CoverPlateBoltedInputData
 from .inputdata.beam_beam_end_plate_input import BeamBeamEndPlateInputData
+from .inputdata.column_column_cover_plate_welded_input import ColumnCoverPlateWeldedInputData
 from .inputdata.cover_plate_weld_input import CoverPlateWeldedInputData
 from .inputdata.beam_to_column_end_plate_input import BeamToColumnEndPlateInputData
 from .inputdata.tension_member_bolted_input import TensionMemberBoltedInputData
@@ -26,6 +27,7 @@ INPUT_DATA_FACTORY = {
     'SeatedAngleConnection': SeatedAngleInputData(),
     'Beam-to-Beam-Cover-Plate-Bolted-Connection': CoverPlateBoltedInputData(),
     'Beam-Beam-End-Plate-Connection': BeamBeamEndPlateInputData(),
+    'Column-to-Column-Cover-Plate-Welded-Connection' : ColumnCoverPlateWeldedInputData(),
     'Beam-to-Beam-Cover-Plate-Welded-Connection': CoverPlateWeldedInputData(),
     'Beam-to-Column-End-Plate-Connection': BeamToColumnEndPlateInputData(),
     'Tension-Member-Bolted-Design': TensionMemberBoltedInputData(),
