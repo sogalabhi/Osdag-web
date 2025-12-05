@@ -71,7 +71,7 @@ const LoginPage = () => {
     const [fPasswordNewPass, setFPasswordNewPass] = useState('');
 
     useEffect(() => {
-        if (!isLoggedIn) {
+        if (isLoggedIn) {
             navigate('/home');
         }
     }, [isLoggedIn]);

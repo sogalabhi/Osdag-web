@@ -17,7 +17,7 @@ from osdag.views import dashboard_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('osdag.urls')),
+    # path('', include('osdag.urls')),
     path('api/auth/firebase-login/', FirebaseLoginView.as_view(), name="firebase_login"),
     # path("api/auth/firebase-login/", views.firebase_login, name="firebase_login"),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
