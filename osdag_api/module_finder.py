@@ -1,4 +1,4 @@
-from osdag_api.modules import beam_beam_end_plate_connection, fin_plate_connection,end_plate_connection,cleat_angle_connection,seated_angle_connection,cover_plate_bolted_connection, cover_plate_welded_connection, beam_column_end_plate,bolted_tension_member, simply_supported_beam, welded_tension_member, column_to_column_cover_plated_welded_connection
+from osdag_api.modules import beam_beam_end_plate_connection, fin_plate_connection,end_plate_connection,cleat_angle_connection,seated_angle_connection,cover_plate_bolted_connection, cover_plate_welded_connection, beam_column_end_plate,bolted_tension_member, simply_supported_beam, welded_tension_member, column_to_column_cover_plated_welded_connection, column_to_column_cover_plate_bolted_connection, column_to_column_end_plate
 from types import ModuleType
 import typing
 from typing import Dict, Any, List
@@ -37,7 +37,9 @@ module_dict : Dict[str, ModuleApiType] = {
     'Cleat-Angle-Connection': cleat_angle_connection,
     'SeatedAngleConnection': seated_angle_connection,
     'Beam-to-Beam-Cover-Plate-Bolted-Connection': cover_plate_bolted_connection,
+    'Column-to-Column-Cover-Plate-Bolted-Connection': column_to_column_cover_plate_bolted_connection,
     'Beam-Beam-End-Plate-Connection': beam_beam_end_plate_connection,
+    'Column-to-Column-End-Plate-Connection': column_to_column_end_plate,
     'Column-to-Column-Cover-Plate-Welded-Connection': column_to_column_cover_plated_welded_connection,
     'Beam-to-Beam-Cover-Plate-Welded-Connection': cover_plate_welded_connection,
     'Beam-to-Column-End-Plate-Connection': beam_column_end_plate,

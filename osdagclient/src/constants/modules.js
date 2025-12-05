@@ -115,4 +115,6 @@ export const MODULE_NAME_TO_KEY = {
     "Beam-to-Beam-Cover-Plate-Welded-Connection": "CoverPlateWelded",
     "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
     "Column-to-Column-Cover-Plate-Welded-Connection" : "CCCoverPlateWelded",
+    "Column-to-Column-Cover-Plate-Bolted-Connection" : "CCCoverPlateBolted",
+    "Column-to-Column-End-Plate-Connection" : "CCEndPlate",
 };

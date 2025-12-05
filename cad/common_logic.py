@@ -1269,7 +1269,7 @@ class CommonDesignLogic(object):
     def createCCCoverPlateCAD(self):
 
         if self.connection == KEY_DISP_COLUMNCOVERPLATE:
-            C = self.module_class()
+            C = self.module_class
             columnLenght = (max(float(C.flange_plate.length), float(C.web_plate.length)) + 600) / 2
             # column = ISection(B=206.4, T=17.3, D=215.8, t=10, R1=15, R2=75, alpha=94, length=1000, notchObj=None)
             # flangePlate = Plate(L=240, W=203.6, T=10)
@@ -1897,7 +1897,7 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, welds, update=True, color=Quantity_NOC_RED)
 
             elif self.connection == KEY_DISP_COLUMNCOVERPLATE:
-                self.C = self.module_class()
+                self.C = self.module_class
                 self.CPObj = self.createCCCoverPlateCAD()
                 columns = self.CPObj.get_column_models()
                 plates = self.CPObj.get_plate_models()
