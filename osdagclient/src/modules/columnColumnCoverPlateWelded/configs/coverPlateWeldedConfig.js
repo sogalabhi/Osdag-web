@@ -57,7 +57,7 @@ export const coverPlateWeldedConfig = {
       "Load.Shear": inputs.load_shear || "0",
       "Material": inputs.material,
       "Member.Designation": inputs.member_designation,
-      "Member.Material": inputs.member_material,
+      "Member.Material": inputs.material,
       "Module": "Column-to-Column-Cover-Plate-Welded-Connection",
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade_overwrite,
