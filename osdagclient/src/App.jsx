@@ -35,6 +35,8 @@ import CompressionMember from "./modules/compressionMember/CompressionMember";
 
 // Beam modules
 import SimplySupportedBeam from "./modules/flexuralMember/simplySupportedBeam";
+import OnCantilever from "./modules/flexuralMember/onCantilever";
+import Purlin from "./modules/flexuralMember/purlin";
 import BeamBeamEndPlate from "./modules/beamBeamEndPlate/BeamBeamEndPlate";
 
 // Cover plate modules
@@ -66,6 +68,8 @@ function App() {
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_welded/:projectId?" element={<CoverPlateWelded />} />
         <Route path="/design/:designType/beam-to-beam-splice/end_plate/:projectId?" element={<BeamBeamEndPlate />} />
         <Route path="/design/:designType/simply_supported_beam/:projectId?" element={<SimplySupportedBeam />} />
+        <Route path="/design/:designType/on_cantilever/:projectId?" element={<OnCantilever />} />
+        <Route path="/design/:designType/purlin/:projectId?" element={<Purlin />} />
         <Route path="/design/:designType/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
         <Route path="/design/:designType/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
         <Route path="/design/:designType/column-beam/:projectId?" element={<BeamToColumnEndPlate />} />
