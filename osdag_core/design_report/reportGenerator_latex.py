@@ -15,7 +15,7 @@ from pylatex import Math, TikZ, Axis, Plot, Figure, Matrix, Alignat, TextColor, 
 from pylatex.base_classes import Environment, CommandBase, Arguments
 from pylatex.package import Package
 from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, MediumText, LineBreak, simple_page_number, NewPage
-from importlib_resources import files
+from importlib.resources import files
 from ..Report_functions import *
 from ..utils.common.common_calculation import *
 from pylatex.utils import NoEscape

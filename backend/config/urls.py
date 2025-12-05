@@ -11,6 +11,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from apps.core.api.legacy.outputCalc_view import OutputData
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,6 +24,9 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    # Catch-all for migrated modules using the legacy calculate-output URL pattern
+    path('calculate-output/<str:module_id>', OutputData.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
