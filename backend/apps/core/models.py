@@ -18,6 +18,7 @@ class Project(models.Model):
     """Project object to store minimal project info and file location."""
     name = models.CharField(max_length=200)
     # Optional module and submodule identifiers for routing/reporting
+    
     module = models.CharField(max_length=200, blank=True, null=True)
     submodule = models.CharField(max_length=200, blank=True, null=True)
     # Canonical inputs persisted as JSON
@@ -28,6 +29,7 @@ class Project(models.Model):
     user_email = models.CharField(max_length=200, blank=True, null=True)
     
     class Meta:
+        app_label = 'core'
         db_table = "Project"
         ordering = ['-updated_at']  # Most recent first
 
@@ -45,6 +47,7 @@ class OsiFile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        app_label = 'core'
         db_table = "OsiFile"
 
     def __str__(self):
@@ -61,6 +64,7 @@ class Design(models.Model):
     cad_design_status = models.BooleanField(blank=True)
     
     class Meta : 
+        app_label = 'core'
         db_table = "Design"
 
 
@@ -73,12 +77,14 @@ class UserAccount(models.Model) :
     allInputValueFiles = ArrayField(models.TextField(blank = True))
 
     class Meta : 
+        app_label = 'core'
         db_table = "UserAccount"
 
 class Anchor_Bolt(models.Model):
     Diameter = models.TextField()
 
     class Meta:
+        app_label = 'core'
         db_table = "Anchor_Bolt"
 
 
@@ -91,6 +97,7 @@ class Angle_Pitch(models.Model):
     S3 = models.IntegerField(null=True)
 
     class Meta:
+        app_label = 'core'
         db_table = "Angle_Pitch"
 
 
@@ -123,6 +130,7 @@ class Angles(models.Model):
     Type = models.CharField(max_length=100, null=True)
 
     class Meta:
+        app_label = 'core'
         db_table = "Angles"
 
 
@@ -151,6 +159,7 @@ class Beams(models.Model):
     Type = models.CharField(null=True, max_length=100)
 
     class Meta:
+        app_label = 'core'
         db_table = "Beams"
 
 
@@ -159,6 +168,7 @@ class Bolt(models.Model):
     Bolt_diameter = models.TextField()
 
     class Meta:
+        app_label = 'core'
         db_table = "Bolt"
 
 
@@ -170,6 +180,7 @@ class Bolt_fy_fu(models.Model):
     fu = models.IntegerField()
 
     class Meta:
+        app_label = 'core'
         db_table = "Bolt_fy_fu"
 
 
@@ -190,6 +201,7 @@ class CHS(models.Model):
     Source = models.CharField(max_length=50)
 
     class Meta:
+        app_label = 'core'
         db_table = "CHS"
 
 
@@ -219,6 +231,7 @@ class Channels(models.Model):
     Type = models.CharField(null=True, max_length=100)
 
     class Meta:
+        app_label = 'core'
         db_table = "Channels"
 
 
@@ -247,6 +260,7 @@ class Columns(models.Model):
     Type = models.CharField(null=True, max_length=100)
 
     class Meta:
+        app_label = 'core'
         db_table = "Columns"
 
 
@@ -278,6 +292,7 @@ class EqualAngle(models.Model):
     It = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
+        app_label = 'core'
         db_table = "EqualAngle"
 
 
@@ -309,6 +324,7 @@ class UnequalAngle(models.Model):
     It = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
+        app_label = 'core'
         db_table = "UnequalAngle"
 
 
@@ -321,6 +337,7 @@ class Material(models.Model):
     Elongation = models.IntegerField(db_column="Elongation ", blank=True)
 
     class Meta:
+        app_label = 'core'
         db_table = "Material"
 
 class CustomMaterials(models.Model):
@@ -333,6 +350,7 @@ class CustomMaterials(models.Model):
     Elongation = models.IntegerField(db_column="Elongation ", blank=True)
 
     class Meta:
+        app_label = 'core'
         db_table = "CustomMaterials"
 
 
@@ -354,6 +372,7 @@ class RHS(models.Model):
     Source = models.CharField(max_length=50)
 
     class Meta:
+        app_label = 'core'
         db_table = "RHS"
 
 
@@ -375,4 +394,5 @@ class SHS(models.Model):
     Source = models.CharField(max_length=50)
 
     class Meta:
+        app_label = 'core'
         db_table = "SHS"

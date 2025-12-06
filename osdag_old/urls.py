@@ -1,41 +1,3 @@
-from django.urls import path
-# Import from apps.core for migrated views (avoids osdag.models import)
-from apps.core.api import (
-    DesignPreference, MaterialDetails,
-    SignupView, ForgetPasswordView, LogoutView, LoginView,
-    ObtainInputFileView, CheckEmailView, SaveInputFileView, SetRefreshTokenCookieView,
-    JWTHomeView, GoogleSSOView,
-    ProjectAPI, ProjectDetailAPI, ProjectByNameAPI,
-    SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
-    CompanyLogoView,
-    ParseReportSections, CustomizeReport, GenerateInitialReport,
-    CADGeneration, CADDownload,
-    GetModules
-)
-from apps.core import views
-# Import from apps.core to avoid osdag.models import
-from apps.core.api.legacy.input_data_api import InputValues
-from apps.core.api.legacy.output_data_api import OutputValues
-from apps.core.api.legacy.inputData_view import InputData, DesignView
-# OutputData removed - migrated modules now use apps.modules.* URLs
-# from apps.core.web_api.outputCalc_view import OutputData
-from apps.core.api import CreateDesignReport, GetPDF
-# Import from apps.core to avoid osdag.models import
-# Migrated modules removed - now handled by apps.modules.*
-# from apps.core.web_api.endplate_outputView import EndPLateOutputData
-# from apps.core.web_api.cleatangle_outputView import CleatAngleOutputData
-# from apps.core.web_api.seatedangle_outputView import SeatedAngleOutputData
-# from apps.core.web_api.coverplatebolted_outputView import CoverPlateBoltedOutputData
-# from apps.core.web_api.beambeamendplate_outputView import BeamBeamEndPlateOutputData
-# from apps.core.web_api.cover_plate_weld_output import CoverPlateWeldedOutputData
-# from apps.core.web_api.beam_to_column_endplate_output import BeamToColumnEndPlateOutputData
-# Keep non-migrated modules (legacy endpoints)
-from apps.core.api.legacy.output_views.tensionmemberbolted_outputView import TensionMemberBoltedOutputData
-from apps.core.api.legacy.output_views.tensionmemberwelded_outputView import TensionMemberWeldedOutputData
-from apps.core.api.legacy.output_views.simplysupportedbeam_outputView import SimplySupportedBeamOutputData
-# temporary
-app_name = 'osdag-web/'
-
 urlpatterns = [
     # Session endpoints removed - no longer needed for multi-module support
     path('design/input_values/', InputValues.as_view()),
@@ -44,7 +6,7 @@ urlpatterns = [
     path('design/output_values', OutputValues.as_view()),
     path('design/cad/', CADGeneration.as_view()),
     path('design/cad', CADGeneration.as_view()),
-    path('design/downloadCad/' , CADDownload.as_view()),
+    path('design/downloadCad/', CADDownload.as_view()),
     path('design/downloadCad', CADDownload.as_view()),
     path('modules', GetModules.as_view()),
     path('modules/', GetModules.as_view()),
@@ -75,27 +37,27 @@ urlpatterns = [
     path('populate', InputData.as_view()),
     path('design', DesignView.as_view()),
 #     Legacy
-#     path('generate-report' , CreateDesignReport.as_view()),
-#     path('getPDF' , GetPDF.as_view()),
+#     path('generate-report', CreateDesignReport.as_view()),
+#     path('getPDF', GetPDF.as_view()),
     path('design-preferences/', DesignPreference.as_view(), name="design-pref"),
     path('materialDetails/', MaterialDetails.as_view()),
-    path('company-logo/' , CompanyLogoView.as_view()),
+    path('company-logo/', CompanyLogoView.as_view()),
 
-    # authentications nad authorozation URL mappings
-    path('jwt/home' , JWTHomeView.as_view()),     # view for testing purpose
-    path('googlesso/' , GoogleSSOView.as_view()),
+    # authentications and authorization URL mappings
+    path('jwt/home', JWTHomeView.as_view()),     # view for testing purpose
+    path('googlesso/', GoogleSSOView.as_view()),
 
     # user urls 
-    path('user/signup/' , SignupView.as_view()),
-    path('user/forgetpassword/' , ForgetPasswordView.as_view()),
-    path('user/logout/' ,  LogoutView.as_view()),
-    path('user/login/' , LoginView.as_view()),
-    path('user/checkemail/' , CheckEmailView.as_view()),
-    path('user/saveinput/' , SaveInputFileView.as_view()),
-    path('user/obtain-input-file/' , ObtainInputFileView.as_view()),
+    path('user/signup/', SignupView.as_view()),
+    path('user/forgetpassword/', ForgetPasswordView.as_view()),
+    path('user/logout/', LogoutView.as_view()),
+    path('user/login/', LoginView.as_view()),
+    path('user/checkemail/', CheckEmailView.as_view()),
+    path('user/saveinput/', SaveInputFileView.as_view()),
+    path('user/obtain-input-file/', ObtainInputFileView.as_view()),
     # osi upload via DRF (multipart form-data)
     path('api/save-osi/', SaveInputFileView.as_view()),
-    path('user/set-refresh/' , SetRefreshTokenCookieView.as_view()),
+    path('user/set-refresh/', SetRefreshTokenCookieView.as_view()),
 
     # project management urls
     path('api/projects/', ProjectAPI.as_view(), name='projects'),
@@ -119,17 +81,26 @@ urlpatterns = [
     # - Beam-Beam-End-Plate-Connection -> /api/modules/moment-connection/beam-beam-end-plate/design/
     # - Cover-Plate-Welded-Connection -> /api/modules/moment-connection/cover-plate-welded/design/
     # - Beam-to-Column-End-Plate-Connection -> /api/modules/moment-connection/beam-column-end-plate/design/
-    
-    # Keep legacy calculate-output URLs for non-migrated modules
+
+    # Keep legacy calculate-output URLs for non-migrated modules (your new joints)
+    path('calculate-output/Butt-Joint-Welded',
+         ButtJointWeldedOutputView.as_view(), name='Butt-Joint-Welded'),
+    path('calculate-output/Butt-Joint-Bolted',
+         ButtJointBoltedOutputView.as_view(), name='Butt-Joint-Bolted'),
+    path('calculate-output/Lap-Joint-Welded',
+         LapJointWeldedOutputView.as_view(), name='Lap-Joint-Welded'),
+    path('calculate-output/Lap-Joint-Bolted',
+         LapJointBoltedOutputView.as_view(), name='Lap-Joint-Bolted'),
+
     path('calculate-output/Tension-Member-Bolted-Design',
-         TensionMemberBoltedOutputData.as_view(),name="Tension-Member-Bolted-Design"),
+         TensionMemberBoltedOutputData.as_view(), name="Tension-Member-Bolted-Design"),
     path('calculate-output/Tension-Member-Welded-Design',
-         TensionMemberWeldedOutputData.as_view(),name="Tension-Member-Welded-Design"),
+         TensionMemberWeldedOutputData.as_view(), name="Tension-Member-Welded-Design"),
     path('calculate-output/Simply-Supported-Beam',
          SimplySupportedBeamOutputData.as_view(), name="Simply-Supported-Beam"),
     path('calculate-output/Compression-Member-Design',
          CompressionMemberOutputData.as_view(), name="Compression-Member-Design"),
-    
+
     # Report customization API endpoints
     path('api/report/generate-initial/', GenerateInitialReport.as_view(), name='generate-initial-report'),
     path('api/report/parse-sections/', ParseReportSections.as_view(), name='parse-report-sections'),

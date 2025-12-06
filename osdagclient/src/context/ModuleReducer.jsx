@@ -27,12 +27,14 @@ export default (state, action) => {
         sectionProfileList = [],
         endPlateTypeList = [],
         weldTypes = [],
-        weldFab = []
+        weldFab = [],
+        coverPlateList = [],
+        weldSizeList = [],
       } = action.payload;
 
       // Merge with existing custom materials from localStorage if needed
       const existingCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials") || "[]");
-      const mergedMaterialList = existingCustomMaterials.length > 0 
+      const mergedMaterialList = existingCustomMaterials.length > 0
         ? [...materialList, ...existingCustomMaterials]
         : materialList;
 
@@ -40,27 +42,29 @@ export default (state, action) => {
         ...state,
         // Core data lists
         materialList: mergedMaterialList,
+        coverPlateList,
         boltDiameterList,
         thicknessList,
         propertyClassList,
         boltTypeList,
         connectivityList,
-        
+
         // Structural elements
         beamList,
         columnList,
-        
+
         // Module-specific lists
         angleList,
         topAngleList,
         channelList,
         sectionProfileList,
         endPlateTypeList,
-        
+
         // Welding data
         weldTypes,
         weldFab,
-        
+        weldSizeList,
+
         // Clear any previous errors
         error_msg: "",
       };
@@ -197,10 +201,10 @@ export default (state, action) => {
       // Consolidated action for both supporting and supported section updates
       const { sectionType, materialValue } = action.payload;
       const designPrefData = { ...state.designPrefData };
-      
+
       const isCustom = materialValue?.includes?.("Cus") || false;
       const sectionKey = sectionType === "supporting" ? "supporting_section_results" : "supported_section_results";
-      
+
       if (designPrefData[sectionKey] && designPrefData[sectionKey][0]) {
         const sectionResults = { ...designPrefData[sectionKey][0] };
         sectionResults.Source = isCustom ? "Custom" : "IS808_Rev";
@@ -254,11 +258,11 @@ export default (state, action) => {
     case "SAVE_MATERIAL_DETAILS": {
       // Unified action for all material detail saving
       const { materialType, materialData } = action.payload;
-      
+
       switch (materialType) {
         case "connector":
           return { ...state, conn_material_details: materialData, error_msg: "" };
-        case "supported": 
+        case "supported":
           return { ...state, supported_material_details: materialData, error_msg: "" };
         case "supporting":
           return { ...state, supporting_material_details: materialData, error_msg: "" };

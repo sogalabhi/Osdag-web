@@ -44,6 +44,8 @@ export const EngineeringModule = ({
     sectionDesignation,
     cadModelPaths,
     hoverDict: ctxHoverDict,
+    coverPlateList,
+    weldSizeList,
 
     // State
     inputs,
@@ -486,7 +488,7 @@ export const EngineeringModule = ({
       return ["Model", "Beam", "Column", "End Plate"];
     }
 
-    return  moduleConfig.cadOptions || ["Model", "Beam", "Connector"];
+    return moduleConfig.cadOptions || ["Model", "Beam", "Connector"];
   };
 
   const options = getViewOptions();
@@ -503,7 +505,9 @@ export const EngineeringModule = ({
     boltTypeList,
     sectionProfileList,
     channelList,
-    sectionDesignation
+    sectionDesignation,
+    coverPlateList,
+    weldSizeList,
   };
 
   const triggerScreenshotCapture = () => {
@@ -530,19 +534,19 @@ export const EngineeringModule = ({
       Member: "Member",
       Angle: "Angle",
     };
-    
+
     // Backend hover_dict values override defaults
     const final = {
       ...defaults,
       ...(ctxHoverDict || {}),
     };
-    
+
     // Debug: log hoverDict to see what we have
     if (ctxHoverDict && Object.keys(ctxHoverDict).length > 0) {
       console.log('[EngineeringModule] ctxHoverDict:', ctxHoverDict);
       console.log('[EngineeringModule] Final hoverDict:', final);
     }
-    
+
     return final;
   }, [ctxHoverDict]);
 
@@ -600,7 +604,7 @@ export const EngineeringModule = ({
             className={`group p-2 rounded-md transition-colors ${showInputDock
               ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
               : 'hover:bg-black/10 dark:hover:bg-black/40'
-            }`}
+              }`}
             title={`${showInputDock ? 'Hide' : 'Show'} input dock`}
             type="button"
           >
@@ -635,11 +639,10 @@ export const EngineeringModule = ({
           </button>
           <button
             onClick={toggleLogs}
-            className={`p-2 rounded-md transition-colors ${
-              showLogs
-                ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
-                : 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40'
-            }`}
+            className={`p-2 rounded-md transition-colors ${showLogs
+              ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
+              : 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40'
+              }`}
             title={`${showLogs ? 'Hide' : 'Show'} logs`}
             type="button"
           >
@@ -662,9 +665,9 @@ export const EngineeringModule = ({
               {/* Bottom section fill */}
               <rect
                 x="5"
-                y="65"       
+                y="65"
                 width="90"
-                height="30"   
+                height="30"
                 fill="currentColor"
                 stroke="none"
               />
@@ -808,9 +811,9 @@ export const EngineeringModule = ({
                 <button
                   onClick={() => setDesignPrefModalStatus(true)}
                   className={`flex items-center justify-center px-4 py-1 my-2 text-sm font-medium rounded-lg transition-colors bg-osdag-green text-white hover:bg-osdag-dark-green`}
-                    // ${isInputLocked ? 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400' : 'bg-osdag-green text-white hover:bg-osdag-dark-green'}`}
+                  // ${isInputLocked ? 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400' : 'bg-osdag-green text-white hover:bg-osdag-dark-green'}`}
                   title={isInputLocked ? 'Unlock the dock to edit additional inputs' : 'Open Additional Inputs'}
-                  // disabled={isInputLocked}
+                // disabled={isInputLocked}
                 >
                   Additional Inputs
                 </button>
@@ -834,49 +837,49 @@ export const EngineeringModule = ({
                 </button>
                 {/* POPUP WARNING */}
                 {showUnlockWarning && (
-                      <div
-                        style={{
-                          position: "fixed",
-                          inset: 0,
-                          backgroundColor: "rgba(0, 0, 0, 0.7)",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          zIndex: 9999,
-                        }}
-                      >
-                        <div
-                          style={{
-                            backgroundColor: "white",
-                            padding: "20px",
-                            borderRadius: "8px",
-                            width: "300px",
-                            boxShadow: "0 0 10px rgba(0,0,0,0.25)",
-                          }}
+                  <div
+                    style={{
+                      position: "fixed",
+                      inset: 0,
+                      backgroundColor: "rgba(0, 0, 0, 0.7)",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 9999,
+                    }}
+                  >
+                    <div
+                      style={{
+                        backgroundColor: "white",
+                        padding: "20px",
+                        borderRadius: "8px",
+                        width: "300px",
+                        boxShadow: "0 0 10px rgba(0,0,0,0.25)",
+                      }}
+                    >
+                      <h2 className="text-lg font-semibold mb-4">Warning</h2>
+                      <p className="mb-6">
+                        The current designs will be lost.
+                        You can save them by clicking on <strong>Save Input</strong>.
+                      </p>
+
+                      <div className="flex justify-end gap-3">
+                        <button
+                          onClick={cancelUnlock}
+                          className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
                         >
-                          <h2 className="text-lg font-semibold mb-4">Warning</h2>
-                          <p className="mb-6">
-                            The current designs will be lost.  
-                            You can save them by clicking on <strong>Save Input</strong>.
-                          </p>
+                          Cancel
+                        </button>
 
-                          <div className="flex justify-end gap-3">
-                            <button
-                              onClick={cancelUnlock}
-                              className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
-                            >
-                              Cancel
-                            </button>
-
-                            <button
-                              onClick={confirmUnlock}
-                              className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
-                            >
-                              Unlock
-                            </button>
-                          </div>
-                        </div>
+                        <button
+                          onClick={confirmUnlock}
+                          className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+                        >
+                          Unlock
+                        </button>
                       </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -1046,7 +1049,7 @@ export const EngineeringModule = ({
                     <label
                       key={option}
                       className={`flex items-center gap-3 px-4 py-2 cursor-pointer text-sm font-medium text-black dark:text-white`}
-                        // rounded-lg cursor-pointer transition-colors text-sm font-medium ${isChecked ? 'bg-osdag-green/10 text-osdag-green dark:bg-osdag-dark-green/20 dark:text-osdag-green' : 'text-black dark:text-white hover:bg-black/10 dark:hover:bg-black/40'}`}
+                    // rounded-lg cursor-pointer transition-colors text-sm font-medium ${isChecked ? 'bg-osdag-green/10 text-osdag-green dark:bg-osdag-dark-green/20 dark:text-osdag-green' : 'text-black dark:text-white hover:bg-black/10 dark:hover:bg-black/40'}`}
                     >
                       {/* Checkbox highlight box */}
                       <div
@@ -1058,52 +1061,52 @@ export const EngineeringModule = ({
                           }
                         `}
                       >
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-400 text-osdag-green focus:ring-osdag-green"
-                        checked={isChecked}
-                        onChange={(event) => {
-                          if (isModel) {
-                            // If Model is selected, clear all others and select only Model
-                            if (event.target.checked) {
-                              setSelectedSection(["Model"]);
-                              setSelectedView("Model");
-                              setSelectedCameraView("Model");
-                            } else {
-                              // Don't allow unchecking Model if it's the only one
-                              if (selectedSection.length === 1 && selectedSection[0] === "Model") {
-                                return;
-                              }
-                            }
-                          } else {
-                            // If a non-Model option is selected
-                            if (event.target.checked) {
-                              // Remove Model from selection and add this option
-                              const newSelection = selectedSection.filter(s => s !== "Model");
-                              if (!newSelection.includes(option)) {
-                                newSelection.push(option);
-                              }
-                              setSelectedSection(newSelection);
-                              // Use first selected for camera/view if needed
-                              setSelectedView(newSelection[0]);
-                              setSelectedCameraView(newSelection[0]);
-                            } else {
-                              // Uncheck: remove this option
-                              const newSelection = selectedSection.filter(s => s !== option);
-                              // If nothing left, default to Model
-                              if (newSelection.length === 0) {
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-gray-400 text-osdag-green focus:ring-osdag-green"
+                          checked={isChecked}
+                          onChange={(event) => {
+                            if (isModel) {
+                              // If Model is selected, clear all others and select only Model
+                              if (event.target.checked) {
                                 setSelectedSection(["Model"]);
                                 setSelectedView("Model");
                                 setSelectedCameraView("Model");
                               } else {
+                                // Don't allow unchecking Model if it's the only one
+                                if (selectedSection.length === 1 && selectedSection[0] === "Model") {
+                                  return;
+                                }
+                              }
+                            } else {
+                              // If a non-Model option is selected
+                              if (event.target.checked) {
+                                // Remove Model from selection and add this option
+                                const newSelection = selectedSection.filter(s => s !== "Model");
+                                if (!newSelection.includes(option)) {
+                                  newSelection.push(option);
+                                }
                                 setSelectedSection(newSelection);
+                                // Use first selected for camera/view if needed
                                 setSelectedView(newSelection[0]);
                                 setSelectedCameraView(newSelection[0]);
+                              } else {
+                                // Uncheck: remove this option
+                                const newSelection = selectedSection.filter(s => s !== option);
+                                // If nothing left, default to Model
+                                if (newSelection.length === 0) {
+                                  setSelectedSection(["Model"]);
+                                  setSelectedView("Model");
+                                  setSelectedCameraView("Model");
+                                } else {
+                                  setSelectedSection(newSelection);
+                                  setSelectedView(newSelection[0]);
+                                  setSelectedCameraView(newSelection[0]);
+                                }
                               }
                             }
-                          }
-                        }}
-                      />
+                          }}
+                        />
                       </div>
                       <span>{option}</span>
                     </label>
@@ -1287,15 +1290,15 @@ export const EngineeringModule = ({
             maskClosable={false}
             className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
           >
-              <DesignPrefSections
-                module={moduleConfig.sessionName}
-                inputs={inputs}
-                setInputs={setInputs}
-                setDesignPrefModalStatus={setDesignPrefModalStatus}
-                confirmationModal={confirmationModal}
-                setConfirmationModal={setConfirmationModal}
-                isInputLocked={isInputLocked}
-              />
+            <DesignPrefSections
+              module={moduleConfig.sessionName}
+              inputs={inputs}
+              setInputs={setInputs}
+              setDesignPrefModalStatus={setDesignPrefModalStatus}
+              confirmationModal={confirmationModal}
+              setConfirmationModal={setConfirmationModal}
+              isInputLocked={isInputLocked}
+            />
           </Modal>
         )
       }

@@ -12,12 +12,23 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from osdag.views import FirebaseLoginView
-from osdag.views import dashboard_view
+
+import sys
+import os
+from pathlib import Path
+
+# Add backend to sys.path to allow importing apps
+BASE_DIR = Path(__file__).resolve().parent.parent
+BACKEND_DIR = BASE_DIR / 'backend'
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.append(str(BACKEND_DIR))
+
+from apps.core.views import FirebaseLoginView, dashboard_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', include('osdag.urls')),
+    path('', include('apps.core.urls')),
     path('api/auth/firebase-login/', FirebaseLoginView.as_view(), name="firebase_login"),
     # path("api/auth/firebase-login/", views.firebase_login, name="firebase_login"),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),

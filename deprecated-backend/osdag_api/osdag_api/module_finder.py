@@ -1,4 +1,11 @@
-from osdag_api.modules import beam_beam_end_plate_connection, fin_plate_connection,end_plate_connection,cleat_angle_connection,seated_angle_connection,cover_plate_bolted_connection, cover_plate_welded_connection, beam_column_end_plate,bolted_tension_member, simply_supported_beam, welded_tension_member, compression_member
+from osdag_api.modules import (
+    beam_beam_end_plate_connection, fin_plate_connection, end_plate_connection,
+    cleat_angle_connection, seated_angle_connection, cover_plate_bolted_connection, 
+    cover_plate_welded_connection, beam_column_end_plate,
+    bolted_tension_member, simply_supported_beam, welded_tension_member, 
+    butt_joint_welded, butt_joint_bolted, lap_joint_bolted, lap_joint_welded,
+    compression_member
+)
 from types import ModuleType
 import typing
 from typing import Dict, Any, List
@@ -40,6 +47,10 @@ module_dict : Dict[str, ModuleApiType] = {
     'Beam-Beam-End-Plate-Connection': beam_beam_end_plate_connection,
     'Beam-to-Beam-Cover-Plate-Welded-Connection': cover_plate_welded_connection,
     'Beam-to-Column-End-Plate-Connection': beam_column_end_plate,
+    'Butt-Joint-Welded': butt_joint_welded,
+    'Butt-Joint-Bolted': butt_joint_bolted,
+    'Lap-Joint-Welded': lap_joint_welded,
+    'Lap-Joint-Bolted': lap_joint_bolted,
     'Tension-Member-Bolted-Design': bolted_tension_member,
     'Tension-Member-Welded-Design': welded_tension_member,
     'Simply-Supported-Beam': simply_supported_beam,

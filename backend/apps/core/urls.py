@@ -26,6 +26,8 @@ urlpatterns = [
     # Authentication and authorization
     path('jwt/home', JWTHomeView.as_view()),  # view for testing purpose
     path('googlesso/', GoogleSSOView.as_view()),
+    path('api/auth/firebase-login/', views.FirebaseLoginView.as_view(), name="firebase_login"),
+    path('api/dashboard/', views.dashboard_view, name='dashboard'),
     
     # User URLs
     path('user/signup/', SignupView.as_view()),

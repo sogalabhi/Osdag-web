@@ -216,6 +216,7 @@ export const InputSection = ({
       setInputs({ ...safeInputs, [field.key]: allKeys });
       updateSelectionState(field.selectionKey, "Customized");
       updateModalState(field.modalKey, true);
+      toggleAllSelected(field.key, false);
     } else {
       // "All" option - get all values and set them in inputs 
       const allValues = getAllValuesForInputKey(field.key);
@@ -231,6 +232,7 @@ export const InputSection = ({
       updateSelectedItems(field.key, []);
       updateSelectionState(field.selectionKey, "All");
       updateModalState(field.modalKey, false);
+      toggleAllSelected(field.key, true); // fix allSelected flag not triggering
     }
   };
 
@@ -239,7 +241,8 @@ export const InputSection = ({
 
     switch (field.type) {
       case 'select': {
-        const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options);
+        // workaround for simple connections
+        const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options) && !(field.key.includes("plate1") || field.key.includes("plate2"));
         const rawList = Array.isArray(field.options) ? field.options : safeContextData[field.options];
         const options = Array.isArray(field.options) ? field.options : toSelectOptions(rawList);
 
