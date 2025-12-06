@@ -10,7 +10,7 @@ function SimplySupportedBeam() {
       moduleConfig={simplySupportedBeamConfig}
       OutputDockComponent={SimplySupportedBeamOutputDock}
       menuItems={menuItems}
-      title="Simply Supported Beam (Flexural Member)"
+      title="Simply Supported Beam(Flexural M ember)"
     />
   );
 }

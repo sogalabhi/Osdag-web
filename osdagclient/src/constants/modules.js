@@ -86,7 +86,8 @@ export const GENERIC_SUBMODULE_CONTENT = {
             label: "Flexure Member",
             options: [
                 { key: "SimplySupportedBeam", label: "Simply Supported Beam", img: "shear_fin_plate_connec.svg" },
-                { key: "CantileverBeam", label: "Cantilever Beam", img: "shear_fin_plate_connec.svg" },
+                { key: "OnCantilever", label: "Cantilever Beam", img: "shear_fin_plate_connec.svg" },
+                { key: "Purlin", label: "Purlin", img: "shear_fin_plate_connec.svg" },
                 { key: "PlateGirder", label: "Plate Girder", img: "shear_fin_plate_connec.svg" },
             ],
         },
@@ -106,6 +107,8 @@ export const MODULE_ROUTES = {
     LapJointWelded: "/design/connections/simple/lap_joint_welded",
     LapJointBolted: "/design/connections/simple/lap_joint_bolted",
     SimplySupportedBeam: "/design/flexure_member/simply_supported_beam",
+    OnCantilever: "/design/flexure/on_cantilever",
+    Purlin: "/design/flexure/purlin",
     BoltedToEndPlate: "/design/tension-member/bolted_to_end_gusset",
     WeldedToEndPlate: "/design/tension-member/welded_to_end_gusset",
     BoltedToEndGusset: "/design/tension-member/bolted_to_end_gusset",
