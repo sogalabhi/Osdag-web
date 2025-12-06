@@ -43,9 +43,12 @@ import CompressionMember from "./modules/compressionMember/CompressionMember";
 import SimplySupportedBeam from "./modules/flexuralMember/simplySupportedBeam";
 import OnCantilever from "./modules/flexuralMember/onCantilever";
 import Purlin from "./modules/flexuralMember/purlin";
+import ColumnColumnEndPlate from "./modules/columnColumnEndPlate/ColumnColumnEndPlate";
 import BeamBeamEndPlate from "./modules/beamBeamEndPlate/BeamBeamEndPlate";
 
 // Cover plate modules
+import ColumnColumnCoverPlateBolted from "./modules/columnColumnCoverPlateBolted/CoverPlateBolted";
+import ColumnColumnCoverPlateWelded from "./modules/columnColumnCoverPlateWelded/CoverPlateWelded";
 import CoverPlateBolted from "./modules/coverPlateBolted/CoverPlateBolted";
 import CoverPlateWelded from "./modules/coverPlateWelded/CoverPlateWelded";
 
@@ -70,6 +73,9 @@ function App() {
         <Route path="/design/:designType/shear/end_plate/:projectId?" element={<EndPlate />} />
         <Route path="/design/:designType/shear/seatAngle/:projectId?" element={<SeatedAngle />} />
         <Route path="/design/:designType/shear/cleat_angle/:projectId?" element={<CleatAngle />} />
+        <Route path="/design/:designType/column-to-column-splice/cover_plate_bolted/:projectId?" element={<ColumnColumnCoverPlateBolted />} />
+        <Route path="/design/:designType/column-to-column-splice/cover_plate_welded/:projectId?" element={<ColumnColumnCoverPlateWelded />} />
+        <Route path="/design/:designType/column-to-column-splice/end_plate/:projectId?" element={<ColumnColumnEndPlate />} />
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_bolted/:projectId?" element={<CoverPlateBolted />} />
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_welded/:projectId?" element={<CoverPlateWelded />} />
         <Route path="/design/:designType/beam-to-beam-splice/end_plate/:projectId?" element={<BeamBeamEndPlate />} />

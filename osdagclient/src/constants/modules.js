@@ -40,19 +40,19 @@ export const CONNECTIONS_TAB_CONTENT = {
             options: [
                 { key: "CoverPlateBolted", label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
                 { key: "CoverPlateWelded", label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
-                { key: "EndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" },
+                { key: "BeamBeamEndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" }, 
             ],
         },
         {
             label: "Beam to Column Splice",
-            options: [{ key: "EndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" }],
+            options: [{ key: "BeamColumnEndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" }],
         },
         {
             label: "Column to Column Splice",
             options: [
-                { key: "CoverPlateBolted", label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
-                { key: "CoverPlateWelded", label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
-                { key: "EndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" },
+                { key: "CCCoverPlateBolted", label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
+                { key: "CCCoverPlateWelded", label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
+                { key: "CCEndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" },
             ],
         },
     ],
@@ -99,6 +99,9 @@ export const MODULE_ROUTES = {
     CleatAngle: "/design/connections/shear/cleat_angle",
     EndPlate: "/design/connections/shear/end_plate",
     SeatedAngle: "/design/connections/shear/seatAngle",
+    CCCoverPlateBolted: "/design/connections/column-to-column-splice/cover_plate_bolted",
+    CCCoverPlateWelded: "/design/connections/column-to-column-splice/cover_plate_welded",
+    CCEndPlate: "/design/connections/column-to-column-splice/end_plate",
     CoverPlateBolted: "/design/connections/beam-to-beam-splice/cover_plate_bolted",
     CoverPlateWelded: "/design/connections/beam-to-beam-splice/cover_plate_welded",
     BeamBeamEndPlate: "/design/connections/beam-to-beam-splice/end_plate",
@@ -131,4 +134,7 @@ export const MODULE_NAME_TO_KEY = {
     "Beam-to-Beam-Cover-Plate-Bolted-Connection": "CoverPlateBolted",
     "Beam-to-Beam-Cover-Plate-Welded-Connection": "CoverPlateWelded",
     "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
+    "Column-to-Column-Cover-Plate-Welded-Connection" : "CCCoverPlateWelded",
+    "Column-to-Column-Cover-Plate-Bolted-Connection" : "CCCoverPlateBolted",
+    "Column-to-Column-End-Plate-Connection" : "CCEndPlate",
 };

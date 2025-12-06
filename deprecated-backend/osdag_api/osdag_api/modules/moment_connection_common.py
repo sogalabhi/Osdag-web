@@ -20,3 +20,9 @@ def setup_for_cad(cdl: CommonDesignLogic, module_class):
         cdl.CPObj = cdl.createBBCoverPlateCAD()
     if module_object.module == "Beam-to-Column End Plate Connection":
         cdl.CPObj = cdl.createBCEndPlateCAD() # Initialize the CAD object for beam-column end plate
+    if module_object.module == "Column-to-Column-Cover-Plate-Welded-Connection":
+        cdl.CPObj = cdl.createCCCoverPlateCAD()
+    if module_object.module == "Column-to-Column-Cover-Plate-Bolted-Connection":
+        cdl.CPObj = cdl.createCCCoverPlateCAD()
+    if module_object.module == "Column-to-Column-End-Plate-Connection":
+        cdl.CEPObj = cdl.createCCEndPlateCAD()

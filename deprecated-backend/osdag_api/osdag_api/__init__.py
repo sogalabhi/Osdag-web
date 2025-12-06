@@ -14,7 +14,10 @@ developed_modules = [
     "Lap-Joint-Welded",
     "Lap-Joint-Bolted",
     "Tension-Member-Bolted-Design",
-    "Simply-Supported-Beam"
+    "Simply-Supported-Beam",
+    "Column-to-Column-Cover-Plate-Welded-Connection",
+    "Column-to-Column-Cover-Plate-Bolted-Connection",
+    "Column-to-Column-End-Plate-Connection"
 ]
 
 module_dict = [
@@ -101,5 +104,24 @@ module_dict = [
         "image": "/static/images/modules/simply_supported_beam.png",
         "name": "Simply Supported Beam",
         "path": "Flexural Member/simply_supported_beam"
-    }
+    },
+    {
+        "key": "Column-to-Column-Cover-Plate-Welded-Connection",
+        "image": "/static/images/modules/column_column_cover_plate_welded_connection.png",
+        "name": "Column-to-Column-Cover-Plate-Welded-Connection",
+        "path": "Connection/Moment Connection"
+    },
+    {
+        "key": "Column-to-Column-Cover-Plate-Bolted-Connection",
+        "image": "/static/images/modules/column_column_cover_plate_bolted_connection.png",
+        "name": "Column-to-Column-Cover-Plate-Bolted-Connection",
+        "path": "Connection/Moment Connection"
+    },
+    {
+        "key": "Column-to-Column-End-Plate-Connection",
+        "image": "/static/images/modules/column_column_end_plate_connection.png",
+        "name": "Column-to-Column-End-Plate-Connection",
+        "path": "Connection/Moment Connection"
+    },
+
 ]
