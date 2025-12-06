@@ -26,6 +26,12 @@ import CleatAngle from "./modules/shearConnection/cleatAngle/CleatAngle";
 import EndPlate from "./modules/shearConnection/endPlate/EndPlate";
 import SeatedAngle from "./modules/shearConnection/seatAngle/SeatedAngle";
 
+// Simple connection modules
+import ButtJointWelded from "./modules/SimpleConnection/ButtJointWelded/ButtJointWelded";
+import ButtJointBolted from "./modules/SimpleConnection/ButtJointBolted/ButtJointBolted";
+import LapJointWelded from "./modules/SimpleConnection/LapJointWelded/LapJointWelded";
+import LapJointBolted from "./modules/SimpleConnection/LapJointBolted/LapJointBolted";
+
 // Tension members modules
 import BoltedToEnd from "./modules/TensionMembers/BoltedToEnd/BoltedToEnd";
 import WeldedToEnd from "./modules/TensionMembers/WeldedToEnd/WeldedToEnd";
@@ -65,6 +71,10 @@ function App() {
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_bolted/:projectId?" element={<CoverPlateBolted />} />
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_welded/:projectId?" element={<CoverPlateWelded />} />
         <Route path="/design/:designType/beam-to-beam-splice/end_plate/:projectId?" element={<BeamBeamEndPlate />} />
+        <Route path="/design/:designType/simple/butt_joint_welded/:projectId?" element={<ButtJointWelded />} />
+        <Route path="/design/:designType/simple/butt_joint_bolted/:projectId?" element={<ButtJointBolted />} />
+        <Route path="/design/:designType/simple/lap_joint_welded/:projectId?" element={<LapJointWelded />} />
+        <Route path="/design/:designType/simple/lap_joint_bolted/:projectId?" element={<LapJointBolted />} />
         <Route path="/design/:designType/simply_supported_beam/:projectId?" element={<SimplySupportedBeam />} />
         <Route path="/design/:designType/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
         <Route path="/design/:designType/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />

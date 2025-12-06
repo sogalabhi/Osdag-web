@@ -18,7 +18,10 @@ from .inputdata.beam_to_column_end_plate_input import BeamToColumnEndPlateInputD
 from .inputdata.tension_member_bolted_input import TensionMemberBoltedInputData
 from .inputdata.tension_member_welded_input import TensionMemberWeldedInputData
 from .inputdata.simply_supported_beam_input import SimplySupportedBeamInputData
-
+from .inputdata.butt_joint_welded_input import ButtJointWeldedInputData
+from .inputdata.butt_joint_bolted_input import ButtJointBoltedInputData
+from .inputdata.lap_joint_welded_input import LapJointWeldedInputData
+from .inputdata.lap_joint_bolted_input import LapJointBoltedInputData
 INPUT_DATA_FACTORY = {
     'FinPlateConnection': FinPlateInputData(),
     'Cleat-Angle-Connection': CleatAngleInputData(),
@@ -30,9 +33,17 @@ INPUT_DATA_FACTORY = {
     'Beam-to-Column-End-Plate-Connection': BeamToColumnEndPlateInputData(),
     'Tension-Member-Bolted-Design': TensionMemberBoltedInputData(),
     'Tension-Member-Welded-Design': TensionMemberWeldedInputData(),
+<<<<<<< HEAD:osdag/web_api/inputData_view.py
+    'Simply-Supported-Beam': SimplySupportedBeamInputData(),
+    'Butt-Joint-Welded': ButtJointWeldedInputData(),
+    'Butt-Joint-Bolted': ButtJointBoltedInputData(),
+    'Lap-Joint-Welded': LapJointWeldedInputData(),
+    'Lap-Joint-Bolted': LapJointBoltedInputData(),
+=======
     # Use the same input-data provider as tension member so we get angleList/materialList
     'Compression-Member-Design': TensionMemberBoltedInputData(),
     'Simply-Supported-Beam': SimplySupportedBeamInputData()
+>>>>>>> ddf6b31a8a093ec3a2d9bd13cb922f02324b9393:osdag_old/web_api/inputData_view.py
 }
 
 

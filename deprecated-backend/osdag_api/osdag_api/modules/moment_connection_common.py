@@ -1,4 +1,8 @@
+<<<<<<< HEAD:osdag_api/modules/moment_connection_common.py
+from osdag_core.cad.common_logic import CommonDesignLogic  # Changed to osdag_core as ButtJointedBoltedCad is present there.
+=======
 from osdag_core.cad.common_logic import CommonDesignLogic
+>>>>>>> ddf6b31a8a093ec3a2d9bd13cb922f02324b9393:deprecated-backend/osdag_api/osdag_api/modules/moment_connection_common.py
 from OCC.Display.backend import *
 from osdag_core.Common import *
 def setup_for_cad(cdl: CommonDesignLogic, module_class):

@@ -29,6 +29,8 @@ export const useEngineeringModule = (moduleConfig) => {
     renderCadModel,
     cadModelPaths,
     hoverDict,
+    coverPlateList,
+    weldSizeList,
 
     // NEW SIMPLIFIED API - 8 Core Functions Only
     getModuleData,              // Universal data fetcher
@@ -584,7 +586,8 @@ export const useEngineeringModule = (moduleConfig) => {
       propertyClassList,
       thicknessList,
       angleList, // FIXED: Added angleList to submission params
-      channelList
+      channelList,
+      weldSizeList,
     }, extraState);
 
     // Show loading modal
@@ -808,6 +811,8 @@ export const useEngineeringModule = (moduleConfig) => {
     renderCadModel,
     cadModelPaths,
     hoverDict,
+    coverPlateList,
+    weldSizeList,
 
     // NEW SIMPLIFIED API - 8 Core Functions Only
     // SIMPLIFIED API ACCESS - Expose core functions for advanced usage
