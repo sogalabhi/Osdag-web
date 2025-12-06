@@ -12,6 +12,9 @@ import BC_CF_BW_EBW from "../../../assets/BC_CF-BW-EBW.png";
 import BC_CW_BW_FLUSH from "../../../assets/BC_CW-BW-Flush.png";
 import BC_CW_BW_EOW from "../../../assets/BC_CW-BW-EOW.png";
 import BC_CW_BW_EBW from "../../../assets/BC_CW-BW-EBW.png";
+import ANGLE_SECTION from "../../../assets/TensionMember/com1_1.png";
+import BACK_TO_BACK_ANGLES_SAME_SIDE from "../../../assets/TensionMember/com1_2.png";
+import BACK_TO_BACK_ANGLES_OPPOSITE_SIDE from "../../../assets/TensionMember/com1_3.png";
 import ErrorImg from "../../../assets/notSelected.png";
 
 export const InputSection = ({
@@ -43,6 +46,16 @@ export const InputSection = ({
         borderColor: '#91B014',
       },
     }),
+    option: (base) => ({
+      ...base,
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    }),
+    menu: (base) => ({
+      ...base,
+      minWidth: 'max-content',
+    }),
   };
 
   // Helper to normalize lists into react-select option shape
@@ -60,6 +73,24 @@ export const InputSection = ({
 
 
   useEffect(() => {
+    // Check for section profile first (takes priority)
+    const sectionProfileField = section.fields.find(
+      (f) => f.type === 'sectionProfileSelect'
+    );
+    if (sectionProfileField) {
+      const profileValue = extraState.selectedProfile || safeInputs[sectionProfileField.key] || sectionProfileField.defaultValue;
+      if (profileValue) {
+        const sectionProfileMap = {
+          "Angles": ANGLE_SECTION,
+          "Back to Back Angles - Same side of gusset": BACK_TO_BACK_ANGLES_SAME_SIDE,
+          "Back to Back Angles - Opposite side of gusset": BACK_TO_BACK_ANGLES_OPPOSITE_SIDE,
+        };
+        setImageSource(sectionProfileMap[profileValue] || ErrorImg);
+        return; // Exit early if section profile is found
+      }
+    }
+
+    // Handle connectivity/endplate images
     if (extraState.selectedOption) {
       const conn = safeInputs.connectivity;
       const epType = extraState.selectedOption;
@@ -135,6 +166,17 @@ export const InputSection = ({
       const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
         : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
       setExtraState((prev) => ({ ...prev, selectedOption: firstValue }));
+    }
+
+    // Set default for section profile dropdowns
+    const sectionProfileField = section.fields.find(
+      (f) => f.type === 'sectionProfileSelect'
+    );
+    if (sectionProfileField && !extraState.selectedProfile) {
+      const currentValue = safeInputs[sectionProfileField.key] || sectionProfileField.defaultValue;
+      if (currentValue) {
+        setExtraState((prev) => ({ ...prev, selectedProfile: currentValue }));
+      }
     }
   }, [safeContextData, section.fields]);
 
@@ -226,6 +268,7 @@ export const InputSection = ({
               isMulti
               options={options}
               value={currentValue}
+              isSearchable={false}
               onChange={(selectedOptions) => {
                 const newValues = selectedOptions.map(opt => opt.value);
                 setInputs({ ...safeInputs, [field.key]: newValues });
@@ -234,7 +277,6 @@ export const InputSection = ({
               styles={customSelectStyles}
               classNamePrefix="react-select"
               className="w-[60%]"
-              isSearchable={false}
             />
           );
         }
@@ -261,12 +303,12 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isSearchable={false}
             onChange={(selected) => setInputs({ ...safeInputs, [field.key]: selected.value })}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
-            isSearchable={false}
           />
         );
       }
@@ -282,6 +324,7 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isSearchable={false}
             onChange={(selected) => {
               setExtraState({ ...extraState, selectedOption: selected.value });
               setInputs({ ...safeInputs, output: null });
@@ -290,7 +333,31 @@ export const InputSection = ({
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
+          />
+        );
+      }
+
+      case 'sectionProfileSelect': {
+        const options = Array.isArray(field.options) ? field.options : toSelectOptions(field.options);
+        const currentValue = safeInputs[field.key] || field.defaultValue;
+        const value = options.find(opt => opt.value === currentValue);
+        return (
+          <Select
+            options={options}
+            value={value}
             isSearchable={false}
+            onChange={(selected) => {
+              setExtraState({ ...extraState, selectedProfile: selected.value });
+              if (field.onChange) {
+                field.onChange(selected.value, safeInputs, setInputs, safeContextData, extraState, setExtraState);
+              } else {
+                setInputs({ ...safeInputs, [field.key]: selected.value });
+              }
+            }}
+            menuPortalTarget={document.body}
+            styles={customSelectStyles}
+            classNamePrefix="react-select"
+            className="w-[60%]"
           />
         );
       }
@@ -302,12 +369,12 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isSearchable={false}
             onChange={(selected) => handleCustomizableSelect(field, selected.value)}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
-            isSearchable={false}
           />
         );
       }

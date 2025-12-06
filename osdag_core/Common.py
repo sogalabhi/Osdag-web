@@ -16,8 +16,8 @@ import sqlite3
 
 from .utils.common.other_standards import *
 # from .utils.common.component import *
-# from design_type.connection.fin_plate_connection import FinPlateConnection
-# from design_type.connection.column_cover_plate import ColumnCoverPlate
+# from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
+# from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 
 class OurLog(logging.Handler):
 
@@ -337,7 +337,7 @@ KEY_MODULE_STATUS = 'Module.Status'
 
 TYPE_MODULE = 'Window Title'
 
-KEY_DISP_FINPLATE = 'Fin Plate Connection'
+KEY_DISP_FINPLATE = 'FinPlateConnection'
 KEY_DISP_ENDPLATE = 'End Plate Connection'
 KEY_DISP_CLEATANGLE = 'Cleat Angle Connection'
 KEY_DISP_SEATED_ANGLE = 'SeatedAngleConnection'
