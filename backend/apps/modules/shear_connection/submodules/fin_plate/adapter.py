@@ -521,58 +521,23 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         raise  # Re-raise to prevent using undefined cld
 
     # The section of the module that will be generated.
+    # Explicitly skip merged Model generation; only per-part files are needed.
+    if section == "Model":
+        print("[CAD Adapter] Skipping Model generation (per requirement: only per-part files)")
+        return None
+
     cld.component = section
     print(f'[CAD Adapter] Setting cld.component = {section}')
 
-    # When section == "Model", also ensure per-part shapes exist and prepare a compound
-    # Try to include additional subparts like Welds and Bolts if available
-    part_names = ["Beam", "Column", "Plate", "Weld", "Welds", "Bolt", "Bolts"]
+    # Only per-part generation
+    part_names = []
     part_files = {}
     compound_model = None
 
     try:
-        if section == "Model":
-            # Build compound by adding each part shape without fusing
-            builder = BRep_Builder()
-            compound = TopoDS_Compound()
-            builder.MakeCompound(compound)
-
-            for part in part_names:
-                try:
-                    # Generate shape for this part
-                    cld.component = part
-                    part_shape = cld.create2Dcad()
-                    if part_shape is None:
-                        continue
-
-                    # Add to compound
-                    builder.Add(compound, part_shape)
-
-                    # Ensure per-part BREP file exists (write or overwrite)
-                    part_file_name = f"{session}_{part}.brep"
-                    part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
-                    BRepTools.breptools.Write(part_shape, part_file_path_rel, Message_ProgressRange())
-                    part_files[part] = part_file_path_rel
-                    # Also write STL for this part
-                    try:
-                        part_stl_rel = part_file_path_rel.replace(".brep", ".stl")
-                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_rel))
-                    except Exception as stle:
-                        print(f"Failed to write STL for part {part}: {stle}")
-                except Exception as e:
-                    print(f"Failed to build/write part {part}: {e}")
-
-            # Reset component to Model and set compound as the model to write
-            cld.component = section
-            compound_model = compound
-        # Generate model for non-Model sections (or fallback)
-        if compound_model is not None:
-            model = compound_model
-            print(f'[CAD Adapter] Using compound_model for {section}')
-        else:
-            print(f'[CAD Adapter] Generating individual part: cld.component = {cld.component}')
-            model = cld.create2Dcad()
-            print(f'[CAD Adapter] Generated model type: {type(model)}')
+        print(f'[CAD Adapter] Generating individual part: cld.component = {cld.component}')
+        model = cld.create2Dcad()
+        print(f'[CAD Adapter] Generated model type: {type(model)}')
     except Exception as e :
         print('Error in cld.create2Dcad() e : ' , e)
         return False
@@ -591,65 +556,15 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 
     try : 
         BRepTools.breptools.Write(model, file_path, Message_ProgressRange()) # Generate CAD Model
-
-        # If it's 'Model' section, write a manifest referencing per-part breps and save extra formats
-        if section == "Model":
-            try:
-                manifest = {
-                    "session": session,
-                    "mergedBrep": file_path,
-                    "parts": [
-                        {"name": name, "brepPath": part_files.get(name)} for name in part_names if part_files.get(name)
-                    ]
-                }
-                # add stlPath for parts
-                for entry in manifest["parts"]:
-                    if entry.get("brepPath"):
-                        entry["stlPath"] = entry["brepPath"].replace(".brep", ".stl")
-                manifest_path = file_path.replace(".brep", ".parts.json")
-                full_manifest_path = os.path.join(os.getcwd(), manifest_path)
-                with open(full_manifest_path, "w", encoding="utf-8") as mf:
-                    json.dump(manifest, mf)
-                print(f"Parts manifest saved at {full_manifest_path}")
-            except Exception as me:
-                print(f"Warning: Failed to write manifest: {me}")
-
-            # Save STEP
-            step_writer = STEPControl_Writer()
-            step_writer.Transfer(model, STEPControl_AsIs)
-            step_file_path = file_path.replace(".brep", ".step")
-            full_step_file_path = os.path.join(os.getcwd(), step_file_path)
-            if step_writer.Write(full_step_file_path) == 1:
-                print(f"STEP file saved at {full_step_file_path}")
-            else:
-                print("Warning: Failed to save STEP file!")
-
-            # Save IGES
-            iges_writer = IGESControl_Writer()
-            iges_writer.AddShape(model)
-            iges_file_path = file_path.replace(".brep", ".iges")
-            full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
-            if iges_writer.Write(full_iges_file_path) == 1:
-                print(f"IGES file saved at {full_iges_file_path}")
-            else:
-                print("Warning: Failed to save IGES file!")
-            # Write merged STL for Model
-            try:
-                merged_stl_rel = file_path.replace(".brep", ".stl")
-                write_stl(model, os.path.join(os.getcwd(), merged_stl_rel))
-                print(f"STL file saved at {os.path.join(os.getcwd(), merged_stl_rel)}")
-            except Exception as stle:
-                print(f"Warning: Failed to save merged STL: {stle}")
     except Exception as e : 
         print('Writing to BREP file failed e : ' , e)
 
-    # For non-Model sections, export single STL next to BREP
-    if section != "Model":
-        try:
-            single_stl_rel = file_path.replace(".brep", ".stl")
-            write_stl(model, os.path.join(os.getcwd(), single_stl_rel))
-            print(f"STL file saved at {os.path.join(os.getcwd(), single_stl_rel)}")
-        except Exception as stle:
-            print(f"Warning: Failed to save STL for {section}: {stle}")
+    # Export single STL next to BREP
+    try:
+        single_stl_rel = file_path.replace(".brep", ".stl")
+        write_stl(model, os.path.join(os.getcwd(), single_stl_rel))
+        print(f"STL file saved at {os.path.join(os.getcwd(), single_stl_rel)}")
+    except Exception as stle:
+        print(f"Warning: Failed to save STL for {section}: {stle}")
 
     return file_path

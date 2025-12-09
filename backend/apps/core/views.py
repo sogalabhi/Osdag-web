@@ -20,16 +20,22 @@ from .data.design_types import design_type_data, connections_data, shear_connect
 # TODO: Move this to a better place (e.g., AppConfig ready method) and use environment variables for path
 if not firebase_admin._apps:
     # Try to find the credential file
-    cred_path = "osdag_web/firebase-service-account.json"
-    if not os.path.exists(cred_path):
-        # Fallback or check other locations
-        cred_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "firebase-service-account.json")
+    # Prefer service account placed in backend/firebase-service-account.json
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # .../backend
+    cred_candidates = [
+        os.path.join(repo_root, "firebase-service-account.json"),
+        os.path.join(repo_root, "config", "firebase-service-account.json"),
+        "osdag_web/firebase-service-account.json",  # legacy location
+    ]
+    cred_path = next((p for p in cred_candidates if os.path.exists(p)), None)
     
-    if os.path.exists(cred_path):
+    if cred_path and os.path.exists(cred_path):
         cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred)
     else:
-        print(f"Warning: Firebase credentials not found at {cred_path}")
+        print("Warning: Firebase credentials not found. Checked:")
+        for p in cred_candidates:
+            print(f" - {p}")
 
 
 @api_view(['GET'])

@@ -11,7 +11,8 @@ from apps.core.api import (
     ProjectAPI, ProjectDetailAPI, ProjectByNameAPI,
     SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
     ParseReportSections, CustomizeReport, GenerateInitialReport,
-    DesignPreference, MaterialDetails, CompanyLogoView
+    DesignPreference, MaterialDetails, CompanyLogoView,
+    CADGeneration, CADDownload
 )
 # Legacy input-data handler (kept under apps.core.api.legacy)
 from apps.core.api.legacy.inputData_view import InputData as LegacyInputData
@@ -62,6 +63,12 @@ urlpatterns = [
     path('api/report/customize/', CustomizeReport.as_view(), name='customize-report'),
     # Legacy populate endpoint (kept for frontend compatibility)
     path('populate', LegacyInputData.as_view()),
+
+    # CAD generation & download (new backend handlers)
+    path('design/cad', CADGeneration.as_view()),
+    path('design/cad/', CADGeneration.as_view()),
+    path('design/downloadCad', CADDownload.as_view()),
+    path('design/downloadCad/', CADDownload.as_view()),
     
     # Legacy design type views (temporary - may be moved later)
     path('osdag-web/', views.get_design_types, name='index'),

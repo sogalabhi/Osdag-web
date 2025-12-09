@@ -61,8 +61,11 @@ class CADGeneration(View):
                 "Cover-Plate-Welded-Connection": "CoverPlateWelded",
                 "Beam-to-Column-End-Plate-Connection": "BeamToColumnEndPlate",
                 "Tension-Member-Bolted-Design": "TensionMember",
-                "Tension-Member-Welded-Design": "TensionMember"
-
+                "Tension-Member-Welded-Design": "TensionMember",
+                "Butt-Joint-Welded": "ButtJointWelded",
+                "Butt-Joint-Bolted": "ButtJointBolted",
+                "Lap-Joint-Welded": "LapJointWelded",
+                "Lap-Joint-Bolted": "LapJointBolted",
             }
             
             session_type = module_type_mapping.get(module_id)
@@ -76,11 +79,13 @@ class CADGeneration(View):
         
         # Directory setup
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        parent_dir = os.path.dirname(os.path.dirname(current_dir))
+        # repo_root points to project root (.../Osdag-web)
+        repo_root = os.path.abspath(os.path.join(current_dir, "../../../../../"))
+        backend_root = os.path.join(repo_root, "backend")
     
         # Determine sections based on the session type and what each backend module expects
         if session_type == "FinPlateConnection":
-            sections = ["Model", "Beam", "Column", "Plate"]
+            sections = ["Beam", "Column", "Plate"]
         elif session_type == "CleatAngle":
             sections = ["Model", "Beam", "Column", "cleatAngle"]
         elif session_type == "EndPlate":
@@ -115,16 +120,32 @@ class CADGeneration(View):
                 if not hasattr(module_api, 'create_cad_model'):
                     error_details.append({"section": section, "error": "create_cad_model not implemented"})
                     continue
+                print(f"[cad_model_api] Calling create_cad_model for section '{section}' with session_id={session_id}")
                 path = module_api.create_cad_model(input_values, section, session_id)
 
                 if not path:
-                    print(f'Error generating {section}: create_cad_model() returned None or empty string')
+                    print(f'[cad_model_api] Error generating {section}: create_cad_model() returned None or empty string')
                     continue  # Skip to the next section
                 
-                print(f'{section} generated successfully')
+                print(f'[cad_model_api] {section} generated successfully, returned path: {path}')
 
-                # Prefer STL; fall back to BREP
-                path_to_file = os.path.join(parent_dir, path)
+                # Resolve returned path. Modules typically return "file_storage/..."
+                base_root = repo_root
+                if os.path.isabs(path):
+                    path_to_file = path
+                else:
+                    # Prefer project root; fall back to backend root (where CAD generators write)
+                    path_repo_root = os.path.join(repo_root, path)
+                    path_backend_root = os.path.join(backend_root, path)
+                    if os.path.exists(path_repo_root):
+                        path_to_file = path_repo_root
+                    elif os.path.exists(path_backend_root):
+                        path_to_file = path_backend_root
+                        base_root = backend_root
+                    else:
+                        # Default to repo root for error reporting
+                        path_to_file = path_repo_root
+                print(f"[cad_model_api] Resolved path for section '{section}': {path_to_file} (base_root={base_root})")
                 if not os.path.exists(path_to_file):
                     msg = f'Generated file for {section} does not exist at: {path_to_file}'
                     print(msg)
@@ -135,25 +156,29 @@ class CADGeneration(View):
                 import base64
                 try:
                     if os.path.exists(stl_path):
+                        print(f"[cad_model_api] Using STL for section '{section}': {stl_path}")
                         with open(stl_path, "rb") as f:
                             b64 = base64.b64encode(f.read()).decode("ascii")
                         output_files[section] = f"data:application/octet-stream;base64,{b64}"
-                        print(f"Loaded STL for {section}")
+                        print(f"[cad_model_api] Loaded STL for {section}")
                     else:
+                        print(f"[cad_model_api] STL missing for section '{section}', falling back to BREP: {path_to_file}")
                         with open(path_to_file, "rb") as f:
                             b64 = base64.b64encode(f.read()).decode("ascii")
                         output_files[section] = f"data:application/octet-stream;base64,{b64}"
-                        print(f"Loaded BREP for {section}")
+                        print(f"[cad_model_api] Loaded BREP for {section}")
 
                     # If this is the merged Model, also try to include per-part STLs from manifest
                     if section == "Model":
                         try:
                             manifest_path = path_to_file.replace(".brep", ".parts.json")
                             if os.path.exists(manifest_path):
+                                print(f"[cad_model_api] Found manifest at {manifest_path}")
                                 import json as _json
                                 with open(manifest_path, "r", encoding="utf-8") as mf:
                                     manifest = _json.load(mf)
                                 parts = manifest.get("parts", [])
+                                print(f"[cad_model_api] Manifest parts count: {len(parts)}")
                                 for entry in parts:
                                     name = entry.get("name")
                                     stl_rel = entry.get("stlPath")
@@ -162,15 +187,27 @@ class CADGeneration(View):
                                         continue
                                     # Prefer STL
                                     part_file_abs = None
-                                    if stl_rel and os.path.exists(os.path.join(parent_dir, stl_rel)):
-                                        part_file_abs = os.path.join(parent_dir, stl_rel)
-                                    elif brep_rel and os.path.exists(os.path.join(parent_dir, brep_rel)):
-                                        part_file_abs = os.path.join(parent_dir, brep_rel)
-                                    if part_file_abs and name not in output_files:
+                                    part_base_roots = [base_root, repo_root]
+                                    if stl_rel:
+                                        for root in part_base_roots:
+                                            candidate = os.path.join(root, stl_rel)
+                                            if os.path.exists(candidate):
+                                                part_file_abs = candidate
+                                                print(f"[cad_model_api] Part '{name}' using STL {candidate}")
+                                                break
+                                    if not part_file_abs and brep_rel:
+                                        for root in part_base_roots:
+                                            candidate = os.path.join(root, brep_rel)
+                                            if os.path.exists(candidate):
+                                                part_file_abs = candidate
+                                                print(f"[cad_model_api] Part '{name}' using BREP {candidate}")
+                                                break
+                                    if part_file_abs:
+                                        # Prefer manifest part files for accuracy, even if section already populated
                                         with open(part_file_abs, "rb") as pf:
                                             b64p = base64.b64encode(pf.read()).decode("ascii")
                                         output_files[name] = f"data:application/octet-stream;base64,{b64p}"
-                                        print(f"Loaded part {name} from manifest")
+                                        print(f"[cad_model_api] Loaded part {name} from manifest (overrides section if existed)")
                         except Exception as me:
                             print(f"Failed to load parts from manifest: {me}")
                 except Exception as e:
@@ -182,6 +219,8 @@ class CADGeneration(View):
                 print(f"Exception while generating {section}: {e}")
                 error_details.append({"section": section, "error": str(e)})
                 
+        print(f"[cad_model_api] Final output_files keys: {list(output_files.keys())}")
+
         if not output_files:
             # Unprocessable due to inputs or environment; include details to aid debugging
             return JsonResponse({"status": "error", "message": "No CAD models were generated.", "errors": error_details}, status=422)
