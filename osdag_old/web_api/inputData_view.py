@@ -39,17 +39,14 @@ INPUT_DATA_FACTORY = {
     'Beam-to-Column-End-Plate-Connection': BeamToColumnEndPlateInputData(),
     'Tension-Member-Bolted-Design': TensionMemberBoltedInputData(),
     'Tension-Member-Welded-Design': TensionMemberWeldedInputData(),
-<<<<<<< HEAD:osdag/web_api/inputData_view.py
     'Simply-Supported-Beam': SimplySupportedBeamInputData(),
     'Butt-Joint-Welded': ButtJointWeldedInputData(),
     'Butt-Joint-Bolted': ButtJointBoltedInputData(),
     'Lap-Joint-Welded': LapJointWeldedInputData(),
     'Lap-Joint-Bolted': LapJointBoltedInputData(),
-=======
     # Use the same input-data provider as tension member so we get angleList/materialList
     'Compression-Member-Design': TensionMemberBoltedInputData(),
     'Simply-Supported-Beam': SimplySupportedBeamInputData()
->>>>>>> ddf6b31a8a093ec3a2d9bd13cb922f02324b9393:osdag_old/web_api/inputData_view.py
 }
 
 

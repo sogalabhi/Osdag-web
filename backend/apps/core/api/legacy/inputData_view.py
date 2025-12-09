@@ -18,6 +18,10 @@ from apps.core.api.legacy.inputdata.beam_to_column_end_plate_input import BeamTo
 from apps.core.api.legacy.inputdata.tension_member_bolted_input import TensionMemberBoltedInputData
 from apps.core.api.legacy.inputdata.tension_member_welded_input import TensionMemberWeldedInputData
 from apps.core.api.legacy.inputdata.simply_supported_beam_input import SimplySupportedBeamInputData
+from apps.core.api.legacy.inputdata.butt_joint_welded_input import ButtJointWeldedInputData
+from apps.core.api.legacy.inputdata.butt_joint_bolted_input import ButtJointBoltedInputData
+from apps.core.api.legacy.inputdata.lap_joint_welded_input import LapJointWeldedInputData
+from apps.core.api.legacy.inputdata.lap_joint_bolted_input import LapJointBoltedInputData
 
 INPUT_DATA_FACTORY = {
     'FinPlateConnection': FinPlateInputData(),
@@ -32,6 +36,14 @@ INPUT_DATA_FACTORY = {
     'Tension-Member-Welded-Design': TensionMemberWeldedInputData(),
     'Simply-Supported-Beam': SimplySupportedBeamInputData()
 }
+
+# Register simple/joint modules that frontend still requests by name
+INPUT_DATA_FACTORY.update({
+    'Butt-Joint-Welded': ButtJointWeldedInputData(),
+    'Butt-Joint-Bolted': ButtJointBoltedInputData(),
+    'Lap-Joint-Welded': LapJointWeldedInputData(),
+    'Lap-Joint-Bolted': LapJointBoltedInputData(),
+})
 
 
 class InputData(APIView):

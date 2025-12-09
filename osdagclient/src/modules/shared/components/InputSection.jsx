@@ -38,7 +38,14 @@ export const InputSection = ({
   // Styling object for react-select to fix z-index and other container issues
   const customSelectStyles = {
     menuPortal: base => ({ ...base, zIndex: 9999 }),
-    option: base => ({ ...base,minHeight: 35, lineHeight: '1' }),
+    option: (base) => ({
+      ...base,
+      minHeight: 35,
+      lineHeight: '1',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    }),
     control: (base) => ({
       ...base,
       borderColor: '#000',
@@ -46,17 +53,12 @@ export const InputSection = ({
         borderColor: '#91B014',
       },
     }),
-    option: (base) => ({
-      ...base,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    }),
     menu: (base) => ({
       ...base,
       minWidth: 'max-content',
     }),
   };
+
 
   // Helper to normalize lists into react-select option shape
   const toSelectOptions = (list = []) => {
@@ -140,9 +142,9 @@ export const InputSection = ({
       const current = safeInputs[field.key];
       const currentExistsInOptions = Array.isArray(rawList)
         ? (Array.isArray(field.options) ? rawList : toSelectOptions(rawList)).some(opt => {
-            const val = Array.isArray(field.options) ? opt.value : opt.value;
-            return val === current;
-          })
+          const val = Array.isArray(field.options) ? opt.value : opt.value;
+          return val === current;
+        })
         : false;
 
       if (current === undefined || current === null || current === '' || !currentExistsInOptions) {
@@ -157,10 +159,10 @@ export const InputSection = ({
     const list = connectivityField?.type === 'connectivitySelect'
       ? (safeContextData.connectivityList || [])
       : [
-          'Flushed - Reversible Moment',
-          'Extended One Way - Irreversible Moment',
-          'Extended Both Ways - Reversible Moment',
-        ];
+        'Flushed - Reversible Moment',
+        'Extended One Way - Irreversible Moment',
+        'Extended Both Ways - Reversible Moment',
+      ];
     if (connectivityField && !extraState.selectedOption && list && list.length > 0) {
       const first = list[0];
       const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
@@ -192,7 +194,7 @@ export const InputSection = ({
       const listName = keyMap[inputKey];
       if (field?.getDynamicDataSource) {
         let options = field.getDynamicDataSource(inputs, contextData)
-        setModalDynamicSrc((modalDynSrc) => ({...modalDynSrc, [field.key]:options}));
+        setModalDynamicSrc((modalDynSrc) => ({ ...modalDynSrc, [field.key]: options }));
         return options;
       }
       return Array.isArray(safeContextData[listName]) ? safeContextData[listName] : [];
@@ -209,7 +211,7 @@ export const InputSection = ({
         }
         return val.toString();
       });
-      
+
       // Set all items as selected (moved to right side) - this populates the Transfer component
       updateSelectedItems(field.key, allKeys);
       // Also update inputs with all values

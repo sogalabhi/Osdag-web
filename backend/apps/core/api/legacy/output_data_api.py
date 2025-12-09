@@ -21,7 +21,7 @@ from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from apps.core.module_finder import developed_modules, get_module_api
-from osdag_api.errors import OsdagApiException
+from apps.core.utils import OsdagApiException
 import typing
 import json
 

@@ -9,13 +9,10 @@ from django.http import HttpResponse, HttpRequest
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-# Try new module_finder first, fall back to old osdag_api for metadata
-try:
-    from apps.core.module_finder import developed_modules
-    # For now, still use old metadata list until we create a dynamic one
-    from osdag_api import module_dict
-except ImportError:
-    from osdag_api import module_dict, developed_modules
+# Use the new `apps.core.module_finder` which exposes `module_dict` and
+# `developed_modules`. The module_finder implementation already falls back
+# to the legacy `osdag_api` where necessary, so import that single source.
+from apps.core.module_finder import module_dict, developed_modules
 import json
 import typing
 

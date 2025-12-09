@@ -10,6 +10,9 @@ urlpatterns = [
     
     # Moment Connection module
     path('moment-connection/', include('apps.modules.moment_connection.urls')),
+
+    # Simple Connection module
+    path('simple-connection/', include('apps.modules.simple_connection.urls')),
     
     # Tension Member module
     path('tension-member/', include('apps.modules.tension_member.urls')),

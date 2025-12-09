@@ -4,7 +4,7 @@ from apps.core.utils import (
     contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
     write_stl
 )
-from ..shared import setup_for_cad  # Use moment_connection shared utilities
+from ...shared import setup_for_cad  # Use moment_connection shared utilities
 from osdag_core.cad.common_logic import CommonDesignLogic
 from OCC.Core import BRepTools
 from OCC.Core.TopoDS import TopoDS_Compound

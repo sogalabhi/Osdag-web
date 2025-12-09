@@ -3,7 +3,7 @@ from apps.core.utils import (
     MissingKeyError, InvalidInputTypeError,
     contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
 )
-from ..shared import setup_for_cad  # Use moment_connection shared utilities
+from ...shared import setup_for_cad  # Use moment_connection shared utilities
 from OCC.Core import BRepTools
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer

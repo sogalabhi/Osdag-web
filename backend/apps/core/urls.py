@@ -13,6 +13,8 @@ from apps.core.api import (
     ParseReportSections, CustomizeReport, GenerateInitialReport,
     DesignPreference, MaterialDetails, CompanyLogoView
 )
+# Legacy input-data handler (kept under apps.core.api.legacy)
+from apps.core.api.legacy.inputData_view import InputData as LegacyInputData
 from apps.core import views
 
 app_name = 'core'
@@ -58,6 +60,8 @@ urlpatterns = [
     path('api/report/generate-initial/', GenerateInitialReport.as_view(), name='generate-initial-report'),
     path('api/report/parse-sections/', ParseReportSections.as_view(), name='parse-report-sections'),
     path('api/report/customize/', CustomizeReport.as_view(), name='customize-report'),
+    # Legacy populate endpoint (kept for frontend compatibility)
+    path('populate', LegacyInputData.as_view()),
     
     # Legacy design type views (temporary - may be moved later)
     path('osdag-web/', views.get_design_types, name='index'),
