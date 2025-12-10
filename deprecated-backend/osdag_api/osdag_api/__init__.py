@@ -1,0 +1,127 @@
+from osdag_api.module_finder import *
+
+developed_modules = [
+    "FinPlateConnection",
+    "End-Plate-Connection", 
+    "Cleat-Angle-Connection",
+    "Seated-Angle-Connection",
+    "Beam-to-Beam-Cover-Plate-Bolted-Connection",
+    "Beam-to-Beam-Cover-Plate-Welded-Connection",
+    "Beam-Beam-End-Plate-Connection",
+    "Beam-to-Column-End-Plate-Connection",
+    "Butt-Joint-Welded",
+    "Butt-Joint-Bolted",
+    "Lap-Joint-Welded",
+    "Lap-Joint-Bolted",
+    "Tension-Member-Bolted-Design",
+    "Simply-Supported-Beam",
+    "Column-to-Column-Cover-Plate-Welded-Connection",
+    "Column-to-Column-Cover-Plate-Bolted-Connection",
+    "Column-to-Column-End-Plate-Connection"
+]
+
+module_dict = [
+    {
+        "key": "FinPlateConnection",
+        "image": "/static/images/modules/fin_plate_connection.png",
+        "name": "Fin Plate",
+        "path": "Connection/Shear Connection",
+    },
+    {
+        "key": "End-Plate-Connection",
+        "image": "/static/images/modules/end_plate_connection.png",
+        "name": "End Plate",
+        "path": "Connection/Shear Connection",
+    },
+    {
+        "key": "Cleat-Angle-Connection",
+        "image": "/static/images/modules/cleat_angle_connection.png",
+        "name": "Cleat Angle",
+        "path": "Connection/Shear Connection",
+    },
+    {
+        "key": "Seated-Angle-Connection",
+        "image": "/static/images/modules/seated_angle_connection.png",
+        "name": "Seated Angle",
+        "path": "Connection/Shear Connection"
+    },
+    {
+        "key": "Beam-to-Beam-Cover-Plate-Bolted-Connection",
+        "image": "/static/images/modules/cover_plate_bolted_connection.png",
+        "name": "Cover Plate Bolted",
+        "path": "Connection/Moment Connection"
+    },
+    {
+        "key": "Beam-Beam-End-Plate-Connection",
+        "image": "/static/images/modules/beam_beam_end_plate_connection.png",
+        "name": "Beam Beam End Plate",
+        "path": "Connection/Moment Connection"
+    },
+    {
+        "key": "Beam-to-Beam-Cover-Plate-Welded-Connection",
+        "image": "/static/images/modules/cover_plate_welded_connection.png",
+        "name": "Cover Plate Welded",
+        "path": "Connection/Moment Connection"
+    },
+    {
+        "key": "Beam-to-Column-End-Plate-Connection",
+        "image": "/static/images/modules/beam_to_column_end_plate_connection.png",
+        "name": "Beam-to-Column End Plate",
+        "path": "Connection/Moment Connection"
+    },
+    {
+        "key": "Butt-Joint-Welded",
+        "image": "/static/images/modules/butt_joint_welded.png",
+        "name": "Butt Joint Welded",
+        "path": "Connection/Simple Connection"
+    },
+    {
+        "key": "Butt-Joint-Bolted",
+        "image": "/static/images/modules/butt_joint_bolted.png",
+        "name": "Butt Joint Bolted",
+        "path": "Connection/Simple Connection"
+    },
+    {
+        "key": "Lap-Joint-Welded",
+        "image": "/static/images/modules/lap_joint_welded.png",
+        "name": "Lap Joint Welded",
+        "path": "Connection/Simple Connection"
+    },
+    {
+        "key": "Lap-Joint-Bolted",
+        "image": "/static/images/modules/lap_joint_bolted.png",
+        "name": "Lap Joint Bolted",
+        "path": "Connection/Simple Connection"
+    },
+    {
+        "key": "Tension-Member-Bolted-Design",
+        "image": "/static/images/modules/tension_member_bolted.png",
+        "name": "Tension Member Bolted Design",
+        "path": "Tension Member/tension_bolted"
+    },
+    {
+        "key": "Simply-Supported-Beam",
+        "image": "/static/images/modules/simply_supported_beam.png",
+        "name": "Simply Supported Beam",
+        "path": "Flexural Member/simply_supported_beam"
+    },
+    {
+        "key": "Column-to-Column-Cover-Plate-Welded-Connection",
+        "image": "/static/images/modules/column_column_cover_plate_welded_connection.png",
+        "name": "Column-to-Column-Cover-Plate-Welded-Connection",
+        "path": "Connection/Moment Connection"
+    },
+    {
+        "key": "Column-to-Column-Cover-Plate-Bolted-Connection",
+        "image": "/static/images/modules/column_column_cover_plate_bolted_connection.png",
+        "name": "Column-to-Column-Cover-Plate-Bolted-Connection",
+        "path": "Connection/Moment Connection"
+    },
+    {
+        "key": "Column-to-Column-End-Plate-Connection",
+        "image": "/static/images/modules/column_column_end_plate_connection.png",
+        "name": "Column-to-Column-End-Plate-Connection",
+        "path": "Connection/Moment Connection"
+    },
+
+]

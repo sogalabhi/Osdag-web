@@ -39,26 +39,8 @@ const TabbedModulePage = () => {
     setActiveSubSubmodule(firstLabel);
   }, [activeSubmodule, content]);
 
-  // Improved route resolver for EndPlate and moment cases
-  const getRoute = (optionKey, sectionLabel) => {
-    if (optionKey === "EndPlate") {
-      if (activeSubmodule === "Moment") {
-        switch (sectionLabel) {
-          case "Beam to Beam Splice":
-            return "/design/connections/beam-to-beam-splice/end_plate";
-          case "Beam to Column Splice":
-            return "/design/connections/column-beam/end_plate";
-          default:
-            return "/design/connections/beam-to-beam-splice/end_plate";
-        }
-      }
-      return "/design/connections/shear/end_plate";
-    }
-    return MODULE_ROUTES[optionKey] || "";
-  };
-
   const handleModuleClick = (optionKey, sectionLabel) => {
-    const route = getRoute(optionKey, sectionLabel);
+    const route = MODULE_ROUTES[optionKey] || "";
 
     if (isGuestUser()) {
       route && navigate(route);

@@ -1,5 +1,6 @@
 export const MODULE_SUBMODULES = {
     Connections: [
+        { key: "Simple", "label": "Simple Connections" },
         { key: "Shear", label: "Shear Connection" },
         { key: "Moment", label: "Moment Connection" },
         { key: "BasePlate", label: "Base Plate" },
@@ -11,6 +12,17 @@ export const MODULE_SUBMODULES = {
 };
 
 export const CONNECTIONS_TAB_CONTENT = {
+    Simple: [
+        {
+            label: "Simple Connections",
+            options: [
+                { key: "ButtJointWelded", label: "Butt Joint Welded", img: "shear_fin_plate_connec.svg" },
+                { key: "ButtJointBolted", label: "Butt Joint Bolted", img: "shear_fin_plate_connec.svg" },
+                { key: "LapJointWelded", label: "Lap Joint Welded", img: "shear_fin_plate_connec.svg" },
+                { key: "LapJointBolted", label: "Lap Joint Bolted", img: "shear_fin_plate_connec.svg" },
+            ],
+        },
+    ],
     Shear: [
         {
             label: "Shear Connections",
@@ -28,19 +40,19 @@ export const CONNECTIONS_TAB_CONTENT = {
             options: [
                 { key: "CoverPlateBolted", label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
                 { key: "CoverPlateWelded", label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
-                { key: "EndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" },
+                { key: "BeamBeamEndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" }, 
             ],
         },
         {
             label: "Beam to Column Splice",
-            options: [{ key: "EndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" }],
+            options: [{ key: "BeamColumnEndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" }],
         },
         {
             label: "Column to Column Splice",
             options: [
-                { key: "CoverPlateBolted", label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
-                { key: "CoverPlateWelded", label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
-                { key: "EndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" },
+                { key: "CCCoverPlateBolted", label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
+                { key: "CCCoverPlateWelded", label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
+                { key: "CCEndPlate", label: "End Plate", img: "shear_fin_plate_connec.svg" },
             ],
         },
     ],
@@ -74,7 +86,8 @@ export const GENERIC_SUBMODULE_CONTENT = {
             label: "Flexure Member",
             options: [
                 { key: "SimplySupportedBeam", label: "Simply Supported Beam", img: "shear_fin_plate_connec.svg" },
-                { key: "CantileverBeam", label: "Cantilever Beam", img: "shear_fin_plate_connec.svg" },
+                { key: "OnCantilever", label: "Cantilever Beam", img: "shear_fin_plate_connec.svg" },
+                { key: "Purlin", label: "Purlin", img: "shear_fin_plate_connec.svg" },
                 { key: "PlateGirder", label: "Plate Girder", img: "shear_fin_plate_connec.svg" },
             ],
         },
@@ -86,14 +99,24 @@ export const MODULE_ROUTES = {
     CleatAngle: "/design/connections/shear/cleat_angle",
     EndPlate: "/design/connections/shear/end_plate",
     SeatedAngle: "/design/connections/shear/seatAngle",
+    CCCoverPlateBolted: "/design/connections/column-to-column-splice/cover_plate_bolted",
+    CCCoverPlateWelded: "/design/connections/column-to-column-splice/cover_plate_welded",
+    CCEndPlate: "/design/connections/column-to-column-splice/end_plate",
     CoverPlateBolted: "/design/connections/beam-to-beam-splice/cover_plate_bolted",
     CoverPlateWelded: "/design/connections/beam-to-beam-splice/cover_plate_welded",
     BeamBeamEndPlate: "/design/connections/beam-to-beam-splice/end_plate",
+    ButtJointWelded: "/design/connections/simple/butt_joint_welded",
+    ButtJointBolted: "/design/connections/simple/butt_joint_bolted",
+    LapJointWelded: "/design/connections/simple/lap_joint_welded",
+    LapJointBolted: "/design/connections/simple/lap_joint_bolted",
     SimplySupportedBeam: "/design/flexure_member/simply_supported_beam",
+    OnCantilever: "/design/flexure/on_cantilever",
+    Purlin: "/design/flexure/purlin",
     BoltedToEndPlate: "/design/tension-member/bolted_to_end_gusset",
     WeldedToEndPlate: "/design/tension-member/welded_to_end_gusset",
     BoltedToEndGusset: "/design/tension-member/bolted_to_end_gusset",
-    BeamColumnEndPlate: "/design/connections/column-beam/end_plate"
+    BeamColumnEndPlate: "/design/connections/column-beam/end_plate",
+    StrutsInTrusses: "/design/compression_member/compression_member/struts_in_trusses",
     // Add other needed routes
 };
 
@@ -111,4 +134,7 @@ export const MODULE_NAME_TO_KEY = {
     "Beam-to-Beam-Cover-Plate-Bolted-Connection": "CoverPlateBolted",
     "Beam-to-Beam-Cover-Plate-Welded-Connection": "CoverPlateWelded",
     "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
+    "Column-to-Column-Cover-Plate-Welded-Connection" : "CCCoverPlateWelded",
+    "Column-to-Column-Cover-Plate-Bolted-Connection" : "CCCoverPlateBolted",
+    "Column-to-Column-End-Plate-Connection" : "CCEndPlate",
 };

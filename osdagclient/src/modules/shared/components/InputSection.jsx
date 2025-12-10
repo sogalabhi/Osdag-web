@@ -12,6 +12,9 @@ import BC_CF_BW_EBW from "../../../assets/BC_CF-BW-EBW.png";
 import BC_CW_BW_FLUSH from "../../../assets/BC_CW-BW-Flush.png";
 import BC_CW_BW_EOW from "../../../assets/BC_CW-BW-EOW.png";
 import BC_CW_BW_EBW from "../../../assets/BC_CW-BW-EBW.png";
+import ANGLE_SECTION from "../../../assets/TensionMember/com1_1.png";
+import BACK_TO_BACK_ANGLES_SAME_SIDE from "../../../assets/TensionMember/com1_2.png";
+import BACK_TO_BACK_ANGLES_OPPOSITE_SIDE from "../../../assets/TensionMember/com1_3.png";
 import ErrorImg from "../../../assets/notSelected.png";
 
 export const InputSection = ({
@@ -35,7 +38,14 @@ export const InputSection = ({
   // Styling object for react-select to fix z-index and other container issues
   const customSelectStyles = {
     menuPortal: base => ({ ...base, zIndex: 9999 }),
-    option: base => ({ ...base,minHeight: 35, lineHeight: '1' }),
+    option: (base) => ({
+      ...base,
+      minHeight: 35,
+      lineHeight: '1',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    }),
     control: (base) => ({
       ...base,
       borderColor: '#000',
@@ -43,7 +53,12 @@ export const InputSection = ({
         borderColor: '#91B014',
       },
     }),
+    menu: (base) => ({
+      ...base,
+      minWidth: 'max-content',
+    }),
   };
+
 
   // Helper to normalize lists into react-select option shape
   const toSelectOptions = (list = []) => {
@@ -60,6 +75,24 @@ export const InputSection = ({
 
 
   useEffect(() => {
+    // Check for section profile first (takes priority)
+    const sectionProfileField = section.fields.find(
+      (f) => f.type === 'sectionProfileSelect'
+    );
+    if (sectionProfileField) {
+      const profileValue = extraState.selectedProfile || safeInputs[sectionProfileField.key] || sectionProfileField.defaultValue;
+      if (profileValue) {
+        const sectionProfileMap = {
+          "Angles": ANGLE_SECTION,
+          "Back to Back Angles - Same side of gusset": BACK_TO_BACK_ANGLES_SAME_SIDE,
+          "Back to Back Angles - Opposite side of gusset": BACK_TO_BACK_ANGLES_OPPOSITE_SIDE,
+        };
+        setImageSource(sectionProfileMap[profileValue] || ErrorImg);
+        return; // Exit early if section profile is found
+      }
+    }
+
+    // Handle connectivity/endplate images
     if (extraState.selectedOption) {
       const conn = safeInputs.connectivity;
       const epType = extraState.selectedOption;
@@ -109,9 +142,9 @@ export const InputSection = ({
       const current = safeInputs[field.key];
       const currentExistsInOptions = Array.isArray(rawList)
         ? (Array.isArray(field.options) ? rawList : toSelectOptions(rawList)).some(opt => {
-            const val = Array.isArray(field.options) ? opt.value : opt.value;
-            return val === current;
-          })
+          const val = Array.isArray(field.options) ? opt.value : opt.value;
+          return val === current;
+        })
         : false;
 
       if (current === undefined || current === null || current === '' || !currentExistsInOptions) {
@@ -126,15 +159,26 @@ export const InputSection = ({
     const list = connectivityField?.type === 'connectivitySelect'
       ? (safeContextData.connectivityList || [])
       : [
-          'Flushed - Reversible Moment',
-          'Extended One Way - Irreversible Moment',
-          'Extended Both Ways - Reversible Moment',
-        ];
+        'Flushed - Reversible Moment',
+        'Extended One Way - Irreversible Moment',
+        'Extended Both Ways - Reversible Moment',
+      ];
     if (connectivityField && !extraState.selectedOption && list && list.length > 0) {
       const first = list[0];
       const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
         : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
       setExtraState((prev) => ({ ...prev, selectedOption: firstValue }));
+    }
+
+    // Set default for section profile dropdowns
+    const sectionProfileField = section.fields.find(
+      (f) => f.type === 'sectionProfileSelect'
+    );
+    if (sectionProfileField && !extraState.selectedProfile) {
+      const currentValue = safeInputs[sectionProfileField.key] || sectionProfileField.defaultValue;
+      if (currentValue) {
+        setExtraState((prev) => ({ ...prev, selectedProfile: currentValue }));
+      }
     }
   }, [safeContextData, section.fields]);
 
@@ -150,7 +194,7 @@ export const InputSection = ({
       const listName = keyMap[inputKey];
       if (field?.getDynamicDataSource) {
         let options = field.getDynamicDataSource(inputs, contextData)
-        setModalDynamicSrc((modalDynSrc) => ({...modalDynSrc, [field.key]:options}));
+        setModalDynamicSrc((modalDynSrc) => ({ ...modalDynSrc, [field.key]: options }));
         return options;
       }
       return Array.isArray(safeContextData[listName]) ? safeContextData[listName] : [];
@@ -167,13 +211,14 @@ export const InputSection = ({
         }
         return val.toString();
       });
-      
+
       // Set all items as selected (moved to right side) - this populates the Transfer component
       updateSelectedItems(field.key, allKeys);
       // Also update inputs with all values
       setInputs({ ...safeInputs, [field.key]: allKeys });
       updateSelectionState(field.selectionKey, "Customized");
       updateModalState(field.modalKey, true);
+      toggleAllSelected(field.key, false);
     } else {
       // "All" option - get all values and set them in inputs 
       const allValues = getAllValuesForInputKey(field.key);
@@ -189,6 +234,7 @@ export const InputSection = ({
       updateSelectedItems(field.key, []);
       updateSelectionState(field.selectionKey, "All");
       updateModalState(field.modalKey, false);
+      toggleAllSelected(field.key, true); // fix allSelected flag not triggering
     }
   };
 
@@ -197,7 +243,8 @@ export const InputSection = ({
 
     switch (field.type) {
       case 'select': {
-        const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options);
+        // workaround for simple connections
+        const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options) && !(field.key.includes("plate1") || field.key.includes("plate2"));
         const rawList = Array.isArray(field.options) ? field.options : safeContextData[field.options];
         const options = Array.isArray(field.options) ? field.options : toSelectOptions(rawList);
 
@@ -223,6 +270,7 @@ export const InputSection = ({
               isMulti
               options={options}
               value={currentValue}
+              isSearchable={false}
               onChange={(selectedOptions) => {
                 const newValues = selectedOptions.map(opt => opt.value);
                 setInputs({ ...safeInputs, [field.key]: newValues });
@@ -231,7 +279,6 @@ export const InputSection = ({
               styles={customSelectStyles}
               classNamePrefix="react-select"
               className="w-[60%]"
-              isSearchable={false}
             />
           );
         }
@@ -258,12 +305,12 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isSearchable={false}
             onChange={(selected) => setInputs({ ...safeInputs, [field.key]: selected.value })}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
-            isSearchable={false}
           />
         );
       }
@@ -279,6 +326,7 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isSearchable={false}
             onChange={(selected) => {
               setExtraState({ ...extraState, selectedOption: selected.value });
               setInputs({ ...safeInputs, output: null });
@@ -287,7 +335,31 @@ export const InputSection = ({
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
+          />
+        );
+      }
+
+      case 'sectionProfileSelect': {
+        const options = Array.isArray(field.options) ? field.options : toSelectOptions(field.options);
+        const currentValue = safeInputs[field.key] || field.defaultValue;
+        const value = options.find(opt => opt.value === currentValue);
+        return (
+          <Select
+            options={options}
+            value={value}
             isSearchable={false}
+            onChange={(selected) => {
+              setExtraState({ ...extraState, selectedProfile: selected.value });
+              if (field.onChange) {
+                field.onChange(selected.value, safeInputs, setInputs, safeContextData, extraState, setExtraState);
+              } else {
+                setInputs({ ...safeInputs, [field.key]: selected.value });
+              }
+            }}
+            menuPortalTarget={document.body}
+            styles={customSelectStyles}
+            classNamePrefix="react-select"
+            className="w-[60%]"
           />
         );
       }
@@ -299,12 +371,12 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isSearchable={false}
             onChange={(selected) => handleCustomizableSelect(field, selected.value)}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
-            isSearchable={false}
           />
         );
       }

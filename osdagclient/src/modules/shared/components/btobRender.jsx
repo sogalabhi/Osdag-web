@@ -106,6 +106,12 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
     console.log('=== [btobRender] Model loading useEffect triggered ===');
     console.log('[btobRender] useEffect - hoverDict:', hoverDict);
     console.log('[btobRender] hasModelPaths:', !!modelPaths);
+    if (modelPaths) {
+      console.log('[btobRender] modelPaths keys:', Object.keys(modelPaths));
+      console.log('[btobRender] modelPaths Plate value (len):', modelPaths.Plate ? modelPaths.Plate.length : null);
+      console.log('[btobRender] modelPaths Bolt value (len):', modelPaths.Bolt ? modelPaths.Bolt.length : null);
+      console.log('[btobRender] modelPaths Bolts value (len):', modelPaths.Bolts ? modelPaths.Bolts.length : null);
+    }
     if (!modelPaths) {
       console.log('[btobRender] modelPaths is missing, skipping model load');
       return;
@@ -132,7 +138,8 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
         "Bolts",
         "cleatAngle",
         "SeatedAngle",
-        "Connector"
+        "Connector",
+        "Cover Plate"
       ]);
       
       Object.entries(modelPaths).forEach(([key, dataUrl]) => {
@@ -276,14 +283,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
         const label = c.userData?.hoverLabel || meshName;
         
         // Debug: log mesh names being extracted
-        if (meshName.toLowerCase().includes('bolt')) {
-          console.log(`[btobRender] Extracting Bolt mesh:`, {
-            meshName,
-            label,
-            userDataHoverLabel: c.userData?.hoverLabel,
-            parentName: c.parent?.name
-          });
-        }
+        console.log(`[btobRender] Extract mesh: name="${meshName}" label="${label}" type=${c.type}`);
         
         meshes.push({ name: meshName, geometry: c.geometry, hoverLabel: label });
       }
@@ -309,8 +309,15 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
     Column: "#484836",
     Plate: "#2f2f23",
     Weld: "#ff0000",
+    Welds: "#ff0000",
     weld_left: "#ff0000",
     weld_right: "#ff0000",
+    Bolt: "#996633",
+    Bolts: "#996633",
+    Connector: "#868664",
+    cleatAngle: "#2f2f23",
+    SeatedAngle: "#2f2f23",
+    "Cover Plate": "#2f2f23",
   }), []);
   const geometryBeam = useMemo(
     () => (parsedModels?.Beam ? getGeometry(parsedModels.Beam) : null),
@@ -320,8 +327,21 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
     () => (parsedModels?.Column ? getGeometry(parsedModels.Column) : null),
     [parsedModels, texture]
   );
-  const geometryPlate = useMemo(
-    () => (parsedModels?.Plate ? getGeometry(parsedModels.Plate) : null),
+  const geometryPlate = useMemo(() => {
+    const geom = parsedModels?.Plate ? getGeometry(parsedModels.Plate) : null;
+    if (geom) {
+      console.log("[btobRender] geometryPlate extracted (may be merged):", geom);
+    } else {
+      console.log("[btobRender] geometryPlate missing");
+    }
+    return geom;
+  }, [parsedModels, texture]);
+  const geometryBolt = useMemo(
+    () => (parsedModels?.Bolt ? getGeometry(parsedModels.Bolt) : null),
+    [parsedModels, texture]
+  );
+  const geometryBolts = useMemo(
+    () => (parsedModels?.Bolts ? getGeometry(parsedModels.Bolts) : null),
     [parsedModels, texture]
   );
   const geometryConnector = useMemo(
@@ -348,7 +368,10 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
     () => (parsedModels?.SeatedAngle ? getGeometry(parsedModels.SeatedAngle) : null),
     [parsedModels, texture]
   );
-
+  const geometryCoverPlate = useMemo(
+    () => (parsedModels?.["Cover Plate"] ? getGeometry(parsedModels["Cover Plate"]) : null),
+    [parsedModels, texture]
+  );
   if (!parsedModels) {
     return null;
   }
@@ -364,8 +387,8 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
       <spotLight position={[0, 10, 0]} angle={0.3} penumbra={1} intensity={1.0} />
       <AxisHelperWidget orthographicView={orthographicView} />
 
-      {/* Model Section - render each subpart with its own color (used for Model view or multi-select) */}
-      {((activeViews.includes("Model") || GRID_VIEWS.includes(primaryView) || activeViews.length > 1) && modelMeshes.length > 0) && (
+      {/* Model Section - render each subpart with its own color (only when Model/grid is active) */}
+      {((activeViews.includes("Model") || GRID_VIEWS.includes(primaryView)) && modelMeshes.length > 0) && (
         <>
           {modelMeshes.map((m, idx) => {
             const name = m.name || "";
@@ -722,13 +745,55 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
         </>
       )}
 
-      {/* Plate Section - show Plate and Bolt as separate parts (for Fin Plate connections) */}
-      {activeViews.includes("Plate") && !activeViews.includes("Model") && activeViews.length === 1 && modelMeshes.length > 0 && (
+      {/* Cover Plate Section */}
+      {activeViews.includes("CoverPlate") &&
+        !activeViews.includes("Model") &&
+        activeViews.length === 1 &&
+        geometryCoverPlate && (
+          <>
+            <mesh
+              geometry={geometryCoverPlate}
+              scale={modelScale}
+              position={modelPosition}
+              rotation={[Math.PI / -2, 0, 0]}  // Change if needed
+              renderOrder={1}
+            >
+              <meshPhysicalMaterial
+                color={partColors.Plate}
+                attach="material"
+                metalness={0.25}
+                roughness={0.3}
+                opacity={1.0}
+                transparent={true}
+                transmission={0.008}
+                clearcoat={1.0}
+                clearcoatRoughness={0.25}
+              />
+            </mesh>
+
+            {/* Outlines */}
+            <primitive
+              object={
+                new THREE.LineSegments(
+                  new THREE.EdgesGeometry(geometryCoverPlate, 15),
+                  new THREE.LineBasicMaterial({ color: "black" })
+                )
+              }
+              scale={modelScale}
+              position={modelPosition}
+              rotation={[Math.PI / -2, 0, 0]}
+            />
+          </>
+      )}
+
+
+      {/* Plate Section - show Plate and Bolt/Bolts; prefer per-part meshes from Model group to avoid merged STL */}
+      {activeViews.includes("Plate") && !activeViews.includes("Model") && activeViews.length === 1 && (
         <>
-          {modelMeshes.map((m, idx) => {
+          {/* Preferred path: use Model-derived meshes filtered to Plate/Bolt/Bolts */}
+          {modelMeshes.length > 0 && modelMeshes.map((m, idx) => {
             const name = m.name || "";
             const lower = name.toLowerCase();
-            // Only show Plate and Bolt/Bolts in Plate view
             if (!["Plate", "Bolt", "Bolts"].includes(name) && !lower.includes("plate") && !lower.includes("bolt")) {
               return null;
             }
@@ -738,7 +803,6 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             }
             const meshId = `plate-view-${name}-${idx}`;
             const renderOrder = getRenderOrder(name);
-            
             return (
               <group key={meshId}>
                 <mesh
@@ -747,103 +811,105 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
                   rotation={[Math.PI / -2, 0, 0]}
                   position={modelPosition}
                   renderOrder={renderOrder}
-                  userData={{ 
-                    // Prioritize hoverDict (which includes backend values) over stored m.hoverLabel
-                    hoverLabel: (
-                      hoverDict?.[name] || 
-                      hoverDict?.[lower] || 
-                      hoverDict?.[name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()] ||
-                      (name.toLowerCase().endsWith('s') && hoverDict?.[name.slice(0, -1)]) ||
-                      (!name.toLowerCase().endsWith('s') && hoverDict?.[name + 's']) ||
-                      m.hoverLabel
-                    ) || name, 
-                    renderOrder,
-                    meshName: name
-                  }}
-                  onPointerMove={(e) => {
-                    e.stopPropagation();
-                    
-                    // Resolve hover label with improved key matching
-                    // ALWAYS check hoverDict first - it has the latest backend values
-                    const meshName = e.object?.userData?.meshName || name;
-                    const lowerName = meshName?.toLowerCase?.();
-                    const capitalizedName = meshName?.charAt(0).toUpperCase() + meshName?.slice(1).toLowerCase();
-                    
-                    // Try multiple key variations in hoverDict first
-                    let resolvedLabel = null;
-                    if (hoverDict && typeof hoverDict === 'object') {
-                      resolvedLabel = (
-                        hoverDict[meshName] ||
-                        hoverDict[lowerName] ||
-                        hoverDict[capitalizedName] ||
-                        (lowerName?.endsWith('s') && hoverDict[meshName.slice(0, -1)]) ||
-                        (!lowerName?.endsWith('s') && hoverDict[meshName + 's'])
-                      );
-                    }
-                    
-                    // Fallback to stored label or mesh name only if hoverDict lookup failed
-                    if (!resolvedLabel) {
-                      resolvedLabel = e.object?.userData?.hoverLabel || name;
-                    }
-                    
-                    const label = resolvedLabel;
-                    const nx = e?.nativeEvent?.clientX;
-                    const ny = e?.nativeEvent?.clientY;
-                    
-                    // Store this event with its renderOrder for processing
-                    pendingEventsRef.current.set(renderOrder, {
-                      label,
-                      x: nx,
-                      y: ny,
-                      meshId,
-                      renderOrder,
-                      meshObject: e.object
-                    });
-                    
-                    // Update active mesh reference if this has higher priority
-                    const currentActive = activeMeshRef.current;
-                    const currentRenderOrder = currentActive?.userData?.renderOrder ?? -1;
-                    
-                    if (renderOrder > currentRenderOrder || currentActive === null) {
-                      activeMeshRef.current = e.object;
-                      hoveredMeshDataRef.current = { label, x: nx, y: ny };
-                    }
-                    
-                    // Use requestAnimationFrame to batch process all events and pick the highest priority
-                    if (!rafScheduledRef.current) {
-                      rafScheduledRef.current = true;
-                      requestAnimationFrame(() => {
-                        rafScheduledRef.current = false;
-                        if (hoveredMeshDataRef.current) {
-                          onHoverLabel(hoveredMeshDataRef.current.label, hoveredMeshDataRef.current.x, hoveredMeshDataRef.current.y);
-                        }
-                      });
-                    }
-                  }}
-                  onPointerOut={(e) => {
-                    e.stopPropagation();
-                    pendingEventsRef.current.delete(renderOrder);
-                    if (activeMeshRef.current === e.object) {
-                      activeMeshRef.current = null;
-                      hoveredMeshDataRef.current = null;
-                      onHoverEnd();
-                    }
-                  }}
                 >
                   <meshPhysicalMaterial
                     attach="material"
                     color={color}
-                    metalness={0.3}
-                    roughness={0.4}
+                    metalness={0.25}
+                    roughness={0.3}
                     opacity={1.0}
-                    transparent={false}
-                    clearcoat={0.8}
-                    clearcoatRoughness={0.2}
+                    transparent={true}
+                    transmission={0.008}
+                    clearcoat={1.0}
+                    clearcoatRoughness={0.25}
                   />
                 </mesh>
               </group>
             );
           })}
+
+          {/* Fallback path: dedicated Plate/Bolt/Bolts geometries if no modelMeshes */}
+          {modelMeshes.length === 0 && (
+            <>
+              {geometryPlate && (
+                <group key="plate-geometry">
+                  <mesh
+                    geometry={geometryPlate}
+                    scale={modelScale}
+                    rotation={[Math.PI / -2, 0, 0]}
+                    position={modelPosition}
+                    renderOrder={getRenderOrder("Plate")}
+                  >
+                    <meshPhysicalMaterial
+                      attach="material"
+                      color={partColors.Plate}
+                      metalness={0.25}
+                      roughness={0.3}
+                      opacity={1.0}
+                      transparent={true}
+                      transmission={0.008}
+                      clearcoat={1.0}
+                      clearcoatRoughness={0.25}
+                    />
+                  </mesh>
+                  <primitive
+                    object={
+                      new THREE.LineSegments(
+                        new THREE.EdgesGeometry(geometryPlate, 15),
+                        new THREE.LineBasicMaterial({ color: "black" })
+                      )
+                    }
+                    scale={modelScale}
+                    rotation={[Math.PI / -2, 0, 0]}
+                    position={modelPosition}
+                  />
+                </group>
+              )}
+
+              {geometryBolt && (
+                <mesh
+                  key="plate-bolt"
+                  geometry={geometryBolt}
+                  scale={modelScale}
+                  rotation={[Math.PI / -2, 0, 0]}
+                  position={modelPosition}
+                  renderOrder={getRenderOrder("Bolt")}
+                >
+                  <meshPhysicalMaterial
+                    attach="material"
+                    color={partColors.Bolt}
+                    metalness={0.25}
+                    roughness={0.35}
+                    opacity={1.0}
+                    transparent={false}
+                    clearcoat={0.8}
+                    clearcoatRoughness={0.25}
+                  />
+                </mesh>
+              )}
+              {geometryBolts && (
+                <mesh
+                  key="plate-bolts"
+                  geometry={geometryBolts}
+                  scale={modelScale}
+                  rotation={[Math.PI / -2, 0, 0]}
+                  position={modelPosition}
+                  renderOrder={getRenderOrder("Bolts")}
+                >
+                  <meshPhysicalMaterial
+                    attach="material"
+                    color={partColors.Bolts}
+                    metalness={0.25}
+                    roughness={0.35}
+                    opacity={1.0}
+                    transparent={false}
+                    clearcoat={0.8}
+                    clearcoatRoughness={0.25}
+                  />
+                </mesh>
+              )}
+            </>
+          )}
         </>
       )}
 

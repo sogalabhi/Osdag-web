@@ -31,6 +31,7 @@ class BeamCoverPlateWeld(MomentConnection):
 
     def __init__(self):
         super(BeamCoverPlateWeld, self).__init__()
+        self.hover_dict = {}
         self.design_status = False
 
     ###############################################
@@ -1952,7 +1953,7 @@ class BeamCoverPlateWeld(MomentConnection):
         from PyQt5.QtWidgets import QCheckBox
         from PyQt5.QtCore import Qt
         for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Cover Plate':
+            if chkbox.objectName() == 'Cover Plate Welded':
                 continue
             if isinstance(chkbox, QCheckBox):
                 chkbox.setChecked(Qt.Unchecked)
@@ -2744,7 +2745,6 @@ class BeamCoverPlateWeld(MomentConnection):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image)
         return True
-
 
 
 

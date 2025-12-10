@@ -29,6 +29,8 @@ export const useEngineeringModule = (moduleConfig) => {
     renderCadModel,
     cadModelPaths,
     hoverDict,
+    coverPlateList,
+    weldSizeList,
 
     // NEW SIMPLIFIED API - 8 Core Functions Only
     getModuleData,              // Universal data fetcher
@@ -573,20 +575,34 @@ export const useEngineeringModule = (moduleConfig) => {
       angleList,
       extraState,
     });
+    console.log('🔵 [useEngineeringModule] handleSubmit - starting submission process');
     const validationResult = moduleConfig.validateInputs(inputs, extraState, { angleList, boltDiameterList, propertyClassList, thicknessList }, selectionStates);
     if (!validationResult.isValid) {
       alert(validationResult.message);
       return;
     }
-
-    const param = moduleConfig.buildSubmissionParams(inputs, allSelected, {
-      boltDiameterList,
-      propertyClassList,
-      thicknessList,
-      angleList, // FIXED: Added angleList to submission params
-      channelList
-    }, extraState);
-
+    console.log('🔵 [useEngineeringModule] handleSubmit - input validation passed');
+    console.log('🔵 [useEngineeringModule] handleSubmit - before buildSubmissionParams');
+    let param = null;
+    try {
+      param = moduleConfig.buildSubmissionParams(inputs, allSelected, {
+        boltDiameterList,
+        propertyClassList,
+        thicknessList,
+        angleList, // FIXED: Added angleList to submission params
+        channelList,
+        weldSizeList,
+      }, extraState);
+      console.log('🔵 [useEngineeringModule] handleSubmit - after buildSubmissionParams', param);
+    } catch (err) {
+      console.error('🔴 [useEngineeringModule] buildSubmissionParams threw:', err);
+      // Restore UI state and abort
+      setIsLoadingModalVisible(false);
+      setLoading(false);
+      setLoadingStage("");
+      alert('Error preparing submission parameters. See console for details.');
+      return;
+    }
     // Show loading modal
     setIsLoadingModalVisible(true);
     setLoadingStage("Generating design calculations...");
@@ -808,6 +824,8 @@ export const useEngineeringModule = (moduleConfig) => {
     renderCadModel,
     cadModelPaths,
     hoverDict,
+    coverPlateList,
+    weldSizeList,
 
     // NEW SIMPLIFIED API - 8 Core Functions Only
     // SIMPLIFIED API ACCESS - Expose core functions for advanced usage

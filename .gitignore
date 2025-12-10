@@ -65,3 +65,15 @@ file_storage/cad_models/*.stp
 file_storage/cad_models/*.glb
 file_storage/osdag_web/firebase-service-account.json
 key
+
+backend/file_storage/cad_models/*.brep
+backend/file_storage/cad_models/*.obj
+backend/file_storage/cad_models/*.iges
+backend/file_storage/cad_models/*.step
+backend/file_storage/cad_models/*.stp
+backend/file_storage/cad_models/*.glb
+backend/file_storage/cad_models/*.parts.json
+backend/file_storage/cad_models/*.stl
+backend/file_storage/cad_models/*.stp
+backend/file_storage/cad_models/*.glb
+backend/file_storage/cad_models/*.parts.json
