@@ -10,6 +10,7 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "./firebase";
 import axios from "axios";
 import { clearAuthStorage } from "../utils/auth";
+import { apiBase } from '../api';
 
 const generateRandomString = (length) => {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -352,8 +353,8 @@ const LoginPage = () => {
       const idToken = await user.getIdToken();
 
       // Step 3️⃣: Send token to Django backend for verification
-      const host = "http://localhost:8000"; // Django backend
-      const response = await axios.post(`${host}/api/auth/firebase-login/`, {
+    //   const host = "http://localhost:8000"; // Django backend
+      const response = await axios.post(`${apiBase}auth/firebase-login/`, {
         token: idToken,
       });
         const { data } = response;
