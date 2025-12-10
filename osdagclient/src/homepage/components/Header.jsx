@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { MODULE_ROUTES, MODULE_NAME_TO_KEY } from '../../constants/modules';
 import { isGuestUser } from '../../utils/auth';
 import axios from "axios";
+import { apiBase } from '../../api';
 
 const Header = ({ setshowSideBar, active }) => {
   const [isDark, setIsDark] = useState(false);
@@ -36,7 +37,7 @@ const Header = ({ setshowSideBar, active }) => {
       }
 
       try {
-        const response = await axios.get("http://localhost:8000/api/dashboard/", {
+        const response = await axios.get(`${apiBase}dashboard/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
