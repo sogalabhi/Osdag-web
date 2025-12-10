@@ -265,7 +265,11 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
 def create_module() -> CleatAngleConnection:
     """Create an instance of the cleat angle connection module design class and set it up for use"""
     module = CleatAngleConnection()  # Create an instance of the CleatAngleConnection
-    module.set_osdaglogger(None)
+    # Initialize logger to avoid None during member capacity checks
+    try:
+        module.set_osdaglogger(None)
+    except Exception as log_e:
+        print("Warning: failed to init logger:", log_e)
     return module
 
 def create_from_input(input_values: Dict[str, Any]) -> CleatAngleConnection:
@@ -446,7 +450,9 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     print('module from input values : ' , module)
     # Object that will create the CAD model.
     try : 
-        cld = CommonDesignLogic(None, '', module.module , module.mainmodule)
+        # CommonDesignLogic(display, cad_widget, folder, connection, mainmodule)
+        from osdag_core.Common import KEY_DISP_CLEATANGLE
+        cld = CommonDesignLogic(None, None, '', KEY_DISP_CLEATANGLE, module.mainmodule)
     except Exception as e : 
         print('error in cld e : ' , e)
     
@@ -479,10 +485,12 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
                     full_brep_path = os.path.join(os.getcwd(), part_file_path_rel)
                     from OCC.Core import BRepTools
                     BRepTools.breptools.Write(part_shape, full_brep_path, Message_ProgressRange())
+                    print(f"[CleatAngle CAD] Wrote BREP for {part} at {full_brep_path}")
                     # STL as well
                     part_stl_file = part_file_path_rel.replace(".brep", ".stl")
                     try:
                         write_stl(part_shape, os.path.join(os.getcwd(), part_stl_file))
+                        print(f"[CleatAngle CAD] Wrote STL for {part} at {os.path.join(os.getcwd(), part_stl_file)}")
                     except Exception as e:
                         print(f"Failed to write STL for part {part} (CleatAngle):", e)
                 except Exception as e:
@@ -494,11 +502,14 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
             compound_file_name = f"{session}_Model.brep"
             compound_file_path_rel = os.path.join("file_storage", "cad_models", compound_file_name)
             from OCC.Core import BRepTools
-            BRepTools.breptools.Write(model, os.path.join(os.getcwd(), compound_file_path_rel), Message_ProgressRange())
+            full_compound_path = os.path.join(os.getcwd(), compound_file_path_rel)
+            BRepTools.breptools.Write(model, full_compound_path, Message_ProgressRange())
+            print(f"[CleatAngle CAD] Wrote Model BREP at {full_compound_path}")
             # Compound/model STL (for completeness, not loaded in UI)
             compound_stl_file = compound_file_path_rel.replace(".brep", ".stl")
             try:
                 write_stl(model, os.path.join(os.getcwd(), compound_stl_file))
+                print(f"[CleatAngle CAD] Wrote Model STL at {os.path.join(os.getcwd(), compound_stl_file)}")
             except Exception as e:
                 print("Failed to write Model STL for CleatAngle:", e)
             return compound_file_path_rel
@@ -517,10 +528,14 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
             print('brep file path in create_cad_model : ' , file_path)
             try :
                 from OCC.Core import BRepTools
-                BRepTools.breptools.Write(model, os.path.join(os.getcwd(), file_path), Message_ProgressRange())
+                full_brep = os.path.join(os.getcwd(), file_path)
+                BRepTools.breptools.Write(model, full_brep, Message_ProgressRange())
+                print(f"[CleatAngle CAD] Wrote BREP for {section} at {full_brep}")
                 # Write STL too
                 stl_file_path = file_path.replace(".brep", ".stl")
-                write_stl(model, os.path.join(os.getcwd(), stl_file_path))
+                full_stl = os.path.join(os.getcwd(), stl_file_path)
+                write_stl(model, full_stl)
+                print(f"[CleatAngle CAD] Wrote STL for {section} at {full_stl}")
             except Exception as e :
                 print('Writing to BREP or STL file failed e : ' , e)
             return file_path

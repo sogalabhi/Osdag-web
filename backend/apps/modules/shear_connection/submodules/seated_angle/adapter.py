@@ -9,6 +9,7 @@ from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.Message import Message_ProgressRange
 from osdag_core.cad.common_logic import CommonDesignLogic
+from osdag_core.Common import KEY_DISP_SEATED_ANGLE
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
 import sys
@@ -299,8 +300,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     """
     output = {}  # Dictionary for formatted values
     module = create_from_input(input_values)  # Create module from input.
-    print('module : ' , module)
-    print('type of module : ' , type(module))
 
     # Generate output values in unformatted form.
     raw_output_text = module.output_values(True)
@@ -342,7 +341,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         for visible in [rest[0] if rest else True]
     ]
     
-    logs = module.logs
+    # Prefer CustomLogger logs if available
+    if hasattr(module, "logger") and hasattr(module.logger, "get_logs"):
+        logs = module.logger.get_logs()
+    else:
+        logs = module.logs
     raw_output = raw_output_text + raw_output_capacities + raw_seated_spacing_col + raw_seated_spacing_beam + raw_top_spacing_beam + raw_top_spacing_col
     # os.system("clear")
     # Loop over all the text values and add them to ouptut dict.
@@ -369,12 +372,12 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         raise InvalidInputTypeError(
             "section", "'Model', 'Beam', 'Column' or 'SeatedAngle'")
     module = create_from_input(input_values)  # Create module from input.
-    print('module from input values : ' , module)
     # Object that will create the CAD model.
     try : 
-        cld = CommonDesignLogic(None, '', module.module , module.mainmodule)
+        cld = CommonDesignLogic(None, None, '', KEY_DISP_SEATED_ANGLE, module.mainmodule)
     except Exception as e : 
         print('error in cld e : ' , e)
+        return False
     
     try : 
         # Setup the calculations object for generating CAD model.
@@ -405,10 +408,19 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
                     full_brep_path = os.path.join(os.getcwd(), part_file_path_rel)
                     from OCC.Core import BRepTools
                     BRepTools.breptools.Write(part_shape, full_brep_path, Message_ProgressRange())
+                    try:
+                        module.logs.append(f"Wrote {part} BREP: {full_brep_path}")
+                    except Exception:
+                        pass
                     # STL as well
                     part_stl_file = part_file_path_rel.replace(".brep", ".stl")
                     try:
-                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_file))
+                        full_stl = os.path.join(os.getcwd(), part_stl_file)
+                        write_stl(part_shape, full_stl)
+                        try:
+                            module.logs.append(f"Wrote {part} STL: {full_stl}")
+                        except Exception:
+                            pass
                     except Exception as e:
                         print(f"Failed to write STL for part {part} (SeatedAngle):", e)
                 except Exception as e:
@@ -420,11 +432,21 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
             compound_file_name = f"{session}_Model.brep"
             compound_file_path_rel = os.path.join("file_storage", "cad_models", compound_file_name)
             from OCC.Core import BRepTools
-            BRepTools.breptools.Write(model, os.path.join(os.getcwd(), compound_file_path_rel), Message_ProgressRange())
+            full_compound = os.path.join(os.getcwd(), compound_file_path_rel)
+            BRepTools.breptools.Write(model, full_compound, Message_ProgressRange())
+            try:
+                module.logs.append(f"Wrote Model BREP: {full_compound}")
+            except Exception:
+                pass
             # Compound/model STL (for completeness, not loaded in UI)
             compound_stl_file = compound_file_path_rel.replace(".brep", ".stl")
             try:
-                write_stl(model, os.path.join(os.getcwd(), compound_stl_file))
+                full_compound_stl = os.path.join(os.getcwd(), compound_stl_file)
+                write_stl(model, full_compound_stl)
+                try:
+                    module.logs.append(f"Wrote Model STL: {full_compound_stl}")
+                except Exception:
+                    pass
             except Exception as e:
                 print("Failed to write Model STL for SeatedAngle:", e)
             return compound_file_path_rel
@@ -437,16 +459,24 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
             if(not os.path.exists(os.path.join(os.getcwd() , "file_storage/cad_models/"))) :
                 print('path does not exists cad_models , creating one')
                 os.mkdir(os.path.join(os.getcwd() , "file_storage/cad_models/"))
-            print('2d model : ' , model)
             file_name = session + "_" + section + ".brep"
             file_path = "file_storage/cad_models/" + file_name
-            print('brep file path in create_cad_model : ' , file_path)
             try :
                 from OCC.Core import BRepTools
-                BRepTools.breptools.Write(model, os.path.join(os.getcwd(), file_path), Message_ProgressRange())
+                full_brep = os.path.join(os.getcwd(), file_path)
+                BRepTools.breptools.Write(model, full_brep, Message_ProgressRange())
+                try:
+                    module.logs.append(f"Wrote {section} BREP: {full_brep}")
+                except Exception:
+                    pass
                 # Write STL too
                 stl_file_path = file_path.replace(".brep", ".stl")
-                write_stl(model, os.path.join(os.getcwd(), stl_file_path))
+                full_stl = os.path.join(os.getcwd(), stl_file_path)
+                write_stl(model, full_stl)
+                try:
+                    module.logs.append(f"Wrote {section} STL: {full_stl}")
+                except Exception:
+                    pass
             except Exception as e :
                 print('Writing to BREP or STL file failed e : ' , e)
             return file_path

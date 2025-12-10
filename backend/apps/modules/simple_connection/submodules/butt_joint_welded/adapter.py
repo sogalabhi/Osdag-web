@@ -22,8 +22,33 @@ def get_required_keys() -> List[str]:
     return []
 
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate input values"""
-    pass
+    """Validate required inputs for ButtJointWelded (no fallbacks)."""
+    iv = dict(input_values or {})
+
+    required_keys = [
+        "Material",
+        "Weld.Material_Grade_OverWrite",
+        "Weld.Fab",
+        "Weld.Size",
+        "Plate1Thickness",
+        "Plate2Thickness",
+        "PlateWidth",
+        "ButtJoint.CoverPlate",
+        "Load.Axial",
+        "Design.For",
+    ]
+
+    missing = [k for k in required_keys if k not in iv or iv[k] in (None, "")]
+    if missing:
+        raise ValueError(f"Missing required inputs: {', '.join(missing)}")
+
+    # Weld.Size must be a non-empty list/tuple
+    weld_size = iv.get("Weld.Size")
+    if isinstance(weld_size, (int, float, str)):
+        iv["Weld.Size"] = [weld_size]
+    elif not isinstance(weld_size, (list, tuple)) or len(weld_size) == 0:
+        raise ValueError("Weld.Size must be a non-empty list")
+
 
 def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     """Generate output from input values"""
@@ -31,6 +56,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     logs = []
     try:
         module = ButtJointWelded()
+        validate_input(input_values)
         module.set_input_values(input_values)
         # module.design_module()
         # output = module.get_output_values()
@@ -44,6 +70,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     """Create CAD model"""
     try:
         module = ButtJointWelded()
+        validate_input(input_values)
         module.set_input_values(input_values)
         setup_for_cad(module, input_values)
         return ""
@@ -54,5 +81,6 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 def create_from_input(input_values: Dict[str, Any]) -> Any:
     """Create module instance from input"""
     module = ButtJointWelded()
+    validate_input(input_values)
     module.set_input_values(input_values)
     return module

@@ -404,7 +404,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             print(f"Logger exists: {type(module.logger)}")
             if isinstance(module.logger, CustomLogger):
                 logs = module.logger.get_logs()
-                print(f"✅ Retrieved {len(logs)} logs from custom logger")
+                print(f"Retrieved {len(logs)} logs from custom logger")
             else:
                 print(f"⚠️ Logger is not CustomLogger instance, type: {type(module.logger)}")
         else:

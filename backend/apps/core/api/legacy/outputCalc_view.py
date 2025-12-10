@@ -66,9 +66,18 @@ class OutputData(APIView):
         print('Module name:', module_name)
         print('Input values received:', input_values)
         
+        # Normalize hyphenated ids to backend ids
+        module_aliases = {
+            "Butt-Joint-Welded": "ButtJointWelded",
+            "Butt-Joint-Bolted": "ButtJointBolted",
+            "Lap-Joint-Welded": "LapJointWelded",
+            "Lap-Joint-Bolted": "LapJointBolted",
+        }
+        canonical_module_name = module_aliases.get(module_name, module_name)
+
         # Get module API
         try:
-            module_api = get_module_api(module_name)
+            module_api = get_module_api(canonical_module_name)
         except Exception as e:
             print('Error getting module API:', e)
             return JsonResponse({"data": {}, "logs": [], "success": False, "error": "Module not found"}, safe=False, status=400)

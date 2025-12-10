@@ -47,10 +47,19 @@ class CADGeneration(View):
             if not input_values:
                 return JsonResponse({"status": "error", "message": "input_values are required"}, status=400)
             
+            # Normalize hyphenated ids to backend ids
+            module_aliases = {
+                "Butt-Joint-Welded": "ButtJointWelded",
+                "Butt-Joint-Bolted": "ButtJointBolted",
+                "Lap-Joint-Welded": "LapJointWelded",
+                "Lap-Joint-Bolted": "LapJointBolted",
+            }
+            canonical_module_id = module_aliases.get(module_id, module_id)
+
             # Get module API
-            module_api = get_module_api(module_id)
+            module_api = get_module_api(canonical_module_id)
             
-            # Determine session type from module_id
+            # Determine session type from canonical_module_id
             module_type_mapping = {
                 "FinPlateConnection": "FinPlateConnection",
                 "Cleat-Angle-Connection": "CleatAngle", 
@@ -62,13 +71,13 @@ class CADGeneration(View):
                 "Beam-to-Column-End-Plate-Connection": "BeamToColumnEndPlate",
                 "Tension-Member-Bolted-Design": "TensionMember",
                 "Tension-Member-Welded-Design": "TensionMember",
-                "Butt-Joint-Welded": "ButtJointWelded",
-                "Butt-Joint-Bolted": "ButtJointBolted",
-                "Lap-Joint-Welded": "LapJointWelded",
-                "Lap-Joint-Bolted": "LapJointBolted",
+                "ButtJointWelded": "ButtJointWelded",
+                "ButtJointBolted": "ButtJointBolted",
+                "LapJointWelded": "LapJointWelded",
+                "LapJointBolted": "LapJointBolted",
             }
             
-            session_type = module_type_mapping.get(module_id)
+            session_type = module_type_mapping.get(canonical_module_id)
             if not session_type:
                 return JsonResponse({"status": "error", "message": f"Unknown module type: {module_id}"}, status=400)
                 
