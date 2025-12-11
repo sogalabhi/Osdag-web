@@ -25,8 +25,8 @@ from apps.core.api.legacy.inputdata.lap_joint_bolted_input import LapJointBolted
 
 INPUT_DATA_FACTORY = {
     'FinPlateConnection': FinPlateInputData(),
-    'Cleat-Angle-Connection': CleatAngleInputData(),
-    'End-Plate-Connection': EndPlateInputData(),
+    'CleatAngleConnection': CleatAngleInputData(),
+    'EndPlateConnection': EndPlateInputData(),
     'SeatedAngleConnection': SeatedAngleInputData(),
     'Cover-Plate-Bolted-Connection': CoverPlateBoltedInputData(),
     'Beam-Beam-End-Plate-Connection': BeamBeamEndPlateInputData(),

@@ -579,6 +579,7 @@ class CleatAngleConnection(ShearConnection):
         # @author Arsil Zunzunia
         #
         # Set Custom logger
+        global logger
         logging.setLoggerClass(CustomLogger)
 
         self.logger = logging.getLogger('Osdag')
@@ -607,6 +608,16 @@ class CleatAngleConnection(ShearConnection):
             formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
+
+        # Route module-level logger variable used across the class to the instance logger
+        global logger
+        logger = self.logger
+
+        # Route module-level logger variable used across the class to the instance logger
+        logger = self.logger
+
+        # Expose logger-backed logs buffer if available
+        self.logs = self.logger.get_logs() if hasattr(self.logger, "get_logs") else []
 
     def module_name(self):
         return KEY_DISP_CLEATANGLE

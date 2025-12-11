@@ -74,8 +74,8 @@ urlpatterns = [
     # output generation from input
     # Migrated modules removed - now handled by apps.modules.* URLs:
     # - FinPlateConnection -> /api/modules/shear-connection/fin-plate/design/
-    # - End-Plate-Connection -> /api/modules/shear-connection/end-plate/design/
-    # - Cleat-Angle-Connection -> /api/modules/shear-connection/cleat-angle/design/
+    # - EndPlateConnection -> /api/modules/shear-connection/end-plate/design/
+    # - CleatAngleConnection -> /api/modules/shear-connection/cleat-angle/design/
     # - SeatedAngleConnection -> /api/modules/shear-connection/seated-angle/design/
     # - Cover-Plate-Bolted-Connection -> /api/modules/moment-connection/cover-plate-bolted/design/
     # - Beam-Beam-End-Plate-Connection -> /api/modules/moment-connection/beam-beam-end-plate/design/

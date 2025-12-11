@@ -109,6 +109,6 @@ export const MODULE_KEY_SEAT_ANGLE = 'SeatedAngleConnection'; // canonical key f
 export const MODULE_DISPLAY_FIN_PLATE = 'FinPlateConnection'; // display name for UI 
 
 // Module Keys - CleatAngle
-export const MODULE_KEY_CLEAT_ANGLE = 'Cleat-Angle-Connection';
-export const MODULE_DISPLAY_CLEAT_ANGLE = 'Cleat-Angle-Connection';
+export const MODULE_KEY_CLEAT_ANGLE = 'CleatAngleConnection';
+export const MODULE_DISPLAY_CLEAT_ANGLE = 'CleatAngleConnection';
 export const MODULE_DISPLAY_SEAT_ANGLE = 'SeatedAngleConnection'; // display name for UI 

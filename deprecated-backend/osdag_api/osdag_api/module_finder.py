@@ -43,8 +43,8 @@ class ModuleApiType(_Protocol):
         pass
 module_dict : Dict[str, ModuleApiType] = {
     'FinPlateConnection': fin_plate_connection,
-    'End-Plate-Connection': end_plate_connection,
-    'Cleat-Angle-Connection': cleat_angle_connection,
+    'EndPlateConnection': end_plate_connection,
+    'CleatAngleConnection': cleat_angle_connection,
     'SeatedAngleConnection': seated_angle_connection,
     'Beam-to-Beam-Cover-Plate-Bolted-Connection': cover_plate_bolted_connection,
     'Column-to-Column-Cover-Plate-Bolted-Connection': column_to_column_cover_plate_bolted_connection,

@@ -12,9 +12,6 @@ class EndPlateService:
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:
         """Run design calculation and return results"""
         validate_input(inputs)
-        model = EndPlateConnection()
-        model.set_input_values(inputs)
-        model.hard_values()
         output, logs = generate_output(inputs)
         return {
             'data': output,

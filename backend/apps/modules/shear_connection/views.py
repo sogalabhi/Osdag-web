@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .registry import ShearConnectionRegistry
 from apps.core.utils.module_helpers import handle_design_request
+from rest_framework import status
+from apps.core.models import Columns, Beams, Bolt, Material, CustomMaterials, Angles
 
 
 class ShearConnectionViewSet(viewsets.ViewSet):
@@ -89,9 +91,85 @@ class ShearConnectionViewSet(viewsets.ViewSet):
     def options(self, request, submodule_slug=None):
         """
         GET /api/modules/shear-connection/{submodule_slug}/options/
-        
-        Returns input options for the sub-module (e.g., beam list, column list)
+        Returns dropdown/options data for the sub-module.
         """
-        # TODO: Implement options endpoint if needed
-        return Response({'message': 'Options endpoint not yet implemented'}, status=501)
+        email = request.query_params.get("email")
+        slug = submodule_slug
+
+        # Common data helpers
+        def material_list():
+            mats = list(Material.objects.all().values())
+            if email:
+                mats += list(CustomMaterials.objects.filter(email=email).values())
+            mats.append({"id": -1, "Grade": "Custom"})
+            return mats
+
+        def bolt_diameters():
+            lst = list(Bolt.objects.values_list('Bolt_diameter', flat=True))
+            lst.sort()
+            return lst
+
+        property_classes = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+        thickness_list = [
+            '8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50',
+            '56', '63', '75', '80', '90', '100', '110', '120'
+        ]
+        connectivity_common = ['Column Flange-Beam-Web', 'Column Web-Beam-Web', 'Beam-Beam']
+
+        try:
+            if slug == 'fin-plate':
+                data = {
+                    'connectivityList': connectivity_common,
+                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
+                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'materialList': material_list(),
+                    'boltDiameterList': bolt_diameters(),
+                    'propertyClassList': property_classes,
+                    'thicknessList': thickness_list,
+                }
+                return Response(data, status=status.HTTP_200_OK)
+
+            if slug == 'cleat-angle':
+                data = {
+                    'connectivityList': connectivity_common,
+                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
+                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'materialList': material_list(),
+                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
+                    'boltDiameterList': bolt_diameters(),
+                    'propertyClassList': property_classes,
+                }
+                return Response(data, status=status.HTTP_200_OK)
+
+            if slug == 'end-plate':
+                data = {
+                    'connectivityList': connectivity_common,
+                    'boltTypeList': ['Bearing Bolt', 'Friction Grip Bolt'],
+                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
+                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'materialList': material_list(),
+                    'boltDiameterList': bolt_diameters(),
+                    'propertyClassList': property_classes,
+                    'thicknessList': thickness_list,
+                }
+                return Response(data, status=status.HTTP_200_OK)
+
+            if slug == 'seated-angle':
+                data = {
+                    'connectivityList': ['Column Flange-Beam-Web', 'Column Web-Beam-Web'],
+                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
+                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'materialList': material_list(),
+                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
+                    'topAngleList': list(Angles.objects.values_list('Designation', flat=True)),
+                    'boltDiameterList': bolt_diameters(),
+                    'boltTypeList': ['Bearing Bolt', 'Friction Grip Bolt'],
+                    'propertyClassList': property_classes,
+                    'thicknessList': thickness_list,
+                }
+                return Response(data, status=status.HTTP_200_OK)
+
+            return Response({'error': f'Sub-module {slug} not found'}, status=404)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
 

@@ -2,9 +2,23 @@
 
 export const BASE_URL = "http://127.0.0.1:8000/";
 
+// Map backend module ids to new shear-connection slugs
+const SHEAR_SLUGS = {
+  FinPlateConnection: 'fin-plate',
+  CleatAngleConnection: 'cleat-angle',
+  EndPlateConnection: 'end-plate',
+  SeatedAngleConnection: 'seated-angle',
+};
+
+const getShearSlug = (moduleKey) => SHEAR_SLUGS[moduleKey] || moduleKey;
+
 export const createDesign = async (param, module_id, onCADSuccess = null, dispatch) => {
   try {
-    const url = `${BASE_URL}calculate-output/${module_id}`;
+    const slug = getShearSlug(module_id);
+    const isShear = SHEAR_SLUGS.hasOwnProperty(module_id);
+    const url = isShear
+      ? `${BASE_URL}api/modules/shear-connection/${slug}/design/`
+      : `${BASE_URL}calculate-output/${module_id}`;
     const response = await fetch(url, {
       method: "POST",
       mode: "cors",
@@ -13,7 +27,8 @@ export const createDesign = async (param, module_id, onCADSuccess = null, dispat
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify(param),
+      // New shear endpoint expects {inputs: {...}} but accepts raw dict; send both for safety
+      body: JSON.stringify(isShear ? { inputs: param } : param),
     });
     const jsonResponse = await response?.json();
 
@@ -29,7 +44,9 @@ export const createDesign = async (param, module_id, onCADSuccess = null, dispat
       dispatch && dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
     } else {
     }
+    return { status: response.status, body: jsonResponse };
   } catch (error) {
+    return { status: 500, body: { success: false, error: error?.message || 'Design request failed' } };
   }
 };
 
@@ -47,7 +64,20 @@ export const getDesingPrefData = async (params) => {
 };
 
 export const populateModule = async (moduleKey, dispatch) => {
-  const response = await fetch(`${BASE_URL}populate?moduleName=${moduleKey}`, {
+  const SHEAR_SLUGS = {
+    FinPlateConnection: 'fin-plate',
+    CleatAngleConnection: 'cleat-angle',
+    EndPlateConnection: 'end-plate',
+    SeatedAngleConnection: 'seated-angle',
+  };
+  const isShear = Object.prototype.hasOwnProperty.call(SHEAR_SLUGS, moduleKey);
+  const slug = SHEAR_SLUGS[moduleKey] || moduleKey;
+  const email = localStorage.getItem("email");
+  const url = isShear
+    ? `${BASE_URL}api/modules/shear-connection/${slug}/options/${email ? `?email=${encodeURIComponent(email)}` : ''}`
+    : `${BASE_URL}populate?moduleName=${moduleKey}${email ? `&email=${encodeURIComponent(email)}` : ''}`;
+
+  const response = await fetch(url, {
     method: "GET",
     credentials: "include"
   });
@@ -57,10 +87,15 @@ export const populateModule = async (moduleKey, dispatch) => {
 
 export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => {
   let error = null;
-  const designRes = await fetch(`${BASE_URL}calculate-output/${moduleKey}`, {
+  const slug = getShearSlug(moduleKey);
+  const isShear = SHEAR_SLUGS.hasOwnProperty(moduleKey);
+  const designUrl = isShear
+    ? `${BASE_URL}api/modules/shear-connection/${slug}/design/`
+    : `${BASE_URL}calculate-output/${moduleKey}`;
+  const designRes = await fetch(designUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(inputParams),
+    body: JSON.stringify(isShear ? { inputs: inputParams } : inputParams),
     credentials: "include"
   });
   const designData = await designRes.json();
@@ -74,6 +109,7 @@ export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => 
     payload
   });
   if (designRes.status === 201 && (designData.data || designData)) {
+    // CAD endpoint remains legacy for now; reuse moduleKey as-is
     const cadRes = await fetch(`${BASE_URL}design/cad/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

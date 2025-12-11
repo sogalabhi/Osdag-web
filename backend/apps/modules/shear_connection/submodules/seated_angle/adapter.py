@@ -12,6 +12,7 @@ from osdag_core.cad.common_logic import CommonDesignLogic
 from osdag_core.Common import KEY_DISP_SEATED_ANGLE
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
+from osdag_core.custom_logger import CustomLogger
 import sys
 import os
 from typing import Dict, Any, List
@@ -73,7 +74,7 @@ def validate_input(input_values: Dict[str,Any])-> None:
     bolt_diameter =input_values["Bolt.Diameter"]
     if (not isinstance(bolt_diameter,list)
         or not validate_list_type(bolt_diameter,str)
-        or not custom_list_validation(bolt_diameter)):
+        or not custom_list_validation(bolt_diameter, int_able)):
         raise InvalidInputTypeError(
             "Bolt.Diameter","non empty List[str] where all items can be converted to int"
         )
@@ -304,7 +305,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     # Generate output values in unformatted form.
     raw_output_text = module.output_values(True)
     raw_output_capacities = module.capacities(True)
-    raw_output_seated_spacing_beam = module.spacing(True)
+    raw_output_seated_spacing_beam = module.seated_spacing_beam(True)
     raw_output_seated_spacing_col = module.seated_spacing_col(True)
     raw_output_top_spacing_col = module.top_spacing_col(True)
     raw_output_top_spacing_beam = module.top_spacing_beam(True)
@@ -342,10 +343,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     ]
     
     # Prefer CustomLogger logs if available
-    if hasattr(module, "logger") and hasattr(module.logger, "get_logs"):
+    if hasattr(module, "logger") and isinstance(module.logger, CustomLogger):
         logs = module.logger.get_logs()
     else:
-        logs = module.logs
+        logs = module.logs if hasattr(module, "logs") else []
     raw_output = raw_output_text + raw_output_capacities + raw_seated_spacing_col + raw_seated_spacing_beam + raw_top_spacing_beam + raw_top_spacing_col
     # os.system("clear")
     # Loop over all the text values and add them to ouptut dict.

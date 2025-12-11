@@ -609,7 +609,24 @@ export const useEngineeringModule = (moduleConfig) => {
 
     try {
       console.log('🔵 [useEngineeringModule] handleSubmit - calling createDesign');
-      await createDesign(param, moduleConfig.designType, null);
+      const designResult = await createDesign(param, moduleConfig.designType, null);
+      const designStatus = designResult?.status;
+      const designBody = designResult?.body;
+      const designSuccess =
+        designStatus >= 200 && designStatus < 300 &&
+        designBody?.success !== false &&
+        designBody?.data &&
+        Object.keys(designBody.data).length > 0;
+
+      if (!designSuccess) {
+        console.error('🔴 [useEngineeringModule] Design failed, skipping CAD. status:', designStatus, 'body:', designBody);
+        alert(designBody?.error || 'Design failed. Please check inputs.');
+        setLoading(false);
+        setIsLoadingModalVisible(false);
+        setLoadingStage("");
+        return;
+      }
+
       // Auto-trigger CAD after successful design
       console.log('🔵 [useEngineeringModule] Design complete, calling createCADModel');
       setLoadingStage("Generating 3D model...");

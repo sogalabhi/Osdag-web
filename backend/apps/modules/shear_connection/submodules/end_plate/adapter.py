@@ -9,6 +9,7 @@ from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
 from osdag_core.cad.common_logic import CommonDesignLogic
 from osdag_core.Common import KEY_DISP_ENDPLATE
+from osdag_core.custom_logger import CustomLogger
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
@@ -327,8 +328,16 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     raw_output_spacing = module.spacing(True)  # Generate output val
     raw_output_capacities = module.capacities(True)
     raw_output_bolt_capacity = module.bolt_capacity_details(True)
-    logs = module.logs
-    # print("LOGSS AREE ",module.logs)
+
+    # Prefer CustomLogger if attached
+    if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
+        logs = module.logger.get_logs()
+    else:
+        logs = module.logs if hasattr(module, 'logs') else []
+    # Ensure logs is a list even if empty
+    if not logs:
+        logs = ["No logs generated"]
+
     raw_output = raw_output_capacities + raw_output_spacing + raw_output_text + raw_output_bolt_capacity
     # os.system("clear")
     # Loop over all the text values and add them to ouptut dict.

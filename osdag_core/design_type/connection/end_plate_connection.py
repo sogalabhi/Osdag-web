@@ -44,6 +44,7 @@ from .shear_connection import ShearConnection
 from ...utils.common.component import *
 from ...utils.common.material import *
 from ...Common import *
+from ...custom_logger import CustomLogger
 from osdag_core.design_report.reportGenerator_latex import CreateLatex
 from ...Report_functions import *
 import logging
@@ -200,30 +201,39 @@ class EndPlateConnection(ShearConnection):
         """
         Function to set Logger for End Plate Module
         """
-        # @author Arsil Zunzunia
         global logger
-        logger = logging.getLogger('Osdag')
+        logging.setLoggerClass(CustomLogger)
 
-        logger.setLevel(logging.DEBUG)
+        self.logger = logging.getLogger('Osdag')
+
+        if not isinstance(self.logger, CustomLogger):
+            logging.getLogger('Osdag').manager.loggerDict.pop('Osdag', None)
+            # clear any existing handlers
+            self.logger = logging.getLogger('Osdag')
+
+        self.logger.handlers.clear()
+
+        self.logger.setLevel(logging.DEBUG)
         handler = logging.StreamHandler()
-        # handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        self.logger.addHandler(handler)
         handler = logging.FileHandler('logging_text.log')
 
-        # handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        self.logger.addHandler(handler)
 
         if key is not None:
             handler = OurLog(key)
-            # handler.setLevel(logging.DEBUG)
             formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
             handler.setFormatter(formatter)
-            logger.addHandler(handler)
+            self.logger.addHandler(handler)
+
+        logger = self.logger
+        # Expose logger-backed logs buffer if available
+        self.logs = self.logger.get_logs() if hasattr(self.logger, "get_logs") else []
 
     def module_name(self):
         return KEY_DISP_ENDPLATE

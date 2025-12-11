@@ -6,16 +6,6 @@ import * as THREE from "three";
 import AxisHelperWidget from "../utils/AxisHelperWidget";
 
 function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings, hoverDict = {}, onHoverLabel, onHoverEnd }) {
-  // Log props when component receives them
-  console.log('=== [btobRender] Model component rendered ===');
-  console.log('[btobRender] Props received:', {
-    hasModelPaths: !!modelPaths,
-    modelPathsKeys: modelPaths ? Object.keys(modelPaths) : [],
-    hoverDict,
-    hoverDictKeys: Object.keys(hoverDict || {}),
-    hoverDictEntries: Object.entries(hoverDict || {}),
-    hoverDictSize: Object.keys(hoverDict || {}).length,
-  });
   
   const [parsedModels, setParsedModels] = useState(null);
   const [hoveredMeshId, setHoveredMeshId] = useState(null);
@@ -89,39 +79,9 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
     return 0;
   };
 
-  // Separate useEffect to log hoverDict changes
-  useEffect(() => {
-    console.log('=== [btobRender] hoverDict changed ===');
-    console.log('[btobRender] hoverDict value:', hoverDict);
-    console.log('[btobRender] hoverDict type:', typeof hoverDict);
-    console.log('[btobRender] hoverDict is object:', hoverDict && typeof hoverDict === 'object');
-    console.log('[btobRender] hoverDict keys:', hoverDict ? Object.keys(hoverDict) : 'N/A');
-    console.log('[btobRender] hoverDict entries:', hoverDict ? Object.entries(hoverDict) : 'N/A');
-    if (hoverDict && typeof hoverDict === 'object') {
-      console.log('[btobRender] hoverDict JSON:', JSON.stringify(hoverDict, null, 2));
-    }
-  }, [hoverDict]);
 
   useEffect(() => {
-    console.log('=== [btobRender] Model loading useEffect triggered ===');
-    console.log('[btobRender] useEffect - hoverDict:', hoverDict);
-    console.log('[btobRender] hasModelPaths:', !!modelPaths);
-    if (modelPaths) {
-      console.log('[btobRender] modelPaths keys:', Object.keys(modelPaths));
-      console.log('[btobRender] modelPaths Plate value (len):', modelPaths.Plate ? modelPaths.Plate.length : null);
-      console.log('[btobRender] modelPaths Bolt value (len):', modelPaths.Bolt ? modelPaths.Bolt.length : null);
-      console.log('[btobRender] modelPaths Bolts value (len):', modelPaths.Bolts ? modelPaths.Bolts.length : null);
-    }
-    if (!modelPaths) {
-      console.log('[btobRender] modelPaths is missing, skipping model load');
-      return;
-    }
-    
-    // Log hoverDict on model load
-    console.log('[btobRender] Model loading - hoverDict:', hoverDict);
-    console.log('[btobRender] hoverDict keys:', Object.keys(hoverDict || {}));
-    console.log('[btobRender] hoverDict entries:', Object.entries(hoverDict || {}));
-    
+   
     try {
       const stlLoader = new STLLoader();
       const parsedData = {};
@@ -195,16 +155,6 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
             );
             mesh.userData.hoverLabel = hoverLabel;
             
-            // Debug: log hover label resolution for each mesh
-            console.log(`[btobRender] Mesh "${key}":`, {
-              key,
-              lowerKey,
-              capitalizedKey,
-              resolvedHoverLabel: hoverLabel,
-              hoverDictHasKey: !!hoverDict?.[key],
-              hoverDictHasLower: !!hoverDict?.[lowerKey],
-            });
-            
             parsedData[key] = mesh;
 
             // Accumulate per-part meshes into a single group (exclude merged Model)
@@ -232,8 +182,6 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
 
       setParsedModels(parsedData);
       
-      // Log all hover label mappings after parsing
-      console.log('[btobRender] Model parsing complete - Hover label mappings:');
       const hoverMappings = {};
       Object.entries(parsedData).forEach(([key, obj]) => {
         let hoverLabel = key;
@@ -247,10 +195,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
           hoverLabel = firstChild?.userData?.hoverLabel || firstChild?.name || key;
         }
         hoverMappings[key] = hoverLabel;
-        console.log(`  "${key}" ->`, hoverLabel);
       });
-      console.log('[btobRender] Complete hover mappings object:', hoverMappings);
-      console.log('[btobRender] Total meshes/groups parsed:', Object.keys(parsedData).length);
     } catch (error) {
       console.error('Error parsing model data:', error);
     }
@@ -281,10 +226,6 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
         // Preserve the original mesh name - this is critical for hoverDict lookup
         const meshName = c.name || "";
         const label = c.userData?.hoverLabel || meshName;
-        
-        // Debug: log mesh names being extracted
-        console.log(`[btobRender] Extract mesh: name="${meshName}" label="${label}" type=${c.type}`);
-        
         meshes.push({ name: meshName, geometry: c.geometry, hoverLabel: label });
       }
     });
@@ -329,11 +270,6 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
   );
   const geometryPlate = useMemo(() => {
     const geom = parsedModels?.Plate ? getGeometry(parsedModels.Plate) : null;
-    if (geom) {
-      console.log("[btobRender] geometryPlate extracted (may be merged):", geom);
-    } else {
-      console.log("[btobRender] geometryPlate missing");
-    }
     return geom;
   }, [parsedModels, texture]);
   const geometryBolt = useMemo(
@@ -463,20 +399,6 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
                         const plural = meshName + 's';
                         resolvedLabel = hoverDict[plural] || hoverDict[plural.toLowerCase()];
                       }
-                      
-                      // Debug logging for Bolt specifically
-                      if (lowerName?.includes('bolt') && !resolvedLabel) {
-                        console.log(`⚠️ [btobRender] Bolt hover resolution failed for "${meshName}":`, {
-                          meshName,
-                          lowerName,
-                          capitalizedName,
-                          hoverDictKeys: Object.keys(hoverDict),
-                          availableBoltKeys: Object.keys(hoverDict).filter(k => k.toLowerCase().includes('bolt')),
-                          hoverDictBolt: hoverDict['Bolt'],
-                          hoverDictBolts: hoverDict['Bolts'],
-                          hoverDictBoltLower: hoverDict['bolt'],
-                        });
-                      }
                     }
                     
                     // Fallback to stored label or mesh name only if hoverDict lookup failed
@@ -499,7 +421,6 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
                     
                     // Final safety check: if resolved label contains Plate info but mesh is Bolt, try harder
                     if (lowerName?.includes('bolt') && resolvedLabel?.toLowerCase().includes('plate') && !resolvedLabel?.toLowerCase().includes('bolt')) {
-                      console.warn(`⚠️ [btobRender] Bolt mesh "${meshName}" resolved to Plate label "${resolvedLabel}", forcing Bolt lookup`);
                       // Force Bolt lookup
                       resolvedLabel = hoverDict?.['Bolt'] || hoverDict?.['Bolts'] || hoverDict?.['bolt'] || hoverDict?.['bolts'] || name;
                     }
@@ -508,23 +429,6 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
                     const isBoltMesh = lowerName?.includes('bolt');
                     if (isBoltMesh || (!window._hoverDebugCount || window._hoverDebugCount < 5)) {
                       if (!isBoltMesh) window._hoverDebugCount = (window._hoverDebugCount || 0) + 1;
-                      console.log(`🔍 [btobRender] Hover on "${meshName}" (Model view, renderOrder: ${renderOrder}):`, {
-                        meshName,
-                        lowerName,
-                        capitalizedName,
-                        renderOrder,
-                        hoverDictExists: !!hoverDict,
-                        hoverDictKeys: Object.keys(hoverDict),
-                        hoverDictHasExact: !!hoverDict?.[meshName],
-                        hoverDictHasLower: !!hoverDict?.[lowerName],
-                        hoverDictHasCapitalized: !!hoverDict?.[capitalizedName],
-                        exactValue: hoverDict?.[meshName],
-                        lowerValue: hoverDict?.[lowerName],
-                        resolvedLabel,
-                        storedUserDataLabel: e.object?.userData?.hoverLabel,
-                        mHoverLabel: m.hoverLabel,
-                        mName: m.name
-                      });
                     }
                     
                     const label = resolvedLabel;
@@ -541,20 +445,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
                       meshId,
                       renderOrder,
                       meshObject: e.object // Store the mesh object
-                    });
-                    
-                    // Debug: log Bolt events specifically
-                    if (lowerName?.includes('bolt')) {
-                      console.log(`🔵 [btobRender] Bolt event stored:`, {
-                        meshName,
-                        meshId,
-                        renderOrder,
-                        label,
-                        eventKey,
-                        pendingEventsCount: pendingEventsRef.current.size
-                      });
-                    }
-                    
+                    });                    
                     // Update active mesh reference if this has higher priority
                     const currentActive = activeMeshRef.current;
                     const currentRenderOrder = currentActive?.userData?.renderOrder ?? -1;
@@ -573,20 +464,6 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
                         // Find the highest priority event among all pending events
                         let highestPriority = -1;
                         let highestPriorityEvent = null;
-                        
-                        // Debug: log all pending events
-                        if (pendingEventsRef.current.size > 0) {
-                          console.log(`[btobRender] Processing ${pendingEventsRef.current.size} pending hover events:`, 
-                            Array.from(pendingEventsRef.current.entries()).map(([key, evt]) => ({
-                              eventKey: key,
-                              renderOrder: evt.renderOrder,
-                              meshId: evt.meshId,
-                              label: evt.label,
-                              meshName: evt.meshObject?.userData?.meshName
-                            }))
-                          );
-                        }
-                        
                         // Find highest priority event by comparing renderOrder values
                         pendingEventsRef.current.forEach((eventData, eventKey) => {
                           if (eventData.renderOrder > highestPriority) {

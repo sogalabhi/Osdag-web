@@ -113,16 +113,33 @@ export const ModuleProvider = ({ children }) => {
       // Set current module
       dispatch({ type: "SET_CURRENT_MODULE_NAME", payload: moduleName });
 
-      // Build URL with parameters
+      // Map shear modules to new options endpoint
+      const SHEAR_SLUGS = {
+        FinPlateConnection: 'fin-plate',
+        CleatAngleConnection: 'cleat-angle',
+        EndPlateConnection: 'end-plate',
+        SeatedAngleConnection: 'seated-angle',
+      };
+      const isShear = Object.prototype.hasOwnProperty.call(SHEAR_SLUGS, moduleName);
+      const slug = SHEAR_SLUGS[moduleName] || moduleName;
       const email = localStorage.getItem("email");
-      let url = `${BASE_URL}populate?moduleName=${moduleName}`;
 
-      if (options.connectivity) {
-        url += `&connectivity=${encodeURIComponent(options.connectivity)}`;
+      let url;
+      if (isShear) {
+        url = `${BASE_URL}api/modules/shear-connection/${slug}/options/`;
+        if (email) {
+          url += `?email=${encodeURIComponent(email)}`;
+        }
+      } else {
+        url = `${BASE_URL}populate?moduleName=${moduleName}`;
+        if (options.connectivity) {
+          url += `&connectivity=${encodeURIComponent(options.connectivity)}`;
+        }
+        if (email) {
+          url += `&email=${encodeURIComponent(email)}`;
+        }
       }
-      if (email) {
-        url += `&email=${encodeURIComponent(email)}`;
-      }
+
       const response = await fetch(url, {
         method: "GET",
         mode: "cors",

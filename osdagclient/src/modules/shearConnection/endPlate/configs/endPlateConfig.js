@@ -1,7 +1,7 @@
 export const endPlateConfig = {
   sessionName: "End Plate Connection",
   routePath: "/design/connections/shear/end_plate",
-  designType: "End-Plate-Connection",
+  designType: "EndPlateConnection",
   cameraKey: "EndPlate",
   cadOptions: ["Model", "Beam", "Column", "Plate"],
 
@@ -67,6 +67,12 @@ export const endPlateConfig = {
   },
 
   buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+    // Ensure plate thickness list is always List[str]
+    const toStrList = (arr = []) => (Array.isArray(arr) ? arr.map((v) => `${v}`) : []);
+    const plateList = allSelected.plate_thickness
+      ? toStrList(lists.thicknessList)
+      : toStrList(inputs.plate_thickness);
+
     const conn_map = {
       "Column Flange-Beam-Web": "Column Flange-Beam Web",
       "Column Web-Beam-Web": "Column Web-Beam Web",
@@ -93,10 +99,10 @@ export const endPlateConfig = {
       "Member.Supported_Section.Material": inputs.supported_material,
       "Member.Supporting_Section.Designation": connectivity === "Beam-Beam" ? inputs.primary_beam : inputs.column_section,
       "Member.Supporting_Section.Material": inputs.supporting_material,
-      "Module": "End-Plate-Connection",
+      "Module": "EndPlateConnection",
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
-      "Connector.Plate.Thickness_List": allSelected.plate_thickness ? lists.thicknessList : inputs.plate_thickness,
+      "Connector.Plate.Thickness_List": plateList,
     };
     return params;
   },

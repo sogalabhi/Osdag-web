@@ -108,11 +108,11 @@ urlpatterns = [
     path('calculate-output/FinPlateConnection',
          OutputData.as_view(), name='FinPlateConnection'),
 
-    path('calculate-output/End-Plate-Connection',
-         EndPLateOutputData.as_view(), name='End-Plate-Connection'),
+    path('calculate-output/EndPlateConnection',
+         EndPLateOutputData.as_view(), name='EndPlateConnection'),
     
-    path('calculate-output/Cleat-Angle-Connection',
-         CleatAngleOutputData.as_view(),name="Cleat-Angle-Connection"),
+    path('calculate-output/CleatAngleConnection',
+         CleatAngleOutputData.as_view(),name="CleatAngleConnection"),
     
     path('calculate-output/SeatedAngleConnection',
          SeatedAngleOutputData.as_view(),name="SeatedAngleConnection"),

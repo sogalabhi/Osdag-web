@@ -102,8 +102,8 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
       // Resolve moduleConfig to reuse DesignReportModal logic
       const resolver = {
         'FinPlateConnection': finPlateConfig,
-        'End-Plate-Connection': endPlateConfig,
-        'Cleat-Angle-Connection': cleatAngleConfig,
+        'EndPlateConnection': endPlateConfig,
+        'CleatAngleConnection': cleatAngleConfig,
         'Seated-Angle-Connection': seatedAngleConfig,
         'Beam-to-Beam-Cover-Plate-Bolted-Connection': coverPlateBoltedConfig,
         'Beam-Beam-End-Plate-Connection': beamBeamEndPlateConfig,
@@ -165,8 +165,8 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
           boltedtoendplate: '/design/tension-member/bolted_to_end_gusset',
           ssb: '/design/FlexureMember/simply_supported_beam',
           [MODULE_KEY_FIN_PLATE]: '/design/connections/shear/fin_plate',
-          'End-Plate-Connection': '/design/connections/shear/end_plate',
-          'Cleat-Angle-Connection': '/design/connections/shear/cleat_angle',
+          'EndPlateConnection': '/design/connections/shear/end_plate',
+          'CleatAngleConnection': '/design/connections/shear/cleat_angle',
           'Seated-Angle-Connection': '/design/connections/shear/seatAngle',
           'Beam-to-Beam-Cover-Plate-Bolted-Connection': '/design/connections/beam-to-beam-splice/cover_plate_bolted',
           'Beam-to-Beam-Cover-Plate-Welded-Connection': '/design/connections/beam-to-beam-splice/cover_plate_welded',

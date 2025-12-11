@@ -11,6 +11,7 @@ from OCC.Core.Message import Message_ProgressRange
 from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
+from osdag_core.custom_logger import CustomLogger
 import sys
 import os
 from typing import Dict, Any, List
@@ -63,7 +64,7 @@ def validate_input(input_values: Dict[str,Any])-> None:
     bolt_diameter =input_values["Bolt.Diameter"]
     if (not isinstance(bolt_diameter,list)
         or not validate_list_type(bolt_diameter,str)
-        or not custom_list_validation(bolt_diameter)):
+        or not custom_list_validation(bolt_diameter, int_able)):
         raise InvalidInputTypeError(
             "Bolt.Diameter","non empty List[str] where all items can be converted to int"
         )
@@ -358,11 +359,18 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         raw_output_text = []
         
     try:
-        raw_output_spacing = module.spacing(True)  # Generate output val
-        print('CleatAngle - raw_output_spacing:', raw_output_spacing)
+        raw_output_spacing_supported = module.spacing(True)  # Generate output val (supported side)
+        print('CleatAngle - raw_output_spacing_supported:', raw_output_spacing_supported)
     except Exception as e:
-        print('CleatAngle - Error calling spacing:', e)
-        raw_output_spacing = []
+        print('CleatAngle - Error calling spacing (supported):', e)
+        raw_output_spacing_supported = []
+
+    try:
+        raw_output_spacing_supporting = module.spting_spacing(True)  # supporting side spacing
+        print('CleatAngle - raw_output_spacing_supporting:', raw_output_spacing_supporting)
+    except Exception as e:
+        print('CleatAngle - Error calling spting_spacing (supporting):', e)
+        raw_output_spacing_supporting = []
         
     try:
         # raw_output_capacities = module.capacities(True)
@@ -392,17 +400,36 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         if key
     ]
     
-    logs = module.logs
-    print(f'CleatAngle - Module logs: {logs}')
-    print(f'CleatAngle - Module logs length: {len(logs)}')
-    print(f'CleatAngle - Module logs type: {type(logs)}')
-    
+    # Create spacing outputs with side-specific suffixes to avoid key collisions
+    raw_spacing_supported = [
+        (f"{key}_supported", label, typ, value, visible if len(item) == 5 else True)
+        for item in raw_output_spacing_supported
+        if len(item) >= 4 and item[0]
+        for (key, label, typ, value, *rest) in [item]
+        for visible in [rest[0] if rest else True]
+    ]
+
+    raw_spacing_supporting = [
+        (f"{key}_supporting", label, typ, value, visible if len(item) == 5 else True)
+        for item in raw_output_spacing_supporting
+        if len(item) >= 4 and item[0]
+        for (key, label, typ, value, *rest) in [item]
+        for visible in [rest[0] if rest else True]
+    ]
+
+    # Prefer CustomLogger if attached
+    if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
+        logs = module.logger.get_logs()
+        print(f'CleatAngle - Retrieved {len(logs)} logs from CustomLogger')
+    else:
+        logs = module.logs if hasattr(module, 'logs') else []
+        print(f'CleatAngle - Module logs: {logs}')
     # Ensure logs is a list if empty
     if not logs:
         logs = ["No logs generated"]
         print("CleatAngle - Setting default logs message")
     
-    raw_output = raw_output_spacing + raw_output_text + raw_supported + raw_supporting
+    raw_output = raw_spacing_supported + raw_spacing_supporting + raw_output_text + raw_supported + raw_supporting
     print(f'CleatAngle - Total raw_output items: {len(raw_output)}')
     print(f'CleatAngle - Raw output sample: {raw_output[:5] if raw_output else "Empty"}')
     

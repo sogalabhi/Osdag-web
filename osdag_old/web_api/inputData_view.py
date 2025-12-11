@@ -27,8 +27,8 @@ from .inputdata.lap_joint_welded_input import LapJointWeldedInputData
 from .inputdata.lap_joint_bolted_input import LapJointBoltedInputData
 INPUT_DATA_FACTORY = {
     'FinPlateConnection': FinPlateInputData(),
-    'Cleat-Angle-Connection': CleatAngleInputData(),
-    'End-Plate-Connection': EndPlateInputData(),
+    'CleatAngleConnection': CleatAngleInputData(),
+    'EndPlateConnection': EndPlateInputData(),
     'SeatedAngleConnection': SeatedAngleInputData(),
     'Beam-to-Beam-Cover-Plate-Bolted-Connection': CoverPlateBoltedInputData(),
     'Beam-Beam-End-Plate-Connection': BeamBeamEndPlateInputData(),

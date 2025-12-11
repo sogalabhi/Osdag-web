@@ -53,8 +53,8 @@ class CADGeneration(View):
             # Determine session type from module_id
             module_type_mapping = {
                 "FinPlateConnection": "FinPlateConnection",
-                "Cleat-Angle-Connection": "CleatAngle", 
-                "End-Plate-Connection": "EndPlate",
+                "CleatAngleConnection": "CleatAngle", 
+                "EndPlateConnection": "EndPlate",
                 "SeatedAngleConnection": "SeatedAngleConnection",
                 "Beam-to-Beam-Cover-Plate-Bolted-Connection": "CoverPlateBolted",
                 "Column-to-Column-Cover-Plate-Welded-Connection": "ColumnToColumnCoverPlateWelded",
