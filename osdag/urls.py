@@ -84,7 +84,7 @@ urlpatterns = [
     path('user/signup/' , SignupView.as_view()),
     path('user/forgetpassword/' , ForgetPasswordView.as_view()),
     path('user/logout/' ,  LogoutView.as_view()),
-    path('user/login/' , LoginView.as_view()),
+    path('api/user/login/' , LoginView.as_view()),
     path('user/checkemail/' , CheckEmailView.as_view()),
     path('user/saveinput/' , SaveInputFileView.as_view()),
     path('user/obtain-input-file/' , ObtainInputFileView.as_view()),

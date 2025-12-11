@@ -2,6 +2,7 @@ import { createContext, useEffect, useReducer } from "react";
 import UserReducer from "./UserReducer";
 import jwt_decode from 'jwt-decode';
 import { clearAuthStorage } from "../utils/auth";
+import { apiBase } from "../api";
 
 // crypto packages
 import { decode as base64_decode, encode as base64_encode } from "base-64";
@@ -28,7 +29,8 @@ let initialValue = {
   loginCredValid: false,
 };
 
-const BASE_URL = "http://127.0.0.1:8000/";
+// const BASE_URL = "http://127.0.0.1:8000/";
+const BASE_URL = `${apiBase}`;
 
 //create context
 export const UserContext = createContext(initialValue);
@@ -264,6 +266,7 @@ export const UserProvider = ({ children }) => {
     try {
       console.log("sending the login request to the server");
       const response = await fetch(`${BASE_URL}user/login/`, {
+      // const response = await fetch(`${apiBase}user/login/`, {
         method: "POST",
         mode: "cors",
         headers: {

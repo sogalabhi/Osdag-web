@@ -599,6 +599,8 @@ export const EngineeringModule = ({
         )}
 
         <div className="flex items-center gap-2 ml-auto pr-4 text-black dark:text-white">
+
+          {/* Input Dock Button */}
           <button
             onClick={toggleInputDock}
             className={`group p-2 rounded-md transition-colors ${showInputDock
@@ -607,36 +609,22 @@ export const EngineeringModule = ({
               }`}
             title={`${showInputDock ? 'Hide' : 'Show'} input dock`}
             type="button"
+            className="p-2 rounded-md transition-colors "
           >
-            {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-5 h-5" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm120-80v-560H200v560h120Zm80 0h360v-560H400v560Zm-80 0H200h120Z" /></svg> */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 100 100"
-              className="w-5 h-5"
-              fill="none"
-            >
-              {/* Outer frame */}
-              <rect
-                x="5"
-                y="5"
-                width="90"
-                height="90"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="10"
-              />
-
-              {/* Left panel (filled) */}
-              <rect
-                x="5"
-                y="5"
-                width="30"
-                height="90"
-                fill="currentColor"
-                stroke="none"
-              />
+            <svg viewBox="0 0 100 100" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="6">
+              {/* Frame */}
+              <rect x="8" y="8" width="84" height="84" />
+              {/* Divider line */}
+              <line x1="38" y1="8" x2="38" y2="92" />
+              {/* LEFT panel fill only when active */}
+              {showInputDock && (
+                <rect x="8" y="8" width="30" height="84" fill="currentColor" stroke="none" />
+              )}
             </svg>
+
           </button>
+
+          {/* Logs Button */}
           <button
             onClick={toggleLogs}
             className={`p-2 rounded-md transition-colors ${showLogs
@@ -645,6 +633,7 @@ export const EngineeringModule = ({
               }`}
             title={`${showLogs ? 'Hide' : 'Show'} logs`}
             type="button"
+            className="p-2 rounded-md transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -674,74 +663,28 @@ export const EngineeringModule = ({
             </svg>
           </button>
 
+          {/* Output Dock Button */}
           <button
             onClick={toggleOutputDock}
-            className={`p-2 rounded-md transition-colors ${showOutputDock ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : isDesignComplete ? 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40' : 'opacity-40 cursor-not-allowed'}`}
+            disabled={!isDesignComplete}
             title={isDesignComplete ? `${showOutputDock ? 'Hide' : 'Show'} output dock` : 'Run a design to view outputs'}
             type="button"
-            disabled={!isDesignComplete}
+            className={`p-2 rounded-md transition-colors ${
+              isDesignComplete
+                ? ""
+                : "opacity-40 cursor-not-allowed"
+            }`}
           >
-            {/* <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-5 h-5" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm440-80h120v-560H640v560Zm-80 0v-560H200v560h360Zm80 0h120-120Z" /></svg> */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 100 100"
-              className="w-5 h-5"
-              stroke="currentColor"
-              fill="none"
-            >
-              {/* Outer frame */}
-              <rect
-                x="5"
-                y="5"
-                width="90"
-                height="90"
-                strokeWidth="10"
-              />
-
-              {/* RIGHT panel — filled when showOutputDock is true */}
-              <rect
-                x="50"
-                y="3"
-                width="47"
-                height="134"
-                fill="currentColor"
-                stroke="none"
-                strokeWidth="10"
-              />
+            <svg viewBox="0 0 100 100" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="6">
+              {/* Frame */}
+              <rect x="8" y="8" width="84" height="84" />
+              {/* Divider line */}
+              <line x1="62" y1="8" x2="62" y2="92" />
+              {/* RIGHT panel fill only when active */}
+              {showOutputDock && (
+                <rect x="62" y="8" width="30" height="84" fill="currentColor" stroke="none" />
+              )}
             </svg>
-          </button>
-
-          <button
-            onClick={handleHomeClick}
-            className="p-2 rounded-md transition-colors hover:bg-black/10 dark:hover:bg-black/40"
-            title="Home"
-            type="button"
-          >
-            <img src={Homesvg} alt="Home" className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => {
-              const current = document.body.classList.contains('dark');
-              if (current) {
-                document.body.classList.remove('dark');
-                localStorage.setItem('osdag-theme', 'light');
-              } else {
-                document.body.classList.add('dark');
-                localStorage.setItem('osdag-theme', 'dark');
-              }
-            }}
-            title="Toggle dark/light mode"
-            className="p-2 rounded-md transition-colors hover:bg-black/10 dark:hover:bg-black/40"
-            type="button"
-          >
-            {
-              document.body.classList.contains('dark')
-                ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-5 h-5" fill="currentColor"><path d="M440-760v-160h80v160h-80Zm266 110-55-55 112-115 56 57-113 113Zm54 210v-80h160v80H760ZM440-40v-160h80v160h-80ZM254-652 140-763l57-56 113 113-56 54Zm508 512L651-255l54-54 114 110-57 59ZM40-440v-80h160v80H40Zm157 300-56-57 112-112 29 27 29 28-114 114Zm283-100q-100 0-170-70t-70-170q0-100 70-170t170-70q100 0 170 70t70 170q0 100-70 170t-170 70Zm0-80q66 0 113-47t47-113q0-66-47-113t-113-47q-66 0-113 47t-47 113q0 66 47 113t113 47Zm0-160Z" /></svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" className="w-5 h-5" fill="currentColor"><path d="M484-80q-84 0-157.5-32t-128-86.5Q144-253 112-326.5T80-484q0-146 93-257.5T410-880q-18 99 11 193.5T521-521q71 71 165.5 100T880-410q-26 144-138 237T484-80Zm0-80q88 0 163-44t118-121q-86-8-163-43.5T464-465q-61-61-97-138t-43-163q-77 43-120.5 118.5T160-484q0 135 94.5 229.5T484-160Zm-20-305Z" /></svg>
-                )
-            }
           </button>
         </div>
 
