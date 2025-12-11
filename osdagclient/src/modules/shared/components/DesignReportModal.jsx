@@ -144,7 +144,8 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
       };
 
       // Generate initial LaTeX report
-      const response = await fetch(`${BASE_URL}api/report/generate-initial/`, {
+      const cleanedBase = BASE_URL.replace(/api\/?$/, "");
+      const response = await fetch(`${cleanedBase}api/report/generate-initial/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

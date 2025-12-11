@@ -15,6 +15,7 @@ import { ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { isGuestUser, getCurrentUserEmail } from '../../utils/auth';
 import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../../constants/DesignKeys';
+import { apiBase } from "../../api";
 
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
   const [projects, setProjects] = React.useState(projectsProp);
@@ -41,7 +42,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   const [reportExtraState, setReportExtraState] = React.useState({});
   const navigate = useNavigate();
 
-  const BASE_URL = 'http://localhost:8000/api/';
+  const BASE_URL = `${apiBase}`;
 
   const getAccessToken = () => (
     localStorage.getItem('access') || localStorage.getItem('token') || ''

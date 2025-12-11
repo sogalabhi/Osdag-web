@@ -1,6 +1,6 @@
 // API/business logic for module operations
-
-export const BASE_URL = "http://127.0.0.1:8000/";
+import { apiBase } from "../../../api";
+export const BASE_URL = `${apiBase}`;
 
 export const createDesign = async (param, module_id, onCADSuccess = null, dispatch) => {
   try {

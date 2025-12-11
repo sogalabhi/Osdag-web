@@ -17,7 +17,7 @@ import DesignPrefSections from "../../../components/DesignPrefSections";
 import Homesvg from "../../../assets/Homesvg.svg";
 import GridSelector from "../utils/GridSelector";
 import { message, Modal as AntdModal } from 'antd';
-
+import { apiBase } from "../../../api";
 export const EngineeringModule = ({
   moduleConfig,
   OutputDockComponent,
@@ -122,7 +122,8 @@ export const EngineeringModule = ({
   const [hoverText, setHoverText] = useState("");
   const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
   // Auth helpers
-  const BASE_URL = 'http://localhost:8000/api/';
+  // const BASE_URL = 'http://localhost:8000/api/';
+  const BASE_URL = `${apiBase}`;
   const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
   const isGuest = () => (localStorage.getItem('userType') === 'guest');
   const location = useLocation();

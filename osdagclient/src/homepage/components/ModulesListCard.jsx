@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ProjectNameModal from '../components/ProjectNameModal';
 import { isGuestUser } from '../../utils/auth';
 import { MODULE_KEY_FIN_PLATE } from '../../constants/DesignKeys';
+import { apiBase } from "../../api";
 
 const MODULE_ROUTES = {
   fp: "/design/connections/shear/fin_plate",
@@ -41,7 +42,7 @@ const ModulesListCard = ({ items }) => {
     if (!selectedModule) return;
     try {
       const safeProjectName = (projectName || `${selectedModule.name} Project`).replace(/\s+/g, '_');
-      const response = await fetch('http://localhost:8000/api/projects/', {
+      const response = await fetch(`${apiBase}api/projects/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
