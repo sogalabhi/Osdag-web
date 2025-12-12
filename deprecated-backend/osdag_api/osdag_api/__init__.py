@@ -9,10 +9,10 @@ developed_modules = [
     "Beam-to-Beam-Cover-Plate-Welded-Connection",
     "Beam-Beam-End-Plate-Connection",
     "Beam-to-Column-End-Plate-Connection",
-    "Butt-Joint-Welded",
-    "Butt-Joint-Bolted",
-    "Lap-Joint-Welded",
-    "Lap-Joint-Bolted",
+    "ButtJointWelded",
+    "ButtJointBolted",
+    "LapJointWelded",
+    "LapJointBolted",
     "Tension-Member-Bolted-Design",
     "Simply-Supported-Beam",
     "Column-to-Column-Cover-Plate-Welded-Connection",
@@ -70,25 +70,25 @@ module_dict = [
         "path": "Connection/Moment Connection"
     },
     {
-        "key": "Butt-Joint-Welded",
+        "key": "ButtJointWelded",
         "image": "/static/images/modules/butt_joint_welded.png",
         "name": "Butt Joint Welded",
         "path": "Connection/Simple Connection"
     },
     {
-        "key": "Butt-Joint-Bolted",
+        "key": "ButtJointBolted",
         "image": "/static/images/modules/butt_joint_bolted.png",
         "name": "Butt Joint Bolted",
         "path": "Connection/Simple Connection"
     },
     {
-        "key": "Lap-Joint-Welded",
+        "key": "LapJointWelded",
         "image": "/static/images/modules/lap_joint_welded.png",
         "name": "Lap Joint Welded",
         "path": "Connection/Simple Connection"
     },
     {
-        "key": "Lap-Joint-Bolted",
+        "key": "LapJointBolted",
         "image": "/static/images/modules/lap_joint_bolted.png",
         "name": "Lap Joint Bolted",
         "path": "Connection/Simple Connection"

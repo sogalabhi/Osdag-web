@@ -10,7 +10,7 @@ from osdag_api import get_module_api
 class LapJointBoltedOutputView(APIView):
     def post(self, request):
         input_values = request.data
-        module_name = input_values.get('Module', 'Lap-Joint-Bolted')
+        module_name = input_values.get('Module', 'LapJointBolted')
         print('in lap_joint_bolted_output.py: Processing request for module:', module_name)
         print('in lap_joint_bolted_output.py: Input values keys:', list(input_values.keys()))
         print('in lap_joint_bolted_output.py: Module field value:', input_values.get('Module', 'NOT_FOUND'))

@@ -63,13 +63,18 @@ class CADGeneration(View):
                 "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
                 "Beam-to-Beam-Cover-Plate-Welded-Connection": "CoverPlateWelded",
                 "Beam-to-Column-End-Plate-Connection": "BeamToColumnEndPlate",
-                "Tension-Member-Bolted-Design": "TensionMember",
-                "Tension-Member-Welded-Design": "TensionMember"
+                "Tension-Member-Bolted-Design": "TensionMemberBolted",
+                "Tension-Member-Welded-Design": "TensionMemberWelded",
+                "ButtJointWelded": "ButtJointWelded",
+                "ButtJointBolted": "ButtJointBolted",
+                "LapJointWelded": "LapJointWelded",
+                "LapJointBolted": "LapJointBolted",
                 # Compression member design shares the same API pattern but currently has no CAD implementation.
                 # We still map it here so the endpoint recognises the module_id and can short-circuit gracefully.
                 "Compression-Member-Design": "CompressionMember",
             }
-            
+            print("module_type_mapping: ", module_type_mapping)
+            print("module_id: ", module_id)
             session_type = module_type_mapping.get(module_id)
             if not session_type:
                 return JsonResponse({"status": "error", "message": f"Unknown module type: {module_id}"}, status=400)

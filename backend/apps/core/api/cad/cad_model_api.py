@@ -49,10 +49,16 @@ class CADGeneration(View):
             
             # Normalize hyphenated ids to backend ids
             module_aliases = {
-                "Butt-Joint-Welded": "ButtJointWelded",
-                "Butt-Joint-Bolted": "ButtJointBolted",
-                "Lap-Joint-Welded": "LapJointWelded",
-                "Lap-Joint-Bolted": "LapJointBolted",
+                # legacy hyphenated
+                "ButtJointWelded": "ButtJointWelded",
+                "ButtJointBolted": "ButtJointBolted",
+                "LapJointWelded": "LapJointWelded",
+                "LapJointBolted": "LapJointBolted",
+                # slug forms
+                "butt-joint-welded": "ButtJointWelded",
+                "butt-joint-bolted": "ButtJointBolted",
+                "lap-joint-welded": "LapJointWelded",
+                "lap-joint-bolted": "LapJointBolted",
             }
             canonical_module_id = module_aliases.get(module_id, module_id)
 
@@ -76,7 +82,8 @@ class CADGeneration(View):
                 "LapJointWelded": "LapJointWelded",
                 "LapJointBolted": "LapJointBolted",
             }
-            
+            print("module_type_mapping: ", module_type_mapping)
+            print("canonical_module_id: ", canonical_module_id)
             session_type = module_type_mapping.get(canonical_module_id)
             if not session_type:
                 return JsonResponse({"status": "error", "message": f"Unknown module type: {module_id}"}, status=400)
@@ -111,6 +118,8 @@ class CADGeneration(View):
             sections = ["Model", "Beam", "Column", "Connector"]
         elif session_type == "TensionMember":
             sections = ["Model", "Member", "Plate", "Endplate"]
+        elif session_type in ("ButtJointWelded", "ButtJointBolted", "LapJointWelded", "LapJointBolted"):
+            sections = ["Model", "Column", "Plate"]
         else:
             return JsonResponse({"status": "error", "message": "Unknown module type"}, status=400)
         

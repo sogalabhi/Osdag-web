@@ -83,14 +83,14 @@ urlpatterns = [
     # - Beam-to-Column-End-Plate-Connection -> /api/modules/moment-connection/beam-column-end-plate/design/
 
     # Keep legacy calculate-output URLs for non-migrated modules (your new joints)
-    path('calculate-output/Butt-Joint-Welded',
-         ButtJointWeldedOutputView.as_view(), name='Butt-Joint-Welded'),
-    path('calculate-output/Butt-Joint-Bolted',
-         ButtJointBoltedOutputView.as_view(), name='Butt-Joint-Bolted'),
-    path('calculate-output/Lap-Joint-Welded',
-         LapJointWeldedOutputView.as_view(), name='Lap-Joint-Welded'),
-    path('calculate-output/Lap-Joint-Bolted',
-         LapJointBoltedOutputView.as_view(), name='Lap-Joint-Bolted'),
+    path('calculate-output/ButtJointWelded',
+         ButtJointWeldedOutputView.as_view(), name='ButtJointWelded'),
+    path('calculate-output/ButtJointBolted',
+         ButtJointBoltedOutputView.as_view(), name='ButtJointBolted'),
+    path('calculate-output/LapJointWelded',
+         LapJointWeldedOutputView.as_view(), name='LapJointWelded'),
+    path('calculate-output/LapJointBolted',
+         LapJointBoltedOutputView.as_view(), name='LapJointBolted'),
 
     path('calculate-output/Tension-Member-Bolted-Design',
          TensionMemberBoltedOutputData.as_view(), name="Tension-Member-Bolted-Design"),

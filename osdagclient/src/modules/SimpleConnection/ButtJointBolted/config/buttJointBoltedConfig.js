@@ -9,8 +9,8 @@ import {
 
 export const buttJointBoltedConfig = {
     sessionName: "Butt Joint Bolted",
-    routePath: "/design/connections/simple/butt_joint_welded",
-    designType: "Butt-Joint-Bolted",
+    routePath: "/design/connections/simple/butt_joint_bolted",
+    designType: "ButtJointBolted",
     cameraKey: "Connection",
     cadOptions: ["Model", "Plate", "Column"],
 
@@ -70,7 +70,7 @@ export const buttJointBoltedConfig = {
         console.log({
             [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
             [KEY_DP_DETAILING_PACKING_PLATE]: "No",
-            [KEY_MODULE]: "Butt-Joint-Bolted",
+            [KEY_MODULE]: "ButtJointBolted",
             [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
             [KEY_PLATE2_THICKNESS]: String(inputs.plate2_thickness),
             [KEY_PLATE_WIDTH]: String(inputs.plate_width),
@@ -86,7 +86,7 @@ export const buttJointBoltedConfig = {
         return {
             [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
             [KEY_DP_DETAILING_PACKING_PLATE]: "No",
-            [KEY_MODULE]: "Butt-Joint-Bolted",
+            [KEY_MODULE]: "ButtJointBolted",
             [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
             [KEY_PLATE2_THICKNESS]: String(inputs.plate2_thickness),
             [KEY_PLATE_WIDTH]: String(inputs.plate_width),

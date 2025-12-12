@@ -727,7 +727,7 @@ class Connection(Main):
                                   KEY_REPORT_ZPZ: round(self.supported_section.plast_sec_mod_z * 1e-3, 2),
                                   KEY_REPORT_ZPY: round(self.supported_section.plast_sec_mod_y * 1e-3, 2)}
 
-            if self.module == KEY_DISP_FINPLATE or self.module == 'FinPlateConnection' or self.module == KEY_DISP_ENDPLATE or self.module == 'End-Plate-Connection':
+            if self.module == KEY_DISP_FINPLATE or self.module == 'FinPlateConnection' or self.module == KEY_DISP_ENDPLATE or self.module == 'EndPlateConnection':
                 self.report_input = \
                     {KEY_MAIN_MODULE: self.mainmodule,
                      KEY_MODULE: self.module,

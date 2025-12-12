@@ -68,10 +68,10 @@ class OutputData(APIView):
         
         # Normalize hyphenated ids to backend ids
         module_aliases = {
-            "Butt-Joint-Welded": "ButtJointWelded",
-            "Butt-Joint-Bolted": "ButtJointBolted",
-            "Lap-Joint-Welded": "LapJointWelded",
-            "Lap-Joint-Bolted": "LapJointBolted",
+            "ButtJointWelded": "ButtJointWelded",
+            "ButtJointBolted": "ButtJointBolted",
+            "LapJointWelded": "LapJointWelded",
+            "LapJointBolted": "LapJointBolted",
         }
         canonical_module_name = module_aliases.get(module_name, module_name)
 

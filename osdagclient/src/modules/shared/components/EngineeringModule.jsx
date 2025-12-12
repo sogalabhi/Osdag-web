@@ -609,7 +609,6 @@ export const EngineeringModule = ({
               }`}
             title={`${showInputDock ? 'Hide' : 'Show'} input dock`}
             type="button"
-            className="p-2 rounded-md transition-colors "
           >
             <svg viewBox="0 0 100 100" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="6">
               {/* Frame */}
@@ -633,7 +632,6 @@ export const EngineeringModule = ({
               }`}
             title={`${showLogs ? 'Hide' : 'Show'} logs`}
             type="button"
-            className="p-2 rounded-md transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -669,11 +667,10 @@ export const EngineeringModule = ({
             disabled={!isDesignComplete}
             title={isDesignComplete ? `${showOutputDock ? 'Hide' : 'Show'} output dock` : 'Run a design to view outputs'}
             type="button"
-            className={`p-2 rounded-md transition-colors ${
-              isDesignComplete
+            className={`p-2 rounded-md transition-colors ${isDesignComplete
                 ? ""
                 : "opacity-40 cursor-not-allowed"
-            }`}
+              }`}
           >
             <svg viewBox="0 0 100 100" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="6">
               {/* Frame */}

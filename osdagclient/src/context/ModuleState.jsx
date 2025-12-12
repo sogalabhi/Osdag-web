@@ -120,13 +120,26 @@ export const ModuleProvider = ({ children }) => {
         EndPlateConnection: 'end-plate',
         SeatedAngleConnection: 'seated-angle',
       };
+      const SIMPLE_SLUGS = {
+        'ButtJointBolted': 'butt-joint-bolted',
+        'ButtJointWelded': 'butt-joint-welded',
+        'LapJointBolted': 'lap-joint-bolted',
+        'LapJointWelded': 'lap-joint-welded',
+      };
       const isShear = Object.prototype.hasOwnProperty.call(SHEAR_SLUGS, moduleName);
+      const isSimple = Object.prototype.hasOwnProperty.call(SIMPLE_SLUGS, moduleName);
       const slug = SHEAR_SLUGS[moduleName] || moduleName;
+      const simpleSlug = SIMPLE_SLUGS[moduleName] || moduleName;
       const email = localStorage.getItem("email");
 
       let url;
       if (isShear) {
         url = `${BASE_URL}api/modules/shear-connection/${slug}/options/`;
+        if (email) {
+          url += `?email=${encodeURIComponent(email)}`;
+        }
+      } else if (isSimple) {
+        url = `${BASE_URL}api/modules/simple-connection/${simpleSlug}/options/`;
         if (email) {
           url += `?email=${encodeURIComponent(email)}`;
         }

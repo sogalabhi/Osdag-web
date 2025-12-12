@@ -10,15 +10,28 @@ const SHEAR_SLUGS = {
   SeatedAngleConnection: 'seated-angle',
 };
 
+// Map simple-connection module ids to slugs
+const SIMPLE_SLUGS = {
+  'ButtJointBolted': 'butt-joint-bolted',
+  'ButtJointWelded': 'butt-joint-welded',
+  'LapJointBolted': 'lap-joint-bolted',
+  'LapJointWelded': 'lap-joint-welded',
+};
+
 const getShearSlug = (moduleKey) => SHEAR_SLUGS[moduleKey] || moduleKey;
+const getSimpleSlug = (moduleKey) => SIMPLE_SLUGS[moduleKey] || moduleKey;
 
 export const createDesign = async (param, module_id, onCADSuccess = null, dispatch) => {
   try {
-    const slug = getShearSlug(module_id);
     const isShear = SHEAR_SLUGS.hasOwnProperty(module_id);
+    const isSimple = SIMPLE_SLUGS.hasOwnProperty(module_id);
+    const slug = isShear ? getShearSlug(module_id) : getSimpleSlug(module_id);
+
     const url = isShear
       ? `${BASE_URL}api/modules/shear-connection/${slug}/design/`
-      : `${BASE_URL}calculate-output/${module_id}`;
+      : isSimple
+        ? `${BASE_URL}api/modules/simple-connection/${slug}/design/`
+        : `${BASE_URL}calculate-output/${module_id}`;
     const response = await fetch(url, {
       method: "POST",
       mode: "cors",
@@ -27,8 +40,8 @@ export const createDesign = async (param, module_id, onCADSuccess = null, dispat
         "Content-Type": "application/json",
       },
       credentials: "include",
-      // New shear endpoint expects {inputs: {...}} but accepts raw dict; send both for safety
-      body: JSON.stringify(isShear ? { inputs: param } : param),
+      // New endpoints expect {inputs: {...}}; keep raw dict for legacy
+      body: JSON.stringify((isShear || isSimple) ? { inputs: param } : param),
     });
     const jsonResponse = await response?.json();
 
@@ -36,7 +49,10 @@ export const createDesign = async (param, module_id, onCADSuccess = null, dispat
       dispatch({ type: "SET_DESIGN_DATA_AND_LOGS", payload: jsonResponse });
     }
 
-    if (response.status == 201 && jsonResponse?.data && Object.keys(jsonResponse.data).length > 0) {
+    const hasData = jsonResponse?.data && Object.keys(jsonResponse.data || {}).length > 0;
+    const isSuccess = response.ok && jsonResponse?.success !== false && (hasData || Array.isArray(jsonResponse));
+
+    if (isSuccess) {
       if (onCADSuccess && typeof onCADSuccess === 'function') {
         onCADSuccess(jsonResponse.data, jsonResponse.logs);
       }
@@ -110,10 +126,23 @@ export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => 
   });
   if (designRes.status === 201 && (designData.data || designData)) {
     // CAD endpoint remains legacy for now; reuse moduleKey as-is
+    // Normalize module id for CAD (simple-connection slugs → legacy ids)
+    const moduleAlias = {
+      'butt-joint-bolted': 'ButtJointBolted',
+      'butt-joint-welded': 'ButtJointWelded',
+      'lap-joint-bolted': 'LapJointBolted',
+      'lap-joint-welded': 'LapJointWelded',
+      'ButtJointBolted': 'ButtJointBolted',
+      'ButtJointWelded': 'ButtJointWelded',
+      'LapJointBolted': 'LapJointBolted',
+      'LapJointWelded': 'LapJointWelded',
+    };
+    const cadModuleId = moduleAlias[moduleKey] || moduleKey;
+
     const cadRes = await fetch(`${BASE_URL}design/cad/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ module_id: moduleKey, input_values: inputParams }),
+      body: JSON.stringify({ module_id: cadModuleId, input_values: inputParams }),
       credentials: "include"
     });
     // CAD-specific: simple alert on 500

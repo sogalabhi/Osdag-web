@@ -9,8 +9,8 @@ import {
 
 export const lapJointBoltedConfig = {
     sessionName: "Lap Joint Bolted",
-    routePath: "/design/connections/simple/lap_joint_welded",
-    designType: "Lap-Joint-Bolted",
+    routePath: "/design/connections/simple/lap_joint_bolted",
+    designType: "LapJointBolted",
     cameraKey: "Connection",
     cadOptions: ["Model", "Plate", "Column"],
 
@@ -70,7 +70,7 @@ export const lapJointBoltedConfig = {
         return {
             [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
             [KEY_DP_DETAILING_PACKING_PLATE]: "No",
-            [KEY_MODULE]: "Lap-Joint-Bolted",
+            [KEY_MODULE]: "LapJointBolted",
             [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
             [KEY_PLATE2_THICKNESS]: String(inputs.plate2_thickness),
             [KEY_PLATE_WIDTH]: String(inputs.plate_width),

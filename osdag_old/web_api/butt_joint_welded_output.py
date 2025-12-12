@@ -10,7 +10,7 @@ from osdag_api import get_module_api
 class ButtJointWeldedOutputView(APIView):
     def post(self, request):
         input_values = request.data
-        module_name = input_values.get('Module', 'Butt-Joint-Welded')
+        module_name = input_values.get('Module', 'ButtJointWelded')
         print('in butt_joint_welded_output.py: Processing request for module:', module_name)
         print('in butt_joint_welded_output.py: Input values keys:', list(input_values.keys()))
         print('in butt_joint_welded_output.py: Module field value:', input_values.get('Module', 'NOT_FOUND'))

@@ -39,10 +39,10 @@ INPUT_DATA_FACTORY = {
 
 # Register simple/joint modules that frontend still requests by name
 INPUT_DATA_FACTORY.update({
-    'Butt-Joint-Welded': ButtJointWeldedInputData(),
-    'Butt-Joint-Bolted': ButtJointBoltedInputData(),
-    'Lap-Joint-Welded': LapJointWeldedInputData(),
-    'Lap-Joint-Bolted': LapJointBoltedInputData(),
+    'ButtJointWelded': ButtJointWeldedInputData(),
+    'ButtJointBolted': ButtJointBoltedInputData(),
+    'LapJointWelded': LapJointWeldedInputData(),
+    'LapJointBolted': LapJointBoltedInputData(),
 })
 
 

@@ -9,7 +9,7 @@ import {
 export const buttJointWeldedConfig = {
     sessionName: "Butt Joint Welded",
     routePath: "/design/connections/simple/butt_joint_welded",
-    designType: "Butt-Joint-Welded",
+    designType: "ButtJointWelded",
     cameraKey: "Connection",
     cadOptions: ["Model", "Plate", "Column"],
 
@@ -61,7 +61,7 @@ export const buttJointWeldedConfig = {
         return {
             [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
             [KEY_DP_DETAILING_PACKING_PLATE]: "No",
-            [KEY_MODULE]: "Butt-Joint-Welded",
+            [KEY_MODULE]: "ButtJointWelded",
             [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
             [KEY_PLATE2_THICKNESS]: String(inputs.plate2_thickness),
             [KEY_PLATE_WIDTH]: String(inputs.plate_width),

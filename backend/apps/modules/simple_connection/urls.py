@@ -1,7 +1,8 @@
-from django.urls import path
-from apps.core.api.projects.osi_api import ModuleRoutes
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import SimpleConnectionViewSet
 
-urlpatterns = [
-    # Add specific routes for simple connection submodules here if needed
-    # Currently, the generic ModuleRoutes handles the mapping
-]
+router = DefaultRouter()
+router.register(r'', SimpleConnectionViewSet, basename='simple-connection')
+
+urlpatterns = router.urls

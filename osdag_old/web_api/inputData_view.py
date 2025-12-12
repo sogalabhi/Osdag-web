@@ -40,10 +40,10 @@ INPUT_DATA_FACTORY = {
     'Tension-Member-Bolted-Design': TensionMemberBoltedInputData(),
     'Tension-Member-Welded-Design': TensionMemberWeldedInputData(),
     'Simply-Supported-Beam': SimplySupportedBeamInputData(),
-    'Butt-Joint-Welded': ButtJointWeldedInputData(),
-    'Butt-Joint-Bolted': ButtJointBoltedInputData(),
-    'Lap-Joint-Welded': LapJointWeldedInputData(),
-    'Lap-Joint-Bolted': LapJointBoltedInputData(),
+    'ButtJointWelded': ButtJointWeldedInputData(),
+    'ButtJointBolted': ButtJointBoltedInputData(),
+    'LapJointWelded': LapJointWeldedInputData(),
+    'LapJointBolted': LapJointBoltedInputData(),
     # Use the same input-data provider as tension member so we get angleList/materialList
     'Compression-Member-Design': TensionMemberBoltedInputData(),
     'Simply-Supported-Beam': SimplySupportedBeamInputData()
