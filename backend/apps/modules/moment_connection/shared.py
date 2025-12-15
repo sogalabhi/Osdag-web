@@ -14,11 +14,40 @@ def setup_for_cad(cdl: CommonDesignLogic, module_class):
     print("******")
     module_object = module_class
     print("********")
+    # Ensure CommonDesignLogic has module/mainmodule for moment connections
+    if not getattr(cdl, "mainmodule", None):
+        cdl.mainmodule = getattr(module_object, "mainmodule", None)
+
+    # Column cover plate (bolted / welded) and column end plate support
+    if module_object.module in (
+        "ColumnCoverPlateBolted",
+        "Column-to-Column Cover Plate Bolted Connection",
+        "Column-to-Column-Cover-Plate-Bolted-Connection",
+    ):
+        cdl.C = module_object
+        cdl.CPObj = cdl.createCCCoverPlateCAD()
+    if module_object.module in (
+        "Column-to-Column Cover Plate Welded Connection",
+        "Column-to-Column-Cover-Plate-Welded-Connection",
+    ):
+        cdl.C = module_object
+        cdl.CPObj = cdl.createCCCoverPlateCAD()
+    if module_object.module in (
+        "Column-to-Column-End-Plate-Connection",
+        "Column-to-Column End Plate Connection",
+    ):
+        cdl.CEP = module_object
+        cdl.CEPObj = cdl.createCCEndPlateCAD()
+
+    # Beam-side moment modules
     if module_object.module == "Beam-to-Beam Cover Plate Bolted Connection":
+        # Required for createBBCoverPlateCAD which expects self.B to exist
+        cdl.B = module_object
         cdl.CPObj = cdl.createBBCoverPlateCAD()
     if module_object.module == "Beam-to-Beam End Plate Connection":
         cdl.CPObj = cdl.createBBEndPlateCAD()
     if module_object.module == "Beam-to-Beam Cover Plate Welded Connection":
+        cdl.B = module_object
         cdl.CPObj = cdl.createBBCoverPlateCAD()
     if module_object.module == "Beam-to-Column End Plate Connection":
         cdl.CPObj = cdl.createBCEndPlateCAD()  # Initialize the CAD object for beam-column end plate

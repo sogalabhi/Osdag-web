@@ -3,12 +3,13 @@ Tension Member ViewSet - Routes to sub-module services
 Uses URL slug (not POST body) to find the correct service
 Handles guest mode and optional project_id saving
 """
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .registry import TensionMemberRegistry
 from apps.core.utils.module_helpers import handle_design_request
+from apps.core.models import Material, CustomMaterials, Bolt, Angles, Channels
 
 
 class TensionMemberViewSet(viewsets.ViewSet):
@@ -17,6 +18,23 @@ class TensionMemberViewSet(viewsets.ViewSet):
     Supports guest mode and optional project_id saving for authenticated users.
     """
     permission_classes = [AllowAny]  # Allow both authenticated and guest users
+
+    @staticmethod
+    def _normalize_slug(raw_slug: str) -> str:
+        """
+        Accept both URL slugs and MODULE_ID values from legacy/frontend calls.
+        Example inputs:
+          - 'bolted', 'welded' (preferred)
+          - 'Tension-Member-Bolted-Design', 'Tension-Member-Welded-Design' (legacy)
+        """
+        if not raw_slug:
+            return raw_slug
+        slug_lower = raw_slug.lower()
+        module_id_map = {
+            'tension-member-bolted-design': 'bolted',
+            'tension-member-welded-design': 'welded',
+        }
+        return module_id_map.get(slug_lower, raw_slug)
     
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/design')
     def design(self, request, submodule_slug=None):
@@ -39,12 +57,15 @@ class TensionMemberViewSet(viewsets.ViewSet):
         - Can calculate designs
         - Can save to projects if project_id is provided
         """
+        # Normalize slug (supports MODULE_ID inputs)
+        normalized_slug = self._normalize_slug(submodule_slug)
+
         # Use URL slug to find service (not POST body)
-        ServiceClass = TensionMemberRegistry.get_service_by_slug(submodule_slug)
+        ServiceClass = TensionMemberRegistry.get_service_by_slug(normalized_slug)
         
         if not ServiceClass:
             return Response(
-                {'error': f'Sub-module {submodule_slug} not found'}, 
+                {'error': f'Sub-module {normalized_slug} not found'}, 
                 status=404
             )
         
@@ -57,7 +78,7 @@ class TensionMemberViewSet(viewsets.ViewSet):
             request=request,
             inputs=inputs,
             project_id=project_id,
-            submodule_slug=submodule_slug,
+            submodule_slug=normalized_slug,
             module_name='tension-member'
         )
         
@@ -92,6 +113,70 @@ class TensionMemberViewSet(viewsets.ViewSet):
         
         Returns input options for the sub-module (e.g., section lists, materials)
         """
-        # TODO: Implement options endpoint if needed
-        return Response({'message': 'Options endpoint not yet implemented'}, status=501)
+        email = request.query_params.get("email")
+        slug = self._normalize_slug(submodule_slug)
+
+        # Shared helpers
+        def material_list():
+            mats = list(Material.objects.all().values())
+            if email:
+                mats += list(CustomMaterials.objects.filter(email=email).values())
+            mats.append({"id": -1, "Grade": "Custom"})
+            return mats
+
+        def bolt_diameters():
+            lst = list(Bolt.objects.values_list('Bolt_diameter', flat=True))
+            lst.sort()
+            return [str(x) for x in lst]
+
+        property_classes = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
+        thickness_list = [
+            '8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50',
+            '56', '63', '75', '80', '90', '100', '110', '120'
+        ]
+        section_profiles = ["Angles", "Back to Back Angles", "Star Angles", "Channels"]
+        bolt_hole_type_list = ["Standard", "Oversized", "Short Slotted", "Long Slotted"]
+        bolt_type_list = ["Bearing Bolt", "Friction Grip Bolt"]
+        bolt_slip_factor_list = ["0.3", "0.5"]
+        design_method_list = ["Limit State Design", "Working Stress Design"]
+        edge_type_list = ["Rolled, machine-flame cut, sawn and planed"]
+        corrosive_influences_list = ["Yes", "No"]
+
+        try:
+            if slug == 'bolted':
+                data = {
+                    'materialList': material_list(),
+                    'connectorMaterialList': material_list(),
+                    'sectionProfileList': section_profiles,
+                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
+                    'channelList': list(Channels.objects.values_list('Designation', flat=True)),
+                    'boltDiameterList': bolt_diameters(),
+                    'propertyClassList': property_classes,
+                    'thicknessList': thickness_list,
+                    'boltHoleTypeList': bolt_hole_type_list,
+                    'boltTypeList': bolt_type_list,
+                    'boltSlipFactorList': bolt_slip_factor_list,
+                    'designMethodList': design_method_list,
+                    'edgeTypeList': edge_type_list,
+                    'corrosiveInfluencesList': corrosive_influences_list,
+                }
+                return Response(data, status=status.HTTP_200_OK)
+
+            if slug == 'welded':
+                data = {
+                    'materialList': material_list(),
+                    'connectorMaterialList': material_list(),
+                    'sectionProfileList': section_profiles,
+                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
+                    'channelList': list(Channels.objects.values_list('Designation', flat=True)),
+                    'thicknessList': thickness_list,
+                    'designMethodList': design_method_list,
+                    'edgeTypeList': edge_type_list,
+                    'corrosiveInfluencesList': corrosive_influences_list,
+                }
+                return Response(data, status=status.HTTP_200_OK)
+
+            return Response({'error': f'Sub-module {slug} not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as exc:
+            return Response({'error': str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

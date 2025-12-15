@@ -2,36 +2,43 @@
 
 export const BASE_URL = "http://127.0.0.1:8000/";
 
-// Map backend module ids to new shear-connection slugs
-const SHEAR_SLUGS = {
-  FinPlateConnection: 'fin-plate',
-  CleatAngleConnection: 'cleat-angle',
-  EndPlateConnection: 'end-plate',
-  SeatedAngleConnection: 'seated-angle',
+// Single map of all modules -> slugs with parent path prefix
+const MODULE_SLUGS = {
+  // Shear
+  FinPlateConnection: 'shear-connection/fin-plate',
+  CleatAngleConnection: 'shear-connection/cleat-angle',
+  EndPlateConnection: 'shear-connection/end-plate',
+  SeatedAngleConnection: 'shear-connection/seated-angle',
+  // Moment
+  CoverPlateBolted: 'moment-connection/beam-beam-cover-plate-bolted',
+  'Beam-to-Beam-Cover-Plate-Bolted-Connection': 'moment-connection/beam-beam-cover-plate-bolted',
+  'Cover-Plate-Bolted-Connection': 'moment-connection/beam-beam-cover-plate-bolted',
+  CoverPlateWelded: 'moment-connection/beam-beam-cover-plate-welded',
+  'Beam-to-Beam-Cover-Plate-Welded-Connection': 'moment-connection/beam-beam-cover-plate-welded',
+  'Cover-Plate-Welded-Connection': 'moment-connection/beam-beam-cover-plate-welded',
+  BeamBeamEndPlate: 'moment-connection/beam-beam-end-plate',
+  'Beam-Beam-End-Plate-Connection': 'moment-connection/beam-beam-end-plate',
+  BeamColumnEndPlate: 'moment-connection/beam-column-end-plate',
+  'Beam-to-Column-End-Plate-Connection': 'moment-connection/beam-column-end-plate',
+  CCCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
+  ColumnCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
+  CCCoverPlateWelded: 'moment-connection/column-column-cover-plate-welded',
+  'Column-to-Column-Cover-Plate-Welded-Connection': 'moment-connection/column-column-cover-plate-welded',
+  CCEndPlate: 'moment-connection/column-column-end-plate',
+  'Column-to-Column-End-Plate-Connection': 'moment-connection/column-column-end-plate',
+  // Simple
+  ButtJointBolted: 'simple-connection/butt-joint-bolted',
+  ButtJointWelded: 'simple-connection/butt-joint-welded',
+  LapJointBolted: 'simple-connection/lap-joint-bolted',
+  LapJointWelded: 'simple-connection/lap-joint-welded',
 };
 
-// Map simple-connection module ids to slugs
-const SIMPLE_SLUGS = {
-  'ButtJointBolted': 'butt-joint-bolted',
-  'ButtJointWelded': 'butt-joint-welded',
-  'LapJointBolted': 'lap-joint-bolted',
-  'LapJointWelded': 'lap-joint-welded',
-};
-
-const getShearSlug = (moduleKey) => SHEAR_SLUGS[moduleKey] || moduleKey;
-const getSimpleSlug = (moduleKey) => SIMPLE_SLUGS[moduleKey] || moduleKey;
+const getSlug = (moduleKey) => MODULE_SLUGS[moduleKey] || moduleKey;
 
 export const createDesign = async (param, module_id, onCADSuccess = null, dispatch) => {
   try {
-    const isShear = SHEAR_SLUGS.hasOwnProperty(module_id);
-    const isSimple = SIMPLE_SLUGS.hasOwnProperty(module_id);
-    const slug = isShear ? getShearSlug(module_id) : getSimpleSlug(module_id);
-
-    const url = isShear
-      ? `${BASE_URL}api/modules/shear-connection/${slug}/design/`
-      : isSimple
-        ? `${BASE_URL}api/modules/simple-connection/${slug}/design/`
-        : `${BASE_URL}calculate-output/${module_id}`;
+    const slug = getSlug(module_id);
+    const url = `${BASE_URL}api/modules/${slug}/design/`;
     const response = await fetch(url, {
       method: "POST",
       mode: "cors",
@@ -40,8 +47,8 @@ export const createDesign = async (param, module_id, onCADSuccess = null, dispat
         "Content-Type": "application/json",
       },
       credentials: "include",
-      // New endpoints expect {inputs: {...}}; keep raw dict for legacy
-      body: JSON.stringify((isShear || isSimple) ? { inputs: param } : param),
+      // New endpoints expect {inputs: {...}}
+      body: JSON.stringify({ inputs: param }),
     });
     const jsonResponse = await response?.json();
 
@@ -80,18 +87,9 @@ export const getDesingPrefData = async (params) => {
 };
 
 export const populateModule = async (moduleKey, dispatch) => {
-  const SHEAR_SLUGS = {
-    FinPlateConnection: 'fin-plate',
-    CleatAngleConnection: 'cleat-angle',
-    EndPlateConnection: 'end-plate',
-    SeatedAngleConnection: 'seated-angle',
-  };
-  const isShear = Object.prototype.hasOwnProperty.call(SHEAR_SLUGS, moduleKey);
-  const slug = SHEAR_SLUGS[moduleKey] || moduleKey;
+  const slug = getSlug(moduleKey);
   const email = localStorage.getItem("email");
-  const url = isShear
-    ? `${BASE_URL}api/modules/shear-connection/${slug}/options/${email ? `?email=${encodeURIComponent(email)}` : ''}`
-    : `${BASE_URL}populate?moduleName=${moduleKey}${email ? `&email=${encodeURIComponent(email)}` : ''}`;
+  const url = `${BASE_URL}api/modules/${slug}/options/${email ? `?email=${encodeURIComponent(email)}` : ''}`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -103,15 +101,11 @@ export const populateModule = async (moduleKey, dispatch) => {
 
 export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => {
   let error = null;
-  const slug = getShearSlug(moduleKey);
-  const isShear = SHEAR_SLUGS.hasOwnProperty(moduleKey);
-  const designUrl = isShear
-    ? `${BASE_URL}api/modules/shear-connection/${slug}/design/`
-    : `${BASE_URL}calculate-output/${moduleKey}`;
+  const designUrl = `${BASE_URL}api/modules/${getSlug(moduleKey)}/design/`;
   const designRes = await fetch(designUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(isShear ? { inputs: inputParams } : inputParams),
+    body: JSON.stringify({ inputs: inputParams }),
     credentials: "include"
   });
   const designData = await designRes.json();
@@ -125,9 +119,39 @@ export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => 
     payload
   });
   if (designRes.status === 201 && (designData.data || designData)) {
-    // CAD endpoint remains legacy for now; reuse moduleKey as-is
-    // Normalize module id for CAD (simple-connection slugs → legacy ids)
+    // CAD endpoint remains legacy for now; normalize module ids to backend canonical values
     const moduleAlias = {
+      // Shear (legacy ids already canonical)
+      'fin-plate': 'FinPlateConnection',
+      'cleat-angle': 'CleatAngleConnection',
+      'end-plate': 'EndPlateConnection',
+      'seated-angle': 'SeatedAngleConnection',
+      FinPlateConnection: 'FinPlateConnection',
+      CleatAngleConnection: 'CleatAngleConnection',
+      EndPlateConnection: 'EndPlateConnection',
+      SeatedAngleConnection: 'SeatedAngleConnection',
+      // Moment
+      'beam-beam-cover-plate-bolted': 'Cover-Plate-Bolted-Connection',
+      'beam-beam-cover-plate-welded': 'Cover-Plate-Welded-Connection',
+      'beam-beam-end-plate': 'Beam-Beam-End-Plate-Connection',
+      'beam-column-end-plate': 'Beam-to-Column-End-Plate-Connection',
+      'column-column-cover-plate-bolted': 'ColumnCoverPlateBolted',
+      'column-column-cover-plate-welded': 'Column-to-Column-Cover-Plate-Welded-Connection',
+      'column-column-end-plate': 'Column-to-Column-End-Plate-Connection',
+      CoverPlateBolted: 'Cover-Plate-Bolted-Connection',
+      CoverPlateWelded: 'Cover-Plate-Welded-Connection',
+      BeamBeamEndPlate: 'Beam-Beam-End-Plate-Connection',
+      BeamColumnEndPlate: 'Beam-to-Column-End-Plate-Connection',
+      CCCoverPlateBolted: 'ColumnCoverPlateBolted',
+      CCCoverPlateWelded: 'Column-to-Column-Cover-Plate-Welded-Connection',
+      CCEndPlate: 'Column-to-Column-End-Plate-Connection',
+      'Beam-to-Beam-Cover-Plate-Bolted-Connection': 'Cover-Plate-Bolted-Connection',
+      'Beam-to-Beam-Cover-Plate-Welded-Connection': 'Cover-Plate-Welded-Connection',
+      'Beam-Beam-End-Plate-Connection': 'Beam-Beam-End-Plate-Connection',
+      'Beam-to-Column-End-Plate-Connection': 'Beam-to-Column-End-Plate-Connection',
+      'Column-to-Column-Cover-Plate-Bolted-Connection': 'ColumnCoverPlateBolted',
+      'Column-to-Column-Cover-Plate-Welded-Connection': 'Column-to-Column-Cover-Plate-Welded-Connection',
+      'Column-to-Column-End-Plate-Connection': 'Column-to-Column-End-Plate-Connection',
       'butt-joint-bolted': 'ButtJointBolted',
       'butt-joint-welded': 'ButtJointWelded',
       'lap-joint-bolted': 'LapJointBolted',

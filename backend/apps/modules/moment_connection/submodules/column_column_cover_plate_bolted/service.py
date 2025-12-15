@@ -1,22 +1,19 @@
 """
-Beam Beam End Plate Service - Business logic layer
+Column Cover Plate Bolted Service - Business logic layer
 Bridges between API and osdag_core
 """
-from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
+from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 from .adapter import validate_input, generate_output, create_cad_model
 
 
-class BeamBeamEndPlateService:
-    """Service class for Beam Beam End Plate Connection module"""
+class ColumnCoverPlateBoltedService:
+    """Service class for Column Cover Plate Bolted Connection module"""
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:
         """Run design calculation and return results"""
         validate_input(inputs)
-        model = BeamBeamEndPlateSplice()
-        # Initialize logger to avoid NoneType errors on .info usage
-        if hasattr(model, "set_osdaglogger"):
-            model.set_osdaglogger(None)
+        model = ColumnCoverPlate()
         model.set_input_values(inputs)
         model.hard_values()
         output, logs = generate_output(inputs)

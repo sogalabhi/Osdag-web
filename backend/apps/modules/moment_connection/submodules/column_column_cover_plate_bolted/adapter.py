@@ -10,7 +10,7 @@ from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.Message import Message_ProgressRange
 from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
-from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
+from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 import sys
 import os
 from typing import Dict, Any, List
@@ -29,10 +29,10 @@ def get_required_keys() -> List[str]:
         "Bolt.Slip_Factor",
         "Bolt.TensionType",
         "Bolt.Type",
-        "Connectivity *",
-        "EndPlateType",
-        "Connector.Plate.Thickness_List",
+        "Connector.Flange_Plate.Preferences",
+        "Connector.Flange_Plate.Thickness_list",
         "Connector.Material",
+        "Connector.Web_Plate.Thickness_List",
         "Design.Design_Method",
         "Detailing.Corrosive_Influences",
         "Detailing.Edge_type",
@@ -41,12 +41,9 @@ def get_required_keys() -> List[str]:
         "Load.Moment",
         "Load.Shear",
         "Material",
-        "Member.Supported_Section.Designation",
-        "Member.Supported_Section.Material",
+        "Member.Designation",
+        "Member.Material",
         "Module",
-        "Weld.Fab",
-        "Weld.Material_Grade_OverWrite",
-        "Weld.Type"
     ]
 
 
@@ -108,30 +105,30 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     if not isinstance(input_values["Bolt.Type"], str):
         raise InvalidInputTypeError("Bolt.Type", "str")  # If not, raise error.
 
-    # Validate Connectivity
-    # Check if Connectivity is a string.
-    if not isinstance(input_values["Connectivity *"], str):
-        # If not, raise error.
-        raise InvalidInputTypeError("Connectivity *", "str")
-
-    # Validate Connectivity
-    # Check if Connectivity is a string.
-    if not isinstance(input_values["EndPlateType"], str):
-        # If not, raise error.
-        raise InvalidInputTypeError("EndPlateType", "str")
+     # Validate Connector.Flange_Plate.Preferences
+    if not isinstance(input_values["Connector.Flange_Plate.Preferences"], str):
+        raise InvalidInputTypeError("Connector.Flange_Plate.Preferences", "str")
 
     # Validate Connector.Flange_Plate.Thickness_list
-    thickness_list = input_values["Connector.Plate.Thickness_List"]
-    if (not isinstance(thickness_list, list)
-            or not validate_list_type(thickness_list, str)
-            or not custom_list_validation(thickness_list, int_able)):
+    flange_thickness_list = input_values["Connector.Flange_Plate.Thickness_list"]
+    if (not isinstance(flange_thickness_list, list)
+            or not validate_list_type(flange_thickness_list, str)
+            or not custom_list_validation(flange_thickness_list, int_able)):
         raise InvalidInputTypeError(
-            "Connector.Plate.Thickness_List", "List[str] where all items can be converted to int")
+            "Connector.Flange_Plate.Thickness_list", "List[str] where all items can be converted to int")
     # Validate Connector.Material
     # Check if Connector.Material is a string.
     if not isinstance(input_values["Connector.Material"], str):
         # If not, raise error.
         raise InvalidInputTypeError("Connector.Material", "str")
+
+     # Validate Connector.Web_Plate.Thickness_List
+    web_thickness_list = input_values["Connector.Web_Plate.Thickness_List"]
+    if (not isinstance(web_thickness_list, list)
+            or not validate_list_type(web_thickness_list, str)
+            or not custom_list_validation(web_thickness_list, int_able)):
+        raise InvalidInputTypeError(
+            "Connector.Web_Plate.Thickness_List", "List[str] where all items can be converted to int")
         
     # Validate Design.Design_Method
     # Check if Design.Design_Method is a string.
@@ -187,110 +184,26 @@ def validate_input(input_values: Dict[str, Any]) -> None:
         raise InvalidInputTypeError("Material", "str")  # If not, raise error.
     
     # Validate Member.Designation
-    if not isinstance(input_values["Member.Supported_Section.Designation"], str):
-        raise InvalidInputTypeError("Member.Supported_Section.Designation", "str")
+    if not isinstance(input_values["Member.Designation"], str):
+        raise InvalidInputTypeError("Member.Designation", "str")
 
     # Validate Member.Material
-    if not isinstance(input_values["Member.Supported_Section.Material"], str):
-        raise InvalidInputTypeError("Member.Supported_Section.Material", "str")
+    if not isinstance(input_values["Member.Material"], str):
+        raise InvalidInputTypeError("Member.Material", "str")
 
     # Check if Module is a string.
     if not isinstance(input_values["Module"], str):
         raise InvalidInputTypeError("Module", "str")  # If not, raise error.
-    
-    # Validate Weld.Fab
-    # Check if Weld.Fab is a string.
-    if not isinstance(input_values["Weld.Fab"], str):
-        raise InvalidInputTypeError("Weld.Fab", "str")  # If not, raise error.
 
-    # Validate Weld.Material_Grade_OverWrite
-    weld_materialgradeoverwrite = input_values["Weld.Material_Grade_OverWrite"]
-    if (not isinstance(weld_materialgradeoverwrite, str)  # Check if Weld.Material_Grade_OverwWite is a string.
-            or not int_able(weld_materialgradeoverwrite)):  # Check if Weld.Material_Grade_OverWrite can be converted to int.
-        # If any of these conditions fail, raise error.
-        raise InvalidInputTypeError(
-            "Weld.Material_Grade_OverWrite", "str where str can be converted to int.")
-        
-    # Validate Weld.Type
-    # Check if Weld.Type is a string.
-    if not isinstance(input_values["Weld.Type"], str):
-        raise InvalidInputTypeError("Weld.Type", "str")  # If not, raise error.
-
-def validate_input_new(input_values: Dict[str, Any]) -> None:
-    """Validate type for all values in design dict. Raise error when invalid"""
-
-    # Check if all required keys exist
-    required_keys = get_required_keys()
-    print('required_keys : ' , required_keys)
-    # Check if input_values contains all required keys.
-    missing_keys = contains_keys(input_values, required_keys)
-    print('missing keys : ' , missing_keys)
-    if missing_keys != None:  # If keys are missing.
-        # Raise error for the first missing key.
-        print("missing keys is not None")
-        raise MissingKeyError(missing_keys[0])
-
-    # Validate key types using loops.
-
-    # Validate all strings.
-    str_keys = ["Bolt.Bolt_Hole_Type",  # List of all parameters that are strings
-                "Bolt.TensionType",
-                "Bolt.Type",
-                "Connectivity *",
-                "EndPlateType",
-                "Bolt.Connector_Material",
-                "Connector.Flange_Plate.Preferences",
-                "Design.Design_Method",
-                "Detailing.Edge_type",
-                "Material",
-                "Member.Supported_Section.Designation",
-                "Member.Supported_Section.Material",
-                "Module",
-                "Weld.Fab",
-                "Weld.Type"
-            ]
-    for key in str_keys:  # Loop through all keys.
-        print('validating string key')
-        
-        try : 
-            validate_string(key) # Check if key is a string. If not, raise error.
-        except : 
-            print('error in validating string keys')
-            print('string key passed  : ' , key )
-
-    # Validate for keys that are numbers
-    num_keys = [("Bolt.Slip_Factor", True),  # List of all parameters that are numbers (key, is_float)
-                ("Detailing.Gap", False),
-                ("Load.Axial", False),
-                ("Load.Moment", False),
-                ("Load.Shear", False),
-                ("Weld.Material_Grade_OverWrite", False)
-            ]
-    for key in num_keys:  # Loop through all keys.
-        # Check if key is a number. If not, raise error.
-        print('validating num keys')
-        validate_num(key[0], key[1])
-
-    # Validate for keys that are arrays
-    arr_keys = [("Bolt.Diameter", False),  # List of all parameters that can be converted to numbers (key, is_float)
-                ("Bolt.Grade", True),
-                ("Connector.Plate.Thickness_List", False)]
-    for key in arr_keys:
-        print('validating arr key')
-        # Check if key is a list where all items can be converted to numbers. If not, raise error.
-        validate_arr(key[0], key[1])
-
-
-def create_module() -> BeamBeamEndPlateSplice:
-    """Create an instance of the beambeam end plate connection module design class and set it up for use"""
-    module = BeamBeamEndPlateSplice()  # Create an instance of the BeamBeamEndPlateConnection
+def create_module() -> ColumnCoverPlate:
+    """Create an instance of the ColumnCoverPlate module design class and set it up for use"""
+    module = ColumnCoverPlate()  # Create an instance of the ColumnCoverPlate
     module.set_osdaglogger(None)
     return module
 
 
-def create_from_input(input_values: Dict[str, Any]) -> BeamBeamEndPlateSplice:
-    """Create an instance of the beam beam end plate connection module design class from input values."""
-    # validate_input(input_values)
+def create_from_input(input_values: Dict[str, Any]) -> ColumnCoverPlate:
+    """Create an instance of the ColumnCoverPlate module design class from input values."""
     try : 
         module = create_module()  # Create module instance.
     except Exception as e : 
@@ -299,12 +212,12 @@ def create_from_input(input_values: Dict[str, Any]) -> BeamBeamEndPlateSplice:
     
     # Set the input values on the module instance.
     try : 
-        print("**********", input_values)
+        print("INPUT SET FOR FINAL OUTPUT",input_values)
         module.set_input_values(input_values)
     except Exception as e : 
         traceback.print_exc()
-        print('e in set_input_values ************ : ' , e)
-        print('error in setting the input values **********')
+        print('e in set_input_values : ' , e)
+        print('error in setting the input values')
 
     return module
 
@@ -323,19 +236,75 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     print("************")
     output = {}  # Dictionary for formatted values
     module = create_from_input(input_values)  # Create module from input.
-    print('module : ******' , module)
-    print('type of module : ******** ' , type(module))
+    print('module : ' , module)
+    print('type of module : ' , type(module))
+
     # Generate output values in unformatted form.
     raw_output_text = module.output_values(True)
-    stiffener_output = module.stiffener_details(True)
+    raw_member_capacity = module.member_capacityoutput(True)
+    raw_flange_bolt_capacity = [
+        (f"{key}_flange_bolt_capacity", label, typ, value, visible if len(item) == 5 else True)
+        for item in module.flange_bolt_capacity(True)
+        if len(item) >= 4 and item[0] and item[2] == "TextBox"
+        for (key, label, typ, value, *rest) in [item]
+        for visible in [rest[0] if rest else True]
+    ]
+
+    raw_web_bolt_capacity = [
+        (f"{key}_web_bolt_capacity", label, typ, value, visible if len(item) == 5 else True)
+        for item in module.web_bolt_capacity(True)
+        if len(item) >= 4 and item[0] and item[2] == "TextBox"
+        for (key, label, typ, value, *rest) in [item]
+        for visible in [rest[0] if rest else True]
+    ]
+
+    raw_flange_capacity = [
+        (f"{key}_flange_capacity", label, typ, value, visible if len(item) == 5 else True)
+        for item in module.flangecapacity(True)
+        if len(item) >= 4 and item[0] and item[2] == "TextBox"
+        for (key, label, typ, value, *rest) in [item]
+        for visible in [rest[0] if rest else True]
+    ]
+
+    raw_web_capacity = [
+        (f"{key}_web_capacity", label, typ, value, visible if len(item) == 5 else True)
+        for item in module.webcapacity(True)
+        if len(item) >= 4 and item[0] and item[2] == "TextBox"
+        for (key, label, typ, value, *rest) in [item]
+        for visible in [rest[0] if rest else True]
+    ]
+
+    raw_flange_spacing = [
+        (f"{key}_flange_spacing", label, typ, value, visible if len(item) == 5 else True)
+        for item in module.flangespacing(True)
+        if len(item) >= 4 and item[0] and item[2] == "TextBox"
+        for (key, label, typ, value, *rest) in [item]
+        for visible in [rest[0] if rest else True]
+    ]
+
+    raw_web_spacing = [
+        (f"{key}_web_spacing", label, typ, value, visible if len(item) == 5 else True)
+        for item in module.webspacing(True)
+        if len(item) >= 4 and item[0] and item[2] == "TextBox"
+        for (key, label, typ, value, *rest) in [item]
+        for visible in [rest[0] if rest else True]
+    ]
     
     from osdag_core.custom_logger import CustomLogger
     if hasattr(module, "logger") and isinstance(module.logger, CustomLogger):
         logs = module.logger.get_logs() or []
     else:
         logs = getattr(module, "logs", []) or []
-    raw_output = raw_output_text + stiffener_output
-    
+    raw_output = ( 
+        raw_output_text +
+        raw_member_capacity + 
+        raw_flange_bolt_capacity +
+        raw_web_bolt_capacity +
+        raw_flange_capacity +
+        raw_web_capacity +
+        raw_flange_spacing +
+        raw_web_spacing
+    )
     # os.system("clear")
     # Loop over all the text values and add them to ouptut dict.
     for param in raw_output:
@@ -353,15 +322,16 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Beam", "EndPlate"):
-        raise InvalidInputTypeError("section", "'Model', 'Beam' or 'EndPlate'")
+    if section == "Plate":
+        section = "CoverPlate"
+    if section not in ("Model", "Column", "CoverPlate"):
+        raise InvalidInputTypeError("section", "'Model', 'Column' or 'CoverPlate'")
 
     module = create_from_input(input_values)
-    from osdag_core.Common import KEY_DISP_BB_EP_SPLICE
-    # Force correct keys for CAD routing
-    if getattr(module, "module", None) != KEY_DISP_BB_EP_SPLICE:
-        print(f"[CAD DEBUG] Adjusting module.module from {getattr(module,'module',None)} to {KEY_DISP_BB_EP_SPLICE}")
-        module.module = KEY_DISP_BB_EP_SPLICE
+    from osdag_core.Common import KEY_DISP_COLUMNCOVERPLATE
+    if getattr(module, "module", None) != KEY_DISP_COLUMNCOVERPLATE:
+        print(f"[CAD DEBUG] Adjusting module.module from {getattr(module,'module',None)} to {KEY_DISP_COLUMNCOVERPLATE}")
+        module.module = KEY_DISP_COLUMNCOVERPLATE
     if getattr(module, "mainmodule", None) != "Moment Connection":
         print(f"[CAD DEBUG] Adjusting module.mainmodule from {getattr(module,'mainmodule',None)} to Moment Connection")
         module.mainmodule = "Moment Connection"
@@ -413,5 +383,4 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         print('Writing to BREP file failed e : ' , e)
     
     return file_path
-
 

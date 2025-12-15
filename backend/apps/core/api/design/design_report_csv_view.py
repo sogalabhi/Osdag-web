@@ -8,10 +8,13 @@ from apps.modules.shear_connection.submodules.fin_plate.adapter import create_fr
 from apps.modules.shear_connection.submodules.end_plate.adapter import create_from_input as end_plate_create_from_input
 from apps.modules.shear_connection.submodules.cleat_angle.adapter import create_from_input as cleat_angle_create_from_input
 from apps.modules.shear_connection.submodules.seated_angle.adapter import create_from_input as seated_angle_create_from_input
-from apps.modules.moment_connection.submodules.cover_plate_bolted.adapter import create_from_input as cover_plate_bolted_create_from_input
+from apps.modules.moment_connection.submodules.beam_beam_cover_plate_bolted.adapter import create_from_input as cover_plate_bolted_create_from_input
+from apps.modules.moment_connection.submodules.beam_beam_cover_plate_welded.adapter import create_from_input as cover_plate_welded_create_from_input
 from apps.modules.moment_connection.submodules.beam_beam_end_plate.adapter import create_from_input as beam_beam_end_plate_create_from_input
-from apps.modules.moment_connection.submodules.cover_plate_welded.adapter import create_from_input as cover_plate_welded_create_from_input
 from apps.modules.moment_connection.submodules.beam_column_end_plate.adapter import create_from_input as beam_to_column_end_plate_create_from_input
+from apps.modules.moment_connection.submodules.column_column_cover_plate_bolted.adapter import create_from_input as column_cover_plate_bolted_create_from_input
+from apps.modules.moment_connection.submodules.column_column_cover_plate_welded.adapter import create_from_input as column_cover_plate_welded_create_from_input
+from apps.modules.moment_connection.submodules.column_column_end_plate.adapter import create_from_input as column_end_plate_create_from_input
 from apps.modules.tension_member.submodules.bolted.adapter import create_from_input as tension_member_bolted_create_from_input
 from apps.modules.tension_member.submodules.welded.adapter import create_from_input as tension_member_welded_create_from_input
 # importing models
@@ -109,6 +112,9 @@ class CreateDesignReport(APIView):
             'Beam-Beam-End-Plate-Connection': beam_beam_end_plate_create_from_input,
             'Cover-Plate-Welded-Connection': cover_plate_welded_create_from_input,
             'Beam-to-Column-End-Plate-Connection': beam_to_column_end_plate_create_from_input,
+            'ColumnCoverPlateBolted': column_cover_plate_bolted_create_from_input,
+            'Column-to-Column-Cover-Plate-Welded-Connection': column_cover_plate_welded_create_from_input,
+            'Column-to-Column-End-Plate-Connection': column_end_plate_create_from_input,
             'Tension-Member-Bolted-Design': tension_member_bolted_create_from_input,
             'Tension-Member-Welded-Design': tension_member_welded_create_from_input
         }

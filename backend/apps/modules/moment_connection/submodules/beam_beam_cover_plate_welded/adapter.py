@@ -168,7 +168,12 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     flange_capacity = module.flangecapacity(True)
     web_block_shear_pattern = module.web_pattern(True)
 
-    logs = module.logs
+    from osdag_core.custom_logger import CustomLogger
+    logs = []
+    if hasattr(module, "logger") and isinstance(module.logger, CustomLogger):
+        logs = module.logger.get_logs() or []
+    else:
+        logs = getattr(module, "logs", []) or []
     raw_output = (
         raw_output_text +
         raw_member_capacity
@@ -243,32 +248,25 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Beam", "CoverPlate"):  # Error checking: If section is valid.
-        raise InvalidInputTypeError(
-            "section", "'Model', 'Beam' or 'CoverPlate'")
-    module = create_from_input(input_values)  # Create module from input.
-    print('module from input values : ' , module)
-    # Object that will create the CAD model.
-    try : 
-        cld = CommonDesignLogic(None, '', module.module , module.mainmodule)
-    except Exception as e : 
-        print('error in cld e : ' , e)
-    
-    try : 
-        # Setup the calculations object for generating CAD model.
-        setup_for_cad(cld, module)
-    except Exception as e : 
-        traceback.print_exc()
-        print('Error in setting up cad e : ' , e)
+    if section == "Plate":
+        section = "CoverPlate"
+    if section not in ("Model", "Beam", "CoverPlate"):
+        raise InvalidInputTypeError("section", "'Model', 'Beam' or 'CoverPlate'")
 
-    # The section of the module that will be generated.
+    module = create_from_input(input_values)
+
+    from osdag_core.Common import KEY_DISP_BEAMCOVERPLATEWELD
+    if getattr(module, "module", None) != KEY_DISP_BEAMCOVERPLATEWELD:
+        module.module = KEY_DISP_BEAMCOVERPLATEWELD
+    module.mainmodule = "Moment Connection"
+
+    print(f"[CAD DEBUG] BB cover plate welded: module={module.module}, mainmodule={module.mainmodule}, section={section}")
+    # CommonDesignLogic(display, cad_widget, folder, connection, mainmodule)
+    cld = CommonDesignLogic(None, "", "", module.module, module.mainmodule)
+    setup_for_cad(cld, module)
+
     cld.component = section
-    
-    try : 
-        model = cld.create2Dcad()  # Generate CAD Model.
-    except Exception as e :
-        print('Error in cld.create2Dcad() e : ' , e)
-        return False
+    model = cld.create2Dcad()
 
     # check if the cad_models folder exists or not 
     # if no, then create one 

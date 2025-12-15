@@ -109,6 +109,7 @@ export const MODULE_ROUTES = {
     ButtJointBolted: "/design/connections/simple/butt_joint_bolted",
     LapJointWelded: "/design/connections/simple/lap_joint_welded",
     LapJointBolted: "/design/connections/simple/lap_joint_bolted",
+    BasePlateConnection: "/design/connections/base_plate",
     SimplySupportedBeam: "/design/flexure_member/simply_supported_beam",
     OnCantilever: "/design/flexure/on_cantilever",
     Purlin: "/design/flexure/purlin",
@@ -137,4 +138,5 @@ export const MODULE_NAME_TO_KEY = {
     "Column-to-Column-Cover-Plate-Welded-Connection" : "CCCoverPlateWelded",
     "Column-to-Column-Cover-Plate-Bolted-Connection" : "CCCoverPlateBolted",
     "Column-to-Column-End-Plate-Connection" : "CCEndPlate",
+    "Base-Plate": "BasePlateConnection",
 };

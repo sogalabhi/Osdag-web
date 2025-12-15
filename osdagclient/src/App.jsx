@@ -51,6 +51,7 @@ import ColumnColumnCoverPlateBolted from "./modules/columnColumnCoverPlateBolted
 import ColumnColumnCoverPlateWelded from "./modules/columnColumnCoverPlateWelded/CoverPlateWelded";
 import CoverPlateBolted from "./modules/coverPlateBolted/CoverPlateBolted";
 import CoverPlateWelded from "./modules/coverPlateWelded/CoverPlateWelded";
+import BasePlate from "./modules/basePlate/BasePlate";
 
 import "./App.css";
 import BeamToColumnEndPlate from "./modules/beamToColumnEndPlate/BeamToColumnEndPlate";
@@ -79,6 +80,7 @@ function App() {
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_bolted/:projectId?" element={<CoverPlateBolted />} />
         <Route path="/design/:designType/beam-to-beam-splice/cover_plate_welded/:projectId?" element={<CoverPlateWelded />} />
         <Route path="/design/:designType/beam-to-beam-splice/end_plate/:projectId?" element={<BeamBeamEndPlate />} />
+        <Route path="/design/:designType/base_plate/:projectId?" element={<BasePlate />} />
         <Route path="/design/:designType/simple/butt_joint_welded/:projectId?" element={<ButtJointWelded />} />
         <Route path="/design/:designType/simple/butt_joint_bolted/:projectId?" element={<ButtJointBolted />} />
         <Route path="/design/:designType/simple/lap_joint_welded/:projectId?" element={<LapJointWelded />} />

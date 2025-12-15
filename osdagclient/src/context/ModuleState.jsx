@@ -126,32 +126,47 @@ export const ModuleProvider = ({ children }) => {
         'LapJointBolted': 'lap-joint-bolted',
         'LapJointWelded': 'lap-joint-welded',
       };
-      const isShear = Object.prototype.hasOwnProperty.call(SHEAR_SLUGS, moduleName);
-      const isSimple = Object.prototype.hasOwnProperty.call(SIMPLE_SLUGS, moduleName);
-      const slug = SHEAR_SLUGS[moduleName] || moduleName;
-      const simpleSlug = SIMPLE_SLUGS[moduleName] || moduleName;
-      const email = localStorage.getItem("email");
+      // Unified slug map to align with /api/modules/{slug}/... endpoints
+      const MODULE_SLUGS = {
+        // Shear
+        FinPlateConnection: 'shear-connection/fin-plate',
+        CleatAngleConnection: 'shear-connection/cleat-angle',
+        EndPlateConnection: 'shear-connection/end-plate',
+        SeatedAngleConnection: 'shear-connection/seated-angle',
+        // Moment
+        CoverPlateBolted: 'moment-connection/beam-beam-cover-plate-bolted',
+        'Beam-to-Beam-Cover-Plate-Bolted-Connection': 'moment-connection/beam-beam-cover-plate-bolted',
+        'Cover-Plate-Bolted-Connection': 'moment-connection/beam-beam-cover-plate-bolted',
+        CoverPlateWelded: 'moment-connection/beam-beam-cover-plate-welded',
+        'Beam-to-Beam-Cover-Plate-Welded-Connection': 'moment-connection/beam-beam-cover-plate-welded',
+        'Cover-Plate-Welded-Connection': 'moment-connection/beam-beam-cover-plate-welded',
+        BeamBeamEndPlate: 'moment-connection/beam-beam-end-plate',
+        'Beam-Beam-End-Plate-Connection': 'moment-connection/beam-beam-end-plate',
+        BeamColumnEndPlate: 'moment-connection/beam-column-end-plate',
+        'Beam-to-Column-End-Plate-Connection': 'moment-connection/beam-column-end-plate',
+        CCCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
+        ColumnCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
+        CCCoverPlateWelded: 'moment-connection/column-column-cover-plate-welded',
+        'Column-to-Column-Cover-Plate-Welded-Connection': 'moment-connection/column-column-cover-plate-welded',
+        CCEndPlate: 'moment-connection/column-column-end-plate',
+        'Column-to-Column-End-Plate-Connection': 'moment-connection/column-column-end-plate',
+        // Simple
+        ButtJointBolted: 'simple-connection/butt-joint-bolted',
+        ButtJointWelded: 'simple-connection/butt-joint-welded',
+        LapJointBolted: 'simple-connection/lap-joint-bolted',
+        LapJointWelded: 'simple-connection/lap-joint-welded',
+      };
 
-      let url;
-      if (isShear) {
-        url = `${BASE_URL}api/modules/shear-connection/${slug}/options/`;
-        if (email) {
-          url += `?email=${encodeURIComponent(email)}`;
-        }
-      } else if (isSimple) {
-        url = `${BASE_URL}api/modules/simple-connection/${simpleSlug}/options/`;
-        if (email) {
-          url += `?email=${encodeURIComponent(email)}`;
-        }
-      } else {
-        url = `${BASE_URL}populate?moduleName=${moduleName}`;
-        if (options.connectivity) {
-          url += `&connectivity=${encodeURIComponent(options.connectivity)}`;
-        }
-        if (email) {
-          url += `&email=${encodeURIComponent(email)}`;
-        }
-      }
+      const getSlug = (key) => MODULE_SLUGS[key] || key;
+      const email = localStorage.getItem("email");
+      const slug = getSlug(moduleName);
+
+      let url = `${BASE_URL}api/modules/${slug}/options/`;
+      const params = new URLSearchParams();
+      if (options.connectivity) params.append("connectivity", options.connectivity);
+      if (email) params.append("email", email);
+      const qs = params.toString();
+      if (qs) url += `?${qs}`;
 
       const response = await fetch(url, {
         method: "GET",
