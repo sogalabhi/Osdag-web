@@ -22,9 +22,9 @@ app_name = 'core'
 
 urlpatterns = [
     # Design preferences
-    path('design-preferences/', DesignPreference.as_view(), name="design-pref"),
-    path('materialDetails/', MaterialDetails.as_view()),
-    path('company-logo/', CompanyLogoView.as_view()),
+    path('api/design-preferences/', DesignPreference.as_view(), name="design-pref"),
+    path('api/materialDetails/', MaterialDetails.as_view()),
+    path('api/company-logo/', CompanyLogoView.as_view()),
     
     # Authentication and authorization
     path('jwt/home', JWTHomeView.as_view()),  # view for testing purpose
@@ -33,14 +33,14 @@ urlpatterns = [
     path('api/dashboard/', views.dashboard_view, name='dashboard'),
     
     # User URLs
-    path('user/signup/', SignupView.as_view()),
-    path('user/forgetpassword/', ForgetPasswordView.as_view()),
-    path('user/logout/', LogoutView.as_view()),
+    path('api/user/signup/', SignupView.as_view()),
+    path('api/user/forgetpassword/', ForgetPasswordView.as_view()),
+    path('api/user/logout/', LogoutView.as_view()),
     path('api/user/login/', LoginView.as_view()),
-    path('user/checkemail/', CheckEmailView.as_view()),
-    path('user/saveinput/', SaveInputFileView.as_view()),
-    path('user/obtain-input-file/', ObtainInputFileView.as_view()),
-    path('user/set-refresh/', SetRefreshTokenCookieView.as_view()),
+    path('api/user/checkemail/', CheckEmailView.as_view()),
+    path('api/user/saveinput/', SaveInputFileView.as_view()),
+    path('api/user/obtain-input-file/', ObtainInputFileView.as_view()),
+    path('api/user/set-refresh/', SetRefreshTokenCookieView.as_view()),
     
     # OSI upload via DRF (multipart form-data)
     path('api/save-osi/', SaveInputFileView.as_view()),
@@ -62,13 +62,13 @@ urlpatterns = [
     path('api/report/parse-sections/', ParseReportSections.as_view(), name='parse-report-sections'),
     path('api/report/customize/', CustomizeReport.as_view(), name='customize-report'),
     # Legacy populate endpoint (kept for frontend compatibility)
-    path('populate', LegacyInputData.as_view()),
+    path('api/populate', LegacyInputData.as_view()),
 
     # CAD generation & download (new backend handlers)
-    path('design/cad', CADGeneration.as_view()),
-    path('design/cad/', CADGeneration.as_view()),
-    path('design/downloadCad', CADDownload.as_view()),
-    path('design/downloadCad/', CADDownload.as_view()),
+    path('api/design/cad', CADGeneration.as_view()),
+    path('api/design/cad/', CADGeneration.as_view()),
+    path('api/design/downloadCad', CADDownload.as_view()),
+    path('api/design/downloadCad/', CADDownload.as_view()),
     
     # Legacy design type views (temporary - may be moved later)
     path('osdag-web/', views.get_design_types, name='index'),

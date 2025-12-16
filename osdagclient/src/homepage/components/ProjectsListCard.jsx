@@ -15,6 +15,7 @@ import { ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { isGuestUser, getCurrentUserEmail } from '../../utils/auth';
 import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../../constants/DesignKeys';
+import { apiBase } from "../../api";
 
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
   const [projects, setProjects] = React.useState(projectsProp);
@@ -41,7 +42,8 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   const [reportExtraState, setReportExtraState] = React.useState({});
   const navigate = useNavigate();
 
-  const BASE_URL = 'http://localhost:8000/api/';
+  // const BASE_URL = 'http://localhost:8000/api/';
+  const BASE_URL = `${apiBase}`;
 
   const getAccessToken = () => (
     localStorage.getItem('access') || localStorage.getItem('token') || ''
@@ -60,7 +62,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
       const fetchRecentProjects = async () => {
         setLoading(true);
         try {
-          const res = await fetch(`${BASE_URL}projects/`, {
+          const res = await fetch(`${BASE_URL}api/projects/`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -132,7 +134,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   };
 
   const fetchProjectDetail = async (projectId) => {
-    const res = await fetch(`${BASE_URL}projects/${projectId}/`, {
+    const res = await fetch(`${BASE_URL}api/projects/${projectId}/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -146,7 +148,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
 
   const handleOpenProject = async (project) => {
     try {
-      const response = await fetch(`${BASE_URL}projects/${project.id}/`, {
+      const response = await fetch(`${BASE_URL}api/projects/${project.id}/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -191,7 +193,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
 
   const handleDownloadOsi = async (project) => {
     try {
-      const detailRes = await fetch(`${BASE_URL}projects/${project.id}/`, {
+      const detailRes = await fetch(`${BASE_URL}api/projects/${project.id}/`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getAccessToken()}` },
       });

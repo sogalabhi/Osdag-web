@@ -6,6 +6,7 @@ import { UserContext } from "../../../context/UserState";
 import { MODULE_KEY_FIN_PLATE } from '../../../constants/DesignKeys';
 import { message } from 'antd';
 import { useLocation } from 'react-router-dom';
+import { apiBase } from "../../../api";
 
 // Module-specific configurations
 const MODULE_CONFIGS = {
@@ -98,7 +99,8 @@ function UnifiedDropdownMenu({
   } = useContext(ModuleContext);
 
   const { SaveInputValueFile } = useContext(UserContext);
-  const BASE_URL = 'http://localhost:8000/api/';
+  // const BASE_URL = 'http://localhost:8000/api/';
+  const BASE_URL = `${apiBase}`;
   const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
   const location = useLocation();
   const getProjectIdFromUrl = () => {
@@ -301,7 +303,7 @@ function UnifiedDropdownMenu({
         // Update project's osi_file_path via projectId from URL
         if (pid && data.url) {
           try {
-            const upd = await fetch(`${BASE_URL}projects/${pid}/`, {
+            const upd = await fetch(`${BASE_URL}api/projects/${pid}/`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',

@@ -1,4 +1,7 @@
-const BASE_URL = "http://127.0.0.1:8000/";
+import { apiBase } from "../api";
+
+// const BASE_URL = "http://127.0.0.1:8000/";
+const BASE_URL = `${apiBase}`;
 
 export const URLS = {
   POPULATE_VALUES: `${BASE_URL}populate`,
