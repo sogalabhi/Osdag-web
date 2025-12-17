@@ -50,7 +50,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
       "EndPlate": ["EndPlate"],
       "Member": ["Member"],
     };
-    
+
     // Check if any selected view maps to this part
     for (const view of activeViews) {
       const mappedParts = viewToPartMap[view] || [];
@@ -336,7 +336,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
 
       {/* Model Section - render each subpart with its own color (only when Model/grid is active) */}
       {((activeViews.includes("Model") || GRID_VIEWS.includes(primaryView)) && modelMeshes.length > 0) && (
-        <>
+	 <>
           {modelMeshes.map((m, idx) => {
             const name = m.name || "";
             const lower = name.toLowerCase();

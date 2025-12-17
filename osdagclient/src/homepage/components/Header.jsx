@@ -37,7 +37,7 @@ const Header = ({ setshowSideBar, active }) => {
       }
 
       try {
-        const response = await axios.get(`${apiBase}dashboard/`, {
+        const response = await axios.get(`${apiBase}api/dashboard/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

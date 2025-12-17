@@ -55,7 +55,7 @@ export const UserProvider = ({ children }) => {
   const setRefreshTokenCookie = async (refresh_token) => {
     console.log("Inside set refresh token thunk");
     try {
-      const response = await fetch(`${BASE_URL}user/set-refresh/`, {
+      const response = await fetch(`${BASE_URL}api/user/set-refresh/`, {
         method: "POST",
         mode: "cors",
         credentials: "include",
@@ -179,7 +179,7 @@ export const UserProvider = ({ children }) => {
     console.log("inside the user signup thunk");
     // console.log("username : ", username);
     try {
-      const response = await fetch(`${BASE_URL}user/signup/`, {
+      const response = await fetch(`${BASE_URL}api/user/signup/`, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -265,7 +265,7 @@ export const UserProvider = ({ children }) => {
 
     try {
       console.log("sending the login request to the server");
-      const response = await fetch(`${BASE_URL}user/login/`, {
+      const response = await fetch(`${BASE_URL}api/user/login/`, {
       // const response = await fetch(`${apiBase}user/login/`, {
         method: "POST",
         mode: "cors",
@@ -393,7 +393,7 @@ export const UserProvider = ({ children }) => {
     const email = localStorage.getItem("email");
     try {
       console.log("fetching the input file");
-      fetch(`${BASE_URL}user/obtain-input-file/`, {
+      fetch(`${BASE_URL}api/user/obtain-input-file/`, {
         method: "POST",
         mode: "cors",
         credentials: "include",
@@ -480,7 +480,7 @@ export const UserProvider = ({ children }) => {
     console.log("email : ", email);
 
     try {
-      const response = await fetch(`${BASE_URL}user/checkemail/`, {
+      const response = await fetch(`${BASE_URL}api/user/checkemail/`, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -547,7 +547,7 @@ export const UserProvider = ({ children }) => {
     console.log("email : ", Lemail);
 
     try {
-      const response = await fetch(`${BASE_URL}user/forgetpassword/`, {
+      const response = await fetch(`${BASE_URL}api/user/forgetpassword/`, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -612,7 +612,7 @@ export const UserProvider = ({ children }) => {
     console.log("email in localStorage : ", email);
 
     try {
-      const response = await fetch(`${BASE_URL}user/saveinput/`, {
+      const response = await fetch(`${BASE_URL}api/user/saveinput/`, {
         method: "POST",
         mode: "cors",
         headers: {

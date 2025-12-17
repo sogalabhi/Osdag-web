@@ -11,6 +11,7 @@ import {
 } from "../../constants/modules";
 
 import SectionCards from "./SectionCards";
+import { apiBase } from "../../api";
 
 const TabbedModulePage = () => {
   const moduleName = window.location.pathname.split("/")[1];
@@ -59,7 +60,7 @@ const TabbedModulePage = () => {
     const safeProjectName = (projectName || `${selectedModule.label} Project`).replace(/\s+/g, "_");
     try {
       const token = getAccessToken();
-      const response = await fetch("http://localhost:8000/api/projects/", {
+      const response = await fetch(`${apiBase}api/projects/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

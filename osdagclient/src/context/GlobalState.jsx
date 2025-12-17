@@ -7,6 +7,7 @@ import AppReducer from './AppReducer';
 */
 
 import axios from 'axios';
+import { apiBase } from '../api';
 
 //initial state
 let initialValue = {
@@ -18,8 +19,8 @@ let initialValue = {
     fetch_cache: '',
 }
 
-const BASE_URL = 'http://127.0.0.1:8000/'
-
+// const BASE_URL = 'http://127.0.0.1:8000/'
+const BASE_URL = `${apiBase}`;
 
 //create context
 export const GlobalContext = createContext(initialValue);

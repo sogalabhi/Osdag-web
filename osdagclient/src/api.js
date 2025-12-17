@@ -1,1 +1,1 @@
-export const apiBase = `${window.location.protocol}//${window.location.hostname}:8000/api/`;
+export const apiBase = `${window.location.protocol}//${window.location.hostname}/`;

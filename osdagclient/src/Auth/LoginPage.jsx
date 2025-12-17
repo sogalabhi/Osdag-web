@@ -354,7 +354,7 @@ const LoginPage = () => {
 
       // Step 3️⃣: Send token to Django backend for verification
     //   const host = "http://localhost:8000"; // Django backend
-      const response = await axios.post(`${apiBase}auth/firebase-login/`, {
+      const response = await axios.post(`${apiBase}api/auth/firebase-login/`, {
         token: idToken,
       });
         const { data } = response;
