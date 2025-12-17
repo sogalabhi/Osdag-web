@@ -14,6 +14,8 @@ class ColumnCoverPlateWeldedService:
         """Run design calculation and return results"""
         validate_input(inputs)
         model = ColumnCoverPlateWeld()
+        if hasattr(model, "set_osdaglogger"):
+            model.set_osdaglogger(None)
         model.set_input_values(inputs)
         output, logs = generate_output(inputs)
         return {

@@ -30,7 +30,9 @@ class ColumnCoverPlate(MomentConnection):
 
     def __init__(self):
         super(ColumnCoverPlate, self).__init__()
+        self.hover_dict = {}
         self.design_status = False
+
 
     ###############################################
     # Design Preference Functions Start
@@ -2776,13 +2778,16 @@ class ColumnCoverPlate(MomentConnection):
         return components
 
     def call_3DPlate(self, ui, bgcolor):
+        ui = getattr(ui, "ui", ui)
+        frame = getattr(ui, "frame", None)
         from PyQt5.QtWidgets import QCheckBox
         from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Cover Plate':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+        if frame:
+            for chkbox in ui.frame.children():
+                if chkbox.objectName() == 'Column Cover Plate Bolted':
+                    continue
+                if isinstance(chkbox, QCheckBox):
+                    chkbox.setChecked(Qt.Unchecked)
         ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
 
@@ -4045,5 +4050,4 @@ class ColumnCoverPlate(MomentConnection):
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
-        return True
         

@@ -349,10 +349,14 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     cld = CommonDesignLogic(None, "", "", module.module, module.mainmodule)
     setup_for_cad(cld, module)
 
-    # Map external section names to internal component names expected by CommonDesignLogic
+    # Map external section names to internal component names expected by CommonDesignLogic.
+    # For column cover plate, the core CAD logic expects component name "Cover Plate"
+    # (with a space) for the plate + bolts assembly. Using "Connector" here falls
+    # through to CPObj.get_models(), which can later be treated like a list and
+    # cause TypeErrors such as "object of type 'TopoDS_Compound' has no len()".
     internal_section = section
     if section == "CoverPlate":
-        internal_section = "Connector"
+        internal_section = "Cover Plate"
 
     cld.component = internal_section
     print(f"[cadissue] CC cover plate bolted: cld.component set to {internal_section} for section={section}")

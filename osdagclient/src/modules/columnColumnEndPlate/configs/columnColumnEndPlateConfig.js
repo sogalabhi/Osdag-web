@@ -235,7 +235,6 @@ export const columnColumnEndPlateConfig = {
     bolt_slip_factor: "0.3",
     bolt_tension_type: "Non pre-tensioned",
     bolt_type: "Bearing Bolt",
-    endPlateType: "Flush End Plate",
     connectivity: "Coplanar Tension-Compression Flange",
     plate_thickness: [],
     connector_material: "E 250 (Fe 410 W)A",
@@ -287,8 +286,8 @@ export const columnColumnEndPlateConfig = {
       "Bolt.Slip_Factor": inputs.bolt_slip_factor,
       "Bolt.TensionType": inputs.bolt_tension_type,
       "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-      Connectivity: inputs.connectivity,
-      EndPlateType: inputs.endPlateType || "Flush End Plate",
+      "Connectivity *": inputs.connectivity,
+      "Connectivity": inputs.connectivity,
       "Connector.Plate.Thickness_List": allSelected.plate_thickness 
         ? lists.thicknessList : inputs.plate_thickness,
       "Connector.Material": inputs.supported_material,
@@ -321,11 +320,6 @@ export const columnColumnEndPlateConfig = {
             { value: "Flush End Plate", label: "Flush End Plate" },
             { value: "Extended Both Way", label: "Extended Both Way", disabled: true }
           ]
-        },
-        {
-          key: "endPlateType",
-          label: "End Plate Type *",
-          type: "columnColumnendPlateSelect",
         },
         {
           key: "supported_designation",

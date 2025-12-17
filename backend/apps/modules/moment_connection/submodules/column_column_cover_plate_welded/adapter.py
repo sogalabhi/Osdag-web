@@ -237,7 +237,9 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     # The section of the module that will be generated.
     internal_section = section
     if section == "CoverPlate":
-        internal_section = "Connector"
+        # CommonDesignLogic expects "Cover Plate" (with space) for cover plate
+        # + welds assembly in the column cover plate welded branch.
+        internal_section = "Cover Plate"
 
     cld.component = internal_section
     print(f"[cadissue] CC cover plate welded: cld.component set to {internal_section} for section={section}")
