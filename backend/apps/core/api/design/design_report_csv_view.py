@@ -218,13 +218,50 @@ class CreateDesignReport(APIView):
         except Exception as e:
             print('Error while creating module:', e)
 
+        # ------------------------------------------------------------
+        # Normalize metadata/logs for legacy save_design()
+        # The desktop report code expects string fields and may call
+        # .split() on them; make sure we don't pass lists/dicts.
+        # ------------------------------------------------------------
+        try:
+            raw_logs = metadata_final.get('logs')
+            if isinstance(raw_logs, list):
+                normalized_lines = []
+                for log in raw_logs:
+                    if isinstance(log, dict):
+                        ts = log.get('timestamp', '')
+                        lvl = log.get('type', 'INFO')
+                        msg = log.get('message', '')
+                        normalized_lines.append(f"{ts} - {lvl} - {msg}")
+                    else:
+                        normalized_lines.append(str(log))
+                metadata_final['logs'] = "\n".join(normalized_lines)
+
+            # Ensure logger_messages is a plain string
+            if isinstance(metadata_final.get('logger_messages'), list):
+                metadata_final['logger_messages'] = "\n".join(
+                    str(x) for x in metadata_final['logger_messages']
+                )
+        except Exception as norm_exc:
+            # Don't fail report generation just because normalization failed;
+            # log and continue with original metadata.
+            print('WARN: error normalizing metadata/logs before save_design:', norm_exc)
+
         try:
             print('generating the report .save_design')
             resultBoolean = module.save_design(metadata_final)
             print(resultBoolean)
         except Exception as e:
+            # Legacy desktop save_design sometimes raises even after writing .tex,
+            # for example when it calls .split() on an internal list.
+            # Treat this as non-fatal if the expected LaTeX file was created.
             print('e : ', e)
-            resultBoolean = False  # Set default value if save_design fails
+            tex_path = f'{file_path}.tex'
+            if os.path.exists(tex_path):
+                print('WARN: save_design raised, but LaTeX file exists at', tex_path)
+                resultBoolean = True
+            else:
+                resultBoolean = False  # Set default value if save_design fails and no file
         
         if(resultBoolean):
             print('The LaTEX file has been created successfully')

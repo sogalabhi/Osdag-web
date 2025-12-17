@@ -155,6 +155,11 @@ export const ModuleProvider = ({ children }) => {
         ButtJointWelded: 'simple-connection/butt-joint-welded',
         LapJointBolted: 'simple-connection/lap-joint-bolted',
         LapJointWelded: 'simple-connection/lap-joint-welded',
+        // Tension
+        'Tension-Member-Bolted-Design': 'tension-member/bolted',
+        'Tension-Member-Welded-Design': 'tension-member/welded',
+        BoltedToEndGusset: 'tension-member/bolted',
+        WeldedToEndGusset: 'tension-member/welded',
       };
 
       const getSlug = (key) => MODULE_SLUGS[key] || key;

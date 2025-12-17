@@ -20,7 +20,8 @@ Functions:
 from apps.core.utils import (
     validate_arr, validate_num, validate_string,
     MissingKeyError, InvalidInputTypeError,
-    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
+    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
+    write_stl,
 )
 
 from ...shared import setup_for_cad  # Use moment_connection shared utilities
@@ -232,9 +233,18 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     file_name = session + "_" + section + ".brep"
     file_path = "file_storage/cad_models/" + file_name
 
-    try : 
-        BRepTools.breptools.Write(model, file_path, Message_ProgressRange()) # Generate CAD Model
-        
+    try:
+        BRepTools.breptools.Write(model, file_path, Message_ProgressRange())  # Generate CAD Model
+
+        # Always try to write STL for the requested section
+        try:
+            stl_rel = file_path.replace(".brep", ".stl")
+            full_stl = os.path.join(os.getcwd(), stl_rel)
+            write_stl(model, full_stl)
+            print(f"STL file saved at {full_stl}")
+        except Exception as stle:
+            print(f"Warning: Failed to save STL at {file_path}: {stle}")
+
         if section == "Model":
             # Save STEP
             step_writer = STEPControl_Writer()
@@ -255,9 +265,9 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
                 print(f"IGES file saved at {full_iges_file_path}")
             else:
                 print("Warning: Failed to save IGES file!")
-        
-    except Exception as e : 
-        print('Writing to BREP file failed e : ' , e)
+
+    except Exception as e:
+        print('Writing to BREP/STL file failed e : ', e)
     
     return file_path
 

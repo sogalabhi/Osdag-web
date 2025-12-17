@@ -600,6 +600,15 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     try : 
         BRepTools.breptools.Write(model, file_path, Message_ProgressRange()) # Generate CAD Model
 
+        # Always try to write STL for the requested section
+        try:
+            stl_rel = file_path.replace(".brep", ".stl")
+            full_stl = os.path.join(os.getcwd(), stl_rel)
+            write_stl(model, full_stl)
+            print(f"STL file saved at {full_stl}")
+        except Exception as stle:
+            print(f"Warning: Failed to save STL at {file_path}: {stle}")
+
         # If it's 'Model' section, write a manifest referencing per-part breps and save extra formats
         if section == "Model":
             try:
