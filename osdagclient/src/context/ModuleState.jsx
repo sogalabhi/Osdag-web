@@ -146,6 +146,7 @@ export const ModuleProvider = ({ children }) => {
         'Beam-to-Column-End-Plate-Connection': 'moment-connection/beam-column-end-plate',
         CCCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
         ColumnCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
+        'Column-to-Column-Cover-Plate-Bolted-Connection': 'moment-connection/column-column-cover-plate-bolted',
         CCCoverPlateWelded: 'moment-connection/column-column-cover-plate-welded',
         'Column-to-Column-Cover-Plate-Welded-Connection': 'moment-connection/column-column-cover-plate-welded',
         CCEndPlate: 'moment-connection/column-column-end-plate',
@@ -296,12 +297,12 @@ export const ModuleProvider = ({ children }) => {
    * @param {Function} onCADSuccess - Success callback function
    */
   const createCADModel = useCallback(async (inputData, moduleId, onCADSuccess = null) => {
-    console.log('🚀 [ModuleState] createCADModel CALLED');
-    console.log('[ModuleState] moduleId:', moduleId);
-    console.log('[ModuleState] inputData keys:', inputData ? Object.keys(inputData) : 'N/A');
+    console.log('[cadissue] createCADModel CALLED');
+    console.log('[cadissue] moduleId:', moduleId);
+    console.log('[cadissue] inputData keys:', inputData ? Object.keys(inputData) : 'N/A');
     try {
 
-      console.log('[ModuleState] Making fetch request to:', `${BASE_URL}design/cad`);
+      console.log('[cadissue] Making fetch request to:', `${BASE_URL}design/cad`);
       const response = await fetch(`${BASE_URL}design/cad`, {
         method: "POST",
         mode: "cors",
@@ -318,18 +319,17 @@ export const ModuleProvider = ({ children }) => {
 
       const data = await response.json();
 
-      // Log the API response to debug hover_dict
-      console.log('=== [ModuleState] CAD API Response ===');
-      console.log('[ModuleState] Response status:', response.status);
-      console.log('[ModuleState] Response data keys:', Object.keys(data));
-      console.log('[ModuleState] data.hover_dict:', data.hover_dict);
-      console.log('[ModuleState] data.hover_dict type:', typeof data.hover_dict);
-      console.log('[ModuleState] data.hover_dict is object:', data.hover_dict && typeof data.hover_dict === 'object');
-      if (data.hover_dict && typeof data.hover_dict === 'object') {
-        console.log('[ModuleState] hover_dict keys:', Object.keys(data.hover_dict));
-        console.log('[ModuleState] hover_dict entries:', Object.entries(data.hover_dict));
-        console.log('[ModuleState] hover_dict JSON:', JSON.stringify(data.hover_dict, null, 2));
+      // Log the API response to debug CAD files and hover_dict
+      console.log('[cadissue] CAD API Response status:', response.status);
+      console.log('[cadissue] CAD API Response keys:', Object.keys(data));
+      console.log('[cadissue] CAD files keys:', data.files ? Object.keys(data.files) : 'NO files');
+      if (data.files) {
+        console.log('[cadissue] CAD files has Model:', !!data.files.Model);
+        console.log('[cadissue] CAD files has Beam:', !!data.files.Beam);
+        console.log('[cadissue] CAD files has CoverPlate:', !!data.files.CoverPlate);
+        console.log('[cadissue] CAD files has Plate:', !!data.files.Plate);
       }
+      console.log('[cadissue] hover_dict keys:', data.hover_dict && typeof data.hover_dict === 'object' ? Object.keys(data.hover_dict) : 'NO hover_dict');
 
       if (!response.ok) {
         let message = data.message || "CAD generation failed";
@@ -345,9 +345,9 @@ export const ModuleProvider = ({ children }) => {
         dispatch({ type: "SET_CAD_MODEL_PATHS", payload: data.files });
 
         // Log before dispatching hover_dict
-        console.log('[ModuleState] Before dispatch - data.hover_dict:', data.hover_dict);
+        console.log('[cadissue] Before dispatch - data.hover_dict:', data.hover_dict);
         if (data.hover_dict) {
-          console.log('[ModuleState] Dispatching SET_HOVER_DICT with:', data.hover_dict);
+          console.log('[cadissue] Dispatching SET_HOVER_DICT with keys:', Object.keys(data.hover_dict || {}));
           dispatch({ type: "SET_HOVER_DICT", payload: data.hover_dict });
         } else {
           console.warn('[ModuleState] data.hover_dict is missing or empty!');

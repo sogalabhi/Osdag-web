@@ -22,6 +22,7 @@ const MODULE_SLUGS = {
   'Beam-to-Column-End-Plate-Connection': 'moment-connection/beam-column-end-plate',
   CCCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
   ColumnCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
+  'Column-to-Column-Cover-Plate-Bolted-Connection': 'moment-connection/column-column-cover-plate-bolted',
   CCCoverPlateWelded: 'moment-connection/column-column-cover-plate-welded',
   'Column-to-Column-Cover-Plate-Welded-Connection': 'moment-connection/column-column-cover-plate-welded',
   CCEndPlate: 'moment-connection/column-column-end-plate',

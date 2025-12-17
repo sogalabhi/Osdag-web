@@ -322,7 +322,14 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    """Generate the CAD model from input values as a BREP file. Return file path."""
+    """Generate the CAD model from input values as a BREP/STL file.
+
+    External API uses section names: "Model", "Column", "CoverPlate".
+    Internally, the legacy CAD logic for column cover plate uses component
+    name "Connector" for the cover plate + bolts assembly. Map CoverPlate ->
+    Connector for CAD routing, but keep the external section name for file
+    naming and response keys.
+    """
     if section == "Plate":
         section = "CoverPlate"
     if section not in ("Model", "Column", "CoverPlate"):
@@ -338,10 +345,17 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         module.mainmodule = "Moment Connection"
 
     print(f"[CAD DEBUG] building CommonDesignLogic with module={module.module}, mainmodule={module.mainmodule}, section={section}")
-    cld = CommonDesignLogic(None, "", module.module, module.mainmodule)
+    # CommonDesignLogic(display, cad_widget, folder, connection, mainmodule)
+    cld = CommonDesignLogic(None, "", "", module.module, module.mainmodule)
     setup_for_cad(cld, module)
 
-    cld.component = section
+    # Map external section names to internal component names expected by CommonDesignLogic
+    internal_section = section
+    if section == "CoverPlate":
+        internal_section = "Connector"
+
+    cld.component = internal_section
+    print(f"[cadissue] CC cover plate bolted: cld.component set to {internal_section} for section={section}")
     model = cld.create2Dcad()
 
     # check if the cad_models folder exists or not 

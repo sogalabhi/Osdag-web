@@ -328,9 +328,21 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         raise InvalidInputTypeError(
             "section", "'Model', 'Column' or 'Connector'")
     module = create_from_input(input_values)  # Create module from input.
+
+    # Ensure correct display keys for CAD routing
+    from osdag_core.Common import KEY_DISP_COLUMNENDPLATE
+    if getattr(module, "module", None) != KEY_DISP_COLUMNENDPLATE:
+        print(f"[CAD DEBUG] Adjusting module.module from {getattr(module,'module',None)} to {KEY_DISP_COLUMNENDPLATE}")
+        module.module = KEY_DISP_COLUMNENDPLATE
+    if getattr(module, "mainmodule", None) != "Moment Connection":
+        print(f"[CAD DEBUG] Adjusting module.mainmodule from {getattr(module,'mainmodule',None)} to Moment Connection")
+        module.mainmodule = "Moment Connection"
+
+    print(f"[CAD DEBUG] building CommonDesignLogic with module={module.module}, mainmodule={module.mainmodule}, section={section}")
     # Object that will create the CAD model.
-    try : 
-        cld = CommonDesignLogic(None, '', module.module , module.mainmodule)
+    try:
+        # CommonDesignLogic(display, cad_widget, folder, connection, mainmodule)
+        cld = CommonDesignLogic(None, '', "", module.module , module.mainmodule)
     except Exception as e : 
         print('error in cld e : ' , e)
     

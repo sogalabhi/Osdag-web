@@ -15,7 +15,6 @@ class ColumnCoverPlateWeldedService:
         validate_input(inputs)
         model = ColumnCoverPlateWeld()
         model.set_input_values(inputs)
-        model.hard_values()
         output, logs = generate_output(inputs)
         return {
             'data': output,

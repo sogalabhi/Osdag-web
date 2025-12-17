@@ -141,11 +141,11 @@ class CADGeneration(View):
         elif session_type == "SeatedAngleConnection":
             sections = ["Model", "Beam", "Column", "SeatedAngle"]
         elif session_type == "CoverPlateBolted":
-            sections = ["Model", "Beam", "Plate"]
+            sections = ["Model", "Beam", "CoverPlate"]
         elif session_type == "BeamBeamEndPlate":
             sections = ["Model", "Beam", "EndPlate"]
         elif session_type == "CoverPlateWelded":
-            sections = ["Model", "Beam", "Plate"]
+            sections = ["Model", "Beam", "CoverPlate"]
         elif session_type == "BeamToColumnEndPlate":
             sections = ["Model", "Beam", "Column", "Connector"]
         elif session_type == "ColumnCoverPlateBolted":
@@ -161,6 +161,8 @@ class CADGeneration(View):
         else:
             return JsonResponse({"status": "error", "message": "Unknown module type"}, status=400)
         
+        print(f"[cadissue] cad_model_api: module_id={module_id}, session_type={session_type}, sections={sections}")
+
         # initialize the empty dictionary to hold model data and collect errors
         output_files = {}
         error_details = []
@@ -171,7 +173,7 @@ class CADGeneration(View):
         session_id = str(uuid.uuid4())
         
         for section in sections:
-            print(f'Generating section: {section}')
+            print(f"[cadissue] Generating section: {section}")
             try:
                 if not hasattr(module_api, 'create_cad_model'):
                     error_details.append({"section": section, "error": "create_cad_model not implemented"})
@@ -184,6 +186,7 @@ class CADGeneration(View):
                     continue  # Skip to the next section
                 
                 print(f'[cad_model_api] {section} generated successfully, returned path: {path}')
+                print(f"[cadissue] create_cad_model returned path for section={section}: {path}")
 
                 # Resolve returned path. Modules typically return "file_storage/..."
                 base_root = repo_root
@@ -202,6 +205,7 @@ class CADGeneration(View):
                         # Default to repo root for error reporting
                         path_to_file = path_repo_root
                 print(f"[cad_model_api] Resolved path for section '{section}': {path_to_file} (base_root={base_root})")
+                print(f"[cadissue] Path resolution for section={section}: {path_to_file}, exists={os.path.exists(path_to_file)}")
                 if not os.path.exists(path_to_file):
                     msg = f'Generated file for {section} does not exist at: {path_to_file}'
                     print(msg)
@@ -209,6 +213,7 @@ class CADGeneration(View):
                     continue
 
                 stl_path = path_to_file.replace(".brep", ".stl")
+                print(f"[cadissue] Looking for STL for section={section} at: {stl_path}")
                 import base64
                 try:
                     if os.path.exists(stl_path):
@@ -217,12 +222,14 @@ class CADGeneration(View):
                             b64 = base64.b64encode(f.read()).decode("ascii")
                         output_files[section] = f"data:application/octet-stream;base64,{b64}"
                         print(f"[cad_model_api] Loaded STL for {section}")
+                        print(f"[cadissue] Stored STL entry for section={section}")
                     else:
                         print(f"[cad_model_api] STL missing for section '{section}', falling back to BREP: {path_to_file}")
                         with open(path_to_file, "rb") as f:
                             b64 = base64.b64encode(f.read()).decode("ascii")
                         output_files[section] = f"data:application/octet-stream;base64,{b64}"
                         print(f"[cad_model_api] Loaded BREP for {section}")
+                        print(f"[cadissue] Stored BREP entry for section={section}")
 
                     # If this is the merged Model, also try to include per-part STLs from manifest
                     if section == "Model":
@@ -276,6 +283,7 @@ class CADGeneration(View):
                 error_details.append({"section": section, "error": str(e)})
                 
         print(f"[cad_model_api] Final output_files keys: {list(output_files.keys())}")
+        print(f"[cadissue] Final output_files keys: {list(output_files.keys())}")
 
         if not output_files:
             # Unprocessable due to inputs or environment; include details to aid debugging

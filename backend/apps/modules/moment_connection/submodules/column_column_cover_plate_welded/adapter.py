@@ -197,30 +197,54 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    """Generate the CAD model from input values as a BREP file. Return file path."""
+    """Generate the CAD model from input values as a BREP/STL file.
+
+    External API uses section names: "Model", "Column", "CoverPlate".
+    Internally, the legacy CAD logic for column cover plate welded uses
+    component name "Connector" for the cover plate + bolts assembly. Map
+    CoverPlate -> Connector for CAD routing, but keep the external section
+    name for file naming and response keys.
+    """
     if section not in ("Model", "Column", "CoverPlate"):  # Error checking: If section is valid.
         raise InvalidInputTypeError(
             "section", "'Model', 'Column' or 'CoverPlate'")
     module = create_from_input(input_values)  # Create module from input.
+
+    # Ensure correct display keys for CAD routing
+    from osdag_core.Common import KEY_DISP_COLUMNCOVERPLATEWELD
+    if getattr(module, "module", None) != KEY_DISP_COLUMNCOVERPLATEWELD:
+        print(f"[CAD DEBUG] Adjusting module.module from {getattr(module,'module',None)} to {KEY_DISP_COLUMNCOVERPLATEWELD}")
+        module.module = KEY_DISP_COLUMNCOVERPLATEWELD
+    if getattr(module, "mainmodule", None) != "Moment Connection":
+        print(f"[CAD DEBUG] Adjusting module.mainmodule from {getattr(module,'mainmodule',None)} to Moment Connection")
+        module.mainmodule = "Moment Connection"
+
+    print(f"[CAD DEBUG] building CommonDesignLogic with module={module.module}, mainmodule={module.mainmodule}, section={section}")
     # Object that will create the CAD model.
-    try : 
-        cld = CommonDesignLogic(None, '', module.module , module.mainmodule)
+    try:
+        # CommonDesignLogic(display, cad_widget, folder, connection, mainmodule)
+        cld = CommonDesignLogic(None, '', "", module.module , module.mainmodule)
     except Exception as e : 
         print('error in cld e : ' , e)
     
-    try : 
+    try:
         # Setup the calculations object for generating CAD model.
         setup_for_cad(cld, module)
-    except Exception as e : 
+    except Exception as e:
         traceback.print_exc()
         print('Error in setting up cad e : ' , e)
 
     # The section of the module that will be generated.
-    cld.component = section
-    
-    try : 
+    internal_section = section
+    if section == "CoverPlate":
+        internal_section = "Connector"
+
+    cld.component = internal_section
+    print(f"[cadissue] CC cover plate welded: cld.component set to {internal_section} for section={section}")
+
+    try:
         model = cld.create2Dcad()  # Generate CAD Model.
-    except Exception as e :
+    except Exception as e:
         print('Error in cld.create2Dcad() e : ' , e)
         return False
 

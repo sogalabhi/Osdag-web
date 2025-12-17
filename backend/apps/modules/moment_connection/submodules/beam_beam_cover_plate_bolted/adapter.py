@@ -386,10 +386,13 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    """Generate the CAD model from input values as a BREP file. Return file path."""
-    # Accept "Plate" as alias for CoverPlate
-    if section == "Plate":
-        section = "CoverPlate"
+    """Generate the CAD model from input values as a BREP/STL file.
+
+    External API uses section names: "Model", "Beam", "CoverPlate".
+    Internally, the legacy CAD logic for beam cover plate uses component name "Connector"
+    for the cover plate + bolts assembly. Map CoverPlate -> Connector for CAD routing,
+    but keep the external section name for file naming and response keys.
+    """
     if section not in ("Model", "Beam", "CoverPlate"):
         raise InvalidInputTypeError("section", "'Model', 'Beam' or 'CoverPlate'")
 
@@ -408,7 +411,14 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     # Setup module for CAD
     setup_for_cad(cld, module)
 
-    cld.component = section
+    # Map external section names to internal component names expected by CommonDesignLogic
+    internal_section = section
+    if section == "CoverPlate":
+        # Legacy CAD uses component name "Connector" for cover plate + bolts
+        internal_section = "Connector"
+
+    cld.component = internal_section
+    print(f"[cadissue] BB cover plate bolted: cld.component set to {internal_section} for section={section}")
     model = cld.create2Dcad()
 
     # check if the cad_models folder exists or not 

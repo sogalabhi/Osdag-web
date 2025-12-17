@@ -89,6 +89,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
       const partKeys = new Set([
         "Member",
         "Endplate",
+        "EndPlate",
         "Beam",
         "Column",
         "Plate",
@@ -99,7 +100,8 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
         "cleatAngle",
         "SeatedAngle",
         "Connector",
-        "Cover Plate"
+        "Cover Plate",
+        "CoverPlate", 
       ]);
       
       Object.entries(modelPaths).forEach(([key, dataUrl]) => {
@@ -122,6 +124,7 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
               // map to canonical keys used by sections
               Member: '#808080',
               Endplate: '#2f2f23',
+              EndPlate: '#2f2f23',
               Beam: '#868664',
               Column: '#484836',
               Plate: '#2f2f23',
@@ -246,9 +249,11 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
   const partColors = useMemo(() => ({
     Member: '#808080',
     Endplate: '#2f2f23',
+    EndPlate: '#2f2f23',
     Beam: "#868664",
     Column: "#484836",
     Plate: "#2f2f23",
+    CoverPlate: "#2f2f23",
     Weld: "#ff0000",
     Welds: "#ff0000",
     weld_left: "#ff0000",
@@ -297,7 +302,10 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
     [parsedModels, texture]
   );
   const geometryEndplate = useMemo(
-    () => (parsedModels?.Endplate ? getGeometry(parsedModels.Endplate) : null),
+    () => {
+      const mesh = parsedModels?.Endplate || parsedModels?.EndPlate;
+      return mesh ? getGeometry(mesh) : null;
+    },
     [parsedModels, texture]
   );
   const geometrySeatedAngle = useMemo(
@@ -305,7 +313,10 @@ function Model({ modelPaths, selectedView, selectedViews = null, cameraSettings,
     [parsedModels, texture]
   );
   const geometryCoverPlate = useMemo(
-    () => (parsedModels?.["Cover Plate"] ? getGeometry(parsedModels["Cover Plate"]) : null),
+    () => {
+      const mesh = parsedModels?.CoverPlate || parsedModels?.["Cover Plate"];
+      return mesh ? getGeometry(mesh) : null;
+    },
     [parsedModels, texture]
   );
   if (!parsedModels) {

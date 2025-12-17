@@ -67,6 +67,7 @@ export const beamBeamEndPlateConfig = {
       "Bolt.TensionType": inputs.bolt_tension_type,
       "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
       "Connectivity *": inputs.connectivity,
+      "Connectivity": inputs.connectivity,
       EndPlateType: conn_map[extraData?.selectedOption] || "Flushed - Reversible Moment",
       "Connector.Plate.Thickness_List": allSelected.plate_thickness 
         ? lists.thicknessList : inputs.plate_thickness,

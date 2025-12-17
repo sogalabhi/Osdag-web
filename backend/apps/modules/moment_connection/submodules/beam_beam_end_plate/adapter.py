@@ -368,7 +368,8 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         module.mainmodule = "Moment Connection"
 
     print(f"[CAD DEBUG] building CommonDesignLogic with module={module.module}, mainmodule={module.mainmodule}, section={section}")
-    cld = CommonDesignLogic(None, "", module.module, module.mainmodule)
+    # CommonDesignLogic(display, cad_widget, folder, connection, mainmodule)
+    cld = CommonDesignLogic(None, "", "", module.module, module.mainmodule)
     setup_for_cad(cld, module)
 
     cld.component = section

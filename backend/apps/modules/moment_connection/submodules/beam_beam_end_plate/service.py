@@ -18,7 +18,6 @@ class BeamBeamEndPlateService:
         if hasattr(model, "set_osdaglogger"):
             model.set_osdaglogger(None)
         model.set_input_values(inputs)
-        model.hard_values()
         output, logs = generate_output(inputs)
         return {
             'data': output,
