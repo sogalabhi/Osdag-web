@@ -28,6 +28,7 @@ import CustomSectionModal from "../CustomSectionModal";
 // drop down
 import DropdownMenu from "../DropdownMenu";
 import ScreenshotCapture from "../ScreenShotCapture";
+import { apiBase } from "../../api";
 
 const { Option } = Select;
 
@@ -1528,7 +1529,8 @@ function SeatedAngle() {
           }}
         >
           <Viewer
-            fileUrl={`http://localhost:5173/00335c94-1b3f-47f1-959e-6b96475dfd38`}
+            // fileUrl={`http://localhost:5173/00335c94-1b3f-47f1-959e-6b96475dfd38`}
+	    fileUrl={`${apiBase}00335c94-1b3f-47f1-959e-6b96475dfd38`}
           />
         </div>
       ) : (

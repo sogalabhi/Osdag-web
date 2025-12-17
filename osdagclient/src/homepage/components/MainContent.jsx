@@ -4,6 +4,7 @@ import ProjectsListCard from './ProjectsListCard';
 import ModulesListCard from './ModulesListCard';
 import { isGuestUser, getCurrentUserEmail, getAccessToken } from '../../utils/auth';
 import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE, MODULE_KEY_SEAT_ANGLE, MODULE_DISPLAY_SEAT_ANGLE } from '../../constants/DesignKeys';
+import { apiBase } from "../../api";
 
 const MainContent = () => {
   const isGuest = isGuestUser();
@@ -23,7 +24,8 @@ const MainContent = () => {
   const fetchRecentProjects = async () => {
     setLoading(true);
     try {
-      const url = `http://localhost:8000/api/projects/`;
+      // const url = `http://localhost:8000/api/projects/`;
+      const url = `${apiBase}api/projects/`;
       const token = getAccessToken();
       const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
       const data = await response.json();
@@ -41,7 +43,7 @@ const MainContent = () => {
   const handleDeleteProject = async (projectId) => {
     try {
       const token = getAccessToken();
-      await fetch(`http://localhost:8000/api/projects/${projectId}/`, {
+      await fetch(`${apiBase}api/projects/${projectId}/`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       });

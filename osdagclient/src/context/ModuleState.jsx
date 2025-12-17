@@ -5,6 +5,7 @@ import ModuleReducer from "./ModuleReducer";
 import { decode as base64_decode, encode as base64_encode } from "base-64";
 import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../constants/DesignKeys';
 import { createDesign as apiCreateDesign, createDesignReport as apiCreateDesignReport, populateModule } from '../modules/shared/api/moduleApi';
+import { apiBase } from "../api";
 
 /* 
     ######################################################### 
@@ -76,7 +77,8 @@ let initialValue = {
   },
 };
 
-const BASE_URL = "http://127.0.0.1:8000/";
+// const BASE_URL = "http://127.0.0.1:8000/";
+const BASE_URL = `${apiBase}`;
 
 //create context
 export const ModuleContext = createContext(initialValue);
@@ -216,7 +218,7 @@ export const ModuleProvider = ({ children }) => {
           const { grade, inputs, connectivity, type } = data;
           const email = localStorage.getItem("email");
 
-          const response = await fetch(`${BASE_URL}materialDetails/`, {
+          const response = await fetch(`${BASE_URL}api/materialDetails/`, {
             method: "POST",
             mode: "cors",
             credentials: "include",
@@ -301,8 +303,8 @@ export const ModuleProvider = ({ children }) => {
     console.log('[ModuleState] inputData keys:', inputData ? Object.keys(inputData) : 'N/A');
     try {
 
-      console.log('[ModuleState] Making fetch request to:', `${BASE_URL}design/cad`);
-      const response = await fetch(`${BASE_URL}design/cad`, {
+      console.log('[ModuleState] Making fetch request to:', `${BASE_URL}api/design/cad`);
+      const response = await fetch(`${BASE_URL}api/design/cad`, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -382,7 +384,7 @@ export const ModuleProvider = ({ children }) => {
   const downloadCADModel = useCallback(async (format) => {
     try {
 
-      const response = await fetch(`${BASE_URL}design/downloadCad/`, {
+      const response = await fetch(`${BASE_URL}api/design/downloadCad/`, {
         method: "POST",
         mode: "cors",
         credentials: "include",
@@ -424,7 +426,7 @@ export const ModuleProvider = ({ children }) => {
         }
 
         case 'csv': {
-          const response = await fetch(`${BASE_URL}save-csv`, {
+          const response = await fetch(`${BASE_URL}api/save-csv`, {
             method: "GET",
             mode: "cors",
             credentials: "include",
@@ -470,7 +472,7 @@ export const ModuleProvider = ({ children }) => {
       const formData = new FormData();
       formData.append("file", companyLogo, companyLogoName);
 
-      const response = await fetch(`${BASE_URL}company-logo/`, {
+      const response = await fetch(`${BASE_URL}api/company-logo/`, {
         method: "POST",
         mode: "cors",
         credentials: "include",
@@ -503,7 +505,7 @@ export const ModuleProvider = ({ children }) => {
       switch (action) {
         case 'get': {
           const { supported_section, supporting_section, connectivity } = params;
-          let url = `${BASE_URL}design-preferences/?`;
+          let url = `${BASE_URL}api/design-preferences/?`;
 
           if (supported_section) url += `supported_section=${encodeURIComponent(supported_section)}&`;
           if (supporting_section) url += `supporting_section=${encodeURIComponent(supporting_section)}&`;

@@ -1,6 +1,8 @@
 // API/business logic for module operations
 
-export const BASE_URL = "http://127.0.0.1:8000/";
+// export const BASE_URL = "http://127.0.0.1:8000/";
+import { apiBase } from "../../../api";
+export const BASE_URL = `${apiBase}`;
 
 // Single map of all modules -> slugs with parent path prefix
 const MODULE_SLUGS = {
@@ -168,7 +170,7 @@ export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => 
     };
     const cadModuleId = moduleAlias[moduleKey] || moduleKey;
 
-    const cadRes = await fetch(`${BASE_URL}design/cad/`, {
+    const cadRes = await fetch(`${BASE_URL}api/design/cad/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ module_id: cadModuleId, input_values: inputParams }),

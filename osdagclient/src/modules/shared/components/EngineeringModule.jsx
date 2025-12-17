@@ -17,6 +17,7 @@ import DesignPrefSections from "../../../components/DesignPrefSections";
 import Homesvg from "../../../assets/Homesvg.svg";
 import GridSelector from "../utils/GridSelector";
 import { message, Modal as AntdModal } from 'antd';
+import { apiBase } from "../../../api";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -117,12 +118,19 @@ export const EngineeringModule = ({
   const [selectedSection, setSelectedSection] = useState(["Model"]);
   const [selectedCameraView, setSelectedCameraView] = useState("Model");
   const [lockZoom, setLockZoom] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+    document.documentElement.classList.toggle('dark');
+  };
 
   // Hover tooltip state for 3D parts
   const [hoverText, setHoverText] = useState("");
   const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
   // Auth helpers
-  const BASE_URL = 'http://localhost:8000/api/';
+  // const BASE_URL = 'http://localhost:8000/api/';
+  const BASE_URL = `${apiBase}`;
   const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
   const isGuest = () => (localStorage.getItem('userType') === 'guest');
   const location = useLocation();
@@ -147,7 +155,7 @@ export const EngineeringModule = ({
     }
     (async () => {
       try {
-        const res = await fetch(`${BASE_URL}projects/${projectId}/`, {
+        const res = await fetch(`${BASE_URL}api/projects/${projectId}/`, {
           method: 'GET',
           headers: { 'Authorization': `Bearer ${getAccessToken()}` },
         });
@@ -229,7 +237,7 @@ export const EngineeringModule = ({
         const pid = getProjectIdFromUrl();
         if (pid && !Number.isNaN(pid)) {
           try {
-            await fetch(`${BASE_URL}projects/${pid}/`, {
+            await fetch(`${BASE_URL}api/projects/${pid}/`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
@@ -398,7 +406,7 @@ export const EngineeringModule = ({
         message.warning('No active project. Open or create a project first.');
         return;
       }
-      const updateResponse = await fetch(`${BASE_URL}projects/${projectId}/`, {
+      const updateResponse = await fetch(`${BASE_URL}api/projects/${projectId}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -683,6 +691,39 @@ export const EngineeringModule = ({
               )}
             </svg>
           </button>
+          {/* home */}
+          <button
+            onClick={() => navigate('/home')}
+            title="Home"
+            type="button"
+            className="p-2 rounded-md transition-colors "
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
+          </button>
+          {/* theme mode */}
+          <button
+            onClick={toggleTheme}
+            className="p-2 text-black transition-colors dark:text-white"
+          >
+            {isDark ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="currentColor"
+              >
+                <path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21.64 13.64a1 1 0 00-1.05-.24 8 8 0 01-10-10 1 1 0 00-.24-1.05A1 1 0 008.73 2 10 10 0 1022 15.27a1 1 0 00-.36-1.63z" />
+              </svg>
+            )}
+          </button>
+          
         </div>
 
         {/* Initial theme detection, run once per mount */}
@@ -1018,7 +1059,8 @@ export const EngineeringModule = ({
                                   return;
                                 }
                               }
-                            } else {
+                            } 
+                            else {
                               // If a non-Model option is selected
                               if (event.target.checked) {
                                 // Remove Model from selection and add this option
