@@ -266,7 +266,6 @@ export const UserProvider = ({ children }) => {
     try {
       console.log("sending the login request to the server");
       const response = await fetch(`${BASE_URL}api/user/login/`, {
-      // const response = await fetch(`${apiBase}user/login/`, {
         method: "POST",
         mode: "cors",
         headers: {

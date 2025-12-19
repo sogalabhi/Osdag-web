@@ -53,7 +53,6 @@ def get_required_keys() -> List[str]:
         "Bolt.TensionType",
         "Bolt.Type",
         "Connectivity",
-        "EndPlateType",
         "Connector.Material",
         "Design.Design_Method",
         "Detailing.Corrosive_Influences",
@@ -125,9 +124,6 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     if not isinstance(input_values["Connectivity"], str):
         raise InvalidInputTypeError("Connectivity", "str")
 
-    # Validate EndPlateType
-    if not isinstance(input_values["EndPlateType"], str):
-        raise InvalidInputTypeError("EndPlateType", "str")
 
     # Validate Connector.Material
     if not isinstance(input_values["Connector.Material"], str):
@@ -271,16 +267,13 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     logger.info("Generating output for Column-to-Column End Plate")
     output = {}
     logs = []  # Initialize logs
-    
+
     try:
         module = create_from_input(input_values)
-
-        # Get raw output data
         raw_output_text = module.output_values(True)
-        detailing = module.detailing(True)
-        weld_details = module.weld_details(True)
-        bolt_details = module.bolt_details(True)
-        
+        raw_output_flange = module.flange_bolt_spacing(True)
+        raw_output_web = module.web_bolt_spacing(True)
+
         if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
             logs = module.logger.get_logs() or []
             print(f'Retrieved {len(logs)} logs from custom logger')
@@ -291,7 +284,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
         raw_output = (
             raw_output_text +
-            detailing + weld_details + bolt_details
+            raw_output_flange + raw_output_web
         )
 
         # Format output

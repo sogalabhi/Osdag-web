@@ -35,6 +35,7 @@ def setup_for_cad(cdl: CommonDesignLogic, module_class):
     if module_object.module in (
         "Column-to-Column-End-Plate-Connection",
         "Column-to-Column End Plate Connection",
+        KEY_DISP_COLUMNENDPLATE,
     ):
         cdl.CEP = module_object
         cdl.CEPObj = cdl.createCCEndPlateCAD()

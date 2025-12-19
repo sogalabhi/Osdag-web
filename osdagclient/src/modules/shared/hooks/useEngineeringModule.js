@@ -676,7 +676,7 @@ export const useEngineeringModule = (moduleConfig) => {
         if (navigationSource === "home") {
           navigate("/home");
         } else if (navigationSource === "back") {
-          navigate("/design-type/connections");
+          navigate(-1);
         }
 
         setAllowNavigation(false);

@@ -77,3 +77,6 @@ backend/file_storage/cad_models/*.stl
 backend/file_storage/cad_models/*.stp
 backend/file_storage/cad_models/*.glb
 backend/file_storage/cad_models/*.parts.json
+backend/file_storage/cad_models/*.aux
+
+backend/firebase-service-account.json
