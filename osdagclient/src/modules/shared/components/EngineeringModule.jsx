@@ -119,6 +119,24 @@ export const EngineeringModule = ({
   const [selectedCameraView, setSelectedCameraView] = useState("Model");
   const [lockZoom, setLockZoom] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [isLandscape, setIsLandscape] = useState(false);
+
+  // Detect landscape orientation for mobile
+  useEffect(() => {
+    const checkOrientation = () => {
+      // Landscape: width > height and on mobile/tablet
+      setIsLandscape(window.innerWidth > window.innerHeight && window.innerWidth < 768);
+    };
+    
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -185,11 +203,22 @@ export const EngineeringModule = ({
     if (!loading && !isRedesigning && output && renderBoolean) {
       setIsDesignComplete(true);
       setShowOptionsContainer(true); // Show options container after design is complete
-      // Auto-switch to output dock only after design is complete
-      setShowInputDock(false);
-      setShowOutputDock(true);
-      setShowLogs(true);
-      setIsInputLocked(true);
+      
+      // Mobile/Tablet: Close input dock, show CAD and logs
+      if (window.innerWidth < 768) {
+        setShowInputDock(false);
+        setShowOutputDock(false);
+        setShowLogs(true);
+        
+        // Show toast to open output dock
+        message.info('Design complete! Open Output Dock to view results.', 5);
+      } else {
+        // Desktop: Keep current behavior
+        setShowInputDock(false);
+        setShowOutputDock(true);
+        setShowLogs(true);
+        setIsInputLocked(true);
+      }
     } else if (isRedesigning || loading) {
       setIsDesignComplete(false);
       setShowOptionsContainer(false);
@@ -264,11 +293,32 @@ export const EngineeringModule = ({
 
   // Toggle functions for SVG clicks
   const toggleInputDock = () => {
+    // On mobile/tablet, close output dock if open
+    if (window.innerWidth < 768) {
+      if (showOutputDock) {
+        setShowOutputDock(false);
+      }
+    }
+    // Close logs when dock opens
+    if (showLogs) {
+      setShowLogs(false);
+    }
     setShowInputDock((prev) => !prev);
   };
 
   const toggleOutputDock = () => {
     if (!isDesignComplete) return;
+    
+    // On mobile/tablet, close input dock if open
+    if (window.innerWidth < 768) {
+      if (showInputDock) {
+        setShowInputDock(false);
+      }
+    }
+    // Close logs when dock opens
+    if (showLogs) {
+      setShowLogs(false);
+    }
     setShowOutputDock((prev) => !prev);
   };
 
@@ -305,7 +355,16 @@ export const EngineeringModule = ({
   };
 
   const toggleLogs = () => {
-    setShowLogs(!showLogs);
+    // On mobile/tablet, if any dock is open, close it first
+    if (window.innerWidth < 768) {
+      if (showInputDock) {
+        setShowInputDock(false);
+      }
+      if (showOutputDock) {
+        setShowOutputDock(false);
+      }
+    }
+    setShowLogs((prev) => !prev);
   };
 
   const handleResetEnhanced = async () => {
@@ -580,7 +639,7 @@ export const EngineeringModule = ({
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       {/* Navigation */}
-      <div className="flex flex-row bg-[#d2d4d2] pl-4 gap-4 w-full text-sm  flex-shrink-0">
+      <div className="sticky top-0 z-[60] h-[15%] min-h-[48px] max-h-[80px] flex flex-row flex-wrap justify-center items-center bg-[#d2d4d2] gap-x-4 w-full text-sm flex-shrink-0">
         {menuItems.map((item, index) => (
           <UnifiedDropdownMenu
             key={index}
@@ -606,12 +665,12 @@ export const EngineeringModule = ({
           </span>
         )}
 
-        <div className="flex items-center gap-2 ml-auto pr-4 text-black dark:text-white">
+        <div className="flex flex-row flex-wrap justify-center items-center gap-2 text-black dark:text-white">
 
           {/* Input Dock Button */}
           <button
             onClick={toggleInputDock}
-            className={`group p-2 rounded-md transition-colors ${showInputDock
+            className={`group p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${showInputDock
               ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
               : 'hover:bg-black/10 dark:hover:bg-black/40'
               }`}
@@ -634,7 +693,7 @@ export const EngineeringModule = ({
           {/* Logs Button */}
           <button
             onClick={toggleLogs}
-            className={`p-2 rounded-md transition-colors ${showLogs
+            className={`p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${showLogs
               ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
               : 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40'
               }`}
@@ -675,8 +734,8 @@ export const EngineeringModule = ({
             disabled={!isDesignComplete}
             title={isDesignComplete ? `${showOutputDock ? 'Hide' : 'Show'} output dock` : 'Run a design to view outputs'}
             type="button"
-            className={`p-2 rounded-md transition-colors ${isDesignComplete
-                ? ""
+            className={`p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${isDesignComplete
+                ? (showOutputDock ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 dark:hover:bg-black/40')
                 : "opacity-40 cursor-not-allowed"
               }`}
           >
@@ -696,7 +755,7 @@ export const EngineeringModule = ({
             onClick={() => navigate('/home')}
             title="Home"
             type="button"
-            className="p-2 rounded-md transition-colors "
+            className="p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
@@ -705,7 +764,7 @@ export const EngineeringModule = ({
           {/* theme mode */}
           <button
             onClick={toggleTheme}
-            className="p-2 text-black transition-colors dark:text-white"
+            className="p-2 md:p-2 min-w-[44px] min-h-[44px] text-black transition-colors dark:text-white"
           >
             {isDark ? (
               <svg
@@ -737,15 +796,12 @@ export const EngineeringModule = ({
         }, [])}
       </div>
 
-      <div
-        className={`superMainBody relative ${!showInputDock ? "no-input-dock" : ""} ${!showOutputDock ? "no-output-dock" : ""
-          }`}
-      >
-        {/* Input Dock Toggle Button - Fixed to left, shows when dock is closed */}
+      <div className="relative flex flex-row h-full w-full">
+        {/* Input Dock Toggle Button - Fixed to left, shows when dock is closed (Desktop only) */}
         {!showInputDock && (
           <button
             onClick={toggleInputDock}
-            className="absolute left-0 top-0 h-full w-8 bg-white dark:bg-osdag-dark-color border-r border-gray-300 dark:border-osdag-border flex items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
+            className="hidden md:flex absolute left-0 top-0 h-full w-8 bg-white dark:bg-osdag-dark-color border-r border-gray-300 dark:border-osdag-border items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
             title="Open Input Dock"
             type="button"
           >
@@ -755,11 +811,11 @@ export const EngineeringModule = ({
           </button>
         )}
 
-        {/* Output Dock Toggle Button - Fixed to right, shows when dock is closed and design is complete */}
+        {/* Output Dock Toggle Button - Fixed to right, shows when dock is closed and design is complete (Desktop only) */}
         {!showOutputDock && isDesignComplete && (
           <button
             onClick={toggleOutputDock}
-            className="absolute right-0 top-0 h-full w-8 bg-white dark:bg-osdag-dark-color border-l border-gray-300 dark:border-gray-700 flex items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
+            className="hidden md:flex absolute right-0 top-0 h-full w-8 bg-white dark:bg-osdag-dark-color border-l border-gray-300 dark:border-gray-700 items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
             title="Open Output Dock"
             type="button"
           >
@@ -769,24 +825,16 @@ export const EngineeringModule = ({
           </button>
         )}
 
-        {/* Input Dock Close Button - Right side, outside dock, pointing left */}
-        {showInputDock && (
-          <button
-            onClick={toggleInputDock}
-            className="absolute left-[400px] top-1/2 -translate-y-1/2 w-[30px] h-[30px] bg-white dark:bg-osdag-dark-color border border-gray-300 dark:border-gray-700 rounded flex items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
-            title="Close Input Dock"
-            type="button"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-gray-600 dark:text-gray-300" fill="currentColor">
-              <path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6 1.41 1.41z" />
-            </svg>
-          </button>
-        )}
-
         {/* Left - Input Dock - Only show if showInputDock is true */}
         {showInputDock && (
-          <div className="w-[400px] bg-white dark:bg-osdag-dark-color">
-            <div className="flex items-center justify-between inputRow">
+          <div className={`
+            ${showInputDock ? 'flex' : 'hidden'}
+            fixed md:relative left-0 right-0 md:left-auto md:right-auto md:top-auto bottom-0 md:bottom-auto z-50 md:z-auto
+            w-full md:w-[400px]
+            bg-white dark:bg-osdag-dark-color
+            flex-col
+          `}>
+            <div className="sticky top-0 z-10 bg-white dark:bg-osdag-dark-color border-b border-gray-200 dark:border-gray-700 flex items-center justify-between inputRow">
               <span className="flex justify-center items-center w-32 my-2 ml-4 py-1 px-1 text-sm text-center rounded-xl font-medium bg-osdag-green text-white flex-shrink-0">Input Dock</span>
               <div className="flex items-center gap-2 mr-4">
                 <button
@@ -802,7 +850,7 @@ export const EngineeringModule = ({
                 <button
                   ref={lockBtnRef}
                   onClick={handleLockToggle}
-                  className={`my-2 p-2 rounded-lg transition-all duration-200 transition-colors ${lockZoom ? "scale-110" : "scale-100"} ${isInputLocked ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'}`}
+                  className={`my-2 p-2 rounded-lg transition-all duration-200 ${lockZoom ? "scale-110" : "scale-100"} ${isInputLocked ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'}`}
                   title={isInputLocked ? 'Unlock input dock' : 'Lock input dock'}
                   type="button"
                 >
@@ -885,7 +933,7 @@ export const EngineeringModule = ({
               ))}
               </div>
             </div> */}
-            <div className="relative subMainBody scroll-data dark:bg-osdag-dark-color bg-white">
+            <div className="flex-1 overflow-y-auto subMainBody scroll-data dark:bg-osdag-dark-color bg-white">
 
               {/* 🔒 Overlay when input dock is locked */}
               {/* {isInputLocked && (
@@ -972,7 +1020,7 @@ export const EngineeringModule = ({
 
             </div>
 
-            <div className="flex items-center justify-between w-full gap-x-4 px-4">
+            <div className="sticky bottom-0 z-10 bg-white dark:bg-osdag-dark-color border-t border-gray-200 dark:border-gray-700 flex items-center justify-between w-full gap-x-4 px-4 py-2">
               {/* Save Inputs Button */}
               <button
                 onClick={handleSaveInputs}
@@ -997,14 +1045,11 @@ export const EngineeringModule = ({
         )}
 
         {/* Middle - 3D Model */}
-        <div
-          className={`superMainBody_mid ${showOptionsContainer ? "has-options" : ""
-            }`}
-        >
-          {/* Options Container - Only show after design is complete */}
-          {showOptionsContainer && (
-            <div className="options-container">
-              <div className="view-options">
+        <div className="flex-1 flex flex-col relative min-w-0">
+          {/* Options Container - Only show after design is complete and docks are closed */}
+          {showOptionsContainer && !showInputDock && !showOutputDock && (
+            <div className="flex flex-wrap justify-center items-center gap-2 p-2 bg-white/90 dark:bg-osdag-dark-color/90 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="flex flex-wrap justify-center items-center gap-2">
                 {/* {options.map((option) => (
                   <div
                     key={option}
@@ -1098,7 +1143,15 @@ export const EngineeringModule = ({
             </div>
           )}
 
-          <div className={`model-container ${!showLogs ? "full-height" : ""}`}>
+          <div className={`
+            model-container
+            ${showInputDock || showOutputDock ? 'hidden md:block' : ''}
+            ${showLogs 
+              ? (isLandscape ? 'hidden' : 'h-[70%] md:h-[60%]')
+              : 'h-full md:h-full'
+            }
+            ${!showLogs ? 'full-height' : ''}
+          `}>
             {loading || isRedesigning ? (
               <div className="modelLoading">
                 <p>{isRedesigning ? "Updating Model..." : "Loading Model..."}</p>
@@ -1120,8 +1173,10 @@ export const EngineeringModule = ({
                   />
                 </div> */}
 
-                {/* Grid selector - right side */}
-                <GridSelector onViewChange={handleOrthographicViewChange} />
+                {/* Grid selector - right side - Hide when docks are open on mobile */}
+                {(!showInputDock && !showOutputDock) && (
+                  <GridSelector onViewChange={handleOrthographicViewChange} />
+                )}
 
                 <Canvas
                   gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
@@ -1146,6 +1201,7 @@ export const EngineeringModule = ({
                       modelPaths={cadModelPaths}
                       selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
                       selectedViews={selectedSection}
+                      isMobile={window.innerWidth < 768}
                       cameraSettings={{
                         ...cameraSettings,
                         connectivity: getConnectivity(), // Add connectivity info
@@ -1168,33 +1224,31 @@ export const EngineeringModule = ({
             )}
           </div>
 
-          {showLogs && (
-            <div className={`logs-container ${!showInputDock ? 'pl-[30px]' : ''} ${!showOutputDock && isDesignComplete ? 'pr-[30px]' : ''} `}>
+          {showLogs && !showInputDock && !showOutputDock && (
+            <div className={`
+              logs-container
+              ${isLandscape ? 'h-full' : 'h-[40%] md:h-[40%]'}
+              ${!showInputDock ? 'md:pl-0' : 'md:pl-[30px]'}
+              ${!showOutputDock && isDesignComplete ? 'md:pr-0' : 'md:pr-[30px]'}
+            `}>
               <Logs logs={logs} />
             </div>
           )}
         </div>
 
-        {/* Output Dock Close Button - Left side, outside dock, pointing right */}
-        {showOutputDock && isDesignComplete && (
-          <button
-            onClick={toggleOutputDock}
-            className="absolute right-[25%] top-1/2 -translate-y-1/2 w-[30px] h-[30px] bg-white dark:bg-osdag-dark-color border border-gray-300 dark:border-gray-700 rounded flex items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
-            title="Close Output Dock"
-            type="button"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-gray-600 dark:text-gray-300" fill="currentColor">
-              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
-            </svg>
-          </button>
-        )}
-
         {/* Right - Output Dock - Only show if showOutputDock is true and design is complete */}
         {showOutputDock && isDesignComplete && (
-          <div className="superMain_right">
-            <div className="OutputDock">
-              <OutputDockComponent output={output} extraState={{ ...extraState, cadModelPaths, renderCadModel: renderBoolean }} />
-              <div className="flex items-center w-full gap-x-4 px-5 mt-2">
+          <div className={`
+            ${showOutputDock && isDesignComplete ? 'flex' : 'hidden'}
+            fixed md:relative left-0 right-0 md:left-auto md:right-auto top-24 md:top-auto bottom-0 md:bottom-auto z-50 md:z-auto
+            w-full md:w-[400px]
+            flex-col
+          `}>
+            <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-osdag-dark-color">
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                <OutputDockComponent output={output} extraState={{ ...extraState, cadModelPaths, renderCadModel: renderBoolean }} />
+              </div>
+              <div className="sticky bottom-0 z-10 bg-white dark:bg-osdag-dark-color border-t border-gray-200 dark:border-gray-700 flex items-center w-full gap-x-4 px-5 py-2">
                 <button
                   onClick={handleCreateDesignReport}
                   className="flex flex-1 items-center justify-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-3 rounded-lg shadow-md duration-200 hover:bg-osdag-dark-green"
@@ -1266,9 +1320,9 @@ export const EngineeringModule = ({
                 : setConfirmationModal(true)        // Ask confirmation
             }
             footer={null}
-            minWidth={1200}
-            width={1400}
-            maxHeight={1200}
+            minWidth={window.innerWidth < 768 ? undefined : 1200}
+            width={window.innerWidth < 768 ? '100%' : 1400}
+            maxHeight={window.innerWidth < 768 ? '100%' : 1200}
             maskClosable={false}
             className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
           >
@@ -1314,7 +1368,7 @@ export const EngineeringModule = ({
               : "Yes, Leave Page"}
           </Button>,
         ]}
-        width={500}
+        width={window.innerWidth < 768 ? '90%' : 500}
         className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
       >
         <div>
@@ -1337,7 +1391,7 @@ export const EngineeringModule = ({
         closable={false}
         maskClosable={false}
         centered
-        width={420}
+        width={window.innerWidth < 768 ? '90%' : 420}
         className="loading-modal"
         styles={{
           body: {

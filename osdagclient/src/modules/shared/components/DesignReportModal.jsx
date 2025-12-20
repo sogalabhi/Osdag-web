@@ -114,14 +114,14 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
     setLoading(true);
     try {
       // Transform input values using the same logic as design calculation
-      const transformedInputValues = moduleConfig?.buildSubmissionParams ? 
+      const transformedInputValues = moduleConfig?.buildSubmissionParams ?
         moduleConfig.buildSubmissionParams(inputValues, allSelected, {
           boltDiameterList,
           propertyClassList,
           thicknessList,
           angleList,
         }, extraState) : inputValues;
-      
+
       // Prepare request data
       const requestData = {
         metadata: {
@@ -281,190 +281,199 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
       open={isOpen}
       onCancel={onCancel}
       footer={null}
-      className="designModal [&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
+      className={`designModal [&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4 ${
+        window.innerWidth < 768 
+          ? '[&_.ant-modal]:!w-screen [&_.ant-modal]:!h-screen [&_.ant-modal]:!top-0 [&_.ant-modal]:!max-w-full [&_.ant-modal]:!m-0 [&_.ant-modal]:!left-0 [&_.ant-modal-body]:!p-4 [&_.ant-modal-body]:!h-[calc(100vh-55px)] [&_.ant-modal-body]:!overflow-y-auto' 
+          : ''
+      }`}
       title="Design Report Summary"
-        width={600}
+      width={window.innerWidth < 768 ? '100vw' : 1400}
+      style={window.innerWidth < 768 ? { 
+        maxWidth: '100vw',
+        top: 0,
+        paddingBottom: 0
+      } : {}}
     >
       <div className="design-report-form">
-        {/* Company Name */}
-        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
-          <Col span={6}>
-            <label>Company Name:</label>
-          </Col>
-          <Col span={18}>
-            <Input
-              value={designReportInputs.companyName}
-              onChange={(e) => handleFieldChange('companyName', e.target.value)}
-              placeholder="Enter company name"
-            />
-          </Col>
-        </Row>
+          {/* Company Name */}
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
+            <Col span={6}>
+              <label>Company Name:</label>
+            </Col>
+            <Col span={18}>
+              <Input
+                value={designReportInputs.companyName}
+                onChange={(e) => handleFieldChange('companyName', e.target.value)}
+                placeholder="Enter company name"
+              />
+            </Col>
+          </Row>
 
-        {/* Company Logo */}
-        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
-          <Col span={6}>
-            <label>Company Logo:</label>
-          </Col>
-          <Col span={18}>
-            <input
-              type="file"
-              accept="image/png, image/jpeg, image/jpg"
-              onChange={handleFileChange}
-            />
-            {designReportInputs.companyLogoName && (
-              <div style={{ marginTop: "5px", fontSize: "12px", color: "#666" }}>
-                Selected: {designReportInputs.companyLogoName}
-              </div>
-            )}
-          </Col>
-        </Row>
+          {/* Company Logo */}
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
+            <Col span={6}>
+              <label>Company Logo:</label>
+            </Col>
+            <Col span={18}>
+              <input
+                type="file"
+                accept="image/png, image/jpeg, image/jpg"
+                onChange={handleFileChange}
+              />
+              {designReportInputs.companyLogoName && (
+                <div style={{ marginTop: "5px", fontSize: "12px", color: "#666" }}>
+                  Selected: {designReportInputs.companyLogoName}
+                </div>
+              )}
+            </Col>
+          </Row>
 
-        {/* Group/Team Name */}
-        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
-          <Col span={6}>
-            <label>Group/Team Name:</label>
-          </Col>
-          <Col span={18}>
-            <Input
-              value={designReportInputs.groupTeamName}
-              onChange={(e) => handleFieldChange('groupTeamName', e.target.value)}
-              placeholder="Enter team name"
-            />
-          </Col>
-        </Row>
+          {/* Group/Team Name */}
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
+            <Col span={6}>
+              <label>Group/Team Name:</label>
+            </Col>
+            <Col span={18}>
+              <Input
+                value={designReportInputs.groupTeamName}
+                onChange={(e) => handleFieldChange('groupTeamName', e.target.value)}
+                placeholder="Enter team name"
+              />
+            </Col>
+          </Row>
 
-        {/* Designer */}
-        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
-          <Col span={6}>
-            <label>Designer:</label>
-          </Col>
-          <Col span={18}>
-            <Input
-              value={designReportInputs.designer}
-              onChange={(e) => handleFieldChange('designer', e.target.value)}
-              placeholder="Enter designer name"
-            />
-          </Col>
-        </Row>
+          {/* Designer */}
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
+            <Col span={6}>
+              <label>Designer:</label>
+            </Col>
+            <Col span={18}>
+              <Input
+                value={designReportInputs.designer}
+                onChange={(e) => handleFieldChange('designer', e.target.value)}
+                placeholder="Enter designer name"
+              />
+            </Col>
+          </Row>
 
-        {/* Profile Management */}
-        <div
-          style={{
-            marginBottom: "20px",
-            display: "flex",
-            justifyContent: "center",
-            gap: "10px",
-          }}
-        >
-          <Upload
-            beforeUpload={handleProfileFileChange}
-            showUploadList={false}
+          {/* Profile Management */}
+          <div
+            style={{
+              marginBottom: "20px",
+              display: "flex",
+              justifyContent: "center",
+              gap: "10px",
+            }}
           >
-            <Button>Select Profile File</Button>
-          </Upload>
-          <Button type="button" onClick={handleUseProfile}>
-            Use Profile
-          </Button>
-          <Button type="button" onClick={handleSaveProfile}>
-            Save Profile
-          </Button>
-        </div>
+            <Upload
+              beforeUpload={handleProfileFileChange}
+              showUploadList={false}
+            >
+              <Button>Select Profile File</Button>
+            </Upload>
+            <Button type="button" onClick={handleUseProfile}>
+              Use Profile
+            </Button>
+            <Button type="button" onClick={handleSaveProfile}>
+              Save Profile
+            </Button>
+          </div>
 
-        {/* Project Title */}
-        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
-          <Col span={6}>
-            <label>Project Title:</label>
-          </Col>
-          <Col span={18}>
-            <Input
-              value={designReportInputs.projectTitle}
-              onChange={(e) => handleFieldChange('projectTitle', e.target.value)}
-              placeholder="Enter project title"
-            />
-          </Col>
-        </Row>
+          {/* Project Title */}
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
+            <Col span={6}>
+              <label>Project Title:</label>
+            </Col>
+            <Col span={18}>
+              <Input
+                value={designReportInputs.projectTitle}
+                onChange={(e) => handleFieldChange('projectTitle', e.target.value)}
+                placeholder="Enter project title"
+              />
+            </Col>
+          </Row>
 
-        {/* Subtitle */}
-        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
-          <Col span={6}>
-            <label>Subtitle:</label>
-          </Col>
-          <Col span={18}>
-            <Input
-              value={designReportInputs.subtitle}
-              onChange={(e) => handleFieldChange('subtitle', e.target.value)}
-              placeholder="Enter subtitle"
-            />
-          </Col>
-        </Row>
+          {/* Subtitle */}
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
+            <Col span={6}>
+              <label>Subtitle:</label>
+            </Col>
+            <Col span={18}>
+              <Input
+                value={designReportInputs.subtitle}
+                onChange={(e) => handleFieldChange('subtitle', e.target.value)}
+                placeholder="Enter subtitle"
+              />
+            </Col>
+          </Row>
 
-        {/* Job Number */}
-        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
-          <Col span={6}>
-            <label>Job Number:</label>
-          </Col>
-          <Col span={18}>
-            <Input
-              value={designReportInputs.jobNumber}
-              onChange={(e) => handleFieldChange('jobNumber', e.target.value)}
-              placeholder="Enter job number"
-            />
-          </Col>
-        </Row>
+          {/* Job Number */}
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
+            <Col span={6}>
+              <label>Job Number:</label>
+            </Col>
+            <Col span={18}>
+              <Input
+                value={designReportInputs.jobNumber}
+                onChange={(e) => handleFieldChange('jobNumber', e.target.value)}
+                placeholder="Enter job number"
+              />
+            </Col>
+          </Row>
 
-        {/* Client */}
-        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
-          <Col span={6}>
-            <label>Client:</label>
-          </Col>
-          <Col span={18}>
-            <Input
-              value={designReportInputs.client}
-              onChange={(e) => handleFieldChange('client', e.target.value)}
-              placeholder="Enter client name"
-            />
-          </Col>
-        </Row>
+          {/* Client */}
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
+            <Col span={6}>
+              <label>Client:</label>
+            </Col>
+            <Col span={18}>
+              <Input
+                value={designReportInputs.client}
+                onChange={(e) => handleFieldChange('client', e.target.value)}
+                placeholder="Enter client name"
+              />
+            </Col>
+          </Row>
 
-        {/* Additional Comments */}
-        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
-          <Col span={6}>
-            <label>Additional Comments:</label>
-          </Col>
-          <Col span={18}>
-            <Input.TextArea
-              value={designReportInputs.additionalComments}
-              onChange={(e) => handleFieldChange('additionalComments', e.target.value)}
-              rows={4}
-              placeholder="Enter additional comments"
-              showCount
-              maxLength={500}
-            />
-          </Col>
-        </Row>
+          {/* Additional Comments */}
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: "5px" }}>
+            <Col span={6}>
+              <label>Additional Comments:</label>
+            </Col>
+            <Col span={18}>
+              <Input.TextArea
+                value={designReportInputs.additionalComments}
+                onChange={(e) => handleFieldChange('additionalComments', e.target.value)}
+                rows={4}
+                placeholder="Enter additional comments"
+                showCount
+                maxLength={500}
+              />
+            </Col>
+          </Row>
 
-        {/* Action Buttons */}
-        <div style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "10px",
-          marginTop: "20px",
-          paddingTop: "15px",
-          borderTop: "1px solid #f0f0f0"
-        }}>
-          <Button type="default" onClick={onCancel}>
-            Cancel
-          </Button>
+          {/* Action Buttons */}
+          <div style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "10px",
+            marginTop: "20px",
+            paddingTop: "15px",
+            borderTop: "1px solid #f0f0f0"
+          }}>
+            <Button type="default" onClick={onCancel}>
+              Cancel
+            </Button>
             <Button
               type="primary"
               onClick={handleGenerateInitialReport}
               loading={loading}
             >
               {loading ? "Generating..." : "Generate Report"}
-          </Button>
+            </Button>
+          </div>
         </div>
-      </div>
-    </Modal>
+      </Modal>
 
       {/* Report Customization Modal */}
       <ReportCustomizationModal
