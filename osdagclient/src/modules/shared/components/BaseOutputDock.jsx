@@ -324,16 +324,20 @@ export const BaseOutputDock = ({
   };
   return (
     <>
-      <p>{title}</p>
-      <div className="subMainBody scroll-data">
-        {Object.entries(outputConfig.sections).map(([sectionName, fields]) => (
-          <div key={sectionName} className='cards'>
-            <h3 className='text-black dark:text-white'>{sectionName}</h3>
-            <div className="component-grid">
-              {fields.map((field, index) => renderField(field, index))}
+      <div className="flex flex-col h-full min-h-0">
+        <div className="p-2">
+          <p className="p-2 inline-block bg-osdag-green text-white rounded">{title}</p>
+        </div>
+        <div className="flex-1 overflow-y-auto subMainBody scroll-data min-h-0">
+          {Object.entries(outputConfig.sections).map(([sectionName, fields]) => (
+            <div key={sectionName} className='cards'>
+              <h3 className='text-black dark:text-white'>{sectionName}</h3>
+              <div className="component-grid">
+                {fields.map((field, index) => renderField(field, index))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Dynamic Modal Rendering */}
