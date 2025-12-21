@@ -639,33 +639,35 @@ export const EngineeringModule = ({
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       {/* Navigation */}
-      <div className="sticky top-0 z-[60] h-[15%] min-h-[48px] max-h-[80px] flex flex-row flex-wrap justify-center items-center bg-[#d2d4d2] gap-x-4 w-full text-sm flex-shrink-0">
-        {menuItems.map((item, index) => (
-          <UnifiedDropdownMenu
-            key={index}
-            label={item.label}
-            dropdown={item.dropdown}
-            setDesignPrefModalStatus={setDesignPrefModalStatus}
-            inputs={inputs}
-            setInputs={setInputs}
-            allSelected={allSelected}
-            logs={logs}
-            setCreateDesignReportBool={setCreateDesignReportBool}
-            triggerScreenshotCapture={triggerScreenshotCapture}
-            selectedOption={extraState.selectedOption}
-            setSelectedOption={(value) =>
-              setExtraState({ ...extraState, selectedOption: value })
-            }
-          />
-        ))}
+      <div className="sticky top-0 z-[60] md:h-[15%] min-h-[48px] max-h-[80px] flex flex-row flex-wrap justify-center md:justify-between items-center bg-[#d2d4d2] gap-x-4 w-full text-sm flex-shrink-0 pl-4">
+        <div className="flex flex-row flex-wrap justify-center md:justify-start items-center gap-x-4">
+          {menuItems.map((item, index) => (
+            <UnifiedDropdownMenu
+              key={index}
+              label={item.label}
+              dropdown={item.dropdown}
+              setDesignPrefModalStatus={setDesignPrefModalStatus}
+              inputs={inputs}
+              setInputs={setInputs}
+              allSelected={allSelected}
+              logs={logs}
+              setCreateDesignReportBool={setCreateDesignReportBool}
+              triggerScreenshotCapture={triggerScreenshotCapture}
+              selectedOption={extraState.selectedOption}
+              setSelectedOption={(value) =>
+                setExtraState({ ...extraState, selectedOption: value })
+              }
+            />
+          ))}
 
-        {displaySaveInputPopup && (
-          <span id="save-input-style" style={{ marginTop: "18px" }}>
-            <strong>Saved input file as "{saveInputFileName}"</strong>
-          </span>
-        )}
+          {displaySaveInputPopup && (
+            <span id="save-input-style" style={{ marginTop: "18px" }}>
+              <strong>Saved input file as "{saveInputFileName}"</strong>
+            </span>
+          )}
+        </div>
 
-        <div className="flex flex-row flex-wrap justify-center items-center gap-2 text-black dark:text-white">
+        <div className="flex flex-row flex-wrap justify-center items-center gap-2 text-black dark:text-white pr-4">
 
           {/* Input Dock Button */}
           <button
