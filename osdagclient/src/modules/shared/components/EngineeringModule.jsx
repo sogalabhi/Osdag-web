@@ -876,24 +876,6 @@ export const EngineeringModule = ({
           {showOptionsContainer && output && (window.innerWidth >= 768 || (!showInputDock && !showOutputDock)) && (
             <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 flex flex-wrap justify-center items-center gap-2 p-2 bg-white/90 dark:bg-osdag-dark-color/90 rounded-lg border border-gray-200 dark:border-gray-700 shadow-md">
               <div className="flex flex-wrap justify-center items-center gap-2">
-                {/* {options.map((option) => (
-                  <div
-                    key={option}
-                    className="option-wrapper"
-                    onClick={() => {
-                      setSelectedView(option);
-                      setOrthographicView(null);
-                    }}
-                  >
-                    <div
-                      className={`option-box ${selectedView === option && !orthographicView
-                        ? "selected"
-                        : ""
-                        }`}
-                    ></div>
-                    <span className="option-label dark:text-white">{option}</span>
-                  </div>
-                ))} */}
                 {options.map((option) => {
                   const isChecked = selectedSection.includes(option);
                   const isModel = option === "Model";
@@ -1069,35 +1051,16 @@ export const EngineeringModule = ({
             fixed md:relative left-0 right-0 md:left-auto md:right-auto top-24 md:top-auto bottom-0 md:bottom-auto z-50 md:z-auto
             w-full md:w-[400px]
             flex-col
+            bg-white dark:bg-osdag-dark-color
           `}>
-            <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-osdag-dark-color">
-              <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-                <BaseOutputDock
-                  output={output}
-                  outputConfig={outputConfig}
-                  title={title || UI_STRINGS.OUTPUT_DOCK}
-                  extraState={{ ...extraState, cadModelPaths, renderCadModel: renderBoolean }}
-                />
-              </div>
-              <div className="sticky bottom-0 z-10 bg-white dark:bg-osdag-dark-color border-t border-gray-200 dark:border-gray-700 flex items-center w-full gap-x-4 px-5 py-2">
-                <button
-                  onClick={handleCreateDesignReport}
-                  className="flex flex-1 items-center justify-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-3 rounded-lg shadow-md duration-200 hover:bg-osdag-dark-green"
-                  type="button"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm200-190q13 0 21.5-8.5T510-820q0-13-8.5-21.5T480-850q-13 0-21.5 8.5T450-820q0 13 8.5 21.5T480-790ZM200-200v-560 560Z" /></svg>
-                  Generate Report
-                </button>
-                <button
-                  onClick={saveOutput}
-                  className="flex flex-1 items-center justify-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-3 rounded-lg shadow-md duration-200 hover:bg-osdag-dark-green"
-                  type="button"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z" /></svg>
-                  Save Output
-                </button>
-              </div>
-            </div>
+            <BaseOutputDock
+              output={output}
+              outputConfig={outputConfig}
+              title={title || UI_STRINGS.OUTPUT_DOCK}
+              extraState={{ ...extraState, cadModelPaths, renderCadModel: renderBoolean }}
+              handleCreateDesignReport={handleCreateDesignReport}
+              saveOutput={saveOutput}
+            />
           </div>
         )}
       </div>
