@@ -1,16 +1,14 @@
 import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
-import { menuItems } from '../../shared/utils/moduleUtils';
-import lapJointWeldedOutputDock from './components/LapJointWeldedOutputDock';
 import { lapJointWeldedConfig } from './config/lapJointWeldedConfig';
+import { lapJointWeldedOutputConfig } from './config/lapJointWeldedOutputConfig';
 
 
 function LapJointWelded() {
     return (
         <EngineeringModule
             moduleConfig={lapJointWeldedConfig}
-            OutputDockComponent={lapJointWeldedOutputDock}
-            menuItems={menuItems}
+            outputConfig={lapJointWeldedOutputConfig}
             title="Lap Joint Welded"
         />
     );

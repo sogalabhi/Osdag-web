@@ -1,15 +1,13 @@
 import React from 'react';
 import { EngineeringModule } from '../shared/components/EngineeringModule';
 import { compressionMemberConfig } from './configs/compressionMemberConfig';
-import CompressionMemberOutputDock from './components/CompressionMemberOutputDock';
-import { menuItems } from '../shared/utils/moduleUtils';
+import { compressionMemberOutputConfig } from './configs/compressionMemberOutputConfig';
 
 function CompressionMember() {
   return (
     <EngineeringModule
       moduleConfig={compressionMemberConfig}
-      OutputDockComponent={CompressionMemberOutputDock}
-      menuItems={menuItems}
+      outputConfig={compressionMemberOutputConfig}
       title="Compression Member (Struts in Trusses)"
     />
   );

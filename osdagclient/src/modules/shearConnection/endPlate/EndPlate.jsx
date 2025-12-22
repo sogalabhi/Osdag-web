@@ -1,15 +1,13 @@
 import React from "react";
 import { EngineeringModule } from "../../shared/components/EngineeringModule";
 import { endPlateConfig } from "./configs/endPlateConfig";
-import EndPlateOutputDock from "./components/EndPlateOutputDock";
-import { menuItems } from "../../shared/utils/moduleUtils";
+import { endPlateOutputConfig } from "./configs/endPlateOutputConfig";
 
 function EndPlate() {
   return (
     <EngineeringModule
       moduleConfig={endPlateConfig}
-      OutputDockComponent={EndPlateOutputDock}
-      menuItems={menuItems}
+      outputConfig={endPlateOutputConfig}
       title="End Plate"
     />
   );

@@ -1,15 +1,13 @@
 import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
 import { onCantileverConfig } from './configs/onCantileverConfig';
-import SimplySupportedBeamOutputDock from '../simplySupportedBeam/components/SimplySupportedBeamOutputDock';
-import { menuItems } from '../../shared/utils/moduleUtils';
+import { simplySupportedBeamOutputConfig } from '../simplySupportedBeam/configs/simplySupportedBeamOutputConfig';
 
 function OnCantilever() {
   return (
     <EngineeringModule
       moduleConfig={onCantileverConfig}
-      OutputDockComponent={SimplySupportedBeamOutputDock}
-      menuItems={menuItems}
+      outputConfig={simplySupportedBeamOutputConfig}
       title="On Cantilever Beam (Flexural Member)"
     />
   );
