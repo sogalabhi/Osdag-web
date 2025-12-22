@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
@@ -10,12 +11,11 @@ import { BaseOutputDock } from "./BaseOutputDock";
 import { CustomizationModal } from "../components/CustomizationModal";
 import { DesignReportModal } from "../components/DesignReportModal";
 import useViewCamera from "./btobViewCamera";
-import Model from "./btobRender";
+import Model from "./CadViewer";
 import Logs from "../../../components/Logs";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import ScreenshotCapture from "../../../components/ScreenShotCapture";
 import DesignPrefSections from "../../../components/DesignPrefSections";
-import Homesvg from "../../../assets/Homesvg.svg";
 import GridSelector from "../utils/GridSelector";
 import { message, Modal as AntdModal } from 'antd';
 import { apiBase } from "../../../api";
@@ -1017,6 +1017,7 @@ export const EngineeringModule = ({
                       hoverDict={hoverDict}
                       onHoverLabel={handleHoverLabel}
                       onHoverEnd={handleHoverEnd}
+                      moduleCadConfig={moduleConfig?.cadConfig}
                       key={modelKey}
                     />
                     <ScreenshotCapture
