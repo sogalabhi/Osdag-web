@@ -1,15 +1,13 @@
 import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
 import { weldedToEndConfig } from './configs/weldedToEndConfig';
-import WeldedToEndOutputDock from './components/WeldedToEndOutputDock';
-import { menuItems } from '../../shared/utils/moduleUtils';
+import { weldedToEndOutputConfig } from './configs/weldedToEndOutputConfig';
 
 function WeldedToEnd() {
   return (
     <EngineeringModule
       moduleConfig={weldedToEndConfig}
-      OutputDockComponent={WeldedToEndOutputDock}
-      menuItems={menuItems}
+      outputConfig={weldedToEndOutputConfig}
       title="Tension Member Bolted Design"
     />
   );

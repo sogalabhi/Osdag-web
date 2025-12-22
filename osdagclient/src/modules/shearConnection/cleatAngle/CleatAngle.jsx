@@ -2,16 +2,14 @@
 import React from "react";
 import { EngineeringModule } from "../../shared/components/EngineeringModule";
 import { cleatAngleConfig } from "./configs/cleatAngleConfig";
-import CleatAngleOutputDock from "./components/CleatAngleOutputDock";
-import { menuItems } from "../../shared/utils/moduleUtils";
+import { cleatAngleOutputConfig } from "./configs/cleatAngleOutputConfig";
 import { UI_STRINGS } from '../../../constants/UIStrings';
 
 function CleatAngle() {
   return (
     <EngineeringModule
       moduleConfig={cleatAngleConfig}
-      OutputDockComponent={CleatAngleOutputDock}
-      menuItems={menuItems}
+      outputConfig={cleatAngleOutputConfig}
       title={UI_STRINGS.CONNECTING_MEMBERS}
     />
   );

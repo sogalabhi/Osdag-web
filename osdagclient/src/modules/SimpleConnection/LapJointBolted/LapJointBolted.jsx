@@ -1,16 +1,14 @@
 import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
-import { menuItems } from '../../shared/utils/moduleUtils';
-import lapJointBoltedOutputDock from './components/LapJointBoltedOutputDock';
 import { lapJointBoltedConfig } from './config/lapJointBoltedConfig';
+import { lapJointBoltedOutputConfig } from './config/lapJointBoltedOutputConfig';
 
 
 function LapJointBolted() {
     return (
         <EngineeringModule
             moduleConfig={lapJointBoltedConfig}
-            OutputDockComponent={lapJointBoltedOutputDock}
-            menuItems={menuItems}
+            outputConfig={lapJointBoltedOutputConfig}
             title="Lap Joint Bolted"
         />
     );
