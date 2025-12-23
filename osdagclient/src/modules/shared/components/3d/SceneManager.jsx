@@ -180,31 +180,28 @@ export const SceneManager = forwardRef(({
 
   return (
     <group name="scene" ref={groupRef}>
-      {((activeViews.includes("Model") || GRID_VIEWS.includes(primaryView)) && modelMeshes.length > 0) && (
+      {/* Render per-part meshes from Model group (available for Model or individual parts) */}
+      {modelMeshes.length > 0 && (
         <>
           {modelMeshes.map((m, idx) => {
             const name = m.name || "";
             if (shouldShowPart && !shouldShowPart(name)) return null;
-            
+
             let color = getColorForPart ? getColorForPart(name) : getPartColor(name, moduleCadConfig);
             if (name.toLowerCase().startsWith("weld") && color === "#888888") {
               color = getColorForPart ? getColorForPart("Weld") : getPartColor("Weld", moduleCadConfig);
             }
-            
+
             const meshId = `${name}-${idx}`;
             const renderOrder = getPartRenderOrder ? getPartRenderOrder(name) : 0;
 
-            // --- POSITION LOGIC ---
             let partPosition = finalPosition;
-
             if (name === "Member" || name === "EndPlate" || name === "Endplate") {
                partPosition = [0, 0, 4];
             } 
             else if (["CleatAngle", "SeatedAngle", "Connector", "CoverPlate"].includes(name)) {
-               // Ensure finalPosition is treated as array
                partPosition = [finalPosition[0], finalPosition[1], finalPosition[2] + 1];
             }
-            // ----------------------
 
             return (
               <SmartPart
@@ -214,7 +211,6 @@ export const SceneManager = forwardRef(({
                 name={name}
                 color={color}
                 renderOrder={renderOrder}
-                // FIXED: Use partPosition here!
                 position={partPosition} 
                 rotation={finalRotation}
                 scale={modelScale}
@@ -229,6 +225,62 @@ export const SceneManager = forwardRef(({
           })}
         </>
       )}
+
+      {/* Render dedicated geometries when present (fallback if Model group missing or for clarity) */}
+      {Object.entries(geometries).map(([keyName, geom]) => {
+        if (!geom) return null;
+        const partNameMap = {
+          beam: "Beam",
+          column: "Column",
+          plate: "Plate",
+          bolt: "Bolt",
+          bolts: "Bolts",
+          connector: "Connector",
+          cleatAngle: "CleatAngle",
+          seatedAngle: "SeatedAngle",
+          coverPlate: "CoverPlate",
+          member: "Member",
+          endplate: "EndPlate",
+        };
+        const name = partNameMap[keyName] || keyName;
+        if (shouldShowPart && !shouldShowPart(name)) return null;
+
+        let color = getColorForPart ? getColorForPart(name) : getPartColor(name, moduleCadConfig);
+        if (name.toLowerCase().startsWith("weld") && color === "#888888") {
+          color = getColorForPart ? getColorForPart("Weld") : getPartColor("Weld", moduleCadConfig);
+        }
+
+        const meshId = `${name}-geom`;
+        const renderOrder = getPartRenderOrder ? getPartRenderOrder(name) : 0;
+
+        let partPosition = finalPosition;
+        if (name === "Member" || name === "EndPlate" || name === "Endplate" || name === "EndPlate") {
+           partPosition = [0, 0, 4];
+        } 
+        else if (["CleatAngle", "SeatedAngle", "Connector", "CoverPlate"].includes(name)) {
+           partPosition = [finalPosition[0], finalPosition[1], finalPosition[2] + 1];
+        }
+
+        return (
+          <SmartPart
+            key={meshId}
+            meshId={meshId}
+            geometry={geom}
+            name={name}
+            color={color}
+            renderOrder={renderOrder}
+            position={partPosition}
+            rotation={finalRotation}
+            scale={modelScale}
+            hoverDict={hoverDict}
+            hoverLabel={hoverDict?.[name] || name}
+            isHovered={hoveredMeshId === meshId}
+            onHover={handlePartHover}
+            onHoverEnd={handlePartHoverEnd}
+            showEdges={true}
+          />
+        );
+      })}
     </group>
   );
 });
