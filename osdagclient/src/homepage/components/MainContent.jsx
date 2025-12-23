@@ -3,7 +3,22 @@ import DashboardSectionCard from './DashboardSectionCard';
 import ProjectsListCard from './ProjectsListCard';
 import ModulesListCard from './ModulesListCard';
 import { isGuestUser, getCurrentUserEmail, getAccessToken } from '../../utils/auth';
-import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE, MODULE_KEY_SEAT_ANGLE, MODULE_DISPLAY_SEAT_ANGLE } from '../../constants/DesignKeys';
+import {
+  MODULE_KEY_FIN_PLATE,
+  MODULE_DISPLAY_FIN_PLATE,
+  MODULE_KEY_SEAT_ANGLE,
+  MODULE_DISPLAY_SEAT_ANGLE,
+  MODULE_KEY_CLEAT_ANGLE,
+  MODULE_DISPLAY_CLEAT_ANGLE,
+  MODULE_KEY_END_PLATE,
+  MODULE_KEY_BEAM_COLUMN_END_PLATE,
+  MODULE_KEY_BEAM_BEAM_END_PLATE,
+  MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED,
+  MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED,
+  MODULE_KEY_TENSION_BOLTED,
+  MODULE_KEY_TENSION_WELDED,
+  MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
+} from '../../constants/DesignKeys';
 import { apiBase } from "../../api";
 
 const MainContent = () => {
@@ -74,27 +89,26 @@ const MainContent = () => {
 
   function getModuleDisplayName(moduleId) {
     const moduleNames = {
-      'fp': 'FinPlateConnection',
-      'ca': 'Cleat Angle Connection',
-      'ep': 'End Plate Connection',
-      'sa': 'SeatedAngleConnection',
-      'cpb': 'Cover Plate Bolted',
-      'cpw': 'Cover Plate Welded',
-      'boltedtoendplate': 'Tension Member Bolted',
-      'ssb': 'Simply Supported Beam',
-      'pg': 'Plate Girder',
+      fp: MODULE_DISPLAY_FIN_PLATE,
+      ca: MODULE_DISPLAY_CLEAT_ANGLE,
+      ep: 'End Plate Connection',
+      sa: MODULE_DISPLAY_SEAT_ANGLE,
+      cpb: 'Cover Plate Bolted',
+      cpw: 'Cover Plate Welded',
+      boltedtoendplate: 'Tension Member Bolted',
+      ssb: 'Simply Supported Beam',
+      pg: 'Plate Girder',
       [MODULE_KEY_FIN_PLATE]: MODULE_DISPLAY_FIN_PLATE,
-      'EndPlateConnection': 'End Plate Connection',
-      'CleatAngleConnection': 'Cleat Angle Connection',
-      // 'Seated-Angle-Connection': 'Seated Angle Connection',
+      [MODULE_KEY_CLEAT_ANGLE]: MODULE_DISPLAY_CLEAT_ANGLE,
+      [MODULE_KEY_END_PLATE]: 'End Plate Connection',
       [MODULE_KEY_SEAT_ANGLE]: MODULE_DISPLAY_SEAT_ANGLE,
-      'Beam-to-Beam-Cover-Plate-Bolted-Connection': 'Cover Plate Bolted',
-      'Beam-to-Beam-Cover-Plate-Welded-Connection': 'Cover Plate Welded',
-      'Beam-Beam-End-Plate-Connection': 'Beam-Beam End Plate',
-      'Beam-to-Column-End-Plate-Connection': 'Beam-Column End Plate',
-      'Tension-Member-Bolted-Design': 'Tension Member Bolted',
-      'Tension-Member-Welded-Design': 'Tension Member Welded',
-      'Simply-Supported-Beam': 'Simply Supported Beam'
+      [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED]: 'Cover Plate Bolted',
+      [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED]: 'Cover Plate Welded',
+      [MODULE_KEY_BEAM_BEAM_END_PLATE]: 'Beam-Beam End Plate',
+      [MODULE_KEY_BEAM_COLUMN_END_PLATE]: 'Beam-Column End Plate',
+      [MODULE_KEY_TENSION_BOLTED]: 'Tension Member Bolted',
+      [MODULE_KEY_TENSION_WELDED]: 'Tension Member Welded',
+      [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: 'Simply Supported Beam',
     };
     return moduleNames[moduleId] || moduleId;
   }

@@ -107,8 +107,41 @@ export const KEY_DESIGN_TYPE_FLEXURE = "KEY_DESIGN_TYPE_FLEXURE";
 export const MODULE_KEY_FIN_PLATE = 'FinPlateConnection'; // canonical key for API, state, config
 export const MODULE_KEY_SEAT_ANGLE = 'SeatedAngleConnection'; // canonical key for API, state, config
 export const MODULE_DISPLAY_FIN_PLATE = 'FinPlateConnection'; // display name for UI 
-
 // Module Keys - CleatAngle
 export const MODULE_KEY_CLEAT_ANGLE = 'CleatAngleConnection';
 export const MODULE_DISPLAY_CLEAT_ANGLE = 'CleatAngleConnection';
 export const MODULE_DISPLAY_SEAT_ANGLE = 'SeatedAngleConnection'; // display name for UI 
+
+// Module Keys - End Plate / Beam-Column End Plate / Beam-Beam End Plate
+export const MODULE_KEY_END_PLATE = 'EndPlateConnection';
+export const MODULE_KEY_BEAM_COLUMN_END_PLATE = 'BeamToColumnEndPlate';
+export const MODULE_KEY_BEAM_BEAM_END_PLATE = 'BeamBeamEndPlate';
+
+// Module Keys - Cover Plate (Moment)
+export const MODULE_KEY_COVER_PLATE_BOLTED = 'CoverPlateBolted';
+export const MODULE_KEY_COVER_PLATE_WELDED = 'CoverPlateWelded';
+export const MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED = 'Beam-to-Beam-Cover-Plate-Bolted-Connection';
+export const MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED = 'Beam-to-Beam-Cover-Plate-Welded-Connection';
+export const MODULE_KEY_COVER_PLATE_BOLTED_ALT = 'Cover-Plate-Bolted-Connection';
+export const MODULE_KEY_COVER_PLATE_WELDED_ALT = 'Cover-Plate-Welded-Connection';
+export const MODULE_KEY_BEAM_BEAM_END_PLATE_ALT = 'Beam-Beam-End-Plate-Connection';
+export const MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT = 'Beam-to-Column-End-Plate-Connection';
+export const MODULE_KEY_CC_COVER_PLATE_BOLTED = 'Column-to-Column-Cover-Plate-Bolted-Connection';
+export const MODULE_KEY_CC_COVER_PLATE_WELDED = 'Column-to-Column-Cover-Plate-Welded-Connection';
+export const MODULE_KEY_CC_END_PLATE = 'Column-to-Column-End-Plate-Connection';
+
+// Module Keys - Simple connections
+export const MODULE_KEY_BUTT_JOINT_BOLTED = 'ButtJointBolted';
+export const MODULE_KEY_BUTT_JOINT_WELDED = 'ButtJointWelded';
+export const MODULE_KEY_LAP_JOINT_BOLTED = 'LapJointBolted';
+export const MODULE_KEY_LAP_JOINT_WELDED = 'LapJointWelded';
+
+// Module Keys - Tension
+export const MODULE_KEY_TENSION_BOLTED = 'Tension-Member-Bolted-Design';
+export const MODULE_KEY_TENSION_WELDED = 'Tension-Member-Welded-Design';
+export const MODULE_KEY_BOLTED_TO_END_GUSSET = 'BoltedToEndGusset';
+export const MODULE_KEY_WELDED_TO_END_GUSSET = 'WeldedToEndGusset';
+
+// Module Keys - Flexure
+export const MODULE_KEY_SIMPLY_SUPPORTED_BEAM = 'Simply-Supported-Beam';
+

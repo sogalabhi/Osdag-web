@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { MODULE_KEY_FIN_PLATE } from "../../../constants/DesignKeys";
+import {
+  MODULE_KEY_FIN_PLATE,
+  MODULE_KEY_CLEAT_ANGLE,
+  MODULE_KEY_SEAT_ANGLE,
+  MODULE_KEY_END_PLATE,
+  MODULE_KEY_BEAM_BEAM_END_PLATE,
+  MODULE_KEY_BEAM_COLUMN_END_PLATE,
+} from "../../../constants/DesignKeys";
 
 /**
  * Form/state layer for engineering modules.
@@ -21,11 +28,15 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     }
     if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
       return { selectedOption: "Column Flange-Beam-Web" };
-    } else if (moduleConfig.cameraKey === "EndPlate") {
+    } else if (moduleConfig.cameraKey === MODULE_KEY_CLEAT_ANGLE) {
       return { selectedOption: "Column Flange-Beam-Web" };
-    } else if (moduleConfig.cameraKey === "BeamBeamEndPlate") {
+    } else if (moduleConfig.cameraKey === MODULE_KEY_SEAT_ANGLE) {
+      return { selectedOption: "Column Flange-Beam-Web" };
+    } else if (moduleConfig.cameraKey === MODULE_KEY_END_PLATE) {
+      return { selectedOption: "Column Flange-Beam-Web" };
+    } else if (moduleConfig.cameraKey === MODULE_KEY_BEAM_BEAM_END_PLATE) {
       return { selectedOption: "Flushed - Reversible Moment" };
-    } else if (moduleConfig.cameraKey === "BeamToColumnEndPlate") {
+    } else if (moduleConfig.cameraKey === MODULE_KEY_BEAM_COLUMN_END_PLATE) {
       return { selectedOption: "Flushed - Reversible Moment" };
     }
     return { selectedOption: "Column Flange-Beam-Web" };

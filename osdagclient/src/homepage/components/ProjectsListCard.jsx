@@ -14,7 +14,22 @@ import { simplySupportedBeamConfig } from '../../modules/flexuralMember/simplySu
 import { ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { isGuestUser, getCurrentUserEmail } from '../../utils/auth';
-import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../../constants/DesignKeys';
+import {
+  MODULE_KEY_FIN_PLATE,
+  MODULE_KEY_CLEAT_ANGLE,
+  MODULE_KEY_END_PLATE,
+  MODULE_KEY_SEAT_ANGLE,
+  MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED,
+  MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED,
+  MODULE_KEY_COVER_PLATE_BOLTED,
+  MODULE_KEY_COVER_PLATE_WELDED,
+  MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
+  MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
+  MODULE_KEY_TENSION_BOLTED,
+  MODULE_KEY_TENSION_WELDED,
+  MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
+  MODULE_DISPLAY_FIN_PLATE,
+} from '../../constants/DesignKeys';
 import { apiBase } from "../../api";
 
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
@@ -99,20 +114,20 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
       const detail = await fetchProjectDetail(project.id);
       setReportProject(project);
       setReportInputValues(detail?.inputs_json || {});
-      const modId = detail?.submodule || detail?.module || 'FinPlateConnection';
+      const modId = detail?.submodule || detail?.module || MODULE_KEY_FIN_PLATE;
       setReportModuleId(modId);
       // Resolve moduleConfig to reuse DesignReportModal logic
       const resolver = {
-        'FinPlateConnection': finPlateConfig,
-        'EndPlateConnection': endPlateConfig,
-        'CleatAngleConnection': cleatAngleConfig,
-        'Seated-Angle-Connection': seatedAngleConfig,
-        'Beam-to-Beam-Cover-Plate-Bolted-Connection': coverPlateBoltedConfig,
-        'Beam-Beam-End-Plate-Connection': beamBeamEndPlateConfig,
-        'Beam-to-Beam-Cover-Plate-Welded-Connection': coverPlateWeldedConfig,
-        'Beam-to-Column-End-Plate-Connection': beamToColumnEndPlateConfig,
-        'Tension-Member-Bolted-Design': boltedToEndConfig,
-        'Simply-Supported-Beam': simplySupportedBeamConfig,
+        [MODULE_KEY_FIN_PLATE]: finPlateConfig,
+        [MODULE_KEY_END_PLATE]: endPlateConfig,
+        [MODULE_KEY_CLEAT_ANGLE]: cleatAngleConfig,
+        [MODULE_KEY_SEAT_ANGLE]: seatedAngleConfig,
+        [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED]: coverPlateBoltedConfig,
+        [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED]: coverPlateWeldedConfig,
+        [MODULE_KEY_BEAM_BEAM_END_PLATE_ALT]: beamBeamEndPlateConfig,
+        [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: beamToColumnEndPlateConfig,
+        [MODULE_KEY_TENSION_BOLTED]: boltedToEndConfig,
+        [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: simplySupportedBeamConfig,
       };
       const cfg = resolver[modId] || null;
       setReportModuleConfig(cfg);
@@ -167,15 +182,15 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
           boltedtoendplate: '/design/tension-member/bolted_to_end_gusset',
           ssb: '/design/FlexureMember/simply_supported_beam',
           [MODULE_KEY_FIN_PLATE]: '/design/connections/shear/fin_plate',
-          'EndPlateConnection': '/design/connections/shear/end_plate',
-          'CleatAngleConnection': '/design/connections/shear/cleat_angle',
-          'Seated-Angle-Connection': '/design/connections/shear/seatAngle',
-          'Beam-to-Beam-Cover-Plate-Bolted-Connection': '/design/connections/beam-to-beam-splice/cover_plate_bolted',
-          'Beam-to-Beam-Cover-Plate-Welded-Connection': '/design/connections/beam-to-beam-splice/cover_plate_welded',
-          'Beam-Beam-End-Plate-Connection': '/design/connections/beam-to-beam-splice/end_plate',
-          'Beam-to-Column-End-Plate-Connection': '/design/connections/column-beam/end_plate',
-          'Tension-Member-Bolted-Design': '/design/tension-member/bolted_to_end_gusset',
-          'Simply-Supported-Beam': '/design/FlexureMember/simply_supported_beam',
+          [MODULE_KEY_END_PLATE]: '/design/connections/shear/end_plate',
+          [MODULE_KEY_CLEAT_ANGLE]: '/design/connections/shear/cleat_angle',
+          [MODULE_KEY_SEAT_ANGLE]: '/design/connections/shear/seatAngle',
+          [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED]: '/design/connections/beam-to-beam-splice/cover_plate_bolted',
+          [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED]: '/design/connections/beam-to-beam-splice/cover_plate_welded',
+          [MODULE_KEY_BEAM_BEAM_END_PLATE_ALT]: '/design/connections/beam-to-beam-splice/end_plate',
+          [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: '/design/connections/column-beam/end_plate',
+          [MODULE_KEY_TENSION_BOLTED]: '/design/tension-member/bolted_to_end_gusset',
+          [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: '/design/FlexureMember/simply_supported_beam',
         };
         const route = moduleRoutes[project.module_id];
         if (route) {
@@ -203,7 +218,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
         return;
       }
       const inputs = detail.project?.inputs_json || {};
-      const module_id = detail.project?.submodule || detail.project?.module || 'FinPlateConnection';
+      const module_id = detail.project?.submodule || detail.project?.module || MODULE_KEY_FIN_PLATE;
 
       const saveRes = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
         method: 'POST',

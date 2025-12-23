@@ -6,6 +6,13 @@ import { Html, PerspectiveCamera } from "@react-three/drei";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Modal, Button } from "antd";
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
+import {
+  MODULE_KEY_FIN_PLATE,
+  MODULE_KEY_CLEAT_ANGLE,
+  MODULE_KEY_END_PLATE,
+  MODULE_KEY_SEAT_ANGLE,
+  MODULE_KEY_BEAM_COLUMN_END_PLATE,
+} from "../../../constants/DesignKeys";
 import { BaseInputDock } from "./BaseInputDock";
 import { BaseOutputDock } from "./BaseOutputDock";
 import { CustomizationModal } from "../components/CustomizationModal";
@@ -401,7 +408,7 @@ export const EngineeringModule = ({
     const userIsGuest = isGuest();
 
     // Determine module_id - use designType from moduleConfig, or fallback to inputs.module
-    const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || 'SeatedAngleConnection';
+    const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || MODULE_KEY_SEAT_ANGLE;
     const projectName = inputs?.project_name || inputs?.name || moduleConfig?.sessionName || 'project';
 
     try {
@@ -507,7 +514,7 @@ export const EngineeringModule = ({
 
   // Get connectivity for FinPlateConnection module
   const getConnectivity = () => {
-    if (moduleConfig.cameraKey === "FinPlateConnection") {
+    if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
       return extraState?.selectedOption || inputs?.connectivity;
     }
     return null;
@@ -531,19 +538,19 @@ export const EngineeringModule = ({
       return moduleConfig.cadOptions || ["Model", "Beam", "Connector"];
     }
 
-    if (moduleConfig.cameraKey === "FinPlateConnection") {
+    if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
       return ["Model", "Beam", "Column", "Plate"];
     }
-    else if (moduleConfig.cameraKey === "CleatAngle") {
+    else if (moduleConfig.cameraKey === MODULE_KEY_CLEAT_ANGLE) {
       return ["Model", "Beam", "Column", "CleatAngle"]; // FIXED: Use CleatAngle instead of Connector
     }
-    else if (moduleConfig.cameraKey === "EndPlate") {
+    else if (moduleConfig.cameraKey === MODULE_KEY_END_PLATE) {
       return ["Model", "Beam", "Column", "Plate"];
     }
-    else if (moduleConfig.cameraKey === "SeatedAngle") {
+    else if (moduleConfig.cameraKey === MODULE_KEY_SEAT_ANGLE) {
       return ["Model", "Beam", "Column", "SeatedAngle"]; // FIXED: Use SeatedAngle instead of Connector
     }
-    else if (moduleConfig.cameraKey === "BeamToColumnEndPlate") {
+    else if (moduleConfig.cameraKey === MODULE_KEY_BEAM_COLUMN_END_PLATE) {
       return ["Model", "Beam", "Column", "End Plate"];
     }
 

@@ -1,8 +1,10 @@
+import { MODULE_KEY_END_PLATE } from "../../../../constants/DesignKeys";
+
 export const endPlateConfig = {
   sessionName: "End Plate Connection",
   routePath: "/design/connections/shear/end_plate",
-  designType: "EndPlateConnection",
-  cameraKey: "EndPlate",
+  designType: MODULE_KEY_END_PLATE,
+  cameraKey: MODULE_KEY_END_PLATE,
   cadOptions: ["Model", "Beam", "Column", "Plate"],
 
   // IMPROVEMENT: Removed hardcoded defaults for API-driven lists (e.g., beam_section).
@@ -99,7 +101,7 @@ export const endPlateConfig = {
       "Member.Supported_Section.Material": inputs.supported_material,
       "Member.Supporting_Section.Designation": connectivity === "Beam-Beam" ? inputs.primary_beam : inputs.column_section,
       "Member.Supporting_Section.Material": inputs.supporting_material,
-      "Module": "EndPlateConnection",
+      "Module": MODULE_KEY_END_PLATE,
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
       "Connector.Plate.Thickness_List": plateList,

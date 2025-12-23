@@ -5,7 +5,7 @@ export const finPlateConfig = {
   sessionName: MODULE_DISPLAY_FIN_PLATE,
   routePath: "/design/connections/shear/fin_plate",
   designType: MODULE_KEY_FIN_PLATE,
-  cameraKey: "FinPlateConnection",
+  cameraKey: MODULE_KEY_FIN_PLATE,
   cadOptions: ["Model", "Beam", "Column", "Plate"],
   
   defaultInputs: {

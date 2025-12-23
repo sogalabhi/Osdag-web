@@ -4,6 +4,7 @@ import ModuleReducer from "./ModuleReducer";
 // crypto packages
 import { decode as base64_decode, encode as base64_encode } from "base-64";
 import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../constants/DesignKeys';
+import { getModuleSlug } from "../constants/apiRoutes";
 import { createDesign as apiCreateDesign, createDesignReport as apiCreateDesignReport, populateModule } from '../modules/shared/api/moduleApi';
 import { apiBase } from "../api";
 
@@ -115,57 +116,7 @@ export const ModuleProvider = ({ children }) => {
       // Set current module
       dispatch({ type: "SET_CURRENT_MODULE_NAME", payload: moduleName });
 
-      // Map shear modules to new options endpoint
-      const SHEAR_SLUGS = {
-        FinPlateConnection: 'fin-plate',
-        CleatAngleConnection: 'cleat-angle',
-        EndPlateConnection: 'end-plate',
-        SeatedAngleConnection: 'seated-angle',
-      };
-      const SIMPLE_SLUGS = {
-        'ButtJointBolted': 'butt-joint-bolted',
-        'ButtJointWelded': 'butt-joint-welded',
-        'LapJointBolted': 'lap-joint-bolted',
-        'LapJointWelded': 'lap-joint-welded',
-      };
-      // Unified slug map to align with /api/modules/{slug}/... endpoints
-      const MODULE_SLUGS = {
-        // Shear
-        FinPlateConnection: 'shear-connection/fin-plate',
-        CleatAngleConnection: 'shear-connection/cleat-angle',
-        EndPlateConnection: 'shear-connection/end-plate',
-        SeatedAngleConnection: 'shear-connection/seated-angle',
-        // Moment
-        CoverPlateBolted: 'moment-connection/beam-beam-cover-plate-bolted',
-        'Beam-to-Beam-Cover-Plate-Bolted-Connection': 'moment-connection/beam-beam-cover-plate-bolted',
-        'Cover-Plate-Bolted-Connection': 'moment-connection/beam-beam-cover-plate-bolted',
-        CoverPlateWelded: 'moment-connection/beam-beam-cover-plate-welded',
-        'Beam-to-Beam-Cover-Plate-Welded-Connection': 'moment-connection/beam-beam-cover-plate-welded',
-        'Cover-Plate-Welded-Connection': 'moment-connection/beam-beam-cover-plate-welded',
-        BeamBeamEndPlate: 'moment-connection/beam-beam-end-plate',
-        'Beam-Beam-End-Plate-Connection': 'moment-connection/beam-beam-end-plate',
-        BeamColumnEndPlate: 'moment-connection/beam-column-end-plate',
-        'Beam-to-Column-End-Plate-Connection': 'moment-connection/beam-column-end-plate',
-        CCCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
-        ColumnCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
-        'Column-to-Column-Cover-Plate-Bolted-Connection': 'moment-connection/column-column-cover-plate-bolted',
-        CCCoverPlateWelded: 'moment-connection/column-column-cover-plate-welded',
-        'Column-to-Column-Cover-Plate-Welded-Connection': 'moment-connection/column-column-cover-plate-welded',
-        CCEndPlate: 'moment-connection/column-column-end-plate',
-        'Column-to-Column-End-Plate-Connection': 'moment-connection/column-column-end-plate',
-        // Simple
-        ButtJointBolted: 'simple-connection/butt-joint-bolted',
-        ButtJointWelded: 'simple-connection/butt-joint-welded',
-        LapJointBolted: 'simple-connection/lap-joint-bolted',
-        LapJointWelded: 'simple-connection/lap-joint-welded',
-        // Tension
-        'Tension-Member-Bolted-Design': 'tension-member/bolted',
-        'Tension-Member-Welded-Design': 'tension-member/welded',
-        BoltedToEndGusset: 'tension-member/bolted',
-        WeldedToEndGusset: 'tension-member/welded',
-      };
-
-      const getSlug = (key) => MODULE_SLUGS[key] || key;
+      const getSlug = (key) => getModuleSlug(key);
       const email = localStorage.getItem("email");
       const slug = getSlug(moduleName);
 
@@ -304,45 +255,7 @@ export const ModuleProvider = ({ children }) => {
     console.log('[cadissue] inputData keys:', inputData ? Object.keys(inputData) : 'N/A');
     try {
       // Map module ID to slug (same as design endpoint)
-      const MODULE_SLUGS = {
-        // Shear
-        FinPlateConnection: 'shear-connection/fin-plate',
-        CleatAngleConnection: 'shear-connection/cleat-angle',
-        EndPlateConnection: 'shear-connection/end-plate',
-        SeatedAngleConnection: 'shear-connection/seated-angle',
-        // Moment
-        CoverPlateBolted: 'moment-connection/beam-beam-cover-plate-bolted',
-        'Beam-to-Beam-Cover-Plate-Bolted-Connection': 'moment-connection/beam-beam-cover-plate-bolted',
-        'Cover-Plate-Bolted-Connection': 'moment-connection/beam-beam-cover-plate-bolted',
-        CoverPlateWelded: 'moment-connection/beam-beam-cover-plate-welded',
-        'Beam-to-Beam-Cover-Plate-Welded-Connection': 'moment-connection/beam-beam-cover-plate-welded',
-        'Cover-Plate-Welded-Connection': 'moment-connection/beam-beam-cover-plate-welded',
-        BeamBeamEndPlate: 'moment-connection/beam-beam-end-plate',
-        'Beam-Beam-End-Plate-Connection': 'moment-connection/beam-beam-end-plate',
-        BeamColumnEndPlate: 'moment-connection/beam-column-end-plate',
-        'Beam-to-Column-End-Plate-Connection': 'moment-connection/beam-column-end-plate',
-        CCCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
-        ColumnCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
-        'Column-to-Column-Cover-Plate-Bolted-Connection': 'moment-connection/column-column-cover-plate-bolted',
-        CCCoverPlateWelded: 'moment-connection/column-column-cover-plate-welded',
-        'Column-to-Column-Cover-Plate-Welded-Connection': 'moment-connection/column-column-cover-plate-welded',
-        CCEndPlate: 'moment-connection/column-column-end-plate',
-        'Column-to-Column-End-Plate-Connection': 'moment-connection/column-column-end-plate',
-        // Simple
-        ButtJointBolted: 'simple-connection/butt-joint-bolted',
-        ButtJointWelded: 'simple-connection/butt-joint-welded',
-        LapJointBolted: 'simple-connection/lap-joint-bolted',
-        LapJointWelded: 'simple-connection/lap-joint-welded',
-        // Tension
-        'Tension-Member-Bolted-Design': 'tension-member/bolted',
-        'Tension-Member-Welded-Design': 'tension-member/welded',
-        BoltedToEndGusset: 'tension-member/bolted',
-        WeldedToEndGusset: 'tension-member/welded',
-        // Flexure
-        'Simply-Supported-Beam': 'flexure-member/simply-supported-beam',
-      };
-      
-      const slug = MODULE_SLUGS[moduleId] || moduleId;
+      const slug = getModuleSlug(moduleId);
       const url = `${BASE_URL}api/modules/${slug}/cad/`;
       
       console.log('[ModuleState] Making fetch request to:', url);

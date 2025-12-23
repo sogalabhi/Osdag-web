@@ -1,8 +1,10 @@
+import { MODULE_KEY_BEAM_BEAM_END_PLATE, MODULE_KEY_BEAM_BEAM_END_PLATE_ALT } from "../../../constants/DesignKeys";
+
 export const beamBeamEndPlateConfig = {
   sessionName: "Beam Beam End Plate Connection",
   routePath: "/design/connections/beam-to-beam-splice/end_plate",
-  designType: "Beam-Beam-End-Plate-Connection",
-  cameraKey: "BeamBeamEndPlate",
+  designType: MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
+  cameraKey: MODULE_KEY_BEAM_BEAM_END_PLATE,
   cadOptions: ["Model", "Beam", "EndPlate"],
   
   defaultInputs: {
@@ -25,7 +27,7 @@ export const beamBeamEndPlateConfig = {
     material: "E 250 (Fe 410 W)A",
     supported_designation: "WPB 900 X 300 X 291.46",
     supported_material: "E 250 (Fe 410 W)A",
-    module: "Beam-Beam-End-Plate-Connection",
+    module: MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
     weld_fab: "Shop Weld",
     weld_material_grade: "410",
     weld_type: "Groove Weld",
@@ -85,7 +87,7 @@ export const beamBeamEndPlateConfig = {
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
       "Weld.Type": inputs.weld_type,
-      Module: "Beam-Beam-End-Plate-Connection",
+    Module: MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
     };
   },
 
