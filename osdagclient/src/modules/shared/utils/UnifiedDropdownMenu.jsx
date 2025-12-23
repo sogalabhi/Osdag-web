@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 import { useContext, useRef, useState, useEffect } from "react";
-import { ModuleContext } from "../../../context/ModuleState";
 import { UserContext } from "../../../context/UserState";
+import { useEngineeringService } from "../hooks/useEngineeringService";
 import { MODULE_KEY_FIN_PLATE } from '../../../constants/DesignKeys';
 import { message } from 'antd';
 import { useLocation } from 'react-router-dom';
@@ -88,18 +88,14 @@ function UnifiedDropdownMenu({
   setSelectedOption = () => { },
   moduleType, // "FinPlateConnection" | "endplate" | "coverplate"
   currentProjectId,
+  boltDiameterList = [],
+  propertyClassList = [],
+  thicknessList = [],
+  angleList = [],
+  topAngleList = [],
 }) {
-  const {
-    boltDiameterList,
-    propertyClassList,
-    thicknessList,
-    angleList,
-    topAngleList,
-    downloadCADModel,
-  } = useContext(ModuleContext);
-
+  const service = useEngineeringService();
   const { SaveInputValueFile } = useContext(UserContext);
-  // const BASE_URL = 'http://localhost:8000/api/';
   const BASE_URL = `${apiBase}`;
   const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
   const location = useLocation();
@@ -404,7 +400,8 @@ function UnifiedDropdownMenu({
 
             const handle = await window.showSaveFilePicker(options);
             const fileExtension = handle.name.split(".").pop();
-            const blob = await downloadCADModel(fileExtension);
+            const result = await service.downloadCADModel(fileExtension);
+            const blob = result.success ? result.blob : null;
 
             if (blob) {
               const writable = await handle.createWritable();

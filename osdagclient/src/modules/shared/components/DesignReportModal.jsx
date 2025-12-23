@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Row, Col, Input, Button, Upload, Spin, message } from 'antd';
 import { ReportCustomizationModal } from './ReportCustomizationModal';
-import { BASE_URL } from "../api/moduleApi";
+import { useEngineeringService } from '../hooks/useEngineeringService';
 
 export const DesignReportModal = ({
   isOpen,
@@ -29,6 +29,7 @@ export const DesignReportModal = ({
   const [sections, setSections] = useState({});
   const [selectedSections, setSelectedSections] = useState([]);
   const [loadingSections, setLoadingSections] = useState(false);
+  const service = useEngineeringService();
 
   const handleFieldChange = (field, value) => {
     setDesignReportInputs(prev => ({
@@ -144,16 +145,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
       };
 
       // Generate initial LaTeX report
-      const response = await fetch(`${BASE_URL}api/report/generate-initial/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(requestData),
-      });
-
-      const result = await response.json();
+      const result = await service.generateInitialReport(requestData);
 
       if (result.success) {
         setReportId(result.report_id);
@@ -188,28 +180,16 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
   const handleOpenPDF = async (selectedSections) => {
     try {
       // Generate customized PDF and open in new tab
-      const response = await fetch(`${BASE_URL}api/report/customize/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          report_id: reportId,
-          selected_sections: selectedSections,
-        }),
-      });
+      const result = await service.customizeReport(reportId, selectedSections);
 
-      if (response.ok) {
+      if (result.success && result.blob) {
         // Open PDF in new tab
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
+        const url = window.URL.createObjectURL(result.blob);
         window.open(url, '_blank', 'noopener,noreferrer');
 
         message.success("PDF opened in new tab!");
       } else {
-        const errorData = await response.json();
-        message.error(errorData.error || "Failed to generate PDF");
+        message.error(result.error || "Failed to generate PDF");
       }
     } catch (error) {
       console.error('[DesignReportModal] handleOpenPDF:error', error);
@@ -219,25 +199,14 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
 
   const handleSavePDF = async (selectedSections) => {
     try {
-      const response = await fetch(`${BASE_URL}api/report/customize/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          report_id: reportId,
-          selected_sections: selectedSections,
-        }),
-      });
+      const result = await service.customizeReport(reportId, selectedSections);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        message.error(errorData.error || "Failed to generate customized report");
+      if (!result.success || !result.blob) {
+        message.error(result.error || "Failed to generate customized report");
         return;
       }
 
-      const blob = await response.blob();
+      const blob = result.blob;
 
       if (window.showSaveFilePicker) {
         const handle = await window.showSaveFilePicker({

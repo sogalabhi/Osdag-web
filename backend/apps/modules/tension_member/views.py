@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .registry import TensionMemberRegistry
 from apps.core.utils.module_helpers import handle_design_request
+from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from apps.core.models import Material, CustomMaterials, Bolt, Angles, Channels
 
 
@@ -179,4 +180,103 @@ class TensionMemberViewSet(viewsets.ViewSet):
             return Response({'error': f'Sub-module {slug} not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as exc:
             return Response({'error': str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/cad')
+    def cad(self, request, submodule_slug=None):
+        """
+        POST /api/modules/tension-member/{submodule_slug}/cad/
+        
+        Request body:
+        {
+            "inputs": {...},  # Design input parameters
+            "sections": ["Model", "Member", ...]  # Optional: specific sections to generate
+        }
+        
+        Returns:
+        {
+            "status": "success",
+            "files": {section: base64_data, ...},
+            "hover_dict": {...},
+            "warnings": [...]
+        }
+        """
+        # Normalize slug
+        normalized_slug = self._normalize_slug(submodule_slug)
+        
+        # Get service from registry
+        ServiceClass = TensionMemberRegistry.get_service_by_slug(normalized_slug)
+        
+        if not ServiceClass:
+            return Response(
+                {'error': f'Sub-module {normalized_slug} not found'},
+                status=404
+            )
+        
+        # Extract inputs
+        inputs = request.data.get('inputs', request.data)
+        
+        if not inputs:
+            return Response(
+                {'error': 'inputs are required'},
+                status=400
+            )
+        
+        # Get sections from request or use defaults
+        sections = request.data.get('sections')
+        if not sections:
+            sections = get_default_sections('tension-member', normalized_slug)
+        
+        if not sections:
+            return Response(
+                {'error': f'No sections defined for {normalized_slug}'},
+                status=400
+            )
+        
+        try:
+            # Import adapter to get create_from_input function for hover_dict
+            create_from_input_func = None
+            try:
+                if normalized_slug == 'bolted':
+                    from .submodules.bolted.adapter import create_from_input
+                    create_from_input_func = create_from_input
+                elif normalized_slug == 'welded':
+                    from .submodules.welded.adapter import create_from_input
+                    create_from_input_func = create_from_input
+            except ImportError as e:
+                print(f"[TensionMemberViewSet] Could not import create_from_input for {normalized_slug}: {e}")
+            
+            # Generate CAD models
+            result = generate_cad_models(
+                service_class=ServiceClass,
+                inputs=inputs,
+                sections=sections,
+                create_from_input_func=create_from_input_func
+            )
+            
+            if not result['files']:
+                return Response(
+                    {
+                        'status': 'error',
+                        'message': 'No CAD models were generated',
+                        'errors': result['warnings']
+                    },
+                    status=422
+                )
+            
+            return Response({
+                'status': 'success',
+                'files': result['files'],
+                'hover_dict': result['hover_dict'],
+                'message': 'CAD models generated successfully',
+                'warnings': result['warnings']
+            }, status=201)
+            
+        except Exception as e:
+            print(f"[TensionMemberViewSet] Error generating CAD: {e}")
+            import traceback
+            traceback.print_exc()
+            return Response(
+                {'error': str(e), 'status': 'error'},
+                status=500
+            )
 

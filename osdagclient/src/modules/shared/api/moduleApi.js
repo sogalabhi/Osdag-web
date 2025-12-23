@@ -127,54 +127,14 @@ export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => 
     payload
   });
   if (designRes.status === 201 && (designData.data || designData)) {
-    // CAD endpoint remains legacy for now; normalize module ids to backend canonical values
-    const moduleAlias = {
-      // Shear (legacy ids already canonical)
-      'fin-plate': 'FinPlateConnection',
-      'cleat-angle': 'CleatAngleConnection',
-      'end-plate': 'EndPlateConnection',
-      'seated-angle': 'SeatedAngleConnection',
-      FinPlateConnection: 'FinPlateConnection',
-      CleatAngleConnection: 'CleatAngleConnection',
-      EndPlateConnection: 'EndPlateConnection',
-      SeatedAngleConnection: 'SeatedAngleConnection',
-      // Moment
-      'beam-beam-cover-plate-bolted': 'Cover-Plate-Bolted-Connection',
-      'beam-beam-cover-plate-welded': 'Cover-Plate-Welded-Connection',
-      'beam-beam-end-plate': 'Beam-Beam-End-Plate-Connection',
-      'beam-column-end-plate': 'Beam-to-Column-End-Plate-Connection',
-      'column-column-cover-plate-bolted': 'ColumnCoverPlateBolted',
-      'column-column-cover-plate-welded': 'Column-to-Column-Cover-Plate-Welded-Connection',
-      'column-column-end-plate': 'Column-to-Column-End-Plate-Connection',
-      CoverPlateBolted: 'Cover-Plate-Bolted-Connection',
-      CoverPlateWelded: 'Cover-Plate-Welded-Connection',
-      BeamBeamEndPlate: 'Beam-Beam-End-Plate-Connection',
-      BeamColumnEndPlate: 'Beam-to-Column-End-Plate-Connection',
-      CCCoverPlateBolted: 'ColumnCoverPlateBolted',
-      CCCoverPlateWelded: 'Column-to-Column-Cover-Plate-Welded-Connection',
-      CCEndPlate: 'Column-to-Column-End-Plate-Connection',
-      'Beam-to-Beam-Cover-Plate-Bolted-Connection': 'Cover-Plate-Bolted-Connection',
-      'Beam-to-Beam-Cover-Plate-Welded-Connection': 'Cover-Plate-Welded-Connection',
-      'Beam-Beam-End-Plate-Connection': 'Beam-Beam-End-Plate-Connection',
-      'Beam-to-Column-End-Plate-Connection': 'Beam-to-Column-End-Plate-Connection',
-      'Column-to-Column-Cover-Plate-Bolted-Connection': 'ColumnCoverPlateBolted',
-      'Column-to-Column-Cover-Plate-Welded-Connection': 'Column-to-Column-Cover-Plate-Welded-Connection',
-      'Column-to-Column-End-Plate-Connection': 'Column-to-Column-End-Plate-Connection',
-      'butt-joint-bolted': 'ButtJointBolted',
-      'butt-joint-welded': 'ButtJointWelded',
-      'lap-joint-bolted': 'LapJointBolted',
-      'lap-joint-welded': 'LapJointWelded',
-      'ButtJointBolted': 'ButtJointBolted',
-      'ButtJointWelded': 'ButtJointWelded',
-      'LapJointBolted': 'LapJointBolted',
-      'LapJointWelded': 'LapJointWelded',
-    };
-    const cadModuleId = moduleAlias[moduleKey] || moduleKey;
-
-    const cadRes = await fetch(`${BASE_URL}api/design/cad/`, {
+    // Use new CAD endpoint pattern: /api/modules/{slug}/cad/
+    const cadSlug = getSlug(moduleKey);
+    const cadUrl = `${BASE_URL}api/modules/${cadSlug}/cad/`;
+    
+    const cadRes = await fetch(cadUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ module_id: cadModuleId, input_values: inputParams }),
+      body: JSON.stringify({ inputs: inputParams }),
       credentials: "include"
     });
     // CAD-specific: simple alert on 500

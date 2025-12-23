@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .registry import FlexureMemberRegistry
 from apps.core.utils.module_helpers import handle_design_request
+from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 
 
 class FlexureMemberViewSet(viewsets.ViewSet):
@@ -94,4 +95,97 @@ class FlexureMemberViewSet(viewsets.ViewSet):
         """
         # TODO: Implement options endpoint if needed
         return Response({'message': 'Options endpoint not yet implemented'}, status=501)
+    
+    @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/cad')
+    def cad(self, request, submodule_slug=None):
+        """
+        POST /api/modules/flexure-member/{submodule_slug}/cad/
+        
+        Request body:
+        {
+            "inputs": {...},  # Design input parameters
+            "sections": ["Model", ...]  # Optional: specific sections to generate
+        }
+        
+        Returns:
+        {
+            "status": "success",
+            "files": {section: base64_data, ...},
+            "hover_dict": {...},
+            "warnings": [...]
+        }
+        """
+        # Get service from registry
+        ServiceClass = FlexureMemberRegistry.get_service_by_slug(submodule_slug)
+        
+        if not ServiceClass:
+            return Response(
+                {'error': f'Sub-module {submodule_slug} not found'},
+                status=404
+            )
+        
+        # Extract inputs
+        inputs = request.data.get('inputs', request.data)
+        
+        if not inputs:
+            return Response(
+                {'error': 'inputs are required'},
+                status=400
+            )
+        
+        # Get sections from request or use defaults
+        sections = request.data.get('sections')
+        if not sections:
+            sections = get_default_sections('flexure-member', submodule_slug)
+        
+        if not sections:
+            return Response(
+                {'error': f'No sections defined for {submodule_slug}'},
+                status=400
+            )
+        
+        try:
+            # Import adapter to get create_from_input function for hover_dict
+            create_from_input_func = None
+            try:
+                if submodule_slug == 'simply-supported-beam':
+                    from .submodules.simply_supported_beam.adapter import create_from_input
+                    create_from_input_func = create_from_input
+            except ImportError as e:
+                print(f"[FlexureMemberViewSet] Could not import create_from_input for {submodule_slug}: {e}")
+            
+            # Generate CAD models
+            result = generate_cad_models(
+                service_class=ServiceClass,
+                inputs=inputs,
+                sections=sections,
+                create_from_input_func=create_from_input_func
+            )
+            
+            if not result['files']:
+                return Response(
+                    {
+                        'status': 'error',
+                        'message': 'No CAD models were generated',
+                        'errors': result['warnings']
+                    },
+                    status=422
+                )
+            
+            return Response({
+                'status': 'success',
+                'files': result['files'],
+                'hover_dict': result['hover_dict'],
+                'message': 'CAD models generated successfully',
+                'warnings': result['warnings']
+            }, status=201)
+            
+        except Exception as e:
+            print(f"[FlexureMemberViewSet] Error generating CAD: {e}")
+            import traceback
+            traceback.print_exc()
+            return Response(
+                {'error': str(e), 'status': 'error'},
+                status=500
+            )
 

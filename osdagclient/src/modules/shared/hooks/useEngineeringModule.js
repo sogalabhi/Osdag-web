@@ -1,16 +1,62 @@
-import { useState, useEffect, useContext } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ModuleContext } from "../../../context/ModuleState";
-import { MODULE_KEY_FIN_PLATE, MODULE_KEY_CLEAT_ANGLE } from "../../../constants/DesignKeys";
+import { useEngineeringService } from "./useEngineeringService";
+import { useModuleData } from "./useModuleData";
+import { useModuleForm } from "./useModuleForm";
+import { useDesignSubmission } from "./useDesignSubmission";
+import { useNavigationGuard } from "./useNavigationGuard";
+import { useDependentData } from "./useDependentData";
+import { useDesignReport } from "./useDesignReport";
 
+/**
+ * useEngineeringModule Hook
+ * 
+ * Manages business logic and state for engineering module workflows.
+ * Provides a clean API for EngineeringModule component.
+ * 
+ * This hook encapsulates:
+ * - Module data loading and state management
+ * - Design calculation and CAD generation flow
+ * - Input/output state synchronization
+ * - Navigation protection and reset logic
+ * - Modal and selection state management
+ * 
+ * @param {Object} moduleConfig - Module configuration object
+ * @param {string} moduleConfig.designType - Module identifier (e.g., 'FinPlateConnection')
+ * @param {string} moduleConfig.cameraKey - Camera/view key for module
+ * @param {Object} moduleConfig.defaultInputs - Default input values
+ * @param {Array} moduleConfig.modalConfig - Modal configuration array
+ * @param {Array} moduleConfig.selectionConfig - Selection configuration array
+ * @param {Function} moduleConfig.validateInputs - Input validation function
+ * @param {Function} moduleConfig.buildSubmissionParams - Parameter building function
+ * @param {string} moduleConfig.routePath - Route path for navigation
+ * 
+ * @returns {Object} State and action functions
+ * @returns {Array} returns.beamList - List of beam sections
+ * @returns {Array} returns.columnList - List of column sections
+ * @returns {Array} returns.materialList - List of materials
+ * @returns {Array} returns.boltDiameterList - List of bolt diameters
+ * @returns {Object} returns.inputs - Current input values
+ * @returns {Function} returns.setInputs - Update input values
+ * @returns {Object} returns.output - Design output data
+ * @returns {Array} returns.logs - Design calculation logs
+ * @returns {boolean} returns.loading - Loading state
+ * @returns {Function} returns.handleSubmit - Submit design calculation
+ * @returns {Function} returns.handleReset - Reset module state
+ * @returns {Object} returns.service - Engineering service API
+ */
 export const useEngineeringModule = (moduleConfig) => {
   const navigate = useNavigate();
+  const service = useEngineeringService();
+  const { getModuleData, getDesignPreferences } = service;
 
   // ===================================================================
-  // SIMPLIFIED CONTEXT API - Using 8 Core Functions
+  // MODULE DATA - Loaded via dedicated hook
   // ===================================================================
+  const moduleData = useModuleData(getModuleData, moduleConfig.designType);
+
+  // Extract module data for easy access
   const {
-    // State variables (unchanged)
     beamList,
     columnList,
     connectivityList,
@@ -18,634 +64,110 @@ export const useEngineeringModule = (moduleConfig) => {
     boltDiameterList,
     thicknessList,
     propertyClassList,
-    angleList, // FIXED: Added angleList from context
+    angleList,
     boltTypeList,
     sectionProfileList,
     channelList,
     sectionDesignation,
-    designLogs,
-    designData,
-    displayPDF,
-    renderCadModel,
-    cadModelPaths,
-    hoverDict,
     coverPlateList,
     weldSizeList,
+  } = moduleData;
 
-    // NEW SIMPLIFIED API - 8 Core Functions Only
-    getModuleData,              // Universal data fetcher
-    manageDesignPreferences,    // Design preferences management  
-    createDesign,               // Design calculation
-    createCADModel,             // CAD generation
-    generateReport,             // Unified report generation
-    resetModuleState,           // State reset
-  } = useContext(ModuleContext);
+  // ===================================================================
+  // DESIGN & CAD STATE - Managed via dedicated hook
+  // ===================================================================
+  const {
+    submitDesign,
+    designData,
+    designLogs,
+    cadData,
+    renderCadModel,
+    displayPDF,
+    setDisplayPDF,
+    output,
+    logs,
+    loading,
+    renderBoolean,
+    modelKey,
+    isLoadingModalVisible,
+    loadingStage,
+    resetDesignState,
+    clearDesignResults: clearDesignResultsState,
+    screenshotTrigger,
+    setScreenshotTrigger,
+  } = useDesignSubmission(service, moduleConfig);
 
-  // Core state management
-  const [inputs, setInputs] = useState(moduleConfig.defaultInputs);
-  const [output, setOutput] = useState(null);
-  const [logs, setLogs] = useState(null);
-  const [displayOutput, setDisplayOutput] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [renderBoolean, setRenderBoolean] = useState(false);
-  const [modelKey, setModelKey] = useState(0);
+  // Form & selection state (moved into dedicated hook)
+  const {
+    inputs,
+    setInputs,
+    extraState,
+    setExtraState,
+    selectionStates,
+    allSelected,
+    selectedItems,
+    modalStates,
+    modalDynamicSrc,
+    designPrefModalStatus,
+    displaySaveInputPopup,
+    saveInputFileName,
+    updateModalState,
+    updateSelectionState,
+    updateSelectedItems,
+    toggleAllSelected,
+    resetFormState,
+  } = useModuleForm(moduleConfig, moduleData);
 
-  // Sync local output/logs/display with context design results
-  useEffect(() => {
-    // Prefill inputs from sessionStorage if available
-    try {
-      const moduleKey = moduleConfig.cameraKey || moduleConfig.moduleKey || moduleConfig.designType;
-      if (moduleKey) {
-        const raw = sessionStorage.getItem(`prefill:${moduleKey}`);
-        if (raw) {
-          const uiObj = JSON.parse(raw);
-          // Optional: allow per-module mapping via moduleConfig.osiKeyMap
-          const baseDefaults = moduleConfig.defaultInputs || {};
-          const osiKeyMap = moduleConfig.osiKeyMap || {};
-
-          // Build normalized inputs: only keys present in defaults
-          const normalized = {};
-          const addIfPresent = (inputKey, value) => {
-            if (value === undefined || value === null) return;
-            // Array handling: take first element
-            const val = Array.isArray(value) ? (value.length ? value[0] : undefined) : value;
-            if (val === undefined) return;
-            // Coerce to string for number/text fields as this UI primarily holds strings
-            normalized[inputKey] = typeof val === 'string' ? val : String(val);
-          };
-
-          // Iterate default input keys and try to find corresponding values in uiObj
-          for (const inputKey of Object.keys(baseDefaults)) {
-            // 1) Mapped key from .osi if provided
-            const mappedOsiKey = osiKeyMap[inputKey];
-            if (mappedOsiKey && Object.prototype.hasOwnProperty.call(uiObj, mappedOsiKey)) {
-              addIfPresent(inputKey, uiObj[mappedOsiKey]);
-              continue;
-            }
-            // 2) Heuristic: Dot-notated keys in .osi sometimes match with space/different casing
-            // Try direct exact match
-            if (Object.prototype.hasOwnProperty.call(uiObj, inputKey)) {
-              addIfPresent(inputKey, uiObj[inputKey]);
-              continue;
-            }
-            // 3) Simple aliases for common fields
-            const aliases = {
-              bolt_hole_type: 'Bolt.Bolt_Hole_Type',
-              bolt_diameter: 'Bolt.Diameter',
-              bolt_grade: 'Bolt.Grade',
-              bolt_slip_factor: 'Bolt.Slip_Factor',
-              bolt_type: 'Bolt.Type',
-              connector_material: 'Connector.Material',
-              design_method: 'Design.Design_Method',
-              detailing_edge_type: 'Detailing.Edge_type',
-              detailing_gap: 'Detailing.Gap',
-              detailing_corr_status: 'Detailing.Corrosive_Influences',
-              load_axial: 'Load.Axial',
-              load_shear: 'Load.Shear',
-              plate_thickness: 'Connector.Plate.Thickness_List',
-              beam_section: 'Member.Supported_Section.Designation',
-              column_section: 'Member.Supporting_Section.Designation',
-              supported_material: 'Member.Supported_Section.Material',
-              supporting_material: 'Member.Supporting_Section.Material',
-            };
-            const aliasKey = aliases[inputKey];
-            if (aliasKey && Object.prototype.hasOwnProperty.call(uiObj, aliasKey)) {
-              addIfPresent(inputKey, uiObj[aliasKey]);
-              continue;
-            }
-          }
-
-          if (Object.keys(normalized).length > 0) {
-            setInputs({ ...baseDefaults, ...normalized });
-          }
-          // Clear the prefill once read
-          sessionStorage.removeItem(`prefill:${moduleKey}`);
-        }
-      }
-    } catch (e) {
-      console.warn('Prefill from OSI failed:', e);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (designData && Object.keys(designData).length > 0) {
-      setOutput(designData);
-      setDisplayOutput(true);
-    }
-    if (designLogs) {
-      setLogs(designLogs);
-    }
-  }, [designData, designLogs]);
-
-  // Modal states
-  const [modalStates, setModalStates] = useState(
-    moduleConfig.modalConfig.reduce((acc, modal) => {
-      acc[modal.key] = false;
-      return acc;
-    }, {})
-  );
-
-  const [modalDynamicSrc, setModalDynamicSrc] = useState(
-    moduleConfig.modalConfig.reduce((acc, modal) => {
-      if(!modal?.dataSource)
-        acc[modal.key] = [];
-      return acc;
-    }, {})
-  );
-
-  // Selection states
-  const [selectionStates, setSelectionStates] = useState(
-    moduleConfig.selectionConfig.reduce((acc, selection) => {
-      acc[selection.key] = selection.defaultValue || "All";
-      return acc;
-    }, {})
-  );
-
-  // All selected states
-  const [allSelected, setAllSelected] = useState(
-    moduleConfig.selectionConfig.reduce((acc, selection) => {
-      acc[selection.inputKey] = true;
-      return acc;
-    }, {})
-  );
-
-  // Selected items for transfers
-  const [selectedItems, setSelectedItems] = useState(
-    moduleConfig.selectionConfig.reduce((acc, selection) => {
-      acc[selection.inputKey] = [];
-      return acc;
-    }, {})
-  );
-
-  // Initialize inputs arrays when default is "All" and arrays are empty
-  useEffect(() => {
-    const keyToFullListMap = {
-      bolt_diameter: boltDiameterList,
-      bolt_grade: propertyClassList,
-      plate_thickness: thicknessList,
-      flange_plate_thickness: thicknessList,
-      web_plate_thickness: thicknessList,
-      angle_list: angleList,
-      topangle_list: angleList,
-      cleat_section: angleList,
-    };
-
-    const nextInputs = { ...inputs };
-    let changed = false;
-
-    Object.entries(keyToFullListMap).forEach(([inputKey, fullList]) => {
-      if (!allSelected?.[inputKey]) return;
-      const current = inputs?.[inputKey];
-      const isEmptyArray = Array.isArray(current) ? current.length === 0 : !current;
-      if (!isEmptyArray) return;
-
-      const normalized = Array.isArray(fullList)
-        ? fullList.map((val) => {
-            if (typeof val === 'object' && val !== null) {
-              return val.value || val.Grade || String(val);
-            }
-            return String(val);
-          })
-        : [];
-      nextInputs[inputKey] = normalized;
-      changed = true;
-    });
-
-    if (changed) {
-      setInputs(nextInputs);
-    }
-  }, [boltDiameterList, propertyClassList, thicknessList, angleList, allSelected]);
-
-  // Initialize extraState based on module type
-  const getInitialExtraState = () => {
-    if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
-      return {
-        selectedOption: "Column Flange-Beam-Web", // Default for FinPlate
-      };
-    } else if (moduleConfig.cameraKey === "EndPlate") {
-      return {
-        selectedOption: "Column Flange-Beam-Web", // Default for EndPlate
-      };
-    } else if (moduleConfig.cameraKey === "BeamBeamEndPlate") {
-      return {
-        selectedOption: "Flushed - Reversible Moment", // Default for BeamBeamEndPlate
-      };
-    } else if (moduleConfig.cameraKey === "BeamToColumnEndPlate") {
-      return {
-        selectedOption: "Flushed - Reversible Moment", // Default for BeamColumnEndPlate
-      };
-    }
-    return {
-      selectedOption: "Column Flange-Beam-Web", // FIXED: Default for CleatAngle (changed from endplate default)
-    };
-  };
-
-  const [extraState, setExtraState] = useState(getInitialExtraState());
-
-  // On mount: Load module data using simplified API with enhanced error handling
-  useEffect(() => {
-    const loadModuleData = async () => {
-      if (!moduleConfig?.designType) {
-        return;
-      }
-
-      if (!getModuleData) {
-        return;
-      }
-
-      try {
-        // Use the new simplified API which returns { success, data, error }
-        const result = await getModuleData(moduleConfig.designType);
-
-        if (result && result.success) {
-        } else {
-        }
-      } catch (error) {
-      }
-    };
-
-    loadModuleData();
-  }, [moduleConfig?.designType, getModuleData]);
-
-  // Design report states
-  const [createDesignReportBool, setCreateDesignReportBool] = useState(false);
-  const [designReportInputs, setDesignReportInputs] = useState({
-    companyName: "Your company",
-    groupTeamName: "Your team",
-    designer: "You",
-    projectTitle: "",
-    subtitle: "",
-    jobNumber: "1",
-    client: "Someone else",
-    additionalComments: "No comments",
-    companyLogo: null,
-    companyLogoName: "",
-  });
-
-  // Navigation and reset states
-  const [confirmationType, setConfirmationType] = useState("reset");
-  const [allowNavigation, setAllowNavigation] = useState(false);
-  const [navigationSource, setNavigationSource] = useState(null);
-  const [showResetConfirmation, setShowResetConfirmation] = useState(false);
-  const [isLoadingModalVisible, setIsLoadingModalVisible] = useState(false);
-  const [loadingStage, setLoadingStage] = useState("");
-
-  // Other states
-  const [designPrefModalStatus, setDesignPrefModalStatus] = useState(false);
-  const [confirmationModal, setConfirmationModal] = useState(false);
-  const [displaySaveInputPopup, setDisplaySaveInputPopup] = useState(false);
-  const [saveInputFileName, setSaveInputFileName] = useState("");
   const [selectedView, setSelectedView] = useState("Model");
-  const [screenshotTrigger, setScreenshotTrigger] = useState(false);
 
   // Helper function to check if there's unsaved work
   const hasUnsavedWork = () => {
     return !!(output || renderBoolean);
   };
 
+  // Navigation guard
+  const {
+    showConfirmation: showResetConfirmation,
+    setShowConfirmation: setShowResetConfirmation,
+    confirmationType,
+    setConfirmationType,
+    confirmNavigation,
+    performNavigation,
+  } = useNavigationGuard(hasUnsavedWork, moduleConfig.routePath);
+
+  // Design report
+  const report = useDesignReport(
+    service,
+    moduleConfig,
+    output,
+    logs,
+    inputs,
+    allSelected,
+    extraState,
+    { boltDiameterList, propertyClassList, thicknessList, angleList }
+  );
+
+  // Dependent data side-effects
+  useDependentData(getDesignPreferences, moduleConfig, inputs, extraState);
+
   // Comprehensive reset function
   const resetToDefaultState = () => {
-    if (resetModuleState) {
-      resetModuleState();
-    }
+    // Reset design & CAD state
+    resetDesignState();
 
-    setRenderBoolean(false);
-    setModelKey(0);
-    setOutput(null);
-    setLogs(null);
-    setDisplayOutput(false);
-    setLoading(false);
-
-    setInputs(moduleConfig.defaultInputs);
-    setExtraState(getInitialExtraState());
-
-    // Reset selection states
-    setSelectionStates(
-      moduleConfig.selectionConfig.reduce((acc, selection) => {
-        acc[selection.key] = selection.defaultValue || "All";
-        return acc;
-      }, {})
-    );
-
-    setAllSelected(
-      moduleConfig.selectionConfig.reduce((acc, selection) => {
-        acc[selection.inputKey] = true;
-        return acc;
-      }, {})
-    );
-
-    // Reset modal states
-    setModalStates(
-      moduleConfig.modalConfig.reduce((acc, modal) => {
-        acc[modal.key] = false;
-        return acc;
-      }, {})
-    );
-
-    setSelectedItems(
-      moduleConfig.selectionConfig.reduce((acc, selection) => {
-        acc[selection.inputKey] = [];
-        return acc;
-      }, {})
-    );
-
-    setDesignPrefModalStatus(false);
-    setConfirmationModal(false);
-    setDisplaySaveInputPopup(false);
-    setCreateDesignReportBool(false);
+    resetFormState();
     setSelectedView("Model");
-    setScreenshotTrigger(false);
 
-  };
-
-
-  // Navigation protection
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      if (hasUnsavedWork()) {
-        const message = "You have unsaved design progress. Are you sure you want to leave?";
-        event.preventDefault();
-        event.returnValue = message;
-        return message;
-      }
-    };
-
-    const handlePopState = (event) => {
-      if (hasUnsavedWork() && !allowNavigation) {
-        window.history.pushState(null, "", moduleConfig.routePath);
-        setConfirmationType("navigation");
-        setNavigationSource("back");
-        setShowResetConfirmation(true);
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("popstate", handlePopState);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [output, renderBoolean, allowNavigation, moduleConfig.routePath]);
-
-  // Manage history state
-  useEffect(() => {
-    if (hasUnsavedWork()) {
-      window.history.pushState(null, "", window.location.pathname);
-    }
-  }, [output, renderBoolean]);
-
-  // Handle design logs
-  useEffect(() => {
-    if (displayOutput) {
-      try {
-        setLogs(designLogs);
-      } catch (error) { 
-        setOutput(null);
-      }
-    } else {
-      setLogs(null);
-    }
-  }, [designLogs, displayOutput]);
-
-  // Handle design data - normalize to { key: { label, val } }
-  useEffect(() => {
-    if (displayOutput) {
-      try {
-        const formatedOutput = {};
-
-        // Both FinPlate and others use flat entries: { label, val }
-        // Be defensive to support { label, value } too
-        for (const [key, value] of Object.entries(designData || {})) {
-          const label = value?.label ?? key;
-          const val = value?.val ?? value?.value ?? value;
-          if (val !== undefined && val !== null) {
-            formatedOutput[key] = { label, val };
-          }
-        }
-
-        setOutput(formatedOutput);
-      } catch (error) {
-        setOutput(null);
-      }
-    }
-  }, [designData, displayOutput]);
-
-  // Handle CAD model rendering
-  useEffect(() => {
-    if (renderCadModel && cadModelPaths) {
-      setRenderBoolean(true);
-      setLoading(false);
-
-      // Hide loading modal when model is ready
-      setTimeout(() => {
-        setIsLoadingModalVisible(false);
-        setLoadingStage("");
-      }, 500);
-    } else {
-      setRenderBoolean(false);
-    }
-  }, [renderCadModel, cadModelPaths]);
-
-  // Get supported data when member designation changes (BeamBeamEndPlate) - Using simplified API
-  useEffect(() => {
-    const loadSupportedData = async () => {
-      if (inputs.member_designation && moduleConfig.cameraKey !== MODULE_KEY_FIN_PLATE && moduleConfig.cameraKey !== MODULE_KEY_CLEAT_ANGLE && manageDesignPreferences) {
-        try {
-
-          const result = await manageDesignPreferences('get', {
-            supported_section: inputs.member_designation,
-          });
-
-          if (result && result.success) {
-          } else {
-          }
-        } catch (error) {
-        }
-      }
-    };
-
-    loadSupportedData();
-  }, [inputs.member_designation, manageDesignPreferences, moduleConfig.cameraKey]);
-
-  // Get design preferences data for FinPlate and CleatAngle - Using simplified API
-  useEffect(() => {
-    const loadDesignPreferences = async () => {
-      if ((moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE || moduleConfig.cameraKey === MODULE_KEY_CLEAT_ANGLE) && manageDesignPreferences) {
-        const conn_map = {
-          "Column Flange-Beam-Web": "Column Flange-Beam Web",
-          "Column Web-Beam-Web": "Column Web-Beam Web",
-          "Beam-Beam": "Beam-Beam",
-        };
-
-        const connectivity = extraState?.selectedOption || inputs.connectivity;
-
-        try {
-          let params = null;
-
-          if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
-            if (inputs.column_section && inputs.beam_section) {
-              params = {
-                supported_section: inputs.beam_section,
-                supporting_section: inputs.column_section,
-                connectivity: conn_map[connectivity].split(" ").join("-"),
-              };
-            }
-          } else if (connectivity === "Beam-Beam") {
-            if (inputs.primary_beam && inputs.secondary_beam) {
-              params = {
-                supported_section: inputs.secondary_beam,
-                supporting_section: inputs.primary_beam,
-                connectivity: conn_map[connectivity],
-              };
-            }
-          }
-
-          if (params) {
-
-            const result = await manageDesignPreferences('get', params);
-
-            if (result && result.success) {
-            } else {
-            }
-          }
-        } catch (error) {
-        }
-      }
-    };
-
-    loadDesignPreferences();
-  }, [
-    inputs.column_section,
-    inputs.beam_section,
-    inputs.primary_beam,
-    inputs.secondary_beam,
-    extraState.selectedOption,
-    inputs.connectivity,
-    manageDesignPreferences,
-    moduleConfig.cameraKey,
-  ]);
-
-  // Auto-hide save input popup
-  useEffect(() => {
-    if (displaySaveInputPopup) {
-      setTimeout(() => setDisplaySaveInputPopup(false), 4000);
-    }
-  }, [displaySaveInputPopup]);
-
-  const updateModalState = (modalKey, isOpen) => {
-    setModalStates((prev) => ({
-      ...prev,
-      [modalKey]: isOpen,
-    }));
-  };
-
-  const updateSelectionState = (selectionKey, value) => {
-    setSelectionStates((prev) => ({
-      ...prev,
-      [selectionKey]: value,
-    }));
-  };
-
-  const updateSelectedItems = (inputKey, items) => {
-    setSelectedItems((prev) => ({
-      ...prev,
-      [inputKey]: items,
-    }));
-    setInputs((prev) => ({
-      ...prev,
-      [inputKey]: items,
-    }));
-  };
-
-  const toggleAllSelected = (inputKey, isAll) => {
-    setAllSelected((prev) => ({
-      ...prev,
-      [inputKey]: isAll,
-    }));
   };
 
   const handleSubmit = async () => {
-    // Debug: print input state for All/Customized cleat section problems
-    console.log('[HandleSubmit: params for validation]', {
+    await submitDesign({
       inputs,
       selectionStates,
       allSelected,
-      angleList,
+      moduleData,
       extraState,
     });
-    console.log('🔵 [useEngineeringModule] handleSubmit - starting submission process');
-    const validationResult = moduleConfig.validateInputs(inputs, extraState, { angleList, boltDiameterList, propertyClassList, thicknessList }, selectionStates);
-    if (!validationResult.isValid) {
-      alert(validationResult.message);
-      return;
-    }
-    console.log('🔵 [useEngineeringModule] handleSubmit - input validation passed');
-    console.log('🔵 [useEngineeringModule] handleSubmit - before buildSubmissionParams');
-    let param = null;
-    try {
-      param = moduleConfig.buildSubmissionParams(inputs, allSelected, {
-        boltDiameterList,
-        propertyClassList,
-        thicknessList,
-        angleList, // FIXED: Added angleList to submission params
-        channelList,
-        weldSizeList,
-      }, extraState);
-      console.log('🔵 [useEngineeringModule] handleSubmit - after buildSubmissionParams', param);
-    } catch (err) {
-      console.error('🔴 [useEngineeringModule] buildSubmissionParams threw:', err);
-      // Restore UI state and abort
-      setIsLoadingModalVisible(false);
-      setLoading(false);
-      setLoadingStage("");
-      alert('Error preparing submission parameters. See console for details.');
-      return;
-    }
-    // Show loading modal
-    setIsLoadingModalVisible(true);
-    setLoadingStage("Generating design calculations...");
-
-    try {
-      console.log('🔵 [useEngineeringModule] handleSubmit - calling createDesign');
-      const designResult = await createDesign(param, moduleConfig.designType, null);
-      const designStatus = designResult?.status;
-      const designBody = designResult?.body;
-      const designSuccess =
-        designStatus >= 200 && designStatus < 300 &&
-        designBody?.success !== false &&
-        designBody?.data &&
-        Object.keys(designBody.data).length > 0;
-
-      if (!designSuccess) {
-        console.error('🔴 [useEngineeringModule] Design failed, skipping CAD. status:', designStatus, 'body:', designBody);
-        alert(designBody?.error || 'Design failed. Please check inputs.');
-        setLoading(false);
-        setIsLoadingModalVisible(false);
-        setLoadingStage("");
-        return;
-      }
-
-      // Auto-trigger CAD after successful design
-      console.log('🔵 [useEngineeringModule] Design complete, calling createCADModel');
-      setLoadingStage("Generating 3D model...");
-      const cadResult = await createCADModel(param, moduleConfig.designType, null);
-      console.log('🔵 [useEngineeringModule] createCADModel result:', cadResult);
-      if (cadResult?.success) {
-        setDisplayOutput(true);
-        setLoading(false);
-        setModelKey((prev) => prev + 1);
-      } else {
-        setLoading(false);
-        setIsLoadingModalVisible(false);
-        setLoadingStage("");
-      }
-    } catch (e) {
-        setLoading(false);
-      setIsLoadingModalVisible(false);
-      setLoadingStage("");
-    }
   };
 
   const handleReset = () => {
@@ -655,9 +177,7 @@ export const useEngineeringModule = (moduleConfig) => {
 
   const handleHomeClick = () => {
     if (hasUnsavedWork()) {
-      setConfirmationType("navigation");
-      setNavigationSource("home");
-      setShowResetConfirmation(true);
+      confirmNavigation("navigation", "home");
     } else {
       navigate("/home");
     }
@@ -665,23 +185,8 @@ export const useEngineeringModule = (moduleConfig) => {
 
   const performReset = () => {
     if (confirmationType === "navigation") {
-
-      setAllowNavigation(true);
-      setShowResetConfirmation(false);
-      setConfirmationType("reset");
-
-      setTimeout(() => {
-        resetToDefaultState();
-
-        if (navigationSource === "home") {
-          navigate("/home");
-        } else if (navigationSource === "back") {
-          navigate(-1);
-        }
-
-        setAllowNavigation(false);
-        setNavigationSource(null);
-      }, 100);
+      resetToDefaultState();
+      performNavigation();
     } else {
       resetToDefaultState();
       setShowResetConfirmation(false);
@@ -689,134 +194,33 @@ export const useEngineeringModule = (moduleConfig) => {
     }
   };
 
-  const saveOutput = () => {
+  const saveOutput = async () => {
     const validationResult = moduleConfig.validateInputs(inputs, extraState);
     if (!validationResult.isValid) {
       alert(validationResult.message);
       return;
     }
 
-    let data = moduleConfig.buildSubmissionParams(inputs, allSelected, {
-      boltDiameterList,
-      propertyClassList,
-      thicknessList,
-      angleList, // FIXED: Added angleList here too
-    }, extraState);
+    const data = moduleConfig.buildSubmissionParams(
+      inputs,
+      allSelected,
+      {
+        boltDiameterList,
+        propertyClassList,
+        thicknessList,
+        angleList,
+      },
+      extraState
+    );
 
-    // Add output data to the submission data
-    for (const key in output) {
-      if (output.hasOwnProperty(key)) {
-        const { label, val } = output[key];
-        if (label && val !== undefined && val !== null) {
-          const safeLabel = label.replace(/\s+/g, "_");
-          data[`${key}.${safeLabel}`] = val;
-        }
-      }
+    const csvResult = await service.exportToCSV(data);
+    if (!csvResult.success) {
+      alert(csvResult.error || "Failed to export CSV");
     }
-
-    // Convert to CSV and download
-    data = convertToCSV(data);
-    const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(data);
-    const link = document.createElement("a");
-    link.setAttribute("href", csvContent);
-    link.setAttribute("download", "output.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const convertToCSV = (data) => {
-    const keys = Object.keys(data);
-    const values = Object.values(data);
-
-    const csvData = keys.map((key, index) => {
-      const escapedValue = values[index].toString().replace(/"/g, '\\"');
-      return `"${key}","${escapedValue}"`;
-    });
-
-    return csvData.join("\n");
-  };
-
-  const handleCreateDesignReport = () => {
-    setCreateDesignReportBool(true);
-  };
-
-  const handleOkDesignReport = async (selectedSections = []) => {
-    if (!output) {
-      alert("Please submit the design first.");
-      return;
-    }
-
-    try {
-
-      // Build the same submission params used for calculate-output
-      const submissionParams = moduleConfig.buildSubmissionParams(
-        inputs,
-        allSelected,
-        {
-          boltDiameterList,
-          propertyClassList,
-          thicknessList,
-          angleList,
-        },
-        extraState
-      );
-
-      // Prepare payload with selected sections for filtering
-      const payload = {
-        ...designReportInputs,
-        moduleId: moduleConfig.designType,
-        inputValues: submissionParams,
-        designStatus: true,
-        logs: logs || [],
-      };
-
-      // Add sections if provided for customized filtering
-      if (selectedSections && selectedSections.length > 0) {
-        payload.sections = selectedSections;
-      }
-
-      const result = await generateReport('design_report', payload);
-
-      if (result && result.success) {
-        // Optionally show success message or further user feedback
-      } else {
-        alert(`Failed to generate design report: ${result?.error || 'Unknown error'}`);
-      }
-
-    } catch (error) {
-      alert(`Error generating design report: ${error.message}`);
-    }
-
-    handleCancelDesignReport();
-  };
-
-
-  const handleCancelDesignReport = () => {
-    setDesignReportInputs({
-      companyName: "Your company",
-      groupTeamName: "Your team",
-      designer: "You",
-      projectTitle: "",
-      subtitle: "",
-      jobNumber: "1",
-      client: "Someone else",
-      additionalComments: "No comments",
-      companyLogo: null,
-      companyLogoName: "",
-    });
-    setCreateDesignReportBool(false);
   };
 
   const clearDesignResults = () => {
-    setDisplayOutput(false);
-    setOutput(null);
-    setLogs(null);
-    setRenderBoolean(false);
-    setModelKey((prev) => prev + 1);
-    setLoading(false);
-    setIsLoadingModalVisible(false);
-    setLoadingStage("");
+    clearDesignResultsState();
   };
 
   return {
@@ -838,70 +242,57 @@ export const useEngineeringModule = (moduleConfig) => {
     displayPDF,
     designLogs,
     designData,
-    renderCadModel,
-    cadModelPaths,
-    hoverDict,
+    renderCadModel: cadData?.render,
+    cadModelPaths: cadData?.paths,
+    hoverDict: cadData?.hover,
     coverPlateList,
     weldSizeList,
 
-    // NEW SIMPLIFIED API - 8 Core Functions Only
-    // SIMPLIFIED API ACCESS - Expose core functions for advanced usage
+    // SERVICE API - Expose service for advanced usage
     // ===================================================================
-    getModuleData,              // Universal data fetcher
-    manageDesignPreferences,    // Design preferences management  
-    generateReport,             // Unified report generation
-    createDesign,               // Design calculation
-    resetModuleState,           // State reset
+    service,                    // Full service object for advanced usage
 
 
     // ===================================================================
     // COMPONENT STATE - Internal hook state
     // ===================================================================
+    ...moduleData,
+
+    // Form
     inputs,
     setInputs,
+    extraState,
+    setExtraState,
+    selectionStates,
+    allSelected,
+    selectedItems,
+    modalStates,
+    modalDynamicSrc,
+    designPrefModalStatus,
+    displaySaveInputPopup,
+    saveInputFileName,
+
+    // Submission
     output,
     logs,
     loading,
     renderBoolean,
     modelKey,
-    modalStates,
-    selectionStates,
-    allSelected,
-    selectedItems,
-    extraState,
-    setExtraState,
-    modalDynamicSrc,
-    setModalDynamicSrc,
-
-    // Report states
-    createDesignReportBool,
-    setCreateDesignReportBool,
-    designReportInputs,
-    setDesignReportInputs,
-
-    // Modal states
-    designPrefModalStatus,
-    setDesignPrefModalStatus,
-    confirmationModal,
-    setConfirmationModal,
-    displaySaveInputPopup,
-    setDisplaySaveInputPopup,
-    saveInputFileName,
-    setSaveInputFileName,
-    selectedView,
-    setSelectedView,
+    cadData,
+    loadingStage,
+    isLoadingModalVisible,
+    displayPDF,
+    setDisplayPDF,
     screenshotTrigger,
     setScreenshotTrigger,
 
-    // Navigation and Reset states
+    // View state
+    selectedView,
+    setSelectedView,
+
+    // Navigation
     showResetConfirmation,
-    setShowResetConfirmation,
     confirmationType,
-    setConfirmationType,
-    isLoadingModalVisible,
-    setIsLoadingModalVisible,
-    loadingStage,
-    setLoadingStage,
 
     // ===================================================================
     // ACTIONS - Hook action functions
@@ -915,9 +306,15 @@ export const useEngineeringModule = (moduleConfig) => {
     handleHomeClick,
     performReset,
     saveOutput,
-    handleCreateDesignReport,
-    handleOkDesignReport,
-    handleCancelDesignReport,
+
+    // Report
+    createDesignReportBool: report.createDesignReportBool,
+    designReportInputs: report.designReportInputs,
+    setDesignReportInputs: report.setDesignReportInputs,
+    handleCreateDesignReport: report.open,
+    handleOkDesignReport: report.submit,
+    handleCancelDesignReport: report.close,
+
     clearDesignResults,
   };
 };

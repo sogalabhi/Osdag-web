@@ -303,17 +303,58 @@ export const ModuleProvider = ({ children }) => {
     console.log('[cadissue] moduleId:', moduleId);
     console.log('[cadissue] inputData keys:', inputData ? Object.keys(inputData) : 'N/A');
     try {
-
-      console.log('[ModuleState] Making fetch request to:', `${BASE_URL}api/design/cad`);
-      const response = await fetch(`${BASE_URL}api/design/cad`, {
+      // Map module ID to slug (same as design endpoint)
+      const MODULE_SLUGS = {
+        // Shear
+        FinPlateConnection: 'shear-connection/fin-plate',
+        CleatAngleConnection: 'shear-connection/cleat-angle',
+        EndPlateConnection: 'shear-connection/end-plate',
+        SeatedAngleConnection: 'shear-connection/seated-angle',
+        // Moment
+        CoverPlateBolted: 'moment-connection/beam-beam-cover-plate-bolted',
+        'Beam-to-Beam-Cover-Plate-Bolted-Connection': 'moment-connection/beam-beam-cover-plate-bolted',
+        'Cover-Plate-Bolted-Connection': 'moment-connection/beam-beam-cover-plate-bolted',
+        CoverPlateWelded: 'moment-connection/beam-beam-cover-plate-welded',
+        'Beam-to-Beam-Cover-Plate-Welded-Connection': 'moment-connection/beam-beam-cover-plate-welded',
+        'Cover-Plate-Welded-Connection': 'moment-connection/beam-beam-cover-plate-welded',
+        BeamBeamEndPlate: 'moment-connection/beam-beam-end-plate',
+        'Beam-Beam-End-Plate-Connection': 'moment-connection/beam-beam-end-plate',
+        BeamColumnEndPlate: 'moment-connection/beam-column-end-plate',
+        'Beam-to-Column-End-Plate-Connection': 'moment-connection/beam-column-end-plate',
+        CCCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
+        ColumnCoverPlateBolted: 'moment-connection/column-column-cover-plate-bolted',
+        'Column-to-Column-Cover-Plate-Bolted-Connection': 'moment-connection/column-column-cover-plate-bolted',
+        CCCoverPlateWelded: 'moment-connection/column-column-cover-plate-welded',
+        'Column-to-Column-Cover-Plate-Welded-Connection': 'moment-connection/column-column-cover-plate-welded',
+        CCEndPlate: 'moment-connection/column-column-end-plate',
+        'Column-to-Column-End-Plate-Connection': 'moment-connection/column-column-end-plate',
+        // Simple
+        ButtJointBolted: 'simple-connection/butt-joint-bolted',
+        ButtJointWelded: 'simple-connection/butt-joint-welded',
+        LapJointBolted: 'simple-connection/lap-joint-bolted',
+        LapJointWelded: 'simple-connection/lap-joint-welded',
+        // Tension
+        'Tension-Member-Bolted-Design': 'tension-member/bolted',
+        'Tension-Member-Welded-Design': 'tension-member/welded',
+        BoltedToEndGusset: 'tension-member/bolted',
+        WeldedToEndGusset: 'tension-member/welded',
+        // Flexure
+        'Simply-Supported-Beam': 'flexure-member/simply-supported-beam',
+      };
+      
+      const slug = MODULE_SLUGS[moduleId] || moduleId;
+      const url = `${BASE_URL}api/modules/${slug}/cad/`;
+      
+      console.log('[ModuleState] Making fetch request to:', url);
+      const response = await fetch(url, {
         method: "POST",
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
-          module_id: moduleId,
-          input_values: inputData
+          inputs: inputData
         }),
       });
 
@@ -413,9 +454,73 @@ export const ModuleProvider = ({ children }) => {
   // ===================================================================
 
   /**
+   * Convert design output data to CSV format
+   * Handles nested objects by flattening them with dot notation
+   * @param {Object} data - Design output data
+   * @returns {string} CSV formatted string
+   */
+  const convertToCSV = useCallback((data) => {
+    if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+      return '';
+    }
+
+    // Flatten nested objects (e.g., {a: {b: 1}} becomes {"a.b": 1})
+    const flattenObject = (obj, prefix = '') => {
+      const flattened = {};
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          const newKey = prefix ? `${prefix}.${key}` : key;
+          const value = obj[key];
+          
+          if (value === null || value === undefined) {
+            flattened[newKey] = '';
+          } else if (typeof value === 'object' && !Array.isArray(value)) {
+            // Recursively flatten nested objects
+            Object.assign(flattened, flattenObject(value, newKey));
+          } else if (Array.isArray(value)) {
+            // Convert arrays to comma-separated string
+            flattened[newKey] = value.map(v => 
+              typeof v === 'object' ? JSON.stringify(v) : String(v)
+            ).join('; ');
+          } else {
+            flattened[newKey] = value;
+          }
+        }
+      }
+      return flattened;
+    };
+
+    const flatData = flattenObject(data);
+    const keys = Object.keys(flatData);
+    const values = Object.values(flatData);
+
+    if (keys.length === 0) {
+      return '';
+    }
+
+    // Escape CSV values (handle quotes and commas)
+    const escapeCSV = (value) => {
+      const str = String(value);
+      // If value contains comma, quote, or newline, wrap in quotes and escape internal quotes
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    // CSV header row
+    const header = keys.map(escapeCSV).join(',');
+    
+    // CSV data row
+    const row = values.map(escapeCSV).join(',');
+
+    return [header, row].join('\n');
+  }, []);
+
+  /**
    * Generate reports (PDF, CSV, etc.) with unified interface
    * @param {string} type - Report type ('pdf', 'csv')
-   * @param {Object} params - Report parameters
+   * @param {Object} params - Report parameters (for CSV: can pass outputData, otherwise uses state.designData)
    */
   const generateReport = useCallback(async (type, params = {}) => {
     try {
@@ -426,14 +531,33 @@ export const ModuleProvider = ({ children }) => {
         }
 
         case 'csv': {
-          const response = await fetch(`${BASE_URL}api/save-csv`, {
-            method: "GET",
-            mode: "cors",
-            credentials: "include",
-          });
+          // Get output data from params or state
+          const outputData = params.outputData || state.designData;
+          
+          if (!outputData || typeof outputData !== 'object' || Object.keys(outputData).length === 0) {
+            return { success: false, error: 'No output data available. Please run design calculation first.' };
+          }
 
-          const result = await response.json();
-          return { success: true, data: result };
+          // Convert to CSV
+          const csvContent = convertToCSV(outputData);
+          
+          if (!csvContent) {
+            return { success: false, error: 'Failed to generate CSV. Output data is empty.' };
+          }
+
+          // Create blob and trigger download
+          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+          link.download = `design_output_${timestamp}.csv`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+
+          return { success: true, message: 'CSV downloaded successfully' };
         }
 
         case 'design_report': {
@@ -446,7 +570,7 @@ export const ModuleProvider = ({ children }) => {
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }, []);
+  }, [state.designData, convertToCSV]);
 
   /**
    * Upload company logo for reports
