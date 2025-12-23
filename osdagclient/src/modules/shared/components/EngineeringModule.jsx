@@ -140,25 +140,6 @@ export const EngineeringModule = ({
     return out;
   }, [cadModelPaths]);
 
-  // Derive filtered model paths for the active selection (excluding Model)
-  const filteredCadModelPaths = useMemo(() => {
-    const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
-    // If Model is selected, show everything
-    if (activeViews.includes("Model")) return normalizedCadModelPaths;
-    // Pick only the explicitly selected parts
-    const out = {};
-    activeViews.forEach((view) => {
-      const key = view && view.trim();
-      if (!key) return;
-      const val =
-        normalizedCadModelPaths[key] ||
-        normalizedCadModelPaths[key.toLowerCase()] ||
-        normalizedCadModelPaths[key.toUpperCase()];
-      if (val) out[key] = val;
-    });
-    return out;
-  }, [normalizedCadModelPaths, selectedSection]);
-
   // Debug: log CAD paths when they change
   useEffect(() => {
     if (normalizedCadModelPaths) {
@@ -1003,29 +984,26 @@ export const EngineeringModule = ({
                       </Html>
                     }
                   >
-                    {filteredCadModelPaths && Object.keys(filteredCadModelPaths).length === 0 && (
-                      <Html>
-                        <p>No model paths found for the selected view.</p>
-                      </Html>
-                    )}
                     {renderBoolean && normalizedCadModelPaths && Object.keys(normalizedCadModelPaths).length > 0 && (() => {
                       const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
                       const primary = activeViews[0] || "Model";
-                      const hasPart =
-                        filteredCadModelPaths[primary] ||
-                        filteredCadModelPaths[primary?.toLowerCase?.()] ||
-                        filteredCadModelPaths[primary?.toUpperCase?.()];
-                      if (!hasPart && primary !== "Model") {
-                        return (
-                          <Html>
-                            <p>{`No CAD part found for view "${primary}". Available parts: ${Object.keys(normalizedCadModelPaths).join(", ")}`}</p>
-                          </Html>
-                        );
+                      if (primary && primary !== "Model") {
+                        const hasPart =
+                          normalizedCadModelPaths[primary] ||
+                          normalizedCadModelPaths[primary?.toLowerCase?.()] ||
+                          normalizedCadModelPaths[primary?.toUpperCase?.()];
+                        if (!hasPart) {
+                          return (
+                            <Html>
+                              <p>{`No CAD part found for view "${primary}". Available parts: ${Object.keys(normalizedCadModelPaths).join(", ")}`}</p>
+                            </Html>
+                          );
+                        }
                       }
                       return null;
                     })()}
                     <Model
-                      modelPaths={filteredCadModelPaths}
+                      modelPaths={normalizedCadModelPaths}
                       selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
                       selectedViews={selectedSection}
                       isMobile={window.innerWidth < 768}
