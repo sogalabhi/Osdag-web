@@ -64,11 +64,25 @@ export const InputSection = ({
   const toSelectOptions = (list = []) => {
     if (!list || list.length === 0) return [];
     if (typeof list[0] === 'object' && list[0] !== null) {
-      // Supports objects shaped like { Grade, ... } or { value, label }
+      // If already in { value, label } shape, keep it
       if ('value' in list[0] && 'label' in list[0]) {
         return list;
       }
-      return list.map(item => ({ value: item.Grade, label: item.Grade }));
+      // Otherwise normalize using common keys; fallback to stringified object
+      return list.map((item) => {
+        const val =
+          item.value ??
+          item.label ??
+          item.Grade ??
+          item.grade ??
+          item.Designation ??
+          item.designation ??
+          item.name ??
+          item.section ??
+          item.id ??
+          String(item);
+        return { value: val, label: val };
+      });
     }
     return list.map(item => ({ value: item, label: item }));
   };

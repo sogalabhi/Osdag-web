@@ -18,21 +18,22 @@ import ScreenshotCapture from "../../../components/ScreenShotCapture";
 import DesignPrefSections from "../../../components/DesignPrefSections";
 import GridSelector from "../utils/GridSelector";
 import { message, Modal as AntdModal } from 'antd';
-import { apiBase } from "../../../api";
 import { menuItems } from "../utils/moduleUtils";
 import { UI_STRINGS } from "../../../constants/UIStrings";
+import { isGuestUser } from "../../../utils/auth";
 
 export const EngineeringModule = ({
   moduleConfig,
   outputConfig,
   title,
 }) => {
+  const isGuest = isGuestUser;
   const navigate = useNavigate();
   const cameraRef = useRef();
   const lockBtnRef = useRef(null);
 
   const {
-    // Context data
+    // Module data
     beamList,
     columnList,
     connectivityList,
@@ -105,6 +106,9 @@ export const EngineeringModule = ({
     handleOkDesignReport,
     handleCancelDesignReport,
     clearDesignResults,
+    
+    // Service API (for project/OSI operations)
+    service,
   } = useEngineeringModule(moduleConfig);
 
   const [showResetButton, setShowResetButton] = useState(false);
@@ -122,6 +126,47 @@ export const EngineeringModule = ({
   const [lockZoom, setLockZoom] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isLandscape, setIsLandscape] = useState(false);
+
+  // Normalize CAD path keys to handle case/spacing differences
+  const normalizedCadModelPaths = useMemo(() => {
+    const out = {};
+    Object.entries(cadModelPaths || {}).forEach(([key, value]) => {
+      if (!key) return;
+      const trimmed = key.trim();
+      out[trimmed] = value;
+      out[trimmed.toLowerCase()] = value;
+      out[trimmed.toUpperCase()] = value;
+    });
+    return out;
+  }, [cadModelPaths]);
+
+  // Derive filtered model paths for the active selection (excluding Model)
+  const filteredCadModelPaths = useMemo(() => {
+    const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
+    // If Model is selected, show everything
+    if (activeViews.includes("Model")) return normalizedCadModelPaths;
+    // Pick only the explicitly selected parts
+    const out = {};
+    activeViews.forEach((view) => {
+      const key = view && view.trim();
+      if (!key) return;
+      const val =
+        normalizedCadModelPaths[key] ||
+        normalizedCadModelPaths[key.toLowerCase()] ||
+        normalizedCadModelPaths[key.toUpperCase()];
+      if (val) out[key] = val;
+    });
+    return out;
+  }, [normalizedCadModelPaths, selectedSection]);
+
+  // Debug: log CAD paths when they change
+  useEffect(() => {
+    if (normalizedCadModelPaths) {
+      const keys = Object.keys(normalizedCadModelPaths || {});
+      console.log("[EngineeringModule] cadModelPaths keys:", keys);
+      console.log("[EngineeringModule] selectedSection:", selectedSection);
+    }
+  }, [normalizedCadModelPaths, selectedSection]);
 
   // Detect landscape orientation for mobile
   useEffect(() => {
@@ -148,11 +193,6 @@ export const EngineeringModule = ({
   // Hover tooltip state for 3D parts
   const [hoverText, setHoverText] = useState("");
   const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
-  // Auth helpers
-  // const BASE_URL = 'http://localhost:8000/api/';
-  const BASE_URL = `${apiBase}`;
-  const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
-  const isGuest = () => (localStorage.getItem('userType') === 'guest');
   const location = useLocation();
 
   const getProjectIdFromUrl = () => {
@@ -163,7 +203,7 @@ export const EngineeringModule = ({
 
   // Enforce project presence for authenticated users
   useEffect(() => {
-    if (isGuest()) {
+    if (isGuestUser()) {
       console.info('[EngineeringModule] Guest mode detected: skipping project enforcement');
       return; // guests can open without a project
     }
@@ -175,20 +215,16 @@ export const EngineeringModule = ({
     }
     (async () => {
       try {
-        const res = await fetch(`${BASE_URL}api/projects/${projectId}/`, {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${getAccessToken()}` },
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) {
+        const result = await service.getProject(projectId);
+        if (!result.success || !result.project) {
           message.warning('Project not found. Redirecting to home.');
           navigate('/');
           return;
         }
         // Prefill inputs from saved project when opening by id
-        if (data.project && data.project.inputs_json) {
+        if (result.project.inputs_json) {
           try {
-            setInputs(data.project.inputs_json);
+            setInputs(result.project.inputs_json);
           } catch (_ignored) {
             // ignore parse issues; user can overwrite via UI
           }
@@ -198,39 +234,26 @@ export const EngineeringModule = ({
         navigate('/');
       }
     })();
-  }, [location.search]);
+  }, [location.search, service, setInputs, navigate]);
 
   // Only change dock visibility after design is complete
   useEffect(() => {
     if (!loading && !isRedesigning && output && renderBoolean) {
       setIsDesignComplete(true);
       setShowOptionsContainer(true); // Show options container after design is complete
-      
-      // Mobile/Tablet: Close input dock, show CAD and logs
-      if (window.innerWidth < 768) {
-        setShowInputDock(false);
-        setShowOutputDock(false);
-        setShowLogs(true);
-        
-        // Show toast to open output dock
-        message.info('Design complete! Open Output Dock to view results.', 5);
-      } else {
-        // Desktop: Don't force close input dock, just show output and logs if they don't exist
-        // Only auto-open output dock and logs if they're not already open
-        if (!showOutputDock) {
-          setShowOutputDock(true);
-        }
-        if (!showLogs) {
-          setShowLogs(true);
-        }
-        setIsInputLocked(true);
-      }
+
+      // Auto-open output dock and logs on all viewports so results are visible immediately
+      if (!showOutputDock) setShowOutputDock(true);
+      if (!showLogs) setShowLogs(true);
+
+      // Lock inputs after successful design
+      setIsInputLocked(true);
     } else if (isRedesigning || loading) {
       setIsDesignComplete(false);
       setShowOptionsContainer(false);
       setIsInputLocked(false);
     }
-  }, [loading, output, renderBoolean, isRedesigning]);
+  }, [loading, output, renderBoolean, isRedesigning, showOutputDock, showLogs]);
 
   const handleGridToggle = () => {
     setIsGridActive(!isGridActive);
@@ -268,18 +291,11 @@ export const EngineeringModule = ({
       setShowResetButton(true);
 
       // Persist latest inputs to project after design
-      if (!isGuest()) {
+      if (!isGuestUser()) {
         const pid = getProjectIdFromUrl();
         if (pid && !Number.isNaN(pid)) {
           try {
-            await fetch(`${BASE_URL}api/projects/${pid}/`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getAccessToken()}`,
-              },
-              body: JSON.stringify({ inputs_json: inputs }),
-            });
+            await service.updateProject(pid, { inputs_json: inputs });
           } catch (_e) {
             // ignore persistence errors; UI will still show outputs
           }
@@ -440,23 +456,18 @@ export const EngineeringModule = ({
 
       const inputsForSave = expandAllSelectedInputs(inputs);
       if (userIsGuest) {
-        // Guest: existing OSI download flow
-        const response = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: projectName, module_id: module_id, inputs: inputsForSave }),
-        });
-        const data = await response.json();
-        if (response.ok && data.success && data.is_guest) {
+        // Guest: OSI download flow using service
+        const result = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, false);
+        if (result.success && result.is_guest && result.content_base64) {
           try {
-            const binaryString = atob(data.content_base64);
+            const binaryString = atob(result.content_base64);
             const bytes = new Uint8Array(binaryString.length);
             for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
             const blob = new Blob([bytes], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = data.filename || `${projectName}.osi`;
+            link.download = result.filename || `${projectName}.osi`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -468,7 +479,7 @@ export const EngineeringModule = ({
           }
           return;
         }
-        message.error(data.error || 'Failed to save inputs');
+        message.error(result.error || 'Failed to save inputs');
         return;
       }
 
@@ -478,37 +489,24 @@ export const EngineeringModule = ({
         message.warning('No active project. Open or create a project first.');
         return;
       }
-      const updateResponse = await fetch(`${BASE_URL}api/projects/${projectId}/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAccessToken()}`,
-        },
-        body: JSON.stringify({ inputs_json: inputsForSave }),
-      });
-      const upd = await updateResponse.json();
-      if (!updateResponse.ok || !upd.success) {
-        message.error(upd.error || 'Failed to save inputs');
+      const updateResult = await service.updateProject(projectId, { inputs_json: inputsForSave });
+      if (!updateResult.success) {
+        message.error(updateResult.error || 'Failed to save inputs');
         return;
       }
 
       // Also provide a local OSI download for logged-in users (same as guest)
       try {
-        const saveRes = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getAccessToken()}` },
-          body: JSON.stringify({ name: projectName, module_id, inputs: inputsForSave, inline: true }),
-        });
-        const data = await saveRes.json();
-        if (saveRes.ok && data.success && data.content_base64) {
-          const binaryString = atob(data.content_base64);
+        const saveResult = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, true);
+        if (saveResult.success && saveResult.content_base64) {
+          const binaryString = atob(saveResult.content_base64);
           const bytes = new Uint8Array(binaryString.length);
           for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
           const blob = new Blob([bytes], { type: 'text/plain' });
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = data.filename || `${projectName}.osi`;
+          link.download = saveResult.filename || `${projectName}.osi`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1005,8 +1003,29 @@ export const EngineeringModule = ({
                       </Html>
                     }
                   >
+                    {filteredCadModelPaths && Object.keys(filteredCadModelPaths).length === 0 && (
+                      <Html>
+                        <p>No model paths found for the selected view.</p>
+                      </Html>
+                    )}
+                    {renderBoolean && normalizedCadModelPaths && Object.keys(normalizedCadModelPaths).length > 0 && (() => {
+                      const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
+                      const primary = activeViews[0] || "Model";
+                      const hasPart =
+                        filteredCadModelPaths[primary] ||
+                        filteredCadModelPaths[primary?.toLowerCase?.()] ||
+                        filteredCadModelPaths[primary?.toUpperCase?.()];
+                      if (!hasPart && primary !== "Model") {
+                        return (
+                          <Html>
+                            <p>{`No CAD part found for view "${primary}". Available parts: ${Object.keys(normalizedCadModelPaths).join(", ")}`}</p>
+                          </Html>
+                        );
+                      }
+                      return null;
+                    })()}
                     <Model
-                      modelPaths={cadModelPaths}
+                      modelPaths={filteredCadModelPaths}
                       selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
                       selectedViews={selectedSection}
                       isMobile={window.innerWidth < 768}
@@ -1018,7 +1037,7 @@ export const EngineeringModule = ({
                       onHoverLabel={handleHoverLabel}
                       onHoverEnd={handleHoverEnd}
                       moduleCadConfig={moduleConfig?.cadConfig}
-                      key={modelKey}
+                      key={`${modelKey}-${selectedSection}`}
                     />
                     <ScreenshotCapture
                       screenshotTrigger={screenshotTrigger}

@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .registry import ShearConnectionRegistry
 from apps.core.utils.module_helpers import handle_design_request
+from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from rest_framework import status
 from apps.core.models import Columns, Beams, Bolt, Material, CustomMaterials, Angles
 
@@ -172,4 +173,106 @@ class ShearConnectionViewSet(viewsets.ViewSet):
             return Response({'error': f'Sub-module {slug} not found'}, status=404)
         except Exception as e:
             return Response({'error': str(e)}, status=500)
+    
+    @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/cad')
+    def cad(self, request, submodule_slug=None):
+        """
+        POST /api/modules/shear-connection/{submodule_slug}/cad/
+        
+        Request body:
+        {
+            "inputs": {...},  # Design input parameters
+            "sections": ["Model", "Beam", ...]  # Optional: specific sections to generate
+        }
+        
+        Returns:
+        {
+            "status": "success",
+            "files": {section: base64_data, ...},
+            "hover_dict": {...},
+            "warnings": [...]
+        }
+        """
+        # Get service from registry
+        ServiceClass = ShearConnectionRegistry.get_service_by_slug(submodule_slug)
+        
+        if not ServiceClass:
+            return Response(
+                {'error': f'Sub-module {submodule_slug} not found'},
+                status=404
+            )
+        
+        # Extract inputs
+        inputs = request.data.get('inputs', request.data)
+        
+        if not inputs:
+            return Response(
+                {'error': 'inputs are required'},
+                status=400
+            )
+        
+        # Get sections from request or use defaults
+        sections = request.data.get('sections')
+        if not sections:
+            sections = get_default_sections('shear-connection', submodule_slug)
+        
+        if not sections:
+            return Response(
+                {'error': f'No sections defined for {submodule_slug}'},
+                status=400
+            )
+        
+        try:
+            # Import adapter to get create_from_input function for hover_dict
+            create_from_input_func = None
+            try:
+                if submodule_slug == 'fin-plate':
+                    from .submodules.fin_plate.adapter import create_from_input
+                    create_from_input_func = create_from_input
+                elif submodule_slug == 'cleat-angle':
+                    from .submodules.cleat_angle.adapter import create_from_input
+                    create_from_input_func = create_from_input
+                elif submodule_slug == 'end-plate':
+                    from .submodules.end_plate.adapter import create_from_input
+                    create_from_input_func = create_from_input
+                elif submodule_slug == 'seated-angle':
+                    from .submodules.seated_angle.adapter import create_from_input
+                    create_from_input_func = create_from_input
+            except ImportError as e:
+                print(f"[ShearConnectionViewSet] Could not import create_from_input for {submodule_slug}: {e}")
+            
+            # Generate CAD models
+            result = generate_cad_models(
+                service_class=ServiceClass,
+                inputs=inputs,
+                sections=sections,
+                create_from_input_func=create_from_input_func
+            )
+            
+            if not result['files']:
+                return Response(
+                    {
+                        'status': 'error',
+                        'message': 'No CAD models were generated',
+                        'errors': result['warnings']
+                    },
+                    status=422
+                )
+            
+            return Response({
+                'status': 'success',
+                'files': result['files'],
+                'hover_dict': result['hover_dict'],
+                'message': 'CAD models generated successfully',
+                'warnings': result['warnings']
+            }, status=201)
+            
+        except Exception as e:
+            print(f"[ShearConnectionViewSet] Error generating CAD: {e}")
+            import traceback
+            traceback.print_exc()
+            return Response(
+                {'error': str(e), 'status': 'error'},
+                status=500
+            )
 
