@@ -104,6 +104,7 @@ export const KEY_NON_DIM_ESR_LTB = 'NDESR.LTB';
 export const KEY_DESIGN_TYPE_FLEXURE = "KEY_DESIGN_TYPE_FLEXURE";
 
 // Module Keys - FinPlate
+
 export const MODULE_KEY_FIN_PLATE = 'FinPlateConnection'; // canonical key for API, state, config
 export const MODULE_KEY_SEAT_ANGLE = 'SeatedAngleConnection'; // canonical key for API, state, config
 export const MODULE_DISPLAY_FIN_PLATE = 'FinPlateConnection'; // display name for UI 
