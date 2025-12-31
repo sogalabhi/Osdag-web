@@ -400,6 +400,13 @@ class LapJointWelded(MomentConnection):
         self.weld.size = design_dictionary[KEY_WELD_SIZE]
         self.design_of_weld(design_dictionary)
 
+        # 3D Display Labels
+        self.hover_dict = {}
+        self.hover_dict["Model"] = "Lap Joint Welded Connection"
+        self.hover_dict["Plate 1"] = f"Plate 1 ({self.plate1.thickness[0]} mm)"
+        self.hover_dict["Plate 2"] = f"Plate 2 ({self.plate2.thickness[0]} mm)"
+        self.hover_dict["Weld"] = f"Fillet Weld ({self.weld.size} mm)"
+
     def design_of_weld(self, design_dictionary):
         self.logger.info(": =========== Design of Lap Joint Welded Connection ==========")
         self.logger.info(": Design Approach: IS 800:2007 Clause 10.5")

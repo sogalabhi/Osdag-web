@@ -170,8 +170,8 @@ from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
 # from Connections.Shear.cleatAngle.reportGenerator import save_html as cleat_save_html
 # from Connections.Shear.SeatedAngle.design_report_generator import ReportGenerator
 # ----------------------------------------- from reportGenerator import save_html
-from osdag_core.cad.items.plate import Plate
-from osdag_core.cad.items.angle import Angle
+from osdag.cad.items.plate import Plate
+from osdag.cad.items.angle import Angle
 from ..utils.common.component import ISection as ISectionComponent
 from ..utils.common.component import Column
 from ..utils.common.component import Beam
@@ -3810,7 +3810,6 @@ class CommonDesignLogic(object):
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
-
         elif self.mainmodule == KEY_DISP_LAPJOINTWELDED:
             if flag is True:
                 self.display_3DModel("Model", "gradient_bg")
