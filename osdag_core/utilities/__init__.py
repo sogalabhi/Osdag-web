@@ -138,6 +138,7 @@ def osdag_display_shape(display, shapes, material=None, texture=None, color=None
 
 
 
+
 def rgb_color(r, g, b):
     return Quantity_Color(r, g, b, Quantity_NOC_BLACK)
 

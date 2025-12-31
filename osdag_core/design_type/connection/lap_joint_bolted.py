@@ -1052,7 +1052,6 @@ class LapJointBolted(MomentConnection):
                     return round(float(x), 2)
                 except (TypeError, ValueError):
                     return default
-
             def as_int(x, default=0):
                 try:
                     return int(round(float(x)))
