@@ -87,6 +87,13 @@ INSTALLED_APPS = [
 
     # DRF
     'rest_framework',
+
+    # simpleJWT
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    
+    # Channels for WebSocket support
+    'channels',
 ]
 
 # Middleware order is CRITICAL - CorsMiddleware MUST be first
@@ -121,6 +128,7 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 
 # Database
@@ -226,4 +234,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'file_storage/')
 
 SECRET_ROOT = os.path.join(BASE_DIR , 'secret/')
+
+# --- Celery Configuration ---
+# Celery is used for offloading heavy PSO optimization tasks to separate worker processes
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+# --- Django Channels Configuration ---
+# Channels is used for WebSocket support for real-time PSO visualization
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
