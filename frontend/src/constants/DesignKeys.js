@@ -150,6 +150,7 @@ export const MODULE_KEY_WELDED_TO_END_GUSSET = 'WeldedToEndGusset';
 
 // Module Keys - Flexure
 export const MODULE_KEY_SIMPLY_SUPPORTED_BEAM = 'Simply-Supported-Beam';
+export const MODULE_KEY_PLATE_GIRDER = 'Plate-Girder';
 
 // Compression Member Keys
 export const KEY_END1 = 'Member.End_1';
