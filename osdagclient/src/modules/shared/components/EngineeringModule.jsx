@@ -38,6 +38,7 @@ export const EngineeringModule = ({
   const navigate = useNavigate();
   const cameraRef = useRef();
   const lockBtnRef = useRef(null);
+  const designCompletedRef = useRef(false); // Track if we've already handled design completion
 
   const {
     // Module data
@@ -133,6 +134,8 @@ export const EngineeringModule = ({
   const [lockZoom, setLockZoom] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isLandscape, setIsLandscape] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
 
   // Normalize CAD path keys to handle case/spacing differences
   const normalizedCadModelPaths = useMemo(() => {
@@ -156,22 +159,56 @@ export const EngineeringModule = ({
     }
   }, [normalizedCadModelPaths, selectedSection]);
 
-  // Detect landscape orientation for mobile
+  // Detect mobile/desktop and landscape orientation
   useEffect(() => {
-    const checkOrientation = () => {
+    const checkViewport = () => {
+      const width = window.innerWidth;
+      const mobile = width < 768;
+      console.log(`[VIEWPORT] Width changed: ${width}px | isMobile: ${mobile}`);
+      setIsMobile(mobile);
       // Landscape: width > height and on mobile/tablet
-      setIsLandscape(window.innerWidth > window.innerHeight && window.innerWidth < 768);
+      setIsLandscape(width > window.innerHeight && mobile);
+      
+      // On desktop, ensure CAD is always visible (only set once on mount/resize, not on every showCad change)
+      if (!mobile) {
+        setShowCad(true);
+      }
     };
     
-    checkOrientation();
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+    window.addEventListener('orientationchange', checkViewport);
     
     return () => {
-      window.removeEventListener('resize', checkOrientation);
-      window.removeEventListener('orientationchange', checkOrientation);
+      window.removeEventListener('resize', checkViewport);
+      window.removeEventListener('orientationchange', checkViewport);
     };
-  }, []);
+  }, []); // Empty dependency array - only run on mount and resize
+
+  // Log isMobile state changes
+  useEffect(() => {
+    console.log(`[STATE] isMobile changed: ${isMobile} | Window width: ${window.innerWidth}px`);
+  }, [isMobile]);
+
+  // Log showInputDock state changes
+  useEffect(() => {
+    console.log(`[DOCK] showInputDock changed: ${showInputDock}`);
+  }, [showInputDock]);
+
+  // Log showOutputDock state changes
+  useEffect(() => {
+    console.log(`[DOCK] showOutputDock changed: ${showOutputDock}`);
+  }, [showOutputDock]);
+
+  // Log showLogs state changes
+  useEffect(() => {
+    console.log(`[DOCK] showLogs changed: ${showLogs}`);
+  }, [showLogs]);
+
+  // Log showCad state changes
+  useEffect(() => {
+    console.log(`[DOCK] showCad changed: ${showCad}`);
+  }, [showCad]);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -226,22 +263,39 @@ export const EngineeringModule = ({
 
   // Only change dock visibility after design is complete
   useEffect(() => {
-    if (!loading && !isRedesigning && output && renderBoolean) {
+    // Check if design just completed (transition from incomplete to complete)
+    const designJustCompleted = !loading && !isRedesigning && output && renderBoolean && !designCompletedRef.current;
+    
+    if (designJustCompleted) {
+      console.log(`[DESIGN_COMPLETE] Design completed | isMobile: ${isMobile}`);
+      designCompletedRef.current = true; // Mark as handled
       setIsDesignComplete(true);
       setShowOptionsContainer(true); // Show options container after design is complete
 
-      // Auto-open output dock and logs on all viewports so results are visible immediately
-      if (!showOutputDock) setShowOutputDock(true);
-      if (!showLogs) setShowLogs(true);
+      if (isMobile) {
+        // Mobile: Auto-open CAD+Logs so results are visible immediately
+        console.log(`[DESIGN_COMPLETE] Setting mobile docks: CAD=true, Logs=true, Input=false, Output=false`);
+        setShowInputDock(false);
+        setShowOutputDock(false);
+        setShowCad(true);
+        setShowLogs(true);
+      } else {
+        // Desktop: Auto-open output dock and logs
+        console.log(`[DESIGN_COMPLETE] Setting desktop docks: Output=opening, Logs=opening`);
+        setShowOutputDock(true);
+        setShowLogs(true);
+      }
 
       // Lock inputs after successful design
       setIsInputLocked(true);
     } else if (isRedesigning || loading) {
+      // Reset the completion flag when redesigning or loading
+      designCompletedRef.current = false;
       setIsDesignComplete(false);
       setShowOptionsContainer(false);
       setIsInputLocked(false);
     }
-  }, [loading, output, renderBoolean, isRedesigning, showOutputDock, showLogs]);
+  }, [loading, output, renderBoolean, isRedesigning, isMobile]);
 
   const handleGridToggle = () => {
     setIsGridActive(!isGridActive);
@@ -258,6 +312,7 @@ export const EngineeringModule = ({
     if (isDesignComplete || renderBoolean || output) {
 
       // Immediately hide current model and output
+      designCompletedRef.current = false; // Reset completion flag
       setIsRedesigning(true);
       setIsDesignComplete(false);
       setShowOutputDock(false);
@@ -265,6 +320,12 @@ export const EngineeringModule = ({
       setShowOptionsContainer(false);
       setSelectedSection(["Model"]);
       setSelectedCameraView("Model");
+      // Reset CAD state based on device type
+      if (isMobile) {
+        setShowCad(false);
+      } else {
+        setShowCad(true);
+      }
 
       // Reset all the data that controls model rendering
       await performReset();
@@ -303,36 +364,55 @@ export const EngineeringModule = ({
 
   // Toggle functions for SVG clicks
   const toggleInputDock = () => {
-    // On mobile/tablet, close output dock if open
-    if (window.innerWidth < 768) {
-      if (showOutputDock) {
+    console.log(`[TOGGLE] toggleInputDock called | isMobile: ${isMobile} | current showInputDock: ${showInputDock}`);
+    if (isMobile) {
+      // Mobile: Close all other docks when opening input dock
+      if (showInputDock) {
+        // Closing input dock
+        console.log(`[TOGGLE] Closing input dock (mobile)`);
+        setShowInputDock(false);
+      } else {
+        // Opening input dock - close all others first
+        console.log(`[TOGGLE] Opening input dock (mobile) - closing others`);
         setShowOutputDock(false);
-      }
-      // Close logs when dock opens on mobile
-      if (showLogs) {
         setShowLogs(false);
+        setShowCad(false);
+        setShowInputDock(true);
       }
+    } else {
+      // Desktop: Independent toggle
+      console.log(`[TOGGLE] Toggling input dock (desktop): ${!showInputDock}`);
+      setShowInputDock(prev => !prev);
     }
-    // Desktop: No dependencies, just toggle
-    setShowInputDock((prev) => !prev);
   };
 
   const toggleOutputDock = () => {
     // Only check if output exists, not isDesignComplete
-    if (!output) return;
-    
-    // On mobile/tablet, close input dock if open
-    if (window.innerWidth < 768) {
-      if (showInputDock) {
-        setShowInputDock(false);
-      }
-      // Close logs when dock opens on mobile
-      if (showLogs) {
-        setShowLogs(false);
-      }
+    if (!output) {
+      console.log(`[TOGGLE] toggleOutputDock called but output is null`);
+      return;
     }
-    // Desktop: No dependencies, just toggle
-    setShowOutputDock((prev) => !prev);
+    
+    console.log(`[TOGGLE] toggleOutputDock called | isMobile: ${isMobile} | current showOutputDock: ${showOutputDock}`);
+    if (isMobile) {
+      // Mobile: Close all other docks when opening output dock
+      if (showOutputDock) {
+        // Closing output dock
+        console.log(`[TOGGLE] Closing output dock (mobile)`);
+        setShowOutputDock(false);
+      } else {
+        // Opening output dock - close all others first
+        console.log(`[TOGGLE] Opening output dock (mobile) - closing others`);
+        setShowInputDock(false);
+        setShowLogs(false);
+        setShowCad(false);
+        setShowOutputDock(true);
+      }
+    } else {
+      // Desktop: Independent toggle
+      console.log(`[TOGGLE] Toggling output dock (desktop): ${!showOutputDock}`);
+      setShowOutputDock(prev => !prev);
+    }
   };
 
   const handleLockToggle = () => {
@@ -346,6 +426,8 @@ export const EngineeringModule = ({
   };
 
   const confirmUnlock = () => {
+    console.log(`[UNLOCK] confirmUnlock called | isMobile: ${isMobile}`);
+    designCompletedRef.current = false; // Reset completion flag
     clearDesignResults();
     setIsDesignComplete(false);
     setShowOptionsContainer(false);
@@ -360,6 +442,14 @@ export const EngineeringModule = ({
     setShowInputDock(true);
     setIsRedesigning(false);
     setShowUnlockWarning(false);
+    // Reset CAD state based on device type
+    if (isMobile) {
+      console.log(`[UNLOCK] Resetting docks for mobile: Input=true, CAD=false`);
+      setShowCad(false);
+    } else {
+      console.log(`[UNLOCK] Resetting docks for desktop: Input=true, CAD=true`);
+      setShowCad(true);
+    }
   };
 
   const cancelUnlock = () => {
@@ -369,19 +459,74 @@ export const EngineeringModule = ({
 
   const toggleLogs = () => {
     // Only check if output exists
-    if (!output) return;
-    
-    // On mobile/tablet, if any dock is open, close it first
-    if (window.innerWidth < 768) {
-      if (showInputDock) {
-        setShowInputDock(false);
-      }
-      if (showOutputDock) {
-        setShowOutputDock(false);
-      }
+    if (!output) {
+      console.log(`[TOGGLE] toggleLogs called but output is null`);
+      return;
     }
-    // Desktop: No dependencies, just toggle
-    setShowLogs((prev) => !prev);
+    
+    console.log(`[TOGGLE] toggleLogs called | isMobile: ${isMobile} | current showLogs: ${showLogs} | current showCad: ${showCad}`);
+    if (isMobile) {
+      // Mobile: Special logic for CAD+Logs combination
+      if (showLogs) {
+        // Closing logs
+        console.log(`[TOGGLE] Closing logs (mobile)`);
+        setShowLogs(false);
+      } else {
+        // Opening logs
+        if (showCad) {
+          // If CAD is open, keep it open (CAD+Logs case)
+          console.log(`[TOGGLE] Opening logs with CAD (mobile) - CAD+Logs case`);
+          setShowInputDock(false);
+          setShowOutputDock(false);
+          setShowLogs(true);
+        } else {
+          // Open logs only, close all other docks
+          console.log(`[TOGGLE] Opening logs only (mobile) - closing others`);
+          setShowInputDock(false);
+          setShowOutputDock(false);
+          setShowCad(false);
+          setShowLogs(true);
+        }
+      }
+    } else {
+      // Desktop: Independent toggle
+      console.log(`[TOGGLE] Toggling logs (desktop): ${!showLogs}`);
+      setShowLogs(prev => !prev);
+    }
+  };
+
+  // New CAD toggle function
+  const toggleCad = () => {
+    console.log(`[TOGGLE] toggleCad called | isMobile: ${isMobile} | current showCad: ${showCad} | current showLogs: ${showLogs}`);
+    if (isMobile) {
+      // Mobile: Special logic for CAD+Logs combination
+      if (showCad) {
+        // Closing CAD
+        console.log(`[TOGGLE] Closing CAD (mobile)`);
+        setShowCad(false);
+      } else {
+        // Opening CAD
+        if (showLogs) {
+          // If logs are open, keep them open (CAD+Logs case)
+          console.log(`[TOGGLE] Opening CAD with logs (mobile) - CAD+Logs case`);
+          setShowInputDock(false);
+          setShowOutputDock(false);
+          setShowCad(true);
+        } else {
+          // Open CAD only, close all other docks
+          console.log(`[TOGGLE] Opening CAD only (mobile) - closing others`);
+          setShowInputDock(false);
+          setShowOutputDock(false);
+          setShowLogs(false);
+          setShowCad(true);
+        }
+      }
+    } else {
+      // Desktop: CAD is always visible, no toggle needed
+      // This shouldn't be called on desktop, but handle gracefully
+      console.log(`[TOGGLE] toggleCad called on desktop - setting showCad to true`);
+      setShowCad(true);
+    }
   };
 
   const handleResetEnhanced = async () => {
@@ -402,6 +547,12 @@ export const EngineeringModule = ({
     setSelectedCameraView("Model"); // Reset selected camera view
     setIsRedesigning(false); // Reset redesigning state
     setIsInputLocked(false);
+    // Reset CAD state based on device type
+    if (isMobile) {
+      setShowCad(false);
+    } else {
+      setShowCad(true);
+    }
   };
   // Save inputs to OSI file / Project (JSON-first)
   const handleSaveInputs = async () => {
@@ -694,11 +845,12 @@ export const EngineeringModule = ({
           {/* Logs Button */}
           <button
             onClick={toggleLogs}
-            className={`p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${showLogs
-              ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
-              : 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40'
+            disabled={!output}
+            className={`p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${output
+              ? (showLogs ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40')
+              : 'opacity-40 cursor-not-allowed'
               }`}
-            title={`${showLogs ? 'Hide' : 'Show'} logs`}
+            title={output ? `${showLogs ? 'Hide' : 'Show'} logs` : 'Run a design to view logs'}
             type="button"
           >
             <svg
@@ -726,6 +878,33 @@ export const EngineeringModule = ({
                 fill="currentColor"
                 stroke="none"
               />
+            </svg>
+          </button>
+
+          {/* CAD Toggle Button - Mobile Only */}
+          <button
+            onClick={toggleCad}
+            className={`md:hidden p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${showCad
+              ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
+              : 'hover:bg-black/10 dark:hover:bg-black/40'
+              }`}
+            title={`${showCad ? 'Hide' : 'Show'} CAD`}
+            type="button"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              {/* 3D Cube Icon */}
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+              <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
           </button>
 
@@ -799,7 +978,7 @@ export const EngineeringModule = ({
 
       <div className="relative flex flex-row h-full w-full">
         {/* Input Dock Toggle Button - Fixed to left, shows when dock is closed (Desktop only) */}
-        {!showInputDock && (
+        {!showInputDock && !isMobile && (
           <button
             onClick={toggleInputDock}
             className="hidden md:flex absolute left-0 top-0 h-full w-8 bg-white dark:bg-osdag-dark-color border-r border-gray-300 dark:border-osdag-border items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
@@ -813,7 +992,7 @@ export const EngineeringModule = ({
         )}
 
         {/* Output Dock Toggle Button - Fixed to right, shows when dock is closed and output exists (Desktop only) */}
-        {!showOutputDock && output && (
+        {!showOutputDock && output && !isMobile && (
           <button
             onClick={toggleOutputDock}
             className="hidden md:flex absolute right-0 top-0 h-full w-8 bg-white dark:bg-osdag-dark-color border-l border-gray-300 dark:border-gray-700 items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
@@ -826,7 +1005,7 @@ export const EngineeringModule = ({
           </button>
         )}
 
-        {/* Left - Input Dock - Only show if showInputDock is true */}
+        {/* Left - Input Dock */}
         {showInputDock && (
           <BaseInputDock
             moduleConfig={moduleConfig}
@@ -856,10 +1035,13 @@ export const EngineeringModule = ({
           />
         )}
 
-        {/* Middle - 3D Model */}
-        <div className="flex-1 flex flex-col relative min-w-0">
-          {/* Options Container - Show after design is complete. On desktop, show even when docks are open. On mobile, only show when docks are closed */}
-          {showOptionsContainer && output && (window.innerWidth >= 768 || (!showInputDock && !showOutputDock)) && (
+        {/* Middle - 3D Model and Logs Container */}
+        <div className={`
+          flex-1 flex flex-col relative min-w-0
+          ${isMobile && (showInputDock || showOutputDock) ? 'hidden' : 'flex'}
+        `}>
+          {/* Options Container - Show after design is complete. On desktop, show even when docks are open. On mobile, only show when CAD is visible */}
+          {showOptionsContainer && output && (isMobile ? showCad : true) && (
             <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 flex flex-wrap justify-center items-center gap-2 p-2 bg-white/90 dark:bg-osdag-dark-color/90 rounded-lg border border-gray-200 dark:border-gray-700 shadow-md">
               <div className="flex flex-wrap justify-center items-center gap-2">
                 {options.map((option) => {
@@ -937,15 +1119,15 @@ export const EngineeringModule = ({
             </div>
           )}
 
-          <div className={`
-            model-container
-            ${showInputDock || showOutputDock ? 'hidden md:block' : ''}
-            ${showLogs 
-              ? (isLandscape ? 'hidden' : 'h-[70%] md:h-[60%]')
-              : 'h-full md:h-full'
-            }
-            ${!showLogs ? 'full-height' : ''}
-          `}>
+          {/* CAD Window Container */}
+          {(!isMobile || showCad) && (
+            <div className={`
+              model-container
+              ${isMobile 
+                ? (showLogs ? 'h-[70%]' : 'h-full')
+                : (showLogs ? 'h-[60%]' : 'h-full')
+              }
+            `}>
             {loading || isRedesigning ? (
               <div className="modelLoading">
                 <p>{isRedesigning ? "Updating Model..." : "Loading Model..."}</p>
@@ -968,7 +1150,7 @@ export const EngineeringModule = ({
                 </div> */}
 
                 {/* Grid selector - right side - Hide when docks are open on mobile */}
-                {(!showInputDock && !showOutputDock) && (
+                {((isMobile && showCad && !showInputDock && !showOutputDock && !showLogs) || (!isMobile && !showInputDock && !showOutputDock)) && (
                   <GridSelector onViewChange={handleOrthographicViewChange} />
                 )}
 
@@ -1013,7 +1195,7 @@ export const EngineeringModule = ({
                       modelPaths={normalizedCadModelPaths}
                       selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
                       selectedViews={selectedSection}
-                      isMobile={window.innerWidth < 768}
+                      isMobile={isMobile}
                       cameraSettings={{
                         ...cameraSettings,
                         connectivity: getConnectivity(), // Add connectivity info
@@ -1035,27 +1217,31 @@ export const EngineeringModule = ({
             ) : (
               <div className="modelback"></div>
             )}
-          </div>
+            </div>
+          )}
 
-          {showLogs && output && (window.innerWidth >= 768 || (!showInputDock && !showOutputDock)) && (
+          {/* Logs Dock */}
+          {showLogs && output && (
             <div className={`
-              logs-container
-              ${isLandscape ? 'h-full' : 'h-[40%] md:h-[40%]'}
-              ${!showInputDock ? 'md:pl-0' : 'md:pl-[30px]'}
-              ${!showOutputDock && output ? 'md:pr-0' : ''}
+              ${isMobile 
+                ? (showCad ? 'h-[30%]' : 'fixed inset-0 z-50 h-full pt-[80px]')
+                : 'h-[40%]'
+              }
+              ${isMobile && !showCad ? 'bg-white dark:bg-osdag-dark-color' : ''}
+              ${!isMobile && !showInputDock ? 'md:pl-0' : 'md:pl-[30px]'}
+              ${!isMobile && !showOutputDock && output ? 'md:pr-0' : ''}
             `}>
               <Logs logs={logs} />
             </div>
           )}
         </div>
 
-        {/* Right - Output Dock - Only show if showOutputDock is true and output exists */}
+        {/* Right - Output Dock */}
         {showOutputDock && output && outputConfig && (
           <div className={`
-            flex
-            fixed md:relative left-0 right-0 md:left-auto md:right-auto top-24 md:top-auto bottom-0 md:bottom-auto z-50 md:z-auto
-            w-full md:w-[400px]
-            flex-col
+            ${isMobile ? 'fixed inset-0 z-50 h-full pt-[80px]' : 'relative md:relative md:z-auto'}
+            ${isMobile ? 'w-full' : 'md:w-[400px]'}
+            flex flex-col
             bg-white dark:bg-osdag-dark-color
           `}>
             <BaseOutputDock
@@ -1119,9 +1305,9 @@ export const EngineeringModule = ({
                 : setConfirmationModal(true)        // Ask confirmation
             }
             footer={null}
-            minWidth={window.innerWidth < 768 ? undefined : 1200}
-            width={window.innerWidth < 768 ? '100%' : 1400}
-            maxHeight={window.innerWidth < 768 ? '100%' : 1200}
+            minWidth={isMobile ? undefined : 1200}
+            width={isMobile ? '100%' : 1400}
+            maxHeight={isMobile ? '100%' : 1200}
             maskClosable={false}
             className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
           >
@@ -1167,7 +1353,7 @@ export const EngineeringModule = ({
               : "Yes, Leave Page"}
           </Button>,
         ]}
-        width={window.innerWidth < 768 ? '90%' : 500}
+        width={isMobile ? '90%' : 500}
         className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
       >
         <div>
@@ -1190,7 +1376,7 @@ export const EngineeringModule = ({
         closable={false}
         maskClosable={false}
         centered
-        width={window.innerWidth < 768 ? '90%' : 420}
+        width={isMobile ? '90%' : 420}
         className="loading-modal"
         styles={{
           body: {

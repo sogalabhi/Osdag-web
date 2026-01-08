@@ -291,11 +291,66 @@ const Header = ({ setshowSideBar, active }) => {
               </div>
               {/* Documents Button */}
               <div className="relative group">
-                <button className="p-3 text-osdag-text-muted hover:text-white dark:text-gray-400 dark:hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl">
+                <button className="p-3 text-osdag-text-muted hover:text-white dark:text-gray-400 dark:hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </button>
+              </div>
+              {/* Theme Toggle Button - Mobile */}
+              <div className="relative group">
+                <button
+                  onClick={toggleTheme}
+                  className="p-3 text-osdag-text-muted hover:text-white dark:text-gray-400 dark:hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl"
+                >
+                  {isDark ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="24px"
+                      viewBox="0 -960 960 960"
+                      width="24px"
+                      fill="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M21.64 13.64a1 1 0 00-1.05-.24 8 8 0 01-10-10 1 1 0 00-.24-1.05A1 1 0 008.73 2 10 10 0 1022 15.27a1 1 0 00-.36-1.63z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              {/* Profile Icon - Mobile */}
+              <div className="relative profile-dropdown group">
+                <button
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-osdag-green text-white"
+                >
+                  <span className="font-semibold text-lg">
+                    {user.name ? user.name[0].toUpperCase() : "G"}
+                  </span>
+                </button>
+                {/* Dropdown */}
+                {(showProfileDropdown || false) && (
+                  <div className="absolute right-0 top-full mt-2 bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green rounded-xl shadow-lg z-20 min-w-56 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-3 border-b border-gray-100 dark:border-osdag-green/30">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        Welcome, {user.name ? user.name.split("@")[0].replace(/^./, c => c.toUpperCase()) : "Guest"}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {user.email || ""}
+                      </p>
+                    </div>
+                    {user.name ? 
+                    <div className="py-2">
+                      <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
+                        Logout
+                      </button>
+                    </div>
+                    : ""}
+                  </div>
+                )}
               </div>
             </div>
           </div>
