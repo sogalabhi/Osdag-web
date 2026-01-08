@@ -252,9 +252,10 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 
     # check if the cad_models folder exists or not 
     # if no, then create one 
-    if(not os.path.exists(os.path.join(os.getcwd() , "file_storage/cad_models/"))) :
+    cad_models_path = os.path.join(os.getcwd(), "file_storage", "cad_models")
+    if not os.path.exists(cad_models_path):
         print('path does not exists cad_models , creating one')
-        os.mkdir(os.path.join(os.getcwd() , "file_storage/cad_models/"))
+        os.makedirs(cad_models_path, exist_ok=True)
       
     file_name = session + "_" + section + ".brep"
     file_path = "file_storage/cad_models/" + file_name

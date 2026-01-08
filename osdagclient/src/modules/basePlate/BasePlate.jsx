@@ -1,11 +1,10 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
-import { EngineeringModule } from "../../shared/components/EngineeringModule";
+import { EngineeringModule } from "../shared/components/EngineeringModule";
 import { basePlateConfig } from "./configs/basePlateConfig";
 import { basePlateOutputConfig } from "./configs/basePlateOutputConfig";
-import { UI_STRINGS } from '../../../constants/UIStrings';
-
-function BasePlate() {
+import { UI_STRINGS } from "../../constants/UIStrings";
+export default function BasePlate() {
   return (
     <EngineeringModule
       moduleConfig={basePlateConfig}

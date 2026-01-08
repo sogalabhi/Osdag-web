@@ -1,5 +1,5 @@
-import { UI_STRINGS } from '../../../../constants/UIStrings';
-import { MODULE_NAME_TO_KEY } from '../../../../constants/modules';
+import { UI_STRINGS } from '../../../constants/UIStrings';
+import { MODULE_NAME_TO_KEY } from '../../../constants/modules';
 
 export const basePlateConfig = {
   sessionName: "Base Plate",

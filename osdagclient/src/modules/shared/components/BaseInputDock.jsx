@@ -34,8 +34,9 @@ export const BaseInputDock = ({
   return (
     <div className={`
       flex
-      fixed md:relative left-0 right-0 md:left-auto md:right-auto md:top-auto bottom-0 md:bottom-auto z-50 md:z-auto
-      w-full md:w-[400px]
+      fixed md:relative inset-0 md:inset-auto md:left-auto md:right-auto md:top-auto md:bottom-auto z-50 md:z-auto
+      w-full md:w-[400px] h-full
+      pt-[80px] md:pt-0
       bg-white dark:bg-osdag-dark-color
       flex-col
     `}>
