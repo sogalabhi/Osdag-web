@@ -65,7 +65,7 @@ class SimplySupportedBeamInputData(InputDataBase):
             return Response(response, status=status.HTTP_200_OK)
 
         except Exception as e:
-            print(f"❌ Error in Simply Supported Beam Input Data: {str(e)}")
+            print(f"Error in Simply Supported Beam Input Data: {str(e)}")
             return Response(
                 {"error": f"Failed to fetch input data: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR

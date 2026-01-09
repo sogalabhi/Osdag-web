@@ -61,4 +61,24 @@ export const UI_STRINGS = {
   JOB_NUMBER: "Job Number:",
   CLIENT: "Client:",
   ADDITIONAL_COMMENTS: "Additional Comments:",
-}; 
+
+  // Module & Connection Labels (for cards, tabs, titles)
+  SIMPLE_CONNECTIONS: "Simple Connections",
+  SHEAR_CONNECTION: "Shear Connection",
+  SHEAR_CONNECTIONS: "Shear Connections",
+  MOMENT_CONNECTION: "Moment Connection",
+  BASE_PLATE: "Base Plate",
+  BASE_PLATE_CONNECTION: "Base Plate Connection",
+
+  FIN_PLATE: "Fin Plate",
+  CLEAT_ANGLE: "Cleat Angle",
+  END_PLATE: "End Plate",
+  SEATED_ANGLE: "Seated Angle",
+
+  TENSION_MEMBER: "Tension Member",
+  COMPRESSION_MEMBER: "Compression Member",
+  FLEXURE_MEMBER: "Flexure Member",
+
+  BOLTED_TO_END_PLATE: "Bolted to End Plate",
+  WELDED_TO_END_PLATE: "Welded to End Plate",
+};

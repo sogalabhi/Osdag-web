@@ -49,6 +49,9 @@ export const useEngineeringModule = (moduleConfig) => {
   const navigate = useNavigate();
   const service = useEngineeringService();
   const { getModuleData, getDesignPreferences } = service;
+  
+  // Access ModuleContext to get resetModuleState function
+  const { resetModuleState } = useContext(ModuleContext);
 
   // ===================================================================
   // MODULE DATA - Loaded via dedicated hook
@@ -91,6 +94,8 @@ export const useEngineeringModule = (moduleConfig) => {
     modelKey,
     isLoadingModalVisible,
     loadingStage,
+    status,
+    setStatus,
     resetDesignState,
     clearDesignResults: clearDesignResultsState,
     screenshotTrigger,
@@ -152,12 +157,15 @@ export const useEngineeringModule = (moduleConfig) => {
 
   // Comprehensive reset function
   const resetToDefaultState = () => {
-    // Reset design & CAD state
+    // Reset ModuleContext state (designData, logs, CAD paths, etc.)
+    resetModuleState();
+    
+    // Reset design & CAD state (hook-level state)
     resetDesignState();
 
+    // Reset form state
     resetFormState();
     setSelectedView("Model");
-
   };
 
   const handleSubmit = async () => {
@@ -281,6 +289,8 @@ export const useEngineeringModule = (moduleConfig) => {
     cadData,
     loadingStage,
     isLoadingModalVisible,
+    status,
+    setStatus,
     displayPDF,
     setDisplayPDF,
     screenshotTrigger,
@@ -316,5 +326,8 @@ export const useEngineeringModule = (moduleConfig) => {
     handleCancelDesignReport: report.close,
 
     clearDesignResults,
+    
+    // Expose resetModuleState for external use (e.g., module change detection)
+    resetModuleState,
   };
 };

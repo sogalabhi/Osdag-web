@@ -54,7 +54,7 @@ class FinPlateService:
             
         except Exception as e:
             print("\n" + "=" * 60)
-            print("❌ ERROR in FinPlateService.calculate()")
+            print("ERROR in FinPlateService.calculate()")
             print("=" * 60)
             print(f"Exception type: {type(e).__name__}")
             print(f"Exception message: {str(e)}")

@@ -53,7 +53,7 @@ class CompressionMemberService:
             
         except Exception as e:
             print("\n" + "=" * 60)
-            print("❌ ERROR in CompressionMemberService.calculate()")
+            print("ERROR in CompressionMemberService.calculate()")
             print("=" * 60)
             print(f"Exception type: {type(e).__name__}")
             print(f"Exception message: {str(e)}")

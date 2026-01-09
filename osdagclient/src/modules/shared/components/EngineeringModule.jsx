@@ -17,6 +17,8 @@ import { BaseInputDock } from "./BaseInputDock";
 import { BaseOutputDock } from "./BaseOutputDock";
 import { CustomizationModal } from "../components/CustomizationModal";
 import { DesignReportModal } from "../components/DesignReportModal";
+import { DesignStatusModal } from "./DesignStatusModal";
+import { DESIGN_STATUS } from "../hooks/useDesignSubmission";
 import useViewCamera from "./btobViewCamera";
 import Model from "./CadViewer";
 import Logs from "../../../components/Logs";
@@ -39,6 +41,8 @@ export const EngineeringModule = ({
   const cameraRef = useRef();
   const lockBtnRef = useRef(null);
   const designCompletedRef = useRef(false); // Track if we've already handled design completion
+  const prevModuleRef = useRef(null); // Track previous module for change detection
+  const prevProjectIdRef = useRef(null); // Track previous projectId for change detection
 
   const {
     // Module data
@@ -100,6 +104,8 @@ export const EngineeringModule = ({
     setIsLoadingModalVisible,
     loadingStage,
     setLoadingStage,
+    status,
+    setStatus,
 
     // Actions
     updateModalState,
@@ -117,6 +123,7 @@ export const EngineeringModule = ({
     
     // Service API (for project/OSI operations)
     service,
+    resetModuleState, // Exposed from hook for module change detection
   } = useEngineeringModule(moduleConfig);
 
   const [showResetButton, setShowResetButton] = useState(false);
@@ -226,6 +233,76 @@ export const EngineeringModule = ({
     return pid ? parseInt(pid, 10) : null;
   };
 
+  // ===================================================================
+  // MODULE CHANGE DETECTION - Clear state when switching modules
+  // ===================================================================
+  useEffect(() => {
+    const currentModule = moduleConfig.designType;
+    const currentProjectId = getProjectIdFromUrl();
+    
+    // Check if module changed
+    if (prevModuleRef.current && prevModuleRef.current !== currentModule) {
+      console.log(`[STATE_CLEANUP] Module changed: ${prevModuleRef.current} -> ${currentModule}`);
+      
+      // Clear ModuleContext state (designData, logs, CAD paths, etc.)
+      resetModuleState();
+      
+      // Clear hook-level design state
+      clearDesignResults();
+      
+      // Reset UI state
+      setIsDesignComplete(false);
+      setShowOutputDock(false);
+      setShowLogs(false);
+      setShowOptionsContainer(false);
+      setIsInputLocked(false);
+      setSelectedSection(["Model"]);
+      setSelectedCameraView("Model");
+      setIsRedesigning(false);
+      designCompletedRef.current = false;
+      
+      // Reset CAD visibility based on device
+      if (isMobile) {
+        setShowCad(false);
+      } else {
+        setShowCad(true);
+      }
+    }
+    
+    // Check if projectId changed (same module, different project)
+    if (prevProjectIdRef.current !== null && prevProjectIdRef.current !== currentProjectId) {
+      console.log(`[STATE_CLEANUP] Project changed: ${prevProjectIdRef.current} -> ${currentProjectId}`);
+      
+      // Clear design state when switching projects
+      resetModuleState();
+      clearDesignResults();
+      setIsDesignComplete(false);
+      setShowOutputDock(false);
+      setShowLogs(false);
+      setShowOptionsContainer(false);
+      setIsInputLocked(false);
+      designCompletedRef.current = false;
+    }
+    
+    // Update refs
+    prevModuleRef.current = currentModule;
+    prevProjectIdRef.current = currentProjectId;
+  }, [moduleConfig.designType, location.search, resetModuleState, clearDesignResults, isMobile]);
+
+  // ===================================================================
+  // CLEANUP ON UNMOUNT - Clear state when component unmounts
+  // ===================================================================
+  useEffect(() => {
+    return () => {
+      console.log('[STATE_CLEANUP] Component unmounting, clearing ModuleContext state');
+      // Clear ModuleContext state when component unmounts
+      resetModuleState();
+    };
+  }, [resetModuleState]);
+
+  // ===================================================================
+  // PROJECT LOADING - Clear state before loading project inputs
+  // ===================================================================
   // Enforce project presence for authenticated users
   useEffect(() => {
     if (isGuestUser()) {
@@ -240,6 +317,17 @@ export const EngineeringModule = ({
     }
     (async () => {
       try {
+        // Clear design state FIRST before loading project
+        // This ensures we don't show stale design results from previous project
+        resetModuleState();
+        clearDesignResults();
+        setIsDesignComplete(false);
+        setShowOutputDock(false);
+        setShowLogs(false);
+        setShowOptionsContainer(false);
+        setIsInputLocked(false);
+        designCompletedRef.current = false;
+        
         const result = await service.getProject(projectId);
         if (!result.success || !result.project) {
           message.warning('Project not found. Redirecting to home.');
@@ -259,12 +347,12 @@ export const EngineeringModule = ({
         navigate('/');
       }
     })();
-  }, [location.search, service, setInputs, navigate]);
+  }, [location.search, service, setInputs, navigate, resetModuleState, clearDesignResults]);
 
   // Only change dock visibility after design is complete
   useEffect(() => {
-    // Check if design just completed (transition from incomplete to complete)
-    const designJustCompleted = !loading && !isRedesigning && output && renderBoolean && !designCompletedRef.current;
+    // Check if design just completed (transition to COMPLETE status)
+    const designJustCompleted = status.step === DESIGN_STATUS.COMPLETE && !designCompletedRef.current;
     
     if (designJustCompleted) {
       console.log(`[DESIGN_COMPLETE] Design completed | isMobile: ${isMobile}`);
@@ -288,14 +376,28 @@ export const EngineeringModule = ({
 
       // Lock inputs after successful design
       setIsInputLocked(true);
-    } else if (isRedesigning || loading) {
-      // Reset the completion flag when redesigning or loading
-      designCompletedRef.current = false;
-      setIsDesignComplete(false);
-      setShowOptionsContainer(false);
-      setIsInputLocked(false);
+    } else if (isRedesigning || status.step === DESIGN_STATUS.CALCULATING || status.step === DESIGN_STATUS.CAD_GENERATING) {
+      // Reset the completion flag when redesigning or during design process
+      if (isRedesigning) {
+        designCompletedRef.current = false;
+        setIsDesignComplete(false);
+        setShowOptionsContainer(false);
+        setIsInputLocked(false);
+      }
     }
-  }, [loading, output, renderBoolean, isRedesigning, isMobile]);
+  }, [status.step, isRedesigning, isMobile]);
+  
+  // Show output dock immediately after calculation completes (before CAD)
+  useEffect(() => {
+    // When status transitions to CAD_GENERATING, calculation just completed
+    if (status.step === DESIGN_STATUS.CAD_GENERATING && output && !isRedesigning && !designCompletedRef.current) {
+      console.log(`[EARLY_OUTPUT] Calculation complete, showing output dock early`);
+      if (!isMobile) {
+        setShowOutputDock(true);
+        setShowLogs(true);
+      }
+    }
+  }, [status.step, output, isRedesigning, isMobile]);
 
   const handleGridToggle = () => {
     setIsGridActive(!isGridActive);
@@ -1237,7 +1339,7 @@ export const EngineeringModule = ({
         </div>
 
         {/* Right - Output Dock */}
-        {showOutputDock && output && outputConfig && (
+        {showOutputDock && output && outputConfig && status.step !== DESIGN_STATUS.ERROR && (
           <div className={`
             ${isMobile ? 'fixed inset-0 z-50 h-full pt-[80px]' : 'relative md:relative md:z-auto'}
             ${isMobile ? 'w-full' : 'md:w-[400px]'}
@@ -1369,43 +1471,20 @@ export const EngineeringModule = ({
         </div>
       </Modal>
 
-      {/* Loading Modal */}
-      <Modal
-        open={isLoadingModalVisible}
-        footer={null}
-        closable={false}
-        maskClosable={false}
-        centered
-        width={isMobile ? '90%' : 420}
-        className="loading-modal"
-        styles={{
-          body: {
-            textAlign: "center",
-            padding: "30px 20px",
-          },
+      {/* Design Status Modal */}
+      <DesignStatusModal
+        status={status}
+        isMobile={isMobile}
+        onRetry={() => {
+          // Retry logic - could trigger handleSubmitEnhanced again
+          setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
         }}
-      >
-        <div className="loading-content">
-          <div>🔧 OSDAG Design Processing</div>
-          <div>
-            <div className="spinner"></div>
-          </div>
-          <div>{loadingStage || "Generating your engineering design..."}</div>
-          <div>Please wait while we create your 3D model</div>
-        </div>
-      </Modal>
-
-      {/* CSS for spinner animation */}
-      <style>{`
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
+        onClose={() => {
+          if (status.step === DESIGN_STATUS.ERROR) {
+            setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
           }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
+        }}
+      />
 
       {/* Hover tooltip overlay */}
       {hoverText && (

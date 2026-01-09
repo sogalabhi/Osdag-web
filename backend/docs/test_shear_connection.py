@@ -60,7 +60,7 @@ def test_registry():
     if service:
         print(f"✅ Fin Plate Service found: {service.__name__}")
     else:
-        print("❌ Fin Plate Service NOT found!")
+        print("Fin Plate Service NOT found!")
         return False
     
     return True
@@ -92,11 +92,11 @@ def test_endpoint(submodule_slug, inputs):
                 print(f"✅ Logs count: {len(data['logs'])}")
             return True
         else:
-            print(f"❌ Error: {response.json()}")
+            print(f"Error: {response.json()}")
             return False
             
     except Exception as e:
-        print(f"❌ Exception: {str(e)}")
+        print(f"Exception: {str(e)}")
         import traceback
         traceback.print_exc()
         return False
@@ -108,7 +108,7 @@ def main():
     
     # Test 1: Registry
     if not test_registry():
-        print("\n❌ Registry test failed. Cannot continue.")
+        print("\nRegistry test failed. Cannot continue.")
         return
     
     # Test 2: Fin Plate endpoint
@@ -128,7 +128,7 @@ def main():
     if response.status_code == 404:
         print("✅ Correctly returns 404 for invalid slug")
     else:
-        print(f"❌ Expected 404, got {response.status_code}")
+        print(f"Expected 404, got {response.status_code}")
     
     print("\n" + "=" * 60)
     print("TEST COMPLETE")

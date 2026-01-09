@@ -53,7 +53,7 @@ class SimplySupportedBeamService:
             
         except Exception as e:
             print("\n" + "=" * 60)
-            print("❌ ERROR in SimplySupportedBeamService.calculate()")
+            print("ERROR in SimplySupportedBeamService.calculate()")
             print("=" * 60)
             print(f"Exception type: {type(e).__name__}")
             print(f"Exception message: {str(e)}")

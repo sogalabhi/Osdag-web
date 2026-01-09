@@ -323,7 +323,7 @@ export const ModuleProvider = ({ children }) => {
         throw new Error(`CAD generation failed: ${data.message || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('❌ [ModuleState] createCADModel ERROR:', error);
+      console.error('[ModuleState] createCADModel ERROR:', error);
       console.error('[ModuleState] Error message:', error.message);
       console.error('[ModuleState] Error stack:', error.stack);
       dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });

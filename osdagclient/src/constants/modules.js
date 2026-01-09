@@ -22,24 +22,25 @@ import {
     MODULE_KEY_TENSION_BOLTED,
     MODULE_KEY_TENSION_WELDED,
 } from "./DesignKeys";
+import { UI_STRINGS } from "./UIStrings";
 
 export const MODULE_SUBMODULES = {
     Connections: [
-        { key: "Simple", "label": "Simple Connections" },
-        { key: "Shear", label: "Shear Connection" },
-        { key: "Moment", label: "Moment Connection" },
-        { key: "BasePlate", label: "Base Plate" },
+        { key: "Simple", label: UI_STRINGS.SIMPLE_CONNECTIONS },
+        { key: "Shear", label: UI_STRINGS.SHEAR_CONNECTION },
+        { key: "Moment", label: UI_STRINGS.MOMENT_CONNECTION },
+        { key: "BasePlate", label: UI_STRINGS.BASE_PLATE },
         { key: "Truss", label: "Truss Connection" },
     ],
-    TensionMember: [{ key: "Tension", label: "Tension Member" }],
-    CompressionMember: [{ key: "Compression", label: "Compression Member" }],
-    FlexureMember: [{ key: "Flexure", label: "Flexure Member" }],
+    TensionMember: [{ key: "Tension", label: UI_STRINGS.TENSION_MEMBER }],
+    CompressionMember: [{ key: "Compression", label: UI_STRINGS.COMPRESSION_MEMBER }],
+    FlexureMember: [{ key: "Flexure", label: UI_STRINGS.FLEXURE_MEMBER }],
 };
 
 export const CONNECTIONS_TAB_CONTENT = {
     Simple: [
         {
-            label: "Simple Connections",
+            label: UI_STRINGS.SIMPLE_CONNECTIONS,
             options: [
                 { key: MODULE_KEY_BUTT_JOINT_WELDED, label: "Butt Joint Welded", img: "shear_fin_plate_connec.svg" },
                 { key: MODULE_KEY_BUTT_JOINT_BOLTED, label: "Butt Joint Bolted", img: "shear_fin_plate_connec.svg" },
@@ -50,12 +51,12 @@ export const CONNECTIONS_TAB_CONTENT = {
     ],
     Shear: [
         {
-            label: "Shear Connections",
+            label: UI_STRINGS.SHEAR_CONNECTIONS,
             options: [
-                { key: MODULE_KEY_FIN_PLATE, label: "Fin Plate", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_CLEAT_ANGLE, label: "Cleat Angle", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_END_PLATE, label: "End Plate", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_SEAT_ANGLE, label: "Seated Angle", img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_FIN_PLATE, label: UI_STRINGS.FIN_PLATE, img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_CLEAT_ANGLE, label: UI_STRINGS.CLEAT_ANGLE, img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_END_PLATE, label: UI_STRINGS.END_PLATE, img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_SEAT_ANGLE, label: UI_STRINGS.SEATED_ANGLE, img: "shear_fin_plate_connec.svg" },
             ],
         },
     ],
@@ -65,13 +66,13 @@ export const CONNECTIONS_TAB_CONTENT = {
             options: [
                 { key: MODULE_KEY_COVER_PLATE_BOLTED, label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
                 { key: MODULE_KEY_COVER_PLATE_WELDED, label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_BEAM_BEAM_END_PLATE, label: "End Plate", img: "shear_fin_plate_connec.svg" }, 
+                { key: MODULE_KEY_BEAM_BEAM_END_PLATE, label: UI_STRINGS.END_PLATE, img: "shear_fin_plate_connec.svg" }, 
             ],
         },
         {
             label: "Beam to Column Splice",
             options: [
-                { key: MODULE_KEY_BEAM_COLUMN_END_PLATE, label: "End Plate", img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_BEAM_COLUMN_END_PLATE, label: UI_STRINGS.END_PLATE, img: "shear_fin_plate_connec.svg" },
             ],
         },
         {
@@ -79,14 +80,14 @@ export const CONNECTIONS_TAB_CONTENT = {
             options: [
                 { key: MODULE_KEY_CC_COVER_PLATE_BOLTED, label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
                 { key: MODULE_KEY_CC_COVER_PLATE_WELDED, label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_CC_END_PLATE, label: "End Plate", img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_CC_END_PLATE, label: UI_STRINGS.END_PLATE, img: "shear_fin_plate_connec.svg" },
             ],
         },
     ],
     BasePlate: [
         {
             label: "Base Plates",
-            options: [{ key: "BasePlateConnection", label: "Base Plate Connection", img: "shear_fin_plate_connec.svg" }],
+            options: [{ key: "BasePlateConnection", label: UI_STRINGS.BASE_PLATE_CONNECTION, img: "shear_fin_plate_connec.svg" }],
         },
     ],
     Truss: [{ label: "Truss Connections", options: [] }],
@@ -95,22 +96,22 @@ export const CONNECTIONS_TAB_CONTENT = {
 export const GENERIC_SUBMODULE_CONTENT = {
     Tension: [
         {
-            label: "Tension Member",
+            label: UI_STRINGS.TENSION_MEMBER,
             options: [
-                { key: MODULE_KEY_BOLTED_TO_END_GUSSET, label: "Bolted to End Plate", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_WELDED_TO_END_GUSSET, label: "Welded to End Plate", img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_BOLTED_TO_END_GUSSET, label: UI_STRINGS.BOLTED_TO_END_PLATE, img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_WELDED_TO_END_GUSSET, label: UI_STRINGS.WELDED_TO_END_PLATE, img: "shear_fin_plate_connec.svg" },
             ],
         },
     ],
     Compression: [
         {
-            label: "Compression Member",
+            label: UI_STRINGS.COMPRESSION_MEMBER,
             options: [{ key: "StrutsInTrusses", label: "Struts in Trusses", img: "shear_fin_plate_connec.svg" }],
         },
     ],
     Flexure: [
         {
-            label: "Flexure Member",
+            label: UI_STRINGS.FLEXURE_MEMBER,
             options: [
                 { key: MODULE_KEY_SIMPLY_SUPPORTED_BEAM, label: "Simply Supported Beam", img: "shear_fin_plate_connec.svg" },
                 { key: "OnCantilever", label: "Cantilever Beam", img: "shear_fin_plate_connec.svg" },

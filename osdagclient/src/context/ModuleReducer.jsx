@@ -306,16 +306,19 @@ export default (state, action) => {
     case "RESET_MODULE_STATE":
       return {
         ...state,
-        // Reset design-related state
+        // Reset design-related state completely
         designData: {},
         designLogs: [],
         renderCadModel: false,
         cadModelPaths: {},
+        hoverDict: {}, // Clear CAD hover tooltips
         displayPDF: false,
         report_id: "",
         blobUrl: "",
         designPrefData: {},
         error_msg: "",
+        // Keep module data lists (they're module-specific, not design-specific)
+        // These will be refreshed when getModuleData is called for the new module
       };
 
     case "SET_ERR_MSG":

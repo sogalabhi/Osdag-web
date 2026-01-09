@@ -1,6 +1,29 @@
 import { useEffect, useState } from "react";
 
 /**
+ * Status state machine types
+ * Represents the different stages of the design workflow
+ */
+export const DESIGN_STATUS = {
+  IDLE: 'IDLE',
+  VALIDATING: 'VALIDATING',
+  CALCULATING: 'CALCULATING',
+  CAD_GENERATING: 'CAD_GENERATING',
+  COMPLETE: 'COMPLETE',
+  ERROR: 'ERROR'
+};
+
+/**
+ * Status object shape
+ * {
+ *   step: DESIGN_STATUS.IDLE | DESIGN_STATUS.VALIDATING | ...
+ *   message: string
+ *   error: Error | null
+ *   progress: number (0-100, optional)
+ * }
+ */
+
+/**
  * Action layer for design + CAD submission.
  * Encapsulates validation, submission pipeline, and related UI state.
  */
@@ -15,12 +38,17 @@ export const useDesignSubmission = (service, moduleConfig) => {
   const [output, setOutput] = useState(null);
   const [logs, setLogs] = useState(null);
   const [displayOutput, setDisplayOutput] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Keep for backward compatibility
   const [renderBoolean, setRenderBoolean] = useState(false);
   const [modelKey, setModelKey] = useState(0);
-  const [isLoadingModalVisible, setIsLoadingModalVisible] = useState(false);
-  const [loadingStage, setLoadingStage] = useState("");
   const [screenshotTrigger, setScreenshotTrigger] = useState(false);
+  
+  // Status state machine
+  const [status, setStatus] = useState({
+    step: DESIGN_STATUS.IDLE,
+    message: '',
+    error: null
+  });
 
   const submitDesign = async ({ inputs, selectionStates, allSelected, moduleData, extraState }) => {
     console.log("[useDesignSubmission] submitDesign start", {
@@ -28,18 +56,34 @@ export const useDesignSubmission = (service, moduleConfig) => {
       inputs,
       allSelected,
     });
+    
     const { angleList, boltDiameterList, propertyClassList, thicknessList, channelList, weldSizeList } = moduleData;
+    
+    // Validation step
+    setStatus({
+      step: DESIGN_STATUS.VALIDATING,
+      message: 'Validating inputs...',
+      error: null
+    });
+    
     const validationResult = moduleConfig.validateInputs(
       inputs,
       extraState,
       { angleList, boltDiameterList, propertyClassList, thicknessList },
       selectionStates
     );
+    
     if (!validationResult.isValid) {
+      setStatus({
+        step: DESIGN_STATUS.ERROR,
+        message: validationResult.message || 'Validation failed',
+        error: new Error(validationResult.message)
+      });
       alert(validationResult.message);
       return;
     }
 
+    // Parameter building step
     let param = null;
     try {
       param = moduleConfig.buildSubmissionParams(
@@ -49,16 +93,23 @@ export const useDesignSubmission = (service, moduleConfig) => {
         extraState
       );
     } catch (err) {
-      setIsLoadingModalVisible(false);
-      setLoading(false);
-      setLoadingStage("");
+      setStatus({
+        step: DESIGN_STATUS.ERROR,
+        message: 'Error preparing submission parameters',
+        error: err
+      });
       alert("Error preparing submission parameters. See console for details.");
       console.error("buildSubmissionParams threw:", err);
       return;
     }
 
-    setIsLoadingModalVisible(true);
-    setLoadingStage("Generating design calculations...");
+    // Calculation step
+    setStatus({
+      step: DESIGN_STATUS.CALCULATING,
+      message: 'Running design calculations...',
+      error: null
+    });
+    setLoading(true); // Keep for backward compatibility
 
     try {
       const designResult = await service.createDesign(moduleConfig.designType, param);
@@ -71,10 +122,14 @@ export const useDesignSubmission = (service, moduleConfig) => {
         designBody?.data;
 
       if (!designSuccess) {
-        alert(designBody?.error || "Design failed. Please check inputs.");
+        const errorMessage = designBody?.error || "Design failed. Please check inputs.";
+        setStatus({
+          step: DESIGN_STATUS.ERROR,
+          message: errorMessage,
+          error: new Error(errorMessage)
+        });
         setLoading(false);
-        setIsLoadingModalVisible(false);
-        setLoadingStage("");
+        alert(errorMessage);
         return;
       }
 
@@ -93,11 +148,18 @@ export const useDesignSubmission = (service, moduleConfig) => {
       setDesignLogs(nextLogs);
       setLogs(nextLogs);
       setOutput(formattedOutput);
-      setDisplayOutput(true);
+      setDisplayOutput(true); // Show output immediately after calculation
 
-      setLoadingStage("Generating 3D model...");
+      // CAD Generation step
+      setStatus({
+        step: DESIGN_STATUS.CAD_GENERATING,
+        message: 'Building 3D model...',
+        error: null
+      });
+      
       const cadResult = await service.createCADModel(moduleConfig.designType, param);
       console.log("[useDesignSubmission] CAD result", cadResult);
+      
       if (cadResult?.success) {
         console.log('[useDesignSubmission] CAD success, files:', cadResult.files);
         // Normalize CAD keys to expected case
@@ -120,18 +182,56 @@ export const useDesignSubmission = (service, moduleConfig) => {
         setDisplayOutput(true);
         setLoading(false);
         setModelKey((prev) => prev + 1);
-        setIsLoadingModalVisible(false);
-        setLoadingStage("");
+        
+        // Complete
+        setStatus({
+          step: DESIGN_STATUS.COMPLETE,
+          message: 'Design complete!',
+          error: null
+        });
+        
+        // Auto-dismiss after 1 second
+        setTimeout(() => {
+          setStatus({
+            step: DESIGN_STATUS.IDLE,
+            message: '',
+            error: null
+          });
+        }, 1000);
       } else {
+        // CAD failed but calculation succeeded - partial success
+        const cadErrorMessage = cadResult?.error || 'Failed to generate 3D model';
+        setStatus({
+          step: DESIGN_STATUS.ERROR,
+          message: `Calculation succeeded, but ${cadErrorMessage.toLowerCase()}`,
+          error: new Error(cadErrorMessage)
+        });
         setLoading(false);
-        setIsLoadingModalVisible(false);
-        setLoadingStage("");
         setRenderBoolean(false);
+        // Keep output visible since calculation succeeded
       }
     } catch (e) {
+      // Determine if this is a calculation error or CAD error
+      const hasOutput = output !== null;
+      const errorMessage = e.message || 'An error occurred during design';
+      
+      if (hasOutput) {
+        // Partial success: calculation worked, CAD failed
+        setStatus({
+          step: DESIGN_STATUS.ERROR,
+          message: `Calculation succeeded, but ${errorMessage.toLowerCase()}`,
+          error: e
+        });
+      } else {
+        // Complete failure: calculation failed
+        setStatus({
+          step: DESIGN_STATUS.ERROR,
+          message: errorMessage,
+          error: e
+        });
+      }
+      
       setLoading(false);
-      setIsLoadingModalVisible(false);
-      setLoadingStage("");
       setRenderBoolean(false);
     }
   };
@@ -148,8 +248,11 @@ export const useDesignSubmission = (service, moduleConfig) => {
     setLogs(null);
     setDisplayOutput(false);
     setLoading(false);
-    setIsLoadingModalVisible(false);
-    setLoadingStage("");
+    setStatus({
+      step: DESIGN_STATUS.IDLE,
+      message: '',
+      error: null
+    });
   };
 
   const clearDesignResults = () => {
@@ -159,8 +262,11 @@ export const useDesignSubmission = (service, moduleConfig) => {
     setRenderBoolean(false);
     setModelKey((prev) => prev + 1);
     setLoading(false);
-    setIsLoadingModalVisible(false);
-    setLoadingStage("");
+    setStatus({
+      step: DESIGN_STATUS.IDLE,
+      message: '',
+      error: null
+    });
   };
 
   return {
@@ -182,14 +288,26 @@ export const useDesignSubmission = (service, moduleConfig) => {
     displayOutput,
     setDisplayOutput,
     // ui/flags
-    loading,
+    loading, // Keep for backward compatibility
     renderBoolean,
     modelKey,
     setModelKey,
-    isLoadingModalVisible,
-    setIsLoadingModalVisible,
-    loadingStage,
-    setLoadingStage,
+    // status state machine
+    status,
+    setStatus,
+    // backward compatibility (deprecated, use status instead)
+    isLoadingModalVisible: status.step !== DESIGN_STATUS.IDLE,
+    setIsLoadingModalVisible: (visible) => {
+      if (!visible) {
+        setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
+      }
+    },
+    loadingStage: status.message,
+    setLoadingStage: (message) => {
+      if (status.step !== DESIGN_STATUS.IDLE) {
+        setStatus({ ...status, message });
+      }
+    },
     screenshotTrigger,
     setScreenshotTrigger,
     // helpers

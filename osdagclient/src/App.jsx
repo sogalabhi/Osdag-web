@@ -56,8 +56,6 @@ import BasePlate from "./modules/basePlate/BasePlate";
 import "./App.css";
 import BeamToColumnEndPlate from "./modules/beamToColumnEndPlate/BeamToColumnEndPlate";
 
-let renderedOnce = false;
-
 function App() {
   let loggedIn = false;
   const router = createBrowserRouter(

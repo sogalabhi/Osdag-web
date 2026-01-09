@@ -167,7 +167,7 @@ export const BaseInputDock = ({
         <div className={`${isInputLocked ? "pointer-events-none opacity-60" : ""}`}>
           {moduleConfig.inputSections.map((section, index) => (
             <InputSection
-              key={index}
+              key={section?.id || section?.name || index}
               section={section}
               inputs={inputs}
               setInputs={setInputs}

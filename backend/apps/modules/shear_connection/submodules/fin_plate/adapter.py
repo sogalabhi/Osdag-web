@@ -375,7 +375,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         print(f"✅ Module created: {type(module).__name__}")
         print(f"Module object: {module}")
     except Exception as e:
-        print(f"❌ Failed to create module: {e}")
+        print(f"Failed to create module: {e}")
         raise
     
     # Initialize logs variable first
@@ -450,7 +450,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         print(f"✅ Processed {processed_count} parameters, skipped {skipped_count}")
     except Exception as e:
         print("\n" + "=" * 60)
-        print("❌ ERROR in generate_output()")
+        print("ERROR in generate_output()")
         print("=" * 60)
         print(f"Exception type: {type(e).__name__}")
         print(f"Exception message: {str(e)}")
