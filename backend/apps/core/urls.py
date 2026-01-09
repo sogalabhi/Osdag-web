@@ -5,8 +5,7 @@ Extracted from osdag/urls.py
 from django.urls import path
 # Import from new api structure (using re-exports from __init__.py)
 from apps.core.api import (
-    SignupView, ForgetPasswordView, LogoutView, LoginView,
-    ObtainInputFileView, CheckEmailView, SaveInputFileView, SetRefreshTokenCookieView,
+    ObtainInputFileView, SaveInputFileView,
     JWTHomeView, GoogleSSOView,
     ProjectAPI, ProjectDetailAPI, ProjectByNameAPI,
     SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
@@ -29,18 +28,12 @@ urlpatterns = [
     # Authentication and authorization
     path('jwt/home', JWTHomeView.as_view()),  # view for testing purpose
     path('googlesso/', GoogleSSOView.as_view()),
-    path('api/auth/firebase-login/', views.FirebaseLoginView.as_view(), name="firebase_login"),
+    path('api/auth/firebase-login/', views.FirebaseAuthView.as_view(), name="firebase_auth"),
     path('api/dashboard/', views.dashboard_view, name='dashboard'),
     
     # User URLs
-    path('api/user/signup/', SignupView.as_view()),
-    path('api/user/forgetpassword/', ForgetPasswordView.as_view()),
-    path('api/user/logout/', LogoutView.as_view()),
-    path('api/user/login/', LoginView.as_view()),
-    path('api/user/checkemail/', CheckEmailView.as_view()),
     path('api/user/saveinput/', SaveInputFileView.as_view()),
     path('api/user/obtain-input-file/', ObtainInputFileView.as_view()),
-    path('api/user/set-refresh/', SetRefreshTokenCookieView.as_view()),
     
     # OSI upload via DRF (multipart form-data)
     path('api/save-osi/', SaveInputFileView.as_view()),

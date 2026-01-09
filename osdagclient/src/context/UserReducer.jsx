@@ -7,7 +7,8 @@
 export default (state, action) => {
     switch(action.type){
         case 'SET_LOGGING_STATUS' : 
-        localStorage.setItem('isLoggedIn' , action.payload.isLoggedIn)
+        // Remove: localStorage.setItem('isLoggedIn' , action.payload.isLoggedIn)
+        // Keep reducer pure - localStorage sync handled in UserState.jsx useEffect
             return {
                 ...state,
                 isLoggedIn : action.payload.isLoggedIn,

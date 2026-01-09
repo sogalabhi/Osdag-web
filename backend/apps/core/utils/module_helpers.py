@@ -11,6 +11,7 @@ from apps.core.models import Project
 def is_guest_user(request: HttpRequest) -> bool:
     """
     Check if the current user is a guest user.
+    Guests don't send authentication tokens, so they are unauthenticated.
     
     Args:
         request: Django HTTP request object
@@ -18,12 +19,7 @@ def is_guest_user(request: HttpRequest) -> bool:
     Returns:
         bool: True if user is guest, False otherwise
     """
-    if hasattr(request, 'auth') and isinstance(request.auth, dict):
-        return request.auth.get('is_guest', False)
-    # Also check if no auth at all (completely unauthenticated)
-    if not hasattr(request, 'user') or not request.user.is_authenticated:
-        return True
-    return False
+    return not (hasattr(request, 'user') and request.user.is_authenticated)
 
 
 def get_user_email(request: HttpRequest) -> Optional[str]:

@@ -5,31 +5,11 @@ from rest_framework import serializers
 from apps.core.models import Anchor_Bolt , Angle_Pitch , Angles , Beams , Bolt , Bolt_fy_fu , CHS , Channels , Columns , EqualAngle , UnequalAngle , Material , RHS , SHS, CustomMaterials 
 from apps.core.models import Design, UserAccount, OsiFile
 
-# simplejwt imports 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
-
-
 #########################################################
 # Author : Atharva Pingale ( FOSSEE Summer Fellow '23 ) #
 #########################################################
 
-
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-
-        # Add custom claims
-        token['email'] = user.email
-        print('token email : ' , token['email'])
-        token['username'] = user.username
-        print('token username : ' , token['username'])
-        #token['isGuest'] = user.isGuest
-        #print('token isGuest : ' , token['isGuest'])
-
-        return token
-
+# Removed: MyTokenObtainPairSerializer - No longer needed with Firebase authentication
 
 class UserAccount_Serializer(serializers.ModelSerializer):
     class Meta:

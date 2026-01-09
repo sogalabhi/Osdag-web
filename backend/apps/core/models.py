@@ -71,14 +71,40 @@ class Design(models.Model):
 #########################################################
 # Author : Atharva Pingale ( FOSSEE Summer Fellow '23 ) #
 #########################################################
-class UserAccount(models.Model) : 
-    username = models.TextField(blank=True , unique = True)
-    email = models.TextField(blank=True, unique = True)
-    allInputValueFiles = ArrayField(models.TextField(blank = True))
+class UserAccount(models.Model):
+    """
+    User account model for storing user-specific data.
+    
+    IMPORTANT: With Firebase Authentication:
+    - username field stores Firebase UID (not a traditional username)
+    - user field is a ForeignKey to Django User model (which also uses Firebase UID as username)
+    - email field stores the user's email address
+    - No password field needed (authentication handled by Firebase)
+    
+    The User model (Django's built-in) stores:
+    - username = Firebase UID
+    - email = User's email address
+    """
+    # ForeignKey to Django User model (which uses Firebase UID as username)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='user_account',
+        null=True,
+        blank=True,
+        help_text="Link to Django User (username = Firebase UID)"
+    )
+    # Firebase UID stored as username (for backward compatibility and direct lookups)
+    username = models.TextField(blank=True, unique=True, help_text="Firebase UID")
+    email = models.TextField(blank=True, unique=True)
+    allInputValueFiles = ArrayField(models.TextField(blank=True))
 
-    class Meta : 
+    class Meta:
         app_label = 'core'
         db_table = "UserAccount"
+        
+    def __str__(self):
+        return f"UserAccount: {self.username or self.email or 'No identifier'}"
 
 class Anchor_Bolt(models.Model):
     Diameter = models.TextField()

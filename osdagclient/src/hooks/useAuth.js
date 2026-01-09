@@ -1,57 +1,97 @@
-import { useContext, useEffect, useCallback } from 'react';
-import { UserContext } from '../context/UserState';
-import { 
-  checkAutoLogin, 
-  clearTokens, 
-  isAuthenticated,
-  getAccessToken 
-} from '../utils/auth';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '../Auth/firebase';
+import { syncUserToBackend } from '../utils/firebaseAuth';
+import { clearAuthStorage, isGuestUser } from '../utils/auth';
 
 /**
- * Custom hook for authentication management
+ * Custom hook for Firebase authentication management
+ * Replaces the old JWT-based authentication system
  */
 export const useAuth = () => {
-  const { isLoggedIn, userLogin, setIsLoggedIn } = useContext(UserContext);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Auto-login check
+  // Subscribe to Firebase auth state changes
   useEffect(() => {
-    const userData = checkAutoLogin();
-    if (userData && !isLoggedIn) {
-      if (userData.isGuest) {
-        // For guest mode, don't call userLogin which would trigger server call
-        // Guest mode is handled by the userType in localStorage
-        console.log('Guest user detected');
-      } else {
-        // For regular users with valid tokens
-        userLogin(userData.username, "", false, true);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
+      setEmailVerified(firebaseUser?.emailVerified || false);
+      setIsLoggedIn(!!firebaseUser || isGuestUser());
+      setLoading(false);
+      
+      // Sync to backend if authenticated
+      if (firebaseUser) {
+        try {
+          await syncUserToBackend(firebaseUser);
+        } catch (error) {
+          console.error('Error syncing user to backend:', error);
+          // Don't block auth if backend sync fails
+        }
       }
-    }
-  }, [userLogin, isLoggedIn]);
-
-  // Logout function
-  const logout = useCallback(() => {
-    clearTokens();
-    setIsLoggedIn(false);
-    // Redirect to login page
-    window.location.href = '/';
-  }, [setIsLoggedIn]);
-
-  // Check if user is authenticated (including guest mode)
-  const checkAuth = useCallback(() => {
-    const userType = localStorage.getItem('userType');
-    return isLoggedIn || userType === 'guest' || isAuthenticated();
-  }, [isLoggedIn]);
-
-  // Get current token
-  const getCurrentToken = useCallback(() => {
-    return getAccessToken();
+    });
+    
+    return () => unsubscribe();
   }, []);
 
+  // Logout function using Firebase signOut
+  const logout = useCallback(async () => {
+    try {
+      // Check if it's a guest user
+      if (isGuestUser()) {
+        clearAuthStorage();
+        setIsLoggedIn(false);
+        navigate('/');
+        return;
+      }
+
+      // Firebase user logout
+      await signOut(auth);
+      clearAuthStorage();
+      setIsLoggedIn(false);
+      
+      // Redirect to login page
+      navigate('/');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Still clear local state even if Firebase logout fails
+      clearAuthStorage();
+      setIsLoggedIn(false);
+      navigate('/');
+    }
+  }, [navigate]);
+
+  // Get current Firebase token for API calls
+  const getCurrentToken = useCallback(async () => {
+    if (!user) {
+      return null;
+    }
+    try {
+      const token = await user.getIdToken();
+      return token;
+    } catch (error) {
+      console.error('Error getting token:', error);
+      return null;
+    }
+  }, [user]);
+
+  // Check if user is authenticated
+  const checkAuth = useCallback(() => {
+    return isLoggedIn || !!user || isGuestUser();
+  }, [isLoggedIn, user]);
+
   return {
+    user,
+    emailVerified,
+    loading,
     isLoggedIn,
     isAuthenticated: checkAuth(),
     logout,
     checkAuth,
     getCurrentToken,
   };
-}; 
+};

@@ -32,13 +32,8 @@ class SaveOsiFromInputs(APIView):
 
             payload = build_osi_payload(name=name, module_id=module_id, inputs=inputs or {})
             
-            # Check if user is guest
-            is_guest = False
-            if hasattr(request, 'auth') and isinstance(request.auth, dict):
-                is_guest = request.auth.get('is_guest', False)
-            # Also check if no auth at all (completely unauthenticated)
-            if not hasattr(request, 'user') or not request.user.is_authenticated:
-                is_guest = True
+            # Check if user is guest (guests don't send authentication tokens)
+            is_guest = not (hasattr(request, 'user') and request.user.is_authenticated)
 
             # For guests OR when inline flag is set: return OSI content for download (no DB save)
             if is_guest or inline:
@@ -58,6 +53,14 @@ class SaveOsiFromInputs(APIView):
                 }, safe=False, status=200)
 
             # For authenticated users: save to database
+            # Check email verification status (set by FirebaseAuthentication middleware)
+            email_verified = getattr(request, 'email_verified', False)
+            if not email_verified:
+                return JsonResponse({
+                    'success': False, 
+                    'error': 'Please verify your email to save projects. Check your inbox for the verification link.'
+                }, safe=False, status=403)
+
             content_file = make_osifile_contentfile(payload)
 
             # Determine owner email from JWT or user

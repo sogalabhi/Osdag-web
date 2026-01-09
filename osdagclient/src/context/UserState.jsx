@@ -1,6 +1,5 @@
-import { createContext, useEffect, useReducer } from "react";
+import { createContext, useReducer } from "react";
 import UserReducer from "./UserReducer";
-import jwt_decode from 'jwt-decode';
 import { clearAuthStorage } from "../utils/auth";
 import { apiBase } from "../api";
 
@@ -38,347 +37,9 @@ export const UserContext = createContext(initialValue);
 export const UserProvider = ({ children }) => {
   const [state, dispatch] = useReducer(UserReducer, initialValue);
 
-  useEffect(() => {
-    const token = localStorage.getItem("access");
-    if (token) {
-      try {
-        const decoded = jwt_decode(token);
-        if (decoded.exp > Date.now() / 1000) {
-          dispatch({ type: 'LOGIN_SUCCESS', payload: decoded });
-        }
-      } catch (error) {
-        localStorage.removeItem("access");
-      }
-    }
-  }, []);
   // USER AUTHENTICATION AND AUTHORAZATION
-  const setRefreshTokenCookie = async (refresh_token) => {
-    console.log("Inside set refresh token thunk");
-    try {
-      const response = await fetch(`${BASE_URL}api/user/set-refresh/`, {
-        method: "POST",
-        mode: "cors",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          refresh: refresh_token,
-        }),
-      });
-
-      const jsonResponse = await response?.json();
-      console.log("jsonResponse in setRefreshToken : ", jsonResponse);
-
-      if (response.status == 200) {
-        console.log("the refresh token cookie has been set");
-      } else {
-        console.log(
-          "response.status!=200 while setting the refresh token cookie"
-        );
-      }
-    } catch (err) {
-      console.log("Server error while setting refresh token cookie");
-    }
-  };
-  const createJWTToken = async (email, password) => {
-    console.log("inside createJWT token ");
-    console.log("email : ", email);
-    console.log("password : ", password);
-    try {
-      const response = await fetch(`${BASE_URL}api/token/`, {
-        method: "POST",
-        mode: "cors",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-        },
-        body: JSON.stringify({
-          username: email,
-          password: password,
-        }),
-      });
-
-      const jsonResponse = await response?.json();
-      console.log("jsonResposne : ", jsonResponse);
-      if (response.status == 200) {
-        console.log("token has been created");
-
-        // obtain the refresh and the access token
-        const refresh_token = jsonResponse.refresh;
-        const access_token = jsonResponse.access;
-
-        console.log("refresh_token ; ", refresh_token);
-        console.log("access_token : ", access_token);
-
-        setRefreshTokenCookie(refresh_token);
-
-        // set the refresh token and the access token in teh localstorage
-        localStorage.setItem("access", access_token);
-        //localStorage.setItem('refresh' , refresh_token)
-
-        console.log("inside token Local storage set");
-        // now for every next request, set the Authorization header and the access_token
-        // headers : {Authorization : 'Bearer {access_token}'}
-      } else {
-        console.log("response status !=200 for creating token");
-      }
-    } catch (error) {
-      console.log("There was an error in obtainin the token");
-      console.log("error : ", error);
-    }
-  };
-
-  const refreshJWTToken = async () => {
-    // obtain teh refresh token and access token from the localStorage
-
-    let refresh_token = localStorage.getItem("refresh");
-    console.log("refresh_token : ", refresh_token);
-    let access_token = localStorage.getItem("access");
-    console.log("access_token : ", access_token);
-
-    if (!refresh_token) {
-      console.log("refresh token is False");
-    }
-    if (!access_token) {
-      console.log("access_token is False");
-    }
-
-    // send the request to the server to obtain the new set of access_token
-    // post the refresh_token
-    // with Authorization bearer in the headers
-    try {
-      const response = await fetch(`${BASE_URL}api/token/refresh`, {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-          "Content-Type": "application/json; charset=UTF-8",
-        },
-        body: JSON.stringify({
-          refresh: refresh_token,
-        }),
-        credentials: "include",
-      });
-
-      const jsonResponse = await response?.json();
-      if (response.status == 200) {
-        console.log("new access token created : ", jsonResponse.access);
-
-        // set the new access_token to the localStorage
-        localStorage.setItem("access", jsonResponse.access_token);
-      } else {
-        console.log("response status!=200 when creating new access token");
-      }
-    } catch (err) {
-      console.log("Cannot obtain the new access token : ", err);
-    }
-  };
-
-  const userSignup = async (email, password, confirmPassword, isGuest) => {
-    console.log("inside the user signup thunk");
-    // console.log("username : ", username);
-    try {
-      const response = await fetch(`${BASE_URL}api/user/signup/`, {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          // username: username,
-          email: email,
-          password: password,
-          confirmPassword: confirmPassword,
-          isGuest: isGuest,
-        }),
-      });
-
-      const jsonResponse = await response?.json();
-      console.log("jsonResponse  : ", jsonResponse);
-      
-      if (response.status === 201) {
-        console.log("user successfully created");
-
-        // call the thunk for creating the JWT token
-        // createJWTToken(username, password);
-        createJWTToken(email, password);
-
-        // call the reducer action to set the Login variable
-        dispatch({
-          type: "SET_SIGNUP_STATUS",
-          payload: {
-            isLoggedIn: false,
-            message: jsonResponse.message || "User Successfully Signed up",
-            success: true,
-          },
-        });
-
-        console.log("isloggedIn in signup thunk : ", state.isLoggedIn);
-        return { success: true, message: jsonResponse.message };
-      } else {
-        console.log("response.status is not 201, failed to create a new user");
-        const errorMessage = jsonResponse.message || "Error in creating the User Account, please try again";
-        dispatch({
-          type: "SET_SIGNUP_STATUS",
-          payload: {
-            isLoggedIn: false,
-            message: errorMessage,
-            success: false,
-            error_type: jsonResponse.error_type || 'unknown_error',
-          },
-        });
-        return { success: false, message: errorMessage, error_type: jsonResponse.error_type };
-      }
-    } catch (err) {
-      console.log("there is an error in user signup : ", err);
-      const errorMessage = "Network error occurred. Please check your connection and try again";
-      dispatch({
-        type: "SET_SIGNUP_STATUS",
-        payload: {
-          isLoggedIn: false,
-          message: errorMessage,
-          success: false,
-          error_type: 'network_error',
-        },
-      });
-      return { success: false, message: errorMessage, error_type: 'network_error' };
-    }
-  };
-
-  const userLogin = async (email, password, isGst, JWTLogin) => {
-    console.log("in userlogin Context - inside user login");
-    // console.log("in userlogin Context - username : ", username);
-    console.log("in userlogin Context - isGuest : ", isGst);
-
-    if (JWTLogin === true) {
-      dispatch({
-        type: "SET_LOGGING_STATUS",
-        payload: { 
-          isLoggedIn: true, 
-          message: "Login Successful",
-          success: true 
-        },
-      });
-      return { success: true, message: "Login Successful" };
-    }
-
-    try {
-      console.log("sending the login request to the server");
-      const response = await fetch(`${BASE_URL}api/user/login/`, {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          // username: username,
-          username: email,
-          password: password,
-          isGuest: isGst,
-        }),
-      });
-
-      const jsonResponse = await response?.json();
-      console.log("jsonResponse : ", jsonResponse);
-      console.log("jsonResponse msg : ", jsonResponse.message);
-      
-      if (response.status === 200) {
-        console.log("user logged in successfully in userLogin Context ");
-        console.log("isloggedin inside logging below if response 200" + state.isLoggedIn);
-
-        console.log("Line number 194 inside status 200 way to create token...");
-
-        clearAuthStorage();
-        
-        // create a new jwt token
-        if (isGst === false) {
-          // createJWTToken(username, password);
-          // createJWTToken(email, password);
-          localStorage.setItem("userType", "user");
-          // localStorage.setItem("username", username);
-          localStorage.setItem("email", jsonResponse.email || "");
-          localStorage.setItem("access", jsonResponse.access);
-          localStorage.setItem("refresh", jsonResponse.refresh);
-          localStorage.setItem(
-            "allInputValueFilesLength",
-            jsonResponse.allInputValueFilesLength || 0
-          );
-        } else {
-          localStorage.setItem("userType", "guest");
-          localStorage.setItem("username", jsonResponse.username || "Guest");
-          localStorage.setItem("email", jsonResponse.email || "");
-        }
-        
-        // set the login variable to true
-        const loginStatus = isGst !== true;
-        dispatch({
-          type: "SET_LOGGING_STATUS",
-          payload: { 
-            isLoggedIn: loginStatus, 
-            message: jsonResponse.message,
-            success: true 
-          },
-        });
-
-        state.loginCredValid = true;
-        console.log("Done dispatch isLog set true");
-        console.log("Local storage set");
-        console.log("isloggedin inside logging below local storage " + state.isLoggedIn);
-
-        return { 
-          success: true, 
-          message: jsonResponse.message,
-          isGuest: isGst === true
-        };
-      } else {
-        console.log("response.status!=200, user not logged in");
-        const errorMessage = jsonResponse.message || "Login failed";
-        const errorType = jsonResponse.error_type || 'unknown_error';
-        
-        // Set loginCredValid to false for any login failure
-        state.loginCredValid = false;
-        
-        dispatch({
-          type: "SET_LOGGING_STATUS",
-          payload: {
-            isLoggedIn: false,
-            message: errorMessage,
-            success: false,
-            error_type: errorType,
-          },
-        });
-        
-        return { 
-          success: false, 
-          message: errorMessage, 
-          error_type: errorType 
-        };
-      }
-    } catch (err) {
-      console.log("error in logging in", err);
-      const errorMessage = "Network error occurred. Please check your connection and try again";
-      
-      // Set loginCredValid to false for network errors
-      state.loginCredValid = false;
-      
-      dispatch({
-        type: "SET_LOGGING_STATUS",
-        payload: {
-          isLoggedIn: false,
-          message: errorMessage,
-          success: false,
-          error_type: 'network_error',
-        },
-      });
-      
-      return { 
-        success: false, 
-        message: errorMessage, 
-        error_type: 'network_error' 
-      };
-    }
-  };
+  // Removed: All JWT-related functions (createJWTToken, refreshJWTToken, userLogin, setRefreshTokenCookie)
+  // Authentication is now handled by Firebase in LoginPage.jsx and useAuth.js
 
   const setIsLoggedIn = async (value) => {
     console.log("value :  ", value);
@@ -463,9 +124,14 @@ export const UserProvider = ({ children }) => {
     );
     console.log("allInputValueFilesLength : ", allInputValueFilesLength);
     console.log("access_token : ", access_token);
-    // const email = localStorage.getItem('email')
-    const email = "atharva0300@gmail.com";
+    // Fix: Use actual email from localStorage
+    const email = localStorage.getItem("email") || "";
     console.log("email : ", email);
+    
+    if (!email) {
+      console.error("No email found in localStorage");
+      return;
+    }
 
     // calling the obtainSingleInputFile
     // allInputValueFileLekngth number of times
@@ -474,135 +140,8 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  const verifyEmail = async (email) => {
-    console.log("inside the verify email thunk");
-    console.log("email : ", email);
-
-    try {
-      const response = await fetch(`${BASE_URL}api/user/checkemail/`, {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-        }),
-      });
-
-      const jsonResponse = await response?.json();
-      if (response.status === 200) {
-        console.log("the OTP has been sent to the email");
-
-        // set the OTP in the localStorage
-        console.log("OTP : ", jsonResponse.OTP);
-        localStorage.setItem("otp", jsonResponse.OTP);
-        localStorage.setItem("email", email);
-
-        dispatch({
-          type: "SET_CHECKEMAIL_STATUS",
-          payload: { 
-            OTPSent: true, 
-            message: jsonResponse.message || "The OTP has been sent",
-            success: true 
-          },
-        });
-        return { success: true, message: jsonResponse.message };
-      } else {
-        console.log("response.status!=200 while checking the email");
-        const errorMessage = jsonResponse.message || "failed to send the OTP, try again";
-        dispatch({
-          type: "SET_CHECKEMAIL_STATUS",
-          payload: {
-            OTPSent: false,
-            message: errorMessage,
-            success: false,
-            error_type: jsonResponse.error_type || 'unknown_error',
-          },
-        });
-        return { success: false, message: errorMessage, error_type: jsonResponse.error_type };
-      }
-    } catch (err) {
-      console.log("There is an error in the server while checking the email : ", err);
-      const errorMessage = "Network error occurred. Please check your connection and try again";
-      dispatch({
-        type: "SET_CHECKEMAIL_STATUS",
-        payload: {
-          OTPSent: false,
-          message: errorMessage,
-          success: false,
-          error_type: 'network_error',
-        },
-      });
-      return { success: false, message: errorMessage, error_type: 'network_error' };
-    }
-  };
-
-  const ForgetPassword = async (newPassword) => {
-    console.log("inside the forget password thunk");
-    console.log("newPassword : ", newPassword);
-    // obtain the stored email from the localStorage and delete the email, OTP
-    let Lemail = localStorage.getItem("email");
-    console.log("email : ", Lemail);
-
-    try {
-      const response = await fetch(`${BASE_URL}api/user/forgetpassword/`, {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          password: newPassword,
-          email: Lemail,
-        }),
-      });
-
-      const jsonResponse = await response?.json();
-      console.log("jsonResponse : ", jsonResponse);
-      if (response.status === 200) {
-        console.log("password updated");
-
-        dispatch({
-          type: "SET_FORGETPASSWORD_STATUS",
-          payload: {
-            passwordSet: true,
-            passwordSetMessage: jsonResponse.message || "New password has been set",
-            success: true,
-          },
-        });
-        return { success: true, message: jsonResponse.message };
-      } else {
-        console.log("response.status!=200 on forget password");
-        const errorMessage = jsonResponse.message || "Failed to update the password, please try again";
-        
-        dispatch({
-          type: "SET_FORGETPASSWORD_STATUS",
-          payload: {
-            passwordSet: false,
-            passwordSetMessage: errorMessage,
-            success: false,
-            error_type: jsonResponse.error_type || 'unknown_error',
-          },
-        });
-        return { success: false, message: errorMessage, error_type: jsonResponse.error_type };
-      }
-    } catch (err) {
-      console.log("Server error in updating the password", err);
-      const errorMessage = "Network error occurred. Please check your connection and try again";
-
-      dispatch({
-        type: "SET_FORGETPASSWORD_STATUS",
-        payload: {
-          passwordSet: false,
-          passwordSetMessage: errorMessage,
-          success: false,
-          error_type: 'network_error',
-        },
-      });
-      return { success: false, message: errorMessage, error_type: 'network_error' };
-    }
-  };
+  // Removed: verifyEmail - Email verification now handled by Firebase
+  // Removed: ForgetPassword - Use Firebase password reset (resetPassword from firebaseAuth.js) instead
 
   const SaveInputValueFile = async (content) => {
     console.log("inside saveInputValueFile thunk");
@@ -668,12 +207,6 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  const setJWTLogin = async (loggedIn) => {
-    dispatch({
-      type: "SET_LOGGING_STATUS",
-      payload: { isLoggedIn: loggedIn, message: "Login Successful" },
-    });
-  };
 
   return (
     <UserContext.Provider
@@ -689,13 +222,8 @@ export const UserProvider = ({ children }) => {
         loginCredValid: state.loginCredValid,
 
         // thunks
-        userSignup,
-        userLogin,
-        verifyEmail,
-        ForgetPassword,
         obtainAllInputValueFiles,
         SaveInputValueFile,
-        setJWTLogin,
         setIsLoggedIn,
       }}
     >

@@ -60,9 +60,11 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   // const BASE_URL = 'http://localhost:8000/api/';
   const BASE_URL = `${apiBase}`;
 
-  const getAccessToken = () => (
-    localStorage.getItem('access') || localStorage.getItem('token') || ''
-  );
+  // Use Firebase token from auth utils
+  const getFirebaseToken = async () => {
+    const { getAccessToken } = await import('../../utils/auth');
+    return await getAccessToken();
+  };
 
   const isGuest = isGuestUser();
   const userEmail = getCurrentUserEmail();
@@ -81,7 +83,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${getAccessToken()}`,
+              'Authorization': `Bearer ${await getFirebaseToken()}`,
             },
           });
           const data = await res.json();
@@ -149,11 +151,12 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   };
 
   const fetchProjectDetail = async (projectId) => {
+    const token = await getFirebaseToken();
     const res = await fetch(`${BASE_URL}api/projects/${projectId}/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAccessToken()}`,
+        'Authorization': `Bearer ${token}`,
       },
     });
     const data = await res.json();
@@ -163,11 +166,12 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
 
   const handleOpenProject = async (project) => {
     try {
+      const token = await getFirebaseToken();
       const response = await fetch(`${BASE_URL}api/projects/${project.id}/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAccessToken()}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
       const data = await response.json();
@@ -208,9 +212,10 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
 
   const handleDownloadOsi = async (project) => {
     try {
+      const token = await getFirebaseToken();
       const detailRes = await fetch(`${BASE_URL}api/projects/${project.id}/`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getAccessToken()}` },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       });
       const detail = await detailRes.json();
       if (!detailRes.ok || !detail.success) {
@@ -222,7 +227,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
 
       const saveRes = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getAccessToken()}` },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ name: project.name, module_id, inputs, inline: true }),
       });
       const data = await saveRes.json();

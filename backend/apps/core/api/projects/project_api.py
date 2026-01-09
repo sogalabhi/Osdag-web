@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from apps.core.models import Project
+from apps.core.permissions import IsEmailVerified
 import json
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -19,10 +20,9 @@ class ProjectAPI(APIView):
             # if not request.user or not request.user.is_authenticated:
             #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
 
-            # Disallow guest users from listing projects
-            if hasattr(request, 'auth') and isinstance(request.auth, dict):
-                if request.auth.get('is_guest') is True:
-                    return JsonResponse({'success': False, 'error': 'Guest users cannot access projects'}, safe=False, status=403)
+            # Disallow guest users from listing projects (guests don't send authentication tokens)
+            if not (hasattr(request, 'user') and request.user.is_authenticated):
+                return JsonResponse({'success': False, 'error': 'Guest users cannot access projects'}, safe=False, status=403)
 
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
@@ -61,13 +61,17 @@ class ProjectAPI(APIView):
     def post(self, request):
         """Create a new project"""
         try:
-            # if not request.user or not request.user.is_authenticated:
-            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
+            # Check email verification status (set by FirebaseAuthentication middleware)
+            email_verified = getattr(request, 'email_verified', False)
+            if not email_verified:
+                return JsonResponse({
+                    'success': False, 
+                    'error': 'Please verify your email to create projects. Check your inbox for the verification link.'
+                }, safe=False, status=403)
 
-            # Disallow guest users from creating projects
-            if hasattr(request, 'auth') and isinstance(request.auth, dict):
-                if request.auth.get('is_guest') is True:
-                    return JsonResponse({'success': False, 'error': 'Guest users cannot create projects'}, safe=False, status=403)
+            # Disallow guest users from creating projects (guests don't send authentication tokens)
+            if not (hasattr(request, 'user') and request.user.is_authenticated):
+                return JsonResponse({'success': False, 'error': 'Guest users cannot create projects'}, safe=False, status=403)
 
             data = request.data
             print(f"Creating project with data: {data}")
@@ -121,10 +125,9 @@ class ProjectDetailAPI(APIView):
         try:
             # if not request.user or not request.user.is_authenticated:
             #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
-            # Disallow guest users from reading projects
-            if hasattr(request, 'auth') and isinstance(request.auth, dict):
-                if request.auth.get('is_guest') is True:
-                    return JsonResponse({'success': False, 'error': 'Guest users cannot access projects'}, safe=False, status=403)
+            # Disallow guest users from reading projects (guests don't send authentication tokens)
+            if not (hasattr(request, 'user') and request.user.is_authenticated):
+                return JsonResponse({'success': False, 'error': 'Guest users cannot access projects'}, safe=False, status=403)
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
@@ -164,12 +167,17 @@ class ProjectDetailAPI(APIView):
     def put(self, request, project_id):
         """Update project data (name, inputs_json, osi_file_path)"""
         try:
-            # if not request.user or not request.user.is_authenticated:
-            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
-            # Disallow guest users from updating projects
-            if hasattr(request, 'auth') and isinstance(request.auth, dict):
-                if request.auth.get('is_guest') is True:
-                    return JsonResponse({'success': False, 'error': 'Guest users cannot update projects'}, safe=False, status=403)
+            # Check email verification status (set by FirebaseAuthentication middleware)
+            email_verified = getattr(request, 'email_verified', False)
+            if not email_verified:
+                return JsonResponse({
+                    'success': False, 
+                    'error': 'Please verify your email to save projects. Check your inbox for the verification link.'
+                }, safe=False, status=403)
+
+            # Disallow guest users from updating projects (guests don't send authentication tokens)
+            if not (hasattr(request, 'user') and request.user.is_authenticated):
+                return JsonResponse({'success': False, 'error': 'Guest users cannot update projects'}, safe=False, status=403)
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
@@ -222,10 +230,9 @@ class ProjectDetailAPI(APIView):
         try:
             # if not request.user or not request.user.is_authenticated:
             #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
-            # Disallow guest users from deleting projects
-            if hasattr(request, 'auth') and isinstance(request.auth, dict):
-                if request.auth.get('is_guest') is True:
-                    return JsonResponse({'success': False, 'error': 'Guest users cannot delete projects'}, safe=False, status=403)
+            # Disallow guest users from deleting projects (guests don't send authentication tokens)
+            if not (hasattr(request, 'user') and request.user.is_authenticated):
+                return JsonResponse({'success': False, 'error': 'Guest users cannot delete projects'}, safe=False, status=403)
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
@@ -261,10 +268,9 @@ class ProjectByNameAPI(APIView):
         try:
             # if not request.user or not request.user.is_authenticated:
             #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
-            # Disallow guest users from reading projects by name
-            if hasattr(request, 'auth') and isinstance(request.auth, dict):
-                if request.auth.get('is_guest') is True:
-                    return JsonResponse({'success': False, 'error': 'Guest users cannot access projects'}, safe=False, status=403)
+            # Disallow guest users from reading projects by name (guests don't send authentication tokens)
+            if not (hasattr(request, 'user') and request.user.is_authenticated):
+                return JsonResponse({'success': False, 'error': 'Guest users cannot access projects'}, safe=False, status=403)
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
@@ -302,10 +308,9 @@ class ProjectByNameAPI(APIView):
         try:
             # if not request.user or not request.user.is_authenticated:
             #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
-            # Disallow guest users from updating projects by name
-            if hasattr(request, 'auth') and isinstance(request.auth, dict):
-                if request.auth.get('is_guest') is True:
-                    return JsonResponse({'success': False, 'error': 'Guest users cannot update projects'}, safe=False, status=403)
+            # Disallow guest users from updating projects by name (guests don't send authentication tokens)
+            if not (hasattr(request, 'user') and request.user.is_authenticated):
+                return JsonResponse({'success': False, 'error': 'Guest users cannot update projects'}, safe=False, status=403)
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')

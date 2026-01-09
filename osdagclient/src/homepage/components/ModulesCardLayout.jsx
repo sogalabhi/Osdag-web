@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUserEmail, isGuestUser, getAccessToken } from "../../utils/auth";
+import { getCurrentUserEmail, isGuestUser, getAccessToken, canCreateProjects } from "../../utils/auth";
+import { message } from 'antd';
 import ProjectNameModal from "./ProjectNameModal";
 
 import {
@@ -57,9 +58,21 @@ const TabbedModulePage = () => {
   const handleProjectModalConfirm = async (projectName) => {
     if (!selectedModule) return;
 
+    // Check if user can create projects (guests and unverified users cannot)
+    if (!canCreateProjects()) {
+      if (isGuestUser()) {
+        message.warning("Guest users cannot create projects. Please log in to create projects.");
+      } else {
+        message.error("Please verify your email to create projects. Check your inbox for the verification link.");
+      }
+      setShowProjectModal(false);
+      setSelectedModule(null);
+      return;
+    }
+
     const safeProjectName = (projectName || `${selectedModule.label} Project`).replace(/\s+/g, "_");
     try {
-      const token = getAccessToken();
+      const token = await getAccessToken();
       const response = await fetch(`${apiBase}api/projects/`, {
         method: "POST",
         headers: {

@@ -1,10 +1,9 @@
 """
-Core API package - Re-exports for backward compatibility
+Core API package - Re-exports
 """
 # Auth exports
 from .auth.user_view import (
-    SignupView, ForgetPasswordView, LogoutView, LoginView,
-    ObtainInputFileView, CheckEmailView, SaveInputFileView, SetRefreshTokenCookieView
+    ObtainInputFileView, SaveInputFileView
 )
 from .auth.jwt_api import JWTHomeView
 from .auth.google_sso_api import GoogleSSOView
@@ -27,8 +26,7 @@ from .modules.modules_api import GetModules
 
 __all__ = [
     # Auth
-    'SignupView', 'ForgetPasswordView', 'LogoutView', 'LoginView',
-    'ObtainInputFileView', 'CheckEmailView', 'SaveInputFileView', 'SetRefreshTokenCookieView',
+    'ObtainInputFileView', 'SaveInputFileView',
     'JWTHomeView', 'GoogleSSOView',
     # Projects
     'ProjectAPI', 'ProjectDetailAPI', 'ProjectByNameAPI',

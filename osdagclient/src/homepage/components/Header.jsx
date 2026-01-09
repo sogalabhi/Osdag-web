@@ -2,9 +2,10 @@ import { useRef, useState, useEffect } from 'react';
 import yaml from 'js-yaml';
 import { useNavigate } from 'react-router-dom';
 import { MODULE_ROUTES, MODULE_NAME_TO_KEY } from '../../constants/modules';
-import { isGuestUser } from '../../utils/auth';
-import axios from "axios";
-import { apiBase } from '../../api';
+import { isGuestUser, getCurrentUser, getCurrentUserEmail } from '../../utils/auth';
+import { useAuth } from '../../hooks/useAuth';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../Auth/firebase';
 
 const Header = ({ setshowSideBar, active }) => {
   const [isDark, setIsDark] = useState(false);
@@ -13,56 +14,45 @@ const Header = ({ setshowSideBar, active }) => {
   const [showResourcesDropdown, setShowResourcesDropdown] = useState(false);
   const [showAboutDropdown, setShowAboutDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const [user, setUser] = useState({ name: "", email: "" });
+  const [firebaseUser, setFirebaseUser] = useState(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // Check if user is a guest
   const isGuest = isGuestUser();
+
+  // Get user data from Firebase
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setFirebaseUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Get user display name and email
+  // Priority: Firebase displayName -> localStorage username -> email prefix
+  const storedUsername = !isGuest ? localStorage.getItem('username') : '';
+  const userDisplayName = firebaseUser?.displayName || storedUsername || firebaseUser?.email?.split('@')[0] || '';
+  const userEmail = firebaseUser?.email || (!isGuest ? localStorage.getItem('email') : '') || '';
+  // Get initial: from displayName, or email first letter, or 'G' for guest
+  const userInitial = userDisplayName 
+    ? userDisplayName[0].toUpperCase() 
+    : (isGuest ? 'G' : (userEmail ? userEmail[0].toUpperCase() : 'U'));
 
   const toggleTheme = () => {
     setIsDark(!isDark);
     document.documentElement.classList.toggle('dark');
   };
 
-  // ✅ Fetch user data from Django backend
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem("access");
+  // Handle logout
+  const handleLogout = async () => {
+    await logout();
+  };
 
-      if (!token) {
-        console.warn("No access token found");
-        setUser({ name: "", email: "" });
-        return;
-      }
-
-      try {
-        const response = await axios.get(`${apiBase}api/dashboard/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        // Django returns: { message: "Welcome suchita!", email: "suchita@example.com" }
-        const { message, email } = response.data;
-        const username = message.replace("Welcome ", "").replace("!", "");
-
-        setUser({ name: username, email: email });
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-        // Optional: redirect to login if token invalid
-        navigate("/");
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  // ✅ Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem("access");
-    localStorage.removeItem("user"); // in case Firebase stored it
-    navigate("/");
+  // Handle login navigation
+  const handleLogin = () => {
+    navigate('/');
   };
 
   // Mock data for search
@@ -328,27 +318,45 @@ const Header = ({ setshowSideBar, active }) => {
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-osdag-green text-white"
                 >
                   <span className="font-semibold text-lg">
-                    {user.name ? user.name[0].toUpperCase() : "G"}
+                    {userInitial}
                   </span>
                 </button>
                 {/* Dropdown */}
                 {(showProfileDropdown || false) && (
                   <div className="absolute right-0 top-full mt-2 bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green rounded-xl shadow-lg z-20 min-w-56 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="px-4 py-3 border-b border-gray-100 dark:border-osdag-green/30">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        Welcome, {user.name ? user.name.split("@")[0].replace(/^./, c => c.toUpperCase()) : "Guest"}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {user.email || ""}
-                      </p>
-                    </div>
-                    {user.name ? 
-                    <div className="py-2">
-                      <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
-                        Logout
-                      </button>
-                    </div>
-                    : ""}
+                    {isGuest ? (
+                      <>
+                        <div className="px-4 py-3 border-b border-gray-100 dark:border-osdag-green/30">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            Guest User
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Continue as guest or log in
+                          </p>
+                        </div>
+                        <div className="py-2">
+                          <button onClick={handleLogin} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
+                            Login
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="px-4 py-3 border-b border-gray-100 dark:border-osdag-green/30">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            {userDisplayName || userEmail.split('@')[0]}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            {userEmail}
+                          </p>
+                        </div>
+                        <div className="py-2">
+                          <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
+                            Logout
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -524,7 +532,7 @@ const Header = ({ setshowSideBar, active }) => {
                 className="flex items-center justify-center w-10 h-10 rounded-full bg-osdag-green text-white"
               >
                 <span className="font-semibold text-lg">
-                  {user.name ? user.name[0].toUpperCase() : "G"}
+                  {userInitial}
                 </span>
               </button>
             </div>
@@ -533,21 +541,39 @@ const Header = ({ setshowSideBar, active }) => {
             {/* Dropdown */}
             {(showProfileDropdown || false) && (
               <div className="absolute right-0 top-full mt-2 bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green rounded-xl shadow-lg z-20 min-w-56 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="px-4 py-3 border-b border-gray-100 dark:border-osdag-green/30">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    Welcome, {user.name ? user.name.split("@")[0].replace(/^./, c => c.toUpperCase()) : "Guest"}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {user.email || ""}
-                  </p>
-                </div>
-                {user.name ? 
-                <div className="py-2">
-                  <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
-                    Logout
-                  </button>
-                </div>
-                : ""}
+                {isGuest ? (
+                  <>
+                    <div className="px-4 py-3 border-b border-gray-100 dark:border-osdag-green/30">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        Guest User
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Continue as guest or log in
+                      </p>
+                    </div>
+                    <div className="py-2">
+                      <button onClick={handleLogin} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
+                        Login
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="px-4 py-3 border-b border-gray-100 dark:border-osdag-green/30">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {userDisplayName || userEmail.split('@')[0]}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {userEmail}
+                      </p>
+                    </div>
+                    <div className="py-2">
+                      <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
+                        Logout
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>

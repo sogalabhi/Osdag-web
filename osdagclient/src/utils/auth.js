@@ -1,93 +1,64 @@
-// Authentication osdag_core.utils.common with improved security
-import jwt_decode from 'jwt-decode';
+/**
+ * Firebase Authentication Utilities
+ * Handles authentication state and user info using Firebase Auth
+ */
 
-const TOKEN_KEY = 'access_token';
-const REFRESH_KEY = 'refresh_token';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../Auth/firebase';
+import { syncUserToBackend } from './firebaseAuth';
 
 /**
- * Securely store tokens (consider using httpOnly cookies in production)
+ * Get current Firebase user
  */
-export const setTokens = (accessToken, refreshToken) => {
-  if (accessToken) {
-    localStorage.setItem(TOKEN_KEY, accessToken);
-  }
-  if (refreshToken) {
-    // In production, this should be an httpOnly cookie
-    localStorage.setItem(REFRESH_KEY, refreshToken);
-  }
+export const getCurrentUser = () => {
+  return auth.currentUser;
 };
 
 /**
- * Get access token from storage
+ * Check if current user's email is verified
  */
-export const getAccessToken = () => {
-  return localStorage.getItem(TOKEN_KEY) || localStorage.getItem('access');
+export const isEmailVerified = () => {
+  return auth.currentUser?.emailVerified || false;
 };
 
 /**
- * Get refresh token from storage
+ * Get current user email from Firebase
+ * Returns empty string if no user or no email
  */
-export const getRefreshToken = () => {
-  return localStorage.getItem(REFRESH_KEY) || localStorage.getItem('refresh');
+export const getCurrentUserEmail = () => {
+  return auth.currentUser?.email || '';
 };
 
 /**
- * Remove all tokens from storage
+ * Get Firebase ID token for API calls
+ * This replaces the old JWT token system
  */
-export const clearTokens = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(REFRESH_KEY);
-  localStorage.removeItem('access');
-  localStorage.removeItem('refresh');
-  localStorage.removeItem('userType');
-  localStorage.removeItem('username');
-  localStorage.removeItem('email');
-};
-
-/**
- * Clear every auth-related value to avoid stale state across login modes
- */
-export const clearAuthStorage = () => {
-  clearTokens();
-};
-
-/**
- * Check if token is valid and not expired
- */
-export const isTokenValid = (token) => {
-  if (!token) return false;
-  
-  try {
-    const decoded = jwt_decode(token);
-    const currentTime = Date.now() / 1000;
-    
-    // Check if token is expired (with 30 second buffer)
-    return decoded.exp > (currentTime + 30);
-  } catch (error) {
-    console.error('Invalid token:', error);
-    return false;
-  }
-};
-
-/**
- * Get user info from valid token
- */
-export const getUserFromToken = (token) => {
-  if (!isTokenValid(token)) return null;
-  
-  try {
-    const decoded = jwt_decode(token);
-    // Return only safe user info, never include password
-    return {
-      username: decoded.username,
-      email: decoded.email,
-      userId: decoded.user_id,
-      exp: decoded.exp
-    };
-  } catch (error) {
-    console.error('Error decoding token:', error);
+export const getAccessToken = async () => {
+  const user = auth.currentUser;
+  if (!user) {
     return null;
   }
+  try {
+    const token = await user.getIdToken();
+    return token;
+  } catch (error) {
+    console.error('Error getting Firebase token:', error);
+    return null;
+  }
+};
+
+/**
+ * Check if user is authenticated (Firebase user exists or guest mode)
+ */
+export const isAuthenticated = () => {
+  // Check for guest mode first
+  const userType = localStorage.getItem('userType');
+  if (userType === 'guest') {
+    return true; // Guest users are considered authenticated for access
+  }
+
+  // Check for Firebase user
+  return !!auth.currentUser;
 };
 
 /**
@@ -99,49 +70,44 @@ export const isGuestUser = () => {
 };
 
 /**
- * Get current user email
+ * Check if user can create/save projects
+ * Both guests and unverified users cannot create projects
  */
-export const getCurrentUserEmail = () => {
-  const email = localStorage.getItem('email') || '';
-  return email;
+export const canCreateProjects = () => {
+  if (isGuestUser()) return false;
+  if (!isEmailVerified()) return false;
+  return true;
 };
 
 /**
- * Check if user is authenticated (including guest mode)
+ * Check if user can save projects
  */
-export const isAuthenticated = () => {
-  // Check for guest mode first
-  const userType = localStorage.getItem('userType');
-  if (userType === 'guest') {
-    return true; // Guest users are considered authenticated for access
-  }
-
-  // Check for regular token authentication
-  const token = getAccessToken();
-  return isTokenValid(token);
+export const canSaveProjects = () => {
+  return canCreateProjects(); // Same restrictions
 };
 
 /**
- * Auto-login check on app startup
+ * Clear auth storage (for logout)
+ * Removes guest mode and other auth-related localStorage items
  */
-export const checkAutoLogin = () => {
-  // Check for guest mode
-  const userType = localStorage.getItem('userType');
-  if (userType === 'guest') {
-    return { 
-      username: 'Guest User', 
-      email: '', 
-      isGuest: true 
-    };
-  }
+export const clearAuthStorage = () => {
+  localStorage.removeItem('userType');
+  localStorage.removeItem('username');
+  localStorage.removeItem('email');
+  // Note: Firebase handles its own auth state, no need to clear tokens
+};
 
-  // Check for regular token
-  const token = getAccessToken();
-  if (isTokenValid(token)) {
-    return getUserFromToken(token);
-  }
-  
-  // Clear invalid tokens
-  clearTokens();
-  return null;
-}; 
+
+/**
+ * Subscribe to Firebase auth state changes
+ * Useful for components that need to react to login/logout
+ */
+export const onAuthStateChange = (callback) => {
+  return onAuthStateChanged(auth, async (firebaseUser) => {
+    if (firebaseUser) {
+      // Sync to backend when user logs in
+      await syncUserToBackend(firebaseUser);
+    }
+    callback(firebaseUser);
+  });
+};

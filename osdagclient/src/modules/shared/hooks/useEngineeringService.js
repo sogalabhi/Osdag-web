@@ -35,7 +35,7 @@ const getSlug = (moduleKey) => MODULE_SLUGS[moduleKey] || moduleKey;
  */
 const createApiClient = (baseUrl) => {
   return async (url, options = {}) => {
-    const token = getAccessToken();
+    const token = await getAccessToken();
     const headers = {
       'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` }),

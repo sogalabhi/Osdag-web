@@ -97,7 +97,11 @@ function UnifiedDropdownMenu({
   const service = useEngineeringService();
   const { SaveInputValueFile } = useContext(UserContext);
   const BASE_URL = `${apiBase}`;
-  const getAccessToken = () => localStorage.getItem('access') || localStorage.getItem('token') || '';
+  // Use Firebase token from auth utils
+  const getAccessTokenAsync = async () => {
+    const { getAccessToken } = await import('../../../utils/auth');
+    return await getAccessToken();
+  };
   const location = useLocation();
   const getProjectIdFromUrl = () => {
     const params = new URLSearchParams(location.search);
@@ -270,9 +274,21 @@ function UnifiedDropdownMenu({
 
   const saveInput = async () => {
     if (localStorage.getItem("userType") !== "user") {
-      alert("Cannot save, user is not logged in");
+      message.error("Cannot save, user is not logged in");
       return;
     }
+
+    // Check if user can save projects (guests and unverified users cannot)
+    const { canSaveProjects, isGuestUser } = await import('../../../utils/auth');
+    if (!canSaveProjects()) {
+      if (isGuestUser()) {
+        message.warning('Guest users cannot save projects. Please log in to save projects.');
+      } else {
+        message.error('Please verify your email to save projects. Check your inbox for the verification link.');
+      }
+      return;
+    }
+
     // Determine module_id; try inputs.module or selected module key
     const module_id = inputs?.module || MODULE_KEY_FIN_PLATE;
     // Ensure projectId is present to link OSI to project
@@ -282,11 +298,12 @@ function UnifiedDropdownMenu({
       return;
     }
     try {
+      const token = await getFirebaseToken();
       const res = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAccessToken()}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ name: (inputs?.project_name || inputs?.name || 'project'), module_id, inputs }),
       });
@@ -303,7 +320,7 @@ function UnifiedDropdownMenu({
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getAccessToken()}`,
+                'Authorization': `Bearer ${await getFirebaseToken()}`,
               },
               body: JSON.stringify({ osi_file_path: data.url }),
             });

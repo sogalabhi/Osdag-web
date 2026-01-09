@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProjectNameModal from '../components/ProjectNameModal';
-import { isGuestUser } from '../../utils/auth';
+import { isGuestUser, canCreateProjects } from '../../utils/auth';
+import { message } from 'antd';
 import { MODULE_KEY_FIN_PLATE } from '../../constants/DesignKeys';
 
 const MODULE_ROUTES = {
@@ -22,9 +23,11 @@ const ModulesListCard = ({ items }) => {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
 
-  const getAccessToken = () => (
-    localStorage.getItem('access') || localStorage.getItem('token') || ''
-  );
+  // Use Firebase token from auth utils
+  const getFirebaseToken = async () => {
+    const { getAccessToken } = await import('../../utils/auth');
+    return await getAccessToken();
+  };
 
   const handleModuleClick = (item) => {
     const route = MODULE_ROUTES[item.module_id];
@@ -39,13 +42,27 @@ const ModulesListCard = ({ items }) => {
 
   const handleProjectModalConfirm = async (projectName) => {
     if (!selectedModule) return;
+
+    // Check if user can create projects (guests and unverified users cannot)
+    if (!canCreateProjects()) {
+      if (isGuestUser()) {
+        message.warning("Guest users cannot create projects. Please log in to create projects.");
+      } else {
+        message.error("Please verify your email to create projects. Check your inbox for the verification link.");
+      }
+      setShowProjectModal(false);
+      setSelectedModule(null);
+      return;
+    }
+
     try {
       const safeProjectName = (projectName || `${selectedModule.name} Project`).replace(/\s+/g, '_');
+      const token = await getFirebaseToken();
       const response = await fetch('http://localhost:8000/api/projects/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAccessToken()}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ name: safeProjectName, module: selectedModule.parent, submodule: selectedModule.module_id }),
       });

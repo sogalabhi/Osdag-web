@@ -8,7 +8,6 @@ from firebase_admin import auth as firebase_auth
 import firebase_admin
 from firebase_admin import credentials
 from django.contrib.auth.models import User
-from rest_framework_simplejwt.tokens import RefreshToken
 import os
 
 # importing data
@@ -49,42 +48,99 @@ def dashboard_view(request):
     })
 
 
-class FirebaseLoginView(APIView):
+class FirebaseAuthView(APIView):
+    """
+    Unified endpoint for all Firebase authentication (Google + Email/Password).
+    Syncs Firebase users to Django User model and returns user info.
+    """
+    permission_classes = []  # Public endpoint
+    
     def post(self, request):
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # Log request data for debugging
+        logger.info(f"FirebaseAuthView POST request received. Data keys: {list(request.data.keys()) if hasattr(request.data, 'keys') else 'No data'}")
+        
         token = request.data.get("token")
         if not token:
+            logger.error("FirebaseAuthView: No token provided in request")
             return Response({"error": "No token provided"}, status=400)
+        
+        logger.info(f"FirebaseAuthView: Token received (length: {len(token) if token else 0})")
+        
         try:
             decoded = firebase_auth.verify_id_token(token)
-            email = decoded.get("email")
-            uid = decoded.get("uid")
-            if not email:
-                return Response({"error": "Email not found in token"}, status=status.HTTP_400_BAD_REQUEST)
-
-            # ✅ AUTO-CREATE USER IF NOT EXISTS
-            try:
-                user = User.objects.get(email=email)
-                created = False
-            except User.DoesNotExist:
-                user = User.objects.create(
-                    email=email,
-                    username=email.split("@")[0]
-                )
-                created = True
-            print(f"User {email} logged in successfully.")
-
-            # 3️⃣ Generate JWT tokens
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
-            return Response(
-                {"message": "Login successful", "email": email, "uid": uid, "created": created, "access": access_token,
-                "refresh": str(refresh)},
-                status=status.HTTP_200_OK,
+            logger.info(f"FirebaseAuthView: Token verified successfully. UID: {decoded.get('uid')}, Email: {decoded.get('email')}")
+            
+            uid = decoded.get('uid')
+            email = decoded.get('email')
+            email_verified = decoded.get('email_verified', False)
+            
+            if not uid:
+                logger.error("FirebaseAuthView: Token decoded but missing UID")
+                return Response({"error": "Invalid token: missing UID"}, status=400)
+            
+            # Sync user to Django (use Firebase UID as username)
+            user, created = User.objects.get_or_create(
+                username=uid,
+                defaults={'email': email or ''}
             )
-        except firebase_auth.InvalidIdTokenError:
-            return Response({"error": "Invalid Firebase token"}, status=status.HTTP_400_BAD_REQUEST)
+            logger.info(f"FirebaseAuthView: User {'created' if created else 'retrieved'}. Username: {user.username}, Email: {user.email}")
+            
+            # Update email if changed
+            if email and user.email != email:
+                user.email = email
+                user.save()
+                logger.info(f"FirebaseAuthView: Updated user email to {email}")
+            
+            # Sync UserAccount if it doesn't exist
+            from apps.core.models import UserAccount
+            user_account, account_created = UserAccount.objects.get_or_create(
+                username=uid,
+                defaults={
+                    'user': user,
+                    'email': email or '',
+                    'allInputValueFiles': []
+                }
+            )
+            logger.info(f"FirebaseAuthView: UserAccount {'created' if account_created else 'retrieved'}")
+            
+            # Update UserAccount if user link is missing or email changed
+            needs_save = False
+            if not user_account.user:
+                user_account.user = user
+                needs_save = True
+            if email and user_account.email != email:
+                user_account.email = email
+                needs_save = True
+            if user_account.user != user:
+                user_account.user = user
+                needs_save = True
+            
+            if needs_save:
+                user_account.save()
+                logger.info(f"FirebaseAuthView: UserAccount updated")
+            
+            logger.info(f"FirebaseAuthView: Authentication successful for UID: {uid}")
+            return Response({
+                'success': True,
+                'uid': uid,
+                'email': email,
+                'email_verified': email_verified,
+                'created': created,
+                'message': 'Authentication successful'
+            }, status=200)
+            
+        except firebase_auth.InvalidIdTokenError as e:
+            logger.error(f"FirebaseAuthView: Invalid Firebase token error: {str(e)}")
+            return Response({"error": "Invalid Firebase token"}, status=400)
+        except firebase_auth.ExpiredIdTokenError as e:
+            logger.error(f"FirebaseAuthView: Expired Firebase token error: {str(e)}")
+            return Response({"error": "Firebase token has expired"}, status=400)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            logger.error(f"FirebaseAuthView: Unexpected error: {str(e)}", exc_info=True)
+            return Response({"error": str(e)}, status=400)
 
 
 @api_view(['GET'])
