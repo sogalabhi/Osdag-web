@@ -42,26 +42,7 @@ import { menuItems } from "../utils/moduleUtils";
 import { UI_STRINGS } from "../../../constants/UIStrings";
 import { isGuestUser, canCreateProjects } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
-import {
-  downloadGroupedInputsCsv,
-  downloadGroupedOutputsCsv,
-} from "../utils/groupedCsvExport";
-import ProjectNameModal from "../../../homepage/components/ProjectNameModal";
-import { useProjectCreation } from '../hooks/useProjectCreation';
-import { deleteAllCustomSections } from "../../../datasources/sectionsDataSource";
-import HelpLinkModal from "./help/HelpLinkModal";
-import AboutOsdagModal from "./help/AboutOsdagModal";
-import { ASK_QUESTION_LINK, DESIGN_EXAMPLES_URL } from "./help/helpContent";
-import { openOsiFile } from "../../../datasources/osiDataSource";
-import {
-  downloadCachedModelByFormat,
-  downloadExportCadResponse,
-} from "../utils/cadExport";
-import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
-import { getModuleConfig as getDesignPrefModuleConfig } from "../utils/moduleConfig";
-import { useShortcutLayer } from "../../../utils/shortcuts/ShortcutProvider";
-import { SHORTCUT_ACTION_BY_ID } from "../../../constants/shortcuts";
-import FloatingNavBar from "./FloatingNavBar";
+import OptimizationGraph from "./OptimizationGraph";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -205,6 +186,10 @@ export const EngineeringModule = ({
   const [selectedCameraView, setSelectedCameraView] = useState("Model");
   const [lockZoom, setLockZoom] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
+  const [showOptimizationGraph, setShowOptimizationGraph] = useState(false);
 
   // Hooking Graphics Options (Model / Selected Section & Bg Color)
   const colorPickerRef = useRef(null);
@@ -475,6 +460,7 @@ export const EngineeringModule = ({
 
     // Call the actual submit function
     try {
+      openOptiGraph();
       await handleSubmit();
       setShowResetButton(true);
     } catch (error) {
@@ -923,6 +909,7 @@ export const EngineeringModule = ({
               setCreateDesignReportBool={setCreateDesignReportBool}
               triggerScreenshotCapture={triggerScreenshotCapture}
               selectedOption={extraState.selectedOption}
+              openOptiGraph={openOptiGraph}
               setSelectedOption={(value) =>
                 setExtraState({ ...extraState, selectedOption: value })
               }
@@ -1102,7 +1089,7 @@ export const EngineeringModule = ({
         }, [])}
       </div>
 
-      <div className="relative flex flex-row flex-1 overflow-hidden w-full">
+      <div className="relative flex flex-row h-full w-full" style={{ minHeight: 'calc(100vh - 80px)', maxHeight: 'calc(100vh - 48px)' }}> {/* Adjust for nav height */}
         {/* Input Dock Toggle Button - Fixed to left, shows when dock is closed (Desktop only) */}
         {!docks.input && !isMobile && (
           <button

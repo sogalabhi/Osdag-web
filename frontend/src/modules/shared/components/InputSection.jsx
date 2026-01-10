@@ -325,14 +325,13 @@ export const InputSection = ({
             value={value}
             isSearchable={false}
             onChange={(selected) => {
-              if (isMaterialField && selected.value === 'Custom') {
-                if (field.key.includes('supported')) setCustomMaterialType('supported');
-                else if (field.key.includes('supporting')) setCustomMaterialType('supporting');
-                else setCustomMaterialType('connector');
-                setShowCustomMaterialModal(true);
-                return;
+              if (field.key === "design_type") { // For Optimized Inputs
+                setExtraState({
+                  ...extraState,
+                  optimizedInputs: selected.value === "Optimized",
+                });
               }
-              setInputs({ ...safeInputs, [field.key]: selected.value });
+              setInputs({ ...safeInputs, [field.key]: selected.value })
             }}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
