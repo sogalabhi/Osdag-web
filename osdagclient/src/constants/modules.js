@@ -21,6 +21,7 @@ import {
     MODULE_KEY_WELDED_TO_END_GUSSET,
     MODULE_KEY_TENSION_BOLTED,
     MODULE_KEY_TENSION_WELDED,
+    MODULE_KEY_STRUTS_BOLTED,
 } from "./DesignKeys";
 import { UI_STRINGS } from "./UIStrings";
 
@@ -66,7 +67,7 @@ export const CONNECTIONS_TAB_CONTENT = {
             options: [
                 { key: MODULE_KEY_COVER_PLATE_BOLTED, label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
                 { key: MODULE_KEY_COVER_PLATE_WELDED, label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_BEAM_BEAM_END_PLATE, label: UI_STRINGS.END_PLATE, img: "shear_fin_plate_connec.svg" }, 
+                { key: MODULE_KEY_BEAM_BEAM_END_PLATE, label: UI_STRINGS.END_PLATE, img: "shear_fin_plate_connec.svg" },
             ],
         },
         {
@@ -106,7 +107,11 @@ export const GENERIC_SUBMODULE_CONTENT = {
     Compression: [
         {
             label: UI_STRINGS.COMPRESSION_MEMBER,
-            options: [{ key: "StrutsInTrusses", label: "Struts in Trusses", img: "shear_fin_plate_connec.svg" }],
+            options: [
+                { key: MODULE_KEY_STRUTS_BOLTED, label: "Struts Bolted to End Gusset", img: "shear_fin_plate_connec.svg" },
+                { key: "StrutsInTrusses", label: "Struts in Trusses", img: "shear_fin_plate_connec.svg" },
+            ],
+
         },
     ],
     Flexure: [
@@ -148,6 +153,7 @@ export const MODULE_ROUTES = {
     [MODULE_KEY_WELDED_TO_END_GUSSET]: "/design/tension-member/welded_to_end_gusset",
     [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: "/design/connections/column-beam/end_plate",
     StrutsInTrusses: "/design/compression_member/compression_member/struts_in_trusses",
+    [MODULE_KEY_STRUTS_BOLTED]: "/design/compression-member/struts_bolted_to_end_gusset",
     // Add other needed routes
 };
 
@@ -165,8 +171,8 @@ export const MODULE_NAME_TO_KEY = {
     "Beam-to-Beam-Cover-Plate-Bolted-Connection": MODULE_KEY_COVER_PLATE_BOLTED,
     "Beam-to-Beam-Cover-Plate-Welded-Connection": MODULE_KEY_COVER_PLATE_WELDED,
     "Beam-Beam-End-Plate-Connection": MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
-    "Column-to-Column-Cover-Plate-Welded-Connection" : MODULE_KEY_CC_COVER_PLATE_WELDED,
-    "Column-to-Column-Cover-Plate-Bolted-Connection" : MODULE_KEY_CC_COVER_PLATE_BOLTED,
-    "Column-to-Column-End-Plate-Connection" : MODULE_KEY_CC_END_PLATE,
+    "Column-to-Column-Cover-Plate-Welded-Connection": MODULE_KEY_CC_COVER_PLATE_WELDED,
+    "Column-to-Column-Cover-Plate-Bolted-Connection": MODULE_KEY_CC_COVER_PLATE_BOLTED,
+    "Column-to-Column-End-Plate-Connection": MODULE_KEY_CC_END_PLATE,
     "Base-Plate": "BasePlateConnection",
 };

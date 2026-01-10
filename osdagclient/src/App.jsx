@@ -38,6 +38,7 @@ import WeldedToEnd from "./modules/TensionMembers/WeldedToEnd/WeldedToEnd";
 
 // Compression members modules
 import CompressionMember from "./modules/compressionMember/CompressionMember";
+import StrutsBolted from "./modules/compressionMember/StrutsBolted";
 
 // Beam modules
 import SimplySupportedBeam from "./modules/flexuralMember/simplySupportedBeam";
@@ -90,6 +91,7 @@ function App() {
         <Route path="/design/:designType/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
         <Route path="/design/:designType/column-beam/:projectId?" element={<BeamToColumnEndPlate />} />
         <Route path="/design/:designType/compression_member/struts_in_trusses/:projectId?" element={<CompressionMember />} />
+        <Route path="/design/:designType/struts_bolted_to_end_gusset/:projectId?" element={<StrutsBolted />} />
       </Route>
     )
   );

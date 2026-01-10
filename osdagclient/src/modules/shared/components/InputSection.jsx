@@ -431,9 +431,9 @@ export const InputSection = ({
         return (<>{field.conditionalDisplay() &&
           <div className="flex justify-center">
             <img
-              src={field.imageSource(extraState)}
+              src={field.imageSource(extraState, safeInputs)}
               alt="Connection type"
-              className="w-[100px] h-[100px] object-contain"
+              style={{ width: field.width || '100px', height: field.height || '100px', objectFit: 'contain' }}
             /></div>}</>);
 
       case 'number':
