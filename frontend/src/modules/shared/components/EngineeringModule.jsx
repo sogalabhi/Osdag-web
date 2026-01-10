@@ -35,6 +35,7 @@ import { menuItems } from "../utils/moduleUtils";
 import { UI_STRINGS } from "../../../constants/UIStrings";
 import { isGuestUser } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
+import OptimizationGraph from "./OptimizationGraph";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -155,6 +156,7 @@ export const EngineeringModule = ({
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
+  const [showOptimizationGraph, setShowOptimizationGraph] = useState(false);
 
   // Normalize CAD path keys to handle case/spacing differences
   const normalizedCadModelPaths = useMemo(() => {
@@ -467,6 +469,7 @@ export const EngineeringModule = ({
 
     // Call the actual submit function
     try {
+      openOptiGraph();
       await handleSubmit();
       setShowResetButton(true);
 
@@ -888,6 +891,7 @@ export const EngineeringModule = ({
               setCreateDesignReportBool={setCreateDesignReportBool}
               triggerScreenshotCapture={triggerScreenshotCapture}
               selectedOption={extraState.selectedOption}
+              openOptiGraph={openOptiGraph}
               setSelectedOption={(value) =>
                 setExtraState({ ...extraState, selectedOption: value })
               }
@@ -1062,7 +1066,7 @@ export const EngineeringModule = ({
         }, [])}
       </div>
 
-      <div className="relative flex flex-row h-full w-full">
+      <div className="relative flex flex-row h-full w-full" style={{ minHeight: 'calc(100vh - 80px)', maxHeight: 'calc(100vh - 48px)' }}> {/* Adjust for nav height */}
         {/* Input Dock Toggle Button - Fixed to left, shows when dock is closed (Desktop only) */}
         {!showInputDock && !isMobile && (
           <button
