@@ -157,6 +157,28 @@ export const EngineeringModule = ({
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
   const [showOptimizationGraph, setShowOptimizationGraph] = useState(false);
+  const [optimizationDone, setOptimizationDone] = useState(false);
+  const [optimizationData, setOptimizationData] = useState({
+    current_iter: 0,
+    non_fease: {
+      x: [],
+      y: [],
+      z: [],
+    },
+    fease: {
+      x: [],
+      y: [],
+      z: [],
+    },
+    best: {
+      iter: null,
+      found: false,
+      particle: null,
+      x: [],
+      y: [],
+      z: []
+    }
+  });
 
   // Normalize CAD path keys to handle case/spacing differences
   const normalizedCadModelPaths = useMemo(() => {
@@ -469,7 +491,93 @@ export const EngineeringModule = ({
 
     // Call the actual submit function
     try {
-      openOptiGraph();
+      if (extraState.optimizedInputs) {
+        let sequence = -1; // to track and drop out-of-order messages.
+        setShowOptimizationGraph(true);
+        service.getRTUpdates("ws/optimize/plate-girder/",
+          (ev) => {
+            const ws = ev.target
+            ws.send(JSON.stringify({
+              type: "start_optimization",
+              data: inputs
+            }
+            ));
+
+            setOptimizationData({
+              current_iter: 0,
+              non_fease: {
+                x: [],
+                y: [],
+                z: [],
+              },
+              fease: {
+                x: [],
+                y: [],
+                z: [],
+              },
+              best: {
+                iter: null,
+                found: false,
+                particle: null,
+                x: [],
+                y: [],
+                z: []
+              }
+            });
+            setOptimizationDone(false);
+          },
+          (event) => {
+            const msg = JSON.parse(event.data);
+            if (msg.data.sequence > sequence) {
+              sequence = msg.data.sequence;
+              switch (msg.type) {
+                case "task_started":
+                  break;
+                case "pso_update":
+                  setOptimizationData((prev) => {
+                    if (msg.data.ur < 1) {
+                      return {
+                        ...prev,
+                        current_iter: msg.data.iteration,
+                        fease: {
+                          x: [...prev.fease.x, msg.data.ur],
+                          y: [...prev.fease.y, msg.data.depth],
+                          z: [...prev.fease.z, msg.data.weight_kg]
+                        }
+                      }
+                    }
+                    else {
+                      return {
+                        ...prev,
+                        current_iter: msg.data.iteration,
+                        non_fease: {
+                          x: [...prev.non_fease.x, msg.data.ur],
+                          y: [...prev.non_fease.y, msg.data.depth],
+                          z: [...prev.non_fease.z, msg.data.weight_kg]
+                        }
+                      }
+                    }
+
+                  })
+                  break;
+                case "pso_heartbeat":
+                  // update liveness indicator
+                  break;
+                case "pso_complete":
+                  setOptimizationDone(true);
+                  event.target.close(); // close the connection
+                  // show final design; stop loading
+                  break;
+                case "pso_error":
+                  console.lofg
+                  event.target.close(); // close the connection
+                  // show error; stop loading
+                  break;
+              }
+            }
+          }
+        )
+      }
       await handleSubmit();
       setShowResetButton(true);
 
