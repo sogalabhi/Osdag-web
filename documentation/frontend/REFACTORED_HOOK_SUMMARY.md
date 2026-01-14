@@ -48,7 +48,7 @@ if (result && result.success) {
   console.log('✅ Module data loaded successfully');
   console.log('✅ Data keys:', Object.keys(result.data || {}));
 } else {
-  console.error('❌ Failed to load module data:', result?.error || 'Unknown error');
+  console.error('Failed to load module data:', result?.error || 'Unknown error');
 }
 ```
 
@@ -71,7 +71,7 @@ const result = await manageDesignPreferences('get', {
 if (result && result.success) {
   console.log('✅ Supported data loaded successfully');
 } else {
-  console.error('❌ Failed to load supported data:', result?.error);
+  console.error('Failed to load supported data:', result?.error);
 }
 ```
 
@@ -96,12 +96,12 @@ const result = await generateReport('design_report', {
 if (result && result.success) {
   console.log('✅ Design report generated successfully');
 } else {
-  console.error('❌ Failed to generate design report:', result?.error);
+  console.error('Failed to generate design report:', result?.error);
   alert(`Failed to generate design report: ${result?.error || 'Unknown error'}`);
 }
 ```
 
-## 🔧 Technical Changes
+## Technical Changes
 
 ### Module Data Loading
 - ✅ **Replaced** multiple specific data fetchers with single `getModuleData()`
@@ -146,7 +146,7 @@ The refactoring follows a consistent pattern for all API calls:
 ```javascript
 // 1. Check if function exists
 if (!functionName) {
-  console.error('❌ Function not available');
+  console.error('Function not available');
   return;
 }
 
@@ -159,11 +159,11 @@ try {
     console.log('✅ Operation successful');
     // Handle success
   } else {
-    console.error('❌ Operation failed:', result?.error);
+    console.error('Operation failed:', result?.error);
     // Handle failure
   }
 } catch (error) {
-  console.error('❌ Exception:', error);
+  console.error('Exception:', error);
   // Handle exception
 }
 ```

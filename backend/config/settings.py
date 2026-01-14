@@ -40,14 +40,12 @@ HOST = get_host()
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+# SECURITY WARNING: DEV ONLY - Never use ['*'] in production!
+ALLOWED_HOSTS = ['*']
 
-CORS_ALLOWED_ORIGINS = ['http://127.0.0.1:5173',
-                        'http://localhost:5173',
-                        'http://127.0.0.1:3000',
-                        'http://localhost:3000',
-                        'http://127.0.0.1:8080',
-                        'http://localhost:8080']
+# CORS Configuration (DEV ONLY - Allow all origins for LAN testing)
+CORS_ALLOW_ALL_ORIGINS = True  # Allows phone on same WiFi to access
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
 
@@ -62,10 +60,6 @@ CORS_ALLOW_HEADERS = ["accept",
                       'Cache-Control',
                       'Pragma',
                       ]
-
-CORS_ALLOW_CREDENTIALS = True
-
-CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:5173', 'http://localhost:5173', 'http://127.0.0.1:3000', 'http://localhost:3000', 'http://127.0.0.1:8080', 'http://localhost:8080']
 
 
 # Application definition
@@ -89,10 +83,9 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
-ALLOWED_HOSTS = ['*']
-
+# Middleware order is CRITICAL - CorsMiddleware MUST be first
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # MUST BE FIRST for CORS to work
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -100,8 +93,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

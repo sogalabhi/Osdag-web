@@ -8,8 +8,57 @@
 
 ## Table of contents
 * <a href="#quick-start">Quick start</a>
+* <a href="#website--architecture">Website &amp; architecture</a>
+* <a href="#documentation">Documentation</a>
 * <a href="#contribute">Contributing</a>
 * <a href="#license">Copyright and license</a>
+
+## Website &amp; architecture
+
+This repository contains the **Osdag on Cloud website**:
+
+- **Frontend**: React (Vite) app in `osdagclient/`
+- **Backend**: Django + Django REST Framework in `backend/` (new core app under `backend/apps/`)
+- **Database**: PostgreSQL (projects, saved inputs, etc.)
+- **Auth**: Firebase ID tokens verified server-side; authenticated API calls include `Authorization: Bearer <firebase_id_token>`
+
+### High-level flow
+
+1. User opens the website at `http://localhost:5173` (or `http://<LAN_IP>:5173` for phone testing).
+2. Frontend calls backend REST endpoints under `/api/...`.
+3. For protected endpoints (e.g. project save/list), frontend includes Firebase ID token.
+4. Backend verifies token and authorizes the request, then reads/writes to PostgreSQL as needed.
+
+### Architecture (simplified)
+
+```
+Browser (React / Vite)  ── HTTP ──>  Django REST API  ──> PostgreSQL
+         |                                |
+         | (Firebase login)               | (verify Firebase ID token)
+         └─────────────── Firebase Auth ──┘
+```
+
+## Documentation
+
+### Project / onboarding
+- **Root overview**: `SUMMARY.md`
+- **Deployment notes**: `DEPLOYMENT_GUIDE.md`
+- **Contributing**: `CONTRIBUTING.md`
+
+### Backend docs
+- **Setup osdag_core**: `backend/docs/SETUP_OSDAG_CORE.md`
+- **Endpoint features (guest vs authenticated, saving, etc.)**: `backend/docs/ENDPOINT_FEATURES.md`
+- **Shear connection tests**: `backend/docs/TEST_SHEAR_CONNECTION.md`
+- **Module helper utilities**: `backend/apps/core/utils/README.md`
+- **Adding backend modules/submodules**: `documentation/ADDING_MODULES_AND_SUBMODULES_BACKEND.md`
+
+### Frontend docs
+- **Auth flow (Firebase)**: `osdagclient/AUTHENTICATION_FLOW_ANALYSIS.md`
+- **Frontend improvement roadmap**: `osdagclient/FRONTEND_IMPROVEMENTS.md`
+- **Simplified ModuleContext API**: `osdagclient/src/context/SIMPLIFIED_MODULE_CONTEXT_README.md`
+- **Refactored hook summary**: `osdagclient/src/modules/shared/hooks/REFACTORED_HOOK_SUMMARY.md`
+- **Creating a new module (shear connection)**: `osdagclient/src/modules/shearConnection/CREATE_NEW_MODULE.md`
+- **Simply Supported Beam module notes**: `osdagclient/src/modules/flexuralMember/simplySupportedBeam/README.md`
 
 ## <a id="user-content-quick-start" class="anchor" href="#quick-start" aria-hidden="true"></a> Quick start
 
