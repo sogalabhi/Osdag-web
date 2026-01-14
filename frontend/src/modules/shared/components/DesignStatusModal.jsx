@@ -17,12 +17,12 @@ import { DESIGN_STATUS } from '../hooks/useDesignSubmission';
 export const DesignStatusModal = ({ status, isMobile, onRetry, onClose }) => {
   const isVisible = status.step !== DESIGN_STATUS.IDLE;
   
-  // Auto-dismiss on complete after 1 second
+  // Auto-dismiss on complete after 3 seconds (extended to allow user to see close button)
   useEffect(() => {
     if (status.step === DESIGN_STATUS.COMPLETE) {
       const timer = setTimeout(() => {
         if (onClose) onClose();
-      }, 1000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [status.step, onClose]);
@@ -128,12 +128,12 @@ export const DesignStatusModal = ({ status, isMobile, onRetry, onClose }) => {
       <Modal
         open={isVisible}
         footer={null}
-        closable={status.step === DESIGN_STATUS.ERROR}
-        maskClosable={status.step === DESIGN_STATUS.ERROR}
+        closable={status.step === DESIGN_STATUS.ERROR || status.step === DESIGN_STATUS.COMPLETE}
+        maskClosable={status.step === DESIGN_STATUS.ERROR || status.step === DESIGN_STATUS.COMPLETE}
         centered
         width={isMobile ? '90%' : 420}
         className="loading-modal"
-        onCancel={status.step === DESIGN_STATUS.ERROR ? onClose : undefined}
+        onCancel={(status.step === DESIGN_STATUS.ERROR || status.step === DESIGN_STATUS.COMPLETE) ? onClose : undefined}
         styles={{
           body: {
             textAlign: "center",
@@ -151,7 +151,7 @@ export const DesignStatusModal = ({ status, isMobile, onRetry, onClose }) => {
           <div style={{ fontSize: '16px', marginBottom: '8px', fontWeight: '500' }}>
             {content.message}
           </div>
-          <div style={{ fontSize: '14px', color: '#666', marginBottom: content.showRetry ? '20px' : '0' }}>
+          <div style={{ fontSize: '14px', color: '#666', marginBottom: (content.showRetry || status.step === DESIGN_STATUS.COMPLETE) ? '20px' : '0' }}>
             {content.subMessage}
           </div>
           {content.showRetry && onRetry && (
@@ -160,6 +160,19 @@ export const DesignStatusModal = ({ status, isMobile, onRetry, onClose }) => {
               className="mt-4 px-6 py-2 bg-osdag-green text-white rounded-lg hover:bg-opacity-90 transition-opacity font-semibold"
             >
               Retry
+            </button>
+          )}
+          {status.step === DESIGN_STATUS.COMPLETE && (
+            <button
+              onClick={() => {
+                console.log('[DesignStatusModal] Close button clicked');
+                if (onClose) {
+                  onClose();
+                }
+              }}
+              className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+            >
+              Close
             </button>
           )}
         </div>

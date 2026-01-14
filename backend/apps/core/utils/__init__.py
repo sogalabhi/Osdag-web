@@ -7,8 +7,15 @@ from .validation import (
     int_able, float_able, is_yes_or_no,
     validate_string, validate_num, validate_arr
 )
-from .mesh_export import write_stl
-from .cad_export import export_step, export_iges
+
+try: 
+    from .mesh_export import write_stl
+except Exception: 
+    def write_stl(*args, **kwargs):
+        raise ImportError(
+            "write_stl is not available because OCC (pythonOCC) is not installed. "
+            "CAD/STL export cannot be used in this environment."
+        )
 
 __all__ = [
     # Errors
@@ -17,7 +24,6 @@ __all__ = [
     'validate_list_type', 'contains_keys', 'custom_list_validation',
     'int_able', 'float_able', 'is_yes_or_no',
     'validate_string', 'validate_num', 'validate_arr',
-    # Mesh export
     'write_stl',
     # CAD export
     'export_step', 'export_iges',

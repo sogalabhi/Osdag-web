@@ -129,7 +129,8 @@ export const useEngineeringModule = (moduleConfig) => {
     modalDynamicSrc,
     setModalDynamicSrc,
     designPrefModalStatus,
-    setDesignPrefModalStatus, // ADD
+    setModalDynamicSrc,
+    setDesignPrefModalStatus,
     confirmationModal,
     setConfirmationModal,
     displaySaveInputPopup,
@@ -353,7 +354,8 @@ export const useEngineeringModule = (moduleConfig) => {
     modalDynamicSrc,
     setModalDynamicSrc,
     designPrefModalStatus,
-    setDesignPrefModalStatus, // ADD
+    setModalDynamicSrc,
+    setDesignPrefModalStatus,
     confirmationModal,
     setConfirmationModal,
     displaySaveInputPopup,

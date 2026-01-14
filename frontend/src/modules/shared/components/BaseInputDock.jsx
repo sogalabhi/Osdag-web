@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { message } from "antd";
 import { InputSection } from "./InputSection";
-import { Modal } from "antd";
+import { OptimizedBoundsModal } from "./OptimizedBoundsModal";
 
 export const BaseInputDock = React.memo(({
   moduleConfig,
@@ -35,10 +35,39 @@ export const BaseInputDock = React.memo(({
   const internalLockBtnRef = useRef(null);
   const lockBtnRef = externalLockBtnRef || internalLockBtnRef;
 
-  // This contains all the data regarding the optimized modal, like if its open, 
+  // This contains all the data regarding the optimized modal, like if its open,
   // which key it bounds and also the values for setting the inputs
   const [optimizedModal, setOptimizedModal] = useState({ state: false, key: '' });
   const [modalValues, setModalValues] = useState({ lb: '', ub: '', inc: '' });
+
+  const resolveOptimizedFieldLabel = (fieldKey) => {
+    if (!fieldKey || !moduleConfig?.inputSections) return "";
+    for (const section of moduleConfig.inputSections) {
+      const match = section?.fields?.find((field) => field.key === fieldKey);
+      if (match) return match.label || "";
+    }
+    return "";
+  };
+
+  const handleOptimizedModalCancel = () => {
+    setOptimizedModal({ state: false, key: "" });
+    setModalValues({ lb: "", ub: "", inc: "" });
+  };
+
+  const handleOptimizedModalSave = () => {
+    const { key } = optimizedModal;
+    if (!key) {
+      handleOptimizedModalCancel();
+      return;
+    }
+    setInputs({
+      ...inputs,
+      [`${key}_lb`]: modalValues.lb ?? "",
+      [`${key}_ub`]: modalValues.ub ?? "",
+      [`${key}_inc`]: modalValues.inc ?? "",
+    });
+    handleOptimizedModalCancel();
+  };
 
   return (
     <div
@@ -134,80 +163,14 @@ export const BaseInputDock = React.memo(({
             </div>
           )}
 
-          {/* Optimized Input Modal */}
-          <Modal
-            width={window.innerWidth < 768 ? '90%' : 420}
-            open={optimizedModal.state}
-            onCancel={() => {
-              setOptimizedModal({ state: false, key: '', });
-              setModalValues({ lb: 0, ub: 0, inc: 0 });
-            }
-            }
-            onOk={() => {
-              setInputs({
-                ...inputs,
-                [`${optimizedModal.key}_bounds`]: [parseFloat(modalValues.lb), parseFloat(modalValues.ub), parseFloat(modalValues.inc)],
-              })
-              setOptimizedModal({ state: false, key: '', })
-              setModalValues({ lb: 0, ub: 0, inc: 0 });
-            }
-            }
-            centered
-            styles={{
-              body: {
-                textAlign: "center",
-                padding: "0px 0px !important",
-                boxSizing: "content-box",
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-              },
-            }}
-          >
-            <div style={{ background: "transparent", fontWeight: "bold" }}>Optimized Input</div>
-            <div
-              className="gap-4"
-              style={{
-                backgroundColor: "white",
-                padding: "20px",
-                borderRadius: "8px",
-                width: "300px",
-                boxShadow: "0 0 10px rgba(0,0,0,0.25)",
-                display: 'grid',
-                width: '100%',
-              }}
-            >
-
-              <div className="grid grid-cols-3 w-full">
-                <div className="grid text-left content-center">Lower Bounds</div>
-                <input
-                  type="number"
-                  value={String(modalValues.lb)}
-                  onChange={(e) => { setModalValues((prev) => ({ ...prev, lb: e.target.value })); }}
-                  className="grid col-start-2 col-end-4 h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none"
-                />
-              </div>
-              <div className="grid  justify-between grid-cols-3">
-                <div className="grid text-left content-center">Upper Bounds</div>
-                <input
-                  type="number"
-                  value={String(modalValues.ub)}
-                  onChange={(e) => { setModalValues((prev) => ({ ...prev, ub: e.target.value })); }}
-                  className="grid col-start-2 col-end-4 h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none"
-
-                />
-              </div>
-              <div className="grid  justify-between grid-cols-3">
-                <div className="grid text-left content-center">Increment</div>
-                <input
-                  type="number"
-                  value={String(modalValues.inc)}
-                  onChange={(e) => { setModalValues((prev) => ({ ...prev, inc: e.target.value })); }}
-                  className="grid col-start-2 col-end-4 h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none"
-                />
-              </div>
-            </div>
-          </Modal>
+          <OptimizedBoundsModal
+            isOpen={optimizedModal.state}
+            fieldLabel={resolveOptimizedFieldLabel(optimizedModal.key)}
+            values={modalValues}
+            onChange={(nextValues) => setModalValues(nextValues)}
+            onCancel={handleOptimizedModalCancel}
+            onSave={handleOptimizedModalSave}
+          />
         </div>
       </div>
 

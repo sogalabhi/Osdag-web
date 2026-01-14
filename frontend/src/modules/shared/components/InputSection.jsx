@@ -220,17 +220,12 @@ export const InputSection = ({
       return getListForInputKey(inputKey, safeContextData, field.dataSource);
     };
 
+
     if (value === "Customized") {
       // Get all available values
-      const allValues = getAllValuesForInputKey(field.key);
+      const allValues = getAllValuesForInputKey(field.key, field);
       // Convert to array of keys/strings for Transfer component
-      const allKeys = allValues.map(val => {
-        // Handle different data formats (object with value/Grade property, or plain string/number)
-        if (typeof val === 'object' && val !== null) {
-          return val.value || val.Grade || val.toString();
-        }
-        return val.toString();
-      });
+      const allKeys = normalizeValueList(allValues);
 
       // Set all items as selected (moved to right side) - this populates the Transfer component
       updateSelectedItems(field.key, allKeys);
@@ -241,20 +236,31 @@ export const InputSection = ({
       toggleAllSelected(field.key, false);
     } else {
       // "All" option - get all values and set them in inputs 
-      const allValues = getAllValuesForInputKey(field.key);
+      const allValues = getAllValuesForInputKey(field.key, field);
       // Convert to array format if needed
-      const allValuesArray = allValues.map(val => {
-        if (typeof val === 'object' && val !== null) {
-          return val.value || val.Grade || val.toString();
-        }
-        return val.toString();
-      });
+      const allValuesArray = normalizeValueList(allValues);
       setInputs({ ...safeInputs, [field.key]: allValuesArray });
       // Clear selectedItems since we're using "All" (not managed via Transfer)
       updateSelectedItems(field.key, []);
       updateSelectionState(field.selectionKey, "All");
       updateModalState(field.modalKey, false);
       toggleAllSelected(field.key, true); // fix allSelected flag not triggering
+    }
+  };
+
+  const handleThicknessSelection = (field, value) => {
+    if (value === "Customized") {
+      const allValues = getAllValuesForInputKey(field.customizableInputKey, field);
+      const allKeys = normalizeValueList(allValues);
+      const existingValues = Array.isArray(safeInputs[field.customizableInputKey])
+        ? safeInputs[field.customizableInputKey]
+        : [];
+      const selectedValues = existingValues.length > 0 ? existingValues : allKeys;
+      updateSelectedItems(field.customizableInputKey, selectedValues);
+      updateModalState(field.modalKey, true);
+    } else {
+      updateSelectedItems(field.customizableInputKey, []);
+      updateModalState(field.modalKey, false);
     }
   };
 
@@ -332,6 +338,9 @@ export const InputSection = ({
                 });
               }
               setInputs({ ...safeInputs, [field.key]: selected.value })
+              if (field.modalKey && field.customizableInputKey) {
+                handleThicknessSelection(field, selected.value);
+              }
             }}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
@@ -425,13 +434,19 @@ export const InputSection = ({
           />);
       }
       case 'dynamicSelect': {
-        const options = getOptionsForField(field, safeContextData, safeInputs);
-        const value = options.find(opt => opt.value === inputs[field.key]);
+        let options = field.getOptions(safeInputs);
+        const value = options.find(opt => opt.value === safeInputs[field.key]);
         return (
           <Select
             options={options}
             value={value}
-            onChange={(selected) => setInputs({ ...inputs, [field.key]: selected.value })}
+            onChange={(selected) => {
+              if (field.onChange) {
+                field.onChange(selected.value, safeInputs, setInputs, safeContextData, extraState, setExtraState);
+              } else {
+                setInputs({ ...safeInputs, [field.key]: selected.value });
+              }
+            }}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
             classNamePrefix="react-select"

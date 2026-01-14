@@ -66,7 +66,6 @@ from apps.core.utils import (
     MissingKeyError, InvalidInputTypeError,
     contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
 )
-# Lazy import to avoid PySide6 dependency during module discovery
 # PlateGirderWelded will be imported when needed in create_module()
 from osdag_core.custom_logger import CustomLogger
 from osdag_core.Common import (
@@ -79,7 +78,12 @@ from osdag_core.Common import (
     KEY_SUPPORT_WIDTH, KEY_IntermediateStiffener_spacing, KEY_IntermediateStiffener_thickness,
     KEY_LongitudnalStiffener, KEY_LongitudnalStiffener_thickness,
     KEY_IntermediateStiffener_thickness_val, KEY_LongitudnalStiffener_thickness_val,
-    KEY_IS_IT_SYMMETRIC, KEY_DISP_SYM, KEY_DISP_UNSYM
+    KEY_IS_IT_SYMMETRIC, KEY_DISP_SYM, KEY_DISP_UNSYM,
+    KEY_DESIGN_LOAD, KEY_MEMBER_OPTIONS, KEY_SUPPORTING_OPTIONS,
+    KEY_ShearBucklingOption, KEY_DP_DESIGN_METHOD,
+    KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,
+    KEY_T_constatnt, KEY_W_constatnt, KEY_Elastic_CM,
+    KEY_OPTIMUM_UR_COMPRESSION
 )
 import sys
 import os
@@ -241,7 +245,6 @@ def validate_input(input_values: Dict[str, Any]) -> None:
 
 def create_module():
     """Create an instance of the PlateGirderWelded module design class and set it up for use"""
-    # Lazy import to avoid PySide6 dependency during module discovery
     from osdag_core.design_type.plate_girder.core.plate_girder import PlateGirderWelded
     module = PlateGirderWelded()
     module.set_osdaglogger(None)
@@ -281,7 +284,22 @@ def create_from_input(input_values: Dict[str, Any]):
         KEY_IntermediateStiffener_thickness: input_values.get('Design.IntermediateStiffener.Thickness', 'Standard'),
         KEY_LongitudnalStiffener: input_values.get('Design.LongitudnalStiffener', 'No'),
         KEY_LongitudnalStiffener_thickness: input_values.get('Design.LongitudnalStiffener.Thickness', 'Standard'),
+        # Additional design parameters
+        KEY_DESIGN_LOAD: input_values.get('Design.Load', 'Live load'),
+        KEY_MEMBER_OPTIONS: input_values.get('Member.Options', 'Simple Span'),
+        KEY_SUPPORTING_OPTIONS: input_values.get('Supporting.Options', 'NA'),
+        KEY_ShearBucklingOption: input_values.get('Design.ShearBucklingOption', 'Simple Post Critical'),
+        KEY_DP_DESIGN_METHOD: input_values.get('Design.Design_Method', 'Limit State Design'),
+        KEY_EFFECTIVE_AREA_PARA: input_values.get('Design.Effective_Area_Parameter', '1.0'),
+        KEY_LENGTH_OVERWRITE: input_values.get('Design.Length_Overwrite', 'NA'),
     }
+    
+    # Handle symmetry (for both Customized and Optimized design types)
+    symmetry = input_values.get('Symmetry', 'Symmetrical')
+    if symmetry == 'Symmetrical':
+        design_dict[KEY_IS_IT_SYMMETRIC] = KEY_DISP_SYM  # 'Symmetric Girder'
+    else:
+        design_dict[KEY_IS_IT_SYMMETRIC] = KEY_DISP_UNSYM  # 'Unsymmetric Girder'
     
     # Add design type specific keys
     design_type = design_dict[KEY_OVERALL_DEPTH_PG_TYPE]
@@ -296,18 +314,36 @@ def create_from_input(input_values: Dict[str, Any]):
         design_dict[KEY_TOP_Bflange_PG] = '1'
         design_dict[KEY_BOTTOM_Bflange_PG] = '1'
     
-    # Import VALUES_STIFFENER_THICKNESS from plate_girder module
-    from osdag_core.design_type.plate_girder.core.plate_girder import VALUES_STIFFENER_THICKNESS
+    # Import VALUES_STIFFENER_THICKNESS and PlateGirderWelded for exact desktop replica
+    from osdag_core.design_type.plate_girder.core.plate_girder import VALUES_STIFFENER_THICKNESS, PlateGirderWelded
     
-    # Set default values for thickness lists (these are set in set_input_values, but we set them here too)
+    # Exact replica of desktop behavior: populate class variables from input_values (web UI),
+    # then use them exactly like desktop set_input_values() does (lines 778-788)
+    
+    # For intermediate stiffener: populate class variable if customized values provided
     if design_dict[KEY_IntermediateStiffener_thickness] == 'Customized':
-        design_dict[KEY_IntermediateStiffener_thickness_val] = PlateGirderWelded.int_thicklist if PlateGirderWelded.int_thicklist else VALUES_STIFFENER_THICKNESS
+        # Get customized values from input_values (web UI equivalent of PopupDialog selection)
+        custom_values = input_values.get('Design.IntermediateStiffener.Thickness_Values', None)
+        if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
+            # Populate class variable (exact replica of desktop: PlateGirderWelded.int_thicklist = selected_items)
+            PlateGirderWelded.int_thicklist = [str(v) for v in custom_values]
+        # Use class variable exactly like desktop set_input_values() does (line 779)
+        design_dict[KEY_IntermediateStiffener_thickness_val] = PlateGirderWelded.int_thicklist
     else:
+        # Standard mode: use all standard values (exact replica of desktop line 781)
         design_dict[KEY_IntermediateStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
     
+    # For longitudinal stiffener: populate class variable if customized values provided
     if design_dict[KEY_LongitudnalStiffener_thickness] == 'Customized':
-        design_dict[KEY_LongitudnalStiffener_thickness_val] = PlateGirderWelded.long_thicklist if PlateGirderWelded.long_thicklist else VALUES_STIFFENER_THICKNESS
+        # Get customized values from input_values (web UI equivalent of PopupDialog selection)
+        custom_values = input_values.get('Design.LongitudnalStiffener.Thickness_Values', None)
+        if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
+            # Populate class variable (exact replica of desktop: PlateGirderWelded.long_thicklist = selected_items2)
+            PlateGirderWelded.long_thicklist = [str(v) for v in custom_values]
+        # Use class variable exactly like desktop set_input_values() does (line 786)
+        design_dict[KEY_LongitudnalStiffener_thickness_val] = PlateGirderWelded.long_thicklist
     else:
+        # Standard mode: use all standard values (exact replica of desktop line 788)
         design_dict[KEY_LongitudnalStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
     
     try:
@@ -340,6 +376,12 @@ def generate_output(input_values: Dict[str, Any]):
         
         raw_output = raw_output_text
 
+        # Get design preferences for conditional outputs
+        web_philosophy = input_values.get('Design.Web_Philosophy', 'Thick Web without ITS')
+        support_type = input_values.get('Design.Design_Type_Flexure', 'Major Laterally Supported')
+        is_thick_web = 'Thick Web' in web_philosophy
+        is_laterally_supported = 'Laterally Supported' in support_type
+        
         # Process each parameter
         for i, param in enumerate(raw_output):
             if len(param) >= 4:
@@ -354,6 +396,31 @@ def generate_output(input_values: Dict[str, Any]):
                     if hasattr(value, 'item'):
                         value = value.item()
                     
+                    # Handle None/empty values
+                    if value is None or value == '':
+                        # Set appropriate defaults based on field type
+                        if 'Stiffener' in key and is_thick_web:
+                            value = 'N/A'
+                        elif key in [KEY_T_constatnt, KEY_W_constatnt, KEY_Elastic_CM] and is_laterally_supported:
+                            value = 'N/A'
+                        elif 'LongitudnalStiffener' in key and (is_thick_web or not hasattr(module, 'longstiffener_no') or getattr(module, 'longstiffener_no', 0) == 0):
+                            if 'Position' in key:
+                                value = 'N/A'
+                            elif 'Numbers' in key:
+                                value = 0
+                            else:
+                                value = 'N/A'
+                        else:
+                            value = 'N/A'
+                    
+                    # Convert numeric None to 0 or N/A
+                    if isinstance(value, (int, float)) and (value == 0 or value is None):
+                        # For counts/numbers, 0 is valid; for dimensions/strengths, use N/A
+                        if 'Numbers' in key or 'UR' in key:
+                            value = 0 if value is None else value
+                        elif value == 0 and key not in [KEY_OPTIMUM_UR_COMPRESSION]:
+                            value = 'N/A'
+                    
                     output[key] = {
                         "key": key,
                         "label": label,
@@ -362,8 +429,65 @@ def generate_output(input_values: Dict[str, Any]):
     except Exception as e:
         print(f'Error in generate_output: {e}')
         traceback.print_exc()
-        
+        # Re-raise exception so service layer can handle it properly
+        raise
+    
     return output, logs
+
+
+def get_optimization_bounds(input_values: Dict[str, Any]) -> Dict[str, tuple]:
+    """
+    Extract optimization bounds from input_values.
+    
+    Args:
+        input_values: Dictionary with keys like "Total.Depth_lb", "Total.Depth_ub", etc.
+        
+    Returns:
+        Dictionary mapping variable names to (lb, ub, inc) tuples
+        Example: {'D': (200, 2000, 25), 'bf_top': (100, 1000, 10)}
+    """
+    bounds = {}
+    
+    # Map frontend keys to backend variable names
+    variable_mapping = {
+        'Total.Depth': 'D',
+        'Topflange.Width': 'bf_top',
+        'Bottomflange.Width': 'bf_bot',
+        'TopFlange.Width': 'bf_top',  # Alternative naming
+        'BottomFlange.Width': 'bf_bot',  # Alternative naming
+    }
+    
+    for frontend_key, backend_var in variable_mapping.items():
+        lb_key = f"{frontend_key}_lb"
+        ub_key = f"{frontend_key}_ub"
+        inc_key = f"{frontend_key}_inc"
+        
+        lb = input_values.get(lb_key)
+        ub = input_values.get(ub_key)
+        inc = input_values.get(inc_key, '0')
+        
+        if lb and ub:
+            try:
+                lb_val = float(lb)
+                ub_val = float(ub)
+                inc_val = float(inc) if inc else 0
+                
+                # Validate bounds
+                if lb_val >= ub_val:
+                    raise ValueError(f"Lower bound ({lb_val}) must be less than upper bound ({ub_val}) for {frontend_key}")
+                
+                bounds[backend_var] = (lb_val, ub_val, inc_val)
+            except (ValueError, TypeError) as e:
+                print(f"Warning: Invalid bounds for {frontend_key}: {e}")
+                continue
+    
+    # Handle symmetric case: if symmetric, use bf for both top and bot
+    if 'bf_top' in bounds and 'bf_bot' not in bounds:
+        bounds['bf'] = bounds['bf_top']
+    elif 'bf_bot' in bounds and 'bf_top' not in bounds:
+        bounds['bf'] = bounds['bf_bot']
+    
+    return bounds
 
 
 def create_optimization_input(input_values: Dict[str, Any]) -> Dict[str, Any]:
@@ -451,26 +575,71 @@ def create_optimization_input(input_values: Dict[str, Any]) -> Dict[str, Any]:
     design_dict[KEY_TOP_Bflange_PG] = '1'
     design_dict[KEY_BOTTOM_Bflange_PG] = '1'
     
-    # Import VALUES_STIFFENER_THICKNESS from plate_girder module (with fallback)
+    # Import VALUES_STIFFENER_THICKNESS from plate_girder module (standard list)
     try:
         from osdag_core.design_type.plate_girder.core.plate_girder import VALUES_STIFFENER_THICKNESS
     except (ImportError, ModuleNotFoundError):
-        # Fallback: Standard stiffener thickness values if import fails (e.g., PySide6 not available)
+        # Fallback: Standard stiffener thickness values if import fails
         VALUES_STIFFENER_THICKNESS = ['6', '8', '10', '12', '14', '16', '18', '20', 
                                       '22', '24', '26', '28', '30', '32', '36', '40']
+     
+    # Import VALUES_STIFFENER_THICKNESS and PlateGirderWelded for exact desktop replica
+    from osdag_core.design_type.plate_girder.core.plate_girder import VALUES_STIFFENER_THICKNESS, PlateGirderWelded
     
-    # Set default values for thickness lists
+    # Exact replica of desktop behavior: populate class variables from optimization_input (web UI),
+    # then use them exactly like desktop set_input_values() does (lines 778-788)
+    
+    # For intermediate stiffener: populate class variable if customized values provided
     if design_dict[KEY_IntermediateStiffener_thickness] == 'Customized':
-        design_dict[KEY_IntermediateStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
+        # Get customized values from optimization_input (web UI equivalent of PopupDialog selection)
+        custom_values = optimization_input.get('Design.IntermediateStiffener.Thickness_Values', None)
+        if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
+            # Populate class variable (exact replica of desktop: PlateGirderWelded.int_thicklist = selected_items)
+            PlateGirderWelded.int_thicklist = [str(v) for v in custom_values]
+        # Use class variable exactly like desktop set_input_values() does (line 779)
+        design_dict[KEY_IntermediateStiffener_thickness_val] = PlateGirderWelded.int_thicklist
     else:
+        # Standard mode: use all standard values (exact replica of desktop line 781)
         design_dict[KEY_IntermediateStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
     
+    # For longitudinal stiffener: populate class variable if customized values provided
     if design_dict[KEY_LongitudnalStiffener_thickness] == 'Customized':
-        design_dict[KEY_LongitudnalStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
+        # Get customized values from optimization_input (web UI equivalent of PopupDialog selection)
+        custom_values = optimization_input.get('Design.LongitudnalStiffener.Thickness_Values', None)
+        if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
+            # Populate class variable (exact replica of desktop: PlateGirderWelded.long_thicklist = selected_items2)
+            PlateGirderWelded.long_thicklist = [str(v) for v in custom_values]
+        # Use class variable exactly like desktop set_input_values() does (line 786)
+        design_dict[KEY_LongitudnalStiffener_thickness_val] = PlateGirderWelded.long_thicklist
     else:
+        # Standard mode: use all standard values (exact replica of desktop line 788)
         design_dict[KEY_LongitudnalStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
     
     return design_dict
+
+
+def apply_optimization_bounds(module, input_values: Dict[str, Any]) -> None:
+    """
+    Apply custom optimization bounds to module.bounds_map.
+    
+    Args:
+        module: PlateGirderWelded instance
+        input_values: Dictionary with bounds keys (e.g., "Total.Depth_lb", "Total.Depth_ub")
+    """
+    bounds = get_optimization_bounds(input_values)
+    
+    for var, (lb, ub, inc) in bounds.items():
+        if inc > 0:
+            module.bounds_map[var] = (lb, ub, inc)
+        else:
+            module.bounds_map[var] = (lb, ub)
+    
+    # Log applied bounds
+    if bounds:
+        print(f"📏 Applied custom optimization bounds:")
+        for var, (lb, ub, inc) in bounds.items():
+            step_str = f", step={inc}" if inc > 0 else ""
+            print(f"  {var}: [{lb}, {ub}]{step_str}")
 
 
 def determine_optimization_flags(input_values: Dict[str, Any]) -> Tuple[bool, bool]:
