@@ -1,8 +1,18 @@
 import logging
 import math
 import numpy as np
+<<<<<<< HEAD
 from PySide6.QtWidgets import QDialog
 from PySide6.QtCore import Qt
+=======
+
+# PySide6 is only available in the desktop app; wrap import so this file
+# can still be imported in the web backend where PySide6 is not installed.
+try: 
+    from PySide6.QtWidgets import QDialog
+except ImportError:  # pragma: no cover
+    QDialog = None
+>>>>>>> dc5d5059 (feat: Enhance compatibility for PySide6 in GUI components)
 
 from ....Common import *
 from ....utils.common.material import *
