@@ -1,8 +1,23 @@
-from PySide6 import QtCore, QtWidgets
-from PySide6.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QFormLayout, QMessageBox
-from PySide6.QtGui import QFont
-from PySide6.QtCore import Qt
 from .widgets import My_ListWidget
+
+# PySide6 is only available in the desktop GUI application.
+# Guard imports so backend/web usage can still import this module.
+try:
+    from PySide6 import QtCore, QtWidgets
+    from PySide6.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QFormLayout, QMessageBox
+    from PySide6.QtGui import QFont
+    from PySide6.QtCore import Qt
+except ImportError:
+    QtCore = None
+    QtWidgets = None
+    QDialog = object
+    QLabel = object
+    QLineEdit = object
+    QPushButton = object
+    QFormLayout = object
+    QMessageBox = object
+    QFont = None
+    Qt = None
 
 scale = 1  # For resizing components
 

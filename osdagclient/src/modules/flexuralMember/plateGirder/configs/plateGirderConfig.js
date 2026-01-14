@@ -20,20 +20,20 @@ export const plateGirderConfig = {
     module: "Plate-Girder",
     material: "E 250 (Fe 410 W)A",
     design_type: "Customized", // "Customized" or "Optimized"
-    total_depth: "500", // Required for Customized
-    web_thickness: ["6"], // List of standard thicknesses
-    top_flange_width: "200", // Required for Customized
-    top_flange_thickness: ["6"], // List
-    bottom_flange_width: "200", // Required for Customized
-    bottom_flange_thickness: ["6"], // List
-    member_length: "5000", // in mm (backend expects m, but we'll convert)
+    total_depth: "1300", // Required for Customized
+    web_thickness: ["20"], // List of standard thicknesses
+    top_flange_width: "350", // Required for Customized
+    top_flange_thickness: ["40"], // List
+    bottom_flange_width: "350", // Required for Customized
+    bottom_flange_thickness: ["40"], // List
+    member_length: "20000", // in mm (backend expects m, but we'll convert)
     support_type: "Major Laterally Supported",
-    support_width: "100",
+    support_width: "300",
     web_philosophy: "Thick Web without ITS",
     torsional_restraint: "Fully Restrained",
     warping_restraint: "Both flanges fully restrained",
-    bending_moment: "100",
-    shear_force: "50",
+    bending_moment: "4275",
+    shear_force: "877.5",
     bending_moment_shape: "Uniform Loading with pinned-pinned support",
     // Design Preferences defaults
     design_method: "Limit State Design",

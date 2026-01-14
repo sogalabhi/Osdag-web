@@ -1,5 +1,13 @@
-from PySide6.QtWidgets import QListWidget, QListWidgetItem
 import re
+
+# PySide6 is only available in the desktop GUI application.
+# Guard imports so that backend/web usage does not fail on import.
+try:
+    from PySide6.QtWidgets import QListWidget, QListWidgetItem
+except ImportError:
+    QListWidget = object
+    QListWidgetItem = object
+
 
 class My_ListWidget(QListWidget):
     def addItems(self, Iterable, p_str=None):
