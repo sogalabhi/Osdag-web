@@ -15,54 +15,7 @@ from channels.layers import get_channel_layer
 import numpy as np
 
 # ---------------------------------------------------------------------------
-# Safety: mock PySide6 if not installed (backend-only execution)
-# ---------------------------------------------------------------------------
-try:  # pragma: no cover - defensive guard
-    import PySide6  # type: ignore
-except Exception:  # pragma: no cover
-    import types, sys
-
-    # Create a minimal PySide6 package with QtWidgets and QtCore submodules
-    qt_module = types.ModuleType("PySide6")
-    qt_module.__path__ = []  # mark as a package
-
-    qtwidgets = types.ModuleType("PySide6.QtWidgets")
-    qtcore = types.ModuleType("PySide6.QtCore")
-    qtgui = types.ModuleType("PySide6.QtGui")
-
-    class _Dummy:
-        def __init__(self, *args, **kwargs):
-            pass
-
-    # Widgets used by plate_girder GUI code (explicitly known ones)
-    qtwidgets.QDialog = _Dummy
-    qtwidgets.QApplication = _Dummy
-    qtwidgets.QComboBox = _Dummy
-    qtwidgets.QWidget = _Dummy
-
-    # Fallback: any other QtWidgets class (QLabel, QLineEdit, QPushButton, etc.)
-    def _qtwidgets_getattr(name):
-        return _Dummy
-    qtwidgets.__getattr__ = _qtwidgets_getattr  # type: ignore[attr-defined]
-
-    # Core objects used (e.g., QTimer); simple dummy is enough for backend
-    qtcore.QTimer = _Dummy
-    def _qtcore_getattr(name):
-        return _Dummy
-    qtcore.__getattr__ = _qtcore_getattr  # type: ignore[attr-defined]
-
-    # GUI module (e.g., QFont, QIcon); everything is a dummy
-    def _qtgui_getattr(name):
-        return _Dummy
-    qtgui.__getattr__ = _qtgui_getattr  # type: ignore[attr-defined]
-
-    sys.modules.setdefault("PySide6", qt_module)
-    sys.modules.setdefault("PySide6.QtWidgets", qtwidgets)
-    sys.modules.setdefault("PySide6.QtCore", qtcore)
-    sys.modules.setdefault("PySide6.QtGui", qtgui)
-
-# ---------------------------------------------------------------------------
-# Local imports (after PySide guard)
+# Local imports
 # ---------------------------------------------------------------------------
 from apps.modules.flexure_member.submodules.plate_girder.adapter import (
     create_optimization_input,
@@ -212,9 +165,9 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
         logger.info("🔧 Creating PlateGirderWelded module...")
         module = create_module()
         
-        module.bounds_map['bf_top'] = input_data.get('top_flange_width_bounds',(100, 1000, 10))
-        module.bounds_map['bf_bot'] = input_data.get('bottom_flange_width_bounds',(100, 1000, 10)) # width of bottom flange
-        module.bounds_map['D'] = input_data.get('total_depth_bounds',(200, 2000, 25)) # total depth
+        # Apply custom optimization bounds if provided
+        from .adapter import apply_optimization_bounds
+        apply_optimization_bounds(module, input_data)
         
         module.set_input_values(design_dict)
         

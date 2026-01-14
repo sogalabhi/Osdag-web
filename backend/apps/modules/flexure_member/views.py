@@ -79,7 +79,9 @@ class FlexureMemberViewSet(viewsets.ViewSet):
                 if context['project_result'].get('error'):
                     result['project_error'] = context['project_result']['error']
             
-            return Response(result, status=200)
+            # Return appropriate status code based on success flag
+            status_code = 200 if result.get('success', True) else 500
+            return Response(result, status=status_code)
         except Exception as e:
             return Response(
                 {'error': str(e), 'success': False}, 

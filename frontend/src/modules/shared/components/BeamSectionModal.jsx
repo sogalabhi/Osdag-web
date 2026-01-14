@@ -21,7 +21,7 @@ const BeamSectionModal = ({
   const {
     materialList,
     updateSourceAndMechType,
-    getMaterialDetails,
+    manageDesignPreferences,
     supported_material_details,
   } = useContext(ModuleContext);
   const [showModal, setShowModal] = useState(false);
@@ -30,7 +30,10 @@ const BeamSectionModal = ({
     const material = materialList.filter(
       (value) => value.Grade === designPrefInputs.supported_material
     );
-    getMaterialDetails({ data: material[0], type: "supported" });
+    manageDesignPreferences("material_update", {
+      materialType: "supported",
+      materialData: material[0],
+    });
   }, []);
   return (
     <>
@@ -70,13 +73,16 @@ const BeamSectionModal = ({
                       supported_material: material.Grade,
                     }),
                       updateSourceAndMechType(2, material.Grade);
-                    getMaterialDetails({ data: material, type: "supported" });
+                    manageDesignPreferences("material_update", {
+                      materialType: "supported",
+                      materialData: material,
+                    });
                   }}
                 >
                   {materialList.map((item, index) => (
-                    <Option key={index} value={item.id}>
+                    <Select.Option key={index} value={item.id}>
                       {item.Grade}
-                    </Option>
+                    </Select.Option>
                   ))}
                 </Select>
               </div>
@@ -168,9 +174,9 @@ const BeamSectionModal = ({
                   disabled
                 >
                   {["Rolled", "Welded"].map((item, index) => (
-                    <Option key={index} value={item}>
+                    <Select.Option key={index} value={item}>
                       {item}
-                    </Option>
+                    </Select.Option>
                   ))}
                 </Select>
               </div>

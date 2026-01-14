@@ -16,6 +16,7 @@ import {
 import { BaseInputDock } from "./BaseInputDock";
 import { BaseOutputDock } from "./BaseOutputDock";
 import { CustomizationModal } from "../components/CustomizationModal";
+import { ThicknessSelectionModal } from "../../flexuralMember/plateGirder/components/ThicknessSelectionModal";
 import { DesignReportModal } from "../components/DesignReportModal";
 import { DesignStatusModal } from "./DesignStatusModal";
 import { DESIGN_STATUS } from "../hooks/useDesignSubmission";
@@ -36,6 +37,7 @@ import { UI_STRINGS } from "../../../constants/UIStrings";
 import { isGuestUser } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 import OptimizationGraph from "./OptimizationGraph";
+import PSODashboard from "../../flexuralMember/plateGirder/components/PSODashboard";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -160,24 +162,11 @@ export const EngineeringModule = ({
   const [optimizationDone, setOptimizationDone] = useState(false);
   const [optimizationData, setOptimizationData] = useState({
     current_iter: 0,
-    non_fease: {
-      x: [],
-      y: [],
-      z: [],
-    },
-    fease: {
-      x: [],
-      y: [],
-      z: [],
-    },
-    best: {
-      iter: null,
-      found: false,
-      particle: null,
-      x: [],
-      y: [],
-      z: []
-    }
+    variableNames: [],
+    bounds: { lb: [], ub: [] },
+    history: [],
+    currentSwarm: [],
+    globalBest: null
   });
 
   // Normalize CAD path keys to handle case/spacing differences
@@ -505,24 +494,11 @@ export const EngineeringModule = ({
 
             setOptimizationData({
               current_iter: 0,
-              non_fease: {
-                x: [],
-                y: [],
-                z: [],
-              },
-              fease: {
-                x: [],
-                y: [],
-                z: [],
-              },
-              best: {
-                iter: null,
-                found: false,
-                particle: null,
-                x: [],
-                y: [],
-                z: []
-              }
+              variableNames: [],
+              bounds: { lb: [], ub: [] },
+              history: [],
+              currentSwarm: [],
+              globalBest: null
             });
             setOptimizationDone(false);
           },
@@ -535,30 +511,68 @@ export const EngineeringModule = ({
                   break;
                 case "pso_update":
                   setOptimizationData((prev) => {
-                    if (msg.data.ur < 1) {
-                      return {
-                        ...prev,
-                        current_iter: msg.data.iteration,
-                        fease: {
-                          x: [...prev.fease.x, msg.data.ur],
-                          y: [...prev.fease.y, msg.data.depth],
-                          z: [...prev.fease.z, msg.data.weight_kg]
-                        }
-                      }
-                    }
-                    else {
-                      return {
-                        ...prev,
-                        current_iter: msg.data.iteration,
-                        non_fease: {
-                          x: [...prev.non_fease.x, msg.data.ur],
-                          y: [...prev.non_fease.y, msg.data.depth],
-                          z: [...prev.non_fease.z, msg.data.weight_kg]
-                        }
-                      }
+                    const particleData = {
+                      ur: msg.data.ur,
+                      weight_kg: msg.data.weight_kg,
+                      depth: msg.data.depth,
+                      position: msg.data.variables || [],
+                      particle: msg.data.particle_index,
+                      iter: msg.data.iteration
+                    };
+
+                    // Update variable names and bounds if provided (usually in first message)
+                    const variableNames = msg.data.variable_names || prev.variableNames;
+                    const bounds = msg.data.bounds || prev.bounds;
+
+                    // Add to history (keep last 10000 entries)
+                    const newHistory = [...prev.history, particleData].slice(-10000);
+
+                    // Group current swarm by iteration (keep only current iteration)
+                    const currentIter = msg.data.iteration;
+                    let currentSwarm = prev.currentSwarm || [];
+                    if (currentIter !== prev.current_iter) {
+                      // New iteration, reset swarm
+                      currentSwarm = [particleData];
+                    } else {
+                      // Same iteration, add to swarm (limit to 50 particles to match PSO swarm size)
+                      currentSwarm = [...currentSwarm, particleData].slice(-50);
                     }
 
-                  })
+                    // Update global best if this is better
+                    // Priority: feasible (UR <= 1.0) > infeasible, then lower weight is better
+                    let globalBest = prev.globalBest;
+                    if (!globalBest) {
+                      globalBest = particleData;
+                    } else {
+                      const isFeasible = particleData.ur <= 1.0;
+                      const bestIsFeasible = globalBest.ur <= 1.0;
+                      
+                      if (isFeasible && !bestIsFeasible) {
+                        // New particle is feasible, old best is not
+                        globalBest = particleData;
+                      } else if (isFeasible && bestIsFeasible) {
+                        // Both feasible, prefer lower weight
+                        if (particleData.weight_kg < globalBest.weight_kg) {
+                          globalBest = particleData;
+                        }
+                      } else if (!isFeasible && !bestIsFeasible) {
+                        // Both infeasible, prefer lower UR (closer to feasible)
+                        if (particleData.ur < globalBest.ur) {
+                          globalBest = particleData;
+                        }
+                      }
+                      // If new is infeasible and best is feasible, keep best
+                    }
+
+                    return {
+                      current_iter: currentIter,
+                      variableNames,
+                      bounds,
+                      history: newHistory,
+                      currentSwarm,
+                      globalBest
+                    };
+                  });
                   break;
                 case "pso_heartbeat":
                   // update liveness indicator
@@ -566,10 +580,62 @@ export const EngineeringModule = ({
                 case "pso_complete":
                   setOptimizationDone(true);
                   event.target.close(); // close the connection
-                  // show final design; stop loading
+                  
+                  // Extract final design results from WebSocket message
+                  if (msg.data && msg.data.result) {
+                    const result = msg.data.result;
+                    
+                    // Update output with final design results
+                    // The result.design contains the formatted output from backend
+                    // Format it similar to regular API response
+                    if (result.design) {
+                      const formattedOutput = {};
+                      for (const [key, value] of Object.entries(result.design)) {
+                        const label = value?.label ?? key;
+                        const val = value?.val ?? value?.value ?? value;
+                        if (val !== undefined && val !== null) {
+                          formattedOutput[key] = { label, val };
+                        }
+                      }
+                      
+                      // Note: Output and logs will be set via the hook's internal state
+                      // For now, we'll trigger a re-fetch or use the data directly
+                      // The optimization graph will show the final result
+                      
+                      // Update status to complete
+                      setStatus({ 
+                        step: DESIGN_STATUS.COMPLETE, 
+                        message: 'Optimization complete', 
+                        error: null 
+                      });
+                      
+                      // Store final result for later use (can be accessed via optimizationData)
+                      // CRITICAL: Preserve all existing data (history, currentSwarm, globalBest, etc.)
+                      setOptimizationData((prev) => {
+                        // Ensure we preserve all existing data
+                        const preserved = {
+                          current_iter: prev.current_iter || 0,
+                          variableNames: prev.variableNames || [],
+                          bounds: prev.bounds || { lb: [], ub: [] },
+                          history: prev.history || [],
+                          currentSwarm: prev.currentSwarm || [],
+                          globalBest: prev.globalBest || null,
+                          finalResult: result.design,
+                          finalLogs: result.raw || []
+                        };
+                        console.log('[PSO_COMPLETE] Preserving optimization data:', {
+                          historyCount: preserved.history.length,
+                          currentSwarmCount: preserved.currentSwarm.length,
+                          hasGlobalBest: !!preserved.globalBest,
+                          currentIter: preserved.current_iter
+                        });
+                        return preserved;
+                      });
+                    }
+                  }
                   break;
                 case "pso_error":
-                  console.lofg
+                  console.error("PSO optimization error:", msg.data);
                   event.target.close(); // close the connection
                   // show error; stop loading
                   break;
@@ -577,8 +643,12 @@ export const EngineeringModule = ({
             }
           }
         )
+        // For optimized designs, don't call handleSubmit() - WebSocket handles it
+        // The optimization will run via WebSocket and show real-time updates
+      } else {
+        // For non-optimized (Customized) designs, use regular API
+        await handleSubmit();
       }
-      await handleSubmit();
       setShowResetButton(true);
 
       // Persist latest inputs to project after design
@@ -1479,21 +1549,35 @@ export const EngineeringModule = ({
       />
 
       {/* Customization Modals */}
-      {
-        moduleConfig.modalConfig.map((modal) => (
-          <CustomizationModal
+      {moduleConfig.modalConfig.map((modal) => {
+        const ModalComponent = modal.type === "thickness"
+          ? ThicknessSelectionModal
+          : CustomizationModal;
+        return (
+          <ModalComponent
             key={modal.key}
             isOpen={modalStates[modal.key]}
-            onClose={() => updateModalState(modal.key, false)}
-            title="Customized"
+            onClose={() => {
+              // Save selectedItems to inputs when modal closes
+              if (selectedItems[modal.inputKey]) {
+                setInputs({
+                  ...inputs,
+                  [modal.inputKey]: Array.isArray(selectedItems[modal.inputKey])
+                    ? selectedItems[modal.inputKey]
+                    : []
+                });
+              }
+              updateModalState(modal.key, false);
+            }}
+            title={modal.title || "Customized"}
             dataSource={contextData[modal.dataSource] || (modalDynamicSrc[modal.inputKey] || [])} // FIXED: This now includes angleList
             selectedItems={selectedItems[modal.inputKey]}
             onTransferChange={(nextTargetKeys) =>
               updateSelectedItems(modal.inputKey, nextTargetKeys)
             }
           />
-        ))
-      }
+        );
+      })}
 
       {/* Design Preferences Modal (Additional Inputs) */}
       {
@@ -1580,8 +1664,10 @@ export const EngineeringModule = ({
           setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
         }}
         onClose={() => {
-          if (status.step === DESIGN_STATUS.ERROR) {
+          console.log('[DesignStatusModal] onClose called, status:', status.step);
+          if (status.step === DESIGN_STATUS.ERROR || status.step === DESIGN_STATUS.COMPLETE) {
             setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
+            console.log('[DesignStatusModal] Status reset to IDLE');
           }
         }}
       />

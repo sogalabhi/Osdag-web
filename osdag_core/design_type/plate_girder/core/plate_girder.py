@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QDialog
 from PySide6.QtCore import Qt
 =======
 
+<<<<<<< HEAD
 # PySide6 is only available in the desktop app; wrap import so this file
 # can still be imported in the web backend where PySide6 is not installed.
 try: 
@@ -14,6 +15,8 @@ except ImportError:  # pragma: no cover
     QDialog = None
 >>>>>>> dc5d5059 (feat: Enhance compatibility for PySide6 in GUI components)
 
+=======
+>>>>>>> ffad6399 (feat: Add WebSocket connection tests and enhance error handling)
 from ....Common import *
 from ....utils.common.material import *
 from ....utils.common.load import Load
@@ -25,12 +28,15 @@ from ...tension_member import *
 from ....utils.common.Section_Properties_Calculator import BBAngle_Properties
 from ....utils.common import is800_2007
 from ....utils.common.Unsymmetrical_Section_Properties import Unsymmetrical_I_Section_Properties
+<<<<<<< HEAD
 
 # New imports
 from ....Common import *
 from ..gui.dialogs import RangeInputDialog
 from osdag_gui.ui.components.dialogs.customized_popup import CustomValueSelectPopup
 from ..gui.widgets import My_ListWidget, My_ListWidgetItem
+=======
+>>>>>>> ffad6399 (feat: Add WebSocket connection tests and enhance error handling)
 from .section import Section, calc_yj, shear_stress_unsym_I, classify_section
 from .pso_optimizer import GlobalBestPSO
 from ..optimization.intelligent_pso import IntelligentPSO
@@ -55,6 +61,11 @@ from ..report.latex_report import save_design
 from ....custom_logger import CustomLogger
 
 scale = 1
+
+# Standard stiffener thickness values (used for intermediate and longitudinal stiffeners)
+# Values: 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40 mm
+VALUES_STIFFENER_THICKNESS = ['6', '8', '10', '12', '14', '16', '18', '20', 
+                              '22', '24', '26', '28', '30', '32', '36', '40']
 
 class PlateGirderWelded(Member):
     int_thicklist = []
@@ -402,6 +413,7 @@ class PlateGirderWelded(Member):
             PlateGirderWelded.int_thicklist = []
             return {KEY_IntermediateStiffener_thickness_val : VALUES_STIFFENER_THICKNESS}
         else:
+<<<<<<< HEAD
             # Use new styled popup from osdag_gui
             window = QDialog()
             ui = CustomValueSelectPopup()
@@ -417,6 +429,14 @@ class PlateGirderWelded(Member):
             if selected_items:
                 PlateGirderWelded.int_thicklist = selected_items
             return {KEY_IntermediateStiffener_thickness_val : selected_items if selected_items else VALUES_STIFFENER_THICKNESS}                                 
+=======
+            # Desktop-only dialog removed for web version
+            # Web frontend should handle thickness selection via React modals
+            # Return empty list - frontend will provide selected values
+            selected_items = []
+            PlateGirderWelded.int_thicklist = selected_items
+            return {KEY_IntermediateStiffener_thickness_val : selected_items}                                 
+>>>>>>> ffad6399 (feat: Add WebSocket connection tests and enhance error handling)
             
     def Long_stiffener_thickness_customized(self, arg):
         selected_items = []
@@ -425,6 +445,7 @@ class PlateGirderWelded(Member):
             PlateGirderWelded.long_thicklist = []
             return {KEY_LongitudnalStiffener_thickness_val : VALUES_STIFFENER_THICKNESS}
         else:
+<<<<<<< HEAD
             # Use new styled popup from osdag_gui
             window = QDialog()
             ui = CustomValueSelectPopup()
@@ -440,6 +461,14 @@ class PlateGirderWelded(Member):
             if selected_items:
                 PlateGirderWelded.long_thicklist = selected_items
             return {KEY_LongitudnalStiffener_thickness_val : selected_items if selected_items else VALUES_STIFFENER_THICKNESS}
+=======
+            # Desktop-only dialog removed for web version
+            # Web frontend should handle thickness selection via React modals
+            # Return empty list - frontend will provide selected values
+            selected_items2 = []
+            PlateGirderWelded.long_thicklist = selected_items2
+            return {KEY_LongitudnalStiffener_thickness_val : selected_items2}
+>>>>>>> ffad6399 (feat: Add WebSocket connection tests and enhance error handling)
 
 
     @staticmethod
