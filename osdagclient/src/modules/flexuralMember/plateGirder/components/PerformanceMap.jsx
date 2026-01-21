@@ -11,6 +11,34 @@ function PerformanceMap({ data }) {
   const plotData = useMemo(() => {
     const traces = [];
 
+    // Pre-compute weight range (used for feasibility line + axis range)
+    const allWeights = [
+      ...(data?.history?.map(d => d.weight_kg) || []),
+      ...(data?.currentSwarm?.map(d => d.weight_kg) || []),
+      ...(data?.globalBest ? [data.globalBest.weight_kg] : [])
+    ].filter(w => w != null && !isNaN(w));
+
+    const weightMin = allWeights.length > 0 ? Math.max(0, Math.min(...allWeights) * 0.9) : 0;
+    const weightMax = allWeights.length > 0 ? Math.max(...allWeights) * 1.1 : 1000;
+
+    // UR = 1.0 feasibility line (add FIRST so it renders behind points)
+    if (allWeights.length > 0) {
+      traces.push({
+        type: 'scatter',
+        mode: 'lines',
+        name: 'UR = 1.0',
+        x: [weightMin, weightMax],
+        y: [1.0, 1.0],
+        line: {
+          color: 'rgba(255, 0, 0, 1)',
+          width: 2,
+          dash: 'dash'
+        },
+        showlegend: false,
+        hoverinfo: 'skip',
+      });
+    }
+
     // History points (faint background, last 3000)
     if (data?.history && data.history.length > 0) {
       const historyData = data.history.slice(-3000).map(d => ({
@@ -144,34 +172,6 @@ function PerformanceMap({ data }) {
       });
     }
 
-    // UR = 1.0 line (red horizontal line)
-    const allWeights = [
-      ...(data?.history?.map(d => d.weight_kg) || []),
-      ...(data?.currentSwarm?.map(d => d.weight_kg) || []),
-      ...(data?.globalBest ? [data.globalBest.weight_kg] : [])
-    ].filter(w => w != null && !isNaN(w));
-
-    if (allWeights.length > 0) {
-      const weightMin = Math.max(0, Math.min(...allWeights) * 0.9);
-      const weightMax = Math.max(...allWeights) * 1.1;
-
-      traces.push({
-        type: 'scatter',
-        mode: 'lines',
-        name: 'UR = 1.0',
-        x: [weightMin, weightMax],
-        y: [1.0, 1.0],
-        line: {
-          color: 'rgba(255, 0, 0, 1)',
-          width: 2,
-          dash: 'dash'
-        },
-        showlegend: false,
-        hoverinfo: 'y',
-        hovertemplate: 'UR = 1.0 (Feasibility Limit)<extra></extra>'
-      });
-    }
-
     return traces;
   }, [data]);
 
@@ -201,15 +201,20 @@ function PerformanceMap({ data }) {
       title: 'Weight (kg)',
       range: [weightMin, weightMax],
       showgrid: true,
-      gridcolor: 'rgba(0, 0, 0, 0.1)',
-      zeroline: false
+      gridcolor: 'rgba(200, 200, 200, 0.3)',
+      zeroline: false,
+      showline: true,
+      linecolor: 'rgba(0, 0, 0, 0.5)'
     },
     yaxis: {
       title: 'Utilization Ratio (UR)',
       range: [0, urMax],
       showgrid: true,
-      gridcolor: 'rgba(0, 0, 0, 0.1)',
-      zeroline: false
+      gridcolor: 'rgba(200, 200, 200, 0.3)',
+      zeroline: true,
+      zerolinecolor: 'rgba(0, 0, 0, 0.3)',
+      showline: true,
+      linecolor: 'rgba(0, 0, 0, 0.5)'
     },
     font: { size: 12 },
     hovermode: 'closest'

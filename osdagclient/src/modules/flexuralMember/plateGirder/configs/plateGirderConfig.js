@@ -150,6 +150,7 @@ export const plateGirderConfig = {
     longitudinal_stiffener: "No",
     longitudinal_stiffener_thickness: "Standard",
     longitudinal_stiffener_thickness_val: [], // Will be populated
+    shear_buckling_option: "Simple Post Critical",
     // Additional
     symmetry: "Symmetrical",
     // Deflection
@@ -332,7 +333,6 @@ export const plateGirderConfig = {
         "Design.Torsional_Restraint": String(inputs.torsional_restraint || "Fully Restrained"),
         "Design.Warping_Restraint": String(inputs.warping_restraint || "Both flanges fully restrained"),
         "Design.Max_Deflection": String(inputs.max_deflection || "Span/600"),
-        "Structure.Type": String(inputs.structure_type || "Highway Bridge"),
         "Design.Load": String(inputs.design_load || "Live load"),
         "Member.Options": String(inputs.member_options || "Simple Span"),
         "Supporting.Options": String(inputs.supporting_options || "NA"),
@@ -348,7 +348,10 @@ export const plateGirderConfig = {
         "Design.IntermediateStiffener.Spacing": String(inputs.intermediate_stiffener_spacing || "NA"),
         "Design.IntermediateStiffener.Thickness": String(inputs.intermediate_stiffener_thickness || "Standard"),
         "Design.LongitudnalStiffener": String(inputs.longitudinal_stiffener || "No"),
-        "Design.LongitudnalStiffener.Thickness": String(inputs.longitudinal_stiffener_thickness || "Standard")
+        "Design.LongitudnalStiffener.Thickness": String(inputs.longitudinal_stiffener_thickness || "Standard"),
+        
+        // --- Additional Girder Data ---
+        "Symmetry": String(inputs.symmetry || "Symmetrical")
       };
 
     // Add design type specific params
@@ -403,8 +406,15 @@ export const plateGirderConfig = {
   isOptimized: (inputs) => inputs.design_type === "Optimized",
   inputSections: [
     {
-      title: "Basic Properties",
+      title: "Section Details",
       fields: [
+        {
+          key: "module",
+          label: "Module*",
+          type: "text",
+          defaultValue: "Plate-Girder",
+          disabled: true
+        },
         {
           key: "material",
           label: "Material*",
@@ -437,24 +447,11 @@ export const plateGirderConfig = {
           }
         },
         {
-          key: "member_length",
-          label: "Span Length (mm)*",
-          type: "number",
-          validation: "positive_number",
-          placeholder: "Enter span length in mm"
-        }
-      ]
-    },
-    {
-      title: "Section Dimensions",
-      conditionalDisplay: (inputs) => inputs.design_type === "Customized",
-      fields: [
-        {
           key: "total_depth",
           label: "Total Depth (mm)*",
           type: "optimized_number",
           validation: "positive_number",
-          placeholder: "Enter total depth",
+          placeholder: "Enter total depth"
         },
         {
           key: "web_thickness",
@@ -496,66 +493,20 @@ export const plateGirderConfig = {
           modalKey: "bottomFlangeThickness",
           options: "thicknessList",
           defaultValue: ["6"]
-        }
-      ]
-    },
-    {
-      title: "Optimization Bounds",
-      conditionalDisplay: (inputs) => inputs.design_type === "Optimized",
-      fields: [
-        {
-          key: "total_depth",
-          label: "Total Depth (mm)",
-          type: "optimized_number",
-          placeholder: "Set bounds for total depth",
         },
         {
-          key: "top_flange_width",
-          label: "Top Flange Width (mm)",
-          type: "optimized_number",
-          placeholder: "Set bounds for top flange width",
-        },
-        {
-          key: "bottom_flange_width",
-          label: "Bottom Flange Width (mm)",
-          type: "optimized_number",
-          placeholder: "Set bounds for bottom flange width",
-        },
-      ],
-    },
-    {
-      title: "Loads",
-      fields: [
-        {
-          key: "bending_moment",
-          label: "Bending Moment (kNm)*",
+          key: "member_length",
+          label: "Length (m)*",
           type: "number",
           validation: "positive_number",
-          placeholder: "Enter bending moment"
-        },
-        {
-          key: "shear_force",
-          label: "Shear Force (kN)*",
-          type: "number",
-          validation: "number",
-          placeholder: "Enter shear force"
-        },
-        {
-          key: "bending_moment_shape",
-          label: "Bending Moment Shape*",
-          type: "select",
-          options: [
-            { value: "Uniform Loading with pinned-pinned support", label: "Uniform Loading with pinned-pinned support" },
-            { value: "Uniform Loading with fixed-fixed support", label: "Uniform Loading with fixed-fixed support" },
-            { value: "Concentrate Load with pinned-pinned support", label: "Concentrate Load with pinned-pinned support" },
-            { value: "Concentrate load with fixed-fixed support", label: "Concentrate load with fixed-fixed support" }
-          ],
-          defaultValue: "Uniform Loading with pinned-pinned support"
+          placeholder: "Enter span length in meters",
+          // Note: Frontend accepts mm but converts to m for backend
+          // Conversion happens in buildSubmissionParams: memberLengthM = inputs.member_length / 1000
         }
       ]
     },
     {
-      title: "Support & Restraints",
+      title: "Design Inputs",
       fields: [
         {
           key: "support_type",
@@ -610,344 +561,33 @@ export const plateGirderConfig = {
       ]
     },
     {
-      title: "Design Preferences",
+      title: "Factored Maximum Loads",
       fields: [
         {
-          key: "design_method",
-          label: "Design Method",
-          type: "select",
-          options: [
-            { value: "Limit State Design", label: "Limit State Design" }
-          ],
-          defaultValue: "Limit State Design"
-        },
-        {
-          key: "allowable_class",
-          label: "Allowable Class",
-          type: "select",
-          options: [
-            { value: "Plastic", label: "Plastic" },
-            { value: "Compact", label: "Compact" },
-            { value: "Semi-Compact", label: "Semi-Compact" },
-            { value: "Slender", label: "Slender" }
-          ],
-          defaultValue: "Plastic"
-        },
-        {
-          key: "effective_area_parameter",
-          label: "Effective Area Parameter",
+          key: "bending_moment",
+          label: "Moment (kNm)*",
           type: "number",
-          defaultValue: "1.0",
-          placeholder: "Enter effective area parameter"
+          validation: "positive_number",
+          placeholder: "Enter bending moment"
         },
         {
-          key: "length_overwrite",
-          label: "Length Overwrite",
-          type: "select",
-          options: [
-            { value: "NA", label: "NA" }
-          ],
-          defaultValue: "NA"
-        },
-        {
-          key: "loading_condition",
-          label: "Loading Condition",
-          type: "select",
-          options: [
-            { value: "Normal", label: "Normal" },
-            { value: "Crane Load(Manual operation)", label: "Crane Load(Manual operation)" },
-            { value: "Crane load(Electric operation up to 50t)", label: "Crane load(Electric operation up to 50t)" },
-            { value: "Crane load(Electric operation over 50t)", label: "Crane load(Electric operation over 50t)" }
-          ],
-          defaultValue: "Normal"
-        },
-        {
-          key: "structure_type",
-          label: "Structure Type",
-          type: "select",
-          options: [
-            { value: "Highway Bridge", label: "Highway Bridge" },
-            { value: "Railway Bridge", label: "Railway Bridge" },
-            { value: "Industrial Structure", label: "Industrial Structure" },
-            { value: "Other Building", label: "Other Building" }
-          ],
-          defaultValue: "Highway Bridge",
-          // ARCHITECTURAL NOTE: Dynamic logic duplicated from backend for instant UI updates
-          // Backend source: plate_girder.py:member_options_change() and supp_options_change()
-          // See calculateMaxDeflection() comment above for rationale
-          onChange: (value, inputs, setInputs) => {
-            // Update member_options based on structure_type
-            let memberOptions = [];
-            if (value === "Highway Bridge" || value === "Railway Bridge") {
-              memberOptions = ["Simple Span", "Cantilever Span"];
-            } else if (value === "Industrial Structure") {
-              memberOptions = ["Purlin and Girts", "Simple span", "Cantilever span", "Rafter Supporting", "Gantry"];
-            } else if (value === "Other Building") {
-              memberOptions = ["Floor and roof", "Cantilever"];
-            }
-            
-            const newMemberOption = memberOptions.length > 0 ? memberOptions[0] : "NA";
-            
-            // Update supporting_options based on new member_option
-            let supportingOptions = [];
-            if (["Purlin and Girts", "Simple span", "Cantilever span"].includes(newMemberOption)) {
-              supportingOptions = ["Elastic cladding", "Brittle cladding"];
-            } else if (newMemberOption === "Rafter Supporting") {
-              supportingOptions = ["Profiled Metal sheeting", "Plastered sheeting"];
-            } else if (newMemberOption === "Gantry") {
-              supportingOptions = ["Crane"];
-            } else if (["Floor and roof", "Cantilever"].includes(newMemberOption)) {
-              supportingOptions = ["Elements not susceptible to cracking", "Element susceptible to cracking"];
-            } else {
-              supportingOptions = ["NA"];
-            }
-            
-            const newSupportingOption = supportingOptions.length > 0 ? supportingOptions[0] : "NA";
-            
-            // Recalculate max_deflection
-            const maxDefl = calculateMaxDeflection(
-              value,
-              inputs.design_load || "Live load",
-              newMemberOption,
-              newSupportingOption
-            );
-            
-            // Reset member_options and supporting_options when structure_type changes
-            setInputs({
-              ...inputs,
-              structure_type: value,
-              member_options: newMemberOption,
-              supporting_options: newSupportingOption,
-              max_deflection: maxDefl
-            });
-          }
-        },
-        {
-          key: "design_load",
-          label: "Design Load",
-          type: "select",
-          options: [
-            { value: "Live load", label: "Live load" },
-            { value: "Dead load", label: "Dead load" },
-            { value: "Crane Load(Manual operation)", label: "Crane Load(Manual operation)" },
-            { value: "Crane load(Electric operation up to 50t)", label: "Crane load(Electric operation up to 50t)" },
-            { value: "Crane load(Electric operation over 50t)", label: "Crane load(Electric operation over 50t)" }
-          ],
-          defaultValue: "Live load",
-          // ARCHITECTURAL NOTE: Dynamic logic duplicated from backend for instant UI updates
-          // Backend source: plate_girder.py:max_defl_change() (lines 249-308)
-          onChange: (value, inputs, setInputs) => {
-            // Recalculate max_deflection when design_load changes
-            const maxDefl = calculateMaxDeflection(
-              inputs.structure_type || "Highway Bridge",
-              value,
-              inputs.member_options || "Simple Span",
-              inputs.supporting_options || "NA"
-            );
-            setInputs({
-              ...inputs,
-              design_load: value,
-              max_deflection: maxDefl
-            });
-          }
-        },
-        {
-          key: "member_options",
-          label: "Member Options",
-          type: "dynamicSelect",
-          // ARCHITECTURAL NOTE: Dynamic options logic duplicated from backend
-          // Backend source: plate_girder.py:member_options_change() (lines 229-235)
-          // Maps structure_type -> member_options array
-          getOptions: (inputs) => {
-            const structureType = inputs.structure_type || "Highway Bridge";
-            let options = [];
-            if (structureType === "Highway Bridge" || structureType === "Railway Bridge") {
-              options = ["Simple Span", "Cantilever Span"];
-            } else if (structureType === "Industrial Structure") {
-              options = ["Purlin and Girts", "Simple span", "Cantilever span", "Rafter Supporting", "Gantry"];
-            } else if (structureType === "Other Building") {
-              options = ["Floor and roof", "Cantilever"];
-            }
-            return options.map(opt => ({ value: opt, label: opt }));
-          },
-          defaultValue: "Simple Span",
-          // ARCHITECTURAL NOTE: Dynamic logic duplicated from backend for instant UI updates
-          // Backend source: plate_girder.py:supp_options_change() (lines 237-247)
-          onChange: (value, inputs, setInputs) => {
-            // Update supporting_options based on member_options
-            let supportingOptions = [];
-            if (["Purlin and Girts", "Simple span", "Cantilever span"].includes(value)) {
-              supportingOptions = ["Elastic cladding", "Brittle cladding"];
-            } else if (value === "Rafter Supporting") {
-              supportingOptions = ["Profiled Metal sheeting", "Plastered sheeting"];
-            } else if (value === "Gantry") {
-              supportingOptions = ["Crane"];
-            } else if (["Floor and roof", "Cantilever"].includes(value)) {
-              supportingOptions = ["Elements not susceptible to cracking", "Element susceptible to cracking"];
-            } else {
-              supportingOptions = ["NA"];
-            }
-            
-            // Recalculate max_deflection when member_options changes
-            const maxDefl = calculateMaxDeflection(
-              inputs.structure_type || "Highway Bridge",
-              inputs.design_load || "Live load",
-              value,
-              supportingOptions.length > 0 ? supportingOptions[0] : "NA"
-            );
-            
-            setInputs({
-              ...inputs,
-              member_options: value,
-              supporting_options: supportingOptions.length > 0 ? supportingOptions[0] : "NA",
-              max_deflection: maxDefl
-            });
-          }
-        },
-        {
-          key: "supporting_options",
-          label: "Supporting Options",
-          type: "dynamicSelect",
-          // ARCHITECTURAL NOTE: Dynamic options logic duplicated from backend
-          // Backend source: plate_girder.py:supp_options_change() (lines 237-247)
-          // Maps member_options -> supporting_options array
-          getOptions: (inputs) => {
-            const memberOption = inputs.member_options || "Simple Span";
-            let options = [];
-            if (["Purlin and Girts", "Simple span", "Cantilever span"].includes(memberOption)) {
-              options = ["Elastic cladding", "Brittle cladding"];
-            } else if (memberOption === "Rafter Supporting") {
-              options = ["Profiled Metal sheeting", "Plastered sheeting"];
-            } else if (memberOption === "Gantry") {
-              options = ["Crane"];
-            } else if (["Floor and roof", "Cantilever"].includes(memberOption)) {
-              options = ["Elements not susceptible to cracking", "Element susceptible to cracking"];
-            } else {
-              options = ["NA"];
-            }
-            return options.map(opt => ({ value: opt, label: opt }));
-          },
-          defaultValue: "NA",
-          // ARCHITECTURAL NOTE: Dynamic logic duplicated from backend for instant UI updates
-          // Backend source: plate_girder.py:max_defl_change() (lines 249-308)
-          onChange: (value, inputs, setInputs) => {
-            // Recalculate max_deflection when supporting_options changes
-            const maxDefl = calculateMaxDeflection(
-              inputs.structure_type || "Highway Bridge",
-              inputs.design_load || "Live load",
-              inputs.member_options || "Simple Span",
-              value
-            );
-            setInputs({
-              ...inputs,
-              supporting_options: value,
-              max_deflection: maxDefl
-            });
-          }
-        },
-        {
-          key: "max_deflection",
-          label: "Maximum Deflection",
-          type: "select",
-          options: [
-            { value: "Span/600", label: "Span/600" },
-            { value: "Span/800", label: "Span/800" },
-            { value: "Span/400", label: "Span/400" },
-            { value: "Span/300", label: "Span/300" },
-            { value: "Span/360", label: "Span/360" },
-            { value: "Span/150", label: "Span/150" },
-            { value: "Span/180", label: "Span/180" },
-            { value: "Span/240", label: "Span/240" },
-            { value: "Span/120", label: "Span/120" },
-            { value: "Span/500", label: "Span/500" },
-            { value: "Span/750", label: "Span/750" },
-            { value: "Span/1000", label: "Span/1000" }
-          ],
-          defaultValue: "Span/600"
-        }
-      ]
-    },
-    {
-      title: "Stiffeners",
-      fields: [
-        {
-          key: "intermediate_stiffener",
-          label: "Intermediate Stiffener",
-          type: "select",
-          options: [
-            { value: "No", label: "No" },
-            { value: "Yes", label: "Yes" }
-          ],
-          defaultValue: "No"
-        },
-        {
-          key: "intermediate_stiffener_spacing",
-          label: "Intermediate Stiffener Spacing (mm)",
+          key: "shear_force",
+          label: "Shear (kN)*",
           type: "number",
-          conditionalDisplay: (inputs) => inputs.intermediate_stiffener === "Yes",
-          placeholder: "Enter spacing"
+          validation: "number",
+          placeholder: "Enter shear force"
         },
         {
-          key: "intermediate_stiffener_thickness",
-          label: "Intermediate Stiffener Thickness",
-          type: "select",
-          modalKey: "intermediateStiffenerThicknessValues",
-          customizableInputKey: "intermediate_stiffener_thickness_val",
-          customizableOptions: "thicknessList",
-          options: [
-            { value: "Standard", label: "Standard" },
-            { value: "Customized", label: "Customized" }
-          ],
-          defaultValue: "Standard"
-        },
-        {
-          key: "longitudinal_stiffener",
-          label: "Longitudinal Stiffener",
+          key: "bending_moment_shape",
+          label: "Bending Moment Shape*",
           type: "select",
           options: [
-            { value: "No", label: "No" },
-            { value: "Yes and 1 stiffener", label: "Yes and 1 stiffener" },
-            { value: "Yes and 2 stiffeners", label: "Yes and 2 stiffeners" }
+            { value: "Uniform Loading with pinned-pinned support", label: "Uniform Loading with pinned-pinned support" },
+            { value: "Uniform Loading with fixed-fixed support", label: "Uniform Loading with fixed-fixed support" },
+            { value: "Concentrate Load with pinned-pinned support", label: "Concentrate Load with pinned-pinned support" },
+            { value: "Concentrate load with fixed-fixed support", label: "Concentrate load with fixed-fixed support" }
           ],
-          defaultValue: "No"
-        },
-        {
-          key: "longitudinal_stiffener_thickness",
-          label: "Longitudinal Stiffener Thickness",
-          type: "select",
-          modalKey: "longitudinalStiffenerThicknessValues",
-          customizableInputKey: "longitudinal_stiffener_thickness_val",
-          customizableOptions: "thicknessList",
-          options: [
-            { value: "Standard", label: "Standard" },
-            { value: "Customized", label: "Customized" }
-          ],
-          defaultValue: "Standard"
-        },
-        {
-          key: "shear_buckling_option",
-          label: "Shear Buckling Option",
-          type: "select",
-          options: [
-            { value: "Simple Post Critical", label: "Simple Post Critical" },
-            { value: "Tension Field", label: "Tension Field" }
-          ],
-          defaultValue: "Simple Post Critical"
-        }
-      ]
-    },
-    {
-      title: "Additional Properties",
-      fields: [
-        {
-          key: "symmetry",
-          label: "Symmetry",
-          type: "select",
-          options: [
-            { value: "Symmetrical", label: "Symmetrical" },
-            { value: "Unsymmetrical", label: "Unsymmetrical" }
-          ],
-          defaultValue: "Symmetrical"
+          defaultValue: "Uniform Loading with pinned-pinned support"
         }
       ]
     }
