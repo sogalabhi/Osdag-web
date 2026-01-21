@@ -561,6 +561,14 @@ def create_optimization_input(input_values: Dict[str, Any]) -> Dict[str, Any]:
         KEY_IntermediateStiffener_thickness: optimization_input.get('Design.IntermediateStiffener.Thickness', 'Standard'),
         KEY_LongitudnalStiffener: optimization_input.get('Design.LongitudnalStiffener', 'No'),
         KEY_LongitudnalStiffener_thickness: optimization_input.get('Design.LongitudnalStiffener.Thickness', 'Standard'),
+        # Additional design parameters (matching create_from_input)
+        KEY_DESIGN_LOAD: optimization_input.get('Design.Load', 'Live load'),
+        KEY_MEMBER_OPTIONS: optimization_input.get('Member.Options', 'Simple Span'),
+        KEY_SUPPORTING_OPTIONS: optimization_input.get('Supporting.Options', 'NA'),
+        KEY_ShearBucklingOption: optimization_input.get('Design.ShearBucklingOption', 'Simple Post Critical'),
+        KEY_DP_DESIGN_METHOD: optimization_input.get('Design.Design_Method', 'Limit State Design'),
+        KEY_EFFECTIVE_AREA_PARA: optimization_input.get('Design.Effective_Area_Parameter', '1.0'),
+        KEY_LENGTH_OVERWRITE: optimization_input.get('Design.Length_Overwrite', 'NA'),
     }
     
     # Handle symmetry (for optimization)

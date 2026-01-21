@@ -1,5 +1,5 @@
 """
-Phase 2: Core PSO Algorithms and Section Utilities - Import Module
+Core PSO Algorithms and Section Utilities - Import Module
 
 This module centralizes imports of PSO algorithms and section utilities from osdag_core.
 These will be used in the Celery task (tasks.py) for optimization.
