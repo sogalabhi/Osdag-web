@@ -89,40 +89,183 @@ The Plate Girder module supports two main design approaches:
 
 ## Inputs
 
+### Complete Input Summary
+
+**Total Input Parameters**: ~45+ parameters across Input Dock and Design Preferences
+
+**Input Locations:**
+1. **Main Input Dock** (visible in main window): 17 parameters
+2. **Design Preferences Dialog** (6 tabs): 21 parameters  
+3. **Optimization Bounds** (via "Set Bounds" buttons): 6-8 variables
+4. **Optimization Parameters** (code configuration): 7 parameters
+
+**Key UI Elements:**
+- **TextBox**: Direct value input
+- **ComboBox**: Dropdown selection
+- **ComboBox_Customized**: Dropdown with "Customized" option for custom values
+- **"Set Bounds" Button**: Opens bounds dialog (only for Optimized design type)
+
+---
+
 ### Phase 1: Normal/Manual Inputs
 
 These inputs are required for **both** Manual and Optimized design types.
 
-#### Input Dock Parameters
+#### Input Dock Structure
 
 **Location**: Main Input Dock (visible in main window)
+
+The Input Dock is organized into **three main sections**:
+
+```
+┌─────────────────────────────────────────────────┐
+│  INPUT DOCK - PLATE GIRDER                     │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  ┌─ Section 1: Section Details ─────────────┐ │
+│  │  • Module                                │ │
+│  │  • Material                              │ │
+│  │  • Design Type                           │ │
+│  │  • Total Depth*                          │ │
+│  │  • Web Thickness                         │ │
+│  │  • Top Flange Width*                     │ │
+│  │  • Top Flange Thickness                  │ │
+│  │  • Bottom Flange Width*                  │ │
+│  │  • Bottom Flange Thickness               │ │
+│  │  • Length                                │ │
+│  └──────────────────────────────────────────┘ │
+│                                                 │
+│  ┌─ Section 2: Design Inputs ──────────────┐ │
+│  │  • Support Type                          │ │
+│  │  • Support Width                         │ │
+│  │  • Web Philosophy                        │ │
+│  │  • Torsional Restraint                   │ │
+│  │  • Warping Restraint                     │ │
+│  └──────────────────────────────────────────┘ │
+│                                                 │
+│  ┌─ Section 3: Factored Maximum Loads ──────┐ │
+│  │  • Moment                                │ │
+│  │  • Shear                                 │ │
+│  │  • Bending Moment Shape                 │ │
+│  └──────────────────────────────────────────┘ │
+│                                                 │
+└─────────────────────────────────────────────────┘
+
+* Conditional: 
+  - "Customized": TextBox input fields (required)
+  - "Optimized": "Set Bounds" buttons (opens bounds dialog)
+```
+
+**Optimized Design View (with "Set Bounds" buttons):**
+
+```
+┌─────────────────────────────────────────────────┐
+│  INPUT DOCK - PLATE GIRDER (Optimized)         │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  ┌─ Section 1: Section Details ─────────────┐ │
+│  │  • Module (ComboBox)                      │ │
+│  │  • Material (ComboBox)                    │ │
+│  │  • Design Type = Optimized (read-only)    │ │
+│  │  • Total Depth → Set Bounds (button)      │ │
+│  │  • Web Thickness → Customized (dropdown)  │ │
+│  │  • Width of Top Flange → Set Bounds       │ │
+│  │  • Top Flange Thickness → Customized      │ │
+│  │  • Width of Bottom Flange → Set Bounds    │ │
+│  │  • Bottom Flange Thickness → Customized   │ │
+│  │  • Length (TextBox)                       │ │
+│  └──────────────────────────────────────────┘ │
+│                                                 │
+│  ┌─ Section 2: Design Inputs ──────────────┐ │
+│  │  • Support Type (ComboBox)               │ │
+│  │  • Support Width (TextBox)               │ │
+│  │  • Web Philosophy (ComboBox)             │ │
+│  │  • Torsional Restraint (ComboBox)        │ │
+│  │  • Warping Restraint (ComboBox)          │ │
+│  └──────────────────────────────────────────┘ │
+│                                                 │
+│  ┌─ Section 3: Factored Maximum Loads ──────┐ │
+│  │  • Bending Moment (TextBox)              │ │
+│  │  • Shear Force (TextBox)                 │ │
+│  │  • Bending Moment Shape (ComboBox)       │ │
+│  └──────────────────────────────────────────┘ │
+│                                                 │
+└─────────────────────────────────────────────────┘
+```
+
+Notes for Optimized view:
+- **Set Bounds buttons** open a dialog to set Lower Bound, Upper Bound, and optional Step Size for: Total Depth, Width of Top Flange, Width of Bottom Flange.
+- **Customized (dropdown)** for thickness fields opens a selector for standard/custom values (not a Set Bounds dialog).
+- **Length** remains a direct TextBox input in both Customized and Optimized modes.
+
+---
+
+#### Section 1: Section Details (`KEY_DISP_PG_SectionDetail`)
+
+This section contains the basic geometric and material properties of the plate girder.
 
 | Parameter | Key | Type | Required | Description | Units |
 |-----------|-----|------|----------|-------------|-------|
 | **Module** | `KEY_MODULE` | Text | Yes | Module identifier | - |
 | **Material** | `KEY_MATERIAL` | ComboBox | Yes | Steel material grade (e.g., E250, E350) | - |
 | **Design Type** | `KEY_OVERALL_DEPTH_PG_TYPE` | ComboBox | Yes | "Customized" or "Optimized" | - |
-| **Total Depth** | `KEY_OVERALL_DEPTH_PG` | TextBox | Conditional* | Total depth of girder | mm |
-| **Web Thickness** | `KEY_WEB_THICKNESS_PG` | ComboBox | Yes | Web plate thickness (standard values) | mm |
-| **Top Flange Width** | `KEY_TOP_Bflange_PG` | TextBox | Conditional* | Width of top flange | mm |
-| **Top Flange Thickness** | `KEY_TOP_FLANGE_THICKNESS_PG` | ComboBox | Yes | Top flange thickness (standard values) | mm |
-| **Bottom Flange Width** | `KEY_BOTTOM_Bflange_PG` | TextBox | Conditional* | Width of bottom flange | mm |
-| **Bottom Flange Thickness** | `KEY_BOTTOM_FLANGE_THICKNESS_PG` | ComboBox | Yes | Bottom flange thickness (standard values) | mm |
+| **Total Depth** | `KEY_OVERALL_DEPTH_PG` | TextBox / "Set Bounds" Button | Conditional* | Total depth of girder (Customized) OR optimization bounds (Optimized) | mm |
+| **Web Thickness** | `KEY_WEB_THICKNESS_PG` | ComboBox_Customized | Yes | Web plate thickness (standard values or customized list) | mm |
+| **Top Flange Width** | `KEY_TOP_Bflange_PG` | TextBox / "Set Bounds" Button | Conditional* | Width of top flange (Customized) OR optimization bounds (Optimized) | mm |
+| **Top Flange Thickness** | `KEY_TOP_FLANGE_THICKNESS_PG` | ComboBox_Customized | Yes | Top flange thickness (standard values or customized list) | mm |
+| **Bottom Flange Width** | `KEY_BOTTOM_Bflange_PG` | TextBox / "Set Bounds" Button | Conditional* | Width of bottom flange (Customized) OR optimization bounds (Optimized) | mm |
+| **Bottom Flange Thickness** | `KEY_BOTTOM_FLANGE_THICKNESS_PG` | ComboBox_Customized | Yes | Bottom flange thickness (standard values or customized list) | mm |
 | **Length** | `KEY_LENGTH` | TextBox | Yes | Span length of girder | m |
+
+**UI Behavior Based on Design Type:**
+
+**When Design Type = "Customized":**
+- Total Depth: **TextBox** input field (user enters value directly)
+- Top Flange Width: **TextBox** input field (user enters value directly)
+- Bottom Flange Width: **TextBox** input field (user enters value directly)
+
+**When Design Type = "Optimized":**
+- Total Depth: **"Set Bounds" button** (clicking opens bounds dialog)
+- Top Flange Width: **"Set Bounds" button** (clicking opens bounds dialog)
+- Bottom Flange Width: **"Set Bounds" button** (clicking opens bounds dialog)
+
+**"Set Bounds" Dialog Contents:**
+- Lower Bound: Minimum value for optimization search (e.g., 200 mm)
+- Upper Bound: Maximum value for optimization search (e.g., 2000 mm)
+- Step Size: Increment for continuous variables (e.g., 25 mm) - Optional
+- "Add" / "OK" button: Saves the bounds
+- If not set, default bounds are used automatically
+
+*Conditional: 
+- **Customized Design Type**: TextBox input fields (required)
+- **Optimized Design Type**: "Set Bounds" buttons (opens bounds dialog for optimization search space)
+
+**Notes:**
+- When Design Type is "Optimized":
+  - **Total Depth**: Shows "Set Bounds" button (opens bounds dialog) - NOT a text input field
+  - **Top Flange Width**: Shows "Set Bounds" button (opens bounds dialog) - NOT a text input field
+  - **Bottom Flange Width**: Shows "Set Bounds" button (opens bounds dialog) - NOT a text input field
+  - These fields allow customization of optimization search space bounds
+- When Design Type is "Customized":
+  - **Total Depth**: TextBox input field (required)
+  - **Top Flange Width**: TextBox input field (required)
+  - **Bottom Flange Width**: TextBox input field (required)
+- Web Thickness and Flange Thickness fields use ComboBox_Customized type, allowing selection from standard values or custom input
+- Length is always required for both design types (TextBox input)
+
+---
+
+#### Section 2: Design Inputs (`KEY_DISP_SECTION_DATA_PG`)
+
+This section contains support conditions, web philosophy, and restraint conditions.
+
+| Parameter | Key | Type | Required | Description | Units |
+|-----------|-----|------|----------|-------------|-------|
 | **Support Type** | `KEY_DESIGN_TYPE_FLEXURE` | ComboBox | Yes | "Major Laterally Supported" or "Major Laterally Unsupported" | - |
 | **Support Width** | `KEY_SUPPORT_WIDTH` | TextBox | Yes | Width of support | mm |
 | **Web Philosophy** | `KEY_WEB_PHILOSOPHY` | ComboBox | Yes | "Thick Web without ITS" or "Thin Web with ITS" | - |
 | **Torsional Restraint** | `KEY_TORSIONAL_RES` | ComboBox | Yes | Torsional restraint condition | - |
-| **Warping Restraint** | `KEY_WARPING_RES` | ComboBox | Yes | Warping restraint condition | - |
-| **Moment** | `KEY_MOMENT` | TextBox | Yes | Factored bending moment | kNm |
-| **Shear** | `KEY_SHEAR` | TextBox | Yes | Factored shear force | kN |
-| **Bending Moment Shape** | `KEY_BENDING_MOMENT_SHAPE` | ComboBox | Yes | Loading pattern (UDL/Point load, Pin-Pin/Fix-Fix) | - |
-
-*Conditional: Required only for "Customized" design type. Not required for "Optimized" design type.
-
-**Standard Thickness Values** (`VALUES_PLATETHK`):
-- Available options: 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40 mm
-- Can be customized in Design Preferences
+| **Warping Restraint** | `KEY_WARPING_RES` | ComboBox | Yes | Warping restraint condition (depends on Torsional Restraint) | - |
 
 **Support Type Options** (`VALUES_SUPP_TYPE_temp`):
 - "Major Laterally Supported"
@@ -132,11 +275,75 @@ These inputs are required for **both** Manual and Optimized design types.
 - "Thick Web without ITS" (Intermediate Transverse Stiffeners)
 - "Thin Web with ITS"
 
+**Torsional Restraint Options** (`Torsion_Restraint_list`):
+- Various restraint conditions (see code for full list)
+
+**Warping Restraint Options** (`Warping_Restraint_list`):
+- Depends on selected Torsional Restraint
+- Options include: "Both flanges fully restrained", "Compression flange fully restrained", etc.
+
+**Dependencies:**
+- Warping Restraint options change based on Torsional Restraint selection
+- Some output fields (T Constant, W Constant, Elastic Critical Moment) are only shown when Support Type is "Major Laterally Unsupported"
+
+---
+
+#### Section 3: Factored Maximum Loads (`KEY_LOADING`)
+
+This section contains the loading conditions for design.
+
+| Parameter | Key | Type | Required | Description | Units |
+|-----------|-----|------|----------|-------------|-------|
+| **Moment** | `KEY_MOMENT` | TextBox | Yes | Factored bending moment | kNm |
+| **Shear** | `KEY_SHEAR` | TextBox | Yes | Factored shear force | kN |
+| **Bending Moment Shape** | `KEY_BENDING_MOMENT_SHAPE` | ComboBox | Yes | Loading pattern (UDL/Point load, Pin-Pin/Fix-Fix) | - |
+
 **Bending Moment Shape Options** (`Bending_moment_shape_list`):
 - "Uniform Loading with pinned-pinned support" (`KEY_DISP_UDL_PIN_PIN_PG`)
 - "Uniform Loading with fixed-fixed support" (`KEY_DISP_UDL_FIX_FIX_PG`)
 - "Concentrate Load with pinned-pinned support" (`KEY_DISP_PL_PIN_PIN_PG`)
 - "Concentrate load with fixed-fixed support" (`KEY_DISP_PL_FIX_FIX_PG`)
+
+**Notes:**
+- Moment and Shear must be positive values (> 0)
+- Bending Moment Shape affects deflection calculations and moment distribution
+
+**Standard Thickness Values** (`VALUES_PLATETHK`):
+- Available options: 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40 mm
+- Can be customized in Design Preferences
+- Used for: Web Thickness, Top Flange Thickness, Bottom Flange Thickness
+
+---
+
+#### Input Field Validation and Conditional Visibility
+
+**Validation Rules:**
+
+1. **Numeric Fields** (Int Validator):
+   - Total Depth, Top Flange Width, Bottom Flange Width, Support Width: Must be positive integers
+   - Web Thickness, Flange Thicknesses: Selected from standard values or custom positive integer
+   - Moment, Shear: Must be positive numbers (> 0)
+
+2. **Conditional Field Visibility:**
+   - **Total Depth, Top Flange Width, Bottom Flange Width**: 
+     - Visible: Only when Design Type = "Customized"
+     - Hidden: When Design Type = "Optimized"
+   - **Warping Restraint**: 
+     - Options change based on selected Torsional Restraint
+   - **Output Fields** (T Constant, W Constant, Elastic Critical Moment):
+     - Visible: Only when Support Type = "Major Laterally Unsupported"
+     - Hidden: When Support Type = "Major Laterally Supported"
+
+3. **Field Dependencies:**
+   - Warping Restraint options are dynamically filtered based on Torsional Restraint selection
+   - When Design Type changes to "Optimized", dimension fields are automatically hidden
+   - When Design Type changes to "Customized", dimension fields become visible and required
+
+4. **Required Field Indicators:**
+   - Fields marked as "Required" must have values before design can proceed
+   - Conditional fields marked with * are only required when their condition is met
+
+---
 
 #### Design Preferences Parameters
 
@@ -233,9 +440,27 @@ These inputs are **only required/applicable** when Design Type is set to "Optimi
 
 #### Optimization Bounds
 
-**Location**: Design Preferences → Optimisation Tab → Customize buttons
+**Location**: Main Input Dock (Section 1: Section Details) - "Set Bounds" buttons
 
-When "Optimized" design type is selected, users can customize the search space bounds for optimization variables. If not customized, default bounds are used.
+When "Optimized" design type is selected, the following fields in the Input Dock show **"Set Bounds" buttons** instead of text input fields:
+
+1. **Total Depth (mm)** - Shows "Set Bounds" button
+2. **Width of Top Flange (mm)** - Shows "Set Bounds" button  
+3. **Width of Bottom Flange (mm)** - Shows "Set Bounds" button
+
+**How to Set Bounds:**
+
+1. Click the **"Set Bounds"** button next to the variable (e.g., "Total Depth")
+2. A dialog opens allowing you to customize:
+   - **Lower Bound**: Minimum value for optimization search
+   - **Upper Bound**: Maximum value for optimization search
+   - **Step Size**: Increment for continuous variables (optional)
+3. Click "Add" or "OK" to save the bounds
+4. If bounds are not set, default bounds are used automatically
+
+**Alternative Location**: Bounds can also be customized via Design Preferences → Optimisation Tab → Customize buttons (same functionality)
+
+**Note**: For thickness fields (Web Thickness, Flange Thicknesses), bounds are set via "Customized" option in the ComboBox, not "Set Bounds" buttons.
 
 ##### Default Bounds
 
@@ -256,10 +481,17 @@ When "Optimized" design type is selected, users can customize the search space b
 - Web thickness: 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40 mm
 - Flange thickness: 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 36, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100 mm
 
-##### Customizing Bounds
+##### Customizing Bounds - Two Methods
 
-Users can customize bounds for any optimization variable:
+**Method 1: Using "Set Bounds" Buttons in Input Dock** (Primary Method)
+- When Design Type = "Optimized", click "Set Bounds" button next to:
+  - Total Depth
+  - Width of Top Flange
+  - Width of Bottom Flange
+- Enter Lower Bound, Upper Bound, and Step Size (optional)
+- Click "Add" or "OK" to save
 
+**Method 2: Using Design Preferences** (Alternative Method)
 1. Navigate to Design Preferences → Optimisation Tab
 2. Click "Customize" button next to the variable
 3. Enter:
@@ -267,6 +499,12 @@ Users can customize bounds for any optimization variable:
    - **Upper Bound**: Maximum value
    - **Step Size**: Increment for continuous variables (optional)
 4. Click "Add" to save
+
+**For Thickness Variables** (Web Thickness, Flange Thicknesses):
+- These use ComboBox_Customized with "Customized" option
+- Select "Customized" from dropdown
+- A dialog opens to select specific thickness values from standard list
+- NOT set via "Set Bounds" buttons
 
 **Note**: For discrete variables (thicknesses), the system will snap to nearest standard value during optimization.
 
@@ -326,35 +564,130 @@ The variables optimized depend on section configuration:
 
 The Plate Girder module provides comprehensive output results after design completion.
 
-### Output Dock Parameters
+### Output Dock Structure
 
 **Location**: Output Dock (visible in main window after design)
 
-| Output Parameter | Key | Description | Units |
-|------------------|-----|-------------|-------|
-| **Optimum Designation** | `KEY_TITLE_OPTIMUM_DESIGNATION` | Section designation/identifier | - |
-| **Utilization Ratio** | `KEY_OPTIMUM_UR_COMPRESSION` | Maximum utilization ratio (moment/shear/deflection) | - |
-| **Section Classification** | `KEY_OPTIMUM_SC` | Section class (Plastic/Compact/Semi-Compact/Slender) | - |
-| **Beta_b Constant** | `KEY_betab_constatnt` | Beta_b value for lateral-torsional buckling | - |
-| **Effective Section Area** | `KEY_EFF_SEC_AREA` | Effective area for compression | mm² |
-| **Web Thickness** | `KEY_WEB_THICKNESS_PG` | Provided web thickness | mm |
-| **Top Flange Thickness** | `KEY_TOP_FLANGE_THICKNESS_PG` | Provided top flange thickness | mm |
-| **Bottom Flange Thickness** | `KEY_BOTTOM_FLANGE_THICKNESS_PG` | Provided bottom flange thickness | mm |
-| **Intermediate Stiffener Thickness** | `KEY_IntermediateStiffener_thickness` | Intermediate stiffener thickness | mm |
-| **Intermediate Stiffener Spacing** | `KEY_IntermediateStiffener_spacing` | Spacing between intermediate stiffeners | mm |
-| **Longitudinal Stiffener Thickness** | `KEY_LongitudnalStiffener_thickness` | Longitudinal stiffener thickness | mm |
-| **Longitudinal Stiffener Numbers** | `KEY_LongitudnalStiffener_numbers` | Number of longitudinal stiffeners | - |
-| **End Panel Stiffener Thickness** | `KEY_EndpanelStiffener_thickness` | End panel stiffener thickness | mm |
-| **Design Bending Strength** | `KEY_MOMENT_STRENGTH` | Design moment capacity | kNm |
-| **Weld for Web to Flange** | `KEY_WeldWebtoflange` | Fillet weld size for web-flange connection | mm |
-| **Weld for Stiffener to Web** | `KEY_WeldStiffenertoweb` | Fillet weld size for stiffener-web connection | mm |
-| **T Constant** | `KEY_T_constatnt` | Torsional constant (for LTB) | mm⁴ |
-| **W Constant** | `KEY_W_constatnt` | Warping constant (for LTB) | mm⁶ |
-| **Longitudinal Stiffener 1 Position** | `KEY_LongitudinalStiffener1_pos` | Position of first longitudinal stiffener | mm |
-| **Longitudinal Stiffener 2 Position** | `KEY_LongitudinalStiffener2_pos` | Position of second longitudinal stiffener | mm |
-| **Elastic Critical Moment** | `KEY_Elastic_CM` | Elastic critical moment for LTB | kNm |
-| **Calculated Deflection** | `KEY_MAX_DEFL` | Maximum deflection under service loads | mm |
-| **Deflection Limit** | `DeflectionLimit` | Allowable deflection limit | mm |
+The Output Dock displays results organized into **one main section**:
+
+```
+┌─────────────────────────────────────────────────┐
+│  OUTPUT DOCK - PLATE GIRDER                    │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  ┌─ Section Details ─────────────────────────┐ │
+│  │  • Designation                            │ │
+│  │  • Utilization Ratio                      │ │
+│  │  • Section Classification                 │ │
+│  │  • Beta_b Constant                        │ │
+│  │  • Effective Section Area                 │ │
+│  │  • Web Thickness                          │ │
+│  │  • Top Flange Thickness                   │ │
+│  │  • Bottom Flange Thickness                │ │
+│  │  • Intermediate Stiffener Thickness       │ │
+│  │  • Intermediate Stiffener Spacing         │ │
+│  │  • Longitudinal Stiffener Thickness       │ │
+│  │  • Longitudinal Stiffener Numbers          │ │
+│  │  • End Panel Stiffener Thickness          │ │
+│  │  • Design Bending Strength                │ │
+│  │  • Weld for Web to Flange                 │ │
+│  │  • Weld for Stiffener to Web              │ │
+│  │  • T Constant*                            │ │
+│  │  • W Constant*                            │ │
+│  │  • Longitudinal Stiffener 1 Position*     │ │
+│  │  • Longitudinal Stiffener 2 Position*      │ │
+│  │  • Elastic Critical Moment*               │ │
+│  │  • Calculated Deflection                  │ │
+│  │  • Deflection Limit                       │ │
+│  └──────────────────────────────────────────┘ │
+│                                                 │
+└─────────────────────────────────────────────────┘
+
+* Conditional: Only shown when Support Type = "Major Laterally Unsupported"
+```
+
+---
+
+#### Section: Section Details (`DISP_TITLE_STRUT_SECTION`)
+
+This section contains all design results and calculated properties.
+
+| Output Parameter | Key | Type | Visible* | Description | Units |
+|------------------|-----|------|----------|-------------|-------|
+| **Designation** | `KEY_TITLE_OPTIMUM_DESIGNATION` | TextBox | Always | Section designation/identifier | - |
+| **Utilization Ratio** | `KEY_OPTIMUM_UR_COMPRESSION` | TextBox | Always | Maximum utilization ratio (moment/shear/deflection) | - |
+| **Section Classification** | `KEY_OPTIMUM_SC` | TextBox | Always | Section class (Plastic/Compact/Semi-Compact/Slender) | - |
+| **Beta_b Constant** | `KEY_betab_constatnt` | TextBox | Always | Beta_b value for lateral-torsional buckling | - |
+| **Effective Section Area** | `KEY_EFF_SEC_AREA` | TextBox | Always | Effective area for compression | mm² |
+| **Web Thickness** | `KEY_WEB_THICKNESS_PG` | TextBox | Always | Provided web thickness | mm |
+| **Top Flange Thickness** | `KEY_TOP_FLANGE_THICKNESS_PG` | TextBox | Always | Provided top flange thickness | mm |
+| **Bottom Flange Thickness** | `KEY_BOTTOM_FLANGE_THICKNESS_PG` | TextBox | Always | Provided bottom flange thickness | mm |
+| **Intermediate Stiffener Thickness** | `KEY_IntermediateStiffener_thickness` | TextBox | Conditional** | Intermediate stiffener thickness | mm |
+| **Intermediate Stiffener Spacing** | `KEY_IntermediateStiffener_spacing` | TextBox | Conditional** | Spacing between intermediate stiffeners | mm |
+| **Longitudinal Stiffener Thickness** | `KEY_LongitudnalStiffener_thickness` | TextBox | Conditional** | Longitudinal stiffener thickness | mm |
+| **Longitudinal Stiffener Numbers** | `KEY_LongitudnalStiffener_numbers` | TextBox | Conditional** | Number of longitudinal stiffeners | - |
+| **End Panel Stiffener Thickness** | `KEY_EndpanelStiffener_thickness` | TextBox | Conditional** | End panel stiffener thickness | mm |
+| **Design Bending Strength** | `KEY_MOMENT_STRENGTH` | TextBox | Always | Design moment capacity | kNm |
+| **Weld for Web to Flange** | `KEY_WeldWebtoflange` | TextBox | Always | Fillet weld size for web-flange connection | mm |
+| **Weld for Stiffener to Web** | `KEY_WeldStiffenertoweb` | TextBox | Conditional** | Fillet weld size for stiffener-web connection | mm |
+| **T Constant** | `KEY_T_constatnt` | TextBox | Conditional* | Torsional constant (for LTB) | mm⁴ |
+| **W Constant** | `KEY_W_constatnt` | TextBox | Conditional* | Warping constant (for LTB) | mm⁶ |
+| **Longitudinal Stiffener 1 Position** | `KEY_LongitudinalStiffener1_pos` | TextBox | Conditional** | Position of first longitudinal stiffener | mm |
+| **Longitudinal Stiffener 2 Position** | `KEY_LongitudinalStiffener2_pos` | TextBox | Conditional** | Position of second longitudinal stiffener | mm |
+| **Elastic Critical Moment** | `KEY_Elastic_CM` | TextBox | Conditional* | Elastic critical moment for LTB | kNm |
+| **Calculated Deflection** | `KEY_MAX_DEFL` | TextBox | Always | Maximum deflection under service loads | mm |
+| **Deflection Limit** | `DeflectionLimit` | TextBox | Always | Allowable deflection limit | mm |
+
+*Conditional Visibility:
+- **Conditional***: Only shown when Support Type = "Major Laterally Unsupported"
+- **Conditional****: Only shown when Web Philosophy = "Thin Web with ITS"
+
+**Output Field Details:**
+
+1. **Designation**: 
+   - Format: "User Defined" or custom designation
+   - Always displayed
+
+2. **Utilization Ratio**:
+   - Range: 0.0 to > 1.0
+   - Format: Rounded to 3 decimal places (e.g., 0.856)
+   - Values > 1.0 indicate design failure
+   - Values ≤ 1.0 indicate design success
+
+3. **Section Classification**:
+   - Possible values: "Plastic", "Compact", "Semi-Compact", "Slender"
+   - Based on IS 800:2007 Table 2 criteria
+
+4. **Beta_b Constant**:
+   - Used for lateral-torsional buckling calculations
+   - Always displayed
+
+5. **Effective Section Area**:
+   - Calculated effective area considering local buckling
+   - Used for compression capacity calculations
+
+6. **Thickness Values**:
+   - Web, Top Flange, Bottom Flange thicknesses always displayed
+   - Stiffener thicknesses only shown when applicable
+
+7. **Stiffener Information**:
+   - Intermediate Stiffener fields: Only shown for "Thin Web with ITS"
+   - Longitudinal Stiffener fields: Only shown when longitudinal stiffeners are used
+   - End Panel Stiffener: Only shown when end stiffeners are required
+
+8. **Weld Sizes**:
+   - Web to Flange: Maximum of top and bottom flange welds
+   - Stiffener to Web: Only shown when stiffeners are present
+
+9. **LTB Constants** (T Constant, W Constant, Elastic Critical Moment):
+   - Only shown when Support Type = "Major Laterally Unsupported"
+   - Hidden when Support Type = "Major Laterally Supported"
+   - Used for lateral-torsional buckling analysis
+
+10. **Deflection**:
+    - Calculated Deflection: Actual deflection under service loads
+    - Deflection Limit: Allowable deflection based on structure type and loading
+    - Both always displayed
 
 ### Design Status
 
@@ -713,6 +1046,301 @@ MatplotlibCanvas.update_plot
 - Optimization runs on main thread (OpenGL safety)
 - `QApplication.processEvents()` called once per iteration
 - UI updates throttled to prevent lag
+
+---
+
+## User Interface (UI) Components
+
+### PSO Visualization Dashboard UI
+
+The PSO Visualization Dashboard appears when "Optimized" design type is selected and design is executed. It provides real-time visualization of the optimization process.
+
+#### UI Layout Structure
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  HEADER BAR (Height: 50px, Green Background)                      │
+│  ┌───────────────────────────────────────────────────────────────┐ │
+│  │ PSO OPTIMIZATION SPACE  │  ITERATION: X  │  BEST: Y kg  │ CLOSE│ │
+│  └───────────────────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌───────────────────────────────────────────────────────────────┐ │
+│  │  MAIN CONTENT AREA (Matplotlib Canvas)                       │ │
+│  │                                                               │ │
+│  │  ┌─────────────────────────────────────────────────────┐   │ │
+│  │  │  Panel 1: Parallel Coordinates Plot (Top)           │   │ │
+│  │  │  - Shows design variable convergence                │   │ │
+│  │  │  - History (faint), Current swarm (bold)            │   │ │
+│  │  │  - Global best (gold dashed line)                   │   │ │
+│  │  └─────────────────────────────────────────────────────┘   │ │
+│  │                                                               │ │
+│  │  ┌──────────────────────────┐  ┌──────────────────────────┐ │ │
+│  │  │ Panel 2: Performance Map │  │ Panel 3: Cross-Section   │ │ │
+│  │  │ (Bottom Left)            │  │ (Bottom Right)            │ │ │
+│  │  │ - Weight vs UR          │  │ - Best section drawing   │ │ │
+│  │  │ - History + Current     │  │ - Dimensions labeled     │ │ │
+│  │  │ - Feasibility line      │  │ - To scale              │ │ │
+│  │  └──────────────────────────┘  └──────────────────────────┘ │ │
+│  │                                                               │ │
+│  └───────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+├─────────────────────────────────────────────────────────────────────┤
+│  BOTTOM TOOLBAR (Height: 45px, White Background)                   │
+│  ┌───────────────────────────────────────────────────────────────┐ │
+│  │ ⏮ ◀ ▶ ▶ ⏭  [Once/Loop]  💾 Save  Frame: X/Y  Legend        │ │
+│  └───────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### Header Bar Components
+
+**Location**: Top of visualization window  
+**Height**: 50px  
+**Background Color**: `#6B7D20` (Osdag olive header green)  
+**Border**: 2px solid `#556619` bottom border
+
+| Component | Type | Description | Styling |
+|-----------|------|-------------|---------|
+| **Title** | QLabel | "PSO OPTIMIZATION SPACE" | White, bold, 14px, letter-spacing 1px |
+| **Iteration Label** | QLabel | "ITERATION: X" | White (90% opacity), bold, 13px |
+| **Best Weight Label** | QLabel | "BEST: Y kg" | Gold (`#FFD700`), bold, 13px |
+| **Close Button** | QPushButton | "CLOSE" | Green (`#90AF13`), white text, rounded corners, hover effects |
+
+**Close Button Behavior:**
+- Clicking "CLOSE" emits `switch_to_cad` signal
+- Switches view back to CAD window
+- Closes visualization widget
+
+#### Bottom Toolbar Components
+
+**Location**: Bottom of visualization window  
+**Height**: 45px  
+**Background Color**: White  
+**Border**: 1px solid `#ddd` top border  
+**Layout**: Horizontal (QHBoxLayout)  
+**Margins**: 15px left/right, 5px top/bottom  
+**Spacing**: 8px between elements
+
+##### Navigation Controls
+
+| Button | Symbol | Function | Enabled State | Behavior |
+|--------|--------|----------|---------------|----------|
+| **Step Back** | ⏮ | `_step_back()` | After optimization completes | Jump to first frame |
+| **Previous Frame** | ◀ | `_prev_frame()` | After optimization completes | Go back 10 frames |
+| **Play/Pause** | ▶ / ⏸ | `_toggle_play()` | After optimization completes | Toggle animation playback |
+| **Next Frame** | ▶ | `_next_frame()` | After optimization completes | Advance 10 frames |
+| **Step Forward** | ⏭ | `_step_forward()` | After optimization completes | Jump to last frame |
+
+**Button Styling:**
+- Background: `#f0f0f0` (light gray)
+- Text Color: `#333` (dark gray)
+- Border: 1px solid `#ccc`
+- Border Radius: 3px
+- Padding: 4px 8px
+- Font Size: 14px
+- Min Width: 28px (Play button: 35px)
+- Hover: `#e0e0e0`
+- Pressed: `#d0d0d0`
+- Disabled: `#f8f8f8` background, `#aaa` text color
+
+**Play/Pause Button Details:**
+- **Initial State**: ▶ (Play icon), disabled
+- **During Optimization**: Disabled
+- **After Completion**: Enabled
+- **When Playing**: ⏸ (Pause icon)
+- **When Paused**: ▶ (Play icon)
+- **Click Behavior**: 
+  - If paused → Start replay timer (200ms interval = 5 FPS)
+  - If playing → Stop replay timer
+  - Updates button text accordingly
+
+##### Loop Mode Controls
+
+| Control | Type | Options | Default | Description |
+|---------|------|---------|---------|-------------|
+| **Loop Mode** | QRadioButton | "Once" / "Loop" | "Loop" | Controls replay behavior |
+
+**Loop Mode Behavior:**
+- **"Once"**: Play animation once, stop at last frame
+- **"Loop"**: Play animation continuously, restart from first frame when reaching end
+- Styling: `#333` text color, 11px font size
+- Both radio buttons are always enabled after optimization completes
+
+##### Save Button
+
+| Component | Type | Description | States |
+|-----------|------|-------------|--------|
+| **Save Button** | QPushButton | "💾 Save" | Initial: Disabled<br>After completion: Enabled<br>Saving: "Saving..."<br>Success: "✓ Saved!"<br>Error: "❌ Failed" |
+
+**Save Button Behavior:**
+- **Initial State**: Disabled during optimization
+- **After Completion**: Enabled
+- **Click Action**: Opens file dialog to save convergence plot
+- **File Format**: PNG (not GIF - faster, no animation processing)
+- **Default Filename**: "pso_convergence.png"
+- **Resolution**: 150 DPI
+- **Content**: Convergence plot showing best weight vs iteration
+- **States**:
+  - Clicking → "Saving..." (disabled)
+  - Success → "✓ Saved!" (disabled for 2 seconds, then back to "💾 Save")
+  - Error → "❌ Failed" (disabled for 2 seconds, then back to "💾 Save")
+
+##### Frame Counter
+
+| Component | Type | Format | Description |
+|-----------|------|--------|-------------|
+| **Frame Counter** | QLabel | "Frame: X/Y" | Shows current frame and total frames |
+
+**Frame Counter Details:**
+- **During Optimization**: "Frame: 0/0"
+- **After Completion**: "Frame: X/Y" where X = current frame, Y = total cached frames
+- **Styling**: `#666` color, 10px font size
+- **Updates**: Real-time during replay navigation
+
+##### Legend
+
+| Component | Type | Content | Description |
+|-----------|------|---------|-------------|
+| **Legend** | QLabel | Colored icons + text | Visual guide for plot elements |
+
+**Legend Content:**
+- `<span style='color: #FFD700;'>★</span> Best` - Gold star for global best solution
+- `<span style='color: #4ADE80;'>●</span> Feasible` - Green dot for feasible particles (UR ≤ 1.0)
+- `<span style='color: #F87171;'>●</span> Infeasible` - Red dot for infeasible particles (UR > 1.0)
+
+**Styling**: `#333` text color, 10px font size
+
+#### Main Content Area (Matplotlib Canvas)
+
+**Component**: `MatplotlibCanvas` (inherits from `FigureCanvasQTAgg`)  
+**Layout**: Three subplots arranged in grid  
+**Update Rate**: 10 FPS (100ms render timer)  
+**Interactive**: Hover tooltips enabled
+
+##### Panel 1: Parallel Coordinates Plot (Top Panel)
+
+**Position**: Top, full width  
+**Purpose**: Visualize design variable convergence  
+**Axes**:
+- X-axis: Design variables (D, tw, bf, tf, etc.)
+- Y-axis: Normalized range (0-100%)
+
+**Visual Elements**:
+- **History Lines**: Faint background (last 2000 points), shows past particle positions
+- **Current Swarm Lines**: Bold lines, shows current iteration particle positions
+- **Global Best Line**: Gold (`#FFD700`) dashed line with markers, highlights best solution
+- **Color Coding**:
+  - Blue: Feasible particles (UR ≤ 1.0)
+  - Red: Infeasible particles (UR > 1.0)
+  - Gold: Global best (dashed line)
+
+**Update Frequency**: Every render cycle (10 FPS)
+
+##### Panel 2: Performance Map (Bottom Left)
+
+**Position**: Bottom left  
+**Purpose**: Show objective space (Weight vs Utilization Ratio)  
+**Axes**:
+- X-axis: Weight (kg), auto-scaled with 10% margin
+- Y-axis: Utilization Ratio (UR), range 0 to max(2.0, max_UR)
+
+**Visual Elements**:
+- **Feasibility Line**: Red line at UR = 1.0
+- **History Points**: Faint background scatter (last 3000 points)
+- **Current Swarm Points**: Bold scatter points
+- **Global Best**: Gold (`#FFD700`) diamond marker
+- **Color Coding**:
+  - Green (`#4ADE80`): Feasible (UR ≤ 1.0)
+  - Red (`#F87171`): Infeasible (UR > 1.0)
+
+**Dynamic Scaling**: Auto-adjusts based on data range
+
+##### Panel 3: Cross-Section Preview (Bottom Right)
+
+**Position**: Bottom right  
+**Purpose**: Visualize best cross-section found  
+**Content**: To-scale drawing of plate girder cross-section
+
+**Visual Elements**:
+- **Bottom Flange**: Rectangle (blue, `#3b82f6`)
+- **Web**: Rectangle (blue, `#3b82f6`)
+- **Top Flange**: Rectangle (blue, `#3b82f6`)
+- **Annotations**:
+  - Center: "D={depth}\ntw={web_thickness}"
+  - Below: "Bot: {bf_bot}x{tf_bot}"
+  - Above: "Top: {bf_top}x{tf_top}"
+
+**Update Behavior**:
+- Only shows feasible solutions (UR ≤ 1.0)
+- Updates when global best changes
+- Shows "No Feasible Solution Yet" if no feasible solution found
+- Uses global best position vector for dimensions
+
+**Axes Limits**: Auto-scaled based on section dimensions
+
+#### UI State Management
+
+**During Optimization:**
+- All replay controls disabled
+- Frame counter shows "Frame: 0/0"
+- Save button disabled
+- Play button disabled
+- Real-time updates at 10 FPS
+
+**After Optimization Completes:**
+- All replay controls enabled
+- Frame cache built automatically
+- Frame counter updated with total frames
+- Save button enabled
+- Play button enabled
+- Ready for replay navigation
+
+**During Replay:**
+- Play button shows ⏸ (pause icon)
+- Frame counter updates in real-time
+- Navigation buttons functional
+- Loop mode controls active
+
+#### Keyboard Shortcuts
+
+**Note**: Currently no keyboard shortcuts implemented. All controls are mouse-click only.
+
+#### Tooltips and Hover Effects
+
+**Hover Detection**: Enabled on Matplotlib canvas  
+**Tooltip Content**: Shows particle details on hover (if implemented)  
+**Visual Feedback**: Button hover states change background color
+
+#### Color Scheme
+
+**Theme Colors**:
+- **Header Green**: `#6B7D20` (Osdag olive)
+- **Header Border**: `#556619` (darker green)
+- **Safe/Feasible**: `#4ADE80` (green)
+- **Fail/Infeasible**: `#F87171` (red)
+- **Optimal/Best**: `#FFD700` (gold)
+- **Accent Blue**: `#38BDF8` (sky blue)
+- **Section Blue**: `#3b82f6` (blue)
+- **Button Background**: `#f0f0f0` (light gray)
+- **Button Hover**: `#e0e0e0` (medium gray)
+- **Text Dark**: `#333` (dark gray)
+- **Text Medium**: `#666` (medium gray)
+
+#### Performance Considerations
+
+**Render Timer**: 100ms interval (10 FPS)  
+**Replay Timer**: 200ms interval (5 FPS)  
+**Memory Limits**:
+- Max History Entries: 10,000
+- Max Particles: 100
+- Frame Cache: One frame per iteration
+
+**Optimization**:
+- Batch buffering (20 particles per flush)
+- Throttled updates (once per iteration, not per particle)
+- Cached frames for smooth replay
+- Thread-safe data processing (RLock)
 
 ---
 

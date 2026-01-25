@@ -97,8 +97,9 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
     seq = 0
     last_send = 0.0
     last_heartbeat = 0.0
-    current_iteration = 0
+    current_iteration = -1  # Track current iteration
     particles_in_batch = 0
+    last_iteration_first_particle_sent = -1  # Track if we've sent first particle for this iteration
 
     def send_update_event(payload: Dict[str, Any]):
         nonlocal seq, last_send, update_count, current_iteration, particles_in_batch
@@ -181,20 +182,39 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
 
         # Progress callback from optimized_method
         def viz_callback(depth, ur, weight_kg, iteration, particle_idx, position, variable_list, lb, ub):
-            nonlocal last_send, throttled_count, current_iteration, particles_in_batch
+            nonlocal last_send, throttled_count, current_iteration, particles_in_batch, last_iteration_first_particle_sent
             now = time.time()
-            current_iteration = iteration
             
-            # Track throttling
-            if now - last_send < SEND_INTERVAL:
+            # Check if this is a new iteration
+            is_new_iteration = (iteration != current_iteration)
+            
+            if is_new_iteration:
+                # New iteration: reset counters and mark that we haven't sent first particle yet
+                current_iteration = iteration
+                particles_in_batch = 0
+                last_iteration_first_particle_sent = -1
+            
+            # CRITICAL FIX: Always send at least the first particle of each iteration
+            # This ensures we have one frame per iteration for replay
+            is_first_particle = (particles_in_batch == 0)
+            should_send = False
+            
+            if is_first_particle:
+                # Always send first particle of each iteration (ensures frame cache has all iterations)
+                should_send = True
+                last_iteration_first_particle_sent = iteration
+                logger.debug(f"🎯 Sending first particle of iteration {iteration} (guaranteed)")
+            elif now - last_send >= SEND_INTERVAL:
+                # Throttle check: only send if enough time has passed
+                should_send = True
+            else:
+                # Throttled: skip this particle
                 throttled_count += 1
                 send_heartbeat_if_needed()
+                particles_in_batch += 1  # Still count it for tracking
                 return
             
-            # Reset batch counter on new iteration
-            if iteration != current_iteration:
-                particles_in_batch = 0
-            
+            # Send the update
             send_update_event(
                 {
                     "iteration": iteration,

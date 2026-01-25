@@ -52,4 +52,4 @@ RUN bash -c "source /opt/miniconda/etc/profile.d/conda.sh && \
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 EXPOSE 8000
 
-CMD ["bash", "-c", "source /opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && python manage.py runserver 0.0.0.0:8000"]
+CMD ["bash", "-c", "source /opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && uvicorn config.asgi:application --host 0.0.0.0 --port 8000"]
