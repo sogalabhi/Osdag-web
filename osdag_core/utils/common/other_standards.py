@@ -17,17 +17,9 @@ import math
 # FIXME: Keeping os and sys even if not used here. They are used in importing files without being explicitly imported themselves.
 import os
 import sys
-from pathlib import Path
 from importlib.resources import files
 
-# Try to use importlib.resources, fallback to os.path if package structure is incomplete
-try:
-    PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
-except (TypeError, ModuleNotFoundError, ValueError):
-    # Fallback: use path relative to Common.py (which is in osdag_core root)
-    # Since this file is in utils/common/, we need to go up 3 levels to reach osdag_core root
-    _this_file_path = Path(__file__).parent.parent.parent
-    PATH_TO_DATABASE = _this_file_path / "data" / "ResourceFiles" / "Database" / "Intg_osdag.sqlite"
+PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
 
 # IS 1363 - Part 1 : 2002
 class IS1363_part_1_2002(object):
@@ -174,9 +166,6 @@ class IS1367_Part3_2002(object):
 
         bolt_fy = float(row[3])
         bolt_fu = float(row[4])
-
-        print(bolt_fu, bolt_fy)
-        # print(type(bolt_fu))
 
         # bolt_fu = float(int(bolt_grade) * 100)
         # bolt_fy = float((bolt_grade - int(bolt_grade)) * bolt_fu)

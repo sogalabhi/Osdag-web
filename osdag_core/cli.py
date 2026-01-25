@@ -12,7 +12,9 @@ from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBea
 from osdag_core.design_type.connection.beam_column_end_plate import BeamColumnEndPlate
 from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
 from osdag_core.design_type.connection.column_end_plate import ColumnEndPlate
-from osdag_core.design_type.compression_member.compression import Compression
+from osdag_core.design_type.compression_member.compression_welded import Compression_welded
+from osdag_core.design_type.compression_member.compression_bolted import Compression_bolted
+from osdag_core.design_type.compression_member.compression_column import ColumnDesign
 from osdag_core.design_type.main import Main
 from osdag_core.Common import TYPE_TEXTBOX, TYPE_OUT_BUTTON
 from osdag_core.Common import (
@@ -39,8 +41,9 @@ from osdag_core.Common import (
     KEY_DISP_TENSION_WELDED,
 
     # Compression Member
-    KEY_DISP_COMPRESSION
-
+    KEY_DISP_COMPRESSION_COLUMN,
+    KEY_DISP_STRUT_BOLTED_END_GUSSET,
+    KEY_DISP_STRUT_WELDED_END_GUSSET
 )
 
 
@@ -55,19 +58,22 @@ available_modules = {
     KEY_DISP_SEATED_ANGLE:SeatedAngleConnection, 
     KEY_DISP_TENSION_BOLTED:Tension_bolted,
     KEY_DISP_TENSION_WELDED:Tension_welded, 
-    KEY_DISP_COMPRESSION:Compression, 
     KEY_DISP_BEAMCOVERPLATEWELD:BeamCoverPlateWeld,
     KEY_DISP_COLUMNCOVERPLATEWELD:ColumnCoverPlateWeld, 
     KEY_DISP_BB_EP_SPLICE:BeamBeamEndPlateSplice,
     KEY_DISP_BCENDPLATE:BeamColumnEndPlate,
+    KEY_DISP_STRUT_BOLTED_END_GUSSET:Compression_bolted,
+    KEY_DISP_STRUT_WELDED_END_GUSSET:Compression_welded,
+    KEY_DISP_COMPRESSION_COLUMN:ColumnDesign
 }
 
 from pathlib import Path
-import yaml, click
+import yaml, click, platform, os
 import pandas as pd
 
 def _print_result(out_dict:dict):
     print("="*100)
+    print("--Design Results--\n")
     for key, value in out_dict.items():
         print(f"|| {key}: {value}")
     print("="*100)
@@ -77,10 +83,10 @@ def _get_design_dictionary(osi_path:Path) -> dict:
     with open(osi_path, 'r') as file:
         return yaml.safe_load(file)
     
-def _get_output_dictionary(module_class:Main) -> dict:
+def _get_output_dictionary(module:Main) -> dict:
     """return the output dictionary for the design"""
-    status = module_class.design_status
-    out_list = module_class.output_values(module_class, status)
+    status = module.design_status
+    out_list = module.output_values(status)
     out_dict = {"Parameter": "Value"}
     for option in out_list:
         if option[0] is not None and option[2] == TYPE_TEXTBOX:
@@ -88,7 +94,7 @@ def _get_output_dictionary(module_class:Main) -> dict:
         if option[2] == TYPE_OUT_BUTTON:
             tup = option[3]
             fn = tup[1]
-            for item in fn(module_class, status):
+            for item in fn(status):
                 lable = item[0]
                 value = item[3]
                 if lable!=None and value!=None:
@@ -96,13 +102,13 @@ def _get_output_dictionary(module_class:Main) -> dict:
     return out_dict
 
 
-def _save_to_csv(output_dictionary:dict, output_file:str):
+def _generate_csv(output_dictionary:dict, output_file:str):
     """save the output dictionary to a csv file"""
     df = pd.DataFrame(output_dictionary.items())
     df.to_csv(output_file, index=False, header=None)
 
-def _save_to_pdf(module_class:Main, output_file:Path):
-    """save the output dictionary to a pdf file"""
+def _generate_report(module:Main, output_file:Path):
+    """generate pdf and tex report file for the output dictionary."""
     popup_summary = {
             'ProfileSummary': {
             'CompanyName': 'LoremIpsum', 
@@ -119,8 +125,36 @@ def _save_to_pdf(module_class:Main, output_file:Path):
         'does_design_exist': True, 
         'logger_messages': ''
         }
-    module_class.save_design(module_class, popup_summary)
+    module.save_design(popup_summary)
 
+def _get_documents_folder() -> Path:
+    """Get the user's Documents folder path."""
+    system = platform.system()
+
+    if system == "Windows": 
+        return Path(os.environ["USERPROFILE"]) / "Documents"
+
+    elif system == "Darwin":  # macOS
+        return Path.home() / "Documents"
+
+    else:  # Linux
+        # Most Linux systems follow the XDG standard 
+        xdg = os.environ.get("XDG_DOCUMENTS_DIR")
+        if xdg:
+            return Path(os.path.expandvars(xdg))
+        return Path.home() / "Documents"
+
+def _is_in_current_user(path: str | Path) -> bool:
+    """Check if the OSdag is running in the current user's directory."""
+    path = Path(path).expanduser().resolve()
+    home = Path.home().resolve()
+
+    # Check if the given path starts with the home directory
+    try:
+        path.relative_to(home)
+        return True
+    except ValueError:
+        return False
 
 
 def run_module(*args, **kargs) -> dict:
@@ -140,65 +174,71 @@ def run_module(*args, **kargs) -> dict:
 
     if osi_path is None:
         result["errors"].append("No input file provided.")
-        print(result)
+        # print(result)
         return result
     
     osi_path = Path(osi_path) if osi_path else None
     output_path = Path(output_path) if output_path else None
     if not osi_path.exists():
         result["errors"].append(f"File not found: {osi_path}")
-        print(result)
+        # print(result)
         return result
     
     design_dict = _get_design_dictionary(osi_path)
     module_name = design_dict.get("Module")
     if not module_name:
         result["errors"].append("Module not specified.")
-        print(result)
+        # print(result)
         return result
 
     module_class = available_modules.get(module_name)
     if not module_class:
         result["errors"].append(f"Not a valid module class: {module_name}")
-        print(result)
+        # print(result)
         return result
-    
+    module = module_class()
+
     input_filename = osi_path.stem
     output_filename = output_path.stem if output_path else None
     if not output_path:
-        output_folder_path = osi_path.parent / "Outputs" / f"{module_class.__name__}"
+        output_folder_path = _get_documents_folder() / "Osdag Outputs" / f"{module_class.__name__}"
     else:
+        if not _is_in_current_user(output_path):
+            result["errors"].append("Output path must be within the current user's directory.")
+            # print(result)
+            return result
         output_folder_path = output_path.parent / f"{module_class.__name__}"
     output_folder_path.mkdir(parents=True, exist_ok=True)
     output_file = output_folder_path / f"{output_filename if output_filename else input_filename}"
 
-    module_class.set_osdaglogger(None)
-    val_errors = module_class.func_for_validation(module_class, design_dict)
+    module.set_osdaglogger(None, None)
+    val_errors = module.func_for_validation(design_dict)
 
     if val_errors:
         result["errors"].extend(val_errors)
-        print(result)
+        # print(result)
         return result
 
-    out_dict = _get_output_dictionary(module_class)
+    out_dict = _get_output_dictionary(module)
     result["data"] = out_dict
     if op_type == "save_csv":
         try:
-            _save_to_csv(out_dict, str(output_file) + ".csv")
+            output_file = output_file.with_suffix('.csv')
+            _generate_csv(out_dict, str(output_file))
             result["success"] = True
-            result["output"] = str(output_file)
+            result["output"] = str(output_folder_path)
         except Exception as e:
             result["success"] = False
             result["errors"].append(f"Failed to save CSV: {e}")
 
-    elif op_type == "save_pdf":
+    elif op_type == "generate_report":
         try:
-            _save_to_pdf(module_class, output_file)
+            _generate_report(module, output_file)
             result["success"] = True
-            result["output"] = str(output_file)
+            result["output"] = str(output_folder_path)
         except Exception as e:
             result["success"] = False
-            result["errors"].append(f"Failed to save PDF: {e}")
+            result["errors"].append(f"Failed to save Report: {e}")
 
     elif op_type == "print_result":
         try:
@@ -212,6 +252,6 @@ def run_module(*args, **kargs) -> dict:
         result["errors"].append(f"Unsupported op_type: {op_type}")
 
     if len(result["errors"]) > 0:
-        print(result)
+        print(result["errors"])
     
     return result

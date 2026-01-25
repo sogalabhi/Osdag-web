@@ -1,10 +1,11 @@
 import numpy
 from OCC.Display.SimpleGui import init_display
-from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse, BRepAlgoAPI_Cut
 from OCC.Core.BOPAlgo import BOPAlgo_Builder
 from OCC.Core.Quantity import Quantity_NOC_SADDLEBROWN,Quantity_NOC_GRAY,Quantity_NOC_BLUE1,Quantity_NOC_RED
 from OCC.Core.Graphic3d import *
-from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
+from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere, BRepPrimAPI_MakeCylinder
+from OCC.Core.gp import gp_Ax2, gp_Pnt, gp_Dir
 # Import the component classes
 from ...items.bolt import Bolt
 from ...items.nut import Nut
@@ -13,22 +14,24 @@ from ...items.plate import Plate
 def create_bolted_lap_joint(plate1_thickness = 16, plate2_thickness = 8, plate_width = 100, bolt_dia = 16, actual_overlap_length=50,
                             bolt_rows=4,bolt_cols=2,pitch=20,gauge=20,edge=12,end=13.6,number_bolts=7):
 
-    plate_length = 3 * actual_overlap_length
+    plate_length = 2 * actual_overlap_length
     
     # Calculate the offset of the second plate
     plate2_offset = plate_length - actual_overlap_length
     
-    nut_thickness = 3.0
+    nut_thickness = bolt_dia * 0.5
     # Bolt parameters
-    bolt_head_radius = bolt_dia/2
-    bolt_head_thickness = 3.0
-    bolt_length = (plate1_thickness + plate2_thickness) + nut_thickness   # Enough to go through both plates
-    bolt_shaft_radius = 1.5
+    bolt_head_radius = bolt_dia * 0.8
+    bolt_head_thickness = bolt_dia * 0.4
+    bolt_shaft_radius = bolt_dia / 2.0
+    
+    extra_length = 5.0 # stickout
+    bolt_length = (plate1_thickness + plate2_thickness) + nut_thickness + extra_length
     
     # Nut parameters
     nut_radius = bolt_head_radius
     
-    nut_height = bolt_head_radius
+    nut_height = nut_thickness + 2.0 # Ensure hole cuts through
     nut_inner_radius = bolt_shaft_radius
     
     # Create the first plate
@@ -97,6 +100,32 @@ def create_bolted_lap_joint(plate1_thickness = 16, plate2_thickness = 8, plate_w
         nut.place(nut_origin, nut_uDir, nut_wDir)
         nut_model = nut.create_model()
         nuts_models.append(nut_model)
+
+    # --- Cut Bolt Holes in Plates ---
+    # Hole radius slightly larger than bolt shaft for clearance
+    hole_radius = (bolt_dia / 2.0) * 0.7 # Exact fit with bolt
+    
+    # Plate 1: Z from -plate1_thickness/2 to +plate1_thickness/2
+    plate1_z_bottom = -plate1_thickness / 2.0
+    plate1_z_top = plate1_thickness / 2.0
+    
+    # Plate 2: Z from plate1_thickness/2 to plate1_thickness/2 + plate2_thickness
+    plate2_z_bottom = plate1_thickness / 2.0
+    plate2_z_top = plate1_thickness / 2.0 + plate2_thickness
+    
+    # Cut holes in each plate at bolt positions
+    for pos in bolt_positions:
+        bolt_x, bolt_y, _ = pos
+        
+        # Cut hole in Plate 1 (all bolts go through plate1 in overlap area)
+        axis1 = gp_Ax2(gp_Pnt(bolt_x, bolt_y, plate1_z_bottom - 5), gp_Dir(0, 0, 1))
+        hole1 = BRepPrimAPI_MakeCylinder(axis1, hole_radius, plate1_thickness + 10).Shape()
+        plate1_model = BRepAlgoAPI_Cut(plate1_model, hole1).Shape()
+        
+        # Cut hole in Plate 2 (all bolts go through plate2 in overlap area)
+        axis2 = gp_Ax2(gp_Pnt(bolt_x, bolt_y, plate2_z_bottom - 5), gp_Dir(0, 0, 1))
+        hole2 = BRepPrimAPI_MakeCylinder(axis2, hole_radius, plate2_thickness + 10).Shape()
+        plate2_model = BRepAlgoAPI_Cut(plate2_model, hole2).Shape()
 
     # Use BOPAlgo_Builder for assembly
     builder = BOPAlgo_Builder()

@@ -70,12 +70,19 @@ class FilletWeld(object):
             prism = makePrismFromFace(aFace, extrudeDir)
             trns = gp_Trsf()
             angle = radians(rotate_angle)
-            trns.SetRotation(gp_OX(), angle)
+            from OCC.Core.gp import gp
+            trns.SetRotation(gp.OX(), angle)
             brep_trns = BRepBuilderAPI_Transform(prism, trns, False)
             brep_trns.Build()
             prism1 = brep_trns.Shape()
 
         return prism1
+
+    def clone(self):
+        """
+        Create a fresh instance of FilletWeld with the same parameters.
+        """
+        return FilletWeld(self.b, self.h, self.L)
 
 
 if __name__ == '__main__':

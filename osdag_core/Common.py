@@ -3,58 +3,98 @@
 # @author: Amir, Umair, Arsil
 
 # FIXME: Keeping os even if not used here.
-import os
+import os, shutil
 import operator
 import math
 import logging
-from pathlib import Path
 from importlib.resources import files
+from pathlib import Path
+import platform
 
-# Helper function to get resource file paths with fallback
-def _get_resource_path(*path_parts):
-    """Get resource file path, trying importlib.resources first, then falling back to file system."""
-    try:
-        resource_path = files("osdag_core.data.ResourceFiles")
-        for part in path_parts:
-            resource_path = resource_path.joinpath(part)
-        return resource_path
-    except (TypeError, ModuleNotFoundError, ValueError):
-        # Fallback: use path relative to this file
-        _common_file_path = Path(__file__).parent
-        return _common_file_path / "data" / "ResourceFiles" / Path(*path_parts)
-
-# Public version for use in other modules
-def get_resource_path(*path_parts):
-    """Get resource file path, trying importlib.resources first, then falling back to file system.
-    
-    This is a public wrapper around _get_resource_path for use in other modules.
-    """
-    return _get_resource_path(*path_parts)
-
-# Try to use importlib.resources, fallback to os.path if package structure is incomplete
-try:
-    PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
-except (TypeError, ModuleNotFoundError, ValueError):
-    # Fallback: use path relative to this file
-    _common_file_path = Path(__file__).parent
-    PATH_TO_DATABASE = _common_file_path / "data" / "ResourceFiles" / "Database" / "Intg_osdag.sqlite"
-
-try:
-    PDFLATEX = files("osdag_core.data.ResourceFiles.osdag-latex-env.bin.windows").joinpath("pdflatex.exe")
-except (TypeError, ModuleNotFoundError, ValueError):
-    # Fallback: use path relative to this file
-    # Note: This path may not exist in all installations
-    _common_file_path = Path(__file__).parent
-    _pdftex_path = _common_file_path / "data" / "ResourceFiles" / "osdag-latex-env.bin.windows" / "pdflatex.exe"
-    # Only set if path exists, otherwise leave as None or empty Path
-    PDFLATEX = _pdftex_path if _pdftex_path.exists() else None
+PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
+PDFLATEX = "pdflatex"
 
 import sqlite3
 
 from .utils.common.other_standards import *
-# from .utils.common.component import *
-# from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
-# from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
+# This returns the documents directory path for the current user
+def get_documents_folder():
+    system = platform.system()
+    
+    if system == "Windows":
+        # Windows: typically C:\Users\Username\Documents
+        docs_path = Path.home() / "Documents"
+        if not docs_path.exists():
+            docs_path = Path.home() / "OneDrive" / "Documents"
+    elif system == "Darwin":  # macOS
+        # macOS: typically /Users/Username/Documents
+        docs_path = Path.home() / "Documents"
+    elif system == "Linux":
+        # Linux: typically /home/username/Documents
+        # Also check XDG_DOCUMENTS_DIR for custom locations
+        xdg_docs = os.environ.get("XDG_DOCUMENTS_DIR")
+        if xdg_docs:
+            docs_path = Path(xdg_docs)
+        else:
+            docs_path = Path.home() / "Documents"
+    else:
+        # Fallback to home directory for unknown systems
+        docs_path = Path.home()
+    
+    # Ensure the directory exists, otherwise fall back to home
+    if not docs_path.exists():
+        docs_path = Path.home()
+    return str(docs_path)
+
+def get_latex_executable():
+    osdag_dir = os.path.dirname(os.path.abspath(__file__))
+
+    latex_env =  os.path.join(osdag_dir, "data", "ResourceFiles", "osdag-latex-env")
+    if not os.path.isdir(latex_env):
+        # --- System TeX path resolution (Linux / macOS / Windows) ---
+        system_pdflatex = shutil.which("pdflatex")
+
+        if system_pdflatex:
+            return os.path.abspath(system_pdflatex)
+        else:
+            raise FileNotFoundError("LaTeX environment not found. Please ensure that the osdag-latex-env directory exists or that pdflatex is installed on your system.")  
+    else:
+        if sys.platform.startswith("win"):
+            latex_executable = os.path.join(latex_env, "bin", "windows", "pdflatex.exe")
+            return latex_executable
+        else:   # Linux / Unix / macOS
+            system_pdflatex = shutil.which("pdflatex")
+            if system_pdflatex:
+                return os.path.abspath(system_pdflatex)
+            else:
+                raise FileNotFoundError("pdflatex not found in system PATH. Please install TeXLive.")
+  
+def configure_latex_runtime_windows():
+    if not sys.platform.startswith("win"):
+        return
+
+    texmf = os.path.abspath("data/ResourceFiles/osdag-latex-env/texmf-dist")
+
+    os.environ["TEXMFHOME"] = texmf
+    os.environ["TEXINPUTS"] = texmf + os.pathsep + os.environ.get("TEXINPUTS", "")
+
+    # Extra safety: explicitly expose Osdag's bundled style packages
+    try:
+        sty_pkgs = str(files("osdag_core.data.ResourceFiles.osdag-latex-env.texmf-dist.tex.latex")).replace("\\", "/")
+        pkg_resources = [
+            f"{sty_pkgs}/amsmath",
+            f"{sty_pkgs}/graphics",
+            f"{sty_pkgs}/needspace",
+        ]
+
+        os.environ["TEXINPUTS"] = ";".join(pkg_resources) + ";" + os.environ["TEXINPUTS"]
+    except Exception:
+        # importlib.resources might fail in some frozen builds; TEXMFHOME is still enough
+        pass
+
+
+PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
+PDFLATEX = get_latex_executable()
 
 class OurLog(logging.Handler):
 
@@ -72,7 +112,14 @@ class OurLog(logging.Handler):
             msg = "<span style='color: red;'>"+ msg +"</span>"
         elif record.levelname == 'INFO':
             msg = "<span style='color: green;'>" + msg + "</span>"
-        self.key.append(msg)
+        # Safety check: ensure QTextEdit is not deleted before appending
+        try:
+            if self.key is not None:
+                self.key.append(msg)
+        except RuntimeError:
+            # QTextEdit C++ object has been deleted - skip appending
+            pass
+
 
 
 def connectdb1():
@@ -374,17 +421,17 @@ KEY_MODULE_STATUS = 'Module.Status'
 
 TYPE_MODULE = 'Window Title'
 
-KEY_DISP_FINPLATE = 'FinPlateConnection'
+KEY_DISP_FINPLATE = 'Fin Plate Connection'
 KEY_DISP_ENDPLATE = 'End Plate Connection'
 KEY_DISP_CLEATANGLE = 'Cleat Angle Connection'
-KEY_DISP_SEATED_ANGLE = 'SeatedAngleConnection'
+KEY_DISP_SEATED_ANGLE = 'Seated Angle Connection'
 KEY_DISP_BASE_PLATE = 'Base Plate Connection'
 KEY_DISP_TRUSS_BOLTED = 'Truss Connection Bolted'
 
 KEY_DISP_BEAMCOVERPLATE = 'Beam-to-Beam Cover Plate Bolted Connection'
-KEY_DISP_COLUMNCOVERPLATE = 'Column-to-Column-Cover-Plate-Bolted-Connection'
+KEY_DISP_COLUMNCOVERPLATE = 'Column-to-Column Cover Plate Bolted Connection'
 KEY_DISP_BEAMCOVERPLATEWELD = 'Beam-to-Beam Cover Plate Welded Connection'
-KEY_DISP_COLUMNCOVERPLATEWELD = 'Column-to-Column-Cover-Plate-Welded-Connection'
+KEY_DISP_COLUMNCOVERPLATEWELD = 'Column-to-Column Cover Plate Welded Connection'
 KEY_DISP_LAPJOINTBOLTED = 'Lap Joint Bolted Connection'
 KEY_DISP_LAPJOINTWELDED = 'Lap Joint Welded Connection'
 KEY_DISP_BUTTJOINTBOLTED = 'Butt Joint Bolted Connection'
@@ -395,7 +442,6 @@ KEY_DESIGN_FOR = 'Design.For'
 KEY_DISP_DESIGN_FOR = 'Design For'
 KEY_AXIAL_FORCE = 'Load.Axial.Force'  # If not using existing KEY_AXIAL
 KEY_DISP_AXIAL_FORCE = 'Axial Force (kN)'
-
 
 # MADE THIS t.s.
 KEY_DISP_BUTTJOINTWELDED = 'Butt Joint Welded Connection'
@@ -423,7 +469,7 @@ KEY_OUT_DISP_WELD_STRENGTH_kN = 'Strength (kN)'
 
 
 # KEY_DISP_BEAMENDPLATE = 'Beam End Plate Connection'
-KEY_DISP_COLUMNENDPLATE = 'Column-to-Column-End-Plate-Connectionn'
+KEY_DISP_COLUMNENDPLATE = 'Column-to-Column End Plate Connection'
 KEY_DISP_BCENDPLATE = 'Beam-to-Column End Plate Connection'
 KEY_DISP_TENSION_BOLTED = 'Tension Member Design - Bolted to End Gusset'
 KEY_DISP_TENSION_WELDED = 'Tension Member Design - Welded to End Gusset'
@@ -435,7 +481,8 @@ DISP_TITLE_CM = 'Connecting Members'
 
 # Compression Members
 KEY_DISP_COMPRESSION_COLUMN = 'Columns with known support conditions'
-KEY_DISP_COMPRESSION_Strut = 'Struts in Trusses'
+KEY_DISP_STRUT_WELDED_END_GUSSET = 'Struts Welded to End Gusset'
+KEY_DISP_STRUT_BOLTED_END_GUSSET = 'Struts Bolted to End Gusset'
 KEY_SECTION_PROPERTY = 'Section Property'
 KEY_SECTION_DATA = 'Section Data'
 KEY_MEMBER_PROPERTY = 'Member Property'
@@ -537,7 +584,7 @@ KEY_DISP_REDUCE_STRENGTH_MOMENT = 'Reduced Moment Strength (kNm)'
 KEY_EULER_BUCKLING_STRESS = 'MajorBucklingStress'
 KEY_DISP_EULER_BUCKLING_STRESS = 'Buckling Stress (MPa)' # Euler 
 KEY_EFF_SEC_AREA = 'MajorEffSecArea'
-KEY_DISP_EFF_SEC_AREA = 'Eff. Sectional Area (mm<sup>2</sup>)' # ective
+KEY_DISP_EFF_SEC_AREA = 'Eff. Sectional Area (cm<sup>2</sup>)' # ective
 KEY_EFF_LEN = 'Major.Effective_Length'
 KEY_DISP_EFF_LEN = 'Eff. Length (m)' # ective
 KEY_BUCKLING_CURVE = 'BucklingCurve'
@@ -563,6 +610,7 @@ Buckling_Type = 'Type of Buckling'
 End_Connection_title = 'End Connection Details'
 KEY_COMP_STRESS = 'MinorDCS'
 KEY_DISP_COMP_STRESS = 'Compressive Stress (MPa)'
+KEY_DISP_DESIGN_BENDING_STRENGTH = 'Design Bending Strength (kNm)'
 
 KEY_Buckling_Out_plane = ' Out_of_Plane'
 KEY_Buckling_In_plane =  ' In_Plane'
@@ -571,9 +619,9 @@ Buckling_In_plane =  ' In Plane'
 Load_type1 = 'Concentric Load'
 Load_type2 = 'Leg Load'
 Strut_load = list((Load_type1, Load_type2))
-IMG_STRUT_1 = str(_get_resource_path("images", "bA.png"))
-IMG_STRUT_2 = str(_get_resource_path("images", "bBBA.png"))
-IMG_STRUT_3 = str(_get_resource_path("images", "back_back_same_side_angles.png"))
+IMG_STRUT_1 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bA.png"))
+IMG_STRUT_2 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bBBA.png"))
+IMG_STRUT_3 = str(files("osdag_core.data.ResourceFiles.images").joinpath("back_back_same_side_angles.png"))
 VALUES_IMG_STRUT = list(( IMG_STRUT_1, IMG_STRUT_2, IMG_STRUT_3))
 KEY_BOLT_Number = 'Bolt.Number'
 Strut_Bolt_Number = 'Number of Bolts'
@@ -583,10 +631,10 @@ Profile_name_3 = 'Back to Back Angles - Opposite side of gusset'
 loc_type1 = 'Long Leg'
 loc_type2 = 'Short Leg'
 VALUES_SEC_PROFILE_Compression_Strut = list((Profile_name_1, Profile_name_2, Profile_name_3)) #other sections can be added later the elements and not before 'Star Angles', 'Channels', 'Back to Back Channels'
-Profile_2_img1 = str(_get_resource_path("images", "bblssg_eq.png")) # Back to back Long leg on same side of gusset for equal angle
-Profile_2_img2 = str(_get_resource_path("images", "bbsssg_eq.png"))# Back to back short leg on same side of gusset for equal angle
-Profile_2_img3 = str(_get_resource_path("images", "bblssg_ueq.png"))# Back to back Long leg on same side of gusset for unequal angle
-Profile_2_img4 = str(_get_resource_path("images", "bbsssg_ueq.png"))# Back to back short leg on same side of gusset for unequal angle
+Profile_2_img1 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bblssg_eq.png")) # Back to back Long leg on same side of gusset for equal angle
+Profile_2_img2 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bbsssg_eq.png"))# Back to back short leg on same side of gusset for equal angle
+Profile_2_img3 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bblssg_ueq.png"))# Back to back Long leg on same side of gusset for unequal angle
+Profile_2_img4 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bbsssg_ueq.png"))# Back to back short leg on same side of gusset for unequal angle
 
 KEY_ALLOW_CLASS1 = 'Optimum.Class1'
 KEY_DISP_CLASS1 = 'Choose Plastic sections'
@@ -630,7 +678,7 @@ KEY_DISP_BUCKLING_STRENGTH= 'Buckling Strength (kN)'
 KEY_WEB_CRIPPLING= 'Crippling.Strength'
 KEY_DISP_CRIPPLING_STRENGTH = 'Crippling Strength (kN)'
 KEY_DISP_LTB= 'Lateral Torsional Buckling Details'
-KEY_DISP_Elastic_CM= 'Critical Moment (M<sub>cr</sub>)'# Elastic
+KEY_DISP_Elastic_CM= 'Critical Moment (M<sub>cr</sub>) (kNm)'# Elastic
 KEY_DISP_Elastic_CM_YY= 'Critical Moment (y-y) (M<sub>cr</sub>)'
 KEY_DISP_Elastic_CM_ZZ= 'Critical Moment (z-z) (M<sub>cr</sub>)'
 KEY_DISP_Elastic_CM_latex= 'Elastic Critical Moment(kNm)' #
@@ -649,9 +697,9 @@ KEY_NON_DIM_ESR_LTB = 'NDESR.LTB'
 KEY_WEB_BUCKLING= 'Web Buckling Details'
 KEY_WEB_RESISTANCE= 'Web Resistance Details'
 KEY_BEARING_LENGTH = 'Bearing.Length'
-Simply_Supported_img = str(_get_resource_path("images", "ss_beam.png"))
-Cantilever_img = str(_get_resource_path("images", "c_beam.png"))
-Purlin_img = str(_get_resource_path("images", "purlin.jpg"))
+Simply_Supported_img = str(files("osdag_core.data.ResourceFiles.images").joinpath("ss_beam.png"))
+Cantilever_img = str(files("osdag_core.data.ResourceFiles.images").joinpath("c_beam.png"))
+Purlin_img = str(files("osdag_core.data.ResourceFiles.images").joinpath("purlin.jpg"))
 KEY_LENGTH_OVERWRITE = 'Length.Overwrite'
 KEY_DISPP_LENGTH_OVERWRITE = 'Effective Length Parameter'
 KEY_DISP_BEAM_MOMENT = 'Bending Moment (kNm)(M<sub>z-z</sub>)'
@@ -750,11 +798,11 @@ KEY_DISP_r_eff_latex = '$r_{eff}$web'
 KEY_DISP_K_v_latex = '$K_{v}$'
 KEY_DISP_Elastic_Critical_shear_stress_web = 'Elastic Critical Shear Stress Web($N/mm^2$)' #(\tau_{crc})
 KEY_DISP_Transverse_Stiffener_spacing = 'Spacing of Transverse Stiffeners(c)(mm)'
-KEY_DISP_slenderness_ratio_web = 'Web Slenderness ratio($\lambda_w$)'
+KEY_DISP_slenderness_ratio_web = r'Web Slenderness ratio($\lambda_w$)'
 KEY_DISP_BUCKLING_STRENGTH= 'Buckling Resistance (kN)'
 KEY_DISP_reduced_moment= 'Reduced moment (Nmm)'
 # KEY_DISP_reduced_moment= 'Reduced moment (N_f)'
-KEY_DISP_tension_field_incline= 'Tension field inclination($\phi$)'
+KEY_DISP_tension_field_incline= r'Tension field inclination($\phi$)'
 KEY_DISP_Yield_Strength_Tension_field = 'Yield Strength of Tension field(f_v)($N/mm^2$)'
 KEY_DISP_AnchoragelengthTensionField= 'Anchorage length of Tension Field(s)(mm)'
 KEY_DISP_WidthTensionField= 'Width of Tension Field($w_{tf}$)'
@@ -777,17 +825,19 @@ KEY_IntermediateStiffener = 'IntermediateStiffener.Data'
 KEY_DISP_IntermediateStiffener = 'Intermediate Stiffener'
 KEY_DISP_Plate_Girder_PROFILE = 'Section Profile'
 KEY_IntermediateStiffener_spacing = 'IntermediateStiffener.Spacing'
-KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing'
+KEY_DISP_IntermediateStiffener_spacing = 'Intermediate Stiffener Spacing (mm)'
 KEY_LongitudnalStiffener = 'LongitudnalStiffener.Data'
 KEY_LongitudnalStiffener_thickness = 'LongitudnalStiffner.Thickness'
+KEY_LongitudnalStiffener_thickness_val = 'LongitudnalStiffner.Thickness.val'
 KEY_DISP_LongitudnalStiffener = 'Longitudnal Stiffener'
-KEY_DISP_LongitudnalStiffener_thickness = 'Longitudnal Stiffener Thickness'
+KEY_DISP_LongitudnalStiffener_thickness = 'Longitudnal Stiffener Thickness (mm)'
 KEY_IntermediateStiffener_thickness = 'IntermediateStiffener.Thickness'
-KEY_DISP_IntermediateStiffener_thickness = 'Intermediate Stiffener Thickness'
+KEY_IntermediateStiffener_thickness_val = 'IntermediateStiffener.Thickness.val'
+KEY_DISP_IntermediateStiffener_thickness = 'Intermediate Stiffener Thickness (mm)'
 KEY_WeldWebtoflange= 'WeldWebtoflange.Data'
-KEY_DISP_WeldWebtoflange= 'Weld for Web to Flange'
+KEY_DISP_WeldWebtoflange= 'Weld for Web to Flange (mm)'
 KEY_WeldStiffenertoweb= 'WeldStiffenertoweb.Data'
-KEY_DISP_WeldStiffenertoweb= 'Weld for Stiffener to Web'
+KEY_DISP_WeldStiffenertoweb= 'Weld for Stiffener to Web (mm)'
 KEY_IS_IT_SYMMETRIC = 'Girder.Symmetry'
 KEY_DISP_IS_IT_SYMMETRIC = 'Symmetry'
 KEY_DISP_SYM = 'Symmetric Girder'
@@ -838,6 +888,9 @@ KEY_DISP_PL_PIN_PIN_PG='Concentrate Load with pinned-pinned support'
 KEY_PL_FIX_FIX_PG= 'PLFIXFIX.Data'
 KEY_DISP_PL_FIX_FIX_PG= 'Concentrate load with fixed-fixed support'
 KEY_DISP_GIRDERSEC = 'Girder Properties'
+DISP_TITLE_MOMENT_DESIGN = 'Moment Design Details'
+DISP_TITLE_SHEAR_DESIGN = 'Shear Design Details'
+DISP_TITLE_DEFLECTION = 'Deflection Check'
 Bending_moment_shape_list= list((KEY_DISP_UDL_PIN_PIN_PG, KEY_DISP_UDL_FIX_FIX_PG, KEY_DISP_PL_PIN_PIN_PG,KEY_DISP_PL_FIX_FIX_PG))
 VALUES_DEPTH_PG = ['Customized','Optimized']
 VALUES_OPT = ['All']
@@ -861,13 +914,25 @@ KEY_MAX_DEFL = 'Deflection.Max'
 KEY_DISP_MAX_DEFL = 'Maximum Deflection'
 VALUES_MAX_DEFL = ['Span/600','Span/800','Span/400','Span/300','Span/360','Span/150','Span/180','Span/240','Span/120','Span/500','Span/750','Span/1000']
 KEY_SUPPORT_WIDTH = 'Support.Width'
-KEY_DISP_SUPPORT_WIDTH = 'Support Width (mm)'
+KEY_DISP_SUPPORT_WIDTH = 'Support Width (mm) *'
+VALUES_STIFFENER_THICKNESS = ['8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63', '75', '80', '90', '100',
+                        '110', '120']
+KEY_EndpanelStiffener_thickness = 'EndpanelStiffener.Thickness'
+KEY_LongitudnalStiffener_numbers = 'LongitudnalStiffener.Numbers'
+KEY_LongitudinalStiffener1_pos = 'LongitudnalStiffener1.Position'
+KEY_DISP_LongitudinalStiffener1_pos = 'Position of Longitudnal Stiffener 1 from NA (mm) '
+KEY_LongitudinalStiffener2_pos = 'LongitudnalStiffener2.Position'
+KEY_DISP_LongitudinalStiffener2_pos = 'Position of Longitudnal Stiffener 2 from NA (mm)'
+KEY_DISP_LongitudnalStiffener_numbers = 'Number of Longitudnal Stiffeners'
+KEY_DISP_EndpanelStiffener_thickness = 'End Panel Stiffener Thickness (mm)'
+KEY_OVERALL_DEPTH_PG_CST = "Overall Depth (D) (mm)"
+KEY_DISP_DESIGN_BENDING_STRENGTH = 'Design Bending Strength (kNm)'
  
 ###################################
 # All Input Keys
 ###################################
 KEY_MODULE = 'Module'
-KEY_CONN = 'Connectivity'
+KEY_CONN = 'Connectivity *'
 KEY_TABLE = 'Table'
 KEY_MEMBERS = 'No of Members'
 KEY_LOCATION = 'Conn_Location'
@@ -1057,20 +1122,20 @@ except Exception as e:
 VALUES_MATERIAL_SELECTED = "E 250 (Fe 410 W)A"
 # VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
 
-VALUES_IMAGE_PLATEGIRDER = [str(_get_resource_path("images", "ULPPS_PG.png")),
-    str(_get_resource_path("images", "ULFFS_PG.png")),
-    str(_get_resource_path("images", "CLPPS_PG.png")),
-    str(_get_resource_path("images", "CLFFS_PG.png")),
-    str(_get_resource_path("images", "CLPPSPB_PG.png"))]
-VALUES_IMG_TENSIONBOLTED = [str(_get_resource_path("images", "bA.png")),str(_get_resource_path("images", "bBBA.png")),str(_get_resource_path("images", "bSA.png")),str(_get_resource_path("images", "bC.png")),str(_get_resource_path("images", "bBBC.png"))]
-VALUES_IMG_TENSIONWELDED = [str(_get_resource_path("images", "wA.png")),str(_get_resource_path("images", "wBBA.png")),str(_get_resource_path("images", "wSA.png")),str(_get_resource_path("images", "wC.png")),str(_get_resource_path("images", "wBBC.png"))]
-VALUES_IMG_TENSIONBOLTED_DF01 = [str(_get_resource_path("images", "equaldp.png")),str(_get_resource_path("images", "bblequaldp.png")),str(_get_resource_path("images", "bbsequaldp.png")),str(_get_resource_path("images", "salequaldp.png")),str(_get_resource_path("images", "sasequaldp.png"))]
-VALUES_IMG_TENSIONBOLTED_DF02 = [str(_get_resource_path("images", "unequaldp.png")),str(_get_resource_path("images", "bblunequaldp.png")),str(_get_resource_path("images", "bbsunequaldp.png")),str(_get_resource_path("images", "salunequaldp.png")),str(_get_resource_path("images", "sasunequaldp.png"))]
+VALUES_IMAGE_PLATEGIRDER = [str(files("osdag_core.data.ResourceFiles.images").joinpath("ULPPS_PG.png")),
+    str(files("osdag_core.data.ResourceFiles.images").joinpath("ULFFS_PG.png")),
+    str(files("osdag_core.data.ResourceFiles.images").joinpath("CLPPS_PG.png")),
+    str(files("osdag_core.data.ResourceFiles.images").joinpath("CLFFS_PG.png")),
+    str(files("osdag_core.data.ResourceFiles.images").joinpath("CLPPSPB_PG.png"))]
+VALUES_IMG_TENSIONBOLTED = [str(files("osdag_core.data.ResourceFiles.images").joinpath("bA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bBBA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bSA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bC.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bBBC.png"))]
+VALUES_IMG_TENSIONWELDED = [str(files("osdag_core.data.ResourceFiles.images").joinpath("wA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("wBBA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("wSA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("wC.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("wBBC.png"))]
+VALUES_IMG_TENSIONBOLTED_DF01 = [str(files("osdag_core.data.ResourceFiles.images").joinpath("equaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bblequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bbsequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("salequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("sasequaldp.png"))]
+VALUES_IMG_TENSIONBOLTED_DF02 = [str(files("osdag_core.data.ResourceFiles.images").joinpath("unequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bblunequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bbsunequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("salunequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("sasunequaldp.png"))]
 
-VALUES_IMG_TENSIONBOLTED_DF03 = [str(_get_resource_path("images", "Slope_Channel.png")),str(_get_resource_path("images", "Parallel_Channel.png")),str(_get_resource_path("images", "Slope_BBChannel.png")),str(_get_resource_path("images", "Parallel_BBChannel.png"))]
+VALUES_IMG_TENSIONBOLTED_DF03 = [str(files("osdag_core.data.ResourceFiles.images").joinpath("Slope_Channel.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("Parallel_Channel.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("Slope_BBChannel.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("Parallel_BBChannel.png"))]
 
-VALUES_IMG_BEAM = [str(_get_resource_path("images", "Slope_Beam.png")),str(_get_resource_path("images", "Parallel_Beam.png"))]
-VALUES_IMG_HOLLOWSECTION = [str(_get_resource_path("images", "SHS.png")),str(_get_resource_path("images", "RHS.png")),str(_get_resource_path("images", "CHS.png"))]
+VALUES_IMG_BEAM = [str(files("osdag_core.data.ResourceFiles.images").joinpath("Slope_Beam.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("Parallel_Beam.png"))]
+VALUES_IMG_HOLLOWSECTION = [str(files("osdag_core.data.ResourceFiles.images").joinpath("SHS.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("RHS.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("CHS.png"))]
 
 
 ############################
@@ -1166,6 +1231,7 @@ KEY_DISP_MEMBERS = 'No of Members'
 #lapjointbolted
 KEY_PLATE1_THICKNESS = "Plate1Thickness"
 KEY_PLATE2_THICKNESS = "Plate2Thickness" 
+KEY_PLATEC_THICKNESS = "PlatecThickness" 
 KEY_PLATE_WIDTH = "PlateWidth"
 KEY_DISP_PLATE1_THICKNESS = "Thickness of Plate-1 (mm) *"
 KEY_DISP_PLATE2_THICKNESS = "Thickness of Plate-2 (mm) *"
@@ -1520,7 +1586,7 @@ KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG Bolt:'
 
 
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip Factor, (mu<sub>f</sub>)'
-KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT = 'Slip Factor, ($\mu_{f}$)'
+KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT = r'Slip Factor, ($\mu_{f}$)'
 KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
 KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
 KEY_DISP_GAMMA_M0 = "Governed by Yielding"
@@ -1960,9 +2026,10 @@ KEY_DISP_EDGEDIST_W = 'Edge Distance (mm)'
 KEY_WEB_CAPACITY ='section.web_capacities'
 KEY_DISP_WEB_CAPACITY ='Capacity'
 
-# SimpleConnection(Tension+Compression)
+#SimpleConnection(Tension+Compression)
 KEY_OUT_DESIGN_FOR = "Design For" 
 KEY_OUT_DISP_DESIGN_FOR = "Design For"
+
 
 # Web plate
 KEY_REDUCTION_FACTOR_WEB ='web_plate.red,factor'
@@ -2572,8 +2639,6 @@ KEY_DISP_LEN_INLINE = 'Total Length in line with tension'
 KEY_LEN_OPPLINE = 'Total length opp line with tension'
 KEY_DISP_LEN_OPPLINE = 'Total Length opp line with tension'
 
-
-# VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 try:
   VALUES_ANGLESEC_CUSTOMIZED= connectdb("Angles", call_type="popup")
 except Exception as e:
@@ -2596,8 +2661,6 @@ def get_available_cleat_list(input_angle_list, max_leg_length=math.inf, min_leg_
         if operator.le(max(leg_a_length,leg_b_length),max_leg_length_outer) and operator.ge(min(leg_a_length,leg_b_length), min_leg_length_outer) and leg_a_length==leg_b_length:
             # print("appended", designation)
             available_angles.append(designation)
-        # else:
-            # print("popped",designation)
     return available_angles
 
 
@@ -2629,6 +2692,9 @@ except Exception as e:
     all_angles = []
 
 VALUES_CLEAT_CUSTOMIZED = get_available_cleat_list(all_angles, 200.0, 50.0)
+# print(all_angles)
+# print("customised")
+# print(VALUES_CLEAT_CUSTOMIZED)
 
 BOLT_DESCRIPTION = str("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
                 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
