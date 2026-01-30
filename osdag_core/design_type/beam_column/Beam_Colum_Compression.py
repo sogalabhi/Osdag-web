@@ -237,7 +237,8 @@ class ColumnDesign(Member):
 
     # Setting up logger and Input and Output Docks
     ####################################
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_COMPRESSION_COLUMN
 
     def set_osdaglogger(key):
@@ -330,9 +331,9 @@ class ColumnDesign(Member):
 
         return options_list
 
-    def fn_profile_section(self):
+    def fn_profile_section(self, arg):
 
-        profile = self[0]
+        profile = arg[0]
         if profile == 'Beams':
             return connectdb("Beams", call_type="popup")
         elif profile == 'Columns':
@@ -348,9 +349,9 @@ class ColumnDesign(Member):
         elif profile in ['Channels', 'Back to Back Channels']:
             return connectdb("Channels", call_type= "popup")
 
-    def fn_end1_end2(self):
+    def fn_end1_end2(self, arg):
 
-        end1 = self[0]
+        end1 = arg[0]
         if end1 == 'Fixed':
             return VALUES_END2
         elif end1 == 'Free':
@@ -360,21 +361,21 @@ class ColumnDesign(Member):
         elif end1 == 'Roller':
             return ['Fixed', 'Hinged']
 
-    def fn_end1_image(self):
+    def fn_end1_image(self, arg):
 
-        if self == 'Fixed':
+        if arg == 'Fixed':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("6.RRRR.PNG"))
-        elif self == 'Free':
+        elif arg == 'Free':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("1.RRFF.PNG"))
-        elif self == 'Hinged':
+        elif arg == 'Hinged':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("5.RRRF.PNG"))
-        elif self == 'Roller':
+        elif arg == 'Roller':
             return str(files("osdag_core.data.ResourceFiles.images").joinpath("4.RRFR.PNG"))
 
-    def fn_end2_image(self):
+    def fn_end2_image(self, arg):
 
-        end1 = self[0]
-        end2 = self[1]
+        end1 = arg[0]
+        end2 = arg[1]
 
         if end1 == 'Fixed':
             if end2 == 'Fixed':
