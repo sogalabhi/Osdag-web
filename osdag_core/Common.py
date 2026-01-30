@@ -43,7 +43,24 @@ def _get_resource_str(*path_parts):
 PATH_TO_DATABASE = _get_resource_path("data", "ResourceFiles", "Database", "Intg_osdag.sqlite")
 PDFLATEX = "pdflatex"
 
-import sqlite3
+        if system_pdflatex:
+            return os.path.abspath(system_pdflatex)
+        else:
+            raise FileNotFoundError("LaTeX environment not found. Please ensure that the osdag-latex-env directory exists or that pdflatex is installed on your system.")  
+    else:
+        if sys.platform.startswith("win"):
+            latex_executable = os.path.join(latex_env, "bin", "windows", "pdflatex.exe")
+            return latex_executable
+        else:   # Linux / Unix / macOS
+            system_pdflatex = shutil.which("pdflatex")
+            if system_pdflatex:
+                return os.path.abspath(system_pdflatex)
+            else:
+                raise FileNotFoundError("pdflatex not found in system PATH. Please install TeXLive.")
+  
+def configure_latex_runtime_windows():
+    if not sys.platform.startswith("win"):
+        return
 
 from .utils.common.other_standards import *
 # This returns the documents directory path for the current user
