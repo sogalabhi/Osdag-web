@@ -301,7 +301,7 @@ export const useEngineeringService = () => {
    */
   const saveOSIFromInputs = useCallback(async (name, moduleId, inputs, inline = false) => {
     try {
-      const response = await apiCall('save-osi-from-inputs/', {
+      const response = await apiCall('api/save-osi-from-inputs/', {
         method: 'POST',
         body: JSON.stringify({
           name,

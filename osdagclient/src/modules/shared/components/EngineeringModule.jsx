@@ -909,6 +909,7 @@ export const EngineeringModule = ({
               setSelectedOption={(value) =>
                 setExtraState({ ...extraState, selectedOption: value })
               }
+              cadModelPaths={cadModelPaths}
             />
           ))}
 
