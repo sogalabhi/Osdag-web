@@ -285,7 +285,7 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
 def create_module() -> BeamBeamEndPlateSplice:
     """Create an instance of the beambeam end plate connection module design class and set it up for use"""
     module = BeamBeamEndPlateSplice()  # Create an instance of the BeamBeamEndPlateConnection
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     return module
 
 

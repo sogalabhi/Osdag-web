@@ -199,7 +199,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
 def create_module() -> ColumnCoverPlate:
     """Create an instance of the ColumnCoverPlate module design class and set it up for use"""
     module = ColumnCoverPlate()  # Create an instance of the ColumnCoverPlate
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     return module
 
 

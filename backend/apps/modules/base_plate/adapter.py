@@ -78,7 +78,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
 def create_module() -> BasePlateConnection:
     """Create an instance of the BasePlateConnection module design class and set it up for use"""
     module = BasePlateConnection()
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     return module
 
 

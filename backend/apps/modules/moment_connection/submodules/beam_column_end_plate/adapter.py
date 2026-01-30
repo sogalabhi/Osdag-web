@@ -406,7 +406,7 @@ def create_module() -> BeamColumnEndPlate:
     try:
         module = BeamColumnEndPlate()  # Create an instance of the BeamColumnEndPlate
         logger.debug("BeamColumnEndPlate instance created successfully")
-        module.set_osdaglogger(None)
+        module.set_osdaglogger(None, id="web")
         logger.debug("OSDAGLogger set to None")
         return module
     except Exception as e:

@@ -74,7 +74,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     logs = []
     try:
         module = LapJointWelded()
-        module.set_osdaglogger(None)
+        module.set_osdaglogger(None, id="web")
 
         validate_input(input_values)
         module.set_input_values(input_values)
@@ -154,7 +154,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         raise InvalidInputTypeError("section", "'Model', 'Column', 'Plate'")
 
     module = LapJointWelded()
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     validate_input(input_values)
     module.set_input_values(input_values)
     if getattr(module, "module", None) != KEY_DISP_LAPJOINTWELDED:

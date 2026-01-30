@@ -143,7 +143,7 @@ def create_module() -> BeamCoverPlateWeld:
     """Create an instance of the cover plate welded connection module design class and set it up for use"""
     module = BeamCoverPlateWeld()
     print('MODULE', module) # Create module instance.
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     return module
 
 

@@ -142,7 +142,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
 def create_module() -> ColumnCoverPlateWeld:
     """Create an instance of the column cover plate welded connection module design class and set it up for use"""
     module = ColumnCoverPlateWeld()
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     return module
 
 

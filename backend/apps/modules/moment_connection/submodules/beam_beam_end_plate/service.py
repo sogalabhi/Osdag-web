@@ -16,7 +16,7 @@ class BeamBeamEndPlateService:
         model = BeamBeamEndPlateSplice()
         # Initialize logger to avoid NoneType errors on .info usage
         if hasattr(model, "set_osdaglogger"):
-            model.set_osdaglogger(None)
+            model.set_osdaglogger(None, id="web")
         model.set_input_values(inputs)
         output, logs = generate_output(inputs)
         return {

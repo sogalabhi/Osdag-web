@@ -68,7 +68,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     
     try:
         module = ButtJointBolted()
-        module.set_osdaglogger(None)
+        module.set_osdaglogger(None, id="web")
 
         validate_input(input_values)
         module.set_input_values(input_values)
