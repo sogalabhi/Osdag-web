@@ -996,7 +996,29 @@ class FinPlateConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self,popup_summary):
+        print(f"\n[FinPlateConnection.save_design] Called with popup_summary keys: {list(popup_summary.keys())[:10]}")
+        print(f"[FinPlateConnection.save_design] Before super().save_design():")
+        print(f"   self.module: {self.module}")
+        print(f"   self.mainmodule: {getattr(self, 'mainmodule', 'N/A')}")
+        print(f"   self.connectivity: {getattr(self, 'connectivity', 'N/A')}")
+        print(f"   hasattr(self, 'report_input'): {hasattr(self, 'report_input')}")
+        print(f"   hasattr(self, 'load'): {hasattr(self, 'load')}")
+        print(f"   hasattr(self, 'bolt'): {hasattr(self, 'bolt')}")
+        print(f"   hasattr(self, 'supported_section'): {hasattr(self, 'supported_section')}")
+        print(f"   hasattr(self, 'supporting_section'): {hasattr(self, 'supporting_section')}")
+        
+        from osdag_core.Common import KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE
+        print(f"   KEY_DISP_FINPLATE: '{KEY_DISP_FINPLATE}'")
+        print(f"   self.module == KEY_DISP_FINPLATE: {self.module == KEY_DISP_FINPLATE}")
+        
         super(FinPlateConnection,self).save_design()
+        
+        print(f"[FinPlateConnection.save_design] After super().save_design():")
+        print(f"   hasattr(self, 'report_input'): {hasattr(self, 'report_input')}")
+        if hasattr(self, 'report_input'):
+            print(f"   self.report_input keys: {list(self.report_input.keys())[:10]}")
+        else:
+            print(f"   ❌ ERROR: report_input was not set by parent save_design()!")
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
 
         self.report_check = []

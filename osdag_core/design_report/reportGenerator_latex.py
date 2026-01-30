@@ -19,6 +19,7 @@ from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, Medium
 from importlib.resources import files
 from ..Report_functions import *
 from ..utils.common.common_calculation import *
+from ..Common import _get_resource_path
 # from ..Common import *
 # from ..utils.common import component
 
@@ -38,8 +39,9 @@ class CreateLatex(Document):
         client = str(reportsummary['Client'])
 
         does_design_exist = reportsummary['does_design_exist']
-        pkg_images = files("osdag_core.data.ResourceFiles.images")
-        imgpath_osdagheader = str(pkg_images.joinpath("Osdag_header_report.png")).replace("\\", "/")
+        # Use _get_resource_path helper with fallback for importlib.resources issues
+        pkg_images = _get_resource_path("data", "ResourceFiles", "images")
+        imgpath_osdagheader = str(pkg_images / "Osdag_header_report.png").replace("\\", "/")
         # Add document header
         geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
         doc = Document(geometry_options=geometry_options, indent=False)
@@ -114,7 +116,7 @@ class CreateLatex(Document):
                             sectiondetails = uiObj[i]
                             image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
 
-                            Img_path = str(pkg_images.joinpath(image_name + ".png")).replace("\\", "/")
+                            Img_path = str(pkg_images / (image_name + ".png")).replace("\\", "/")
                             if (len(sectiondetails))% 2 == 0:
                             # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
                                 merge_rows = int((len(sectiondetails)/2)) +2
@@ -308,7 +310,7 @@ class CreateLatex(Document):
                                     table.add_hline()
                                     sectiondetails = uiObj[i]
                                     image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
-                                    Img_path = str(pkg_images.joinpath(image_name + ".png")).replace("\\", "/")
+                                    Img_path = str(pkg_images / (image_name + ".png")).replace("\\", "/")
                                     if (len(sectiondetails)) % 2 == 0:
                                         # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
                                         merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 2)
@@ -492,7 +494,7 @@ class CreateLatex(Document):
                 #     view_3D.add_caption('3D View')
         else:
             doc.append(NewPage())
-            imgpath_broken = pkg_images.joinpath("broken.png")
+            imgpath_broken = pkg_images / "broken.png"
             view_3dimg_path = imgpath_broken
             view_topimg_path = imgpath_broken
             view_sideimg_path = imgpath_broken
@@ -516,17 +518,28 @@ class CreateLatex(Document):
 
         with doc.create(Section('Design Log')):
             doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
-            logger_msgs=reportsummary['logger_messages'].split('\n')
+            logger_raw = reportsummary.get('logger_messages', '')
+            # Ensure we always have a string to work with
+            if isinstance(logger_raw, list):
+                logger_raw = "\n".join(str(x) for x in logger_raw)
+            logger_msgs = str(logger_raw).split('\n')
+
             for msg in logger_msgs:
-                if('WARNING' in msg):
-                    colour='blue'
-                elif('INFO' in msg):
-                    colour='OsdagGreen'
-                elif('ERROR' in msg):
-                    colour='red'
-                else:
+                # Skip completely empty lines
+                if not msg or not str(msg).strip():
                     continue
-                doc.append(TextColor(colour,'\n'+msg))
+
+                msg_str = str(msg)
+                msg_lower = msg_str.lower()
+
+                # Default colour
+                colour = 'OsdagGreen'
+                if 'warning' in msg_lower:
+                    colour = 'blue'
+                elif 'error' in msg_lower:
+                    colour = 'red'
+
+                doc.append(TextColor(colour, '\n' + msg_str))
         try:
             print(f"Attempting PDF generation...")
             

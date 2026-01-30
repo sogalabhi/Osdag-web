@@ -320,40 +320,96 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
 
 def create_module() -> FinPlateConnection:
     """Create an instance of the FinPlateConnection module design class and set it up for use"""
-    module = FinPlateConnection()  # Create an instance of the FinPlateConnection
-    module.set_osdaglogger(None, id="web")
-    return module
+    print("\n[create_module] Creating FinPlateConnection instance...")
+    try:
+        module = FinPlateConnection()  # Create an instance of the FinPlateConnection
+        print(f"   ✅ FinPlateConnection instance created: {id(module)}")
+        
+        print(f"   Setting logger with id='web'...")
+        module.set_osdaglogger(None, id="web")
+        print(f"   ✅ Logger set successfully")
+        print(f"   Logger name: {getattr(module.logger, 'name', 'N/A') if hasattr(module, 'logger') else 'No logger'}")
+        
+        return module
+    except Exception as e:
+        print(f"   ❌ ERROR in create_module: {type(e).__name__}: {e}")
+        traceback.print_exc()
+        raise
 
 
 def create_from_input(input_values: Dict[str, Any]) -> FinPlateConnection:
     """Create an instance of the beam beam end plate connection module design class from input values."""
-    # validate_input(input_values)
+    print("\n" + "=" * 60)
+    print("create_from_input() called")
+    print("=" * 60)
+    print(f"Input values received: {len(input_values)} keys")
+    print(f"Sample keys: {list(input_values.keys())[:5]}")
+    
     module = None
+    print("\n[create_from_input] Step 1: Creating module instance...")
     try:
         module = create_module()  # Create module instance.
+        print(f"✅ Module created successfully: {type(module).__name__}")
+        print(f"   Module ID: {id(module)}")
     except Exception as e:
-        print('e in create_module : ', e)
+        print(f"❌ ERROR in create_module: {type(e).__name__}: {e}")
         print('error in creating module')
+        traceback.print_exc()
         raise
     
     # Map frontend keys to osdag_core keys
     # Frontend sends 'Connectivity' but osdag_core expects 'Connectivity *' (KEY_CONN)
+    print(f"\n[create_from_input] Step 2: Mapping frontend keys to osdag_core keys...")
+    print(f"   KEY_CONN constant value: '{KEY_CONN}'")
+    print(f"   'Connectivity' in input_values: {'Connectivity' in input_values}")
+    print(f"   KEY_CONN in input_values: {KEY_CONN in input_values}")
+    
     design_dictionary = input_values.copy()
     if 'Connectivity' in design_dictionary and KEY_CONN not in design_dictionary:
-        design_dictionary[KEY_CONN] = design_dictionary.pop('Connectivity')
+        connectivity_value = design_dictionary.pop('Connectivity')
+        design_dictionary[KEY_CONN] = connectivity_value
+        print(f"   ✅ Mapped 'Connectivity' -> '{KEY_CONN}'")
+        print(f"   Connectivity value: '{connectivity_value}'")
+    else:
+        print(f"   ℹ️  No mapping needed (Connectivity already mapped or not present)")
+        if KEY_CONN in design_dictionary:
+            print(f"   KEY_CONN value: '{design_dictionary[KEY_CONN]}'")
+    
+    print(f"   Final design_dictionary has {len(design_dictionary)} keys")
+    print(f"   Key check - KEY_CONN present: {KEY_CONN in design_dictionary}")
     
     # Set the input values on the module instance.
+    print(f"\n[create_from_input] Step 3: Setting input values on module...")
+    print(f"   Module is None: {module is None}")
     try:
-        print(input_values)
         if module is None:
             raise RuntimeError('Module instance was not created')
+        
+        print(f"   Calling module.set_input_values() with {len(design_dictionary)} keys...")
+        print(f"   Sample keys being passed: {list(design_dictionary.keys())[:5]}")
+        
         module.set_input_values(design_dictionary)
+        print(f"   ✅ set_input_values() completed successfully")
+        
+        # Verify key was set correctly
+        if hasattr(module, 'connectivity'):
+            print(f"   ✅ Module connectivity attribute: '{module.connectivity}'")
+        else:
+            print(f"   ⚠️  Module has no 'connectivity' attribute")
+            
     except Exception as e:
+        print(f"\n❌ ERROR in set_input_values:")
+        print(f"   Exception type: {type(e).__name__}")
+        print(f"   Exception message: {str(e)}")
+        print(f"   Design dictionary keys: {list(design_dictionary.keys())[:10]}")
+        print(f"   KEY_CONN in design_dictionary: {KEY_CONN in design_dictionary}")
+        if KEY_CONN in design_dictionary:
+            print(f"   KEY_CONN value: '{design_dictionary[KEY_CONN]}'")
         traceback.print_exc()
-        print('e in set_input_values : ', e)
         print('error in setting the input values')
         raise
 
+    print("=" * 60)
     return module
 
 
@@ -389,34 +445,81 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     
     try:
         print("\n[Step 2] Calling module.output_values(True)...")
-        raw_output_text = module.output_values(True)
-        print(f"✅ output_values() returned {len(raw_output_text)} parameters")
+        print(f"   Module type: {type(module)}")
+        print(f"   Module has output_values method: {hasattr(module, 'output_values')}")
+        try:
+            raw_output_text = module.output_values(True)
+            print(f"✅ output_values() returned {len(raw_output_text)} parameters")
+            if len(raw_output_text) > 0:
+                print(f"   First parameter sample: {raw_output_text[0] if isinstance(raw_output_text[0], (list, tuple)) else 'N/A'}")
+        except Exception as e:
+            print(f"❌ ERROR in output_values(): {type(e).__name__}: {e}")
+            traceback.print_exc()
+            raise
         
         print("\n[Step 3] Calling module.spacing(True)...")
-        raw_output_spacing = module.spacing(True)
-        print(f"✅ spacing() returned {len(raw_output_spacing)} parameters")
+        print(f"   Module has spacing method: {hasattr(module, 'spacing')}")
+        try:
+            raw_output_spacing = module.spacing(True)
+            print(f"✅ spacing() returned {len(raw_output_spacing)} parameters")
+            if len(raw_output_spacing) > 0:
+                print(f"   First spacing parameter: {raw_output_spacing[0] if isinstance(raw_output_spacing[0], (list, tuple)) else 'N/A'}")
+        except Exception as e:
+            print(f"❌ ERROR in spacing(): {type(e).__name__}: {e}")
+            print(f"   Error details: {str(e)}")
+            traceback.print_exc()
+            raise
         
         print("\n[Step 4] Calling module.capacities(True)...")
-        raw_output_capacities = module.capacities(True)
-        print(f"✅ capacities() returned {len(raw_output_capacities)} parameters")
+        print(f"   Module has capacities method: {hasattr(module, 'capacities')}")
+        try:
+            raw_output_capacities = module.capacities(True)
+            print(f"✅ capacities() returned {len(raw_output_capacities)} parameters")
+            if len(raw_output_capacities) > 0:
+                print(f"   First capacity parameter: {raw_output_capacities[0] if isinstance(raw_output_capacities[0], (list, tuple)) else 'N/A'}")
+        except Exception as e:
+            print(f"❌ ERROR in capacities(): {type(e).__name__}: {e}")
+            traceback.print_exc()
+            raise
         
         print("\n[Step 5] Calling module.section_capacities(True)...")
-        raw_output_section_capacities = module.section_capacities(True)
-        print(f"✅ section_capacities() returned {len(raw_output_section_capacities)} parameters")
+        print(f"   Module has section_capacities method: {hasattr(module, 'section_capacities')}")
+        try:
+            raw_output_section_capacities = module.section_capacities(True)
+            print(f"✅ section_capacities() returned {len(raw_output_section_capacities)} parameters")
+            if len(raw_output_section_capacities) > 0:
+                print(f"   First section_capacity parameter: {raw_output_section_capacities[0] if isinstance(raw_output_section_capacities[0], (list, tuple)) else 'N/A'}")
+        except Exception as e:
+            print(f"❌ ERROR in section_capacities(): {type(e).__name__}: {e}")
+            traceback.print_exc()
+            raise
         
         print("\n[Step 6] Retrieving logs from logger...")
         # Get logs from the custom logger
         if hasattr(module, 'logger'):
-            print(f"Logger exists: {type(module.logger)}")
+            print(f"   Logger exists: {type(module.logger)}")
+            print(f"   Logger name: {getattr(module.logger, 'name', 'N/A')}")
             if isinstance(module.logger, CustomLogger):
-                logs = module.logger.get_logs()
-                print(f"Retrieved {len(logs)} logs from custom logger")
+                try:
+                    logs = module.logger.get_logs()
+                    print(f"   ✅ Retrieved {len(logs) if logs else 0} logs from custom logger")
+                    if logs and len(logs) > 0:
+                        print(f"   First log entry: {logs[0] if isinstance(logs[0], (str, dict)) else 'N/A'}")
+                except Exception as e:
+                    print(f"   ⚠️ Error getting logs: {e}")
+                    logs = []
             else:
-                print(f"⚠️ Logger is not CustomLogger instance, type: {type(module.logger)}")
+                print(f"   ⚠️ Logger is not CustomLogger instance, type: {type(module.logger)}")
+                logs = []
         else:
-            print("⚠️ Module has no logger attribute")
+            print("   ⚠️ Module has no logger attribute")
+            logs = []
 
         print("\n[Step 7] Combining all raw outputs...")
+        print(f"   raw_output_text length: {len(raw_output_text)}")
+        print(f"   raw_output_spacing length: {len(raw_output_spacing)}")
+        print(f"   raw_output_capacities length: {len(raw_output_capacities)}")
+        print(f"   raw_output_section_capacities length: {len(raw_output_section_capacities)}")
         raw_output = raw_output_text + raw_output_spacing + raw_output_capacities + raw_output_section_capacities
         print(f"✅ Combined raw_output length: {len(raw_output)}")
 
@@ -462,11 +565,27 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         print(f"Exception message: {str(e)}")
         print(f"Exception args: {e.args if hasattr(e, 'args') else 'N/A'}")
         
+        print(f"\nModule state at error:")
+        if 'module' in locals():
+            print(f"   Module exists: {module is not None}")
+            if module:
+                print(f"   Module type: {type(module)}")
+                print(f"   Module has logger: {hasattr(module, 'logger')}")
+                if hasattr(module, 'connectivity'):
+                    print(f"   Module connectivity: {module.connectivity}")
+                if hasattr(module, 'design_status'):
+                    print(f"   Module design_status: {module.design_status}")
+        
         # Check if exception has error attribute
         if hasattr(e, 'error'):
             print(f"Exception has 'error' attribute: {e.error}")
             if e.error is None:
                 print("⚠️ WARNING: Exception.error is None!")
+        
+        print(f"\nFull traceback:")
+        traceback.print_exc()
+        print("=" * 60)
+        raise
         
         print("\nFull traceback:")
         import traceback
@@ -483,7 +602,17 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     print(f"Output keys (first 10): {list(output.keys())[:10]}")
     print(f"Logs count: {len(logs) if logs else 0}")
     if logs:
-        print(f"First log entry: {logs[0] if len(logs) > 0 else 'N/A'}")
+        print(f"First log entry (original order): {logs[0] if len(logs) > 0 else 'N/A'}")
+        print(f"Last log entry (original order):  {logs[-1] if len(logs) > 0 else 'N/A'}")
+
+        # Reverse logs so that the latest message appears first (more natural for UI and reports)
+        try:
+            logs = list(reversed(logs))
+            print("✅ Reversed logs order so newest entries come first")
+            print(f"First log entry (reversed): {logs[0] if len(logs) > 0 else 'N/A'}")
+        except Exception as e:
+            print(f"⚠️ Failed to reverse logs order: {type(e).__name__}: {e}")
+
     print("=" * 60)
     
     return output, logs

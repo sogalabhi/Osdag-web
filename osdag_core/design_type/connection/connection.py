@@ -681,9 +681,19 @@ class Connection(Main):
 
     def save_design(self):
         """ """
+        print(f"\n[Connection.save_design] Parent save_design() called")
+        print(f"   self.module: {getattr(self, 'module', 'N/A')}")
+        from osdag_core.Common import KEY_DISP_BASE_PLATE, KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE
+        print(f"   KEY_DISP_BASE_PLATE: '{KEY_DISP_BASE_PLATE}'")
+        print(f"   KEY_DISP_FINPLATE: '{KEY_DISP_FINPLATE}'")
+        print(f"   KEY_DISP_ENDPLATE: '{KEY_DISP_ENDPLATE}'")
+        print(f"   self.module == KEY_DISP_BASE_PLATE: {getattr(self, 'module', None) == KEY_DISP_BASE_PLATE}")
+        
         if self.module == KEY_DISP_BASE_PLATE:  # base plate module
+            print(f"   ⚠️  Base plate module, skipping report_input setup")
             pass
         else:
+            print(f"   ✅ Not base plate, proceeding with report_input setup...")
             if self.supporting_section.flange_slope != 90:
                 section1 = "Slope_Beam"
             else:
@@ -739,41 +749,64 @@ class Connection(Main):
                                   KEY_REPORT_ZPZ: round(self.supported_section.plast_sec_mod_z * 1e-3, 2),
                                   KEY_REPORT_ZPY: round(self.supported_section.plast_sec_mod_y * 1e-3, 2)}
 
+            print(f"   Checking if module matches KEY_DISP_FINPLATE or KEY_DISP_ENDPLATE...")
+            print(f"   self.module == KEY_DISP_FINPLATE: {self.module == KEY_DISP_FINPLATE}")
+            print(f"   self.module == KEY_DISP_ENDPLATE: {self.module == KEY_DISP_ENDPLATE}")
+            
             if self.module == KEY_DISP_FINPLATE or self.module == KEY_DISP_ENDPLATE:
-                self.report_input = \
-                    {KEY_MAIN_MODULE: self.mainmodule,
-                     KEY_MODULE: self.module,
-                     KEY_CONN: self.connectivity,
-                     KEY_DISP_SHEAR: self.load.shear_force,
-                     KEY_DISP_AXIAL: self.load.axial_force,
-                     KEY_DISP_SUPTNGSEC_REPORT: "TITLE",
-                     "Supporting Section Details": self.report_supporting,
-                     KEY_DISP_SUPTDSEC_REPORT: "TITLE",
-                     "Supported Section Details": self.report_supported,
+                print(f"   ✅ Module matches! Setting report_input...")
+                print(f"   self.mainmodule: {getattr(self, 'mainmodule', 'N/A')}")
+                print(f"   self.connectivity: {getattr(self, 'connectivity', 'N/A')}")
+                print(f"   self.load.shear_force: {getattr(self.load, 'shear_force', 'N/A')}")
+                print(f"   self.load.axial_force: {getattr(self.load, 'axial_force', 'N/A')}")
+                print(f"   self.bolt.bolt_diameter: {getattr(self.bolt, 'bolt_diameter', 'N/A')}")
+                print(f"   self.plate.thickness: {getattr(self.plate, 'thickness', 'N/A')}")
+                
+                try:
+                    self.report_input = \
+                        {KEY_MAIN_MODULE: self.mainmodule,
+                         KEY_MODULE: self.module,
+                         KEY_CONN: self.connectivity,
+                         KEY_DISP_SHEAR: self.load.shear_force,
+                         KEY_DISP_AXIAL: self.load.axial_force,
+                         KEY_DISP_SUPTNGSEC_REPORT: "TITLE",
+                         "Supporting Section Details": self.report_supporting,
+                         KEY_DISP_SUPTDSEC_REPORT: "TITLE",
+                         "Supported Section Details": self.report_supported,
 
-                     "Bolt Details - Input and Design Preference": "TITLE",
-                     KEY_DISP_D: str([int(d) for d in self.bolt.bolt_diameter]),
-                     KEY_DISP_GRD: str([float(d) for d in self.bolt.bolt_grade]),
-                     KEY_DISP_TYP: self.bolt.bolt_type,
-                     KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
-                     KEY_DISP_BOLT_PRE_TENSIONING: self.bolt.bolt_tensioning,
-                     KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT: self.bolt.mu_f,
+                         "Bolt Details - Input and Design Preference": "TITLE",
+                         KEY_DISP_D: str([int(d) for d in self.bolt.bolt_diameter]),
+                         KEY_DISP_GRD: str([float(d) for d in self.bolt.bolt_grade]),
+                         KEY_DISP_TYP: self.bolt.bolt_type,
+                         KEY_DISP_DP_BOLT_HOLE_TYPE: self.bolt.bolt_hole_type,
+                         KEY_DISP_BOLT_PRE_TENSIONING: self.bolt.bolt_tensioning,
+                         KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT: self.bolt.mu_f,
 
-                     "Detailing - Design Preference": "TITLE",
-                     KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
-                     KEY_DISP_GAP: self.plate.gap,
-                     KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM: self.bolt.corrosive_influences,
+                         "Detailing - Design Preference": "TITLE",
+                         KEY_DISP_DP_DETAILING_EDGE_TYPE: self.bolt.edge_type,
+                         KEY_DISP_GAP: self.plate.gap,
+                         KEY_DISP_DP_DETAILING_CORROSIVE_INFLUENCES_BEAM: self.bolt.corrosive_influences,
 
-                     "Plate Details - Input and Design Preference": "TITLE",
-                     KEY_DISP_PLATETHK: str([int(d) for d in self.plate.thickness]),
-                     KEY_DISP_MATERIAL: self.plate.material,
-                     KEY_DISP_FU: self.plate.fu,
-                     KEY_DISP_FY: self.plate.fy,
+                         "Plate Details - Input and Design Preference": "TITLE",
+                         KEY_DISP_PLATETHK: str([int(d) for d in self.plate.thickness]),
+                         KEY_DISP_MATERIAL: self.plate.material,
+                         KEY_DISP_FU: self.plate.fu,
+                         KEY_DISP_FY: self.plate.fy,
 
-                     "Weld Details - Input and Design Preference": "TITLE",
-                     KEY_DISP_DP_WELD_TYPE: "Fillet",
-                     KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
-                     KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
+                         "Weld Details - Input and Design Preference": "TITLE",
+                         KEY_DISP_DP_WELD_TYPE: "Fillet",
+                         KEY_DISP_DP_WELD_FAB: self.weld.fabrication,
+                         KEY_DISP_DP_WELD_MATERIAL_G_O: self.weld.fu}
+                    print(f"   ✅ report_input set successfully! Keys: {list(self.report_input.keys())[:10]}")
+                except Exception as e:
+                    print(f"   ❌ ERROR setting report_input: {type(e).__name__}: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    raise
+            else:
+                print(f"   ⚠️  Module does NOT match KEY_DISP_FINPLATE or KEY_DISP_ENDPLATE")
+                print(f"   Module value: '{self.module}'")
+                print(f"   Expected: '{KEY_DISP_FINPLATE}' or '{KEY_DISP_ENDPLATE}'")
 
 
 if __name__ == "__main__":
