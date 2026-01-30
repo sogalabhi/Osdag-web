@@ -216,7 +216,7 @@ def create_module() -> ColumnEndPlate:
     try:
         module = ColumnEndPlate()
         logger.debug("ColumnEndPlate instance created successfully")
-        module.set_osdaglogger(None)
+        module.set_osdaglogger(None, id="web")
         logger.debug("OSDAGLogger set to None")
         return module
     except Exception as e:

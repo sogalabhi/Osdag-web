@@ -41,7 +41,7 @@ from OCC.Core.IGESControl import IGESControl_Writer
 from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
-from osdag_core.Common import KEY_DISP_FINPLATE
+from osdag_core.Common import KEY_DISP_FINPLATE, KEY_CONN
 from osdag_core.custom_logger import CustomLogger
 import sys
 import os
@@ -321,7 +321,7 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
 def create_module() -> FinPlateConnection:
     """Create an instance of the FinPlateConnection module design class and set it up for use"""
     module = FinPlateConnection()  # Create an instance of the FinPlateConnection
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     return module
 
 
@@ -336,12 +336,18 @@ def create_from_input(input_values: Dict[str, Any]) -> FinPlateConnection:
         print('error in creating module')
         raise
     
+    # Map frontend keys to osdag_core keys
+    # Frontend sends 'Connectivity' but osdag_core expects 'Connectivity *' (KEY_CONN)
+    design_dictionary = input_values.copy()
+    if 'Connectivity' in design_dictionary and KEY_CONN not in design_dictionary:
+        design_dictionary[KEY_CONN] = design_dictionary.pop('Connectivity')
+    
     # Set the input values on the module instance.
     try:
         print(input_values)
         if module is None:
             raise RuntimeError('Module instance was not created')
-        module.set_input_values(input_values)
+        module.set_input_values(design_dictionary)
     except Exception as e:
         traceback.print_exc()
         print('e in set_input_values : ', e)

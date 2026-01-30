@@ -10,8 +10,37 @@ import logging
 from importlib.resources import files
 from pathlib import Path
 import platform
+import os
 
-PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
+# Helper function to get resource path with fallback
+def _get_resource_path(*path_parts):
+    """
+    Get resource path using importlib.resources with fallback to file system path.
+    
+    Args:
+        *path_parts: Path components relative to osdag_core root
+        Example: ("data", "ResourceFiles", "Database", "Intg_osdag.sqlite")
+    
+    Returns:
+        Path object to the resource
+    """
+    try:
+        # Try importlib.resources first
+        package = "osdag_core." + ".".join(path_parts[:-1])
+        resource_name = path_parts[-1]
+        return files(package).joinpath(resource_name)
+    except (TypeError, ModuleNotFoundError, ValueError, AttributeError):
+        # Fallback: use path relative to Common.py (which is in osdag_core root)
+        _this_file_path = Path(__file__).parent
+        return _this_file_path / Path(*path_parts)
+
+# Helper function to get resource path as string (for compatibility)
+def _get_resource_str(*path_parts):
+    """Get resource path as string."""
+    return str(_get_resource_path(*path_parts))
+
+# Try to use importlib.resources, fallback to path-based approach if it fails
+PATH_TO_DATABASE = _get_resource_path("data", "ResourceFiles", "Database", "Intg_osdag.sqlite")
 PDFLATEX = "pdflatex"
 
 import sqlite3
@@ -80,7 +109,7 @@ def configure_latex_runtime_windows():
 
     # Extra safety: explicitly expose Osdag's bundled style packages
     try:
-        sty_pkgs = str(files("osdag_core.data.ResourceFiles.osdag-latex-env.texmf-dist.tex.latex")).replace("\\", "/")
+        sty_pkgs = str(_get_resource_path("data", "ResourceFiles", "osdag-latex-env.texmf-dist.tex.latex")).replace("\\", "/")
         pkg_resources = [
             f"{sty_pkgs}/amsmath",
             f"{sty_pkgs}/graphics",
@@ -93,7 +122,7 @@ def configure_latex_runtime_windows():
         pass
 
 
-PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
+PATH_TO_DATABASE = _get_resource_path("data", "ResourceFiles", "Database", "Intg_osdag.sqlite")
 PDFLATEX = get_latex_executable()
 
 class OurLog(logging.Handler):
@@ -619,9 +648,9 @@ Buckling_In_plane =  ' In Plane'
 Load_type1 = 'Concentric Load'
 Load_type2 = 'Leg Load'
 Strut_load = list((Load_type1, Load_type2))
-IMG_STRUT_1 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bA.png"))
-IMG_STRUT_2 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bBBA.png"))
-IMG_STRUT_3 = str(files("osdag_core.data.ResourceFiles.images").joinpath("back_back_same_side_angles.png"))
+IMG_STRUT_1 = _get_resource_str("data", "ResourceFiles", "images", "bA.png")
+IMG_STRUT_2 = _get_resource_str("data", "ResourceFiles", "images", "bBBA.png")
+IMG_STRUT_3 = _get_resource_str("data", "ResourceFiles", "images", "back_back_same_side_angles.png")
 VALUES_IMG_STRUT = list(( IMG_STRUT_1, IMG_STRUT_2, IMG_STRUT_3))
 KEY_BOLT_Number = 'Bolt.Number'
 Strut_Bolt_Number = 'Number of Bolts'
@@ -631,10 +660,10 @@ Profile_name_3 = 'Back to Back Angles - Opposite side of gusset'
 loc_type1 = 'Long Leg'
 loc_type2 = 'Short Leg'
 VALUES_SEC_PROFILE_Compression_Strut = list((Profile_name_1, Profile_name_2, Profile_name_3)) #other sections can be added later the elements and not before 'Star Angles', 'Channels', 'Back to Back Channels'
-Profile_2_img1 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bblssg_eq.png")) # Back to back Long leg on same side of gusset for equal angle
-Profile_2_img2 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bbsssg_eq.png"))# Back to back short leg on same side of gusset for equal angle
-Profile_2_img3 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bblssg_ueq.png"))# Back to back Long leg on same side of gusset for unequal angle
-Profile_2_img4 = str(files("osdag_core.data.ResourceFiles.images").joinpath("bbsssg_ueq.png"))# Back to back short leg on same side of gusset for unequal angle
+Profile_2_img1 = _get_resource_str("data", "ResourceFiles", "images", "bblssg_eq.png") # Back to back Long leg on same side of gusset for equal angle
+Profile_2_img2 = _get_resource_str("data", "ResourceFiles", "images", "bbsssg_eq.png")# Back to back short leg on same side of gusset for equal angle
+Profile_2_img3 = _get_resource_str("data", "ResourceFiles", "images", "bblssg_ueq.png")# Back to back Long leg on same side of gusset for unequal angle
+Profile_2_img4 = _get_resource_str("data", "ResourceFiles", "images", "bbsssg_ueq.png")# Back to back short leg on same side of gusset for unequal angle
 
 KEY_ALLOW_CLASS1 = 'Optimum.Class1'
 KEY_DISP_CLASS1 = 'Choose Plastic sections'
@@ -697,9 +726,9 @@ KEY_NON_DIM_ESR_LTB = 'NDESR.LTB'
 KEY_WEB_BUCKLING= 'Web Buckling Details'
 KEY_WEB_RESISTANCE= 'Web Resistance Details'
 KEY_BEARING_LENGTH = 'Bearing.Length'
-Simply_Supported_img = str(files("osdag_core.data.ResourceFiles.images").joinpath("ss_beam.png"))
-Cantilever_img = str(files("osdag_core.data.ResourceFiles.images").joinpath("c_beam.png"))
-Purlin_img = str(files("osdag_core.data.ResourceFiles.images").joinpath("purlin.jpg"))
+Simply_Supported_img = _get_resource_str("data", "ResourceFiles", "images", "ss_beam.png")
+Cantilever_img = _get_resource_str("data", "ResourceFiles", "images", "c_beam.png")
+Purlin_img = _get_resource_str("data", "ResourceFiles", "images", "purlin.jpg")
 KEY_LENGTH_OVERWRITE = 'Length.Overwrite'
 KEY_DISPP_LENGTH_OVERWRITE = 'Effective Length Parameter'
 KEY_DISP_BEAM_MOMENT = 'Bending Moment (kNm)(M<sub>z-z</sub>)'
@@ -1122,20 +1151,20 @@ except Exception as e:
 VALUES_MATERIAL_SELECTED = "E 250 (Fe 410 W)A"
 # VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
 
-VALUES_IMAGE_PLATEGIRDER = [str(files("osdag_core.data.ResourceFiles.images").joinpath("ULPPS_PG.png")),
-    str(files("osdag_core.data.ResourceFiles.images").joinpath("ULFFS_PG.png")),
-    str(files("osdag_core.data.ResourceFiles.images").joinpath("CLPPS_PG.png")),
-    str(files("osdag_core.data.ResourceFiles.images").joinpath("CLFFS_PG.png")),
-    str(files("osdag_core.data.ResourceFiles.images").joinpath("CLPPSPB_PG.png"))]
-VALUES_IMG_TENSIONBOLTED = [str(files("osdag_core.data.ResourceFiles.images").joinpath("bA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bBBA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bSA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bC.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bBBC.png"))]
-VALUES_IMG_TENSIONWELDED = [str(files("osdag_core.data.ResourceFiles.images").joinpath("wA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("wBBA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("wSA.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("wC.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("wBBC.png"))]
-VALUES_IMG_TENSIONBOLTED_DF01 = [str(files("osdag_core.data.ResourceFiles.images").joinpath("equaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bblequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bbsequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("salequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("sasequaldp.png"))]
-VALUES_IMG_TENSIONBOLTED_DF02 = [str(files("osdag_core.data.ResourceFiles.images").joinpath("unequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bblunequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("bbsunequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("salunequaldp.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("sasunequaldp.png"))]
+VALUES_IMAGE_PLATEGIRDER = [_get_resource_str("data", "ResourceFiles", "images", "ULPPS_PG.png"),
+    _get_resource_str("data", "ResourceFiles", "images", "ULFFS_PG.png"),
+    _get_resource_str("data", "ResourceFiles", "images", "CLPPS_PG.png"),
+    _get_resource_str("data", "ResourceFiles", "images", "CLFFS_PG.png"),
+    _get_resource_str("data", "ResourceFiles", "images", "CLPPSPB_PG.png")]
+VALUES_IMG_TENSIONBOLTED = [_get_resource_str("data", "ResourceFiles", "images", "bA.png"), _get_resource_str("data", "ResourceFiles", "images", "bBBA.png"), _get_resource_str("data", "ResourceFiles", "images", "bSA.png"), _get_resource_str("data", "ResourceFiles", "images", "bC.png"), _get_resource_str("data", "ResourceFiles", "images", "bBBC.png")]
+VALUES_IMG_TENSIONWELDED = [_get_resource_str("data", "ResourceFiles", "images", "wA.png"), _get_resource_str("data", "ResourceFiles", "images", "wBBA.png"), _get_resource_str("data", "ResourceFiles", "images", "wSA.png"), _get_resource_str("data", "ResourceFiles", "images", "wC.png"), _get_resource_str("data", "ResourceFiles", "images", "wBBC.png")]
+VALUES_IMG_TENSIONBOLTED_DF01 = [_get_resource_str("data", "ResourceFiles", "images", "equaldp.png"), _get_resource_str("data", "ResourceFiles", "images", "bblequaldp.png"), _get_resource_str("data", "ResourceFiles", "images", "bbsequaldp.png"), _get_resource_str("data", "ResourceFiles", "images", "salequaldp.png"), _get_resource_str("data", "ResourceFiles", "images", "sasequaldp.png")]
+VALUES_IMG_TENSIONBOLTED_DF02 = [_get_resource_str("data", "ResourceFiles", "images", "unequaldp.png"), _get_resource_str("data", "ResourceFiles", "images", "bblunequaldp.png"), _get_resource_str("data", "ResourceFiles", "images", "bbsunequaldp.png"), _get_resource_str("data", "ResourceFiles", "images", "salunequaldp.png"), _get_resource_str("data", "ResourceFiles", "images", "sasunequaldp.png")]
 
-VALUES_IMG_TENSIONBOLTED_DF03 = [str(files("osdag_core.data.ResourceFiles.images").joinpath("Slope_Channel.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("Parallel_Channel.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("Slope_BBChannel.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("Parallel_BBChannel.png"))]
+VALUES_IMG_TENSIONBOLTED_DF03 = [_get_resource_str("data", "ResourceFiles", "images", "Slope_Channel.png"), _get_resource_str("data", "ResourceFiles", "images", "Parallel_Channel.png"), _get_resource_str("data", "ResourceFiles", "images", "Slope_BBChannel.png"), _get_resource_str("data", "ResourceFiles", "images", "Parallel_BBChannel.png")]
 
-VALUES_IMG_BEAM = [str(files("osdag_core.data.ResourceFiles.images").joinpath("Slope_Beam.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("Parallel_Beam.png"))]
-VALUES_IMG_HOLLOWSECTION = [str(files("osdag_core.data.ResourceFiles.images").joinpath("SHS.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("RHS.png")),str(files("osdag_core.data.ResourceFiles.images").joinpath("CHS.png"))]
+VALUES_IMG_BEAM = [_get_resource_str("data", "ResourceFiles", "images", "Slope_Beam.png"), _get_resource_str("data", "ResourceFiles", "images", "Parallel_Beam.png")]
+VALUES_IMG_HOLLOWSECTION = [_get_resource_str("data", "ResourceFiles", "images", "SHS.png"), _get_resource_str("data", "ResourceFiles", "images", "RHS.png"), _get_resource_str("data", "ResourceFiles", "images", "CHS.png")]
 
 
 ############################

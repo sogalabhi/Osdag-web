@@ -9,6 +9,7 @@ from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.Message import Message_ProgressRange
 from osdag_core.cad.common_logic import CommonDesignLogic
+from osdag_core.Common import KEY_CONN
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
 from osdag_core.custom_logger import CustomLogger
@@ -268,7 +269,7 @@ def create_module() -> CleatAngleConnection:
     module = CleatAngleConnection()  # Create an instance of the CleatAngleConnection
     # Initialize logger to avoid None during member capacity checks
     try:
-        module.set_osdaglogger(None)
+        module.set_osdaglogger(None, id="web")
     except Exception as log_e:
         print("Warning: failed to init logger:", log_e)
     return module
@@ -287,15 +288,21 @@ def create_from_input(input_values: Dict[str, Any]) -> CleatAngleConnection:
         traceback.print_exc()
         return None
     
+    # Map frontend keys to osdag_core keys
+    # Frontend sends 'Connectivity' but osdag_core expects 'Connectivity *' (KEY_CONN)
+    design_dictionary = input_values.copy()
+    if 'Connectivity' in design_dictionary and KEY_CONN not in design_dictionary:
+        design_dictionary[KEY_CONN] = design_dictionary.pop('Connectivity')
+    
     # Set the input values on the module instance.
     print('CleatAngle - About to call module.set_input_values')
     print('CleatAngle - Section designations in input:')
-    print('  - Supporting Section (Column):', input_values.get('Member.Supporting_Section.Designation'))
-    print('  - Supported Section (Beam):', input_values.get('Member.Supported_Section.Designation'))
-    print('  - Connectivity:', input_values.get('Connectivity'))
+    print('  - Supporting Section (Column):', design_dictionary.get('Member.Supporting_Section.Designation'))
+    print('  - Supported Section (Beam):', design_dictionary.get('Member.Supported_Section.Designation'))
+    print('  - Connectivity:', design_dictionary.get(KEY_CONN))
     
     try : 
-        module.set_input_values(input_values)
+        module.set_input_values(design_dictionary)
         print('CleatAngle - module.set_input_values successful')
     except Exception as e : 
         
