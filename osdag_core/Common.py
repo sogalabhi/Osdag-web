@@ -4,13 +4,13 @@
 
 # FIXME: Keeping os even if not used here.
 import os, shutil
+import sys
 import operator
 import math
 import logging
 from importlib.resources import files
 from pathlib import Path
 import platform
-import os
 
 # Helper function to get resource path with fallback
 def _get_resource_path(*path_parts):
@@ -42,25 +42,6 @@ def _get_resource_str(*path_parts):
 # Try to use importlib.resources, fallback to path-based approach if it fails
 PATH_TO_DATABASE = _get_resource_path("data", "ResourceFiles", "Database", "Intg_osdag.sqlite")
 PDFLATEX = "pdflatex"
-
-        if system_pdflatex:
-            return os.path.abspath(system_pdflatex)
-        else:
-            raise FileNotFoundError("LaTeX environment not found. Please ensure that the osdag-latex-env directory exists or that pdflatex is installed on your system.")  
-    else:
-        if sys.platform.startswith("win"):
-            latex_executable = os.path.join(latex_env, "bin", "windows", "pdflatex.exe")
-            return latex_executable
-        else:   # Linux / Unix / macOS
-            system_pdflatex = shutil.which("pdflatex")
-            if system_pdflatex:
-                return os.path.abspath(system_pdflatex)
-            else:
-                raise FileNotFoundError("pdflatex not found in system PATH. Please install TeXLive.")
-  
-def configure_latex_runtime_windows():
-    if not sys.platform.startswith("win"):
-        return
 
 from .utils.common.other_standards import *
 # This returns the documents directory path for the current user
