@@ -14,6 +14,7 @@ from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
 from osdag_core.Common import KEY_DISP_BUTTJOINTWELDED
+from osdag_core.custom_logger import CustomLogger
 from apps.core.utils import (
     MissingKeyError, InvalidInputTypeError,
     contains_keys, custom_list_validation, float_able, int_able, validate_list_type, write_stl
@@ -42,10 +43,13 @@ _validator = create_welded_validator(get_required_keys(), "ButtJointWelded")
 def validate_input(input_values: Dict[str, Any]) -> None:
     """Validate required inputs for ButtJointWelded using shared validator."""
     iv = dict(input_values or {})
-    # Provide legacy defaults for weld metadata if omitted by caller
-    iv.setdefault("Weld.Material_Grade_OverWrite", "410")
-    iv.setdefault("Weld.Fab", "Shop Weld")
-    iv.setdefault("Weld.Type", iv.get("Weld.Fab"))  # keep type aligned with fabrication when absent
+    # Provide legacy defaults for weld metadata if omitted by caller or empty string
+    if not iv.get("Weld.Material_Grade_OverWrite") or iv.get("Weld.Material_Grade_OverWrite", "").strip() == "":
+        iv["Weld.Material_Grade_OverWrite"] = "410"
+    if not iv.get("Weld.Fab") or iv.get("Weld.Fab", "").strip() == "":
+        iv["Weld.Fab"] = "Shop Weld"
+    if not iv.get("Weld.Type") or iv.get("Weld.Type", "").strip() == "":
+        iv["Weld.Type"] = iv.get("Weld.Fab", "Shop Weld")
     # Persist defaults back to caller dict so downstream set_input_values sees them
     input_values.update(iv)
     # Use shared validator for validation
@@ -105,8 +109,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 if len(tup) < 4:
                     continue
                 src_key, label, param_type, val = tup[:4]
-                # Skip buttons, notes, and section images, but include actual spacing values
-                if param_type in ("OutButton", "Button", "Note", "Section") or callable(val):
+                # Skip buttons, notes, section images, and callables (but include actual spacing values)
+                if param_type in ("OutButton", "Button", "Note", "Section", "Title", "Popup_Section") or callable(val):
+                    continue
+                # Skip None keys (used for titles/notes)
+                if src_key is None:
                     continue
                 target_key = key_map.get(src_key, src_key)
                 display_label = label_map.get(target_key, label or target_key)
@@ -115,8 +122,13 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         if hasattr(module, "output_values"):
             map_tuple_list(module.output_values(True))
         # Include spacing details for Butt Joint Welded (it has spacing() method in Osdag)
-        if hasattr(module, "spacing"):
-            map_tuple_list(module.spacing(True))
+        if hasattr(module, "spacing") and callable(getattr(module, "spacing", None)):
+            try:
+                map_tuple_list(module.spacing(True))
+            except (TypeError, AttributeError, ImportError) as e:
+                # Resource file access may fail in web environment
+                print(f"[ButtJointWelded] Could not load spacing diagram: {e}")
+                # Continue without spacing diagram
 
         # Supplement with scalars if not already mapped
         def add_scalar(src_attr, target_key, label):
@@ -141,9 +153,24 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         else:
             output = {}
 
-        logs = getattr(module, "logs", [])
+        # Get logs from the custom logger (same as fin_plate)
+        logs = []
+        if hasattr(module, 'logger'):
+            if isinstance(module.logger, CustomLogger):
+                try:
+                    logs = module.logger.get_logs()
+                except Exception as e:
+                    print(f"[ButtJointWelded] Error getting logs: {e}")
+                    logs = []
+            else:
+                logs = getattr(module, "logs", [])
+        else:
+            logs = getattr(module, "logs", [])
     except Exception as e:
-        logs.append(f"Error in design: {str(e)}")
+        error_msg = f"Error in design: {str(e)}"
+        if 'logs' not in locals():
+            logs = []
+        logs.append(error_msg)
         traceback.print_exc()
     return output, logs
 
@@ -309,6 +336,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 def create_from_input(input_values: Dict[str, Any]) -> Any:
     """Create module instance from input"""
     module = ButtJointWelded()
+    module.set_osdaglogger(None, id="web")
     validate_input(input_values)
     module.set_input_values(input_values)
     return module

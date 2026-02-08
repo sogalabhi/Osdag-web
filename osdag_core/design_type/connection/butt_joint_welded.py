@@ -23,6 +23,7 @@ from ...utils.common.component import *
 from ...utils.common.is800_2007 import IS800_2007
 from ...utils.common.is800_2007 import *
 from ...Common import *
+from ...Common import _get_resource_str
 from ...design_report.reportGenerator_latex import CreateLatex
 from ...Report_functions import *
 from ...utils.common.load import Load
@@ -336,7 +337,7 @@ class ButtJointWelded(MomentConnection):
         spacing.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-            [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_3.png")), 400, 277, ""])  # [image, width, height, caption]
+            [_get_resource_str("data", "ResourceFiles", "images", "spacing_3.png"), 400, 277, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
@@ -621,6 +622,8 @@ class ButtJointWelded(MomentConnection):
         self.plate2 = Plate(thickness=[design_dictionary[KEY_PLATE2_THICKNESS]],
                             material_grade=design_dictionary[KEY_MATERIAL],
                             width=design_dictionary[KEY_PLATE_WIDTH])
+        # Set plate reference for spacing details (use plate1 as default, matching butt_joint_bolted pattern)
+        self.plate = self.plate1
         
         self.weld = Weld(material_g_o=design_dictionary[KEY_DP_WELD_MATERIAL_G_O],
                          type=design_dictionary[KEY_DP_WELD_TYPE],
@@ -1034,7 +1037,7 @@ class ButtJointWelded(MomentConnection):
                 self.logger.info(": Base metal strength in tension is adequate")
     
     def calculate_final_utilization_ratio(self):
-        """Calculate final utilization ratio and set design status after all component checks"""
+        """Calculate final utilization ratio and set spacing values for output"""
         self.logger.info(": =========== Final Design Check ===========")
         
         if not hasattr(self, 'utilization_ratios'):
@@ -1069,6 +1072,17 @@ class ButtJointWelded(MomentConnection):
             self.design_status = True
             self.logger.info(": =========== Design is SAFE ===========")
             self.logger.info(": All utilization ratios are within acceptable limits")
+        
+        # Note: For welded connections, spacing details are representative only
+        # The desktop version also leaves these as 0 since there are no actual bolts
+        # If spacing details need to be shown, they should be calculated based on actual design requirements
+        # For now, matching desktop behavior: leave as 0 (they will show as empty/0 in output)
+        # Store spacing values on main plate for output compatibility (same pattern as butt_joint_bolted)
+        # These remain 0 for welded connections as per desktop version
+        self.plate.pitch_provided = self.final_pitch
+        self.plate.gauge_provided = self.final_gauge
+        self.plate.edge_dist_provided = self.final_edge_dist
+        self.plate.end_dist_provided = self.final_end_dist
         
         self.logger.info(": ==========End Of Design===========\n")
     

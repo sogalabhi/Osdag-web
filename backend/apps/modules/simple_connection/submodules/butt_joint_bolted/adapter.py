@@ -14,6 +14,7 @@ from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
 from osdag_core.Common import KEY_DISP_BUTTJOINTBOLTED
+from osdag_core.custom_logger import CustomLogger
 from apps.core.utils import (
     MissingKeyError, InvalidInputTypeError,
     contains_keys, custom_list_validation, float_able, int_able, validate_list_type, write_stl
@@ -117,7 +118,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                     continue
                 src_key, label, param_type, val = tup[:4]
                 # Skip buttons, notes, section images, and callables (but include actual spacing values)
-                if param_type in ("OutButton", "Button", "Note", "Section", "Title") or callable(val):
+                if param_type in ("OutButton", "Button", "Note", "Section", "Title", "Popup_Section") or callable(val):
                     continue
                 # Skip None keys (used for titles/notes)
                 if src_key is None:
@@ -128,7 +129,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
         if hasattr(module, "output_values"):
             map_tuple_list(module.output_values(True))
-        if hasattr(module, "spacing"):
+        if hasattr(module, "spacing") and callable(getattr(module, "spacing", None)):
             map_tuple_list(module.spacing(True))
 
         # If nothing mapped and module exposes a raw output dict, keep it
@@ -139,11 +140,25 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         elif hasattr(module, "output"):
             output = module.output
 
-        logs = getattr(module, "logs", [])
+        # Get logs from the custom logger (same as fin_plate and butt_joint_welded)
+        logs = []
+        if hasattr(module, 'logger'):
+            if isinstance(module.logger, CustomLogger):
+                try:
+                    logs = module.logger.get_logs()
+                except Exception as e:
+                    print(f"[ButtJointBolted] Error getting logs: {e}")
+                    logs = []
+            else:
+                logs = getattr(module, "logs", [])
+        else:
+            logs = getattr(module, "logs", [])
     except Exception as e:
-        logs.append(f"Error in design: {str(e)}")
+        error_msg = f"Error in design: {str(e)}"
+        if 'logs' not in locals():
+            logs = []
+        logs.append(error_msg)
         traceback.print_exc()
-        
     return output, logs
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
@@ -301,5 +316,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 def create_from_input(input_values: Dict[str, Any]) -> Any:
     """Create module instance from input"""
     module = ButtJointBolted()
+    module.set_osdaglogger(None, id="web")
+    validate_input(input_values)
     module.set_input_values(input_values)
     return module

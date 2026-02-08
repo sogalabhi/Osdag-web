@@ -16,6 +16,7 @@ from .moment_connection import MomentConnection
 from ...utils.common.component import *
 from ...utils.common.is800_2007 import *
 from ...Common import *
+from ...Common import _get_resource_str
 from ...design_report.reportGenerator_latex import CreateLatex
 from ...Report_functions import *
 from ...utils.common.load import Load
@@ -277,7 +278,7 @@ class LapJointBolted(MomentConnection):
         spacing.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-            [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_3.png")), 400, 277, ""])
+            [_get_resource_str("data", "ResourceFiles", "images", "spacing_3.png"), 400, 277, ""])
         spacing.append(t99)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.final_pitch if status else '')

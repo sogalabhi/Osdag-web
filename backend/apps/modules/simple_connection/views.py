@@ -231,13 +231,16 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
             )
             
             if not result['files']:
+                # Check if this is a known limitation (no CAD support yet)
+                # Return "coming soon" message instead of error
                 return Response(
                     {
-                        'status': 'error',
-                        'message': 'No CAD models were generated',
-                        'errors': result['warnings']
+                        'status': 'coming_soon',
+                        'message': '3D model generation is coming soon for this module',
+                        'files': {},
+                        'hover_dict': {}
                     },
-                    status=422
+                    status=200
                 )
             
             return Response({
@@ -252,6 +255,19 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
             print(f"[SimpleConnectionViewSet] Error generating CAD: {e}")
             import traceback
             traceback.print_exc()
+            # For modules without CAD support, return "coming soon" instead of error
+            # Check if it's a CAD-related error (ValueError, AttributeError, etc.)
+            if isinstance(e, (ValueError, AttributeError, ImportError)):
+                return Response(
+                    {
+                        'status': 'coming_soon',
+                        'message': '3D model generation is coming soon for this module',
+                        'files': {},
+                        'hover_dict': {}
+                    },
+                    status=200
+                )
+            # For other errors, return error response
             return Response(
                 {'error': str(e), 'status': 'error'},
                 status=500

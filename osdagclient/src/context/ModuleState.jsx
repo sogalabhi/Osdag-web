@@ -287,6 +287,13 @@ export const ModuleProvider = ({ children }) => {
       }
       console.log('[cadissue] hover_dict keys:', data.hover_dict && typeof data.hover_dict === 'object' ? Object.keys(data.hover_dict) : 'NO hover_dict');
 
+      // Handle "coming soon" status (200 with coming_soon status)
+      if (response.status === 200 && data.status === "coming_soon") {
+        dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
+        // Don't show error alert for "coming soon"
+        return { success: false, coming_soon: true, message: data.message || "3D model generation is coming soon" };
+      }
+
       if (!response.ok) {
         let message = data.message || "CAD generation failed";
 

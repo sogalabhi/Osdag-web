@@ -14,6 +14,7 @@ from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
 from osdag_core.Common import KEY_DISP_LAPJOINTWELDED
+from osdag_core.custom_logger import CustomLogger
 from apps.core.utils import (
     MissingKeyError, InvalidInputTypeError,
     contains_keys, custom_list_validation, float_able, int_able, validate_list_type, write_stl
@@ -42,10 +43,13 @@ _validator = create_welded_validator(get_required_keys(), "LapJointWelded")
 def validate_input(input_values: Dict[str, Any]) -> None:
     """Validate input values using shared validator"""
     iv = dict(input_values or {})
-    # Provide legacy defaults for weld metadata if omitted by caller
-    iv.setdefault("Weld.Material_Grade_OverWrite", "410")
-    iv.setdefault("Weld.Fab", "Shop Weld")
-    iv.setdefault("Weld.Type", iv.get("Weld.Fab"))
+    # Provide legacy defaults for weld metadata if omitted by caller or empty string
+    if not iv.get("Weld.Material_Grade_OverWrite") or iv.get("Weld.Material_Grade_OverWrite", "").strip() == "":
+        iv["Weld.Material_Grade_OverWrite"] = "410"
+    if not iv.get("Weld.Fab") or iv.get("Weld.Fab", "").strip() == "":
+        iv["Weld.Fab"] = "Shop Weld"
+    if not iv.get("Weld.Type") or iv.get("Weld.Type", "").strip() == "":
+        iv["Weld.Type"] = iv.get("Weld.Fab", "Shop Weld")
     input_values.update(iv)
     # Use shared validator for validation
     _validator.validate(input_values)
@@ -127,9 +131,24 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         else:
             output = {}
 
-        logs = getattr(module, "logs", [])
+        # Get logs from the custom logger (same as fin_plate and butt_joint_welded)
+        logs = []
+        if hasattr(module, 'logger'):
+            if isinstance(module.logger, CustomLogger):
+                try:
+                    logs = module.logger.get_logs()
+                except Exception as e:
+                    print(f"[LapJointWelded] Error getting logs: {e}")
+                    logs = []
+            else:
+                logs = getattr(module, "logs", [])
+        else:
+            logs = getattr(module, "logs", [])
     except Exception as e:
-        logs.append(f"Error in design: {str(e)}")
+        error_msg = f"Error in design: {str(e)}"
+        if 'logs' not in locals():
+            logs = []
+        logs.append(error_msg)
         traceback.print_exc()
     return output, logs
 
@@ -295,5 +314,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 def create_from_input(input_values: Dict[str, Any]) -> Any:
     """Create module instance from input"""
     module = LapJointWelded()
+    module.set_osdaglogger(None, id="web")
+    validate_input(input_values)
     module.set_input_values(input_values)
     return module

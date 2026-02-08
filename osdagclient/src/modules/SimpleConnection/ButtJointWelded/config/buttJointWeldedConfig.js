@@ -40,7 +40,8 @@ export const buttJointWeldedConfig = {
 
     ],
 
-    validateInputs: (inputs) => {
+    validateInputs: (inputs, extraState, lists, selectionStates) => {
+        // Validate inputs before API call - return early if invalid
         return validateSimpleConnectionInputs(inputs, { 
             moduleType: 'welded'
         });

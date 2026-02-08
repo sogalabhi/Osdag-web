@@ -6,60 +6,80 @@
 /**
  * Validates simple connection inputs
  * @param {Object} inputs - Input values object
- * @param {Object} options - Validation options
+ * @param {Object} extraState - Extra state (optional, not used)
+ * @param {Object} lists - Lists object (optional, not used)
+ * @param {Object} selectionStates - Selection states (optional, not used)
+ * @param {Object} options - Validation options (if called with options object directly)
  * @param {string} options.moduleType - 'bolted' or 'welded'
  * @returns {Object} Validation result with isValid, errors, and message
  */
-export function validateSimpleConnectionInputs(inputs, options = {}) {
-    const { moduleType = 'bolted' } = options;
+export function validateSimpleConnectionInputs(inputs, extraStateOrOptions, lists, selectionStates) {
+    // Handle both calling patterns:
+    // 1. validateSimpleConnectionInputs(inputs, { moduleType: 'bolted' })
+    // 2. validateSimpleConnectionInputs(inputs, extraState, lists, selectionStates)
+    let moduleType = 'bolted';
+    if (extraStateOrOptions && typeof extraStateOrOptions === 'object' && !Array.isArray(extraStateOrOptions)) {
+        if (extraStateOrOptions.moduleType) {
+            // Called with options object
+            moduleType = extraStateOrOptions.moduleType;
+        } else if (lists && lists.moduleType) {
+            // Try to get from lists if it's there
+            moduleType = lists.moduleType;
+        }
+    }
     const errors = [];
 
     // Required fields validation
-    if (!inputs.material || inputs.material === 'Select Material' || inputs.material.trim() === '') {
+    const materialStr = String(inputs.material || '').trim();
+    if (!materialStr || materialStr === 'Select Material') {
         errors.push({ field: 'material', message: 'Material is required' });
     }
 
-    if (!inputs.plate_width || inputs.plate_width.trim() === '') {
+    const plateWidthStr = String(inputs.plate_width || '').trim();
+    if (!plateWidthStr) {
         errors.push({ field: 'plate_width', message: 'Plate width is required' });
     } else {
-        const plateWidth = parseFloat(inputs.plate_width);
+        const plateWidth = parseFloat(plateWidthStr);
         if (isNaN(plateWidth) || plateWidth <= 0) {
             errors.push({ field: 'plate_width', message: 'Plate width must be greater than zero' });
         }
     }
 
-    if (!inputs.axial_force || inputs.axial_force.trim() === '') {
+    const axialForceStr = String(inputs.axial_force || '').trim();
+    if (!axialForceStr) {
         errors.push({ field: 'axial_force', message: 'Axial force is required' });
     } else {
-        const axialForce = parseFloat(inputs.axial_force);
+        const axialForce = parseFloat(axialForceStr);
         if (isNaN(axialForce) || axialForce <= 0) {
             errors.push({ field: 'axial_force', message: 'Axial force must be greater than zero' });
         }
     }
 
-    if (!inputs.plate1_thickness || 
-        (Array.isArray(inputs.plate1_thickness) && inputs.plate1_thickness.length === 0) ||
-        (!Array.isArray(inputs.plate1_thickness) && inputs.plate1_thickness.trim() === '')) {
+    const plate1Thickness = inputs.plate1_thickness;
+    if (!plate1Thickness || 
+        (Array.isArray(plate1Thickness) && plate1Thickness.length === 0) ||
+        (!Array.isArray(plate1Thickness) && String(plate1Thickness || '').trim() === '')) {
         errors.push({ field: 'plate1_thickness', message: 'Plate 1 thickness is required' });
     } else {
-        const plate1Thickness = Array.isArray(inputs.plate1_thickness) 
-            ? inputs.plate1_thickness[0] 
-            : inputs.plate1_thickness;
-        const thickness1 = parseFloat(plate1Thickness);
+        const plate1ThicknessVal = Array.isArray(plate1Thickness) 
+            ? plate1Thickness[0] 
+            : plate1Thickness;
+        const thickness1 = parseFloat(plate1ThicknessVal);
         if (isNaN(thickness1) || thickness1 <= 0) {
             errors.push({ field: 'plate1_thickness', message: 'Plate 1 thickness must be greater than zero' });
         }
     }
 
-    if (!inputs.plate2_thickness || 
-        (Array.isArray(inputs.plate2_thickness) && inputs.plate2_thickness.length === 0) ||
-        (!Array.isArray(inputs.plate2_thickness) && inputs.plate2_thickness.trim() === '')) {
+    const plate2Thickness = inputs.plate2_thickness;
+    if (!plate2Thickness || 
+        (Array.isArray(plate2Thickness) && plate2Thickness.length === 0) ||
+        (!Array.isArray(plate2Thickness) && String(plate2Thickness || '').trim() === '')) {
         errors.push({ field: 'plate2_thickness', message: 'Plate 2 thickness is required' });
     } else {
-        const plate2Thickness = Array.isArray(inputs.plate2_thickness) 
-            ? inputs.plate2_thickness[0] 
-            : inputs.plate2_thickness;
-        const thickness2 = parseFloat(plate2Thickness);
+        const plate2ThicknessVal = Array.isArray(plate2Thickness) 
+            ? plate2Thickness[0] 
+            : plate2Thickness;
+        const thickness2 = parseFloat(plate2ThicknessVal);
         if (isNaN(thickness2) || thickness2 <= 0) {
             errors.push({ field: 'plate2_thickness', message: 'Plate 2 thickness must be greater than zero' });
         }
@@ -90,15 +110,16 @@ export function validateSimpleConnectionInputs(inputs, options = {}) {
         }
     } else if (moduleType === 'welded') {
         // Validate weld size
-        if (!inputs.weld_size || 
-            (Array.isArray(inputs.weld_size) && inputs.weld_size.length === 0) ||
-            (!Array.isArray(inputs.weld_size) && inputs.weld_size.trim() === '')) {
+        const weldSize = inputs.weld_size;
+        if (!weldSize || 
+            (Array.isArray(weldSize) && weldSize.length === 0) ||
+            (!Array.isArray(weldSize) && String(weldSize || '').trim() === '')) {
             errors.push({ field: 'weld_size', message: 'Weld size is required' });
         } else {
-            const weldSize = Array.isArray(inputs.weld_size) 
-                ? inputs.weld_size[0] 
-                : inputs.weld_size;
-            const size = parseFloat(weldSize);
+            const weldSizeVal = Array.isArray(weldSize) 
+                ? weldSize[0] 
+                : weldSize;
+            const size = parseFloat(weldSizeVal);
             if (isNaN(size) || size <= 0) {
                 errors.push({ field: 'weld_size', message: 'Weld size must be greater than zero' });
             }

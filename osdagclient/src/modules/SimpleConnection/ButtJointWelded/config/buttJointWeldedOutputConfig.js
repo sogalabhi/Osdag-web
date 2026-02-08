@@ -44,9 +44,10 @@ export const buttJointWeldedOutputConfig = {
                 diagram: {
                     origin: "right",
                     props: {
-                        plateWidth: "PlateWidth",
-                        rows: "Bolt.Rows",
-                        cols: "Bolt.Cols",
+                        plateWidth: "Width of Cover Plate",
+                        plateHeight: "Length of Cover Plate",
+                        rows: 3,  // Representative 3x3 pattern as per note
+                        cols: 3,  // Representative 3x3 pattern as per note
                         end: "Bolt.EndDist",
                         pitch: "Bolt.Pitch",
                         gauge: "Bolt.Gauge",

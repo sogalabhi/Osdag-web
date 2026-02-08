@@ -169,7 +169,7 @@ const renderDetailedDimensions = (
             key="h-edge-start-text"
             x={(edgeStart + edgeEnd) / 2}
             y={dimY - 15}
-            text={`${params.edgeDist.toFixed(1)}`}
+            text={`${(params.edgeDist || 0).toFixed(1)}`}
           />
         );
       } else {
@@ -219,7 +219,7 @@ const renderDetailedDimensions = (
             key="h-edge-end-text"
             x={(edgeStart + edgeEnd) / 2}
             y={dimY - 15}
-            text={`${params.edgeDist.toFixed(1)}`}
+            text={`${(params.edgeDist || 0).toFixed(1)}`}
           />
         );
       }
@@ -274,7 +274,7 @@ const renderDetailedDimensions = (
             key="h-edge-end-text"
             x={(edgeStart + edgeEnd) / 2}
             y={dimY - 15}
-            text={`${params.edgeDist.toFixed(1)}`}
+            text={`${(params.edgeDist || 0).toFixed(1)}`}
           />
         );
       } else {
@@ -324,7 +324,7 @@ const renderDetailedDimensions = (
             key="h-edge-start-text"
             x={(edgeStart + edgeEnd) / 2}
             y={dimY - 15}
-            text={`${params.edgeDist.toFixed(1)}`}
+            text={`${(params.edgeDist || 0).toFixed(1)}`}
           />
         );
       }
@@ -484,7 +484,7 @@ const renderDetailedDimensions = (
         key="v-end-top-text"
         x={dimX + 15}
         y={offsetY + (firstBoltY * scale) / 2}
-        text={`${params.endDist.toFixed(1)}`}
+        text={`${(params.endDist || 0).toFixed(1)}`}
       />
     );
     }
@@ -537,7 +537,7 @@ const renderDetailedDimensions = (
           key={`v-pitch-text-${i}`}
           x={dimX + 15}
           y={(y1 + y2) / 2}
-          text={`${pitchValue.toFixed(1)}`}
+          text={`${(pitchValue || 0).toFixed(1)}`}
         />
       );
     }
@@ -588,7 +588,7 @@ const renderDetailedDimensions = (
         key="v-end-bottom-text"
         x={dimX + 15}
         y={(offsetY + lastBoltY * scale + bottomEndY) / 2}
-        text={`${params.endDist.toFixed(1)}`}
+        text={`${(params.endDist || 0).toFixed(1)}`}
       />
     );
     }
@@ -676,53 +676,59 @@ const SpacingDiagram = ({
       }
     }
 
-    const gaugeFallback = gaugeValues[0] || 50;
     const edgeRaw = toNumber(edge);
-    const edgeDist = Number.isFinite(edgeRaw) && edgeRaw > 0 ? edgeRaw : gaugeFallback;
+    const edgeDist = Number.isFinite(edgeRaw) && edgeRaw > 0 ? edgeRaw : undefined;
 
     const endRaw = toNumber(end);
-    const endDist = Number.isFinite(endRaw) && endRaw > 0 ? endRaw : gaugeFallback;
+    const endDist = Number.isFinite(endRaw) && endRaw > 0 ? endRaw : undefined;
 
     const pitchRaw = toNumber(pitch);
-    const pitchDist =
-      Number.isFinite(pitchRaw) && pitchRaw > 0
-        ? pitchRaw
-        : boltRows > 1
-        ? gaugeFallback
-        : gaugeFallback;
+    const pitchDist = Number.isFinite(pitchRaw) && pitchRaw > 0 ? pitchRaw : undefined;
 
-    const widthFallback =
-      toNumber(plateWidth) ||
-      edgeDist * 2 + gaugeFallback * Math.max(boltCols - 1, 0) + 50;
-    const heightFallback =
-      toNumber(plateHeight) ||
-      endDist * 2 + pitchDist * Math.max(boltRows - 1, 0) + 50;
-
-    const width = clampPositive(plateWidth, widthFallback);
-    const height = clampPositive(plateHeight, heightFallback);
-    const holeDia = clampPositive(
-      holeDiameter,
-      Math.min(width, height) * 0.04
-    );
-
-    // Normalise gauges after width fallback
-    if (!gaugeValues.length) {
-      gaugeValues = [gaugeFallback];
+    // All calculations should come from osdag_core - no fallback calculations
+    const width = toNumber(plateWidth);
+    const height = toNumber(plateHeight);
+    
+    // If required dimensions are missing, return early with error state
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+      console.warn('SpacingDiagram: Missing required plateWidth or plateHeight from backend');
+      return {
+        width: 0,
+        height: 0,
+        boltRows,
+        boltCols,
+        edgeDist: edgeDist || 0,
+        endDist: endDist || 0,
+        pitchDist: pitchDist || 0,
+        gaugeValues,
+        holeDia: 0,
+        weld: Math.max(0, toNumber(weldSize, 0)),
+        error: 'Missing plate dimensions from backend',
+      };
     }
-    gaugeValues = gaugeValues.map((value) =>
-      clampPositive(value, width / Math.max(boltCols, 1))
-    );
+    
+    // Hole diameter should come from backend, but if missing use 0 (no holes for welded connections)
+    const holeDia = toNumber(holeDiameter);
+    
+    // All gauge values should come from backend - no fallback normalization
+    if (!gaugeValues.length) {
+      // If no gauge values from backend, use the provided gauge value
+      const singleGauge = toNumber(gauge);
+      if (Number.isFinite(singleGauge) && singleGauge > 0) {
+        gaugeValues = [singleGauge];
+      }
+    }
 
     return {
       width,
       height,
       boltRows,
       boltCols,
-      edgeDist,
-      endDist,
-      pitchDist,
+      edgeDist: edgeDist || 0,
+      endDist: endDist || 0,
+      pitchDist: pitchDist || 0,
       gaugeValues,
-      holeDia,
+      holeDia: holeDia || 0,
       weld: Math.max(0, toNumber(weldSize, 0)),
     };
   }, [plateWidth, plateHeight, rows, cols, edge, end, pitch, gauge, holeDiameter, weldSize]);
