@@ -208,15 +208,11 @@ class CreateLatex(Document):
                     with doc.create(Subsection("List of Input Section")):
                         with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
                             list_sec = uiObj[i].strip("['']")
-                            print( 'list_sec', list_sec,'\n', list_sec.split("', '"))
                             # count = 0
                             # for i in list_sec:
                             #     print(i)
                             #     count += 1
                             str_len = len(list_sec.split("', '"))
-                            print( 'str_len', str_len)
-                            print(f"list_sec.split("', '")[0:220].strip("")", list_sec.split("', '")[0:220])
-                            print('\n',','.join(f"'{x}'" for x in list_sec.split("', '")[0:220]))
                             # list_sec.split("', '")[0:220]
                             if str_len > 200: # 130
                                 table.add_hline()
@@ -305,7 +301,6 @@ class CreateLatex(Document):
                             for i in uiObj:
                                 # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
 
-                                print(i)
                                 if type(uiObj[i]) == dict and i == 'Selected Section Details':
                                     table.add_hline()
                                     sectiondetails = uiObj[i]
@@ -316,8 +311,6 @@ class CreateLatex(Document):
                                         merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 2)
                                     else:
                                         merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 1)
-                                    print('Hi', len(sectiondetails) / 2, round_up(len(sectiondetails), 2) / 2,
-                                          merge_rows)
                                     if (len(sectiondetails)) % 2 == 0:
                                         sectiondetails[''] = ''
                                     a = list(sectiondetails.keys())
@@ -460,15 +453,43 @@ class CreateLatex(Document):
                                 image_5.add_caption('Typical Shear Key Details')
                                 # doc.append(NewPage())
 
+        # Check if images actually exist before using them
+        images_exist = False
+        view_3dimg_path = None
+        view_topimg_path = None
+        view_sideimg_path = None
+        view_frontimg_path = None
+        
+        # Handle None or empty Disp_3d_image
+        if Disp_3d_image is None:
+            Disp_3d_image = ''
+        
         if does_design_exist and sys.platform != 'darwin' and Disp_3d_image != '':
-            doc.append(NewPage())
             Disp_top_image = "/ResourceFiles/images/top.png"
             Disp_side_image = "/ResourceFiles/images/side.png"
             Disp_front_image = "/ResourceFiles/images/front.png"
+            
+            # Use ONLY the provided rel_path (which should be the report directory)
+            # Images are stored at: {report_dir}/ResourceFiles/images/
+            # No fallback checks - deterministic path resolution
             view_3dimg_path = rel_path + Disp_3d_image
             view_topimg_path = rel_path + Disp_top_image
             view_sideimg_path = rel_path + Disp_side_image
             view_frontimg_path = rel_path + Disp_front_image
+            
+            images_exist = (
+                os.path.exists(view_3dimg_path) and
+                os.path.exists(view_topimg_path) and
+                os.path.exists(view_sideimg_path) and
+                os.path.exists(view_frontimg_path)
+            )
+            
+            if not images_exist:
+                # Try to find images in common locations
+                possible_image_dir = os.path.join(rel_path, "ResourceFiles", "images")
+        
+        if does_design_exist and sys.platform != 'darwin' and Disp_3d_image != '' and images_exist and view_3dimg_path:
+            doc.append(NewPage())
             with doc.create(Section('Views')):
                 doc.append(pyl.Command('setlength', arguments=[NoEscape(r'\arrayrulewidth'), NoEscape(r'1pt')]))
                 with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.1)) as table:
@@ -477,12 +498,12 @@ class CreateLatex(Document):
                     view_sideimg_path = rel_path + Disp_side_image
                     view_frontimg_path = rel_path + Disp_front_image
                     table.add_hline()
-                    table.add_row([StandAloneGraphic(image_options="height=4cm",filename=view_3dimg_path),
-                                  StandAloneGraphic(image_options="height=4cm",filename=view_topimg_path)])
+                    table.add_row([StandAloneGraphic(image_options="height=4cm",filename=str(view_3dimg_path)),
+                                  StandAloneGraphic(image_options="height=4cm",filename=str(view_topimg_path))])
                     table.add_row('(a) 3D View', '(b) Top View')
                     table.add_hline()
-                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_sideimg_path),
-                                  StandAloneGraphic(image_options="height=4cm", filename=view_frontimg_path)])
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=str(view_sideimg_path)),
+                                  StandAloneGraphic(image_options="height=4cm", filename=str(view_frontimg_path))])
                     table.add_row('(c) Side View', '(d) Front View')
                     table.add_hline()
                 # with doc.create(Figure(position='h!')) as view_3D:
@@ -507,12 +528,12 @@ class CreateLatex(Document):
                     view_sideimg_path = imgpath_broken
                     view_frontimg_path = imgpath_broken
                     table.add_hline()
-                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_3dimg_path),
-                                   StandAloneGraphic(image_options="height=4cm", filename=view_topimg_path)])
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=str(view_3dimg_path)),
+                                   StandAloneGraphic(image_options="height=4cm", filename=str(view_topimg_path))])
                     table.add_row('(a) 3D View', '(b) Top View')
                     table.add_hline()
-                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_sideimg_path),
-                                   StandAloneGraphic(image_options="height=4cm", filename=view_frontimg_path)])
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=str(view_sideimg_path)),
+                                   StandAloneGraphic(image_options="height=4cm", filename=str(view_frontimg_path))])
                     table.add_row('(c) Side View', '(d) Front View')
                     table.add_hline()
 
@@ -541,8 +562,6 @@ class CreateLatex(Document):
 
                 doc.append(TextColor(colour, '\n' + msg_str))
         try:
-            print(f"Attempting PDF generation...")
-            
             # **CRITICAL FIX**: Use proper file path handling
             full_filename = os.path.join(rel_path, filename)
             doc.generate_pdf(full_filename, compiler='pdflatex', clean_tex=False)
@@ -550,30 +569,22 @@ class CreateLatex(Document):
             # Check if PDF was created in the correct location
             pdf_path = f"{full_filename}.pdf"
             if os.path.exists(pdf_path):
-                file_size = os.path.getsize(pdf_path)
-                print(f"SUCCESS: PDF generated ({file_size} bytes)")
                 return True
             else:
-                print("ERROR: PDF not found")
-                
                 # **DEBUG**: Check if PDF was created in wrong location
                 wrong_pdf_path = f"{filename}.pdf"
                 if os.path.exists(wrong_pdf_path):
-                    print(f"WARNING: PDF was created in wrong location: {wrong_pdf_path}")
                     # Move it to correct location
                     try:
                         import shutil
                         shutil.move(wrong_pdf_path, pdf_path)
-                        print(f"SUCCESS: PDF moved to correct location: {pdf_path}")
                         return True
                     except Exception as move_error:
-                        print(f"ERROR: Could not move PDF: {move_error}")
+                        pass
                 
                 return False
                 
         except Exception as e:
-            print(f"PDF generation error: {e}")
-            
             # **ENHANCED ERROR HANDLING**: Try multiple paths
             possible_paths = [
                 f"{os.path.join(rel_path, filename)}.pdf",
@@ -585,7 +596,6 @@ class CreateLatex(Document):
                 if os.path.exists(path):
                     file_size = os.path.getsize(path)
                     if file_size > 1000:
-                        print(f"PDF found at alternative location: {path} ({file_size} bytes)")
                         return True
             
             return False

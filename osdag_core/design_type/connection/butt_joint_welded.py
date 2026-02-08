@@ -1596,10 +1596,15 @@ class ButtJointWelded(MomentConnection):
             # ==========================================================================
             Disp_2d_image = []
             Disp_3D_image = "/ResourceFiles/images/3d.png"
-            rel_path = os.path.abspath(".").replace("\\", "/")
             fname_no_ext = popup_summary.get("filename", "ButtJointWeldedReport")
-            folder = popup_summary.get('folder', './reports')
-            os.makedirs(folder, exist_ok=True)
+            # Use directory of filename if it's a full path (web API), otherwise use folder (GUI)
+            if fname_no_ext and os.path.isabs(fname_no_ext):
+                rel_path = os.path.dirname(fname_no_ext)
+            else:
+                folder = popup_summary.get('folder', './reports')
+                rel_path = folder
+                os.makedirs(folder, exist_ok=True)
+            rel_path = os.path.abspath(rel_path).replace("\\", "/")
 
             CreateLatex.save_latex(
                 CreateLatex(), self.report_input, self.report_check,

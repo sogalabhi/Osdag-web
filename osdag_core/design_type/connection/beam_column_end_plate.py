@@ -3310,12 +3310,10 @@ class BeamColumnEndPlate(MomentConnection):
 
         Disp_2d_image = [path_weld, path_detailing, path_stiffener]
         Disp_3d_image = "/ResourceFiles/images/3d.png"
-        print(sys.path[0])
-        rel_path = str(sys.path[0])
-        rel_path = os.path.abspath(".") # TEMP
-        rel_path = rel_path.replace("\\", "/")
-
         fname_no_ext = popup_summary['filename']
+        rel_path = os.path.dirname(fname_no_ext) if fname_no_ext else os.path.abspath(".")
+        rel_path = os.path.abspath(rel_path)
+        rel_path = rel_path.replace("\\", "/")
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3d_image, module=self.module)

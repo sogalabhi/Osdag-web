@@ -2700,10 +2700,18 @@ class CommonDesignLogic(object):
 
         self.component = component
 
-        # Use CleanupCoordinator for centralized cleanup
-        from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
-        coordinator = get_cleanup_coordinator()
-        coordinator.cleanup_for_new_design(self.cad_widget, self.display)
+        # Use CleanupCoordinator for centralized cleanup (optional - may not be available in headless/web mode)
+        try:
+            from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+            coordinator = get_cleanup_coordinator()
+            coordinator.cleanup_for_new_design(self.cad_widget, self.display)
+        except ImportError:
+            # Headless/web mode - cleanup coordinator not available, just clear display manually
+            try:
+                if self.display:
+                    self.display.EraseAll()
+            except Exception:
+                pass  # Ignore errors in headless mode
 
         # Show Cube
         self.cad_widget.display_view_cube()

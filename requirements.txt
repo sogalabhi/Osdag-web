@@ -55,6 +55,10 @@ pillow==11.3.0
 cairocffi==1.1.0
 svgwrite==1.4
 
+# --- CAD Rendering (for report image generation) ---
+# Note: Using VTK (already installed) and PySide6 (already installed) for rendering
+# Open3D is optional - can be installed separately if needed: pip install open3d>=0.17.0
+
 # --- Firebase ---
 firebase_admin==7.1.0
 google-cloud-firestore==2.21.0
