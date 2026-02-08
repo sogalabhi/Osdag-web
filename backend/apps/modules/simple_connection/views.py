@@ -2,6 +2,7 @@
 Simple Connection ViewSet - routes to sub-module services via slug.
 Mirrors shear_connection pattern (design + options endpoints).
 """
+import logging
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -10,7 +11,10 @@ from rest_framework.response import Response
 from apps.core.models import Material, CustomMaterials, Bolt
 from apps.core.utils.module_helpers import handle_design_request
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
+from apps.core.utils.errors import format_error_response, get_error_status_code
 from .registry import SimpleConnectionRegistry
+
+logger = logging.getLogger(__name__)
 
 
 class SimpleConnectionViewSet(viewsets.ViewSet):
@@ -55,7 +59,10 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
             status_code = 200 if result.get('success', True) else 400
             return Response(result, status=status_code)
         except Exception as exc:
-            return Response({'error': str(exc), 'success': False}, status=400)
+            logger.error(f"Error in simple connection design for {submodule_slug}: {exc}", exc_info=True)
+            error_response = format_error_response(exc)
+            status_code = get_error_status_code(exc)
+            return Response(error_response, status=status_code)
 
     @action(detail=False, methods=['get'], url_path='(?P<submodule_slug>[^/.]+)/options')
     def options(self, request, submodule_slug=None):
@@ -87,6 +94,15 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
         cover_plate_list = ['Single-Cover', 'Double-Cover']
         weld_size_list = ['4', '5', '6', '8', '10', '12']
 
+        # Design preferences options
+        bolt_type_list = ['Non Pre-tensioned', 'Pre-tensioned']
+        bolt_hole_type_list = ['Standard', 'Over-sized']
+        slip_factor_list = ['0.3', '0.45', '0.5']
+        edge_type_list = ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed']
+        weld_type_list = ['Shop weld', 'Field weld']
+        design_for_list = ['Tension', 'Compression']
+        packing_plate_list = ['Yes', 'No']
+
         try:
             if slug in ('butt-joint-bolted', 'lap-joint-bolted'):
                 data = {
@@ -95,6 +111,20 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
                     'coverPlateList': cover_plate_list,
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,
+                    # Design preferences
+                    'designPreferences': {
+                        'bolt': {
+                            'boltType': bolt_type_list,
+                            'boltHoleType': bolt_hole_type_list,
+                            'slipFactor': slip_factor_list,
+                        },
+                        'detailing': {
+                            'edgeType': edge_type_list,
+                        },
+                        'design': {
+                            'designFor': design_for_list,
+                        }
+                    }
                 }
                 return Response(data, status=status.HTTP_200_OK)
 
@@ -104,6 +134,20 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
                     'thicknessList': thickness_list,
                     'coverPlateList': cover_plate_list,
                     'weldSizeList': weld_size_list,
+                    # Design preferences
+                    'designPreferences': {
+                        'weld': {
+                            'weldType': weld_type_list,
+                            # weldMaterialGradeOverwrite is a text input (Fu in MPa)
+                        },
+                        'detailing': {
+                            'edgeType': edge_type_list,
+                            'packingPlate': packing_plate_list if slug == 'butt-joint-welded' else None,
+                        },
+                        'design': {
+                            'designFor': design_for_list,
+                        }
+                    }
                 }
                 return Response(data, status=status.HTTP_200_OK)
 

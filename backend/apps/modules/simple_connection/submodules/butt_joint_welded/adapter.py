@@ -19,6 +19,7 @@ from apps.core.utils import (
     contains_keys, custom_list_validation, float_able, int_able, validate_list_type, write_stl
 )
 from ...shared import setup_for_cad
+from ...shared_validation import create_welded_validator
 
 def get_required_keys() -> List[str]:
     return [
@@ -35,8 +36,11 @@ def get_required_keys() -> List[str]:
         "Design.For",
     ]
 
+# Create shared validator instance
+_validator = create_welded_validator(get_required_keys(), "ButtJointWelded")
+
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate required inputs for ButtJointWelded (no fallbacks)."""
+    """Validate required inputs for ButtJointWelded using shared validator."""
     iv = dict(input_values or {})
     # Provide legacy defaults for weld metadata if omitted by caller
     iv.setdefault("Weld.Material_Grade_OverWrite", "410")
@@ -44,31 +48,8 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     iv.setdefault("Weld.Type", iv.get("Weld.Fab"))  # keep type aligned with fabrication when absent
     # Persist defaults back to caller dict so downstream set_input_values sees them
     input_values.update(iv)
-    missing = contains_keys(iv, get_required_keys())
-    if missing:
-        raise MissingKeyError(missing[0])
-
-    weld_size = iv.get("Weld.Size")
-    if isinstance(weld_size, (int, float, str)):
-        iv["Weld.Size"] = [str(weld_size)]
-    if (not isinstance(iv.get("Weld.Size"), list)
-            or not validate_list_type(iv.get("Weld.Size"), str)
-            or not custom_list_validation(iv.get("Weld.Size"), float_able)):
-        raise InvalidInputTypeError("Weld.Size", "non empty List[str] convertible to float")
-
-    for key in ("Plate1Thickness", "Plate2Thickness", "PlateWidth", "Load.Axial"):
-        val = iv.get(key)
-        # Normalize list/tuple to first element
-        if isinstance(val, (list, tuple)) and val:
-            val = val[0]
-        # allow numeric and coerce to str before float check
-        if isinstance(val, (int, float)):
-            val = str(val)
-        if not isinstance(val, str) or not float_able(val):
-            raise InvalidInputTypeError(key, "str convertible to float")
-        # persist normalized value
-        iv[key] = val
-        input_values[key] = val
+    # Use shared validator for validation
+    _validator.validate(input_values)
 
 
 def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
@@ -99,6 +80,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Width of Cover Plate": "Width of Cover Plate",
                 "Length of Cover Plate": "Length of Cover Plate",
                 "Thickness of Cover Plate": "Thickness of Cover Plate",
+                # Spacing details (for Butt Joint Welded)
+                "Bolt.Pitch": "Bolt.Pitch",
+                "Bolt.EndDist": "Bolt.EndDist",
+                "Bolt.Gauge": "Bolt.Gauge",
+                "Bolt.EdgeDist": "Bolt.EdgeDist",
             }
             label_map = {
                 "Weld.Type": "Type",
@@ -109,18 +95,28 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Width of Cover Plate": "Width of Cover Plate",
                 "Length of Cover Plate": "Length of Cover Plate",
                 "Thickness of Cover Plate": "Thickness of Cover Plate",
+                # Spacing details
+                "Bolt.Pitch": "Pitch Distance (mm)",
+                "Bolt.EndDist": "End Distance (mm)",
+                "Bolt.Gauge": "Gauge Distance (mm)",
+                "Bolt.EdgeDist": "Edge Distance (mm)",
             }
             for tup in tuple_list or []:
                 if len(tup) < 4:
                     continue
-                src_key, label, _, val = tup[:4]
+                src_key, label, param_type, val = tup[:4]
+                # Skip buttons, notes, and section images, but include actual spacing values
+                if param_type in ("OutButton", "Button", "Note", "Section") or callable(val):
+                    continue
                 target_key = key_map.get(src_key, src_key)
                 display_label = label_map.get(target_key, label or target_key)
                 mapped_output[target_key] = {"key": target_key, "label": display_label, "val": val}
 
         if hasattr(module, "output_values"):
             map_tuple_list(module.output_values(True))
-        # Do not call spacing for welded (spacing() references self.plate and crashes)
+        # Include spacing details for Butt Joint Welded (it has spacing() method in Osdag)
+        if hasattr(module, "spacing"):
+            map_tuple_list(module.spacing(True))
 
         # Supplement with scalars if not already mapped
         def add_scalar(src_attr, target_key, label):
@@ -130,7 +126,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 mapped_output[target_key] = {"key": target_key, "label": label, "val": getattr(module, src_attr)}
 
         add_scalar("weld_size", "Weld.Size", "Size (mm)")
-        add_scalar("weld_strength", "Weld.Strength", "Strength (N/mm2)")
+        # Weld strength in Osdag is in kN (converted from N in output_values)
+        if hasattr(module, 'weld_strength') and module.weld_strength:
+            weld_strength_kn = round(module.weld_strength / 1000, 2) if module.weld_strength > 1000 else module.weld_strength
+            mapped_output["Weld.Strength"] = {"key": "Weld.Strength", "label": "Strength (kN)", "val": weld_strength_kn}
         add_scalar("weld_length_effective", "Weld.EffLength", "Eff.Length (mm)")
         add_scalar("design_for", "Design For", "Design For")
         add_scalar("weld_length_provided", "Bolt.ConnLength", "Length of Connection (mm)")  # reused key for length

@@ -6,6 +6,7 @@ import {
     KEY_DISP_PLATE2_THICKNESS, KEY_D, KEY_TYP, KEY_GRD, KEY_DP_BOLT_HOLE_TYPE,
     KEY_DP_BOLT_TYPE, KEY_DESIGN_FOR,
 } from "../../../../constants/DesignKeys";
+import { validateSimpleConnectionInputs } from "../../shared/validation";
 
 export const buttJointBoltedConfig = {
     sessionName: "Butt Joint Bolted",
@@ -46,13 +47,9 @@ export const buttJointBoltedConfig = {
     ],
 
     validateInputs: (inputs) => {
-        // if (!inputs.section_designation ||
-        //     !inputs.length ||
-        //     !inputs.axial_force ||
-        //     inputs.section_designation === "Select Section") {
-        //     return { isValid: false, message: "Please input all the required fields" };
-        // }
-        return { isValid: true };
+        return validateSimpleConnectionInputs(inputs, { 
+            moduleType: 'bolted'
+        });
     },
 
     buildSubmissionParams: (inputs, allSelected, lists, extraState) => {

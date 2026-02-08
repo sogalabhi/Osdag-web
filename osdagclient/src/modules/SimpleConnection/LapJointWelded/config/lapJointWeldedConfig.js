@@ -4,8 +4,10 @@ import {
     KEY_COVER_PLATE, KEY_DISP_COVER_PLT, KEY_DP_DETAILING_PACKING_PLATE,
     KEY_DISP_WELD_SIZE, KEY_DISP_PLATE1_THICKNESS, KEY_DISP_PLATE_WIDTH,
     KEY_DISP_PLATE2_THICKNESS,
-    KEY_DESIGN_FOR
+    KEY_DESIGN_FOR,
+    KEY_DP_WELD_TYPE, KEY_DP_WELD_MATERIAL_G_O
 } from "../../../../constants/DesignKeys";
+import { validateSimpleConnectionInputs } from "../../shared/validation";
 
 export const lapJointWeldedConfig = {
     sessionName: "Lap Joint Welded",
@@ -24,6 +26,8 @@ export const lapJointWeldedConfig = {
         material: "E 250 (Fe 410 W)A",
         detailing_edge_type: "Sheared or hand flame cut",
         cover_plate: "Single-Cover",
+        weld_fab: "Shop weld",
+        weld_material_grade: "",
         design_for: "Tension",
     },
 
@@ -37,13 +41,9 @@ export const lapJointWeldedConfig = {
     ],
 
     validateInputs: (inputs) => {
-        // if (!inputs.section_designation ||
-        //     !inputs.length ||
-        //     !inputs.axial_force ||
-        //     inputs.section_designation === "Select Section") {
-        //     return { isValid: false, message: "Please input all the required fields" };
-        // }
-        return { isValid: true };
+        return validateSimpleConnectionInputs(inputs, { 
+            moduleType: 'welded'
+        });
     },
 
     buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
@@ -71,6 +71,8 @@ export const lapJointWeldedConfig = {
             [KEY_AXIAL]: String(inputs.axial_force),
             [KEY_WELD_SIZE]: getArrayParam(allSelected.weld_size, lists.weldSizeList, inputs.weld_size),
             [KEY_DESIGN_FOR]: String(inputs.design_for),
+            [KEY_DP_WELD_TYPE]: String(inputs.weld_fab || "Shop weld"),
+            [KEY_DP_WELD_MATERIAL_G_O]: String(inputs.weld_material_grade || ""),
         };
     },
 

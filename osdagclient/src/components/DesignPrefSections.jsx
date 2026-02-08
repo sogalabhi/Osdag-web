@@ -20,9 +20,25 @@ const DesignPrefSections = ({
   confirmationModal,
   isInputLocked
 }) => {
-  const [activeTab, setActiveTab] = useState(
-    module === "Cover Plate Bolted Connection" || module === "Beam Beam End Plate Connection" ? 1 : 0
-  );
+  // Simple connection module names
+  const SIMPLE_CONNECTION_MODULES = [
+    "Butt Joint Bolted",
+    "Butt Joint Welded", 
+    "Lap Joint Bolted",
+    "Lap Joint Welded"
+  ];
+
+  const [activeTab, setActiveTab] = useState(() => {
+    if (SIMPLE_CONNECTION_MODULES.includes(module)) {
+      // For simple connections, start with first available tab (Bolt/Weld = id 3/4, Detailing = 5, Design = 6)
+      if (module === "Butt Joint Bolted" || module === "Lap Joint Bolted") {
+        return 3; // Start with Bolt tab
+      } else {
+        return 4; // Start with Weld tab
+      }
+    }
+    return module === "Cover Plate Bolted Connection" || module === "Beam Beam End Plate Connection" ? 1 : 0;
+  });
   const { designPrefData, design_pref_defaults } = useContext(ModuleContext);
 
   // Tabs configuration per module
@@ -35,6 +51,28 @@ const DesignPrefSections = ({
     { name: "Detailing", id: 5 },
     { name: "Design", id: 6 },
   ];
+
+  // Simple connection tab filtering
+  if (SIMPLE_CONNECTION_MODULES.includes(module)) {
+    // For bolted simple connections: Bolt, Detailing, Design
+    if (module === "Butt Joint Bolted" || module === "Lap Joint Bolted") {
+      tabs = tabs.filter(
+        (tab) => tab.name !== "Column Section*" && 
+                 tab.name !== "Beam Section*" && 
+                 tab.name !== "Connector" && 
+                 tab.name !== "Weld"
+      );
+    }
+    // For welded simple connections: Weld, Detailing, Design
+    else if (module === "Butt Joint Welded" || module === "Lap Joint Welded") {
+      tabs = tabs.filter(
+        (tab) => tab.name !== "Column Section*" && 
+                 tab.name !== "Beam Section*" && 
+                 tab.name !== "Connector" && 
+                 tab.name !== "Bolt"
+      );
+    }
+  }
 
   if (module === "Cover Plate Bolted Connection") {
     tabs = tabs.filter(
@@ -49,7 +87,26 @@ const DesignPrefSections = ({
   }
 
   const [designPrefInputs, setDesignPrefInputs] = useState(() => {
-    if (module === "Cover Plate Bolted Connection") {
+    // Simple connection modules
+    if (module === "Butt Joint Bolted" || module === "Lap Joint Bolted") {
+      return {
+        bolt_tension_type: inputs.bolt_tension_type || "Non Pre-tensioned",
+        bolt_hole_type: inputs.bolt_hole_type || "Standard",
+        bolt_slip_factor: inputs.bolt_slip_factor || "0.3",
+        detailing_edge_type: inputs.detailing_edge_type || "Sheared or hand flame cut",
+        design_for: inputs.design_for || "Tension",
+      };
+    }
+    else if (module === "Butt Joint Welded" || module === "Lap Joint Welded") {
+      return {
+        weld_fab: inputs.weld_fab || "Shop weld",  // Note: Osdag uses "Shop weld" not "Shop Weld"
+        weld_material_grade: inputs.weld_material_grade || "",
+        detailing_edge_type: inputs.detailing_edge_type || "Sheared or hand flame cut",
+        detailing_packing_plate: inputs.detailing_packing_plate || (module === "Butt Joint Welded" ? "No" : undefined),
+        design_for: inputs.design_for || "Tension",
+      };
+    }
+    else if (module === "Cover Plate Bolted Connection") {
       return {
         supported_material: inputs.member_material,
         connector_material: inputs.connector_material,

@@ -19,6 +19,7 @@ from apps.core.utils import (
     contains_keys, custom_list_validation, float_able, int_able, validate_list_type, write_stl
 )
 from ...shared import setup_for_cad
+from ...shared_validation import create_welded_validator
 
 def get_required_keys() -> List[str]:
     return [
@@ -35,38 +36,19 @@ def get_required_keys() -> List[str]:
         "Design.For",
     ]
 
+# Create shared validator instance
+_validator = create_welded_validator(get_required_keys(), "LapJointWelded")
+
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate input values"""
+    """Validate input values using shared validator"""
     iv = dict(input_values or {})
     # Provide legacy defaults for weld metadata if omitted by caller
     iv.setdefault("Weld.Material_Grade_OverWrite", "410")
     iv.setdefault("Weld.Fab", "Shop Weld")
     iv.setdefault("Weld.Type", iv.get("Weld.Fab"))
     input_values.update(iv)
-    missing = contains_keys(iv, get_required_keys())
-    if missing:
-        raise MissingKeyError(missing[0])
-
-    weld_size = iv.get("Weld.Size")
-    if isinstance(weld_size, (int, float, str)):
-        iv["Weld.Size"] = [str(weld_size)]
-    if (not isinstance(iv.get("Weld.Size"), list)
-            or not validate_list_type(iv.get("Weld.Size"), str)
-            or not custom_list_validation(iv.get("Weld.Size"), float_able)):
-        raise InvalidInputTypeError("Weld.Size", "non empty List[str] convertible to float")
-
-    for key in ("Plate1Thickness", "Plate2Thickness", "PlateWidth", "Load.Axial"):
-        val = iv.get(key)
-        # Normalize list/tuple to first element
-        if isinstance(val, (list, tuple)) and val:
-            val = val[0]
-        # allow numeric and coerce to str before float check
-        if isinstance(val, (int, float)):
-            val = str(val)
-        if not isinstance(val, str) or not float_able(val):
-            raise InvalidInputTypeError(key, "str convertible to float")
-        iv[key] = val
-        input_values[key] = val
+    # Use shared validator for validation
+    _validator.validate(input_values)
 
 def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     """Generate output from input values"""
@@ -130,10 +112,13 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 mapped_output[target_key] = {"key": target_key, "label": label, "val": getattr(module, src_attr)}
 
         add_scalar("weld_size", "Weld.Size", "Size (mm)")
-        add_scalar("weld_strength", "Weld.Strength", "Strength (N/mm2)")
+        # Weld strength in Osdag is in kN (converted from N in output_values)
+        if hasattr(module, 'weld_strength') and module.weld_strength:
+            weld_strength_kn = round(module.weld_strength / 1000, 2) if module.weld_strength > 1000 else module.weld_strength
+            mapped_output["Weld.Strength"] = {"key": "Weld.Strength", "label": "Strength (kN)", "val": weld_strength_kn}
         add_scalar("weld_length_effective", "Weld.EffLength", "Eff.Length (mm)")
         add_scalar("design_for", "Design For", "Design For")
-        add_scalar("weld_length_provided", "Bolt.ConnLength", "Length of Connection (mm)")
+        add_scalar("connection_length", "Bolt.ConnLength", "Length of Connection (mm)")
 
         if mapped_output:
             output = mapped_output

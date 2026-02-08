@@ -1,4 +1,6 @@
-import { Select,Input } from 'antd'
+import { Select, Input } from 'antd'
+
+const { Option } = Select;
 
 const WeldSectionModal = ({ inputs, setInputs, designPrefInputs, setDesignPrefInputs, isInputLocked }) => {
 
@@ -19,8 +21,8 @@ Field weld takes a material safety factor of 1.5
                                 value={designPrefInputs.weld_fab}
                                 onSelect={value => setDesignPrefInputs({...designPrefInputs, weld_fab: value})}
                             >
-                                    <Option value="Shop Weld">Shop Weld</Option>
-                                    <Option value="Field Weld">Field Weld</Option>
+                                    <Option value="Shop weld">Shop Weld</Option>
+                                    <Option value="Field weld">Field Weld</Option>
                             </Select>
                         </div>
                     </div>

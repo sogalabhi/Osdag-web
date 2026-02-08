@@ -3,8 +3,10 @@ import {
     KEY_PLATE1_THICKNESS, KEY_PLATE2_THICKNESS, KEY_PLATE_WIDTH, KEY_WELD_SIZE,
     KEY_COVER_PLATE, KEY_DISP_COVER_PLT, KEY_DP_DETAILING_PACKING_PLATE,
     KEY_DISP_WELD_SIZE, KEY_DISP_PLATE1_THICKNESS, KEY_DISP_PLATE_WIDTH,
-    KEY_DISP_PLATE2_THICKNESS, KEY_DESIGN_FOR
+    KEY_DISP_PLATE2_THICKNESS, KEY_DESIGN_FOR,
+    KEY_DP_WELD_TYPE, KEY_DP_WELD_MATERIAL_G_O
 } from "../../../../constants/DesignKeys";
+import { validateSimpleConnectionInputs } from "../../shared/validation";
 
 export const buttJointWeldedConfig = {
     sessionName: "Butt Joint Welded",
@@ -22,7 +24,10 @@ export const buttJointWeldedConfig = {
         plate_width: "200",
         material: "E 250 (Fe 410 W)A",
         detailing_edge_type: "Sheared or hand flame cut",
+        detailing_packing_plate: "No",
         cover_plate: "Single-Cover",
+        weld_fab: "Shop weld",
+        weld_material_grade: "",
         design_for: "Tension",
     },
 
@@ -36,13 +41,9 @@ export const buttJointWeldedConfig = {
     ],
 
     validateInputs: (inputs) => {
-        // if (!inputs.section_designation ||
-        //     !inputs.length ||
-        //     !inputs.axial_force ||
-        //     inputs.section_designation === "Select Section") {
-        //     return { isValid: false, message: "Please input all the required fields" };
-        // }
-        return { isValid: true };
+        return validateSimpleConnectionInputs(inputs, { 
+            moduleType: 'welded'
+        });
     },
 
     buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
@@ -60,7 +61,7 @@ export const buttJointWeldedConfig = {
 
         return {
             [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
-            [KEY_DP_DETAILING_PACKING_PLATE]: "No",
+            [KEY_DP_DETAILING_PACKING_PLATE]: String(inputs.detailing_packing_plate || "No"),
             [KEY_MODULE]: "ButtJointWelded",
             [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
             [KEY_PLATE2_THICKNESS]: String(inputs.plate2_thickness),
@@ -70,6 +71,8 @@ export const buttJointWeldedConfig = {
             [KEY_AXIAL]: String(inputs.axial_force),
             [KEY_WELD_SIZE]: getArrayParam(allSelected.weld_size, lists.weldSizeList, inputs.weld_size),
             [KEY_DESIGN_FOR]: String(inputs.design_for),
+            [KEY_DP_WELD_TYPE]: String(inputs.weld_fab || "Shop weld"),
+            [KEY_DP_WELD_MATERIAL_G_O]: String(inputs.weld_material_grade || ""),
         };
     },
 

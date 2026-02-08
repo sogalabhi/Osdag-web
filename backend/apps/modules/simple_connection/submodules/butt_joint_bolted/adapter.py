@@ -19,6 +19,7 @@ from apps.core.utils import (
     contains_keys, custom_list_validation, float_able, int_able, validate_list_type, write_stl
 )
 from ...shared import setup_for_cad
+from ...shared_validation import create_bolted_validator
 
 def get_required_keys() -> List[str]:
     return [
@@ -37,29 +38,12 @@ def get_required_keys() -> List[str]:
         "Design.For",
     ]
 
+# Create shared validator instance
+_validator = create_bolted_validator(get_required_keys(), "ButtJointBolted")
+
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate input values"""
-    iv = dict(input_values or {})
-    missing = contains_keys(iv, get_required_keys())
-    if missing:
-        raise MissingKeyError(missing[0])
-
-    bolt_dia = iv.get("Bolt.Diameter")
-    if (not isinstance(bolt_dia, list)
-            or not validate_list_type(bolt_dia, str)
-            or not custom_list_validation(bolt_dia, int_able)):
-        raise InvalidInputTypeError("Bolt.Diameter", "non empty List[str] convertible to int")
-
-    bolt_grade = iv.get("Bolt.Grade")
-    if (not isinstance(bolt_grade, list)
-            or not validate_list_type(bolt_grade, str)
-            or not custom_list_validation(bolt_grade, float_able)):
-        raise InvalidInputTypeError("Bolt.Grade", "non empty List[str] convertible to float")
-
-    for key in ("Plate1Thickness", "Plate2Thickness", "PlateWidth", "Load.Axial", "Bolt.Slip_Factor"):
-        val = iv.get(key)
-        if not isinstance(val, str) or not float_able(val):
-            raise InvalidInputTypeError(key, "str convertible to float")
+    """Validate input values using shared validator"""
+    _validator.validate(input_values)
 
 def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     """Generate output from input values"""
@@ -101,6 +85,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Plate.BaseUtilization": "Plate.BaseUtilization",
                 "Bolt.Utilization": "Bolt.Utilization",
                 "Bolt.Connection_Length": "Bolt.ConnLength",
+                "Bolt.Pitch": "Bolt.Pitch",
+                "Bolt.EndDist": "Bolt.EndDist",
+                "Bolt.Gauge": "Bolt.Gauge",
+                "Bolt.EdgeDist": "Bolt.EdgeDist",
             }
             label_map = {
                 "Bolt.Diameter": "Diameter (mm)",
@@ -119,13 +107,20 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Plate.BaseUtilization": "Base Metal Utilization",
                 "Bolt.Utilization": "Bolt Utilization",
                 "Bolt.ConnLength": "Length of Connection (mm)",
+                "Bolt.Pitch": "Pitch Distance (mm)",
+                "Bolt.EndDist": "End Distance (mm)",
+                "Bolt.Gauge": "Gauge Distance (mm)",
+                "Bolt.EdgeDist": "Edge Distance (mm)",
             }
             for tup in tuple_list or []:
                 if len(tup) < 4:
                     continue
                 src_key, label, param_type, val = tup[:4]
-                # skip buttons or callables (e.g., spacing OutButton)
-                if param_type in ("OutButton", "Button") or callable(val):
+                # Skip buttons, notes, section images, and callables (but include actual spacing values)
+                if param_type in ("OutButton", "Button", "Note", "Section", "Title") or callable(val):
+                    continue
+                # Skip None keys (used for titles/notes)
+                if src_key is None:
                     continue
                 target_key = key_map.get(src_key, src_key)
                 display_label = label_map.get(target_key, label or target_key)
