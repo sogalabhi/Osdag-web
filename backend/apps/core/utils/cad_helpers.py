@@ -254,6 +254,8 @@ def generate_cad_models(
             cand = getattr(mdl, 'hover_dict', None)
             if isinstance(cand, dict) and len(cand) > 0:
                 hover_dict = cand
+                if "Weld" in hover_dict and "Welds" not in hover_dict:
+                    hover_dict["Welds"] = hover_dict["Weld"]
                 print(f"[cad_helpers] Retrieved hover_dict: {hover_dict}")
             else:
                 print(f"[cad_helpers] hover_dict is empty or not a dict: {cand}")
