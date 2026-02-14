@@ -152,23 +152,24 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     return output, logs
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Column", "Plate"):
-        raise InvalidInputTypeError("section", "'Model', 'Column', 'Plate'")
+    """Generate the CAD model from input values as a BREP file. Return file path.
+    Desktop options: Model, Plate 1, Plate 2, Welds.
+    """
+    valid_sections = ("Model", "Plate 1", "Plate 2", "Welds")
+    if section not in valid_sections:
+        raise InvalidInputTypeError("section", "'Model', 'Plate 1', 'Plate 2', 'Welds'")
 
     module = LapJointWelded()
     module.set_osdaglogger(None, id="web")
     validate_input(input_values)
     module.set_input_values(input_values)
     if getattr(module, "module", None) != KEY_DISP_LAPJOINTWELDED:
-        print(f"[CAD DEBUG] Adjusting module.module from {getattr(module, 'module', None)} to {KEY_DISP_LAPJOINTWELDED}")
         module.module = KEY_DISP_LAPJOINTWELDED
 
     try:
         connection_key = KEY_DISP_LAPJOINTWELDED
-        mainmodule = "Moment Connection"
+        mainmodule = getattr(module, "mainmodule", "Moment Connection")
         folder = ""
-        print(f"[CAD DEBUG] init CommonDesignLogic: connection={connection_key}, mainmodule={mainmodule}, folder='{folder}'")
         cdl = CommonDesignLogic(None, '', folder, connection_key, mainmodule)
     except Exception as e:
         print('Error initializing CommonDesignLogic:', e)
@@ -179,78 +180,68 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     except Exception as e:
         traceback.print_exc()
         print('Error in setup_for_cad:', e)
-
-    candidate_components = ["Model", "Beam", "Column", "Plate", "Weld", "Bolt", "Bolts", "Connector"]
-    probed_shapes = {}
-    for comp in candidate_components:
-        try:
-            cdl.component = comp
-            shape = cdl.create2Dcad()
-            probed_shapes[comp] = shape
-            shape_type = type(shape).__name__ if shape is not None else None
-            print(f"[CAD DEBUG] component={comp} -> {shape_type}")
-        except Exception as exc:
-            probed_shapes[comp] = exc
-            print(f"[CAD DEBUG] component={comp} raised: {exc}")
-
-    def _is_valid_shape(val: Any) -> bool:
-        return val is not None and not isinstance(val, Exception)
-
-    # Check if CAD generation is available (all components return None means CAD not implemented)
-    valid_shapes = [comp for comp in candidate_components if _is_valid_shape(probed_shapes.get(comp))]
-    if not valid_shapes:
-        error_msg = "3D CAD model generation is not available for LapJointWelded yet. CAD generation methods need to be implemented in osdag_core."
-        print(f"[CAD DEBUG] {error_msg}")
-        raise NotImplementedError(error_msg)
-
-    cdl.component = section
-    part_names = [comp for comp in ("Beam", "Column", "Plate", "Weld", "Bolt", "Bolts", "Connector") if _is_valid_shape(probed_shapes.get(comp))]
-    print(f"[CAD DEBUG] requested section={section}; valid parts discovered={part_names}")
-    part_files = {}
-    compound_model = None
+        return ""
 
     try:
-        if section == "Model":
-            builder = BRep_Builder()
-            compound = TopoDS_Compound()
-            builder.MakeCompound(compound)
-
-            for part in part_names:
-                try:
-                    part_shape = probed_shapes.get(part)
-                    if part_shape is None or isinstance(part_shape, Exception):
-                        print(f"[CAD DEBUG] skip part {part}: {part_shape}")
-                        continue
-                    builder.Add(compound, part_shape)
-                    part_file_name = f"{session}_{part}.brep"
-                    part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
-                    BRepTools.breptools.Write(part_shape, part_file_path_rel, Message_ProgressRange())
-                    part_files[part] = part_file_path_rel
-                    try:
-                        part_stl_rel = part_file_path_rel.replace(".brep", ".stl")
-                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_rel))
-                    except Exception as stle:
-                        print(f"Failed to write STL for part {part}: {stle}")
-                except Exception as e:
-                    print(f"Failed to build/write part {part}: {e}")
-
-            cdl.component = section
-            compound_model = compound
-
-        model = compound_model if compound_model is not None else cdl.create2Dcad()
+        cdl.assembly, cdl.plate1_model, cdl.plate2_model, cdl.weld_models = cdl.createWeldedLapJoint()
     except Exception as e:
-        print("Error in cdl.create2Dcad():", e)
+        print(f"Error in createWeldedLapJoint: {e}")
+        traceback.print_exc()
+        return ""
+
+    def _compound_shapes(shapes):
+        from OCC.Core.BRep import BRep_Builder
+        shapes = [s for s in (shapes if isinstance(shapes, (list, tuple)) else [shapes]) if s]
+        if not shapes:
+            return None
+        if len(shapes) == 1:
+            return shapes[0]
+        builder = BRep_Builder()
+        comp = TopoDS_Compound()
+        builder.MakeCompound(comp)
+        for s in shapes:
+            builder.Add(comp, s)
+        return comp
+
+    model = None
+    part_files = {}
+    part_names = []
+
+    if section == "Model":
+        builder = BRep_Builder()
+        compound = TopoDS_Compound()
+        builder.MakeCompound(compound)
+        for shape in [cdl.plate1_model, cdl.plate2_model] + (list(cdl.weld_models) if cdl.weld_models else []):
+            if shape:
+                builder.Add(compound, shape)
+        model = compound
+        part_names = ["Plate_1", "Plate_2", "Welds"]
+        for pname, pshape in [("Plate_1", cdl.plate1_model), ("Plate_2", cdl.plate2_model), ("Welds", _compound_shapes(cdl.weld_models))]:
+            if pshape:
+                pref = os.path.join("file_storage", "cad_models", f"{session}_{pname}.brep")
+                part_files[pname] = pref
+                try:
+                    BRepTools.breptools.Write(pshape, pref, Message_ProgressRange())
+                    write_stl(pshape, os.path.join(os.getcwd(), pref.replace(".brep", ".stl")))
+                except Exception as ex:
+                    print(f"Warning: failed to write part {pname}: {ex}")
+    elif section == "Plate 1":
+        model = cdl.plate1_model
+    elif section == "Plate 2":
+        model = cdl.plate2_model
+    elif section == "Welds":
+        model = _compound_shapes(cdl.weld_models)
+
+    if model is None:
+        print(f"[CAD DEBUG] No model generated for section={section}; skipping write.")
         return ""
 
     cad_dir = os.path.join(os.getcwd(), "file_storage", "cad_models")
     os.makedirs(cad_dir, exist_ok=True)
 
-    file_name = f"{session}_{section}.brep"
+    section_safe = section.replace(" ", "_")
+    file_name = f"{session}_{section_safe}.brep"
     file_path = os.path.join("file_storage", "cad_models", file_name)
-
-    if model is None:
-        print(f"[CAD DEBUG] No model generated for section={section}; skipping write.")
-        return ""
 
     try:
         BRepTools.breptools.Write(model, file_path, Message_ProgressRange())

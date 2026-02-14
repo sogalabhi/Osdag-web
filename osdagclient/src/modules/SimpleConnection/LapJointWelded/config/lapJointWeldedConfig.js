@@ -13,7 +13,7 @@ export const lapJointWeldedConfig = {
     routePath: "/design/connections/simple/lap_joint_welded",
     designType: "LapJointWelded",
     cameraKey: "Connection",
-    cadOptions: ["Model", "Plate", "Column"],
+    cadOptions: ["Model", "Plate 1", "Plate 2", "Welds"],
 
     defaultInputs: {
         axial_force: "60",

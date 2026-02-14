@@ -160,8 +160,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
     print(f"[LapJointBolted CAD] Starting CAD generation for section='{section}', session='{session}'")
-    if section not in ("Model", "Column", "Plate", "Bolt", "Bolts", "Connector"):
-        raise InvalidInputTypeError("section", "'Model', 'Column', 'Plate', 'Bolt', 'Bolts', 'Connector'")
+    # Two separate plate options: Plate 1 and Plate 2 (each returns only that plate's geometry)
+    valid_sections = ("Model", "Plate 1", "Plate 2", "Bolts", "Plate", "Bolt", "Connector")
+    if section not in valid_sections:
+        raise InvalidInputTypeError("section", "'Model', 'Plate 1', 'Plate 2', 'Bolts'")
 
     print(f"[LapJointBolted CAD] Creating module instance")
     module = LapJointBolted()
@@ -291,9 +293,16 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
                 except Exception as stle:
                     print(f"[LapJointBolted CAD] Failed to write STL for Bolts: {stle}")
         
+        elif section == "Plate 1":
+            print(f"[LapJointBolted CAD] Building Plate 1 section (first plate only)")
+            model = plate1
+            print(f"[LapJointBolted CAD] Plate 1 model type: {type(model).__name__ if model else 'None'}")
+        elif section == "Plate 2":
+            print(f"[LapJointBolted CAD] Building Plate 2 section (second plate only)")
+            model = plate2
+            print(f"[LapJointBolted CAD] Plate 2 model type: {type(model).__name__ if model else 'None'}")
         elif section == "Plate":
             print(f"[LapJointBolted CAD] Building Plate section (combined plates)")
-            # Return combined plates
             model = _fuse_shapes([p for p in [plate1, plate2] if p])
             print(f"[LapJointBolted CAD] Plate model type: {type(model).__name__ if model else 'None'}")
         
@@ -318,7 +327,9 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     cad_dir = os.path.join(os.getcwd(), "file_storage", "cad_models")
     os.makedirs(cad_dir, exist_ok=True)
 
-    file_name = f"{session}_{section}.brep"
+    # Safe filename: replace spaces so "Plate 1" -> "Plate_1"
+    section_safe = section.replace(" ", "_")
+    file_name = f"{session}_{section_safe}.brep"
     file_path = os.path.join("file_storage", "cad_models", file_name)
     print(f"[LapJointBolted CAD] Target file path: {file_path}")
 

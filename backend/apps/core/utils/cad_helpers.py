@@ -27,10 +27,10 @@ SECTION_MAPPINGS = {
         'column-column-end-plate': ['Model', 'Column', 'Connector'],
     },
     'simple-connection': {
-        'butt-joint-bolted': ['Model', 'Column', 'Plate'],
-        'butt-joint-welded': ['Model', 'Column', 'Plate'],
-        'lap-joint-bolted': ['Model', 'Column', 'Plate'],
-        'lap-joint-welded': ['Model', 'Column', 'Plate'],
+        'lap-joint-bolted': ['Model', 'Plate 1', 'Plate 2', 'Bolts'],
+        'lap-joint-welded': ['Model', 'Plate 1', 'Plate 2', 'Welds'],
+        'butt-joint-bolted': ['Model', 'Plate 1', 'Plate 2', 'Cover Plate', 'Bolts'],
+        'butt-joint-welded': ['Model', 'Plate 1', 'Plate 2', 'Cover Plate', 'Welds'],
     },
     'tension-member': {
         'bolted': ['Model', 'Member', 'Plate', 'Endplate'],

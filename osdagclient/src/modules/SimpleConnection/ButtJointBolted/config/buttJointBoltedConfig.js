@@ -13,7 +13,7 @@ export const buttJointBoltedConfig = {
     routePath: "/design/connections/simple/butt_joint_bolted",
     designType: "ButtJointBolted",
     cameraKey: "Connection",
-    cadOptions: ["Model", "Plate", "Column"],
+    cadOptions: ["Model", "Plate 1", "Plate 2", "Cover Plate", "Bolts"],
 
     defaultInputs: {
         axial_force: "60",

@@ -175,10 +175,13 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     return output, logs
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    """Generate the CAD model from input values as a BREP file. Return file path."""
+    """Generate the CAD model from input values as a BREP file. Return file path.
+    Desktop options: Model, Plate 1, Plate 2, Cover Plate, Bolts.
+    """
     print(f"[ButtJointBolted CAD] Starting CAD generation for section='{section}', session='{session}'")
-    if section not in ("Model", "Column", "Plate"):
-        raise InvalidInputTypeError("section", "'Model', 'Column', 'Plate'")
+    valid_sections = ("Model", "Plate 1", "Plate 2", "Cover Plate", "Bolts")
+    if section not in valid_sections:
+        raise InvalidInputTypeError("section", "'Model', 'Plate 1', 'Plate 2', 'Cover Plate', 'Bolts'")
 
     print(f"[ButtJointBolted CAD] Creating module instance")
     module = ButtJointBolted()
@@ -228,22 +231,18 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         traceback.print_exc()
         return ""
 
-    # Map section to component (following create2Dcad() logic)
-    # create2Dcad() supports: "Plate1", "Plate2", "Cover Plate", "Connector", or default (assembly)
-    # For "Model", don't set component (or set to empty) so it goes to else branch and returns assembly
-    if section == "Plate":
-        cdl.component = "Cover Plate"
-    elif section == "Column":
-        # Column not supported for butt joint
-        cdl.component = ""  # Will return None
-    else:
-        # For "Model" or any other section, leave component unset or set to empty
-        # This will make create2Dcad() go to else branch and return assembly
-        cdl.component = ""
-    
+    # Map desktop section names to create2Dcad() component names (Plate1, Plate2, Cover Plate, Connector)
+    section_to_component = {
+        "Plate 1": "Plate1",
+        "Plate 2": "Plate2",
+        "Cover Plate": "Cover Plate",
+        "Bolts": "Connector",
+    }
+    cdl.component = section_to_component.get(section, "")
+
     print(f"[ButtJointBolted CAD] Setting component='{cdl.component}' for section='{section}'")
 
-    # Generate model using create2Dcad() (following fin_plate pattern)
+    # Generate model using create2Dcad()
     print(f"[ButtJointBolted CAD] Calling create2Dcad()")
     try:
         model = cdl.create2Dcad()
@@ -252,17 +251,20 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         print(f"[ButtJointBolted CAD] Error in create2Dcad(): {e}")
         traceback.print_exc()
         return ""
-    
-    # Handle cadlist (list of shapes) - fuse them into a single model
+
+    # create2Dcad() returns a list for Connector (bolts+nuts); compound them
     if isinstance(model, (list, tuple)) and model:
-        print(f"[ButtJointBolted CAD] Model is a list/tuple with {len(model)} items, fusing shapes")
-        from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
-        fused = model[0]
-        for shape in model[1:]:
+        print(f"[ButtJointBolted CAD] Model is a list/tuple with {len(model)} items, building compound")
+        from OCC.Core.BRep import BRep_Builder
+        from OCC.Core.TopoDS import TopoDS_Compound
+        builder = BRep_Builder()
+        comp = TopoDS_Compound()
+        builder.MakeCompound(comp)
+        for shape in model:
             if shape:
-                fused = BRepAlgoAPI_Fuse(fused, shape).Shape()
-        model = fused
-        print(f"[ButtJointBolted CAD] Fused model type: {type(model).__name__ if model else 'None'}")
+                builder.Add(comp, shape)
+        model = comp
+        print(f"[ButtJointBolted CAD] Compound model type: {type(model).__name__}")
 
     if model is None:
         print(f"[ButtJointBolted CAD] No model generated for section={section}; skipping write.")
@@ -273,7 +275,8 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     cad_dir = os.path.join(os.getcwd(), "file_storage", "cad_models")
     os.makedirs(cad_dir, exist_ok=True)
 
-    file_name = f"{session}_{section}.brep"
+    section_safe = section.replace(" ", "_")
+    file_name = f"{session}_{section_safe}.brep"
     file_path = os.path.join("file_storage", "cad_models", file_name)
     print(f"[ButtJointBolted CAD] Target file path: {file_path}")
 

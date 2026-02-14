@@ -85,6 +85,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
   // UI toggles
   const [designPrefModalStatus, setDesignPrefModalStatus] = useState(false);
+  const [confirmationModal, setConfirmationModal] = useState(false);
   const [displaySaveInputPopup, setDisplaySaveInputPopup] = useState(false);
   const [saveInputFileName, setSaveInputFileName] = useState("");
 
@@ -271,6 +272,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     );
 
     setDesignPrefModalStatus(false);
+    setConfirmationModal(false);
     setDisplaySaveInputPopup(false);
     setSaveInputFileName("");
   };
@@ -292,6 +294,8 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     setModalDynamicSrc,
     designPrefModalStatus,
     setDesignPrefModalStatus,
+    confirmationModal,
+    setConfirmationModal,
     displaySaveInputPopup,
     setDisplaySaveInputPopup,
     saveInputFileName,

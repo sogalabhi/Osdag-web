@@ -1306,7 +1306,7 @@ export const EngineeringModule = ({
                       hoverDict={hoverDict}
                       onHoverLabel={handleHoverLabel}
                       onHoverEnd={handleHoverEnd}
-                      moduleCadConfig={moduleConfig?.cadConfig}
+                      moduleCadConfig={moduleConfig}
                       key={`${modelKey}-${selectedSection}`}
                     />
                     <ScreenshotCapture
@@ -1396,12 +1396,12 @@ export const EngineeringModule = ({
         ))
       }
 
-      {/* Design Preferences Modal */}
+      {/* Design Preferences Modal (Additional Inputs) */}
       {
         designPrefModalStatus && (
           <Modal
+            title="Additional Inputs"
             open={designPrefModalStatus}
-            // onCancel={() => setConfirmationModal(true)}
             onCancel={() =>
               isInputLocked
                 ? setDesignPrefModalStatus(false)   // Directly close

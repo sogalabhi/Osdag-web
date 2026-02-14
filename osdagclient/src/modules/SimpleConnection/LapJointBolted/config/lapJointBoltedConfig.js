@@ -12,7 +12,7 @@ export const lapJointBoltedConfig = {
     routePath: "/design/connections/simple/lap_joint_bolted",
     designType: "LapJointBolted",
     cameraKey: "Connection",
-    cadOptions: ["Model", "Plate", "Column"],
+    cadOptions: ["Model", "Plate 1", "Plate 2", "Bolts"],
 
     defaultInputs: {
         axial_force: "60",

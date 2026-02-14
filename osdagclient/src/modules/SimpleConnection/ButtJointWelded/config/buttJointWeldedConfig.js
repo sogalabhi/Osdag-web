@@ -13,7 +13,7 @@ export const buttJointWeldedConfig = {
     routePath: "/design/connections/simple/butt_joint_welded",
     designType: "ButtJointWelded",
     cameraKey: "Connection",
-    cadOptions: ["Model", "Plate", "Column"],
+    cadOptions: ["Model", "Plate 1", "Plate 2", "Cover Plate", "Welds"],
 
     defaultInputs: {
         axial_force: "60",

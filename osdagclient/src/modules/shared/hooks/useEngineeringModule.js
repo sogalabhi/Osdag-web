@@ -115,6 +115,8 @@ export const useEngineeringModule = (moduleConfig) => {
     modalStates,
     modalDynamicSrc,
     designPrefModalStatus,
+    confirmationModal,
+    setConfirmationModal,
     displaySaveInputPopup,
     saveInputFileName,
     updateModalState,
@@ -278,6 +280,8 @@ export const useEngineeringModule = (moduleConfig) => {
     modalStates,
     modalDynamicSrc,
     designPrefModalStatus,
+    confirmationModal,
+    setConfirmationModal,
     displaySaveInputPopup,
     saveInputFileName,
 
