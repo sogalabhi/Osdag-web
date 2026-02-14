@@ -16,7 +16,7 @@ import {
  * - Applies \"Select All\" logic to sync lists into inputs
  */
 export const useModuleForm = (moduleConfig, moduleData) => {
-  const { boltDiameterList, propertyClassList, thicknessList, angleList } = moduleData;
+  const { boltDiameterList, propertyClassList, thicknessList, angleList, weldSizeList } = moduleData;
 
   // Inputs state
   const [inputs, setInputs] = useState(moduleConfig.defaultInputs);
@@ -167,6 +167,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
       angle_list: angleList,
       topangle_list: angleList,
       cleat_section: angleList,
+      weld_size: weldSizeList,
     };
 
     const nextInputs = { ...inputs };
@@ -193,7 +194,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     if (changed) {
       setInputs(nextInputs);
     }
-  }, [boltDiameterList, propertyClassList, thicknessList, angleList, allSelected, inputs]);
+  }, [boltDiameterList, propertyClassList, thicknessList, angleList, weldSizeList, allSelected, inputs]);
 
   // Auto-hide save input popup
   useEffect(() => {

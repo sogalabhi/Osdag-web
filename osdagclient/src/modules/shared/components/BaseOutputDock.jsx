@@ -330,7 +330,7 @@ export const BaseOutputDock = ({
         <div className="p-2">
           <p className="p-2 inline-block bg-osdag-green text-white rounded">{title}</p>
         </div>
-        <div className="flex-1 overflow-y-auto subMainBody scroll-data min-h-0">
+        <div className="flex-1 overflow-y-auto subMainBody scroll-data min-h-0 pb-20">
           {Object.entries(outputConfig.sections).map(([sectionName, fields]) => (
             <div key={sectionName} className='cards'>
               <h3 className='text-black dark:text-white'>{sectionName}</h3>
@@ -341,9 +341,9 @@ export const BaseOutputDock = ({
           ))}
         </div>
 
-        {/* Footer Actions */}
+        {/* Footer Actions - sticky at bottom; scroll area has padding so last content is not hidden */}
         {(handleCreateDesignReport || saveOutput) && (
-          <div className="sticky bottom-0 z-10 bg-white dark:bg-osdag-dark-color border-t border-gray-200 dark:border-gray-700 flex items-center w-full gap-x-4 px-5 py-2">
+          <div className="sticky bottom-0 flex-shrink-0 z-10 bg-white dark:bg-osdag-dark-color border-t border-gray-200 dark:border-gray-700 flex items-center w-full gap-x-4 px-5 py-2">
             {handleCreateDesignReport && (
               <button
                 onClick={handleCreateDesignReport}

@@ -77,6 +77,7 @@ export const KEY_DISP_PLATE2_THICKNESS = "Thickness of Plate-2 (mm) *";
 export const KEY_DISP_PLATE_WIDTH = "Width of Plate (mm) *";
 export const KEY_DISP_WELD_SIZE = 'Weld Size';
 export const KEY_DISP_COVER_PLT = 'Cover Plate *';
+export const KEY_DISP_DP_DETAILING_PACKING_PLATE = 'Packing Plate';
 
 // Flexural Member Constants - Must match exactly with Common.py backend constants
 export const KEY_ALLOW_CLASS = 'Design.Allowable_Class';

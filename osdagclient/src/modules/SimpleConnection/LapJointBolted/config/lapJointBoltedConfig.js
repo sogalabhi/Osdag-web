@@ -1,7 +1,6 @@
 import {
     KEY_MODULE, KEY_MATERIAL, KEY_AXIAL, KEY_DP_DETAILING_EDGE_TYPE,
     KEY_PLATE1_THICKNESS, KEY_PLATE2_THICKNESS, KEY_PLATE_WIDTH,
-    KEY_COVER_PLATE, KEY_DISP_COVER_PLT, KEY_DP_DETAILING_PACKING_PLATE,
     KEY_DISP_PLATE1_THICKNESS, KEY_DISP_PLATE_WIDTH, KEY_DP_BOLT_SLIP_FACTOR,
     KEY_DISP_PLATE2_THICKNESS, KEY_D, KEY_TYP, KEY_GRD, KEY_DP_BOLT_HOLE_TYPE,
     KEY_DP_BOLT_TYPE, KEY_DESIGN_FOR,
@@ -28,7 +27,6 @@ export const lapJointBoltedConfig = {
         plate_width: "200",
         material: "E 250 (Fe 410 W)A",
         detailing_edge_type: "Sheared or hand flame cut",
-        cover_plate: "Single-Cover",
         bolt_tension_type: "Non Pre-tensioned",
         bolt_hole_type: "Standard",
         bolt_slip_factor: "0.3",
@@ -56,29 +54,24 @@ export const lapJointBoltedConfig = {
     buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
         const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
             if (allSelectedFlag) {
-                // Exclude "All" if present in the list
-                return fullList.filter(item => item !== "All");
+                // Prefer full list; if not loaded yet, use already-synced selectedList (e.g. from useEffect)
+                const list = Array.isArray(fullList) && fullList.length ? fullList : (Array.isArray(selectedList) ? selectedList : []);
+                return list.filter(item => item !== "All");
             }
-            // Ensure always array
             if (Array.isArray(selectedList)) {
                 return selectedList.filter(item => item !== "All");
             }
             return [selectedList].filter(item => item !== "All");
         };
         return {
-            [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
-            [KEY_DP_DETAILING_PACKING_PLATE]: "No",
             [KEY_MODULE]: "LapJointBolted",
             [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
             [KEY_PLATE2_THICKNESS]: String(inputs.plate2_thickness),
             [KEY_PLATE_WIDTH]: String(inputs.plate_width),
             [KEY_MATERIAL]: String(inputs.material),
-            [KEY_COVER_PLATE]: String(inputs.cover_plate),
             [KEY_AXIAL]: String(inputs.axial_force),
-            [KEY_DP_BOLT_HOLE_TYPE]: String(inputs.bolt_hole_type),
             [KEY_D]: getArrayParam(allSelected.bolt_diameter, lists.boltDiameterList, inputs.bolt_diameter),
             [KEY_GRD]: getArrayParam(allSelected.bolt_grade, lists.propertyClassList, inputs.bolt_grade),
-            [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
             [KEY_TYP]: String(inputs.bolt_type),
             [KEY_DP_BOLT_HOLE_TYPE]: String(inputs.bolt_hole_type),
             [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
@@ -134,19 +127,6 @@ export const lapJointBoltedConfig = {
                     key: "plate_width",
                     label: KEY_DISP_PLATE_WIDTH,
                     type: "number"
-                },
-                {
-                    key: "cover_plate",
-                    label: KEY_DISP_COVER_PLT,
-                    type: "select",
-                    options: 'coverPlateList',
-                    onChange: (value, inputs, setInputs, options) => {
-                        setInputs({
-                            ...inputs,
-                            "cover_plate": value,
-                        });
-                    }
-
                 }
             ]
         },
@@ -161,7 +141,7 @@ export const lapJointBoltedConfig = {
             fields: [
                 {
                     key: "bolt_diameter",
-                    label: "Diameter (mm)",
+                    label: "Diameter (mm) *",
                     type: "customizable",
                     selectionKey: "boltDiameterSelect",
                     modalKey: "boltDiameter",

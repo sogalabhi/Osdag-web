@@ -50,10 +50,10 @@ export const buttJointWeldedConfig = {
     buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
         const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
             if (allSelectedFlag) {
-                // Exclude "All" if present in the list
-                return fullList.filter(item => item !== "All");
+                // Prefer full list; if not loaded yet, use already-synced selectedList (e.g. from useEffect)
+                const list = Array.isArray(fullList) && fullList.length ? fullList : (Array.isArray(selectedList) ? selectedList : []);
+                return list.filter(item => item !== "All");
             }
-            // Ensure always array
             if (Array.isArray(selectedList)) {
                 return selectedList.filter(item => item !== "All");
             }

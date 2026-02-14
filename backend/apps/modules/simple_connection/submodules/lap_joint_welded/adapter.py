@@ -30,7 +30,6 @@ def get_required_keys() -> List[str]:
         "Plate1Thickness",
         "Plate2Thickness",
         "PlateWidth",
-        "ButtJoint.CoverPlate",
         "Weld.Size",
         "Weld.Material_Grade_OverWrite",
         "Weld.Fab",

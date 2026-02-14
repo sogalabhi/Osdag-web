@@ -1,7 +1,7 @@
 import {
     KEY_MODULE, KEY_MATERIAL, KEY_AXIAL, KEY_DP_DETAILING_EDGE_TYPE,
     KEY_PLATE1_THICKNESS, KEY_PLATE2_THICKNESS, KEY_PLATE_WIDTH,
-    KEY_COVER_PLATE, KEY_DISP_COVER_PLT, KEY_DP_DETAILING_PACKING_PLATE,
+    KEY_COVER_PLATE, KEY_DISP_COVER_PLT,
     KEY_DISP_PLATE1_THICKNESS, KEY_DISP_PLATE_WIDTH, KEY_DP_BOLT_SLIP_FACTOR,
     KEY_DISP_PLATE2_THICKNESS, KEY_D, KEY_TYP, KEY_GRD, KEY_DP_BOLT_HOLE_TYPE,
     KEY_DP_BOLT_TYPE, KEY_DESIGN_FOR,
@@ -56,34 +56,16 @@ export const buttJointBoltedConfig = {
     buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
         const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
             if (allSelectedFlag) {
-                // Exclude "All" if present in the list
-                return fullList.filter(item => item !== "All");
+                // Prefer full list; if not loaded yet, use already-synced selectedList (e.g. from useEffect)
+                const list = Array.isArray(fullList) && fullList.length ? fullList : (Array.isArray(selectedList) ? selectedList : []);
+                return list.filter(item => item !== "All");
             }
-            // Ensure always array
             if (Array.isArray(selectedList)) {
                 return selectedList.filter(item => item !== "All");
             }
             return [selectedList].filter(item => item !== "All");
         };
-        console.log({
-            [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
-            [KEY_DP_DETAILING_PACKING_PLATE]: "No",
-            [KEY_MODULE]: "ButtJointBolted",
-            [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
-            [KEY_PLATE2_THICKNESS]: String(inputs.plate2_thickness),
-            [KEY_PLATE_WIDTH]: String(inputs.plate_width),
-            [KEY_MATERIAL]: String(inputs.material),
-            [KEY_COVER_PLATE]: String(inputs.cover_plate),
-            [KEY_AXIAL]: String(inputs.axial_force),
-            [KEY_DP_BOLT_HOLE_TYPE]: String(inputs.bolt_hole_type),
-            [KEY_D]: getArrayParam(allSelected.bolt_diameter, lists.boltDiameterList, inputs.bolt_diameter),
-            [KEY_GRD]: getArrayParam(allSelected.bolt_grade, lists.propertyClassList, inputs.bolt_grade),
-            [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
-            [KEY_TYP]: String(inputs.bolt_type),
-        })
         return {
-            [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
-            [KEY_DP_DETAILING_PACKING_PLATE]: "No",
             [KEY_MODULE]: "ButtJointBolted",
             [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
             [KEY_PLATE2_THICKNESS]: String(inputs.plate2_thickness),
@@ -91,10 +73,8 @@ export const buttJointBoltedConfig = {
             [KEY_MATERIAL]: String(inputs.material),
             [KEY_COVER_PLATE]: String(inputs.cover_plate),
             [KEY_AXIAL]: String(inputs.axial_force),
-            [KEY_DP_BOLT_HOLE_TYPE]: String(inputs.bolt_hole_type),
             [KEY_D]: getArrayParam(allSelected.bolt_diameter, lists.boltDiameterList, inputs.bolt_diameter),
             [KEY_GRD]: getArrayParam(allSelected.bolt_grade, lists.propertyClassList, inputs.bolt_grade),
-            [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
             [KEY_TYP]: String(inputs.bolt_type),
             [KEY_DP_BOLT_HOLE_TYPE]: String(inputs.bolt_hole_type),
             [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
@@ -177,7 +157,7 @@ export const buttJointBoltedConfig = {
             fields: [
                 {
                     key: "bolt_diameter",
-                    label: "Diameter (mm)",
+                    label: "Diameter (mm) *",
                     type: "customizable",
                     selectionKey: "boltDiameterSelect",
                     modalKey: "boltDiameter",

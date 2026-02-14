@@ -204,6 +204,7 @@ export const InputSection = ({
         'plate_thickness': 'thicknessList',
         'angle_list': 'angleList',
         'cleat_section': 'angleList',
+        'weld_size': 'weldSizeList',
       };
       const listName = keyMap[inputKey];
       if (field?.getDynamicDataSource) {

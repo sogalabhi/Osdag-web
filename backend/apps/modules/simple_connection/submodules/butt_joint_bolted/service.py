@@ -1,7 +1,7 @@
 """
 Service for Butt Joint Bolted
 """
-from .adapter import validate_input, generate_output
+from .adapter import validate_input, generate_output, create_cad_model
 import traceback
 
 
@@ -27,4 +27,19 @@ class Service:
                 'success': False,
                 'error': str(exc),
             }
+    
+    @staticmethod
+    def get_cad_model(inputs: dict, section: str, session: str) -> str:
+        """
+        Generate CAD model and return file path.
+        
+        Args:
+            inputs: Dictionary of input parameters
+            section: Section to generate ('Model', 'Column', 'Plate')
+            session: Session identifier for file naming
+            
+        Returns:
+            File path to the generated CAD model
+        """
+        return create_cad_model(inputs, section, session)
 

@@ -31,7 +31,6 @@ def get_required_keys() -> List[str]:
         "Plate1Thickness",
         "Plate2Thickness",
         "PlateWidth",
-        "ButtJoint.CoverPlate",
         "Bolt.Diameter",
         "Bolt.Grade",
         "Bolt.Type",
@@ -87,6 +86,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Bolt.EndDist": "Bolt.EndDist",
                 "Bolt.Gauge": "Bolt.Gauge",
                 "Bolt.EdgeDist": "Bolt.EdgeDist",
+                "Member.Depth": "PlateWidth",
             }
             label_map = {
                 "Bolt.Diameter": "Diameter (mm)",
@@ -109,6 +109,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Bolt.EndDist": "End Distance (mm)",
                 "Bolt.Gauge": "Gauge Distance (mm)",
                 "Bolt.EdgeDist": "Edge Distance (mm)",
+                "PlateWidth": "Member Depth (mm)",
             }
             for tup in tuple_list or []:
                 if len(tup) < 4:
@@ -158,37 +159,49 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
+    print(f"[LapJointBolted CAD] Starting CAD generation for section='{section}', session='{session}'")
     if section not in ("Model", "Column", "Plate", "Bolt", "Bolts", "Connector"):
         raise InvalidInputTypeError("section", "'Model', 'Column', 'Plate', 'Bolt', 'Bolts', 'Connector'")
 
+    print(f"[LapJointBolted CAD] Creating module instance")
     module = LapJointBolted()
+    print(f"[LapJointBolted CAD] Initializing logger")
+    module.set_osdaglogger(None, id="web")
+    print(f"[LapJointBolted CAD] Setting input values")
     module.set_input_values(input_values)
+    print(f"[LapJointBolted CAD] Input values set successfully")
     if getattr(module, "module", None) != KEY_DISP_LAPJOINTBOLTED:
         print(f"[CAD DEBUG] Adjusting module.module from {getattr(module, 'module', None)} to {KEY_DISP_LAPJOINTBOLTED}")
         module.module = KEY_DISP_LAPJOINTBOLTED
 
+    print(f"[LapJointBolted CAD] Initializing CommonDesignLogic")
     try:
         connection_key = KEY_DISP_LAPJOINTBOLTED
         mainmodule = "Moment Connection"
         folder = ""
-        print(f"[CAD DEBUG] init CommonDesignLogic: connection={connection_key}, mainmodule={mainmodule}, folder='{folder}'")
+        print(f"[LapJointBolted CAD] CommonDesignLogic params: connection={connection_key}, mainmodule={mainmodule}, folder='{folder}'")
         cdl = CommonDesignLogic(None, '', folder, connection_key, mainmodule)
+        print(f"[LapJointBolted CAD] CommonDesignLogic initialized successfully")
     except Exception as e:
-        print('Error initializing CommonDesignLogic:', e)
+        print(f'[LapJointBolted CAD] Error initializing CommonDesignLogic: {e}')
+        traceback.print_exc()
         return ""
 
+    print(f"[LapJointBolted CAD] Setting up CAD")
     try:
         setup_for_cad(cdl, module)
+        print(f"[LapJointBolted CAD] CAD setup completed")
     except Exception as e:
         traceback.print_exc()
-        print('Error in setup_for_cad:', e)
+        print(f'[LapJointBolted CAD] Error in setup_for_cad: {e}')
 
     # Call CAD method directly (bypassing create2Dcad since it doesn't have a branch for LapJointBolted)
+    print(f"[LapJointBolted CAD] Calling createBoltedLapJoint()")
     try:
         lap_joint, plate1, plate2, bolts, nuts = cdl.createBoltedLapJoint()
-        print(f"[CAD DEBUG] LapJointBolted CAD created; components -> lap_joint:{type(lap_joint)}, plate1:{type(plate1)}, plate2:{type(plate2)}, bolts:{type(bolts)}, nuts:{type(nuts)}")
+        print(f"[LapJointBolted CAD] CAD components created -> lap_joint:{type(lap_joint)}, plate1:{type(plate1)}, plate2:{type(plate2)}, bolts:{type(bolts)}, nuts:{type(nuts)}")
     except Exception as exc:
-        print(f"[CAD DEBUG] LapJointBolted CAD build failed: {exc}")
+        print(f"[LapJointBolted CAD] CAD build failed: {exc}")
         traceback.print_exc()
         return ""
 
@@ -227,11 +240,14 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         return comp
 
     # Route components based on section
+    print(f"[LapJointBolted CAD] Processing section: {section}")
     part_files = {}
     model = None
 
+    print(f"[LapJointBolted CAD] Building model for section: {section}")
     try:
         if section == "Model":
+            print(f"[LapJointBolted CAD] Building compound Model")
             # Combine all parts for Model
             fused_main = _fuse_shapes([p for p in [lap_joint, plate1, plate2] if p])
             bolts_comp = _compound_shapes(_flatten_shapes([bolts, nuts]))
@@ -245,61 +261,78 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
             
             # Write Plate part (combined plate1 + plate2)
             if plate1 or plate2:
+                print(f"[LapJointBolted CAD] Writing Plate part")
                 plate_combined = _fuse_shapes([p for p in [plate1, plate2] if p])
                 if plate_combined:
                     part_file_name = f"{session}_Plate.brep"
                     part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
+                    print(f"[LapJointBolted CAD] Writing Plate BREP: {part_file_path_rel}")
                     BRepTools.breptools.Write(plate_combined, part_file_path_rel, Message_ProgressRange())
                     part_files["Plate"] = part_file_path_rel
                     try:
                         part_stl_rel = part_file_path_rel.replace(".brep", ".stl")
+                        print(f"[LapJointBolted CAD] Writing Plate STL: {part_stl_rel}")
                         write_stl(plate_combined, os.path.join(os.getcwd(), part_stl_rel))
                     except Exception as stle:
-                        print(f"Failed to write STL for Plate: {stle}")
+                        print(f"[LapJointBolted CAD] Failed to write STL for Plate: {stle}")
             
             # Write Bolts part
             if bolts_comp:
+                print(f"[LapJointBolted CAD] Writing Bolts part")
                 part_file_name = f"{session}_Bolts.brep"
                 part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
+                print(f"[LapJointBolted CAD] Writing Bolts BREP: {part_file_path_rel}")
                 BRepTools.breptools.Write(bolts_comp, part_file_path_rel, Message_ProgressRange())
                 part_files["Bolts"] = part_file_path_rel
                 try:
                     part_stl_rel = part_file_path_rel.replace(".brep", ".stl")
+                    print(f"[LapJointBolted CAD] Writing Bolts STL: {part_stl_rel}")
                     write_stl(bolts_comp, os.path.join(os.getcwd(), part_stl_rel))
                 except Exception as stle:
-                    print(f"Failed to write STL for Bolts: {stle}")
+                    print(f"[LapJointBolted CAD] Failed to write STL for Bolts: {stle}")
         
         elif section == "Plate":
+            print(f"[LapJointBolted CAD] Building Plate section (combined plates)")
             # Return combined plates
             model = _fuse_shapes([p for p in [plate1, plate2] if p])
+            print(f"[LapJointBolted CAD] Plate model type: {type(model).__name__ if model else 'None'}")
         
         elif section in ("Bolt", "Bolts", "Connector"):
+            print(f"[LapJointBolted CAD] Building {section} section (bolts/nuts)")
             # Return bolts/nuts as compound
             model = _compound_shapes(_flatten_shapes([bolts, nuts]))
+            print(f"[LapJointBolted CAD] {section} model type: {type(model).__name__ if model else 'None'}")
         
         else:
+            print(f"[LapJointBolted CAD] Building default section (lap_joint)")
             # Default: return lap_joint
             model = lap_joint
+            print(f"[LapJointBolted CAD] Default model type: {type(model).__name__ if model else 'None'}")
         
     except Exception as e:
-        print(f"Error processing CAD components: {e}")
+        print(f"[LapJointBolted CAD] Error processing CAD components: {e}")
         traceback.print_exc()
         return ""
 
+    print(f"[LapJointBolted CAD] Creating CAD directory")
     cad_dir = os.path.join(os.getcwd(), "file_storage", "cad_models")
     os.makedirs(cad_dir, exist_ok=True)
 
     file_name = f"{session}_{section}.brep"
     file_path = os.path.join("file_storage", "cad_models", file_name)
+    print(f"[LapJointBolted CAD] Target file path: {file_path}")
 
     if model is None:
-        print(f"[CAD DEBUG] No model generated for section={section}; skipping write.")
+        print(f"[LapJointBolted CAD] No model generated for section={section}; skipping write.")
         return ""
 
+    print(f"[LapJointBolted CAD] Writing BREP file: {file_path}")
     try:
         BRepTools.breptools.Write(model, file_path, Message_ProgressRange())
+        print(f"[LapJointBolted CAD] BREP file written successfully")
 
         if section == "Model":
+            print(f"[LapJointBolted CAD] Generating additional formats for Model")
             try:
                 manifest = {
                     "session": session,
@@ -313,45 +346,58 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
                 full_manifest_path = os.path.join(os.getcwd(), manifest_path)
                 with open(full_manifest_path, "w", encoding="utf-8") as mf:
                     json.dump(manifest, mf)
+                print(f"[LapJointBolted CAD] Manifest written: {manifest_path}")
             except Exception as me:
-                print(f"Warning: Failed to write manifest: {me}")
+                print(f"[LapJointBolted CAD] Warning: Failed to write manifest: {me}")
 
             try:
+                print(f"[LapJointBolted CAD] Exporting STEP format")
                 step_writer = STEPControl_Writer()
                 step_writer.Transfer(model, STEPControl_AsIs)
                 step_file_path = file_path.replace(".brep", ".step")
                 full_step_file_path = os.path.join(os.getcwd(), step_file_path)
                 if step_writer.Write(full_step_file_path) != 1:
-                    print("Warning: Failed to save STEP file")
+                    print(f"[LapJointBolted CAD] Warning: Failed to save STEP file")
+                else:
+                    print(f"[LapJointBolted CAD] STEP file written: {step_file_path}")
             except Exception as stepe:
-                print(f"Warning: STEP export failed: {stepe}")
+                print(f"[LapJointBolted CAD] Warning: STEP export failed: {stepe}")
 
             try:
+                print(f"[LapJointBolted CAD] Exporting IGES format")
                 iges_writer = IGESControl_Writer()
                 iges_writer.AddShape(model)
                 iges_file_path = file_path.replace(".brep", ".iges")
                 full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
                 if iges_writer.Write(full_iges_file_path) != 1:
-                    print("Warning: Failed to save IGES file")
+                    print(f"[LapJointBolted CAD] Warning: Failed to save IGES file")
+                else:
+                    print(f"[LapJointBolted CAD] IGES file written: {iges_file_path}")
             except Exception as igee:
-                print(f"Warning: IGES export failed: {igee}")
+                print(f"[LapJointBolted CAD] Warning: IGES export failed: {igee}")
 
             try:
                 merged_stl_rel = file_path.replace(".brep", ".stl")
+                print(f"[LapJointBolted CAD] Writing merged STL: {merged_stl_rel}")
                 write_stl(model, os.path.join(os.getcwd(), merged_stl_rel))
+                print(f"[LapJointBolted CAD] Merged STL written successfully")
             except Exception as stle:
-                print(f"Warning: Failed to save merged STL: {stle}")
+                print(f"[LapJointBolted CAD] Warning: Failed to save merged STL: {stle}")
 
     except Exception as e:
-        print("Writing to BREP file failed:", e)
+        print(f"[LapJointBolted CAD] Writing to BREP file failed: {e}")
+        traceback.print_exc()
 
     if section != "Model":
         try:
             single_stl_rel = file_path.replace(".brep", ".stl")
+            print(f"[LapJointBolted CAD] Writing single STL: {single_stl_rel}")
             write_stl(model, os.path.join(os.getcwd(), single_stl_rel))
+            print(f"[LapJointBolted CAD] Single STL written successfully")
         except Exception as stle:
-            print(f"Warning: Failed to save STL for {section}: {stle}")
+            print(f"[LapJointBolted CAD] Warning: Failed to save STL for {section}: {stle}")
 
+    print(f"[LapJointBolted CAD] CAD generation completed successfully. Returning path: {file_path}")
     return file_path
 
 def create_from_input(input_values: Dict[str, Any]) -> Any:

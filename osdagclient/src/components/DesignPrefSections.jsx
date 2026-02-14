@@ -168,9 +168,6 @@ const DesignPrefSections = ({
 
   return (
     <div>
-      <div>
-        <h4>Design Preference</h4>
-      </div>
       <div className="bloc-tabs" style={{ marginTop: "10px" }}>
         {tabs.map((item) => {
           return (
@@ -234,6 +231,7 @@ const DesignPrefSections = ({
         )}
         {activeTab == 3 && (
           <BoltSectionModal
+            module={module}
             inputs={inputs}
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
@@ -243,6 +241,7 @@ const DesignPrefSections = ({
         )}
         {activeTab == 4 && tabs.find(t => t.name === "Weld") && (
           <WeldSectionModal
+            module={module}
             inputs={inputs}
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
@@ -252,6 +251,7 @@ const DesignPrefSections = ({
         )}
         {activeTab == 5 && (
           <DetailingSectionModal
+            module={module}
             inputs={inputs}
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
@@ -261,6 +261,7 @@ const DesignPrefSections = ({
         )}
         {activeTab == 6 && (
           <DesignSectionModal
+            module={module}
             inputs={inputs}
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
