@@ -5,10 +5,15 @@ Maps web API payload to osdag_core BasePlateConnection keys and back.
 from apps.core.utils import (
     validate_arr, validate_num, validate_string,
     MissingKeyError, InvalidInputTypeError,
-    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
+    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
+    write_stl,
 )
 from osdag_core.design_type.connection.base_plate_connection import BasePlateConnection
 from osdag_core.custom_logger import CustomLogger
+from osdag_core.cad.common_logic import CommonDesignLogic
+from osdag_core.Common import KEY_DISP_BASE_PLATE
+from OCC.Core import BRepTools
+from OCC.Core.Message import Message_ProgressRange
 import sys
 import os
 from typing import Dict, Any, List
@@ -342,6 +347,74 @@ def generate_output(input_values: Dict[str, Any]):
     return output, logs
 
 
+BASE_PLATE_CAD_SECTIONS = ("Model", "Column", "Plate")
+
+
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    """Generate CAD model from input values. Returns file path or empty string."""
-    return ""
+    """Generate CAD model from input values as BREP/STL. Returns file path or empty string.
+    Desktop options: Model, Column, Base Plate (Plate).
+    """
+    if section not in BASE_PLATE_CAD_SECTIONS:
+        raise InvalidInputTypeError(
+            "section",
+            "'Model', 'Column', 'Plate'",
+        )
+
+    try:
+        module = create_from_input(input_values)
+    except Exception as e:
+        traceback.print_exc()
+        print(f"[BasePlate CAD] create_from_input failed: {e}")
+        return ""
+
+    try:
+        cdl = CommonDesignLogic(
+            None, None, "", KEY_DISP_BASE_PLATE, "Moment Connection",
+        )
+        cdl.module_object = module
+        base_plate = cdl.createBasePlateCAD()
+    except Exception as e:
+        traceback.print_exc()
+        print(f"[BasePlate CAD] createBasePlateCAD failed: {e}")
+        return ""
+
+    # Section -> getter on base_plate (desktop: Model, Column, Base Plate only)
+    section_getters = {
+        "Model": lambda: base_plate.get_models(),
+        "Column": lambda: base_plate.get_column_model(),
+        "Plate": lambda: base_plate.get_plate_connector_models(),
+    }
+    get_shape = section_getters.get(section)
+    if not get_shape:
+        return ""
+
+    try:
+        model = get_shape()
+    except Exception as e:
+        traceback.print_exc()
+        print(f"[BasePlate CAD] getter for section '{section}' failed: {e}")
+        return ""
+
+    if model is None:
+        print(f"[BasePlate CAD] No shape for section '{section}'; skipping write.")
+        return ""
+
+    cad_dir = os.path.join(os.getcwd(), "file_storage", "cad_models")
+    os.makedirs(cad_dir, exist_ok=True)
+    section_safe = section.replace(" ", "_")
+    file_name = f"{session}_{section_safe}.brep"
+    file_path = os.path.join("file_storage", "cad_models", file_name)
+
+    try:
+        BRepTools.breptools.Write(model, file_path, Message_ProgressRange())
+    except Exception as e:
+        print(f"[BasePlate CAD] BREP write failed for {section}: {e}")
+        return ""
+
+    try:
+        stl_path = os.path.join(os.getcwd(), file_path.replace(".brep", ".stl"))
+        write_stl(model, stl_path)
+    except Exception as stle:
+        print(f"[BasePlate CAD] Warning: STL write failed for {section}: {stle}")
+
+    return file_path

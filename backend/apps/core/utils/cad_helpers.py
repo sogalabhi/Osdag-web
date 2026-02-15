@@ -40,7 +40,7 @@ SECTION_MAPPINGS = {
         'simply-supported-beam': [],  # TODO: Add sections when available
     },
     'base-plate': {
-        'base-plate': ['Model', 'Plate', 'Column', 'Bolt', 'Conc', 'Grout', 'Weld', 'Stiffeners'],
+        'base-plate': ['Model', 'Column', 'Plate'],
     },
 }
 

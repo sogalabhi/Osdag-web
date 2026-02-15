@@ -5,7 +5,7 @@ export const basePlateConfig = {
   routePath: "/design/connections/base_plate",
   designType: "BasePlateConnection",
   cameraKey: "BasePlateConnection",
-  cadOptions: ["Model", "Plate", "Column", "Bolt", "Conc", "Grout", "Weld", "Stiffeners"],
+  cadOptions: ["Model", "Column", "Plate"],
 
   defaultInputs: {
     module: "BasePlateConnection",
