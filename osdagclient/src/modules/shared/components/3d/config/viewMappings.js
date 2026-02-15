@@ -22,6 +22,10 @@ export const DEFAULT_VIEW_MAPPINGS = {
   "Cover Plate": ["Cover Plate"],
   "Bolts": ["Bolts"],
   "Welds": ["Welds"],
+  // Base Plate
+  "Conc": ["Conc", "Concrete"],
+  "Grout": ["Grout"],
+  "Stiffeners": ["Stiffeners", "Stiffener"],
 };
 
 /**

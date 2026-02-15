@@ -62,6 +62,12 @@ export const EngineeringModule = ({
     hoverDict: ctxHoverDict,
     coverPlateList,
     weldSizeList,
+    profileList = [],
+    anchorDiameterList = [],
+    anchorGradeList = [],
+    footingGradeList = [],
+    weldTypeList = [],
+    anchorTypeList = [],
 
     // State
     inputs,
@@ -811,7 +817,7 @@ export const EngineeringModule = ({
   };
 
   const options = getViewOptions();
-  // FIXED: Include angleList in contextData 
+  // Include all module data for dropdowns (Base Plate: anchorDiameterList, anchorGradeList, footingGradeList, weldTypeList, anchorTypeList, etc.)
   const contextData = {
     beamList,
     columnList,
@@ -820,13 +826,19 @@ export const EngineeringModule = ({
     boltDiameterList,
     thicknessList,
     propertyClassList,
-    angleList, // FIXED: Added angleList to context data
+    angleList,
     boltTypeList,
     sectionProfileList,
     channelList,
     sectionDesignation,
     coverPlateList,
     weldSizeList,
+    profileList,
+    anchorDiameterList,
+    anchorGradeList,
+    footingGradeList,
+    weldTypeList,
+    anchorTypeList,
   };
 
   const triggerScreenshotCapture = () => {
@@ -1351,7 +1363,7 @@ export const EngineeringModule = ({
               output={output}
               outputConfig={outputConfig}
               title={title || UI_STRINGS.OUTPUT_DOCK}
-              extraState={{ ...extraState, cadModelPaths, renderCadModel: renderBoolean }}
+              extraState={{ ...extraState, cadModelPaths, renderCadModel: renderBoolean, connectivity: inputs?.connectivity, member_designation: inputs?.member_designation, designation: inputs?.member_designation, weld_type: inputs?.weld_type }}
               handleCreateDesignReport={handleCreateDesignReport}
               saveOutput={saveOutput}
             />

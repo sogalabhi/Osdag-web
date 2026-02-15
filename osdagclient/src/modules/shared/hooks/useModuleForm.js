@@ -16,7 +16,16 @@ import {
  * - Applies \"Select All\" logic to sync lists into inputs
  */
 export const useModuleForm = (moduleConfig, moduleData) => {
-  const { boltDiameterList, propertyClassList, thicknessList, angleList, weldSizeList } = moduleData;
+  const {
+    boltDiameterList,
+    propertyClassList,
+    thicknessList,
+    angleList,
+    weldSizeList,
+    sectionDesignation = [],
+    anchorDiameterList = [],
+    anchorGradeList = [],
+  } = moduleData || {};
 
   // Inputs state
   const [inputs, setInputs] = useState(moduleConfig.defaultInputs);
@@ -46,7 +55,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
   // Selection states
   const [selectionStates, setSelectionStates] = useState(
-    moduleConfig.selectionConfig.reduce((acc, selection) => {
+    (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
       acc[selection.key] = selection.defaultValue || "All";
       return acc;
     }, {})
@@ -54,7 +63,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
   // All selected states
   const [allSelected, setAllSelected] = useState(
-    moduleConfig.selectionConfig.reduce((acc, selection) => {
+    (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
       acc[selection.inputKey] = true;
       return acc;
     }, {})
@@ -62,7 +71,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
   // Selected items for transfers
   const [selectedItems, setSelectedItems] = useState(
-    moduleConfig.selectionConfig.reduce((acc, selection) => {
+    (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
       acc[selection.inputKey] = [];
       return acc;
     }, {})
@@ -70,14 +79,14 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
   // Modal states
   const [modalStates, setModalStates] = useState(
-    moduleConfig.modalConfig.reduce((acc, modal) => {
+    (moduleConfig.modalConfig || []).reduce((acc, modal) => {
       acc[modal.key] = false;
       return acc;
     }, {})
   );
 
   const [modalDynamicSrc, setModalDynamicSrc] = useState(
-    moduleConfig.modalConfig.reduce((acc, modal) => {
+    (moduleConfig.modalConfig || []).reduce((acc, modal) => {
       if (!modal?.dataSource) acc[modal.key] = [];
       return acc;
     }, {})
@@ -169,6 +178,12 @@ export const useModuleForm = (moduleConfig, moduleData) => {
       topangle_list: angleList,
       cleat_section: angleList,
       weld_size: weldSizeList,
+      // Base Plate and other modules with section / anchor lists
+      member_designation: sectionDesignation,
+      anchor_diameter_ocf: anchorDiameterList,
+      anchor_grade_ocf: anchorGradeList,
+      anchor_diameter_icf: anchorDiameterList,
+      anchor_grade_icf: anchorGradeList,
     };
 
     const nextInputs = { ...inputs };
@@ -195,7 +210,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     if (changed) {
       setInputs(nextInputs);
     }
-  }, [boltDiameterList, propertyClassList, thicknessList, angleList, weldSizeList, allSelected, inputs]);
+  }, [boltDiameterList, propertyClassList, thicknessList, angleList, weldSizeList, sectionDesignation, anchorDiameterList, anchorGradeList, allSelected, inputs]);
 
   // Auto-hide save input popup
   useEffect(() => {
@@ -240,32 +255,32 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     setInputs(moduleConfig.defaultInputs);
     setExtraState(resolveInitialExtraState());
     setSelectionStates(
-      moduleConfig.selectionConfig.reduce((acc, selection) => {
+      (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
         acc[selection.key] = selection.defaultValue || "All";
         return acc;
       }, {})
     );
     setAllSelected(
-      moduleConfig.selectionConfig.reduce((acc, selection) => {
+      (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
         acc[selection.inputKey] = true;
         return acc;
       }, {})
     );
     setSelectedItems(
-      moduleConfig.selectionConfig.reduce((acc, selection) => {
+      (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
         acc[selection.inputKey] = [];
         return acc;
       }, {})
     );
 
     setModalStates(
-      moduleConfig.modalConfig.reduce((acc, modal) => {
+      (moduleConfig.modalConfig || []).reduce((acc, modal) => {
         acc[modal.key] = false;
         return acc;
       }, {})
     );
     setModalDynamicSrc(
-      moduleConfig.modalConfig.reduce((acc, modal) => {
+      (moduleConfig.modalConfig || []).reduce((acc, modal) => {
         if (!modal?.dataSource) acc[modal.key] = [];
         return acc;
       }, {})

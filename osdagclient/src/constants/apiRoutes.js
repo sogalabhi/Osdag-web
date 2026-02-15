@@ -16,6 +16,7 @@ import {
   MODULE_KEY_CC_COVER_PLATE_BOLTED,
   MODULE_KEY_CC_COVER_PLATE_WELDED,
   MODULE_KEY_CC_END_PLATE,
+  MODULE_KEY_BASE_PLATE,
   MODULE_KEY_BUTT_JOINT_BOLTED,
   MODULE_KEY_BUTT_JOINT_WELDED,
   MODULE_KEY_LAP_JOINT_BOLTED,
@@ -48,6 +49,8 @@ export const MODULE_SLUGS = {
   [MODULE_KEY_CC_COVER_PLATE_BOLTED]: 'moment-connection/column-column-cover-plate-bolted',
   [MODULE_KEY_CC_COVER_PLATE_WELDED]: 'moment-connection/column-column-cover-plate-welded',
   [MODULE_KEY_CC_END_PLATE]: 'moment-connection/column-column-end-plate',
+  // Base Plate
+  [MODULE_KEY_BASE_PLATE]: 'base-plate',
   // Simple
   [MODULE_KEY_BUTT_JOINT_BOLTED]: 'simple-connection/butt-joint-bolted',
   [MODULE_KEY_BUTT_JOINT_WELDED]: 'simple-connection/butt-joint-welded',

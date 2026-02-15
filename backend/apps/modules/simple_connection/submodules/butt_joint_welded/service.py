@@ -42,4 +42,3 @@ class Service:
             File path to the generated CAD model
         """
         return create_cad_model(inputs, section, session)
-

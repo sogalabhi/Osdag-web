@@ -132,6 +132,9 @@ export const MODULE_KEY_CC_COVER_PLATE_BOLTED = 'Column-to-Column-Cover-Plate-Bo
 export const MODULE_KEY_CC_COVER_PLATE_WELDED = 'Column-to-Column-Cover-Plate-Welded-Connection';
 export const MODULE_KEY_CC_END_PLATE = 'Column-to-Column-End-Plate-Connection';
 
+// Module Keys - Base Plate
+export const MODULE_KEY_BASE_PLATE = 'BasePlateConnection';
+
 // Module Keys - Simple connections
 export const MODULE_KEY_BUTT_JOINT_BOLTED = 'ButtJointBolted';
 export const MODULE_KEY_BUTT_JOINT_WELDED = 'ButtJointWelded';

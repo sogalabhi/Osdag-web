@@ -39,6 +39,9 @@ SECTION_MAPPINGS = {
     'flexure-member': {
         'simply-supported-beam': [],  # TODO: Add sections when available
     },
+    'base-plate': {
+        'base-plate': ['Model', 'Plate', 'Column', 'Bolt', 'Conc', 'Grout', 'Weld', 'Stiffeners'],
+    },
 }
 
 

@@ -2577,8 +2577,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # initialise anchor bolt diameter and grade [Reference: based on design experience, field conditions  and sample calculations]
         # the following list of anchor diameters are neglected due its practical non acceptance/unavailability - 'M8', 'M10', 'M12', 'M16'
 
-        # 1.1: Anchor outside flange
-        self.anchor_dia_list_out = [int(a[-2:]) for a in self.anchor_dia_out]  # list of anchor dia provided as input, (int) [20, 24, 30, ...]
+        # 1.1: Anchor outside flange (parse "M8", "M20", "20" etc. to int mm)
+        self.anchor_dia_list_out = [int(str(a).lstrip('Mm')) for a in self.anchor_dia_out]
 
         sort_bolt = filter(lambda x: 'M20' <= x <= self.anchor_dia_out[-1], self.anchor_dia_out)
 
@@ -2591,8 +2591,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_dia_outside_flange = self.anchor_dia_provided_outside_flange  # mm, anchor dia provided outside the column flange (int)
         self.anchor_area_outside_flange = self.bolt_area(self.anchor_dia_provided_outside_flange)  # list of areas [shank area, thread area] mm^2
 
-        # 1.2: Anchor inside flange
-        self.anchor_dia_list_in = [int(a[-2:]) for a in self.anchor_dia_in]  # list of anchor dia provided as input, (int) [20, 24, 30, ...]
+        # 1.2: Anchor inside flange (parse "M8", "M20", "20" etc. to int mm)
+        self.anchor_dia_list_in = [int(str(a).lstrip('Mm')) for a in self.anchor_dia_in]
 
         sort_bolt = filter(lambda x: 'M20' <= x <= self.anchor_dia_in[-1], self.anchor_dia_in)
 
@@ -5456,7 +5456,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.epsilon = round(math.sqrt(250 / self.stiffener_fy), 2)
 
         # design the weld connecting the column and the stiffeners to the base plate
-        self.weld_fu = min(self.dp_weld_fu_overwrite, self.dp_column_fu)
+        # When overwrite is 0, use column fu (weld metal same as parent)
+        self.weld_fu = self.dp_weld_fu_overwrite if self.dp_weld_fu_overwrite > 0 else self.dp_column_fu
 
         # length of the stiffener plate available in case of stiffener requirement/or extra welding
 
@@ -5513,7 +5514,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                     self.strength_unit_len = self.load_axial_compression / (self.effective_length_flange + self.effective_length_web)  # N/mm
                     self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
-                                                                                    [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                    [self.weld_fu, self.dp_column_fu],
                                                                                     [self.plate_thk_provided, self.column_tf], self.dp_weld_fab)  # mm
 
                     self.weld_size_web = self.weld_size  # mm
@@ -5535,7 +5536,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                         # relative strength of weld per unit weld length and weld size including stiffeners along the flange
                         self.strength_unit_len = self.load_axial_compression / self.total_eff_len_available  # N/mm
                         self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
-                                                                                        [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                        [self.weld_fu, self.dp_column_fu],
                                                                                         [self.plate_thk_provided, self.column_tf], self.dp_weld_fab)  # mm
 
                         self.weld_size_web = self.weld_size  # mm
@@ -5555,7 +5556,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                             # relative strength of weld per unit weld length and weld size, including stiffeners along the flange and the web
                             self.strength_unit_len = self.load_axial_compression / self.total_eff_len_available  # N/mm
                             self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
-                                                                                            [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                            [self.weld_fu, self.dp_column_fu],
                                                                                             [self.plate_thk_provided, self.column_tf], self.dp_weld_fab)  # mm
 
                             self.weld_size_web = self.weld_size  # mm
@@ -5583,7 +5584,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                                     # and, weld size, including stiffeners along the flange, web and across the web
                                     self.strength_unit_len = self.load_axial_compression / self.total_eff_len_available  # N/mm
                                     self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
-                                                                                                    [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                                    [self.weld_fu, self.dp_column_fu],
                                                                                                     [self.plate_thk_provided, self.column_tf],
                                                                                                     self.dp_weld_fab)  # mm
 
@@ -5629,7 +5630,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
                 self.strength_unit_len = self.load_axial_compression / length_available  # N/mm
                 self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
-                                                                                [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                [self.weld_fu, self.dp_column_fu],
                                                                                 [self.plate_thk_provided, self.column_tf], self.dp_weld_fab)  # mm
 
                 self.weld_size_hollow = self.weld_size  # mm
@@ -5664,7 +5665,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     # weld size after providing stiffeners
                     self.strength_unit_len = self.load_axial_compression / effective_length_available  # N/mm
                     self.weld_size = self.calc_weld_size_from_strength_per_unit_len(self.strength_unit_len,
-                                                                                    [self.dp_weld_fu_overwrite, self.dp_column_fu],
+                                                                                    [self.weld_fu, self.dp_column_fu],
                                                                                     [self.plate_thk_provided, self.column_tf], self.dp_weld_fab)  # mm
 
                     self.weld_size_hollow = self.weld_size  # mm
@@ -6461,7 +6462,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     end_return_reduction = 2 * self.weld_stiffener_SHS.min_size
                     self.weld_length_stiffener_plt = (2 * (self.stiffener_plt_height - 25)) - end_return_reduction
                     self.weld_size_stiffener_plt = (self.shear_on_stiffener * 1e3 * math.sqrt(3) * self.gamma_mw) / \
-                                                   (0.7 * self.weld_length_stiffener_plt * self.dp_weld_fu_overwrite)
+                                                   (0.7 * self.weld_length_stiffener_plt * self.weld_fu)
                     self.weld_size_stiffener_plt = max(self.weld_size_stiffener_plt, self.weld_stiffener_SHS.min_size)
                     self.weld_size_stiffener_plt = round_up(self.weld_size_stiffener_plt, 2)
             else:
@@ -6472,7 +6473,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
                     end_return_reduction = 2 * self.weld_stiffener_CHS.min_size
                     self.weld_length_stiffener_plt = (2 * (self.stiffener_plt_height - 25)) - end_return_reduction
                     self.weld_size_stiffener_plt = (self.shear_on_stiffener * 1e3 * math.sqrt(3) * self.gamma_mw) / \
-                                                   (0.7 * self.weld_length_stiffener_plt * self.dp_weld_fu_overwrite)
+                                                   (0.7 * self.weld_length_stiffener_plt * self.weld_fu)
                     self.weld_size_stiffener_plt = max(self.weld_size_stiffener_plt, self.weld_stiffener_CHS.min_size)
                     self.weld_size_stiffener_plt = round_up(self.weld_size_stiffener_plt, 2)
 

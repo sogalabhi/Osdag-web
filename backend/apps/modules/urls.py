@@ -20,7 +20,7 @@ urlpatterns = [
     # Flexure Member module
     path('flexure-member/', include('apps.modules.flexure_member.urls')),
     
-    # Future modules will be added here:
-    # path('base-plate/', include('apps.modules.base_plate.urls')),
+    # Base Plate
+    path('base-plate/', include('apps.modules.base_plate.urls')),
 ]
 
