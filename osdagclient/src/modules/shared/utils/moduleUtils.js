@@ -24,10 +24,10 @@ export const menuItems = [
       { name: "Quit", shortcut: "Shift+Q" }
     ],
   },
-  {
-    label: "Edit",
-    dropdown: [{ name: "Design Preferences", shortcut: "Alt+P" }],
-  },
+  // {
+  //  label: "Edit",
+  //  dropdown: [{ name: "Design Preferences", shortcut: "Alt+P" }],
+  // },
   {
     label: "Graphics",
     dropdown: [

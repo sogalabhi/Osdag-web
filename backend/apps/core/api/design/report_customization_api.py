@@ -228,13 +228,28 @@ class CustomizeReport(APIView):
             filter_obj = LaTeXFilter()
             print('[report_customization_api] CustomizeReport:filtering content')
             filtered_latex = filter_obj.filter_content(original_latex, selected_sections)
+            filtered_latex = filtered_latex.replace(
+    		r"\usepackage{lastpage}",
+    		r"\usepackage{pageslts}"
+	    )
+            filtered_latex = filtered_latex.replace(
+    		r"\pageref{LastPage}",
+    		r"\lastpageref{pagesLTS.lastpage}"
+            )
+            filtered_latex = (
+                filtered_latex
+                .lstrip('\ufeff')
+                .replace('\r\n', '\n')
+                .replace('\r', '\n')
+            )
             print('[report_customization_api] CustomizeReport:filter', { 'report_id': report_id, 'selected_count': len(selected_sections) })
             print('[report_customization_api] CustomizeReport:filtered content length', len(filtered_latex))
             print('[report_customization_api] CustomizeReport:filtered content preview', filtered_latex[:200])
             
             # Use fixed temp directory to overwrite each time (matching desktop behavior)
             print('[report_customization_api] CustomizeReport:creating temp dir')
-            safe_temp_dir = os.path.join(tempfile.gettempdir(), "osdag_pdf_compile")
+            # safe_temp_dir = os.path.join(tempfile.gettempdir(), "osdag_pdf_compile")
+            safe_temp_dir = tempfile.mkdtemp(prefix="osdag_pdf_")
             print('[report_customization_api] CustomizeReport:temp dir path', safe_temp_dir)
             try:
                 if os.path.exists(safe_temp_dir):
@@ -252,6 +267,9 @@ class CustomizeReport(APIView):
             custom_tex_path = os.path.join(safe_temp_dir, "filtered_report.tex")
             print('[report_customization_api] CustomizeReport:custom tex path', custom_tex_path)
             try:
+                print("custom_tex_path:", custom_tex_path)
+                print("parent dir exists:", os.path.exists(os.path.dirname(custom_tex_path)))
+                print("parent dir writable:", os.access(os.path.dirname(custom_tex_path), os.W_OK))
                 with open(custom_tex_path, 'w', encoding='utf-8') as f:
                     f.write(filtered_latex)
                 print('[report_customization_api] CustomizeReport:filtered tex written successfully')

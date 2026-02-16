@@ -10,7 +10,7 @@ function FinPlate() {
     <EngineeringModule
       moduleConfig={finPlateConfig}
       outputConfig={finPlateOutputConfig}
-      title={UI_STRINGS.CONNECTING_MEMBERS} 
+      title={UI_STRINGS.OUTPUT_DOCK} 
     />
   );
 }

@@ -14,15 +14,15 @@ export const seatedAngleOutputConfig = {
     "SeatedAngleConnection": [
       { key: "SeatedAngle.Designation", label: "Designation" },
       { key: "TopAngle.Width", label: "Width (mm)" },
-      { key: "CapacityModal", label: "Capacity Details" },
-      { key: "SpacingModal_Seated_col", label: "On Column" },
-      { key: "SpacingModal_Seated_beam", label: "On Beam" },
+      { key: "CapacityModal", label: "Capacity" },
+      { key: "SpacingModal_Seated_col", label: "Bolt Spacing Details" },
+      { key: "SpacingModal_Seated_beam", label: "Bolt Spacing Details" },
     ],
     "Top Angle": [
       { key: "TopAngle.Designation", label: "Designation" },
       { key: "TopAngle.Width", label: "Width (mm)" },
-      { key: "SpacingModal_Top_col", label: "On Column" },
-      { key: "SpacingModal_Top_beam", label: "On Beam" },
+      { key: "SpacingModal_Top_col", label: "Bolt Spacing Details" },
+      { key: "SpacingModal_Top_beam", label: "Bolt Spacing Details" },
     ],
   },
 

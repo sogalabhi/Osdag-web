@@ -15,11 +15,11 @@ export const finPlateOutputConfig = {
       { key: "Plate.Thickness", label: "Thickness (mm)" },
       { key: "Plate.Height", label: "Height (mm)" },
       { key: "Plate.Length", label: "Length (mm)" },
-      { key: "PlateCapacityModal", label: "Capacity" },
+      // { key: "PlateCapacityModal", label: "Capacity" },
     ],
-    "Section Details": [
-      { key: "SectionCapacityModal", label: "Capacity" },
-    ],
+    // "Section Details": [
+    //  { key: "SectionCapacityModal", label: "Capacity" },
+    // ],
     "Weld": [
       { key: "Weld.Size", label: "Size (mm)" },
       { key: "Weld.Strength", label: "Strength (N/mm2)" },

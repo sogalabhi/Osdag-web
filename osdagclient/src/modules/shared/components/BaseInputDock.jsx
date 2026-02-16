@@ -43,7 +43,7 @@ export const BaseInputDock = ({
       {/* Header */}
       <div className="sticky top-0 z-30 bg-white dark:bg-osdag-dark-color border-b border-gray-200 dark:border-gray-700 flex items-center justify-between inputRow">
         <span className="flex justify-center items-center w-32 my-2 ml-4 py-1 px-1 text-sm text-center rounded-xl font-medium bg-osdag-green text-white flex-shrink-0">
-          Input Dock
+          Basic Inputs
         </span>
         <div className="flex items-center gap-2 mr-4">
           <button

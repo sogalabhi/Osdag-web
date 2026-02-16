@@ -1,7 +1,7 @@
-import { MODULE_KEY_END_PLATE } from "../../../../constants/DesignKeys";
+import { MODULE_KEY_END_PLATE, MODULE_DISPLAY_END_PLATE } from "../../../../constants/DesignKeys";
 
 export const endPlateConfig = {
-  sessionName: "End Plate Connection",
+  sessionName: MODULE_DISPLAY_END_PLATE,
   routePath: "/design/connections/shear/end_plate",
   designType: MODULE_KEY_END_PLATE,
   cameraKey: MODULE_KEY_END_PLATE,
@@ -38,7 +38,7 @@ export const endPlateConfig = {
     design_method: "Limit State Design",
     
     bolt_tension_type: "Pre-tensioned",
-    module: "End Plate Connection",
+    module: MODULE_KEY_END_PLATE,
   },
 
   modalConfig: [

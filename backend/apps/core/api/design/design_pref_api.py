@@ -1,3 +1,4 @@
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,6 +10,7 @@ from apps.core.serializers import Material_Serializer, CustomMaterials_Serialize
 
 
 class DesignPreference(APIView):
+    permission_classes = [AllowAny]
 
     def get(self, request):
         supported_section = request.GET.get("supported_section")

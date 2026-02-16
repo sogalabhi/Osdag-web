@@ -10,7 +10,7 @@ function SeatedAngle() {
     <EngineeringModule
       moduleConfig={seatedAngleConfig}
       outputConfig={seatedAngleOutputConfig}
-      title={UI_STRINGS.CONNECTING_MEMBERS}
+      title={UI_STRINGS.OUTPUT_DOCK}
     />  
   );
 }

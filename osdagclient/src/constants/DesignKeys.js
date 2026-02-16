@@ -115,6 +115,7 @@ export const MODULE_DISPLAY_SEAT_ANGLE = 'SeatedAngleConnection'; // display nam
 
 // Module Keys - End Plate / Beam-Column End Plate / Beam-Beam End Plate
 export const MODULE_KEY_END_PLATE = 'EndPlateConnection';
+export const MODULE_DISPLAY_END_PLATE = 'EndPlateConnection';
 export const MODULE_KEY_BEAM_COLUMN_END_PLATE = 'BeamToColumnEndPlate';
 export const MODULE_KEY_BEAM_BEAM_END_PLATE = 'BeamBeamEndPlate';
 
