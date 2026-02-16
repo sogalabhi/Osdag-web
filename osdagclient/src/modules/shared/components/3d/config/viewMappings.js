@@ -16,6 +16,16 @@ export const DEFAULT_VIEW_MAPPINGS = {
   "EndPlate": ["EndPlate"],
   "Member": ["Member"],
   "CoverPlate": ["CoverPlate", "Cover Plate"],
+  // Simple connections (desktop parity): Plate 1, Plate 2, Cover Plate, Bolts, Welds
+  "Plate 1": ["Plate 1"],
+  "Plate 2": ["Plate 2"],
+  "Cover Plate": ["Cover Plate"],
+  "Bolts": ["Bolts"],
+  "Welds": ["Welds"],
+  // Base Plate
+  "Conc": ["Conc", "Concrete"],
+  "Grout": ["Grout"],
+  "Stiffeners": ["Stiffeners", "Stiffener"],
 };
 
 /**
@@ -25,15 +35,15 @@ export const DEFAULT_VIEW_MAPPINGS = {
  */
 export const createViewMapper = (moduleCadConfig = null) => {
   // Use module-specific mappings if provided, otherwise use defaults
-  const viewMappings = moduleCadConfig?.viewMappings || DEFAULT_VIEW_MAPPINGS;
-  
+  const baseMappings = moduleCadConfig?.viewMappings || DEFAULT_VIEW_MAPPINGS;
+  // For simple connections (cadOptions has Plate 1, etc.): Model = merge per-part meshes only (skip backend "Model" mesh to avoid duplicate)
+  const viewMappings = { ...baseMappings };
+  if (moduleCadConfig?.cadOptions && Array.isArray(moduleCadConfig.cadOptions) && moduleCadConfig.cadOptions.includes("Plate 1")) {
+    viewMappings["Model"] = moduleCadConfig.cadOptions.filter((opt) => opt !== "Model");
+  }
+
   return (partName, activeViews) => {
-    // If Model is selected, show all parts
-    if (activeViews.includes("Model")) {
-      return true;
-    }
-    
-    // Check each active view
+    // Check each active view (no special-case for Model so module mapping applies)
     for (const view of activeViews) {
       const mappedParts = viewMappings[view];
       
@@ -49,17 +59,9 @@ export const createViewMapper = (moduleCadConfig = null) => {
           return true;
         }
         
-        // Case-insensitive match
+        // Case-insensitive match only (no partial match, so "Plate 1" does not show "Plate")
         const lowerPartName = partName?.toLowerCase();
         if (mappedParts.some(p => p?.toLowerCase() === lowerPartName)) {
-          return true;
-        }
-        
-        // Partial match (e.g., "Plate" matches "EndPlate")
-        if (mappedParts.some(p => {
-          const lowerP = p?.toLowerCase();
-          return lowerPartName?.includes(lowerP) || lowerP?.includes(lowerPartName);
-        })) {
           return true;
         }
       }

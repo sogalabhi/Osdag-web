@@ -16,6 +16,7 @@ import {
   MODULE_KEY_CC_COVER_PLATE_BOLTED,
   MODULE_KEY_CC_COVER_PLATE_WELDED,
   MODULE_KEY_CC_END_PLATE,
+  MODULE_KEY_BASE_PLATE,
   MODULE_KEY_BUTT_JOINT_BOLTED,
   MODULE_KEY_BUTT_JOINT_WELDED,
   MODULE_KEY_LAP_JOINT_BOLTED,
@@ -25,6 +26,7 @@ import {
   MODULE_KEY_BOLTED_TO_END_GUSSET,
   MODULE_KEY_WELDED_TO_END_GUSSET,
   MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
+  MODULE_KEY_STRUTS_BOLTED,
 } from "./DesignKeys";
 
 // Centralized API route mappings for engineering modules.
@@ -48,6 +50,8 @@ export const MODULE_SLUGS = {
   [MODULE_KEY_CC_COVER_PLATE_BOLTED]: 'moment-connection/column-column-cover-plate-bolted',
   [MODULE_KEY_CC_COVER_PLATE_WELDED]: 'moment-connection/column-column-cover-plate-welded',
   [MODULE_KEY_CC_END_PLATE]: 'moment-connection/column-column-end-plate',
+  // Base Plate
+  [MODULE_KEY_BASE_PLATE]: 'base-plate',
   // Simple
   [MODULE_KEY_BUTT_JOINT_BOLTED]: 'simple-connection/butt-joint-bolted',
   [MODULE_KEY_BUTT_JOINT_WELDED]: 'simple-connection/butt-joint-welded',
@@ -60,6 +64,8 @@ export const MODULE_SLUGS = {
   [MODULE_KEY_WELDED_TO_END_GUSSET]: 'tension-member/welded',
   // Flexure
   [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: 'flexure-member/simply-supported-beam',
+  // Compression
+  [MODULE_KEY_STRUTS_BOLTED]: 'compression-member/struts_bolted',
 };
 
 export const getModuleSlug = (moduleId) => MODULE_SLUGS[moduleId] || moduleId;

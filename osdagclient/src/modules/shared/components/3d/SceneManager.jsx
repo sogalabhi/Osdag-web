@@ -8,7 +8,7 @@ import { getPartColor, VALID_PART_KEYS } from './config/cadConfig';
 export const SceneManager = forwardRef(({
   modelPaths,
   activeViews,
-  modelPosition = [0, -4, 0],
+  modelPosition = [0, 0, 0],
   modelScale = 0.008,
   modelRotation = [Math.PI / -2, 0, 0],
   orthographicView = null,

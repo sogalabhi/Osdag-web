@@ -11,6 +11,38 @@ import Detailing_FP from "../../../assets/Detailing-Flush.png";
 import Detailing_OWE from "../../../assets/Detailing-OWE.png";
 import GrooveImg from "../../../assets/BB-BC-single_bevel_groove.png";
 import SpacingDiagram from "./SpacingDiagram";
+// Base plate output modals (sketch, detailing, weld, key)
+import Moment_BP from "../../../assets/Moment_BP.png";
+import Moment_BP_C2 from "../../../assets/Moment_BP_C2.png";
+import Moment_BP_C3 from "../../../assets/Moment_BP_C3.png";
+import Welded_BP from "../../../assets/Welded_BP.png";
+import SHS_BP from "../../../assets/SHS_BP.png";
+import RHS_BP from "../../../assets/RHS_BP.png";
+import CHS_BP from "../../../assets/CHS_BP.png";
+import Moment_BP_Detailing from "../../../assets/Moment_BP_Detailing.png";
+import Welded_BP_Detailing from "../../../assets/Welded_BP_Detailing.png";
+import SHS_BP_Detailing from "../../../assets/SHS_BP_Detailing.png";
+import RHS_BP_Detailing from "../../../assets/RHS_BP_Detailing.png";
+import CHS_BP_Detailing from "../../../assets/CHS_BP_Detailing.png";
+import Moment_BP_weld_1_1 from "../../../assets/Moment_BP_weld_details_1-1.png";
+import Moment_BP_weld_1_2 from "../../../assets/Moment_BP_weld_details_1-2.png";
+import Moment_BP_weld_2 from "../../../assets/Moment_BP_weld_details_2.png";
+import Welded_BP_single_bevel from "../../../assets/Welded_BP_single_bevel.png";
+import Welded_BP_double_J from "../../../assets/Welded_BP_double_J.png";
+import SHS_BP_groove_weld from "../../../assets/SHS_BP_groove_weld_details.png";
+import SHS_BP_weld from "../../../assets/SHS_BP_weld_details.png";
+import RHS_BP_groove_weld from "../../../assets/RHS_BP_groove_weld_details.png";
+import RHS_BP_weld from "../../../assets/RHS_BP_weld_details.png";
+import CHS_BP_groove_weld from "../../../assets/CHS_BP_groove_weld_details.png";
+import CHS_BP_weld from "../../../assets/CHS_BP_weld_details.png";
+import BP_welded_weld from "../../../assets/BP_welded_weld_details.png";
+import Key_SHS from "../../../assets/Key_SHS.png";
+import Key_SHS_D from "../../../assets/Key_SHS_D.png";
+import Key_SHS_B from "../../../assets/Key_SHS_B.png";
+import Key_RHS from "../../../assets/Key_RHS.png";
+import Key_RHS_D from "../../../assets/Key_RHS_D.png";
+import Key_RHS_B from "../../../assets/Key_RHS_B.png";
+import Key_CHS from "../../../assets/Key_CHS.png";
 
 export const BaseOutputDock = ({
   output,
@@ -57,7 +89,7 @@ export const BaseOutputDock = ({
     </div>
   );
 
-  const getImageForModal = (imageType, selectedOption) => {
+  const getImageForModal = (imageType, selectedOption, basePlateState = {}) => {
     const imageMap = {
       stiffener: {
         "Flushed - Reversible Moment": Stiffener_FP,
@@ -72,12 +104,75 @@ export const BaseOutputDock = ({
       groove: GrooveImg,
       spacing: spacingIMG,
       capacity1: capacityIMG1,
-      capacity2: capacityIMG2
+      capacity2: capacityIMG2,
+      // Base plate: sketch by connectivity (desktop: moment_bp_case for Moment Base Plate)
+      basePlateSketch: {
+        "Moment Base Plate": Moment_BP,
+        "Welded Column Base": Welded_BP,
+        "Hollow/Tubular Column Base": null, // resolved below by section
+      },
+      basePlateDetailing: {
+        "Moment Base Plate": Moment_BP_Detailing,
+        "Welded Column Base": Welded_BP_Detailing,
+        "Hollow/Tubular Column Base": null,
+      },
+      weldDetails: {
+        "Moment Base Plate": Moment_BP_weld_1_1,
+        "Welded Column Base": Welded_BP_single_bevel,
+        "Hollow/Tubular Column Base": null,
+      },
+      keySketch: {
+        SHS: Key_SHS,
+        RHS: Key_RHS,
+        CHS: Key_CHS,
+      },
     };
 
     if (imageType === 'groove' || imageType === 'spacing' ||
       imageType === 'capacity1' || imageType === 'capacity2') {
       return imageMap[imageType];
+    }
+    if (imageType === 'basePlateSketch') {
+      const conn = basePlateState.connectivity || selectedOption;
+      let img = imageMap.basePlateSketch?.[conn];
+      if (conn === 'Hollow/Tubular Column Base') {
+        const sec = (basePlateState.member_designation || basePlateState.designation || '') + '';
+        if (sec.includes('SHS')) img = SHS_BP;
+        else if (sec.includes('RHS')) img = RHS_BP;
+        else if (sec.includes('CHS')) img = CHS_BP;
+      }
+      return img || Moment_BP;
+    }
+    if (imageType === 'basePlateDetailing') {
+      const conn = basePlateState.connectivity || selectedOption;
+      let img = imageMap.basePlateDetailing?.[conn];
+      if (conn === 'Hollow/Tubular Column Base') {
+        const sec = (basePlateState.member_designation || basePlateState.designation || '') + '';
+        if (sec.includes('SHS')) img = SHS_BP_Detailing;
+        else if (sec.includes('RHS')) img = RHS_BP_Detailing;
+        else if (sec.includes('CHS')) img = CHS_BP_Detailing;
+      }
+      return img || Moment_BP_Detailing;
+    }
+    if (imageType === 'weldDetails') {
+      const conn = basePlateState.connectivity || selectedOption;
+      let img = imageMap.weldDetails?.[conn];
+      if (conn === 'Welded Column Base') return BP_welded_weld || Welded_BP_single_bevel;
+      if (conn === 'Hollow/Tubular Column Base') {
+        const sec = (basePlateState.member_designation || basePlateState.designation || '') + '';
+        const groove = basePlateState.weld_type === 'Groove Weld';
+        if (sec.includes('SHS')) img = groove ? SHS_BP_groove_weld : SHS_BP_weld;
+        else if (sec.includes('RHS')) img = groove ? RHS_BP_groove_weld : RHS_BP_weld;
+        else if (sec.includes('CHS')) img = groove ? CHS_BP_groove_weld : CHS_BP_weld;
+      }
+      return img || Moment_BP_weld_1_1;
+    }
+    if (imageType === 'keySketch') {
+      const sec = (basePlateState.member_designation || basePlateState.designation || '') + '';
+      if (sec.includes('SHS')) return Key_SHS;
+      if (sec.includes('RHS')) return Key_RHS;
+      if (sec.includes('CHS')) return Key_CHS;
+      return Key_SHS;
     }
     return imageMap[imageType]?.[selectedOption] || null;
   };
@@ -251,7 +346,7 @@ export const BaseOutputDock = ({
         </div>
       );
     } else if (config.layout === "image-only") {
-      const image = getImageForModal(config.imageType, extraState.selectedOption);
+      const image = getImageForModal(config.imageType, extraState.selectedOption, extraState);
       return (
         <div className="spacing-main-body">
           {image && <img src={image} alt={`${config.imageType} Image`} />}
@@ -290,12 +385,16 @@ export const BaseOutputDock = ({
       return (
         <div className="details-main-body">
           <div className="details-main-body-inside">
-            {fields.map(({ key, label }, idx) => (
-              <div key={idx} className="details-main-body-align">
-                <h4 dangerouslySetInnerHTML={{ __html: label }} />
-                <ValueBox value={getOutputValue(key, output)} />
-              </div>
-            ))}
+            {fields.length > 0 ? (
+              fields.map(({ key, label }, idx) => (
+                <div key={idx} className="details-main-body-align">
+                  <h4 dangerouslySetInnerHTML={{ __html: label }} />
+                  <ValueBox value={getOutputValue(key, output)} />
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500 px-2 py-4">No details available for this section.</p>
+            )}
           </div>
         </div>
       );
@@ -330,7 +429,7 @@ export const BaseOutputDock = ({
         <div className="p-2">
           <p className="p-2 inline-block bg-osdag-green text-white rounded">{title}</p>
         </div>
-        <div className="flex-1 overflow-y-auto subMainBody scroll-data min-h-0">
+        <div className="flex-1 overflow-y-auto subMainBody scroll-data min-h-0 pb-20">
           {Object.entries(outputConfig.sections).map(([sectionName, fields]) => (
             <div key={sectionName} className='cards'>
               <h3 className='text-black dark:text-white'>{sectionName}</h3>
@@ -341,9 +440,9 @@ export const BaseOutputDock = ({
           ))}
         </div>
 
-        {/* Footer Actions */}
+        {/* Footer Actions - sticky at bottom; scroll area has padding so last content is not hidden */}
         {(handleCreateDesignReport || saveOutput) && (
-          <div className="sticky bottom-0 z-10 bg-white dark:bg-osdag-dark-color border-t border-gray-200 dark:border-gray-700 flex items-center w-full gap-x-4 px-5 py-2">
+          <div className="sticky bottom-0 flex-shrink-0 z-10 bg-white dark:bg-osdag-dark-color border-t border-gray-200 dark:border-gray-700 flex items-center w-full gap-x-4 px-5 py-2">
             {handleCreateDesignReport && (
               <button
                 onClick={handleCreateDesignReport}

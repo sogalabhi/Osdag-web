@@ -10,56 +10,21 @@ export const buttJointBoltedOutputConfig = {
         ],
         "Bolt Design": [
             { key: "Bolt.number", label: "Number of Bolts" },
-            { key: "PackingPlate thk", label: "Packing Plate Thickness (mm)" },
+            { key: "PackingPlate thk", label: "Packing Plate thickness (mm)" },
             { key: "Bolt.Rows", label: "Rows of Bolts" },
             { key: "Bolt.Cols", label: "Columns of Bolts" },
             { key: "Bolt.UtilizationRatio", label: "Utilisation Ratio" },
             { key: "Design For", label: "Design For" },
-            { key: "Plate.BaseCapacity", label: "Base Metal Capacity (kN)" },
-            { key: "Plate.BaseUtilization", label: "Base Metal Utilization" },
+            { key: "Plate.BaseCapacity", label: "Connected Plate Capacity (kN)" },
+            { key: "Plate.BaseUtilization", label: "Connected Plate Utilization" },
             { key: "Bolt.Utilization", label: "Bolt Utilization" },
             { key: "Bolt.ConnLength", label: "Length of Connection (mm)" },
-            { key: "SpacingModal", label: "Spacing Details" },
         ],
     },
 
-    modals: {
-        SpacingModal: { type: "spacing", buttonText: "Spacing Details" }
-    },
+    modals: {},
 
-    modalTypes: {
-        spacing: {
-            title: "Spacing Details",
-            width: "68%",
-            layout: "spacing-diagram",
-            hasImage: true,
-            note: "Representative Image for Spacing Details - 3 x 3 pattern considered"
-        }
-    },
+    modalTypes: {},
 
-    modalData: {
-        spacing: {
-            SpacingModal: {
-                fields: [
-                    { key: "Bolt.Pitch", label: "Pitch Distance (mm)" },
-                    { key: "Bolt.EndDist", label: "End Distance (mm)" },
-                    { key: "Bolt.Gauge", label: "Gauge Distance (mm)" },
-                    { key: "Bolt.EdgeDist", label: "Edge Distance (mm)" },
-                ],
-                diagram: {
-                    origin: "right",
-                    props: {
-                        plateWidth: "PlateWidth",
-                        rows: "Bolt.Rows",
-                        cols: "Bolt.Cols",
-                        end: "Bolt.EndDist",
-                        pitch: "Bolt.Pitch",
-                        gauge: "Bolt.Gauge",
-                        edge: "Bolt.EdgeDist",
-                        holeDiameter: "Bolt.Diameter",
-                    },
-                },
-            },
-        }
-    }
+    modalData: {}
 }; 

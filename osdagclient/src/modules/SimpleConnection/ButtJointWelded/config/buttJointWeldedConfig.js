@@ -13,7 +13,7 @@ export const buttJointWeldedConfig = {
     routePath: "/design/connections/simple/butt_joint_welded",
     designType: "ButtJointWelded",
     cameraKey: "Connection",
-    cadOptions: ["Model", "Plate", "Column"],
+    cadOptions: ["Model", "Plate 1", "Plate 2", "Cover Plate", "Welds"],
 
     defaultInputs: {
         axial_force: "60",
@@ -50,10 +50,10 @@ export const buttJointWeldedConfig = {
     buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
         const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
             if (allSelectedFlag) {
-                // Exclude "All" if present in the list
-                return fullList.filter(item => item !== "All");
+                // Prefer full list; if not loaded yet, use already-synced selectedList (e.g. from useEffect)
+                const list = Array.isArray(fullList) && fullList.length ? fullList : (Array.isArray(selectedList) ? selectedList : []);
+                return list.filter(item => item !== "All");
             }
-            // Ensure always array
             if (Array.isArray(selectedList)) {
                 return selectedList.filter(item => item !== "All");
             }

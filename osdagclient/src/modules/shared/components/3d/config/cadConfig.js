@@ -12,6 +12,8 @@ export const DEFAULT_PART_COLORS = {
   
   // Plates and connectors
   Plate: "#2f2f23",
+  "Plate 1": "#2f2f23",
+  "Plate 2": "#4a4a3a",
   Endplate: "#2f2f23",
   EndPlate: "#2f2f23",
   cleatAngle: "#2f2f23",
@@ -60,7 +62,7 @@ export const DEFAULT_RENDER_ORDER = {
   weld: RENDER_ORDER.FASTENER,
 };
 
-// Valid part keys for grouping
+// Valid part keys for grouping (must match API section names so parts are included in the scene)
 export const VALID_PART_KEYS = new Set([
   "Member",
   "Endplate",
@@ -68,6 +70,8 @@ export const VALID_PART_KEYS = new Set([
   "Beam",
   "Column",
   "Plate",
+  "Plate 1",
+  "Plate 2",
   "Weld",
   "Welds",
   "Bolt",

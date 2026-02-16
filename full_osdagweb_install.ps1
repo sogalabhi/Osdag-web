@@ -1036,7 +1036,7 @@ function Step-SetupCondaEnvironment {
         Write-Host "For best results, close this window and:" -ForegroundColor Yellow
         Write-Host "1. Right-click on Anaconda Prompt and select 'Run as administrator'" -ForegroundColor White
         Write-Host "2. Navigate to your project directory" -ForegroundColor White
-        Write-Host "3. Run: conda create -n osdag-web python=3.8 -y" -ForegroundColor White
+        Write-Host "3. Run: conda create -n osdag-web python=3.10 -y" -ForegroundColor White
         
         $continueAnyway = Read-Host "`nDo you want to continue anyway? (y/n)"
         if ($continueAnyway -ne "y") {
@@ -1080,8 +1080,8 @@ function Step-SetupCondaEnvironment {
     $envName = "osdag-web"
     Write-Host "`nUsing environment name: 'osdag-web'" -ForegroundColor Yellow
     
-    # Set Python version to 3.8
-    $pythonVersion = "3.8"
+    # Set Python version to 3.10
+    $pythonVersion = "3.10"
     Write-Host "Using Python $pythonVersion" -ForegroundColor Yellow
     
     # Directly create the environment
@@ -1137,7 +1137,7 @@ function Step-SetupCondaEnvironment {
         # Provide manual instructions with admin emphasis
         Write-Host "`n?? Please try creating the environment manually:" -ForegroundColor Yellow
         Write-Host "   1. Right-click on Anaconda Prompt and select 'Run as administrator'" -ForegroundColor White
-        Write-Host "   2. Run: conda create -n osdag-web python=3.8 -y" -ForegroundColor White
+        Write-Host "   2. Run: conda create -n osdag-web python=3.10 -y" -ForegroundColor White
         Write-Host "   3. After creation, activate with: conda activate osdag-web" -ForegroundColor White
         
         return $false

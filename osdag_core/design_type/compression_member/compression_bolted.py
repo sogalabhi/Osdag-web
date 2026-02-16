@@ -499,7 +499,7 @@ class Compression_bolted(Member):
         out_list.append(t_eff)
 
         # Design Compressive Stress (fcd) - IS 800 Cl 7.1.2.1
-        t_fcd = ('KEY_FCD', 'Design Compressive Stress, fcd (MPa)', TYPE_TEXTBOX,
+        t_fcd = ('KEY_FCD', 'Design Compressive Stress, f<sub>cd</sub> (MPa)', TYPE_TEXTBOX,
                  self.f_cd if flag else '', True)
         out_list.append(t_fcd)
 
@@ -561,9 +561,9 @@ class Compression_bolted(Member):
                round(self.plate.bolt_force / 1000, 2) if flag else '', True)
         out_list.append(t14)
 
-        t17 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON,
-               ['Spacing Details', self.spacing], True)
-        out_list.append(t17)
+        # t17 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON,
+        #        ['Spacing Details', self.spacing], True)
+        # out_list.append(t17)
 
         t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None, True)
         out_list.append(t18)
@@ -592,8 +592,8 @@ class Compression_bolted(Member):
                (round(self.plate.block_shear_capacity/ 1000, 2)) if flag else '', True)
         out_list.append(t24)
 
-        t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.plate_pattern], True)
-        out_list.append(t17)
+        # t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.plate_pattern], True)
+        # out_list.append(t17)
 
         # Intermittent Connection Details (only for built-up sections)
         t18_inter = (None, DISP_TITLE_INTERMITTENT, TYPE_TITLE, None, False)
@@ -1436,6 +1436,12 @@ class Compression_bolted(Member):
 
             self.design_status = True # Provisional
             self.select_bolt_dia(design_dictionary)
+            
+            # Retry logic: If design failed during bolt selection or final member check,
+            # try the next available section (recursion)
+            if self.design_status is False:
+                self.logger.info(f" : Section {self.section_size_1.designation} failed checks. Retrying with next available section...")
+                self.initial_member_capacity(design_dictionary, previous_size=self.section_size_1.designation)
         else:
             self.design_status = False
             self.logger.warning(" : The available depth of the member cannot accommodate the minimum available bolt diameter of {} mm considering the "
@@ -2140,8 +2146,8 @@ class Compression_bolted(Member):
             self.efficiency = round(self.load.axial_force * 1000 / min(bolt_value * n_bolts, plate_cap), 2)
             
             # Bolt Layout Update
-            self.plate.bolts_one_line = n_bolts
-            self.plate.bolt_line = 1
+            self.plate.bolts_one_line = 1
+            self.plate.bolt_line = n_bolts
             
             # Call status_pass (handles plate length check like tension_bolted)
             self.status_pass(design_dictionary)
@@ -3424,10 +3430,12 @@ class Compression_bolted(Member):
         # Generate LaTeX report
         Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"
-        fname_no_ext = popup_summary['filename']
-        rel_path = os.path.dirname(fname_no_ext) if fname_no_ext else os.path.abspath(".")
-        rel_path = os.path.abspath(rel_path)
+
+        rel_path = str(sys.path[0])
+        rel_path = os.path.abspath(".")
         rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
@@ -3437,5 +3445,4 @@ class Compression_bolted(Member):
 
     def max_plate_height_calc(self):
         pass
-
 

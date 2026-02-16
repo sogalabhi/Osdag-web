@@ -52,24 +52,26 @@ const DesignPrefSections = ({
     { name: "Design", id: 6 },
   ];
 
-  // Simple connection tab filtering
+  // Simple connection tab filtering (match desktop: 2 tabs only)
   if (SIMPLE_CONNECTION_MODULES.includes(module)) {
-    // For bolted simple connections: Bolt, Detailing, Design
+    // For bolted simple connections: Bolt, Detailing only (no Design tab per desktop)
     if (module === "Butt Joint Bolted" || module === "Lap Joint Bolted") {
       tabs = tabs.filter(
-        (tab) => tab.name !== "Column Section*" && 
-                 tab.name !== "Beam Section*" && 
-                 tab.name !== "Connector" && 
-                 tab.name !== "Weld"
+        (tab) => tab.name !== "Column Section*" &&
+                 tab.name !== "Beam Section*" &&
+                 tab.name !== "Connector" &&
+                 tab.name !== "Weld" &&
+                 tab.name !== "Design"
       );
     }
-    // For welded simple connections: Weld, Detailing, Design
+    // For welded simple connections: Weld, Detailing only (no Design tab per desktop)
     else if (module === "Butt Joint Welded" || module === "Lap Joint Welded") {
       tabs = tabs.filter(
-        (tab) => tab.name !== "Column Section*" && 
-                 tab.name !== "Beam Section*" && 
-                 tab.name !== "Connector" && 
-                 tab.name !== "Bolt"
+        (tab) => tab.name !== "Column Section*" &&
+                 tab.name !== "Beam Section*" &&
+                 tab.name !== "Connector" &&
+                 tab.name !== "Bolt" &&
+                 tab.name !== "Design"
       );
     }
   }
@@ -159,18 +161,40 @@ const DesignPrefSections = ({
     setConfirmationModal(false);
   };
 
+  // Module-specific defaults for simple connection (match desktop); others use context design_pref_defaults
+  const getDefaultPrefsForModule = () => {
+    if (module === "Butt Joint Bolted" || module === "Lap Joint Bolted") {
+      return {
+        bolt_tension_type: "Non Pre-tensioned",
+        bolt_hole_type: "Standard",
+        bolt_slip_factor: "0.3",
+        detailing_edge_type: "Sheared or hand flame cut",
+        design_for: "Tension",
+      };
+    }
+    if (module === "Butt Joint Welded" || module === "Lap Joint Welded") {
+      const defs = {
+        weld_fab: "Shop weld",
+        weld_material_grade: inputs.weld_material_grade || "",
+        detailing_edge_type: "Sheared or hand flame cut",
+        design_for: "Tension",
+      };
+      if (module === "Butt Joint Welded") defs.detailing_packing_plate = "Yes";
+      return defs;
+    }
+    return design_pref_defaults;
+  };
+
   const resetInputs = () => {
-    setDesignPrefInputs(design_pref_defaults);
-    setInputs({ ...inputs, ...design_pref_defaults });
+    const defaults = getDefaultPrefsForModule();
+    setDesignPrefInputs(defaults);
+    setInputs({ ...inputs, ...defaults });
     setConfirmationModal(false);
     setDesignPrefModalStatus(false);
   };
 
   return (
     <div>
-      <div>
-        <h4>Design Preference</h4>
-      </div>
       <div className="bloc-tabs" style={{ marginTop: "10px" }}>
         {tabs.map((item) => {
           return (
@@ -234,6 +258,7 @@ const DesignPrefSections = ({
         )}
         {activeTab == 3 && (
           <BoltSectionModal
+            module={module}
             inputs={inputs}
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
@@ -243,6 +268,7 @@ const DesignPrefSections = ({
         )}
         {activeTab == 4 && tabs.find(t => t.name === "Weld") && (
           <WeldSectionModal
+            module={module}
             inputs={inputs}
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
@@ -252,6 +278,7 @@ const DesignPrefSections = ({
         )}
         {activeTab == 5 && (
           <DetailingSectionModal
+            module={module}
             inputs={inputs}
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
@@ -261,6 +288,7 @@ const DesignPrefSections = ({
         )}
         {activeTab == 6 && (
           <DesignSectionModal
+            module={module}
             inputs={inputs}
             setInputs={setInputs}
             designPrefInputs={designPrefInputs}
