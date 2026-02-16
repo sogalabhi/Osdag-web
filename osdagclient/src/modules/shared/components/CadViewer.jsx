@@ -26,7 +26,7 @@ function Model({
   
   // 2. Prepare Position Logic
   const useGridCenteredPosition = GRID_VIEWS.includes(primaryView);
-  const modelPosition = useGridCenteredPosition ? [0, 0, 0] : (cameraSettings?.modelPosition || [0, -4, 0]);
+  const modelPosition = useGridCenteredPosition ? [0, 0, 0] : (cameraSettings?.modelPosition ?? [0, 0, 0]);
   const modelScale = cameraSettings?.modelScale || 0.008;
   const orthographicView = cameraSettings?.orthographicView || null;
   const connectivity = cameraSettings?.connectivity || null;

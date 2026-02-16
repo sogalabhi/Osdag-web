@@ -165,6 +165,15 @@ export const useEngineeringService = () => {
 
       const data = await response.json();
 
+      // Handle "coming soon" status (200 with coming_soon status)
+      if (response.status === 200 && data.status === 'coming_soon') {
+        return {
+          success: false,
+          coming_soon: true,
+          message: data.message || '3D model generation is coming soon',
+        };
+      }
+
       if (response.status === 201 && data.status === 'success') {
         return {
           success: true,
@@ -301,7 +310,7 @@ export const useEngineeringService = () => {
    */
   const saveOSIFromInputs = useCallback(async (name, moduleId, inputs, inline = false) => {
     try {
-      const response = await apiCall('save-osi-from-inputs/', {
+      const response = await apiCall('api/save-osi-from-inputs/', {
         method: 'POST',
         body: JSON.stringify({
           name,

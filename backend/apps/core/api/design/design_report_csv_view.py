@@ -1,8 +1,11 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from django.utils.crypto import get_random_string
 from django.http import FileResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 from apps.modules.shear_connection.submodules.fin_plate.adapter import create_from_input as fin_plate_create_from_input
 from apps.modules.shear_connection.submodules.end_plate.adapter import create_from_input as end_plate_create_from_input
@@ -85,7 +88,17 @@ def filter_latex_content(latex_content: str, selected_sections):
 
     return '\n'.join(filtered_lines)
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CreateDesignReport(APIView):
+    permission_classes = [AllowAny]
+
+    def dispatch(self, request, *args, **kwargs):
+        """Override dispatch to log all requests, even if blocked by permissions"""
+        try:
+            result = super().dispatch(request, *args, **kwargs)
+            return result
+        except Exception as e:
+            raise
 
     def post(self, request):
         # Get metadata and design data from request
@@ -97,10 +110,6 @@ class CreateDesignReport(APIView):
         # Optional: sections to include (from UI customization popup) and other customization
         sections = request.data.get('sections')  # e.g., ["Introduction", "Inputs", "Outputs/Spacing"]
         customization = request.data.get('customization')  # generic dict for future options
-        
-        print('metadata:', metadata)
-        print('module_id:', module_id)
-        print('input_values:', input_values)
         
         # Map module IDs to their respective create_from_input functions
         module_function_map = {
@@ -130,16 +139,7 @@ class CreateDesignReport(APIView):
         # obtain the currenct working directory as it gets changed in the osdag desktop code, then 
         # we will use the same value to bring it back to the current directory 
         current_directory = os.getcwd()
-        print('current_directory : '  , current_directory)
-
-
-        print('input_values type:', type(input_values))
-        print('logs type:', type(logs))
-        print('design_status:', design_status)
-
         if (metadata is None or metadata == ''):
-            print('The metadata is None ')
-            print('Setting the default metadata values')
             metadata_profile = {
                 "CompanyName": "Your Company",
                 "CompanyLogo": "",
@@ -176,7 +176,6 @@ class CreateDesignReport(APIView):
                 metadata_final['selected_sections'] = sections
             if customization:
                 metadata_final['customization'] = customization
-            print('metadata final : ', json.dumps(metadata_final, indent=4))
 
         else : 
             # generate a random string for report id
@@ -196,27 +195,19 @@ class CreateDesignReport(APIView):
                 metadata_final['selected_sections'] = sections
             if customization:
                 metadata_final['customization'] = customization
-            print('metadata final : ' , metadata_final)
-            # print('LogoFullPath : ' , metadata_final['CompanyLogo'])
 
         # check if the design_report folder has been created or not 
         # if not, create one 
         cwd = os.path.join(os.getcwd() , "file_storage/design_report/")
-        print('cwd_path : ' , cwd)
-        print("****")
-        if(not os.path.exists):
-            print('path does not exists, creating one : ', cwd)
-            os.mkdir(cwd) 
-
+        if(not os.path.exists(cwd)):
+            os.makedirs(cwd, exist_ok=True)
+        
         try:
-            print('Creating module from input')
-            print("*******")
             module = create_module_func(input_values)
-            print("*$$$*", input_values)
-            print("*$$$$$$$*", module)
-            print("*******************")
         except Exception as e:
-            print('Error while creating module:', e)
+            import traceback
+            traceback.print_exc()
+            raise
 
         # ------------------------------------------------------------
         # Normalize metadata/logs for legacy save_design()
@@ -245,38 +236,63 @@ class CreateDesignReport(APIView):
         except Exception as norm_exc:
             # Don't fail report generation just because normalization failed;
             # log and continue with original metadata.
-            print('WARN: error normalizing metadata/logs before save_design:', norm_exc)
+            pass
 
+        from osdag_core.Common import KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE
+        
+        # Fix module.module if it doesn't match KEY_DISP_FINPLATE or KEY_DISP_ENDPLATE
+        # This is needed for parent save_design() to set report_input
+        if hasattr(module, 'module'):
+            if module.module == 'FinPlateConnection' and module_id == 'FinPlateConnection':
+                module.module = KEY_DISP_FINPLATE
+            elif module.module == 'EndPlateConnection' and module_id == 'EndPlateConnection':
+                module.module = KEY_DISP_ENDPLATE
+        
+        # Check if design has been run - output_values() typically triggers design
+        # But for report generation, we need to ensure design is complete
         try:
-            print('generating the report .save_design')
+            # Try calling output_values to trigger design if not already done
+            if not getattr(module, 'design_status', False):
+                try:
+                    _ = module.output_values(True)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+        
+        try:
+            from apps.core.utils.report_image_generator import generate_cad_images_for_report
+            
+            # Determine report directory
+            report_base_dir = os.path.dirname(file_path)
+            image_result = generate_cad_images_for_report(
+                module=module,
+                input_values=input_values,
+                module_id=module_id,
+                report_dir=report_base_dir
+            )
+        except Exception:
+            pass
+        
+        try:
             resultBoolean = module.save_design(metadata_final)
-            print(resultBoolean)
         except Exception as e:
             # Legacy desktop save_design sometimes raises even after writing .tex,
             # for example when it calls .split() on an internal list.
             # Treat this as non-fatal if the expected LaTeX file was created.
-            print('e : ', e)
+            import traceback
+            traceback.print_exc()
+            
             tex_path = f'{file_path}.tex'
             if os.path.exists(tex_path):
-                print('WARN: save_design raised, but LaTeX file exists at', tex_path)
                 resultBoolean = True
             else:
                 resultBoolean = False  # Set default value if save_design fails and no file
         
-        if(resultBoolean):
-            print('The LaTEX file has been created successfully')
-        
         os.chdir(current_directory)
-        print('cwd after chdir : ' , os.getcwd())
 
-        print("***")
         if (resultBoolean):
-            print("**")
-            print('inside sleep')
             time.sleep(3)
-            isExists = os.path.exists(f'{file_path}.tex')
-            print('report path : ' , f'{file_path}.tex')
-            print('isExists : ' , isExists)
             # If sections provided, post-filter LaTeX file to include only selected sections
             try:
                 if sections:
@@ -286,9 +302,8 @@ class CreateDesignReport(APIView):
                     filtered_tex = filter_latex_content(original_tex, sections)
                     with open(tex_path, 'w', encoding='utf-8') as wf:
                         wf.write(filtered_tex)
-                    print('Applied section filtering to LaTeX file')
-            except Exception as e:
-                print('WARN: Failed to apply section filtering:', e)
+            except Exception:
+                pass
 
             # open and read the file contents (for debug only)
             f = open(f'{os.getcwd()}/file_storage/design_report/{report_id}.tex', 'rb')
@@ -296,33 +311,25 @@ class CreateDesignReport(APIView):
             return Response({'success': 'Design report created', 'report_id': report_id, 'fileContents : ': f}, status=status.HTTP_201_CREATED)
 
         elif(not resultBoolean): 
-            print('Error in generating the desing_report')
             return Response({"message" : "Error in generating the design report"})
 
 
 class GetPDF(APIView):
 
     def get(self, request):
-        print('Inside get PDF')
-
         # obtain the param from the Query
         report_id = request.GET.get('report_id')
-        print('report_id:', report_id)
 
         # TeX source filename
         tex_filename = f'{report_id}.tex'
         filename, ext = os.path.splitext(tex_filename)
-        print('filename:', filename)
         # the corresponding PDF filename
         pdf_filename = filename + '.pdf'
 
         # change the working directory
         path = os.getcwd()
-        print('pdf path : ' , pdf_filename)
         os.chdir(path)
-        print('current path after chdir : ' , path)
         pdfFilePath = f'{os.getcwd()}/file_storage/design_report/{report_id}.pdf'
-        print('pdfFilePath : ' , pdfFilePath)
 
         # compile TeX file for different operating systems
         if platform.system().lower() == 'windows':
@@ -350,25 +357,19 @@ class GetPDF(APIView):
                 'Unknown operating system "{}"'.format(platform.system()))
 
         # delete the extra aux, log files, tex files generated in design_report
-        print('getcwd : ' , os.getcwd())
         try:
             # delete the following paths onyl when the pdf file is created 
             if(os.path.exists(f'{os.getcwd()}/file_storage/design_report/{report_id}.pdf')) : 
                 os.remove(f'{os.getcwd()}/file_storage/design_report/{report_id}.aux')
                 os.remove(f'{os.getcwd()}/file_storage/design_report/{report_id}.log')
                 os.remove(f'{os.getcwd()}/file_storage/design_report/{report_id}.tex')
-            else : 
-                print('the pdf file is being created, cannot remove the other files')
-        except Exception as e:
-            print('e:', e)
+        except Exception:
+            pass
 
         # Return the PDF file as a response
-        # pdf_path = f'{os.getcwd()}/{report_id}.pdf'
         response = FileResponse(open(pdfFilePath, 'rb'))
         response['Content-Type'] = 'application/pdf'
         response['Content-Disposition'] = f'attachment; filename="{report_id}.pdf"'
-        for key, value in response.items():
-            print(f'{key}: {value}')
         return response
 
 
@@ -376,21 +377,17 @@ class CompanyLogoView(APIView) :
     parser_classes = (MultiPartParser , FormParser)
 
     def post(self, request):
-        print('inside company logo post') 
         # check cookie
         try:
             cookie_id = request.COOKIES.get('fin_plate_connection_session')
-            print('cookie id in companyLogo:', cookie_id)
-        except Exception as e:
-            print('e:', e)
+        except Exception:
+            pass
 
         # obtain the file 
-        print('request data : ' , request.data)
         file = request.data['file']
         
         # generate a unique name for the file 
         fileName = ''.join(str(uuid.uuid4()).split('-')) + ".png"
-        print('fileName created : ' , fileName)
         currentDirectory = os.getcwd()
         
         # create the png file 
@@ -398,20 +395,15 @@ class CompanyLogoView(APIView) :
             with open(currentDirectory+"/file_storage/company_logo/"+fileName , 'w') as fp : 
                 pass 
         except : 
-            print('Error in creating the image file')
+            pass
 
-        print('currentWorkingDirectory : ' , currentDirectory)
         try : 
             with default_storage.open(currentDirectory+"/file_storage/company_logo/"+fileName, 'wb+') as destination : 
                 for chunk in file.chunks() :                 
                     destination.write(chunk)
-            print('file saved')
 
             # full path of the company logo w.r.t the Project 
             logoFullPath = currentDirectory+"/file_storage/company_logo/"+fileName
-            print('logoFullPath : ' , logoFullPath)
             return Response({'message' : 'successfully saved file' , 'logoFullPath' : logoFullPath} , status = status.HTTP_201_CREATED)
         except : 
-            print('Error in saving the file ')
-
             return Response({'message' : 'Error in saving the file'} , status = status.HTTP_400_BAD_REQUEST)

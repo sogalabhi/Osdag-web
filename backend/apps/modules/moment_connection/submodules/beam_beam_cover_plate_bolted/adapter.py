@@ -261,7 +261,7 @@ def validate_input_new(input_values: Dict[str, Any]) -> None:
 def create_module() -> BeamCoverPlate:
     """Create an instance of the FinPlateConnection module design class and set it up for use"""
     module = BeamCoverPlate()  # Create an instance of the FinPlateConnection
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     return module
 
 

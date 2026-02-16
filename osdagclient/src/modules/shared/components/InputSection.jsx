@@ -204,8 +204,9 @@ export const InputSection = ({
         'plate_thickness': 'thicknessList',
         'angle_list': 'angleList',
         'cleat_section': 'angleList',
+        'weld_size': 'weldSizeList',
       };
-      const listName = keyMap[inputKey];
+      const listName = field.dataSource || keyMap[inputKey];
       if (field?.getDynamicDataSource) {
         let options = field.getDynamicDataSource(inputs, contextData)
         setModalDynamicSrc((modalDynSrc) => ({ ...modalDynSrc, [field.key]: options }));
@@ -253,7 +254,7 @@ export const InputSection = ({
   };
 
   const renderField = (field) => {
-    if (field.conditionalDisplay && !field.conditionalDisplay(extraState)) return null;
+    if (field.conditionalDisplay && !field.conditionalDisplay(extraState, safeInputs)) return null;
 
     switch (field.type) {
       case 'select': {
@@ -445,7 +446,8 @@ export const InputSection = ({
               value={safeInputs[field.key] ?? ""}
               onChange={(e) => setInputs({ ...safeInputs, [field.key]: e.target.value })}
               placeholder={field.placeholder || `ex. ${field.label}`}
-              className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none"
+              disabled={field.disabled}
+              className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70"
             />
           </div>
         );
@@ -460,7 +462,7 @@ export const InputSection = ({
       <div className="flex flex-col w-full p-4 pt-2">
         {section.fields.map((field, index) => {
           // Entire label+input row is hidden if conditionalDisplay fails
-          if (field.conditionalDisplay && !field.conditionalDisplay(extraState)) return null;
+          if (field.conditionalDisplay && !field.conditionalDisplay(extraState, safeInputs)) return null;
           return (
             <div key={index}>
               <div className="flex w-full justify-between items-center mb-3">

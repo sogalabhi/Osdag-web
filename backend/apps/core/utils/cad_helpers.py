@@ -27,10 +27,10 @@ SECTION_MAPPINGS = {
         'column-column-end-plate': ['Model', 'Column', 'Connector'],
     },
     'simple-connection': {
-        'butt-joint-bolted': ['Model', 'Column', 'Plate'],
-        'butt-joint-welded': ['Model', 'Column', 'Plate'],
-        'lap-joint-bolted': ['Model', 'Column', 'Plate'],
-        'lap-joint-welded': ['Model', 'Column', 'Plate'],
+        'lap-joint-bolted': ['Model', 'Plate 1', 'Plate 2', 'Bolts'],
+        'lap-joint-welded': ['Model', 'Plate 1', 'Plate 2', 'Welds'],
+        'butt-joint-bolted': ['Model', 'Plate 1', 'Plate 2', 'Cover Plate', 'Bolts'],
+        'butt-joint-welded': ['Model', 'Plate 1', 'Plate 2', 'Cover Plate', 'Welds'],
     },
     'tension-member': {
         'bolted': ['Model', 'Member', 'Plate', 'Endplate'],
@@ -38,6 +38,9 @@ SECTION_MAPPINGS = {
     },
     'flexure-member': {
         'simply-supported-beam': [],  # TODO: Add sections when available
+    },
+    'base-plate': {
+        'base-plate': ['Model', 'Column', 'Plate'],
     },
 }
 
@@ -254,6 +257,8 @@ def generate_cad_models(
             cand = getattr(mdl, 'hover_dict', None)
             if isinstance(cand, dict) and len(cand) > 0:
                 hover_dict = cand
+                if "Weld" in hover_dict and "Welds" not in hover_dict:
+                    hover_dict["Welds"] = hover_dict["Weld"]
                 print(f"[cad_helpers] Retrieved hover_dict: {hover_dict}")
             else:
                 print(f"[cad_helpers] hover_dict is empty or not a dict: {cand}")

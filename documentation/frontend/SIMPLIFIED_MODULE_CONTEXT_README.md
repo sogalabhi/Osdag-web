@@ -147,7 +147,7 @@ await manageDesignPreferences('section_update', {
 });
 ```
 
-## 🔧 Utility Functions
+## Utility Functions
 
 #### `resetModuleState()`
 **Reset module state to initial values**
@@ -199,7 +199,7 @@ All legacy functions are still available and redirect to the new core functions:
 - `getDesingPrefData` → `manageDesignPreferences('get')`
 - etc.
 
-## 🔧 Simplified Reducer Actions
+## Simplified Reducer Actions
 
 The ModuleReducer has also been simplified from **20+ action types to 8 core actions**:
 

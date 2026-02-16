@@ -181,7 +181,8 @@ class Flexure_Misc(Member):
 
     # Setting up logger and Input and Output Docks
     ####################################
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_FLEXURE3
 
     def set_osdaglogger(key):
@@ -297,9 +298,9 @@ class Flexure_Misc(Member):
 
         return options_list
 
-    def fn_profile_section(self):
+    def fn_profile_section(self, arg):
 
-        profile = self[0]
+        profile = arg[0]
         if profile == 'Beams': #Beam and Column
             return connectdb("Beams", call_type="popup")
             profile2 = connectdb("Columns", call_type="popup")
@@ -309,17 +310,17 @@ class Flexure_Misc(Member):
         # return list(set(profile1 + profile2))
 
 
-    def fn_supp_image(self):
-        print( 'Inside fn_supp_image', self)
-        if self[0] == KEY_DISP_SUPPORT1:
+    def fn_supp_image(self, arg):
+        print( 'Inside fn_supp_image', arg)
+        if arg[0] == KEY_DISP_SUPPORT1:
             return Simply_Supported_img
         else:
             return Cantilever_img
 
-    def axis_bending_change(self):
-        design = self[0]
-        print( 'Inside fn_supp_image', self)
-        if self[0] == KEY_DISP_DESIGN_TYPE_FLEXURE:
+    def axis_bending_change(self, arg):
+        design = arg[0]
+        print( 'Inside fn_supp_image', arg)
+        if arg[0] == KEY_DISP_DESIGN_TYPE_FLEXURE:
             return ['NA']
         else:
             return VALUES_BENDING_TYPE
@@ -348,9 +349,9 @@ class Flexure_Misc(Member):
 
         return lst
 
-    def major_bending_warning(self):
+    def major_bending_warning(self, arg):
 
-        if self[0] == VALUES_SUPP_TYPE_temp[2]:
+        if arg[0] == VALUES_SUPP_TYPE_temp[2]:
             return True
         else:
             return False
@@ -1824,11 +1825,9 @@ class Flexure_Misc(Member):
 
         Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"
-
-        print(sys.path[0])
-        rel_path = str(sys.path[0])
-        rel_path = os.path.abspath(".") # TEMP
-        rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
+        rel_path = os.path.dirname(fname_no_ext) if fname_no_ext else os.path.abspath(".")
+        rel_path = os.path.abspath(rel_path)
+        rel_path = rel_path.replace("\\", "/")
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module) #

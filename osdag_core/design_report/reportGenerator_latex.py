@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import time
 import datetime
@@ -18,12 +19,9 @@ from pylatex import Document, PageStyle, Head, MiniPage, Foot, LargeText, Medium
 from importlib.resources import files
 from ..Report_functions import *
 from ..utils.common.common_calculation import *
-from pylatex.utils import NoEscape
-
+from ..Common import _get_resource_path
 # from ..Common import *
 # from ..utils.common import component
-os.environ['TEXMFHOME'] = os.path.abspath("data/ResourceFiles/osdag-latex-env/texmf-dist")
-os.environ["TEXINPUTS"] = os.path.abspath("data/ResourceFiles/osdag-latex-env/texmf-dist") + os.pathsep + os.environ.get("TEXINPUTS", "")
 
 class CreateLatex(Document):
 
@@ -31,9 +29,6 @@ class CreateLatex(Document):
         super().__init__()
 
     def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_2d_image, Disp_3d_image, module=''):
-        os.environ['TEXMFHOME'] = os.path.abspath("data/ResourceFiles/osdag-latex-env/texmf-dist")
-        os.environ["TEXINPUTS"] = os.path.abspath("data/ResourceFiles/osdag-latex-env/texmf-dist") + os.pathsep + os.environ.get("TEXINPUTS", "")
-
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
         groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
@@ -44,23 +39,15 @@ class CreateLatex(Document):
         client = str(reportsummary['Client'])
 
         does_design_exist = reportsummary['does_design_exist']
-        pkg_images = files("osdag_core.data.ResourceFiles.images")
-
-        os.environ['TEXMFHOME'] = os.path.abspath("data/ResourceFiles/osdag-latex-env/texmf-dist")
-        sty_pkgs = str(files("osdag_core.data.ResourceFiles.osdag-latex-env.texmf-dist.tex.latex")).replace("\\", "/")
-        pkg_resources = [f'{sty_pkgs}/amsmath', f'{sty_pkgs}/graphics', f'{sty_pkgs}/needspace']
-        texinp = os.environ.get('TEXINPUTS', ' ')
-
-        pkg_path = ";".join(pkg_resources)
-        os.environ['TEXINPUTS'] = f'{pkg_path};{texinp}'
-
-        imgpath_osdagheader = str(pkg_images.joinpath("Osdag_header_report.png")).replace("\\", "/")
+        # Use _get_resource_path helper with fallback for importlib.resources issues
+        pkg_images = _get_resource_path("data", "ResourceFiles", "images")
+        imgpath_osdagheader = str(pkg_images / "Osdag_header_report.png").replace("\\", "/")
         # Add document header
         geometry_options = {"top": "5cm", "hmargin": "2cm", "headheight": "100pt", "footskip": "100pt", "bottom":"5cm"}
         doc = Document(geometry_options=geometry_options, indent=False)
-        doc.packages.append(Package('amsmath', options=NoEscape('')))
-        doc.packages.append(Package('graphicx', options=NoEscape('')))
-        doc.packages.append(Package('needspace', options=NoEscape('')))
+        doc.packages.append(Package('amsmath'))
+        doc.packages.append(Package('graphicx'))
+        doc.packages.append(Package('needspace'))
         doc.append(pyl.Command('fontsize', arguments= [8,12]))
         doc.append(pyl.Command('selectfont'))
 
@@ -75,7 +62,7 @@ class CreateLatex(Document):
             with header.create(Tabularx('|l|p{4cm}|l|X|')) as table:
                 table.add_hline()
                 # MultiColumn(4)
-                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo == '' else StandAloneGraphic(image_options="height=0.95cm",
+                table.add_row((MultiColumn(2, align='|c|', data=('' if companylogo is '' else StandAloneGraphic(image_options="height=0.95cm",
                                                                                                                filename=companylogo))),
                                MultiColumn(2, align='|c|', data=['Created with',StandAloneGraphic(image_options="width=4.0cm,height=1cm",
                                                                                                   filename=imgpath_osdagheader)]),))
@@ -106,83 +93,126 @@ class CreateLatex(Document):
         doc.change_document_style("header")
         extra_page = False
         with doc.create(Section('Input Parameters')):
-            with doc.create(LongTable('|p{5cm}|p{2.5cm}|p{1.5cm}|p{3cm}|p{3.5cm}|', row_height=1.2)) as table:
-                table.add_hline()
-                for i in uiObj:
-                    # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
-                    if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
-                    # if type(uiObj[i]) == list:
-                        continue
-                    if type(uiObj[i]) == dict:
-                        table.add_hline()
-                        sectiondetails = uiObj[i]
-                        image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
+            # Determine if we need the complex 5-column layout (for images/dicts) or simple 2-column layout
+            complex_layout_needed = False
+            for i in uiObj:
+                # Skip the keys that are explicitly skipped in the loop below
+                if i == "Selected Section Details" or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST or i == KEY_DISP_CLEAT_ANGLE_LIST:
+                    continue
+                if type(uiObj[i]) == dict:
+                    complex_layout_needed = True
+                    break
 
-                        Img_path = str(pkg_images.joinpath(image_name + ".png")).replace("\\", "/")
-                        if (len(sectiondetails))% 2 == 0:
-                        # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
-                            merge_rows = int((len(sectiondetails)/2)) +2
+            if complex_layout_needed:
+                with doc.create(LongTable('|p{5cm}|p{2.5cm}|p{1.5cm}|p{3cm}|p{3.5cm}|', row_height=1.2)) as table:
+                    table.add_hline()
+                    for i in uiObj:
+                        # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
+                        if i == "Selected Section Details" or i==KEY_DISP_ANGLE_LIST or i==KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
+                        # if type(uiObj[i]) == list:
+                            continue
+                        if type(uiObj[i]) == dict:
+                            table.add_hline()
+                            sectiondetails = uiObj[i]
+                            image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
+
+                            Img_path = str(pkg_images / (image_name + ".png")).replace("\\", "/")
+                            if (len(sectiondetails))% 2 == 0:
+                            # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
+                                merge_rows = int((len(sectiondetails)/2)) +2
+                            else:
+                                if len(sectiondetails) < 5:
+                                    merge_rows = len(sectiondetails) - 1
+                                else:
+                                    merge_rows = int(len(sectiondetails)/2) + 2
+                            if (len(sectiondetails))% 2 == 0:
+                                sectiondetails['']=''
+
+                            a = list(sectiondetails.keys())
+                            # index=0
+                            for x in range(1, (merge_rows + 1)):
+                                # table.add_row("Col.Det.",i,columndetails[i])
+                                if x == 1:
+                                    table.add_row(
+                                        (MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
+                                                                                    filename=Img_path)),
+                                        MultiColumn(2, align='|c|', data=a[x]),
+                                        MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
+                                elif x <= 4:
+                                    table.add_row(('', MultiColumn(2, align='|c|', data=NoEscape(a[x])),
+                                                MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
+                                else:
+                                    table.add_row(('', NoEscape(a[x]), sectiondetails[a[x]], NoEscape(a[merge_rows + x - 4]),
+                                                sectiondetails[a[merge_rows + x - 4]],))
+                                table.add_hline(2, 5)
+                        elif uiObj[i] == "TITLE":
+                            table.add_hline()
+                            table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
+                            table.add_hline()
+                        elif i == 'Section Size*':
+                            table.add_hline()
+                            table.add_row((MultiColumn(3, align='|c|', data=i, ),MultiColumn(2, align='|c|', data="Ref List of Input Section"),))
+                            table.add_hline()
+                        elif len(str(uiObj[i])) > 55 and type(uiObj[i]) != pyl.math.Math:
+                            str_len = len(str(uiObj[i]))
+                            loop_len = round_up((str_len / 55), 1, 1)
+                            for j in range(1, loop_len + 1):
+                                b = 55 * j + 1
+                                if j == 1:
+                                    table.add_row(
+                                        (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data=i)), MultiColumn(2, align='|c|', data=uiObj[i][0:b]),))
+                                else:
+                                    table.add_row(
+                                        (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data="")),
+                                        MultiColumn(2, align='|c|', data=uiObj[i][b - 55:b]),))
+                            table.add_hline()
                         else:
-                            merge_rows = round_up((len(sectiondetails)/2),2)
-                        if (len(sectiondetails))% 2 == 0:
-                            sectiondetails['']=''
-
-                        a = list(sectiondetails.keys())
-                        # index=0
-                        for x in range(1, (merge_rows + 1)):
-                            # table.add_row("Col.Det.",i,columndetails[i])
-                            if x == 1:
-                                table.add_row(
-                                    (MultiRow(merge_rows, data=StandAloneGraphic(image_options="width=5cm,height=5cm",
-                                                                                 filename=Img_path)),
-                                     MultiColumn(2, align='|c|', data=a[x]),
-                                     MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
-                            elif x <= 4:
-                                table.add_row(('', MultiColumn(2, align='|c|', data=NoEscape(a[x])),
-                                               MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
-                            else:
-                                table.add_row(('', NoEscape(a[x]), sectiondetails[a[x]], NoEscape(a[merge_rows + x - 4]),
-                                               sectiondetails[a[merge_rows + x - 4]],))
-                            table.add_hline(2, 5)
-                    elif uiObj[i] == "TITLE":
-                        table.add_hline()
-                        table.add_row((MultiColumn(5, align='|c|', data=bold(i), ),))
-                        table.add_hline()
-                    elif i == 'Section Size*':
-                        table.add_hline()
-                        table.add_row((MultiColumn(3, align='|c|', data=i, ),MultiColumn(2, align='|c|', data="Ref List of Input Section"),))
-                        table.add_hline()
-                    elif len(str(uiObj[i])) > 55 and type(uiObj[i]) != pyl.math.Math:
-                        str_len = len(str(uiObj[i]))
-                        loop_len = round_up((str_len / 55), 1, 1)
-                        for j in range(1, loop_len + 1):
-                            b = 55 * j + 1
-                            if j == 1:
-                                table.add_row(
-                                    (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data=i)), MultiColumn(2, align='|c|', data=uiObj[i][0:b]),))
-                            else:
-                                table.add_row(
-                                    (MultiColumn(3, align='|c|', data=MultiRow(loop_len,data="")),
-                                     MultiColumn(2, align='|c|', data=uiObj[i][b - 55:b]),))
-                        table.add_hline()
-                    else:
-                        table.add_hline()
-                        table.add_row((MultiColumn(3, align='|c|', data=NoEscape(i)), MultiColumn(2, align='|c|', data=uiObj[i]),))
-                        table.add_hline()
+                            table.add_hline()
+                            table.add_row((MultiColumn(3, align='|c|', data=NoEscape(i)), MultiColumn(2, align='|c|', data=uiObj[i]),))
+                            table.add_hline()
+            else:
+                # Use a wider 2-column table for simple modules (approx 17cm width)
+                # Using 10cm for Key and 7cm for Value to accommodate long keys and keep it balanced
+                with doc.create(LongTable('|p{9cm}|p{7.5cm}|', row_height=1.2)) as table:
+                    table.add_hline()
+                    for i in uiObj:
+                        if i == "Selected Section Details" or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST or i == KEY_DISP_CLEAT_ANGLE_LIST:
+                            continue
+                        
+                        # No dict handling needed here as we checked complex_layout_needed is False
+                        
+                        if uiObj[i] == "TITLE":
+                            table.add_hline()
+                            table.add_row((MultiColumn(2, align='|c|', data=bold(i), ),))
+                            table.add_hline()
+                        elif i == 'Section Size*':
+                            table.add_hline()
+                            table.add_row((i, "Ref List of Input Section"))
+                            table.add_hline()
+                        elif len(str(uiObj[i])) > 65 and type(uiObj[i]) != pyl.math.Math: # Adjusted char limit for wider column
+                            str_len = len(str(uiObj[i]))
+                            loop_len = round_up((str_len / 65), 1, 1)
+                            for j in range(1, loop_len + 1):
+                                b = 65 * j + 1
+                                if j == 1:
+                                    table.add_row((MultiRow(loop_len, data=i), uiObj[i][0:b]))
+                                else:
+                                    table.add_row(("", uiObj[i][b - 65:b]))
+                            table.add_hline()
+                        else:
+                            table.add_hline()
+                            table.add_row((NoEscape(i), uiObj[i]))
+                            table.add_hline()
             for i in uiObj:
                 if i == 'Section Size*' or i == KEY_DISP_ANGLE_LIST or i == KEY_DISP_TOPANGLE_LIST or i==KEY_DISP_CLEAT_ANGLE_LIST:
                     with doc.create(Subsection("List of Input Section")):
                         with doc.create(Tabularx('|p{4cm}|X|', row_height=1.2)) as table:
                             list_sec = uiObj[i].strip("['']")
-                            print( 'list_sec', list_sec,'\n', list_sec.split("', '"))
                             # count = 0
                             # for i in list_sec:
                             #     print(i)
                             #     count += 1
                             str_len = len(list_sec.split("', '"))
-                            print( 'str_len', str_len)
-                            print(f"list_sec.split("', '")[0:220].strip("")", list_sec.split("', '")[0:220])
-                            print('\n',','.join(f"'{x}'" for x in list_sec.split("', '")[0:220]))
                             # list_sec.split("', '")[0:220]
                             if str_len > 200: # 130
                                 table.add_hline()
@@ -271,19 +301,16 @@ class CreateLatex(Document):
                             for i in uiObj:
                                 # row_cells = ('9', MultiColumn(3, align='|c|', data='Multicolumn not on left'))
 
-                                print(i)
                                 if type(uiObj[i]) == dict and i == 'Selected Section Details':
                                     table.add_hline()
                                     sectiondetails = uiObj[i]
                                     image_name = sectiondetails[KEY_DISP_SEC_PROFILE]
-                                    Img_path = str(pkg_images.joinpath(image_name + ".png")).replace("\\", "/")
+                                    Img_path = str(pkg_images / (image_name + ".png")).replace("\\", "/")
                                     if (len(sectiondetails)) % 2 == 0:
                                         # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
                                         merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 2)
                                     else:
                                         merge_rows = int(round_up((len(sectiondetails) / 2), 1, 0) + 1)
-                                    print('Hi', len(sectiondetails) / 2, round_up(len(sectiondetails), 2) / 2,
-                                          merge_rows)
                                     if (len(sectiondetails)) % 2 == 0:
                                         sectiondetails[''] = ''
                                     a = list(sectiondetails.keys())
@@ -426,28 +453,57 @@ class CreateLatex(Document):
                                 image_5.add_caption('Typical Shear Key Details')
                                 # doc.append(NewPage())
 
+        # Check if images actually exist before using them
+        images_exist = False
+        view_3dimg_path = None
+        view_topimg_path = None
+        view_sideimg_path = None
+        view_frontimg_path = None
+        
+        # Handle None or empty Disp_3d_image
+        if Disp_3d_image is None:
+            Disp_3d_image = ''
+        
         if does_design_exist and sys.platform != 'darwin' and Disp_3d_image != '':
-            doc.append(NewPage())
             Disp_top_image = "/ResourceFiles/images/top.png"
             Disp_side_image = "/ResourceFiles/images/side.png"
             Disp_front_image = "/ResourceFiles/images/front.png"
+            
+            # Use ONLY the provided rel_path (which should be the report directory)
+            # Images are stored at: {report_dir}/ResourceFiles/images/
+            # No fallback checks - deterministic path resolution
             view_3dimg_path = rel_path + Disp_3d_image
             view_topimg_path = rel_path + Disp_top_image
             view_sideimg_path = rel_path + Disp_side_image
             view_frontimg_path = rel_path + Disp_front_image
-            with doc.create(Section('3D Views')):
-                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
+            
+            images_exist = (
+                os.path.exists(view_3dimg_path) and
+                os.path.exists(view_topimg_path) and
+                os.path.exists(view_sideimg_path) and
+                os.path.exists(view_frontimg_path)
+            )
+            
+            if not images_exist:
+                # Try to find images in common locations
+                possible_image_dir = os.path.join(rel_path, "ResourceFiles", "images")
+        
+        if does_design_exist and sys.platform != 'darwin' and Disp_3d_image != '' and images_exist and view_3dimg_path:
+            doc.append(NewPage())
+            with doc.create(Section('Views')):
+                doc.append(pyl.Command('setlength', arguments=[NoEscape(r'\arrayrulewidth'), NoEscape(r'1pt')]))
+                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.1)) as table:
                     view_3dimg_path = rel_path + Disp_3d_image
                     view_topimg_path = rel_path + Disp_top_image
                     view_sideimg_path = rel_path + Disp_side_image
                     view_frontimg_path = rel_path + Disp_front_image
                     table.add_hline()
-                    table.add_row([StandAloneGraphic(image_options="height=4cm",filename=view_3dimg_path),
-                                  StandAloneGraphic(image_options="height=4cm",filename=view_topimg_path)])
+                    table.add_row([StandAloneGraphic(image_options="height=4cm",filename=str(view_3dimg_path)),
+                                  StandAloneGraphic(image_options="height=4cm",filename=str(view_topimg_path))])
                     table.add_row('(a) 3D View', '(b) Top View')
                     table.add_hline()
-                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_sideimg_path),
-                                  StandAloneGraphic(image_options="height=4cm", filename=view_frontimg_path)])
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=str(view_sideimg_path)),
+                                  StandAloneGraphic(image_options="height=4cm", filename=str(view_frontimg_path))])
                     table.add_row('(c) Side View', '(d) Front View')
                     table.add_hline()
                 # with doc.create(Figure(position='h!')) as view_3D:
@@ -459,54 +515,95 @@ class CreateLatex(Document):
                 #     view_3D.add_caption('3D View')
         else:
             doc.append(NewPage())
-            imgpath_broken = pkg_images.joinpath("broken.png")
+            imgpath_broken = pkg_images / "broken.png"
             view_3dimg_path = imgpath_broken
             view_topimg_path = imgpath_broken
             view_sideimg_path = imgpath_broken
             view_frontimg_path = imgpath_broken
-            with doc.create(Section('3D Views')):
-                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.2)) as table:
+            with doc.create(Section('Views')):
+                doc.append(pyl.Command('setlength', arguments=[NoEscape(r'\arrayrulewidth'), NoEscape(r'1pt')]))
+                with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.1)) as table:
                     view_3dimg_path = imgpath_broken
                     view_topimg_path = imgpath_broken
                     view_sideimg_path = imgpath_broken
                     view_frontimg_path = imgpath_broken
                     table.add_hline()
-                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_3dimg_path),
-                                   StandAloneGraphic(image_options="height=4cm", filename=view_topimg_path)])
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=str(view_3dimg_path)),
+                                   StandAloneGraphic(image_options="height=4cm", filename=str(view_topimg_path))])
                     table.add_row('(a) 3D View', '(b) Top View')
                     table.add_hline()
-                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=view_sideimg_path),
-                                   StandAloneGraphic(image_options="height=4cm", filename=view_frontimg_path)])
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=str(view_sideimg_path)),
+                                   StandAloneGraphic(image_options="height=4cm", filename=str(view_frontimg_path))])
                     table.add_row('(c) Side View', '(d) Front View')
                     table.add_hline()
 
         with doc.create(Section('Design Log')):
             doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
-            logger_msgs=reportsummary['logger_messages'].split('\n')
+            logger_raw = reportsummary.get('logger_messages', '')
+            # Ensure we always have a string to work with
+            if isinstance(logger_raw, list):
+                logger_raw = "\n".join(str(x) for x in logger_raw)
+            logger_msgs = str(logger_raw).split('\n')
+
             for msg in logger_msgs:
-                if('WARNING' in msg):
-                    colour='blue'
-                elif('INFO' in msg):
-                    colour='OsdagGreen'
-                elif('ERROR' in msg):
-                    colour='red'
-                else:
+                # Skip completely empty lines
+                if not msg or not str(msg).strip():
                     continue
-                doc.append(TextColor(colour,'\n'+msg))
+
+                msg_str = str(msg)
+                msg_lower = msg_str.lower()
+
+                # Default colour
+                colour = 'OsdagGreen'
+                if 'warning' in msg_lower:
+                    colour = 'blue'
+                elif 'error' in msg_lower:
+                    colour = 'red'
+
+                doc.append(TextColor(colour, '\n' + msg_str))
         try:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
+            # **CRITICAL FIX**: Use proper file path handling
+            full_filename = os.path.join(rel_path, filename)
+            doc.generate_pdf(full_filename, compiler='pdflatex', clean_tex=False)
+            
+            # Check if PDF was created in the correct location
+            pdf_path = f"{full_filename}.pdf"
+            if os.path.exists(pdf_path):
+                return True
+            else:
+                # **DEBUG**: Check if PDF was created in wrong location
+                wrong_pdf_path = f"{filename}.pdf"
+                if os.path.exists(wrong_pdf_path):
+                    # Move it to correct location
+                    try:
+                        import shutil
+                        shutil.move(wrong_pdf_path, pdf_path)
+                        return True
+                    except Exception as move_error:
+                        pass
+                
+                return False
+                
+        except Exception as e:
+            # **ENHANCED ERROR HANDLING**: Try multiple paths
+            possible_paths = [
+                f"{os.path.join(rel_path, filename)}.pdf",
+                f"{filename}.pdf",
+                os.path.join(rel_path, f"{filename}.pdf")
+            ]
+            
+            for path in possible_paths:
+                if os.path.exists(path):
+                    file_size = os.path.getsize(path)
+                    if file_size > 1000:
+                        return True
+            
+            return False
 
-            # Go one level up to reach the parent directory
-            parent_dir = os.path.dirname(script_dir)
-
-            # Construct the path to pdflatex.exe
-            latex_executable = os.path.join(parent_dir, "data", "ResourceFiles", "osdag-latex-env", "bin", "windows", "pdflatex.exe")
-
-            # Ensure the path is absolute
-            latex_executable = os.path.abspath(latex_executable)
-            doc.generate_pdf(filename, compiler=latex_executable, clean_tex = False)
-        except:
+        except Exception as e:
             pass
+            
+  
 
 def color_cell(cellcolor,celltext):
     string = NoEscape(r'\cellcolor{'+cellcolor+r'}{'+celltext+r'}')

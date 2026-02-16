@@ -57,7 +57,8 @@ export const useDesignSubmission = (service, moduleConfig) => {
       allSelected,
     });
     
-    const { angleList, boltDiameterList, propertyClassList, thicknessList, channelList, weldSizeList } = moduleData;
+    // Pass full moduleData as lists so buildSubmissionParams can use sectionDesignation, anchorDiameterList, etc.
+    const lists = moduleData;
     
     // Validation step
     setStatus({
@@ -69,7 +70,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
     const validationResult = moduleConfig.validateInputs(
       inputs,
       extraState,
-      { angleList, boltDiameterList, propertyClassList, thicknessList },
+      lists,
       selectionStates
     );
     
@@ -89,7 +90,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
       param = moduleConfig.buildSubmissionParams(
         inputs,
         allSelected,
-        { boltDiameterList, propertyClassList, thicknessList, angleList, channelList, weldSizeList },
+        lists,
         extraState
       );
     } catch (err) {
@@ -133,14 +134,12 @@ export const useDesignSubmission = (service, moduleConfig) => {
         return;
       }
 
-      // Normalize design output once and set
+      // Normalize design output once and set (keep all keys so output dock can show every configured field)
       const formattedOutput = {};
       for (const [key, value] of Object.entries(designBody?.data || {})) {
         const label = value?.label ?? key;
         const val = value?.val ?? value?.value ?? value;
-        if (val !== undefined && val !== null) {
-          formattedOutput[key] = { label, val };
-        }
+        formattedOutput[key] = { label, val: val !== undefined && val !== null ? val : "" };
       }
 
       const nextLogs = designBody.logs || [];

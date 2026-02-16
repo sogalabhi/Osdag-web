@@ -225,7 +225,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
       const inputs = detail.project?.inputs_json || {};
       const module_id = detail.project?.submodule || detail.project?.module || MODULE_KEY_FIN_PLATE;
 
-      const saveRes = await fetch(`${BASE_URL}save-osi-from-inputs/`, {
+      const saveRes = await fetch(`${BASE_URL}api/save-osi-from-inputs/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ name: project.name, module_id, inputs, inline: true }),

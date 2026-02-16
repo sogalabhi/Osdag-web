@@ -1,6 +1,12 @@
-import { Select,Input } from 'antd'
+import { Select, Input } from 'antd'
 
-const BoltSectionModal = ({ designPrefInputs, setDesignPrefInputs, isInputLocked }) => {
+const { Option } = Select;
+
+const SIMPLE_CONNECTION_BOLT_MODULES = ["Butt Joint Bolted", "Lap Joint Bolted"];
+
+const BoltSectionModal = ({ module, designPrefInputs, setDesignPrefInputs, isInputLocked }) => {
+    const isSimpleConnection = module && SIMPLE_CONNECTION_BOLT_MODULES.includes(module);
+
     const Bolt_discription = `
 IS 800 Table 20 Typical Average Values for Coefficient of Friction (µf)
 
@@ -24,16 +30,15 @@ xii) Red lead painted surface     0.1
         <div className='Connector-col-beam-cont'>
             <div>
                 <div className='sub-container'>
-                    <h4>Inputs</h4>
                     <div className='input-cont'>
-                        <h5>Type</h5>
+                        <h5>Bolt tensioning type</h5>
                         <div>
                             <Select disabled={isInputLocked} style={{ width: '200px', height: '25px',fontSize: '12px' }}
                                 value={designPrefInputs.bolt_tension_type}
                                 onSelect={value => setDesignPrefInputs({...designPrefInputs, bolt_tension_type: value})}
                             >
-                                    <Option value="Pretensioned">Pre-tensioned</Option>
-                                    <Option value="Non pre-tensioned">Non Pre-tensioned</Option>
+                                    <Option value="Pre-tensioned">Pre-tensioned</Option>
+                                    <Option value="Non Pre-tensioned">Non Pre-tensioned</Option>
                             </Select>
                         </div>
                     </div>
@@ -45,14 +50,13 @@ xii) Red lead painted surface     0.1
                                 onSelect={value => setDesignPrefInputs({...designPrefInputs, bolt_hole_type: value})}
                             >
                                     <Option value="Standard">Standard</Option>
-                                    <Option value="0ver-Sized">Over-Sized</Option>
+                                    <Option value="Over-Sized">Over-Sized</Option>
                             </Select>
                         </div>
                     </div>
-                    <h4>HSFG Bolt</h4>
                     <div className='input-cont'>
                     <h5>
-                        Slip factor, (mu<span style={{ verticalAlign: 'sub', fontSize: 'smaller' }}>f</span>)
+                        Slip Factor, (µ<span style={{ verticalAlign: 'sub', fontSize: 'smaller' }}>f</span>)
                     </h5>
                         <div>
                             <Select disabled={isInputLocked} style={{ width: '200px', height: '25px',fontSize: '12px' }}
@@ -61,25 +65,25 @@ xii) Red lead painted surface     0.1
                             >
                                     <Option value="0.5">0.5</Option>
                                     <Option value="0.3">0.3</Option>
-                                    <Option value="o.2">0.2</Option>
-                                    <Option value="o.25">0.25</Option>
+                                    <Option value="0.2">0.2</Option>
+                                    <Option value="0.25">0.25</Option>
                                     <Option value="0.1">0.1</Option>
                             </Select>
                         </div>
                     </div>
                 </div>
             </div>
-            {/*  */}
+            {!isSimpleConnection && (
+            <>
             <div>
                 <div className="sub-container">
-                    <h4>Discription</h4>
                     <Input.TextArea  rows={20} cols={150} value={Bolt_discription} readOnly/>
                 </div>
             </div>
-           
-
+            <div><b>Note: If slip is permitted under the design load design the bolt as a bearing bolt select corresponding bolt grade.</b></div>
+            </>
+            )}
         </div>
-            <div><b>Note: If slip is permitted under the design load design the bolt as a bearing bolt select corresponding bolt grade.</b></div> 
             </>
     )
 }

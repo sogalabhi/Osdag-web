@@ -59,7 +59,8 @@ class TrussConnectionBolted(TrussConnection):
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_TRUSS_BOLTED
 
     def member(self, status):
@@ -198,7 +199,7 @@ class TrussConnectionBolted(TrussConnection):
 # import copy
 # from utils.common.common_calculation import *
 # import math
-# from osdag_core.utils.common.is800_2007 import IS800_2007
+# from utils.common.is800_2007 import IS800_2007
 #
 # """ ======The input values start here====== """
 #

@@ -3,15 +3,17 @@ import {
     KEY_PLATE1_THICKNESS, KEY_PLATE2_THICKNESS, KEY_PLATE_WIDTH, KEY_WELD_SIZE,
     KEY_COVER_PLATE, KEY_DISP_COVER_PLT, KEY_DP_DETAILING_PACKING_PLATE,
     KEY_DISP_WELD_SIZE, KEY_DISP_PLATE1_THICKNESS, KEY_DISP_PLATE_WIDTH,
-    KEY_DISP_PLATE2_THICKNESS, KEY_DESIGN_FOR
+    KEY_DISP_PLATE2_THICKNESS, KEY_DESIGN_FOR,
+    KEY_DP_WELD_TYPE, KEY_DP_WELD_MATERIAL_G_O
 } from "../../../../constants/DesignKeys";
+import { validateSimpleConnectionInputs } from "../../shared/validation";
 
 export const buttJointWeldedConfig = {
     sessionName: "Butt Joint Welded",
     routePath: "/design/connections/simple/butt_joint_welded",
     designType: "ButtJointWelded",
     cameraKey: "Connection",
-    cadOptions: ["Model", "Plate", "Column"],
+    cadOptions: ["Model", "Plate 1", "Plate 2", "Cover Plate", "Welds"],
 
     defaultInputs: {
         axial_force: "60",
@@ -22,7 +24,10 @@ export const buttJointWeldedConfig = {
         plate_width: "200",
         material: "E 250 (Fe 410 W)A",
         detailing_edge_type: "Sheared or hand flame cut",
+        detailing_packing_plate: "No",
         cover_plate: "Single-Cover",
+        weld_fab: "Shop weld",
+        weld_material_grade: "",
         design_for: "Tension",
     },
 
@@ -35,23 +40,20 @@ export const buttJointWeldedConfig = {
 
     ],
 
-    validateInputs: (inputs) => {
-        // if (!inputs.section_designation ||
-        //     !inputs.length ||
-        //     !inputs.axial_force ||
-        //     inputs.section_designation === "Select Section") {
-        //     return { isValid: false, message: "Please input all the required fields" };
-        // }
-        return { isValid: true };
+    validateInputs: (inputs, extraState, lists, selectionStates) => {
+        // Validate inputs before API call - return early if invalid
+        return validateSimpleConnectionInputs(inputs, { 
+            moduleType: 'welded'
+        });
     },
 
     buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
         const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
             if (allSelectedFlag) {
-                // Exclude "All" if present in the list
-                return fullList.filter(item => item !== "All");
+                // Prefer full list; if not loaded yet, use already-synced selectedList (e.g. from useEffect)
+                const list = Array.isArray(fullList) && fullList.length ? fullList : (Array.isArray(selectedList) ? selectedList : []);
+                return list.filter(item => item !== "All");
             }
-            // Ensure always array
             if (Array.isArray(selectedList)) {
                 return selectedList.filter(item => item !== "All");
             }
@@ -60,7 +62,7 @@ export const buttJointWeldedConfig = {
 
         return {
             [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
-            [KEY_DP_DETAILING_PACKING_PLATE]: "No",
+            [KEY_DP_DETAILING_PACKING_PLATE]: String(inputs.detailing_packing_plate || "No"),
             [KEY_MODULE]: "ButtJointWelded",
             [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
             [KEY_PLATE2_THICKNESS]: String(inputs.plate2_thickness),
@@ -70,6 +72,8 @@ export const buttJointWeldedConfig = {
             [KEY_AXIAL]: String(inputs.axial_force),
             [KEY_WELD_SIZE]: getArrayParam(allSelected.weld_size, lists.weldSizeList, inputs.weld_size),
             [KEY_DESIGN_FOR]: String(inputs.design_for),
+            [KEY_DP_WELD_TYPE]: String(inputs.weld_fab || "Shop weld"),
+            [KEY_DP_WELD_MATERIAL_G_O]: String(inputs.weld_material_grade || ""),
         };
     },
 

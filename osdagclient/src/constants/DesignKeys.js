@@ -77,6 +77,7 @@ export const KEY_DISP_PLATE2_THICKNESS = "Thickness of Plate-2 (mm) *";
 export const KEY_DISP_PLATE_WIDTH = "Width of Plate (mm) *";
 export const KEY_DISP_WELD_SIZE = 'Weld Size';
 export const KEY_DISP_COVER_PLT = 'Cover Plate *';
+export const KEY_DISP_DP_DETAILING_PACKING_PLATE = 'Packing Plate';
 
 // Flexural Member Constants - Must match exactly with Common.py backend constants
 export const KEY_ALLOW_CLASS = 'Design.Allowable_Class';
@@ -130,6 +131,9 @@ export const MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT = 'Beam-to-Column-End-Plate-Co
 export const MODULE_KEY_CC_COVER_PLATE_BOLTED = 'Column-to-Column-Cover-Plate-Bolted-Connection';
 export const MODULE_KEY_CC_COVER_PLATE_WELDED = 'Column-to-Column-Cover-Plate-Welded-Connection';
 export const MODULE_KEY_CC_END_PLATE = 'Column-to-Column-End-Plate-Connection';
+
+// Module Keys - Base Plate
+export const MODULE_KEY_BASE_PLATE = 'BasePlateConnection';
 
 // Module Keys - Simple connections
 export const MODULE_KEY_BUTT_JOINT_BOLTED = 'ButtJointBolted';

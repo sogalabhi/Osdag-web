@@ -1,13 +1,10 @@
 from . shear_connection import ShearConnection
-from osdag_core.design_report.reportGenerator_latex import CreateLatex
+from ...design_report.reportGenerator_latex import CreateLatex
 from ...utils.common.component import *
 from ...utils.common.material import *
 from ...Report_functions import *
 from ...custom_logger import CustomLogger
-from ...Common import get_resource_path
-from pathlib import Path
-from importlib.resources import files
-import logging
+from ...Common import _get_resource_path
 
 
 class FinPlateConnection(ShearConnection):
@@ -96,8 +93,6 @@ class FinPlateConnection(ShearConnection):
         t2 = (KEY_DISP_BEAMSEC, TYPE_COMBOBOX, [KEY_SUPTDSEC_MATERIAL])
         design_input.append(t2)
 
-
-
         t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
         design_input.append(t3)
 
@@ -139,45 +134,57 @@ class FinPlateConnection(ShearConnection):
     # Setting up logger and Input and Output Docks
     ####################################
 
-    def set_osdaglogger(self, key):
-
+    def set_osdaglogger(self, key, id):
         """
         Function to set Logger for FinPlate Module
         """
-        # @author Arsil Zunzunia
-        # super(FinPlateConnection, FinPlateConnection).set_osdaglogger(key)
-
         # Set Custom logger
         logging.setLoggerClass(CustomLogger)
 
-        self.logger = logging.getLogger('Osdag')
+        # Create unique logger name per instance
+        unique_logger_name = f'Osdag_fin_plate_shear_conn'
+        self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
 
         if not isinstance(self.logger, CustomLogger):
-            logging.getLogger('Osdag').manager.loggerDict.pop('Osdag', None)
-            # clear any existing handlers
-            self.logger = logging.getLogger('Osdag')
+            logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
+            self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
         
+        # Clear any existing handlers
         self.logger.handlers.clear()
-
         self.logger.setLevel(logging.DEBUG)
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+        
+        # Shared formatter for all handlers
+        formatter = logging.Formatter(
+            fmt='%(asctime)s - Osdag - %(levelname)s - %(message)s', 
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
+        
+        # ---------- CONSOLE HANDLER ----------
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        self.logger.addHandler(console_handler)
 
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
-        handler = logging.FileHandler('logging_text.log')
+        # ---------- FILE HANDLER (CLEAR & RESTART LOG) ----------
+        log_dir = Path("ResourceFiles") / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_file_path = log_dir / f"{unique_logger_name}.log"
+        
+        file_handler = logging.FileHandler(
+            log_file_path,
+            mode="w",          # clears previous log
+            encoding="utf-8"
+        )
+        file_handler.setFormatter(formatter)
+        self.logger.addHandler(file_handler)
 
-        formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
-
+        # ---------- GUI HANDLER ----------
         if key is not None:
-            handler = OurLog(key)
-            formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-            handler.setFormatter(formatter)
-            self.logger.addHandler(handler)
+            gui_handler = OurLog(key)
+            gui_handler.setFormatter(formatter)
+            self.logger.addHandler(gui_handler)
 
-    def module_name(self):
+    @staticmethod
+    def module_name():
         return KEY_DISP_FINPLATE
 
     def input_values(self):
@@ -203,7 +210,7 @@ class FinPlateConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(get_resource_path("images", "fin_cf_bw.png")), True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(_get_resource_path("data", "ResourceFiles", "images", "fin_cf_bw.png")), True, 'No Validator')
         options_list.append(t15)
 
         t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, connectdb("Columns"), True, 'No Validator')
@@ -252,7 +259,7 @@ class FinPlateConnection(ShearConnection):
         spacing.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-            [str(get_resource_path("images", "spacing_3.png")), 400, 277, ""])  # [image, width, height, caption]
+            [str(_get_resource_path("data", "ResourceFiles", "images", "spacing_3.png")), 400, 277, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
@@ -272,11 +279,11 @@ class FinPlateConnection(ShearConnection):
     def capacities(self, status):
         capacities = []
 
-        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)")
         capacities.append(t00)
 
         t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
-            [str(get_resource_path("images", "L_shear1.png")), 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
+            [str(_get_resource_path("data", "ResourceFiles", "images", "L_shear1.png")), 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity/1000,2) if status else '')
@@ -289,7 +296,7 @@ class FinPlateConnection(ShearConnection):
         capacities.append(t17)
 
         t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_SECTION,
-            [str(get_resource_path("images", "U.png")), 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+            [str(_get_resource_path("data", "ResourceFiles", "images", "U.png")), 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
@@ -320,11 +327,11 @@ class FinPlateConnection(ShearConnection):
         capacities = []
 
         t00 = (
-        None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)- 2 x 3 Bolts pattern considered")
+        None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)")
         capacities.append(t00)
 
         t99 = (None, 'Failure Pattern due to Shear in Member', TYPE_SECTION,
-            [str(get_resource_path("images", "L_shear1.png")), 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
+            [str(_get_resource_path("data", "ResourceFiles", "images", "L_shear1.png")), 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_SHEAR_YIELDCAPACITY, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.supported_section.shear_yielding_capacity/1000,2) if status else '')
@@ -337,7 +344,7 @@ class FinPlateConnection(ShearConnection):
         capacities.append(t17)
 
         t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
-            [str(get_resource_path("images", "U.png")), 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+            [str(_get_resource_path("data", "ResourceFiles", "images", "U.png")), 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_TENSION_YIELDCAPACITY, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
@@ -443,13 +450,12 @@ class FinPlateConnection(ShearConnection):
         out_list.append(t16)
 
         # Populate hover dict
-        self.hover_dict["Bolt"] = f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.plate.bolts_one_line)*int(self.plate.bolt_line) if flag else ''}"
-        self.hover_dict["Bolt"] = f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.plate.bolts_one_line)*int(self.plate.bolt_line) if flag else ''}"
+        self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.plate.bolts_one_line)*int(self.plate.bolt_line) if flag else ''}"
         
-        self.hover_dict["Plate"]= f"Plate: {float(self.plate.length) if flag else ''} x {float(self.plate.height) if flag else ''} x {self.plate.thickness_provided if flag else ''}"
+        self.hover_dict["Plate"]= f"Plate: {float(self.plate.length) if flag else ''} mm x {float(self.plate.height) if flag else ''} mm x {self.plate.thickness_provided if flag else ''} mm"
             
-        self.hover_dict["Weld"]= f"Weld: {self.weld.size if flag else ''} mm"
-        print("hover_dict:", self.hover_dict)
+        self.hover_dict["Weld"]= f"<b>Weld</b><br>Size: {self.weld.size if flag else ''} mm<br>Length: {self.plate.height if flag else ''} mm"
+
         return out_list
 
     ####################################
@@ -990,8 +996,29 @@ class FinPlateConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self,popup_summary):
-        self.module = KEY_DISP_FINPLATE 
+        print(f"\n[FinPlateConnection.save_design] Called with popup_summary keys: {list(popup_summary.keys())[:10]}")
+        print(f"[FinPlateConnection.save_design] Before super().save_design():")
+        print(f"   self.module: {self.module}")
+        print(f"   self.mainmodule: {getattr(self, 'mainmodule', 'N/A')}")
+        print(f"   self.connectivity: {getattr(self, 'connectivity', 'N/A')}")
+        print(f"   hasattr(self, 'report_input'): {hasattr(self, 'report_input')}")
+        print(f"   hasattr(self, 'load'): {hasattr(self, 'load')}")
+        print(f"   hasattr(self, 'bolt'): {hasattr(self, 'bolt')}")
+        print(f"   hasattr(self, 'supported_section'): {hasattr(self, 'supported_section')}")
+        print(f"   hasattr(self, 'supporting_section'): {hasattr(self, 'supporting_section')}")
+        
+        from osdag_core.Common import KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE
+        print(f"   KEY_DISP_FINPLATE: '{KEY_DISP_FINPLATE}'")
+        print(f"   self.module == KEY_DISP_FINPLATE: {self.module == KEY_DISP_FINPLATE}")
+        
         super(FinPlateConnection,self).save_design()
+        
+        print(f"[FinPlateConnection.save_design] After super().save_design():")
+        print(f"   hasattr(self, 'report_input'): {hasattr(self, 'report_input')}")
+        if hasattr(self, 'report_input'):
+            print(f"   self.report_input keys: {list(self.report_input.keys())[:10]}")
+        else:
+            print(f"   ❌ ERROR: report_input was not set by parent save_design()!")
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
 
         self.report_check = []
@@ -1295,12 +1322,12 @@ class FinPlateConnection(ShearConnection):
 
         Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"
-        rel_path = str(sys.path[0])
-        rel_path = os.path.abspath(".") # TEMP
-        rel_path = rel_path.replace("\\", "/")
         fname_no_ext = popup_summary['filename']
-        popup_summary['logger_messages'] = self.logger.logs
-        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+        rel_path = os.path.dirname(fname_no_ext) if fname_no_ext else os.path.abspath(".")
+        rel_path = os.path.abspath(rel_path)  # Make it absolute
+        rel_path = rel_path.replace("\\", "/")
+        CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image,
+                               Disp_3D_image, module=self.module)
         return True  
 
     ######################################
@@ -1329,7 +1356,6 @@ class FinPlateConnection(ShearConnection):
             if chkbox.objectName() == 'Fin Plate':
                 continue
             if isinstance(chkbox, QCheckBox):
-                print(f"clearing check of {chkbox.objectName()}")
                 chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Plate", bgcolor)
         

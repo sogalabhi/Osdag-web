@@ -322,7 +322,7 @@ const LoginPage = () => {
                                     className="w-full flex items-center justify-center gap-3 py-2 bg-white border border-gray-300 rounded-full shadow-sm text-gray-700 font-medium hover:bg-gray-100"
                                 >
                                     <span className="w-5 h-5 text-xl">👤</span>
-                                    Continue as Guest
+                                    Continue as Guest    
                                 </Button>
                             )}
                             <Button

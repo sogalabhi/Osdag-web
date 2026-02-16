@@ -145,6 +145,11 @@ export const designAndGenerateCad = async (moduleKey, inputParams, dispatch) => 
       
       dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: true });
       return { design: designData, cad: cadData, error: null };
+    } else if (cadRes.status === 200 && cadData.status === "coming_soon") {
+      // Handle "coming soon" status gracefully
+      dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
+      // Don't show error, just return with coming_soon status
+      return { design: designData, cad: { status: "coming_soon", message: cadData.message }, error: null };
     } else {
       dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
       error = cadData?.message || "CAD generation failed.";

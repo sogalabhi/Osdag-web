@@ -26,7 +26,7 @@ urlpatterns = [
     # Compression Member module (lowercase slug for new submodule routing)
     path('compression-member/', include('apps.modules.compression_member.urls')),
     
-    # Future modules will be added here:
-    # path('base-plate/', include('apps.modules.base_plate.urls')),
+    # Base Plate
+    path('base-plate/', include('apps.modules.base_plate.urls')),
 ]
 

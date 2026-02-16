@@ -62,6 +62,12 @@ export const EngineeringModule = ({
     hoverDict: ctxHoverDict,
     coverPlateList,
     weldSizeList,
+    profileList = [],
+    anchorDiameterList = [],
+    anchorGradeList = [],
+    footingGradeList = [],
+    weldTypeList = [],
+    anchorTypeList = [],
 
     // State
     inputs,
@@ -811,7 +817,7 @@ export const EngineeringModule = ({
   };
 
   const options = getViewOptions();
-  // FIXED: Include angleList in contextData 
+  // Include all module data for dropdowns (Base Plate: anchorDiameterList, anchorGradeList, footingGradeList, weldTypeList, anchorTypeList, etc.)
   const contextData = {
     beamList,
     columnList,
@@ -820,13 +826,19 @@ export const EngineeringModule = ({
     boltDiameterList,
     thicknessList,
     propertyClassList,
-    angleList, // FIXED: Added angleList to context data
+    angleList,
     boltTypeList,
     sectionProfileList,
     channelList,
     sectionDesignation,
     coverPlateList,
     weldSizeList,
+    profileList,
+    anchorDiameterList,
+    anchorGradeList,
+    footingGradeList,
+    weldTypeList,
+    anchorTypeList,
   };
 
   const triggerScreenshotCapture = () => {
@@ -909,6 +921,7 @@ export const EngineeringModule = ({
               setSelectedOption={(value) =>
                 setExtraState({ ...extraState, selectedOption: value })
               }
+              cadModelPaths={cadModelPaths}
             />
           ))}
 
@@ -1144,21 +1157,21 @@ export const EngineeringModule = ({
         `}>
           {/* Options Container - Show after design is complete. On desktop, show even when docks are open. On mobile, only show when CAD is visible */}
           {showOptionsContainer && output && (isMobile ? showCad : true) && (
-            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 flex flex-wrap justify-center items-center gap-2 p-2 bg-white/90 dark:bg-osdag-dark-color/90 rounded-lg border border-gray-200 dark:border-gray-700 shadow-md">
-              <div className="flex flex-wrap justify-center items-center gap-2">
+            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 max-w-[95%] w-fit overflow-x-auto overflow-y-hidden flex flex-row items-center gap-2 p-1 bg-white/90 dark:bg-osdag-dark-color/90 rounded-md border border-gray-200 dark:border-gray-700 shadow-md">
+              <div className="flex flex-row items-center gap-2 whitespace-nowrap">
                 {options.map((option) => {
                   const isChecked = selectedSection.includes(option);
                   const isModel = option === "Model";
                   return (
                     <label
                       key={option}
-                      className={`flex items-center gap-3 px-4 py-2 cursor-pointer text-sm font-medium text-black dark:text-white`}
+                      className={`flex items-center gap-1 px-2 py-1 cursor-pointer text-xs font-medium text-black dark:text-white`}
                     // rounded-lg cursor-pointer transition-colors text-sm font-medium ${isChecked ? 'bg-osdag-green/10 text-osdag-green dark:bg-osdag-dark-green/20 dark:text-osdag-green' : 'text-black dark:text-white hover:bg-black/10 dark:hover:bg-black/40'}`}
                     >
                       {/* Checkbox highlight box */}
                       <div
                         className={`
-                          rounded-lg p-1 transition-colors
+                          rounded-md p-[2px] transition-colors
                           ${isChecked
                             ? "bg-osdag-green/20 dark:bg-osdag-dark-green/30"
                             : "bg-transparent"
@@ -1167,7 +1180,7 @@ export const EngineeringModule = ({
                       >
                         <input
                           type="checkbox"
-                          className="h-4 w-4 rounded border-gray-400 text-osdag-green focus:ring-osdag-green"
+                          className="h-3.5 w-3.5 rounded border-gray-400 text-osdag-green focus:ring-osdag-green"
                           checked={isChecked}
                           onChange={(event) => {
                             if (isModel) {
@@ -1217,7 +1230,7 @@ export const EngineeringModule = ({
                     </label>
                   );
                 })}
-              </div>
+               </div>
             </div>
           )}
 
@@ -1305,7 +1318,7 @@ export const EngineeringModule = ({
                       hoverDict={hoverDict}
                       onHoverLabel={handleHoverLabel}
                       onHoverEnd={handleHoverEnd}
-                      moduleCadConfig={moduleConfig?.cadConfig}
+                      moduleCadConfig={moduleConfig}
                       key={`${modelKey}-${selectedSection}`}
                     />
                     <ScreenshotCapture
@@ -1341,8 +1354,8 @@ export const EngineeringModule = ({
         {/* Right - Output Dock */}
         {showOutputDock && output && outputConfig && status.step !== DESIGN_STATUS.ERROR && (
           <div className={`
-            ${isMobile ? 'fixed inset-0 z-50 h-full pt-[80px]' : 'relative md:relative md:z-auto'}
-            ${isMobile ? 'w-full' : 'md:w-[400px]'}
+            fixed inset-0 z-50 h-full pt-[80px] sm:relative sm:inset-auto sm:z-auto sm:h-auto sm:pt-0
+            w-full sm:w-[320px] md:w-[300px] lg:w-[260px]
             flex flex-col
             bg-white dark:bg-osdag-dark-color
           `}>
@@ -1350,7 +1363,7 @@ export const EngineeringModule = ({
               output={output}
               outputConfig={outputConfig}
               title={title || UI_STRINGS.OUTPUT_DOCK}
-              extraState={{ ...extraState, cadModelPaths, renderCadModel: renderBoolean }}
+              extraState={{ ...extraState, cadModelPaths, renderCadModel: renderBoolean, connectivity: inputs?.connectivity, member_designation: inputs?.member_designation, designation: inputs?.member_designation, weld_type: inputs?.weld_type }}
               handleCreateDesignReport={handleCreateDesignReport}
               saveOutput={saveOutput}
             />
@@ -1395,12 +1408,12 @@ export const EngineeringModule = ({
         ))
       }
 
-      {/* Design Preferences Modal */}
+      {/* Design Preferences Modal (Additional Inputs) */}
       {
         designPrefModalStatus && (
           <Modal
+            title="Additional Inputs"
             open={designPrefModalStatus}
-            // onCancel={() => setConfirmationModal(true)}
             onCancel={() =>
               isInputLocked
                 ? setDesignPrefModalStatus(false)   // Directly close

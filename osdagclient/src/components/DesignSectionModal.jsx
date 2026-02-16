@@ -1,13 +1,18 @@
 import { Select, Input } from 'antd'
 
-const DesignSectionModal = ({ designPrefInputs, setDesignPrefInputs, isInputLocked }) => {
+const SIMPLE_CONNECTION_MODULES = [
+    "Butt Joint Bolted", "Butt Joint Welded", "Lap Joint Bolted", "Lap Joint Welded"
+];
+
+const DesignSectionModal = ({ module, designPrefInputs, setDesignPrefInputs, isInputLocked }) => {
+    const isSimpleConnection = module && SIMPLE_CONNECTION_MODULES.includes(module);
 
     return (
         <>
             <div className='Connector-col-beam-cont'>
                 <div>
                     <div className='sub-container'>
-                        <h4>Inputs</h4>
+                        {!isSimpleConnection && (
                         <div className='input-cont'>
                             <h5>Design Method</h5>
                             <div>
@@ -21,6 +26,7 @@ const DesignSectionModal = ({ designPrefInputs, setDesignPrefInputs, isInputLock
                                 </Select>
                             </div>
                         </div>
+                        )}
                         <div className='input-cont'>
                             <h5>Design For</h5>
                             <div>

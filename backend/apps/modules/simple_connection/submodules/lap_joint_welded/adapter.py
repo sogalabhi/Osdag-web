@@ -14,11 +14,13 @@ from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
 from osdag_core.Common import KEY_DISP_LAPJOINTWELDED
+from osdag_core.custom_logger import CustomLogger
 from apps.core.utils import (
     MissingKeyError, InvalidInputTypeError,
     contains_keys, custom_list_validation, float_able, int_able, validate_list_type, write_stl
 )
 from ...shared import setup_for_cad
+from ...shared_validation import create_welded_validator
 
 def get_required_keys() -> List[str]:
     return [
@@ -28,45 +30,28 @@ def get_required_keys() -> List[str]:
         "Plate1Thickness",
         "Plate2Thickness",
         "PlateWidth",
-        "ButtJoint.CoverPlate",
         "Weld.Size",
         "Weld.Material_Grade_OverWrite",
         "Weld.Fab",
         "Design.For",
     ]
 
+# Create shared validator instance
+_validator = create_welded_validator(get_required_keys(), "LapJointWelded")
+
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate input values"""
+    """Validate input values using shared validator"""
     iv = dict(input_values or {})
-    # Provide legacy defaults for weld metadata if omitted by caller
-    iv.setdefault("Weld.Material_Grade_OverWrite", "410")
-    iv.setdefault("Weld.Fab", "Shop Weld")
-    iv.setdefault("Weld.Type", iv.get("Weld.Fab"))
+    # Provide legacy defaults for weld metadata if omitted by caller or empty string
+    if not iv.get("Weld.Material_Grade_OverWrite") or iv.get("Weld.Material_Grade_OverWrite", "").strip() == "":
+        iv["Weld.Material_Grade_OverWrite"] = "410"
+    if not iv.get("Weld.Fab") or iv.get("Weld.Fab", "").strip() == "":
+        iv["Weld.Fab"] = "Shop Weld"
+    if not iv.get("Weld.Type") or iv.get("Weld.Type", "").strip() == "":
+        iv["Weld.Type"] = iv.get("Weld.Fab", "Shop Weld")
     input_values.update(iv)
-    missing = contains_keys(iv, get_required_keys())
-    if missing:
-        raise MissingKeyError(missing[0])
-
-    weld_size = iv.get("Weld.Size")
-    if isinstance(weld_size, (int, float, str)):
-        iv["Weld.Size"] = [str(weld_size)]
-    if (not isinstance(iv.get("Weld.Size"), list)
-            or not validate_list_type(iv.get("Weld.Size"), str)
-            or not custom_list_validation(iv.get("Weld.Size"), float_able)):
-        raise InvalidInputTypeError("Weld.Size", "non empty List[str] convertible to float")
-
-    for key in ("Plate1Thickness", "Plate2Thickness", "PlateWidth", "Load.Axial"):
-        val = iv.get(key)
-        # Normalize list/tuple to first element
-        if isinstance(val, (list, tuple)) and val:
-            val = val[0]
-        # allow numeric and coerce to str before float check
-        if isinstance(val, (int, float)):
-            val = str(val)
-        if not isinstance(val, str) or not float_able(val):
-            raise InvalidInputTypeError(key, "str convertible to float")
-        iv[key] = val
-        input_values[key] = val
+    # Use shared validator for validation
+    _validator.validate(input_values)
 
 def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     """Generate output from input values"""
@@ -74,7 +59,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     logs = []
     try:
         module = LapJointWelded()
-        module.set_osdaglogger(None)
+        module.set_osdaglogger(None, id="web")
 
         validate_input(input_values)
         module.set_input_values(input_values)
@@ -130,10 +115,13 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 mapped_output[target_key] = {"key": target_key, "label": label, "val": getattr(module, src_attr)}
 
         add_scalar("weld_size", "Weld.Size", "Size (mm)")
-        add_scalar("weld_strength", "Weld.Strength", "Strength (N/mm2)")
+        # Weld strength in Osdag is in kN (converted from N in output_values)
+        if hasattr(module, 'weld_strength') and module.weld_strength:
+            weld_strength_kn = round(module.weld_strength / 1000, 2) if module.weld_strength > 1000 else module.weld_strength
+            mapped_output["Weld.Strength"] = {"key": "Weld.Strength", "label": "Strength (kN)", "val": weld_strength_kn}
         add_scalar("weld_length_effective", "Weld.EffLength", "Eff.Length (mm)")
         add_scalar("design_for", "Design For", "Design For")
-        add_scalar("weld_length_provided", "Bolt.ConnLength", "Length of Connection (mm)")
+        add_scalar("connection_length", "Bolt.ConnLength", "Length of Connection (mm)")
 
         if mapped_output:
             output = mapped_output
@@ -142,30 +130,46 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         else:
             output = {}
 
-        logs = getattr(module, "logs", [])
+        # Get logs from the custom logger (same as fin_plate and butt_joint_welded)
+        logs = []
+        if hasattr(module, 'logger'):
+            if isinstance(module.logger, CustomLogger):
+                try:
+                    logs = module.logger.get_logs()
+                except Exception as e:
+                    print(f"[LapJointWelded] Error getting logs: {e}")
+                    logs = []
+            else:
+                logs = getattr(module, "logs", [])
+        else:
+            logs = getattr(module, "logs", [])
     except Exception as e:
-        logs.append(f"Error in design: {str(e)}")
+        error_msg = f"Error in design: {str(e)}"
+        if 'logs' not in locals():
+            logs = []
+        logs.append(error_msg)
         traceback.print_exc()
     return output, logs
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
-    """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Column", "Plate"):
-        raise InvalidInputTypeError("section", "'Model', 'Column', 'Plate'")
+    """Generate the CAD model from input values as a BREP file. Return file path.
+    Desktop options: Model, Plate 1, Plate 2, Welds.
+    """
+    valid_sections = ("Model", "Plate 1", "Plate 2", "Welds")
+    if section not in valid_sections:
+        raise InvalidInputTypeError("section", "'Model', 'Plate 1', 'Plate 2', 'Welds'")
 
     module = LapJointWelded()
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     validate_input(input_values)
     module.set_input_values(input_values)
     if getattr(module, "module", None) != KEY_DISP_LAPJOINTWELDED:
-        print(f"[CAD DEBUG] Adjusting module.module from {getattr(module, 'module', None)} to {KEY_DISP_LAPJOINTWELDED}")
         module.module = KEY_DISP_LAPJOINTWELDED
 
     try:
         connection_key = KEY_DISP_LAPJOINTWELDED
-        mainmodule = "Moment Connection"
+        mainmodule = getattr(module, "mainmodule", "Moment Connection")
         folder = ""
-        print(f"[CAD DEBUG] init CommonDesignLogic: connection={connection_key}, mainmodule={mainmodule}, folder='{folder}'")
         cdl = CommonDesignLogic(None, '', folder, connection_key, mainmodule)
     except Exception as e:
         print('Error initializing CommonDesignLogic:', e)
@@ -176,78 +180,68 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     except Exception as e:
         traceback.print_exc()
         print('Error in setup_for_cad:', e)
-
-    candidate_components = ["Model", "Beam", "Column", "Plate", "Weld", "Bolt", "Bolts", "Connector"]
-    probed_shapes = {}
-    for comp in candidate_components:
-        try:
-            cdl.component = comp
-            shape = cdl.create2Dcad()
-            probed_shapes[comp] = shape
-            shape_type = type(shape).__name__ if shape is not None else None
-            print(f"[CAD DEBUG] component={comp} -> {shape_type}")
-        except Exception as exc:
-            probed_shapes[comp] = exc
-            print(f"[CAD DEBUG] component={comp} raised: {exc}")
-
-    def _is_valid_shape(val: Any) -> bool:
-        return val is not None and not isinstance(val, Exception)
-
-    # Check if CAD generation is available (all components return None means CAD not implemented)
-    valid_shapes = [comp for comp in candidate_components if _is_valid_shape(probed_shapes.get(comp))]
-    if not valid_shapes:
-        error_msg = "3D CAD model generation is not available for LapJointWelded yet. CAD generation methods need to be implemented in osdag_core."
-        print(f"[CAD DEBUG] {error_msg}")
-        raise NotImplementedError(error_msg)
-
-    cdl.component = section
-    part_names = [comp for comp in ("Beam", "Column", "Plate", "Weld", "Bolt", "Bolts", "Connector") if _is_valid_shape(probed_shapes.get(comp))]
-    print(f"[CAD DEBUG] requested section={section}; valid parts discovered={part_names}")
-    part_files = {}
-    compound_model = None
+        return ""
 
     try:
-        if section == "Model":
-            builder = BRep_Builder()
-            compound = TopoDS_Compound()
-            builder.MakeCompound(compound)
-
-            for part in part_names:
-                try:
-                    part_shape = probed_shapes.get(part)
-                    if part_shape is None or isinstance(part_shape, Exception):
-                        print(f"[CAD DEBUG] skip part {part}: {part_shape}")
-                        continue
-                    builder.Add(compound, part_shape)
-                    part_file_name = f"{session}_{part}.brep"
-                    part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
-                    BRepTools.breptools.Write(part_shape, part_file_path_rel, Message_ProgressRange())
-                    part_files[part] = part_file_path_rel
-                    try:
-                        part_stl_rel = part_file_path_rel.replace(".brep", ".stl")
-                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_rel))
-                    except Exception as stle:
-                        print(f"Failed to write STL for part {part}: {stle}")
-                except Exception as e:
-                    print(f"Failed to build/write part {part}: {e}")
-
-            cdl.component = section
-            compound_model = compound
-
-        model = compound_model if compound_model is not None else cdl.create2Dcad()
+        cdl.assembly, cdl.plate1_model, cdl.plate2_model, cdl.weld_models = cdl.createWeldedLapJoint()
     except Exception as e:
-        print("Error in cdl.create2Dcad():", e)
+        print(f"Error in createWeldedLapJoint: {e}")
+        traceback.print_exc()
+        return ""
+
+    def _compound_shapes(shapes):
+        from OCC.Core.BRep import BRep_Builder
+        shapes = [s for s in (shapes if isinstance(shapes, (list, tuple)) else [shapes]) if s]
+        if not shapes:
+            return None
+        if len(shapes) == 1:
+            return shapes[0]
+        builder = BRep_Builder()
+        comp = TopoDS_Compound()
+        builder.MakeCompound(comp)
+        for s in shapes:
+            builder.Add(comp, s)
+        return comp
+
+    model = None
+    part_files = {}
+    part_names = []
+
+    if section == "Model":
+        builder = BRep_Builder()
+        compound = TopoDS_Compound()
+        builder.MakeCompound(compound)
+        for shape in [cdl.plate1_model, cdl.plate2_model] + (list(cdl.weld_models) if cdl.weld_models else []):
+            if shape:
+                builder.Add(compound, shape)
+        model = compound
+        part_names = ["Plate_1", "Plate_2", "Welds"]
+        for pname, pshape in [("Plate_1", cdl.plate1_model), ("Plate_2", cdl.plate2_model), ("Welds", _compound_shapes(cdl.weld_models))]:
+            if pshape:
+                pref = os.path.join("file_storage", "cad_models", f"{session}_{pname}.brep")
+                part_files[pname] = pref
+                try:
+                    BRepTools.breptools.Write(pshape, pref, Message_ProgressRange())
+                    write_stl(pshape, os.path.join(os.getcwd(), pref.replace(".brep", ".stl")))
+                except Exception as ex:
+                    print(f"Warning: failed to write part {pname}: {ex}")
+    elif section == "Plate 1":
+        model = cdl.plate1_model
+    elif section == "Plate 2":
+        model = cdl.plate2_model
+    elif section == "Welds":
+        model = _compound_shapes(cdl.weld_models)
+
+    if model is None:
+        print(f"[CAD DEBUG] No model generated for section={section}; skipping write.")
         return ""
 
     cad_dir = os.path.join(os.getcwd(), "file_storage", "cad_models")
     os.makedirs(cad_dir, exist_ok=True)
 
-    file_name = f"{session}_{section}.brep"
+    section_safe = section.replace(" ", "_")
+    file_name = f"{session}_{section_safe}.brep"
     file_path = os.path.join("file_storage", "cad_models", file_name)
-
-    if model is None:
-        print(f"[CAD DEBUG] No model generated for section={section}; skipping write.")
-        return ""
 
     try:
         BRepTools.breptools.Write(model, file_path, Message_ProgressRange())
@@ -310,5 +304,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 def create_from_input(input_values: Dict[str, Any]) -> Any:
     """Create module instance from input"""
     module = LapJointWelded()
+    module.set_osdaglogger(None, id="web")
+    validate_input(input_values)
     module.set_input_values(input_values)
     return module

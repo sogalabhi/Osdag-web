@@ -18,7 +18,7 @@ import React, { useMemo } from "react";
  */
 const VIEWBOX_WIDTH = 600;
 const VIEWBOX_HEIGHT = 400;
-const MARGIN = 60;
+const MARGIN = 70;
 
 const toNumber = (value, fallback = 0) => {
   if (value === null || value === undefined || value === "") {
@@ -85,13 +85,15 @@ const distributeRows = (rows, end, pitch, plateHeight) => {
   return positions;
 };
 
-const DimensionText = ({ x, y, text }) => (
+const DimensionText = ({ x, y, text, anchor = "middle" }) => (
   <text
     x={x}
     y={y}
-    fontSize="12"
-    textAnchor="middle"
-    fill="var(--spacing-diagram-text, #111)"
+    fontSize="14"
+    fontWeight="500"
+    textAnchor={anchor}
+    fill="#000"
+    fontFamily="Arial, sans-serif"
   >
     {text}
   </text>
@@ -106,11 +108,11 @@ const renderDetailedDimensions = (
   scale,
   origin
 ) => {
-  const dimColor = "var(--spacing-diagram-dim, #333)";
-  const hOffset = 20;
-  const vOffset = 30;
-  const arrowSize = 5;
-  const extLength = 10;
+  const dimColor = "#000";
+  const hOffset = 35;
+  const vOffset = 45;
+  const extLength = 8;
+  const textOffset = 16;
 
   const elements = [];
 
@@ -126,6 +128,32 @@ const renderDetailedDimensions = (
         // Left edge distance
         const edgeStart = offsetX;
         const edgeEnd = offsetX + firstBoltX * scale;
+        
+        // Extension lines
+        elements.push(
+          <line
+            key="h-edge-start-ext1"
+            x1={edgeStart}
+            y1={offsetY - 5}
+            x2={edgeStart}
+            y2={dimY + extLength}
+            stroke={dimColor}
+            strokeWidth="1"
+          />
+        );
+        elements.push(
+          <line
+            key="h-edge-start-ext2"
+            x1={edgeEnd}
+            y1={offsetY - 5}
+            x2={edgeEnd}
+            y2={dimY + extLength}
+            stroke={dimColor}
+            strokeWidth="1"
+          />
+        );
+        
+        // Dimension line with arrows
         elements.push(
           <line
             key="h-edge-start"
@@ -135,47 +163,47 @@ const renderDetailedDimensions = (
             y2={dimY}
             stroke={dimColor}
             strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
             markerEnd="url(#arrow-end)"
             markerStart="url(#arrow-start)"
           />
         );
-        elements.push(
-          <line
-            key="h-edge-start-ext1"
-            x1={edgeStart}
-            y1={dimY - extLength / 2}
-            x2={edgeStart}
-            y2={dimY + extLength / 2}
-            stroke={dimColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-          />
-        );
-        elements.push(
-          <line
-            key="h-edge-start-ext2"
-            x1={edgeEnd}
-            y1={dimY - extLength / 2}
-            x2={edgeEnd}
-            y2={dimY + extLength / 2}
-            stroke={dimColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-          />
-        );
+        
         elements.push(
           <DimensionText
             key="h-edge-start-text"
             x={(edgeStart + edgeEnd) / 2}
-            y={dimY - 15}
-            text={`${params.edgeDist.toFixed(1)}`}
+            y={dimY - textOffset}
+            text={`${(params.edgeDist || 0).toFixed(0)}`}
           />
         );
       } else {
         // Right edge distance
         const edgeStart = offsetX + lastBoltX * scale;
         const edgeEnd = offsetX + params.width * scale;
+        
+        elements.push(
+          <line
+            key="h-edge-end-ext1"
+            x1={edgeStart}
+            y1={offsetY - 5}
+            x2={edgeStart}
+            y2={dimY + extLength}
+            stroke={dimColor}
+            strokeWidth="1"
+          />
+        );
+        elements.push(
+          <line
+            key="h-edge-end-ext2"
+            x1={edgeEnd}
+            y1={offsetY - 5}
+            x2={edgeEnd}
+            y2={dimY + extLength}
+            stroke={dimColor}
+            strokeWidth="1"
+          />
+        );
+        
         elements.push(
           <line
             key="h-edge-end"
@@ -185,146 +213,17 @@ const renderDetailedDimensions = (
             y2={dimY}
             stroke={dimColor}
             strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
             markerEnd="url(#arrow-end)"
             markerStart="url(#arrow-start)"
           />
         );
-        elements.push(
-          <line
-            key="h-edge-end-ext1"
-            x1={edgeStart}
-            y1={dimY - extLength / 2}
-            x2={edgeStart}
-            y2={dimY + extLength / 2}
-            stroke={dimColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-          />
-        );
-        elements.push(
-          <line
-            key="h-edge-end-ext2"
-            x1={edgeEnd}
-            y1={dimY - extLength / 2}
-            x2={edgeEnd}
-            y2={dimY + extLength / 2}
-            stroke={dimColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-          />
-        );
+        
         elements.push(
           <DimensionText
             key="h-edge-end-text"
             x={(edgeStart + edgeEnd) / 2}
-            y={dimY - 15}
-            text={`${params.edgeDist.toFixed(1)}`}
-          />
-        );
-      }
-    }
-
-    // Opposite edge distance (when multiple columns)
-    if (boltColsPositions.length > 1) {
-      if (origin === "left") {
-        // Right edge distance
-        const edgeStart = offsetX + lastBoltX * scale;
-        const edgeEnd = offsetX + params.width * scale;
-        elements.push(
-          <line
-            key="h-edge-end"
-            x1={edgeStart}
-            y1={dimY}
-            x2={edgeEnd}
-            y2={dimY}
-            stroke={dimColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-            markerEnd="url(#arrow-end)"
-            markerStart="url(#arrow-start)"
-          />
-        );
-        elements.push(
-          <line
-            key="h-edge-end-ext1"
-            x1={edgeStart}
-            y1={dimY - extLength / 2}
-            x2={edgeStart}
-            y2={dimY + extLength / 2}
-            stroke={dimColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-          />
-        );
-        elements.push(
-          <line
-            key="h-edge-end-ext2"
-            x1={edgeEnd}
-            y1={dimY - extLength / 2}
-            x2={edgeEnd}
-            y2={dimY + extLength / 2}
-            stroke={dimColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-          />
-        );
-        elements.push(
-          <DimensionText
-            key="h-edge-end-text"
-            x={(edgeStart + edgeEnd) / 2}
-            y={dimY - 15}
-            text={`${params.edgeDist.toFixed(1)}`}
-          />
-        );
-      } else {
-        // Left edge distance
-        const edgeStart = offsetX;
-        const edgeEnd = offsetX + firstBoltX * scale;
-        elements.push(
-          <line
-            key="h-edge-start"
-            x1={edgeStart}
-            y1={dimY}
-            x2={edgeEnd}
-            y2={dimY}
-            stroke={dimColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-            markerEnd="url(#arrow-end)"
-            markerStart="url(#arrow-start)"
-          />
-        );
-        elements.push(
-          <line
-            key="h-edge-start-ext1"
-            x1={edgeStart}
-            y1={dimY - extLength / 2}
-            x2={edgeStart}
-            y2={dimY + extLength / 2}
-            stroke={dimColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-          />
-        );
-        elements.push(
-          <line
-            key="h-edge-start-ext2"
-            x1={edgeEnd}
-            y1={dimY - extLength / 2}
-            x2={edgeEnd}
-            y2={dimY + extLength / 2}
-            stroke={dimColor}
-            strokeWidth="1"
-            vectorEffect="non-scaling-stroke"
-          />
-        );
-        elements.push(
-          <DimensionText
-            key="h-edge-start-text"
-            x={(edgeStart + edgeEnd) / 2}
-            y={dimY - 15}
-            text={`${params.edgeDist.toFixed(1)}`}
+            y={dimY - textOffset}
+            text={`${(params.edgeDist || 0).toFixed(0)}`}
           />
         );
       }
@@ -335,6 +234,31 @@ const renderDetailedDimensions = (
       const x1 = offsetX + boltColsPositions[i] * scale;
       const x2 = offsetX + boltColsPositions[i + 1] * scale;
       const gaugeValue = Math.abs(boltColsPositions[i + 1] - boltColsPositions[i]);
+      
+      // Extension lines
+      elements.push(
+        <line
+          key={`h-gauge-ext1-${i}`}
+          x1={x1}
+          y1={offsetY - 5}
+          x2={x1}
+          y2={dimY + extLength}
+          stroke={dimColor}
+          strokeWidth="1"
+        />
+      );
+      elements.push(
+        <line
+          key={`h-gauge-ext2-${i}`}
+          x1={x2}
+          y1={offsetY - 5}
+          x2={x2}
+          y2={dimY + extLength}
+          stroke={dimColor}
+          strokeWidth="1"
+        />
+      );
+      
       elements.push(
         <line
           key={`h-gauge-${i}`}
@@ -344,47 +268,47 @@ const renderDetailedDimensions = (
           y2={dimY}
           stroke={dimColor}
           strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
           markerEnd="url(#arrow-end)"
           markerStart="url(#arrow-start)"
         />
       );
-      elements.push(
-        <line
-          key={`h-gauge-ext1-${i}`}
-          x1={x1}
-          y1={dimY - extLength / 2}
-          x2={x1}
-          y2={dimY + extLength / 2}
-          stroke={dimColor}
-          strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
-        />
-      );
-      elements.push(
-        <line
-          key={`h-gauge-ext2-${i}`}
-          x1={x2}
-          y1={dimY - extLength / 2}
-          x2={x2}
-          y2={dimY + extLength / 2}
-          stroke={dimColor}
-          strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
-        />
-      );
+      
       elements.push(
         <DimensionText
           key={`h-gauge-text-${i}`}
           x={(x1 + x2) / 2}
-          y={dimY - 15}
-          text={`${gaugeValue.toFixed(1)}`}
+          y={dimY - textOffset}
+          text={`${gaugeValue.toFixed(0)}`}
         />
       );
     }
 
     // Overall width dimension (bottom)
     const widthDimY = offsetY + params.height * scale + hOffset;
+    
+    elements.push(
+      <line
+        key="h-width-ext1"
+        x1={offsetX}
+        y1={offsetY + params.height * scale + 5}
+        x2={offsetX}
+        y2={widthDimY - extLength}
+        stroke={dimColor}
+        strokeWidth="1"
+      />
+    );
+    elements.push(
+      <line
+        key="h-width-ext2"
+        x1={offsetX + params.width * scale}
+        y1={offsetY + params.height * scale + 5}
+        x2={offsetX + params.width * scale}
+        y2={widthDimY - extLength}
+        stroke={dimColor}
+        strokeWidth="1"
+      />
+    );
+    
     elements.push(
       <line
         key="h-width"
@@ -394,41 +318,17 @@ const renderDetailedDimensions = (
         y2={widthDimY}
         stroke={dimColor}
         strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
         markerEnd="url(#arrow-end)"
         markerStart="url(#arrow-start)"
       />
     );
-    elements.push(
-      <line
-        key="h-width-ext1"
-        x1={offsetX}
-        y1={widthDimY - extLength / 2}
-        x2={offsetX}
-        y2={widthDimY + extLength / 2}
-        stroke={dimColor}
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-      />
-    );
-    elements.push(
-      <line
-        key="h-width-ext2"
-        x1={offsetX + params.width * scale}
-        y1={widthDimY - extLength / 2}
-        x2={offsetX + params.width * scale}
-        y2={widthDimY + extLength / 2}
-        stroke={dimColor}
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-      />
-    );
+    
     elements.push(
       <DimensionText
         key="h-width-text"
         x={offsetX + (params.width * scale) / 2}
-        y={widthDimY + 20}
-        text={`${params.width.toFixed(1)}`}
+        y={widthDimY + textOffset + 4}
+        text={`${params.width.toFixed(0)}`}
       />
     );
   }
@@ -441,52 +341,55 @@ const renderDetailedDimensions = (
 
     // Top end distance (only if multiple rows)
     if (boltRowsPositions.length > 1) {
+      const topY = offsetY;
+      const boltY = offsetY + firstBoltY * scale;
+      
       elements.push(
-      <line
-        key="v-end-top"
-        x1={dimX}
-        y1={offsetY}
-        x2={dimX}
-        y2={offsetY + firstBoltY * scale}
-        stroke={dimColor}
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-        markerEnd="url(#arrow-end)"
-        markerStart="url(#arrow-start)"
-      />
-    );
-    elements.push(
-      <line
-        key="v-end-top-ext1"
-        x1={dimX - extLength / 2}
-        y1={offsetY}
-        x2={dimX + extLength / 2}
-        y2={offsetY}
-        stroke={dimColor}
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-      />
-    );
-    elements.push(
-      <line
-        key="v-end-top-ext2"
-        x1={dimX - extLength / 2}
-        y1={offsetY + firstBoltY * scale}
-        x2={dimX + extLength / 2}
-        y2={offsetY + firstBoltY * scale}
-        stroke={dimColor}
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-      />
-    );
-    elements.push(
-      <DimensionText
-        key="v-end-top-text"
-        x={dimX + 15}
-        y={offsetY + (firstBoltY * scale) / 2}
-        text={`${params.endDist.toFixed(1)}`}
-      />
-    );
+        <line
+          key="v-end-top-ext1"
+          x1={offsetX + params.width * scale + 5}
+          y1={topY}
+          x2={dimX - extLength}
+          y2={topY}
+          stroke={dimColor}
+          strokeWidth="1"
+        />
+      );
+      elements.push(
+        <line
+          key="v-end-top-ext2"
+          x1={offsetX + params.width * scale + 5}
+          y1={boltY}
+          x2={dimX - extLength}
+          y2={boltY}
+          stroke={dimColor}
+          strokeWidth="1"
+        />
+      );
+      
+      elements.push(
+        <line
+          key="v-end-top"
+          x1={dimX}
+          y1={topY}
+          x2={dimX}
+          y2={boltY}
+          stroke={dimColor}
+          strokeWidth="1"
+          markerEnd="url(#arrow-end)"
+          markerStart="url(#arrow-start)"
+        />
+      );
+      
+      elements.push(
+        <DimensionText
+          key="v-end-top-text"
+          x={dimX + textOffset + 4}
+          y={(topY + boltY) / 2 + 5}
+          text={`${(params.endDist || 0).toFixed(0)}`}
+          anchor="start"
+        />
+      );
     }
 
     // Pitch distances between bolt rows (only if multiple rows)
@@ -494,6 +397,30 @@ const renderDetailedDimensions = (
       const y1 = offsetY + boltRowsPositions[i] * scale;
       const y2 = offsetY + boltRowsPositions[i + 1] * scale;
       const pitchValue = Math.abs(boltRowsPositions[i + 1] - boltRowsPositions[i]);
+      
+      elements.push(
+        <line
+          key={`v-pitch-ext1-${i}`}
+          x1={offsetX + params.width * scale + 5}
+          y1={y1}
+          x2={dimX - extLength}
+          y2={y1}
+          stroke={dimColor}
+          strokeWidth="1"
+        />
+      );
+      elements.push(
+        <line
+          key={`v-pitch-ext2-${i}`}
+          x1={offsetX + params.width * scale + 5}
+          y1={y2}
+          x2={dimX - extLength}
+          y2={y2}
+          stroke={dimColor}
+          strokeWidth="1"
+        />
+      );
+      
       elements.push(
         <line
           key={`v-pitch-${i}`}
@@ -503,98 +430,101 @@ const renderDetailedDimensions = (
           y2={y2}
           stroke={dimColor}
           strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
           markerEnd="url(#arrow-end)"
           markerStart="url(#arrow-start)"
         />
       );
-      elements.push(
-        <line
-          key={`v-pitch-ext1-${i}`}
-          x1={dimX - extLength / 2}
-          y1={y1}
-          x2={dimX + extLength / 2}
-          y2={y1}
-          stroke={dimColor}
-          strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
-        />
-      );
-      elements.push(
-        <line
-          key={`v-pitch-ext2-${i}`}
-          x1={dimX - extLength / 2}
-          y1={y2}
-          x2={dimX + extLength / 2}
-          y2={y2}
-          stroke={dimColor}
-          strokeWidth="1"
-          vectorEffect="non-scaling-stroke"
-        />
-      );
+      
       elements.push(
         <DimensionText
           key={`v-pitch-text-${i}`}
-          x={dimX + 15}
-          y={(y1 + y2) / 2}
-          text={`${pitchValue.toFixed(1)}`}
+          x={dimX + textOffset + 4}
+          y={(y1 + y2) / 2 + 5}
+          text={`${(pitchValue || 0).toFixed(0)}`}
+          anchor="start"
         />
       );
     }
 
     // Bottom end distance (only if multiple rows)
     if (boltRowsPositions.length > 1) {
-      const bottomEndY = offsetY + params.height * scale;
+      const boltY = offsetY + lastBoltY * scale;
+      const bottomY = offsetY + params.height * scale;
+      
       elements.push(
-      <line
-        key="v-end-bottom"
-        x1={dimX}
-        y1={offsetY + lastBoltY * scale}
-        x2={dimX}
-        y2={bottomEndY}
-        stroke={dimColor}
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-        markerEnd="url(#arrow-end)"
-        markerStart="url(#arrow-start)"
-      />
-    );
-    elements.push(
-      <line
-        key="v-end-bottom-ext1"
-        x1={dimX - extLength / 2}
-        y1={offsetY + lastBoltY * scale}
-        x2={dimX + extLength / 2}
-        y2={offsetY + lastBoltY * scale}
-        stroke={dimColor}
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-      />
-    );
-    elements.push(
-      <line
-        key="v-end-bottom-ext2"
-        x1={dimX - extLength / 2}
-        y1={bottomEndY}
-        x2={dimX + extLength / 2}
-        y2={bottomEndY}
-        stroke={dimColor}
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-      />
-    );
-    elements.push(
-      <DimensionText
-        key="v-end-bottom-text"
-        x={dimX + 15}
-        y={(offsetY + lastBoltY * scale + bottomEndY) / 2}
-        text={`${params.endDist.toFixed(1)}`}
-      />
-    );
+        <line
+          key="v-end-bottom-ext1"
+          x1={offsetX + params.width * scale + 5}
+          y1={boltY}
+          x2={dimX - extLength}
+          y2={boltY}
+          stroke={dimColor}
+          strokeWidth="1"
+        />
+      );
+      elements.push(
+        <line
+          key="v-end-bottom-ext2"
+          x1={offsetX + params.width * scale + 5}
+          y1={bottomY}
+          x2={dimX - extLength}
+          y2={bottomY}
+          stroke={dimColor}
+          strokeWidth="1"
+        />
+      );
+      
+      elements.push(
+        <line
+          key="v-end-bottom"
+          x1={dimX}
+          y1={boltY}
+          x2={dimX}
+          y2={bottomY}
+          stroke={dimColor}
+          strokeWidth="1"
+          markerEnd="url(#arrow-end)"
+          markerStart="url(#arrow-start)"
+        />
+      );
+      
+      elements.push(
+        <DimensionText
+          key="v-end-bottom-text"
+          x={dimX + textOffset + 4}
+          y={(boltY + bottomY) / 2 + 5}
+          text={`${(params.endDist || 0).toFixed(0)}`}
+          anchor="start"
+        />
+      );
     }
 
     // Overall height dimension (left side)
-    const heightDimX = offsetX - vOffset / 2;
+    const heightDimX = offsetX - vOffset;
+    
+    elements.push(
+      <line
+        key="v-height-ext1"
+        x1={offsetX - 5}
+        y1={offsetY}
+        x2={heightDimX + extLength}
+        y2={offsetY}
+        stroke={dimColor}
+        strokeWidth="1"
+      />
+    );
+    elements.push(
+      <line
+        key="v-height-ext2"
+        x1={offsetX - 5}
+        y1={offsetY + params.height * scale}
+        x2={heightDimX + extLength}
+        y2={offsetY + params.height * scale}
+        stroke={dimColor}
+        strokeWidth="1"
+      />
+    );
+    
     elements.push(
       <line
         key="v-height"
@@ -604,41 +534,18 @@ const renderDetailedDimensions = (
         y2={offsetY + params.height * scale}
         stroke={dimColor}
         strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
         markerEnd="url(#arrow-end)"
         markerStart="url(#arrow-start)"
       />
     );
-    elements.push(
-      <line
-        key="v-height-ext1"
-        x1={heightDimX - extLength / 2}
-        y1={offsetY}
-        x2={heightDimX + extLength / 2}
-        y2={offsetY}
-        stroke={dimColor}
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-      />
-    );
-    elements.push(
-      <line
-        key="v-height-ext2"
-        x1={heightDimX - extLength / 2}
-        y1={offsetY + params.height * scale}
-        x2={heightDimX + extLength / 2}
-        y2={offsetY + params.height * scale}
-        stroke={dimColor}
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-      />
-    );
+    
     elements.push(
       <DimensionText
         key="v-height-text"
-        x={heightDimX - 10}
-        y={offsetY + (params.height * scale) / 2}
-        text={`${params.height.toFixed(1)}`}
+        x={heightDimX - textOffset - 4}
+        y={offsetY + (params.height * scale) / 2 + 5}
+        text={`${params.height.toFixed(0)}`}
+        anchor="end"
       />
     );
   }
@@ -676,53 +583,59 @@ const SpacingDiagram = ({
       }
     }
 
-    const gaugeFallback = gaugeValues[0] || 50;
     const edgeRaw = toNumber(edge);
-    const edgeDist = Number.isFinite(edgeRaw) && edgeRaw > 0 ? edgeRaw : gaugeFallback;
+    const edgeDist = Number.isFinite(edgeRaw) && edgeRaw > 0 ? edgeRaw : undefined;
 
     const endRaw = toNumber(end);
-    const endDist = Number.isFinite(endRaw) && endRaw > 0 ? endRaw : gaugeFallback;
+    const endDist = Number.isFinite(endRaw) && endRaw > 0 ? endRaw : undefined;
 
     const pitchRaw = toNumber(pitch);
-    const pitchDist =
-      Number.isFinite(pitchRaw) && pitchRaw > 0
-        ? pitchRaw
-        : boltRows > 1
-        ? gaugeFallback
-        : gaugeFallback;
+    const pitchDist = Number.isFinite(pitchRaw) && pitchRaw > 0 ? pitchRaw : undefined;
 
-    const widthFallback =
-      toNumber(plateWidth) ||
-      edgeDist * 2 + gaugeFallback * Math.max(boltCols - 1, 0) + 50;
-    const heightFallback =
-      toNumber(plateHeight) ||
-      endDist * 2 + pitchDist * Math.max(boltRows - 1, 0) + 50;
-
-    const width = clampPositive(plateWidth, widthFallback);
-    const height = clampPositive(plateHeight, heightFallback);
-    const holeDia = clampPositive(
-      holeDiameter,
-      Math.min(width, height) * 0.04
-    );
-
-    // Normalise gauges after width fallback
-    if (!gaugeValues.length) {
-      gaugeValues = [gaugeFallback];
+    // All calculations should come from osdag_core - no fallback calculations
+    const width = toNumber(plateWidth);
+    const height = toNumber(plateHeight);
+    
+    // If required dimensions are missing, return early with error state
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+      console.warn('SpacingDiagram: Missing required plateWidth or plateHeight from backend');
+      return {
+        width: 0,
+        height: 0,
+        boltRows,
+        boltCols,
+        edgeDist: edgeDist || 0,
+        endDist: endDist || 0,
+        pitchDist: pitchDist || 0,
+        gaugeValues,
+        holeDia: 0,
+        weld: Math.max(0, toNumber(weldSize, 0)),
+        error: 'Missing plate dimensions from backend',
+      };
     }
-    gaugeValues = gaugeValues.map((value) =>
-      clampPositive(value, width / Math.max(boltCols, 1))
-    );
+    
+    // Hole diameter should come from backend, but if missing use 0 (no holes for welded connections)
+    const holeDia = toNumber(holeDiameter);
+    
+    // All gauge values should come from backend - no fallback normalization
+    if (!gaugeValues.length) {
+      // If no gauge values from backend, use the provided gauge value
+      const singleGauge = toNumber(gauge);
+      if (Number.isFinite(singleGauge) && singleGauge > 0) {
+        gaugeValues = [singleGauge];
+      }
+    }
 
     return {
       width,
       height,
       boltRows,
       boltCols,
-      edgeDist,
-      endDist,
-      pitchDist,
+      edgeDist: edgeDist || 0,
+      endDist: endDist || 0,
+      pitchDist: pitchDist || 0,
       gaugeValues,
-      holeDia,
+      holeDia: holeDia || 0,
       weld: Math.max(0, toNumber(weldSize, 0)),
     };
   }, [plateWidth, plateHeight, rows, cols, edge, end, pitch, gauge, holeDiameter, weldSize]);
@@ -760,48 +673,39 @@ const SpacingDiagram = ({
       role="img"
     >
       <defs>
-        <style>
-          {`
-            .spacing-diagram rect,
-            .spacing-diagram line,
-            .spacing-diagram circle {
-              vector-effect: non-scaling-stroke;
-            }
-          `}
-        </style>
         <marker
           id="arrow-start"
-          markerWidth="6"
-          markerHeight="6"
-          refX="0"
-          refY="3"
-          orient="auto"
+          markerWidth="8"
+          markerHeight="8"
+          refX="8"
+          refY="4"
+          orient="auto-start-reverse"
           markerUnits="strokeWidth"
         >
-          <path d="M 0 0 L 6 3 L 0 6 Z" fill="var(--spacing-diagram-dim, #333)" />
+          <path d="M 8 4 L 0 0 L 0 8 Z" fill="#000" />
         </marker>
         <marker
           id="arrow-end"
-          markerWidth="6"
-          markerHeight="6"
-          refX="6"
-          refY="3"
+          markerWidth="8"
+          markerHeight="8"
+          refX="0"
+          refY="4"
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <path d="M 0 0 L 6 3 L 0 6 Z" fill="var(--spacing-diagram-dim, #333)" />
+          <path d="M 8 4 L 0 0 L 0 8 Z" fill="#000" />
         </marker>
       </defs>
+      
       {/* Plate */}
       <rect
         x={offsetX}
         y={offsetY}
         width={numericParams.width * scale}
         height={numericParams.height * scale}
-        fill="none"
-        stroke="var(--spacing-diagram-border, #0b61a4)"
+        fill="#b8b8a0"
+        stroke="#000"
         strokeWidth="2"
-        vectorEffect="non-scaling-stroke"
       />
 
       {/* Optional weld strip */}
@@ -814,7 +718,6 @@ const SpacingDiagram = ({
           fill="rgba(220, 20, 60, 0.2)"
           stroke="rgba(220, 20, 60, 0.6)"
           strokeWidth="2"
-          vectorEffect="non-scaling-stroke"
         />
       )}
 
@@ -827,9 +730,8 @@ const SpacingDiagram = ({
             cy={offsetY + rowY * scale}
             r={(numericParams.holeDia / 2) * scale}
             fill="none"
-            stroke="var(--spacing-diagram-hole, #ce3f3f)"
-            strokeWidth="1.5"
-            vectorEffect="non-scaling-stroke"
+            stroke="#a0522d"
+            strokeWidth="2"
           />
         ))
       )}
@@ -849,4 +751,3 @@ const SpacingDiagram = ({
 };
 
 export default SpacingDiagram;
-

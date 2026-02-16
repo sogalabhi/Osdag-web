@@ -120,7 +120,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
 def create_module() -> Tension_welded:
     """Create an instance of the Tension_welded module design class and set it up for use"""
     module = Tension_welded()
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     return module
 
 

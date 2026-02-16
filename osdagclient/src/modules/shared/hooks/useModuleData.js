@@ -18,8 +18,14 @@ export const useModuleData = (getModuleData, designType) => {
     sectionProfileList: [],
     channelList: [],
     sectionDesignation: [],
+    profileList: [],
     coverPlateList: [],
     weldSizeList: [],
+    anchorDiameterList: [],
+    anchorGradeList: [],
+    footingGradeList: [],
+    weldTypeList: [],
+    anchorTypeList: [],
   });
 
   useEffect(() => {
@@ -44,8 +50,14 @@ export const useModuleData = (getModuleData, designType) => {
             sectionProfileList:pick('sectionProfileList','section_profile_list'),
             channelList:       pick('channelList',       'channel_list'),
             sectionDesignation:pick('sectionDesignation','section_designation'),
+            profileList:         pick('profileList',         'profile_list'),
             coverPlateList:    pick('coverPlateList',    'cover_plate_list'),
             weldSizeList:      pick('weldSizeList',      'weld_size_list'),
+            anchorDiameterList:pick('anchorDiameterList','anchor_diameter_list'),
+            anchorGradeList:   pick('anchorGradeList',   'anchor_grade_list'),
+            footingGradeList:  pick('footingGradeList',  'footing_grade_list'),
+            weldTypeList:      pick('weldTypeList',      'weld_type_list'),
+            anchorTypeList:    pick('anchorTypeList',    'anchor_type_list'),
           });
         }
       } catch (error) {
