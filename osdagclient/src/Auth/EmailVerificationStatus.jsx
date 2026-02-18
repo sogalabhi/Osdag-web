@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Badge, Button, Alert, Space, Spin } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, MailOutlined, ReloadOutlined } from '@ant-design/icons';
-import { auth } from '../Auth/firebase';
+import { auth } from './firebase';
 import { resendEmailVerification } from '../utils/firebaseAuth';
 
 /**

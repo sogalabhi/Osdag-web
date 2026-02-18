@@ -1,10 +1,10 @@
-import { useThree, useFrame } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import { useEffect } from "react";
 
 async function saveImageWithDialog(canvas) {
   try {
     // Check if File System Access API is supported
-    if ('showSaveFilePicker' in window) {
+    if ("showSaveFilePicker" in window) {
       const options = {
         types: [
           {
@@ -53,9 +53,12 @@ async function saveImageWithDialog(canvas) {
       }
     } else {
       // Fallback for browsers that don't support File System Access API
-      const format = prompt("Enter image format (png, jpeg, jpg, bmp):", "png");
+      const format = prompt(
+        "Enter image format (png, jpeg, jpg, bmp):",
+        "png"
+      );
       if (!format) return;
-      
+
       const allowedFormats = ["png", "jpeg", "jpg", "bmp"];
       if (!allowedFormats.includes(format.toLowerCase())) {
         alert("Invalid format. Please choose from: png, jpeg, jpg, bmp");
@@ -94,8 +97,12 @@ async function saveImageWithDialog(canvas) {
   }
 }
 
-const ScreenshotCapture = ({ screenshotTrigger, setScreenshotTrigger, selectedView }) => {
-  const { gl, scene, camera, invalidate } = useThree();
+const ScreenshotCapture = ({
+  screenshotTrigger,
+  setScreenshotTrigger,
+  selectedView,
+}) => {
+  const { gl, invalidate } = useThree();
 
   useEffect(() => {
     const runScreenshot = async () => {
@@ -105,9 +112,10 @@ const ScreenshotCapture = ({ screenshotTrigger, setScreenshotTrigger, selectedVi
         return;
       }
 
-      invalidate(); // 🔥 Force R3F to re-render the next frame properly
+      // Force R3F to re-render the next frame properly
+      invalidate();
 
-      await new Promise((resolve) => requestAnimationFrame(resolve)); // 🔥 wait until the frame is ready
+      await new Promise((resolve) => requestAnimationFrame(resolve));
 
       await saveImageWithDialog(gl.domElement);
 
@@ -117,9 +125,10 @@ const ScreenshotCapture = ({ screenshotTrigger, setScreenshotTrigger, selectedVi
     if (screenshotTrigger) {
       runScreenshot();
     }
-  }, [screenshotTrigger, gl, scene, camera, selectedView, setScreenshotTrigger, invalidate]);
+  }, [screenshotTrigger, gl, selectedView, setScreenshotTrigger, invalidate]);
 
   return null;
 };
 
 export default ScreenshotCapture;
+

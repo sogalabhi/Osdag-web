@@ -12,8 +12,7 @@ import {
     sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "../Auth/firebase";
-import axios from "axios";
-import { apiBase } from '../api';
+import { firebaseLoginWithToken } from '../datasources/authDataSource';
 
 /**
  * Get user-friendly error messages for Firebase auth errors
@@ -43,26 +42,14 @@ export const syncUserToBackend = async (firebaseUser) => {
         const idToken = await firebaseUser.getIdToken();
         console.log("Syncing user to backend. Token length:", idToken?.length || 0);
         
-        const response = await axios.post(`${apiBase}api/auth/firebase-login/`, {
-            token: idToken,
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
+        const data = await firebaseLoginWithToken(idToken);
+        console.log("Backend sync response payload:", data);
         
-        console.log("Backend sync response:", response.status, response.data);
-        const { data } = response;
-        
-        // Store user info
+        // Store user info for convenience
         localStorage.setItem("userType", "user");
         localStorage.setItem("email", firebaseUser.email || "");
-        // Store display name if available, otherwise use email prefix
         const displayName = firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "User";
         localStorage.setItem("username", displayName);
-        
-        // Backend no longer returns JWT tokens (Firebase token is used directly)
-        // Firebase token is automatically included in Authorization header for API calls
         
         return data;
     } catch (error) {

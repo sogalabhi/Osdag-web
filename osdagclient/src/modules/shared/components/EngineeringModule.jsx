@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { Modal, Button } from "antd";
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
 import {
@@ -21,15 +21,16 @@ import { DesignStatusModal } from "./DesignStatusModal";
 import { DESIGN_STATUS } from "../hooks/useDesignSubmission";
 import useViewCamera from "./btobViewCamera";
 import Model from "./CadViewer";
-import Logs from "../../../components/Logs";
+import Logs from "./Logs";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
-import ScreenshotCapture from "../../../components/ScreenShotCapture";
-import DesignPrefSections from "../../../components/DesignPrefSections";
+import ScreenshotCapture from "./ScreenShotCapture";
+import DesignPrefSections from "./DesignPrefSections";
 import GridSelector from "../utils/GridSelector";
 import { message, Modal as AntdModal } from 'antd';
 import { menuItems } from "../utils/moduleUtils";
 import { UI_STRINGS } from "../../../constants/UIStrings";
 import { isGuestUser } from "../../../utils/auth";
+import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -43,6 +44,7 @@ export const EngineeringModule = ({
   const designCompletedRef = useRef(false); // Track if we've already handled design completion
   const prevModuleRef = useRef(null); // Track previous module for change detection
   const prevProjectIdRef = useRef(null); // Track previous projectId for change detection
+  const lastLoadedProjectIdRef = useRef(null); // Prevent re-fetching same project (stops infinite GET loop)
 
   const {
     // Module data
@@ -129,7 +131,8 @@ export const EngineeringModule = ({
     
     // Service API (for project/OSI operations)
     service,
-    resetModuleState, // Exposed from hook for module change detection
+    resetModuleState,
+    contextData,
   } = useEngineeringModule(moduleConfig);
 
   const [showResetButton, setShowResetButton] = useState(false);
@@ -232,11 +235,18 @@ export const EngineeringModule = ({
   const [hoverText, setHoverText] = useState("");
   const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
   const location = useLocation();
+  const params = useParams();
 
+  // Project ID from path (e.g. /design/connections/shear/fin_plate/1) or query (?projectId=1)
   const getProjectIdFromUrl = () => {
-    const params = new URLSearchParams(location.search);
-    const pid = params.get('projectId');
-    return pid ? parseInt(pid, 10) : null;
+    const fromPath = params.projectId;
+    if (fromPath != null && fromPath !== '') {
+      const n = parseInt(fromPath, 10);
+      if (!Number.isNaN(n)) return n;
+    }
+    const searchParams = new URLSearchParams(location.search);
+    const fromQuery = searchParams.get('projectId');
+    return fromQuery ? parseInt(fromQuery, 10) : null;
   };
 
   // ===================================================================
@@ -293,7 +303,7 @@ export const EngineeringModule = ({
     // Update refs
     prevModuleRef.current = currentModule;
     prevProjectIdRef.current = currentProjectId;
-  }, [moduleConfig.designType, location.search, resetModuleState, clearDesignResults, isMobile]);
+  }, [moduleConfig.designType, location.search, location.pathname, resetModuleState, clearDesignResults, isMobile]);
 
   // ===================================================================
   // CLEANUP ON UNMOUNT - Clear state when component unmounts
@@ -309,22 +319,28 @@ export const EngineeringModule = ({
   // ===================================================================
   // PROJECT LOADING - Clear state before loading project inputs
   // ===================================================================
-  // Enforce project presence for authenticated users
+  // Enforce project presence for authenticated users. Only depend on URL so we don't re-run when
+  // service/setInputs/resetModuleState change (which would cause infinite GET /api/projects/1/).
+  const projectIdFromUrl = getProjectIdFromUrl();
   useEffect(() => {
     if (isGuestUser()) {
       console.info('[EngineeringModule] Guest mode detected: skipping project enforcement');
-      return; // guests can open without a project
-    }
-    const projectId = getProjectIdFromUrl();
-    if (!projectId || Number.isNaN(projectId)) {
-      message.warning('No active project. Redirecting to home.');
-      navigate('/');
       return;
     }
+    const projectId = projectIdFromUrl;
+    if (!projectId || Number.isNaN(projectId)) {
+      lastLoadedProjectIdRef.current = null;
+      message.warning('No active project. Redirecting to home.');
+      navigate('/home', { replace: true });
+      return;
+    }
+    // Prevent infinite loop: only fetch once per projectId
+    if (lastLoadedProjectIdRef.current === projectId) {
+      return;
+    }
+    lastLoadedProjectIdRef.current = projectId;
     (async () => {
       try {
-        // Clear design state FIRST before loading project
-        // This ensures we don't show stale design results from previous project
         resetModuleState();
         clearDesignResults();
         setIsDesignComplete(false);
@@ -333,14 +349,14 @@ export const EngineeringModule = ({
         setShowOptionsContainer(false);
         setIsInputLocked(false);
         designCompletedRef.current = false;
-        
+
         const result = await service.getProject(projectId);
         if (!result.success || !result.project) {
+          lastLoadedProjectIdRef.current = null;
           message.warning('Project not found. Redirecting to home.');
-          navigate('/');
+          navigate('/home', { replace: true });
           return;
         }
-        // Prefill inputs from saved project when opening by id
         if (result.project.inputs_json) {
           try {
             setInputs(result.project.inputs_json);
@@ -348,12 +364,21 @@ export const EngineeringModule = ({
             // ignore parse issues; user can overwrite via UI
           }
         }
+        // Normalize URL to path form: .../fin_plate/1 instead of .../fin_plate?projectId=1
+        const pathname = location.pathname;
+        const pathEndsWithId = pathname.endsWith(`/${projectId}`);
+        const hasQueryProjectId = new URLSearchParams(location.search).get('projectId') != null;
+        if (!pathEndsWithId && hasQueryProjectId && moduleConfig.routePath) {
+          const basePath = moduleConfig.routePath.replace(/\/$/, '');
+          navigate(`${basePath}/${projectId}`, { replace: true });
+        }
       } catch (_e) {
+        lastLoadedProjectIdRef.current = null;
         message.warning('Cannot verify project. Redirecting to home.');
-        navigate('/');
+        navigate('/home', { replace: true });
       }
     })();
-  }, [location.search, service, setInputs, navigate, resetModuleState, clearDesignResults]);
+  }, [projectIdFromUrl]); // eslint-disable-line react-hooks/exhaustive-deps -- intentionally stable deps to avoid infinite GET
 
   // Only change dock visibility after design is complete
   useEffect(() => {
@@ -671,37 +696,7 @@ export const EngineeringModule = ({
     const projectName = inputs?.project_name || inputs?.name || moduleConfig?.sessionName || 'project';
 
     try {
-      // Expand inputs for any multi-selects where "All" is selected so arrays are populated
-      const expandAllSelectedInputs = (baseInputs) => {
-        const keyToFullListMap = {
-          bolt_diameter: boltDiameterList,
-          bolt_grade: propertyClassList,
-          plate_thickness: thicknessList,
-          flange_plate_thickness: thicknessList,
-          web_plate_thickness: thicknessList,
-          angle_list: angleList,
-          topangle_list: angleList,
-          cleat_section: angleList,
-        };
-        const expanded = { ...baseInputs };
-        Object.keys(keyToFullListMap).forEach((inputKey) => {
-          if (allSelected?.[inputKey]) {
-            const fullList = keyToFullListMap[inputKey] || [];
-            // Normalize values to strings like the UI does
-            expanded[inputKey] = Array.isArray(fullList)
-              ? fullList.map((val) => {
-                if (typeof val === 'object' && val !== null) {
-                  return val.value || val.Grade || String(val);
-                }
-                return String(val);
-              })
-              : [];
-          }
-        });
-        return expanded;
-      };
-
-      const inputsForSave = expandAllSelectedInputs(inputs);
+      const inputsForSave = expandAllSelectedInputs(inputs, allSelected, contextData);
       if (userIsGuest) {
         // Guest: OSI download flow using service
         const result = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, false);
@@ -817,29 +812,6 @@ export const EngineeringModule = ({
   };
 
   const options = getViewOptions();
-  // Include all module data for dropdowns (Base Plate: anchorDiameterList, anchorGradeList, footingGradeList, weldTypeList, anchorTypeList, etc.)
-  const contextData = {
-    beamList,
-    columnList,
-    connectivityList,
-    materialList,
-    boltDiameterList,
-    thicknessList,
-    propertyClassList,
-    angleList,
-    boltTypeList,
-    sectionProfileList,
-    channelList,
-    sectionDesignation,
-    coverPlateList,
-    weldSizeList,
-    profileList,
-    anchorDiameterList,
-    anchorGradeList,
-    footingGradeList,
-    weldTypeList,
-    anchorTypeList,
-  };
 
   const triggerScreenshotCapture = () => {
     setScreenshotTrigger(true);
@@ -922,6 +894,7 @@ export const EngineeringModule = ({
                 setExtraState({ ...extraState, selectedOption: value })
               }
               cadModelPaths={cadModelPaths}
+              contextData={contextData}
             />
           ))}
 

@@ -3,34 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import ProjectNameModal from '../components/ProjectNameModal';
 import { isGuestUser, canCreateProjects } from '../../utils/auth';
 import { message } from 'antd';
-import { MODULE_KEY_FIN_PLATE } from '../../constants/DesignKeys';
-
-const MODULE_ROUTES = {
-  fp: "/design/connections/shear/fin_plate",
-  [MODULE_KEY_FIN_PLATE]: "/design/connections/shear/fin_plate",
-  ca: "/design/connections/shear/cleat_angle",
-  ep: "/design/connections/shear/end_plate",
-  sa: "/design/connections/shear/seatAngle",
-  cpb: "/design/connections/beam-to-beam-splice/cover_plate_bolted",
-  cpw: "/design/connections/beam-to-beam-splice/cover_plate_welded",
-  boltedtoendplate: "/design/tension-member/bolted_to_end_gusset",
-  weldedtoendplate: "/design/tension-member/welded_to_end_gusset",
-  bp: "/design/connections/base_plate",
-};
+import { createProject } from "../../datasources/projectsDataSource";
+import { getModuleRoute } from "../../constants/moduleRoutes";
 
 const ModulesListCard = ({ items }) => {
   const navigate = useNavigate();
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
 
-  // Use Firebase token from auth utils
-  const getFirebaseToken = async () => {
-    const { getAccessToken } = await import('../../utils/auth');
-    return await getAccessToken();
-  };
-
   const handleModuleClick = (item) => {
-    const route = MODULE_ROUTES[item.module_id];
+    const route = getModuleRoute(item.module_id);
     if (!route) return;
     if (isGuestUser()) {
       navigate(route);
@@ -57,24 +39,20 @@ const ModulesListCard = ({ items }) => {
 
     try {
       const safeProjectName = (projectName || `${selectedModule.name} Project`).replace(/\s+/g, '_');
-      const token = await getFirebaseToken();
-      const response = await fetch('http://localhost:8000/api/projects/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: safeProjectName, module: selectedModule.parent, submodule: selectedModule.module_id }),
-      });
-      const data = await response.json();
-      const route = MODULE_ROUTES[selectedModule.module_id];
-      if (response.ok && data.success && route) {
-        navigate(`${route}?projectId=${encodeURIComponent(data.project_id)}`);
+      const payload = {
+        name: safeProjectName,
+        module: selectedModule.parent,
+        submodule: selectedModule.module_id,
+      };
+      const data = await createProject(payload);
+      const route = getModuleRoute(selectedModule.module_id);
+      if (data.success && route) {
+        navigate(`${route}/${data.project_id}`);
       } else if (route) {
         navigate(route);
       }
     } catch (_e) {
-      const route = MODULE_ROUTES[selectedModule.module_id];
+      const route = getModuleRoute(selectedModule.module_id);
       if (route) navigate(route);
     } finally {
       setShowProjectModal(false);

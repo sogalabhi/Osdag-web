@@ -28,9 +28,10 @@ import {
   MODULE_KEY_TENSION_BOLTED,
   MODULE_KEY_TENSION_WELDED,
   MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
-  MODULE_DISPLAY_FIN_PLATE,
 } from '../../constants/DesignKeys';
-import { apiBase } from "../../api";
+import { getProjectById } from "../../datasources/projectsDataSource";
+import { saveOsiFromInputs } from "../../datasources/osiDataSource";
+import { getModuleRoute } from "../../constants/moduleRoutes";
 
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
   const [projects, setProjects] = React.useState(projectsProp);
@@ -57,15 +58,6 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   const [reportExtraState, setReportExtraState] = React.useState({});
   const navigate = useNavigate();
 
-  // const BASE_URL = 'http://localhost:8000/api/';
-  const BASE_URL = `${apiBase}`;
-
-  // Use Firebase token from auth utils
-  const getFirebaseToken = async () => {
-    const { getAccessToken } = await import('../../utils/auth');
-    return await getAccessToken();
-  };
-
   const isGuest = isGuestUser();
   const userEmail = getCurrentUserEmail();
 
@@ -75,33 +67,14 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
       setLoading(false);
       return;
     }
-    if (!projectsProp || projectsProp.length === 0) {
-      const fetchRecentProjects = async () => {
-        setLoading(true);
-        try {
-          const res = await fetch(`${BASE_URL}api/projects/`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${await getFirebaseToken()}`,
-            },
-          });
-          const data = await res.json();
-          if (res.ok && data.success) {
-            setProjects(data.projects || []);
-          } else {
-            message.error(data.error || 'Failed to load projects');
-          }
-        } catch (_e) {
-          message.error('Failed to load projects');
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchRecentProjects();
-    } else {
+    // If parent didn't provide projects, rely on MainContent's datasource-driven list
+    if (projectsProp && projectsProp.length > 0) {
       setProjects(projectsProp);
       setLoading(loadingProp);
+    } else {
+      // No projects passed in and user is not guest: show empty state
+      setProjects([]);
+      setLoading(false);
     }
   }, [isGuest, projectsProp, loadingProp]);
 
@@ -151,54 +124,18 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   };
 
   const fetchProjectDetail = async (projectId) => {
-    const token = await getFirebaseToken();
-    const res = await fetch(`${BASE_URL}api/projects/${projectId}/`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.error || 'Failed to load project');
+    const data = await getProjectById(projectId);
+    if (!data.success) throw new Error(data.error || 'Failed to load project');
     return data.project;
   };
 
   const handleOpenProject = async (project) => {
     try {
-      const token = await getFirebaseToken();
-      const response = await fetch(`${BASE_URL}api/projects/${project.id}/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
+      const data = await getProjectById(project.id);
       if (data.success) {
-        const moduleRoutes = {
-          fp: '/design/connections/shear/fin_plate',
-          ca: '/design/connections/shear/cleat_angle',
-          ep: '/design/connections/shear/end_plate',
-          sa: '/design/connections/shear/seatAngle',
-          cpb: '/design/connections/beam-to-beam-splice/cover_plate_bolted',
-          cpw: '/design/connections/beam-to-beam-splice/cover_plate_welded',
-          boltedtoendplate: '/design/tension-member/bolted_to_end_gusset',
-          ssb: '/design/FlexureMember/simply_supported_beam',
-          [MODULE_KEY_FIN_PLATE]: '/design/connections/shear/fin_plate',
-          [MODULE_KEY_END_PLATE]: '/design/connections/shear/end_plate',
-          [MODULE_KEY_CLEAT_ANGLE]: '/design/connections/shear/cleat_angle',
-          [MODULE_KEY_SEAT_ANGLE]: '/design/connections/shear/seatAngle',
-          [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED]: '/design/connections/beam-to-beam-splice/cover_plate_bolted',
-          [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED]: '/design/connections/beam-to-beam-splice/cover_plate_welded',
-          [MODULE_KEY_BEAM_BEAM_END_PLATE_ALT]: '/design/connections/beam-to-beam-splice/end_plate',
-          [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: '/design/connections/column-beam/end_plate',
-          [MODULE_KEY_TENSION_BOLTED]: '/design/tension-member/bolted_to_end_gusset',
-          [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: '/design/FlexureMember/simply_supported_beam',
-        };
-        const route = moduleRoutes[project.module_id];
+        const route = getModuleRoute(project.module_id);
         if (route) {
-          navigate(`${route}?projectId=${encodeURIComponent(project.id)}`);
+          navigate(`${route}/${project.id}`);
         } else {
           message.error('Module route not found');
         }
@@ -212,26 +149,22 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
 
   const handleDownloadOsi = async (project) => {
     try {
-      const token = await getFirebaseToken();
-      const detailRes = await fetch(`${BASE_URL}api/projects/${project.id}/`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      });
-      const detail = await detailRes.json();
-      if (!detailRes.ok || !detail.success) {
+      const detailRes = await getProjectById(project.id);
+      if (!detailRes.success) {
         message.error('Failed to load project');
         return;
       }
-      const inputs = detail.project?.inputs_json || {};
-      const module_id = detail.project?.submodule || detail.project?.module || MODULE_KEY_FIN_PLATE;
+      const projectDetail = detailRes.project;
+      const inputs = projectDetail?.inputs_json || {};
+      const module_id = projectDetail?.submodule || projectDetail?.module || MODULE_KEY_FIN_PLATE;
 
-      const saveRes = await fetch(`${BASE_URL}api/save-osi-from-inputs/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ name: project.name, module_id, inputs, inline: true }),
+      const data = await saveOsiFromInputs({
+        name: project.name,
+        moduleId: module_id,
+        inputs,
+        inline: true,
       });
-      const data = await saveRes.json();
-      if (!saveRes.ok || !data.success || !data.content_base64) {
+      if (!data.success || !data.content_base64) {
         message.error(data.error || 'Failed to prepare OSI');
         return;
       }

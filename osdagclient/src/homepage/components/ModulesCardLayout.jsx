@@ -12,7 +12,7 @@ import {
 } from "../../constants/modules";
 
 import SectionCards from "./SectionCards";
-import { apiBase } from "../../api";
+import { createProject } from "../../datasources/projectsDataSource";
 
 const TabbedModulePage = () => {
   const moduleName = window.location.pathname.split("/")[1];
@@ -72,24 +72,15 @@ const TabbedModulePage = () => {
 
     const safeProjectName = (projectName || `${selectedModule.label} Project`).replace(/\s+/g, "_");
     try {
-      const token = await getAccessToken();
-      const response = await fetch(`${apiBase}api/projects/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: safeProjectName,
-          module_id: selectedModule.key,
-          module_name: selectedModule.label,
-          user_email: getCurrentUserEmail(),
-        }),
-      });
-
-      const data = await response.json();
+      const payload = {
+        name: safeProjectName,
+        module_id: selectedModule.key,
+        module_name: selectedModule.label,
+        user_email: getCurrentUserEmail(),
+      };
+      const data = await createProject(payload);
       if (data.success) {
-        navigate(`${selectedModule.route}?projectId=${encodeURIComponent(data.project_id)}`);
+        navigate(`${selectedModule.route}/${data.project_id}`);
       } else {
         navigate(selectedModule.route);
       }

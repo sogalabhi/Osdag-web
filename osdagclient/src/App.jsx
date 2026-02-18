@@ -10,10 +10,8 @@ import { Worker } from "@react-pdf-viewer/core";
 
 import { GlobalProvider } from "./context/GlobalState";
 import { ModuleProvider } from "./context/ModuleState";
-import { UserProvider } from "./context/UserState";
 
 // User components
-import UserAccount from "./Auth/UserAccount";
 import LoginPage from "./Auth/LoginPage";
 
 // Homepage components
@@ -65,7 +63,6 @@ function App() {
         {/* Root and home routes */}
         <Route path="/" element={<LoginPage />} />
         <Route path="/home" element={<Homepage />} />
-        <Route path="/user" element={<UserAccount />} />
         <Route path="/:moduleName" element={<SelectModulePage />} />
 
         {/* Design routes grouped with dynamic designType */}
@@ -98,15 +95,13 @@ function App() {
 
   return (
     <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-      <UserProvider>
-        <GlobalProvider>
-          <ModuleProvider>
-            <div className="app">
-              <RouterProvider router={router} />
-            </div>
-          </ModuleProvider>
-        </GlobalProvider>
-      </UserProvider>
+      <GlobalProvider>
+        <ModuleProvider>
+          <div className="app">
+            <RouterProvider router={router} />
+          </div>
+        </ModuleProvider>
+      </GlobalProvider>
     </Worker>
   );
 }

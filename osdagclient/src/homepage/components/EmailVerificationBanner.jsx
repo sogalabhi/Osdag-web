@@ -1,9 +1,7 @@
 import { Alert, Button, Space } from 'antd';
 import { MailOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { auth } from '../Auth/firebase';
-import { resendEmailVerification } from '../utils/firebaseAuth';
 import React, { useState, useEffect } from 'react';
-import { message } from 'antd';
+import { resendEmailVerification } from '../../utils/firebaseAuth';
 
 /**
  * Email Verification Banner Component
@@ -87,10 +85,11 @@ export const EmailVerificationBanner = ({ user, onVerified }) => {
     setIsResending(true);
     try {
       await resendEmailVerification(user);
-      message.success('Verification email sent! Please check your inbox.');
+      // Localized success messaging handled via parent if needed
       setResendCooldown(60); // 60 second cooldown
     } catch (error) {
-      message.error(error.message || 'Failed to send verification email. Please try again.');
+      // Parent or global handler can show error message
+      console.error('Error resending verification email:', error);
     } finally {
       setIsResending(false);
     }

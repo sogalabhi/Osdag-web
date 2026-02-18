@@ -6,8 +6,7 @@ import AppReducer from './AppReducer';
     This file contains the GlobalState and GlobalProvider components which are used to manage the state of the application.
 */
 
-import axios from 'axios';
-import { apiBase } from '../api';
+import { fetchCatalogRoot, fetchDesignTypes, fetchSubDesignTypes, fetchLeafDesignType } from '../datasources/catalogDataSource';
 
 //initial state
 let initialValue = {
@@ -19,9 +18,6 @@ let initialValue = {
     fetch_cache: '',
 }
 
-// const BASE_URL = 'http://127.0.0.1:8000/'
-const BASE_URL = `${apiBase}`;
-
 //create context
 export const GlobalContext = createContext(initialValue);
 
@@ -32,20 +28,18 @@ export const GlobalProvider = ({ children }) => {
     //action
     const getInitialData = async () => {
         try {
-            const response = await axios.get(BASE_URL + "osdag-web/");
-            const data = response.data.result;
+            const data = await fetchCatalogRoot();
             dispatch({ type: 'GET_MODULES', payload: data });
         } catch (error) {
             console.error(error);
         }
     }
     const getDesignTypes = async (conn_type) => {
-        const URL = `${BASE_URL}osdag-web/${conn_type}`
-        if (initialValue.fetch_cache === URL) return;
-        initialValue.fetch_cache = URL;
+        const URL_KEY = `designTypes:${conn_type}`;
+        if (initialValue.fetch_cache === URL_KEY) return;
+        initialValue.fetch_cache = URL_KEY;
         try {
-            const response = await axios.get(URL);
-            const data = response.data.result;
+            const data = await fetchDesignTypes(conn_type);
             dispatch({ type: 'GET_DESIGNTYPES', payload: data });
         } catch (error) {
             dispatch({ type: 'SET_ERR_MSG', payload: '' });
@@ -55,8 +49,7 @@ export const GlobalProvider = ({ children }) => {
 
     const getSubDesignTypes = async (designType, name) => {
         try {
-            const response = await axios.get(`${BASE_URL}osdag-web/${designType}/${name.toLowerCase().replaceAll("_", '-')}`);
-            const data = response.data.result;
+            const data = await fetchSubDesignTypes(designType, name);
             dispatch({ type: 'GET_SUB_DESIGNTYPES', payload: data });
         } catch (error) {
             dispatch({ type: 'SET_ERR_MSG_SUB', payload: '' });
@@ -66,8 +59,7 @@ export const GlobalProvider = ({ children }) => {
 
     const getLeafLevelDesignType = async (designType, prev, name) => {
         try {
-            const response = await axios.get(`${BASE_URL}osdag-web/${designType}/${prev.toLowerCase().replaceAll("_", '-')}/${name.toLowerCase().replaceAll("_", '-')}`);
-            const data = response.data.result;
+            const data = await fetchLeafDesignType(designType, prev, name);
             dispatch({ type: 'GET_LEAF_DESIGNTYPES', payload: data });
         } catch (error) {
             dispatch({ type: 'SET_ERR_MSG_LEAF', payload: '' });

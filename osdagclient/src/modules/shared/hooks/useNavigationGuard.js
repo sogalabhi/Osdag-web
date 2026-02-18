@@ -29,7 +29,15 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
 
     const handlePopState = () => {
       if (hasUnsavedWork && !allowNavigation) {
-        window.history.pushState(null, "", routePath);
+        try {
+          // Preserve the full current path (including projectId) so we don't
+          // lose the project context when trapping the back button.
+          const currentPath = window.location.pathname;
+          window.history.pushState(null, "", currentPath);
+        } catch (e) {
+          // pushState can throw "The operation is insecure" in some contexts (e.g. post-login redirect, iframe)
+          if (e?.name !== "SecurityError") throw e;
+        }
         setConfirmationType("navigation");
         setNavigationSource("back");
         setShowConfirmation(true);
@@ -47,8 +55,15 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
 
   // Ensure there's a history entry to trap back navigation when work is unsaved
   useEffect(() => {
-    if (hasUnsavedWork) {
-      window.history.pushState(null, "", window.location.pathname);
+    if (!hasUnsavedWork) return;
+    try {
+      const path = window.location.pathname;
+      if (path && window.location.origin) {
+        window.history.pushState(null, "", path);
+      }
+    } catch (e) {
+      // pushState can throw "The operation is insecure" (e.g. post-login, iframe, or restricted context)
+      if (e?.name !== "SecurityError") throw e;
     }
   }, [hasUnsavedWork]);
 

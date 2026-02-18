@@ -4,7 +4,7 @@ const Logs = ({ logs }) => {
   // Ensure logs is always an array, even if null/undefined is passed
   const safeLogs = logs || [];
   // Reverse the logs so that the most recent log appears at the top
-const reversedLogs = [...safeLogs].reverse();
+  const reversedLogs = [...safeLogs].reverse();
   
   return (
     <div className="h-full bg-white dark:bg-osdag-dark-color dark:text-white p-4 font-mono text-sm overflow-y-auto">
@@ -40,17 +40,26 @@ const reversedLogs = [...safeLogs].reverse();
             return (
               <div key={index} className="mb-1">
                 <div className="flex items-start space-x-2">
-                  <span className={`${
-                    logType === 'error' ? 'text-red-400' : 
-                    logType === 'warning' ? 'text-yellow-400' : 
-                    logType === 'success' ? 'text-green-400' : 
-                    'text-blue-400'
-                  }`}>
+                  <span
+                    className={`${
+                      logType === 'error'
+                        ? 'text-red-400'
+                        : logType === 'warning'
+                        ? 'text-yellow-400'
+                        : logType === 'success'
+                        ? 'text-green-400'
+                        : 'text-blue-400'
+                    }`}
+                  >
                     [{logType.toUpperCase()}]
                   </span>
-                  <span className={`break-words flex-1${
-                    logMessage === '=== End Of Design ===' ? ' text-osdag-green font-semibold' : ''
-                  }`}>
+                  <span
+                    className={`break-words flex-1${
+                      logMessage === '=== End Of Design ==='
+                        ? ' text-osdag-green font-semibold'
+                        : ''
+                    }`}
+                  >
                     {logMessage}
                   </span>
                   {logTimestamp && (
@@ -69,3 +78,4 @@ const reversedLogs = [...safeLogs].reverse();
 };
 
 export default Logs;
+

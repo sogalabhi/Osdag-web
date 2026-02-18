@@ -2,25 +2,9 @@ import React, { useEffect, useState } from 'react';
 import DashboardSectionCard from './DashboardSectionCard';
 import ProjectsListCard from './ProjectsListCard';
 import ModulesListCard from './ModulesListCard';
-import { isGuestUser, getCurrentUserEmail, getAccessToken } from '../../utils/auth';
-import {
-  MODULE_KEY_FIN_PLATE,
-  MODULE_DISPLAY_FIN_PLATE,
-  MODULE_KEY_SEAT_ANGLE,
-  MODULE_DISPLAY_SEAT_ANGLE,
-  MODULE_KEY_CLEAT_ANGLE,
-  MODULE_DISPLAY_CLEAT_ANGLE,
-  MODULE_KEY_END_PLATE,
-  MODULE_DISPLAY_END_PLATE,
-  MODULE_KEY_BEAM_COLUMN_END_PLATE,
-  MODULE_KEY_BEAM_BEAM_END_PLATE,
-  MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED,
-  MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED,
-  MODULE_KEY_TENSION_BOLTED,
-  MODULE_KEY_TENSION_WELDED,
-  MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
-} from '../../constants/DesignKeys';
-import { apiBase } from "../../api";
+import { isGuestUser, getCurrentUserEmail } from '../../utils/auth';
+import { getModuleDisplayName } from '../../constants/moduleNames';
+import { listProjects, deleteProject as deleteProjectApi } from "../../datasources/projectsDataSource";
 
 const MainContent = () => {
   const isGuest = isGuestUser();
@@ -40,33 +24,24 @@ const MainContent = () => {
   const fetchRecentProjects = async () => {
     setLoading(true);
     try {
-      // const url = `http://localhost:8000/api/projects/`;
-      const url = `${apiBase}api/projects/`;
-      const token = getAccessToken();
-      const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } });
-      const data = await response.json();
-      if (data.success) {
+      const data = await listProjects();
+      if (data.success && Array.isArray(data.projects)) {
         setProjects(data.projects);
-      } else {
       }
     } catch (e) {
-      // handle error
+      // swallow; UI will just show empty state
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Add a handler to delete a project and refresh the list
   const handleDeleteProject = async (projectId) => {
     try {
-      const token = getAccessToken();
-      await fetch(`${apiBase}api/projects/${projectId}/`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      });
-      // Refresh the list after deletion
+      await deleteProjectApi(projectId);
       fetchRecentProjects();
     } catch (e) {
-      // handle error
+      // ignore; ProjectsListCard will show its own error if needed
     }
   };
 
@@ -87,32 +62,6 @@ const MainContent = () => {
     module_id: project.module_id,
     project_id: project.id,
   }));
-
-  function getModuleDisplayName(moduleId) {
-    const moduleNames = {
-      fp: MODULE_DISPLAY_FIN_PLATE,
-      ca: MODULE_DISPLAY_CLEAT_ANGLE,
-      ep: 'End Plate Connection',
-      sa: MODULE_DISPLAY_SEAT_ANGLE,
-      cpb: 'Cover Plate Bolted',
-      cpw: 'Cover Plate Welded',
-      boltedtoendplate: 'Tension Member Bolted',
-      ssb: 'Simply Supported Beam',
-      pg: 'Plate Girder',
-      [MODULE_KEY_FIN_PLATE]: MODULE_DISPLAY_FIN_PLATE,
-      [MODULE_KEY_CLEAT_ANGLE]: MODULE_DISPLAY_CLEAT_ANGLE,
-      [MODULE_KEY_END_PLATE]: MODULE_DISPLAY_END_PLATE,
-      [MODULE_KEY_SEAT_ANGLE]: MODULE_DISPLAY_SEAT_ANGLE,
-      [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED]: 'Cover Plate Bolted',
-      [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED]: 'Cover Plate Welded',
-      [MODULE_KEY_BEAM_BEAM_END_PLATE]: 'Beam-Beam End Plate',
-      [MODULE_KEY_BEAM_COLUMN_END_PLATE]: 'Beam-Column End Plate',
-      [MODULE_KEY_TENSION_BOLTED]: 'Tension Member Bolted',
-      [MODULE_KEY_TENSION_WELDED]: 'Tension Member Welded',
-      [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: 'Simply Supported Beam',
-    };
-    return moduleNames[moduleId] || moduleId;
-  }
 
   return (
     <div className=" flex-1 px-12 pb-6">

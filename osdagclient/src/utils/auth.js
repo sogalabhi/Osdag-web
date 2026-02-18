@@ -30,8 +30,7 @@ export const getCurrentUserEmail = () => {
 };
 
 /**
- * Get Firebase ID token for API calls
- * This replaces the old JWT token system
+ * Get Firebase ID token for API calls.
  */
 export const getAccessToken = async () => {
   const user = auth.currentUser;

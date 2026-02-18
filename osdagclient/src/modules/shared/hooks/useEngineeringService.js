@@ -11,74 +11,27 @@
  * - DesignReportModal.jsx
  */
 
-import { useCallback, useMemo } from 'react';
-import { getAccessToken } from '../../../utils/auth';
-import { MODULE_SLUGS } from '../../../constants/apiRoutes';
-import { apiBase } from '../../../api';
+import { useCallback } from 'react';
 import { exportToCSV as exportToCSVUtil } from '../../../utils/csvUtils';
-
-/**
- * Get module slug from module key
- * @param {string} moduleKey - Module identifier
- * @returns {string} Module slug
- */
-const getSlug = (moduleKey) => MODULE_SLUGS[moduleKey] || moduleKey;
-
-// ===================================================================
-// API CLIENT HELPER
-// ===================================================================
-
-/**
- * Create API client helper
- * @param {string} baseUrl - Base API URL
- * @returns {Function} API call function
- */
-const createApiClient = (baseUrl) => {
-  return async (url, options = {}) => {
-    const token = await getAccessToken();
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
-      ...options.headers,
-    };
-
-    // Remove Content-Type for FormData
-    if (options.body instanceof FormData) {
-      delete headers['Content-Type'];
-    }
-
-    const response = await fetch(`${baseUrl}${url}`, {
-      ...options,
-      headers,
-      credentials: 'include',
-      mode: 'cors',
-    });
-
-    if (!response.ok) {
-      let errorMessage = `HTTP ${response.status}`;
-      try {
-        const errorData = await response.json().catch(() => ({}));
-        errorMessage = errorData.error || errorData.message || errorMessage;
-      } catch {
-        try {
-          const text = await response.text();
-          if (text) errorMessage = text;
-        } catch {}
-      }
-      throw new Error(errorMessage);
-    }
-
-    return response;
-  };
-};
+import {
+  fetchModuleOptions,
+  createDesign as dsCreateDesign,
+  createCad as dsCreateCad,
+  downloadCad as dsDownloadCad,
+  addCustomMaterial as dsAddCustomMaterial,
+  fetchDesignPreferences as dsFetchDesignPreferences,
+} from '../../../datasources/modulesDataSource';
+import { generateInitialReport as dsGenerateInitialReport, customizeReport as dsCustomizeReport } from '../../../datasources/reportsDataSource';
+import { saveOsiFromInputs as dsSaveOsiFromInputs } from '../../../datasources/osiDataSource';
+import { apiClient } from '../../../utils/apiClient';
+import { getModuleSlug } from '../../../constants/apiRoutes';
 
 // ===================================================================
 // MAIN HOOK
 // ===================================================================
 
 export const useEngineeringService = () => {
-  const BASE_URL = apiBase;
-  const apiCall = useMemo(() => createApiClient(BASE_URL), [BASE_URL]);
+  const apiCall = apiClient;
 
   // ===================================================================
   // 1. MODULE DATA - Get module options and data
@@ -93,28 +46,15 @@ export const useEngineeringService = () => {
    */
   const getModuleData = useCallback(async (moduleKey, options = {}) => {
     try {
-      if (!moduleKey) {
-        return { success: false, error: 'Module name is required' };
-      }
-
-      const slug = getSlug(moduleKey);
       const email = localStorage.getItem('email');
-      
-      let url = `api/modules/${slug}/options/`;
-      const params = new URLSearchParams();
-      if (options.connectivity) params.append('connectivity', options.connectivity);
-      if (email) params.append('email', email);
-      const qs = params.toString();
-      if (qs) url += `?${qs}`;
-
-      const response = await apiCall(url, { method: 'GET' });
-      const data = await response.json();
-
-      return { success: true, data };
+      return await fetchModuleOptions(moduleKey, {
+        connectivity: options.connectivity,
+        email,
+      });
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }, [apiCall]);
+  }, []);
 
   // ===================================================================
   // 2. DESIGN - Design calculation
@@ -128,20 +68,11 @@ export const useEngineeringService = () => {
    */
   const createDesign = useCallback(async (moduleKey, inputs) => {
     try {
-      const slug = getSlug(moduleKey);
-      const url = `api/modules/${slug}/design/`;
-      
-      const response = await apiCall(url, {
-        method: 'POST',
-        body: JSON.stringify({ inputs }),
-      });
-
-      const jsonResponse = await response.json();
-      return { status: response.status, body: jsonResponse };
+      return await dsCreateDesign(moduleKey, inputs);
     } catch (error) {
       return { status: 500, body: { success: false, error: error.message } };
     }
-  }, [apiCall]);
+  }, []);
 
   // ===================================================================
   // 3. CAD - 3D Model generation and download
@@ -155,18 +86,10 @@ export const useEngineeringService = () => {
    */
   const createCADModel = useCallback(async (moduleKey, inputs) => {
     try {
-      const slug = getSlug(moduleKey);
-      const url = `api/modules/${slug}/cad/`;
-
-      const response = await apiCall(url, {
-        method: 'POST',
-        body: JSON.stringify({ inputs }),
-      });
-
-      const data = await response.json();
+      const { status, data } = await dsCreateCad(moduleKey, inputs);
 
       // Handle "coming soon" status (200 with coming_soon status)
-      if (response.status === 200 && data.status === 'coming_soon') {
+      if (status === 200 && data.status === 'coming_soon') {
         return {
           success: false,
           coming_soon: true,
@@ -174,7 +97,7 @@ export const useEngineeringService = () => {
         };
       }
 
-      if (response.status === 201 && data.status === 'success') {
+      if (status === 201 && data.status === 'success') {
         return {
           success: true,
           files: data.files,
@@ -186,7 +109,7 @@ export const useEngineeringService = () => {
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }, [apiCall]);
+  }, []);
 
   /**
    * Download CAD model in specified format
@@ -195,20 +118,11 @@ export const useEngineeringService = () => {
    */
   const downloadCADModel = useCallback(async (format) => {
     try {
-      const response = await apiCall('api/design/downloadCad/', {
-        method: 'POST',
-        body: JSON.stringify({
-          format: format,
-          section: 'Model',
-        }),
-      });
-
-      const blob = await response.blob();
-      return { success: true, blob };
+      return await dsDownloadCad(format);
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }, [apiCall]);
+  }, []);
 
   /**
    * Design and generate CAD in one call
@@ -310,31 +224,11 @@ export const useEngineeringService = () => {
    */
   const saveOSIFromInputs = useCallback(async (name, moduleId, inputs, inline = false) => {
     try {
-      const response = await apiCall('api/save-osi-from-inputs/', {
-        method: 'POST',
-        body: JSON.stringify({
-          name,
-          module_id: moduleId,
-          inputs,
-          inline,
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        return {
-          success: true,
-          content_base64: data.content_base64,
-          filename: data.filename,
-          is_guest: data.is_guest,
-        };
-      } else {
-        return { success: false, error: data.error || 'Failed to save OSI file' };
-      }
+      return await dsSaveOsiFromInputs({ name, moduleId, inputs, inline });
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }, [apiCall]);
+  }, []);
 
   // ===================================================================
   // 6. REPORTS - Report generation
@@ -347,25 +241,11 @@ export const useEngineeringService = () => {
    */
   const generateInitialReport = useCallback(async (reportData) => {
     try {
-      const response = await apiCall('api/report/generate-initial/', {
-        method: 'POST',
-        body: JSON.stringify(reportData),
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        return {
-          success: true,
-          report_id: result.report_id,
-          sections: result.sections,
-        };
-      } else {
-        return { success: false, error: result.error || 'Failed to generate report' };
-      }
+      return await dsGenerateInitialReport(reportData);
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }, [apiCall]);
+  }, []);
 
   /**
    * Customize report (generate PDF)
@@ -375,20 +255,11 @@ export const useEngineeringService = () => {
    */
   const customizeReport = useCallback(async (reportId, selectedSections) => {
     try {
-      const response = await apiCall('api/report/customize/', {
-        method: 'POST',
-        body: JSON.stringify({
-          report_id: reportId,
-          selected_sections: selectedSections,
-        }),
-      });
-
-      const blob = await response.blob();
-      return { success: true, blob };
+      return await dsCustomizeReport(reportId, selectedSections);
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }, [apiCall]);
+  }, []);
 
   // ===================================================================
   // 7. MATERIALS & PREFERENCES - Custom materials and design preferences
@@ -403,27 +274,11 @@ export const useEngineeringService = () => {
    */
   const addCustomMaterial = useCallback(async (materialData) => {
     try {
-      const { grade, inputs } = materialData;
-      const email = localStorage.getItem('email');
-
-      const response = await apiCall('api/materialDetails/', {
-        method: 'POST',
-        body: JSON.stringify({
-          email,
-          materialName: grade,
-          fy_20: parseInt(inputs.fy_20),
-          fy_20_40: parseInt(inputs.fy_20_40),
-          fy_40: parseInt(inputs.fy_40),
-          fu: parseInt(inputs.fu),
-        }),
-      });
-
-      const result = await response.json();
-      return { success: true, data: result };
+      return await dsAddCustomMaterial(materialData);
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }, [apiCall]);
+  }, []);
 
   /**
    * Get design preferences
@@ -435,21 +290,11 @@ export const useEngineeringService = () => {
    */
   const getDesignPreferences = useCallback(async (params = {}) => {
     try {
-      let url = 'api/design-preferences/?';
-      const { supported_section, supporting_section, connectivity } = params;
-
-      if (supported_section) url += `supported_section=${encodeURIComponent(supported_section)}&`;
-      if (supporting_section) url += `supporting_section=${encodeURIComponent(supporting_section)}&`;
-      if (connectivity) url += `connectivity=${encodeURIComponent(connectivity)}`;
-
-      const response = await apiCall(url, { method: 'GET' });
-      const data = await response.json();
-
-      return { success: true, data };
+      return await dsFetchDesignPreferences(params);
     } catch (error) {
       return { success: false, error: error.message };
     }
-  }, [apiCall]);
+  }, []);
 
   /**
    * Upload company logo
@@ -514,7 +359,7 @@ export const useEngineeringService = () => {
     exportToCSV: exportToCSVUtil,
 
     // Utilities
-    getSlug, // Expose slug helper for external use
+    getSlug: getModuleSlug,
   };
 };
 

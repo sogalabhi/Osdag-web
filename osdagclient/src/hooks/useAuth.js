@@ -6,8 +6,8 @@ import { syncUserToBackend } from '../utils/firebaseAuth';
 import { clearAuthStorage, isGuestUser } from '../utils/auth';
 
 /**
- * Custom hook for Firebase authentication management
- * Replaces the old JWT-based authentication system
+ * Custom hook for Firebase authentication management.
+ * Exposes Firebase user, guest mode, and logout helpers.
  */
 export const useAuth = () => {
   const navigate = useNavigate();

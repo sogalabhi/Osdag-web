@@ -4,8 +4,6 @@ import { Modal, Button, Alert, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { clearAuthStorage } from "../utils/auth";
 import { apiBase } from '../api';
-import { auth } from '../Auth/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
 import {
     signupWithFirebase,
     loginWithFirebase,
@@ -13,7 +11,8 @@ import {
     resetPassword,
     getFirebaseErrorMessage,
 } from '../utils/firebaseAuth';
-import { EmailVerificationStatus } from '../components/EmailVerificationStatus';
+import { EmailVerificationStatus } from './EmailVerificationStatus';
+import { useAuth } from '../hooks/useAuth';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -38,8 +37,8 @@ const LoginPage = () => {
     const [fPasswordModalVisible, setFPasswordModalVisible] = useState(false);
     const [fPasswordEmail, setFPasswordEmail] = useState('');
 
-    // Firebase user state
-    const [currentUser, setCurrentUser] = useState(null);
+    // Firebase user state (from shared auth hook)
+    const { user: currentUser } = useAuth();
 
     // Clear errors when switching between login/signup
     useEffect(() => {
@@ -47,14 +46,6 @@ const LoginPage = () => {
         setGeneralError('');
         setSuccessMessage('');
     }, [isSignup]);
-
-    // Listen to Firebase auth state changes
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setCurrentUser(user);
-        });
-        return () => unsubscribe();
-    }, []);
 
     // Validation functions
     const validateEmail = (email) => {

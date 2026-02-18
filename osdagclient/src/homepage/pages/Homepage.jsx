@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../../Auth/firebase';
+import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import MainContent from "../components/MainContent";
-import { EmailVerificationBanner } from '../../components/EmailVerificationBanner';
+import { EmailVerificationBanner } from '../components/EmailVerificationBanner';
+import { useAuth } from '../../hooks/useAuth';
 import mosLogo from '../../assets/homepage/mos_logo.png';
 import constructSteelLogo from '../../assets/homepage/constructsteel_logo.png';
 import moeLogo from '../../assets/homepage/moe_logo.png';
@@ -14,15 +13,7 @@ import InsdagLogo from '../../assets/homepage/insdag_logo.png';
 
 const Homepage = () => {
   const [showSideBar, setshowSideBar] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // Listen to Firebase auth state changes
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-    });
-    return () => unsubscribe();
-  }, []);
+  const { user: currentUser } = useAuth();
 
   return (
     <div className="min-h-screen antialiased w-full relative  bg-white dark:bg-osdag-dark-color">

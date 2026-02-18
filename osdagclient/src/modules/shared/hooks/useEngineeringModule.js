@@ -260,6 +260,9 @@ export const useEngineeringModule = (moduleConfig) => {
     coverPlateList,
     weldSizeList,
 
+    // contextData = moduleData for dropdowns and expand helpers
+    contextData: moduleData,
+
     // SERVICE API - Expose service for advanced usage
     // ===================================================================
     service,                    // Full service object for advanced usage

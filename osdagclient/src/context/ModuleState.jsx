@@ -3,10 +3,15 @@ import ModuleReducer from "./ModuleReducer";
 
 // crypto packages
 import { decode as base64_decode, encode as base64_encode } from "base-64";
-import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../constants/DesignKeys';
-import { getModuleSlug } from "../constants/apiRoutes";
-import { createDesign as apiCreateDesign, createDesignReport as apiCreateDesignReport, populateModule } from '../modules/shared/api/moduleApi';
+import { createDesign as apiCreateDesign } from '../modules/shared/api/moduleApi';
 import { apiBase } from "../api";
+import {
+  fetchModuleOptions as dsFetchModuleOptions,
+  createCad as dsCreateCad,
+  downloadCad as dsDownloadCad,
+  addCustomMaterial as dsAddCustomMaterial,
+  fetchDesignPreferences as dsFetchDesignPreferences,
+} from "../datasources/modulesDataSource";
 
 /* 
     ######################################################### 
@@ -116,28 +121,15 @@ export const ModuleProvider = ({ children }) => {
       // Set current module
       dispatch({ type: "SET_CURRENT_MODULE_NAME", payload: moduleName });
 
-      const getSlug = (key) => getModuleSlug(key);
       const email = localStorage.getItem("email");
-      const slug = getSlug(moduleName);
-
-      let url = `${BASE_URL}api/modules/${slug}/options/`;
-      const params = new URLSearchParams();
-      if (options.connectivity) params.append("connectivity", options.connectivity);
-      if (email) params.append("email", email);
-      const qs = params.toString();
-      if (qs) url += `?${qs}`;
-
-      const response = await fetch(url, {
-        method: "GET",
-        mode: "cors",
-        credentials: "include",
+      const { success, data, error } = await dsFetchModuleOptions(moduleName, {
+        connectivity: options.connectivity,
+        email,
       });
 
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      if (!success) {
+        throw new Error(error || "Failed to load module data");
       }
-
-      const data = await response.json();
       // Dispatch comprehensive data update
       dispatch({ type: "SET_ALL_MODULE_DATA", payload: data });
 
@@ -167,27 +159,8 @@ export const ModuleProvider = ({ children }) => {
 
       switch (action) {
         case 'add': {
-          const { grade, inputs, connectivity, type } = data;
-          const email = localStorage.getItem("email");
-
-          const response = await fetch(`${BASE_URL}api/materialDetails/`, {
-            method: "POST",
-            mode: "cors",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: email,
-              materialName: grade,
-              fy_20: parseInt(inputs.fy_20),
-              fy_20_40: parseInt(inputs.fy_20_40),
-              fy_40: parseInt(inputs.fy_40),
-              fu: parseInt(inputs.fu),
-            }),
-          });
-
-          const result = await response.json();
+          const { connectivity } = data;
+          const result = await dsAddCustomMaterial(data);
 
           // Refresh module data to include the new material
           if (connectivity) {
@@ -254,29 +227,10 @@ export const ModuleProvider = ({ children }) => {
     console.log('[cadissue] moduleId:', moduleId);
     console.log('[cadissue] inputData keys:', inputData ? Object.keys(inputData) : 'N/A');
     try {
-      // Map module ID to slug (same as design endpoint)
-      const slug = getModuleSlug(moduleId);
-      const url = `${BASE_URL}api/modules/${slug}/cad/`;
-      
-      console.log('[ModuleState] Making fetch request to:', url);
-      const response = await fetch(url, {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          inputs: inputData
-        }),
-      });
-
-
-
-      const data = await response.json();
+      const { status, data } = await dsCreateCad(moduleId, inputData);
 
       // Log the API response to debug CAD files and hover_dict
-      console.log('[cadissue] CAD API Response status:', response.status);
+      console.log('[cadissue] CAD API Response status:', status);
       console.log('[cadissue] CAD API Response keys:', Object.keys(data));
       console.log('[cadissue] CAD files keys:', data.files ? Object.keys(data.files) : 'NO files');
       if (data.files) {
@@ -288,21 +242,21 @@ export const ModuleProvider = ({ children }) => {
       console.log('[cadissue] hover_dict keys:', data.hover_dict && typeof data.hover_dict === 'object' ? Object.keys(data.hover_dict) : 'NO hover_dict');
 
       // Handle "coming soon" status (200 with coming_soon status)
-      if (response.status === 200 && data.status === "coming_soon") {
+      if (status === 200 && data.status === "coming_soon") {
         dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
         // Don't show error alert for "coming soon"
         return { success: false, coming_soon: true, message: data.message || "3D model generation is coming soon" };
       }
 
-      if (!response.ok) {
+      if (status < 200 || status >= 300) {
         let message = data.message || "CAD generation failed";
 
         // eslint-disable-next-line no-alert
-        alert(message + " " + response.status);
-        throw new Error(`CAD generation failed: ${response.status} ${response.statusText}`);
+        alert(message + " " + status);
+        throw new Error(`CAD generation failed: ${status}`);
       }
 
-      if (response.status === 201 && data.status === "success") {
+      if (status === 201 && data.status === "success") {
 
         // Store CAD data and trigger rendering
         dispatch({ type: "SET_CAD_MODEL_PATHS", payload: data.files });
@@ -344,25 +298,10 @@ export const ModuleProvider = ({ children }) => {
    */
   const downloadCADModel = useCallback(async (format) => {
     try {
-
-      const response = await fetch(`${BASE_URL}api/design/downloadCad/`, {
-        method: "POST",
-        mode: "cors",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          format: format,
-          section: "Model",
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch CAD file: ${response.status} ${response.statusText}`);
+      const { success, blob, error } = await dsDownloadCad(format);
+      if (!success) {
+        throw new Error(error || "Failed to fetch CAD file");
       }
-
-      const blob = await response.blob();
       return { success: true, blob };
     } catch (error) {
       return { success: false, error: error.message };
@@ -548,20 +487,10 @@ export const ModuleProvider = ({ children }) => {
 
       switch (action) {
         case 'get': {
-          const { supported_section, supporting_section, connectivity } = params;
-          let url = `${BASE_URL}api/design-preferences/?`;
-
-          if (supported_section) url += `supported_section=${encodeURIComponent(supported_section)}&`;
-          if (supporting_section) url += `supporting_section=${encodeURIComponent(supporting_section)}&`;
-          if (connectivity) url += `connectivity=${encodeURIComponent(connectivity)}`;
-
-          const response = await fetch(url, {
-            method: "GET",
-            mode: "cors",
-            credentials: "include",
-          });
-
-          const data = await response.json();
+          const { success, data, error } = await dsFetchDesignPreferences(params);
+          if (!success) {
+            throw new Error(error || "Failed to fetch design preferences");
+          }
           dispatch({ type: "SAVE_DESIGN_PREF_DATA", payload: data });
 
           return { success: true, data };
@@ -748,11 +677,6 @@ export const ModuleProvider = ({ children }) => {
           return manageDesignPreferences('section_update', { id, materialValue });
         },
 
-        // 🚫 DEPRECATED: Use generateReport() instead
-        createDesignReport: (params, moduleId, inputValues, designStatus, logs) => {
-          console.warn('🚫 DEPRECATED: createDesignReport() - Use generateReport("design_report", {...}) instead');
-          return generateReport('design_report', { ...params, moduleId, inputValues, designStatus, logs });
-        },
       }}
     >
       {children}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Select from 'react-select'; // Re-integrated react-select
+import Select from 'react-select';
+import { getOptionsForField, getListForInputKey } from '../utils/fieldOptionUtils';
 import FRM from "../../../assets/flush_ep.png";
 import EOWIM from "../../../assets/owe_ep.png";
 import EBWRM from "../../../assets/extended.png";
@@ -133,20 +134,14 @@ export const InputSection = ({
 
   // Set default selected values when lists/options arrive
   useEffect(() => {
-    // Set defaults for regular selects
     section.fields.forEach((field) => {
       if (field.type !== 'select') return;
 
-      // Resolve options: either a provided array on the field or a fetched list from context
-      const rawList = Array.isArray(field.options)
-        ? field.options
-        : safeContextData[field.options];
-
+      const rawList = getOptionsForField(field, safeContextData, safeInputs);
       if (!rawList || rawList.length === 0) return;
 
-      // Skip multi-selects managed via customizable selector
-      const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options);
-      if (isMulti) return;
+      const isCustomizable = Boolean(field.selectionKey);
+      if (isCustomizable) return;
 
       // Determine first option value
       const first = rawList[0];
@@ -154,12 +149,8 @@ export const InputSection = ({
         : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
 
       const current = safeInputs[field.key];
-      const currentExistsInOptions = Array.isArray(rawList)
-        ? (Array.isArray(field.options) ? rawList : toSelectOptions(rawList)).some(opt => {
-          const val = Array.isArray(field.options) ? opt.value : opt.value;
-          return val === current;
-        })
-        : false;
+      const opts = toSelectOptions(rawList);
+      const currentExistsInOptions = opts.some(opt => opt.value === current);
 
       if (current === undefined || current === null || current === '' || !currentExistsInOptions) {
         setInputs((prev) => ({ ...prev, [field.key]: firstValue }));
@@ -198,21 +189,12 @@ export const InputSection = ({
 
   const handleCustomizableSelect = (field, value) => {
     const getAllValuesForInputKey = (inputKey) => {
-      const keyMap = {
-        'bolt_diameter': 'boltDiameterList',
-        'bolt_grade': 'propertyClassList',
-        'plate_thickness': 'thicknessList',
-        'angle_list': 'angleList',
-        'cleat_section': 'angleList',
-        'weld_size': 'weldSizeList',
-      };
-      const listName = field.dataSource || keyMap[inputKey];
       if (field?.getDynamicDataSource) {
-        let options = field.getDynamicDataSource(inputs, contextData)
+        const options = field.getDynamicDataSource(inputs, contextData);
         setModalDynamicSrc((modalDynSrc) => ({ ...modalDynSrc, [field.key]: options }));
         return options;
       }
-      return Array.isArray(safeContextData[listName]) ? safeContextData[listName] : [];
+      return getListForInputKey(inputKey, safeContextData, field.dataSource);
     };
 
     if (value === "Customized") {
@@ -258,12 +240,11 @@ export const InputSection = ({
 
     switch (field.type) {
       case 'select': {
-        // workaround for simple connections
-        const isMulti = ['boltDiameterList', 'thicknessList', 'propertyClassList', 'angleList'].includes(field.options) && !(field.key.includes("plate1") || field.key.includes("plate2"));
-        const rawList = Array.isArray(field.options) ? field.options : safeContextData[field.options];
-        const options = Array.isArray(field.options) ? field.options : toSelectOptions(rawList);
+        const isCustomizable = Boolean(field.selectionKey) && !(field.key.includes("plate1") || field.key.includes("plate2"));
+        const rawList = getOptionsForField(field, safeContextData, safeInputs);
+        const options = toSelectOptions(rawList);
 
-        if (isMulti) {
+        if (isCustomizable) {
           const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
           if (!isCustomized) {
             return (
@@ -298,8 +279,7 @@ export const InputSection = ({
           );
         }
 
-        // If options are empty or not yet loaded, render disabled with placeholder
-        if (!rawList || (Array.isArray(rawList) && rawList.length === 0)) {
+        if (!rawList || rawList.length === 0) {
           return (
             <Select
               isDisabled={true}
@@ -312,9 +292,7 @@ export const InputSection = ({
           );
         }
 
-        const value = Array.isArray(field.options)
-          ? options.find(opt => opt.value === safeInputs[field.key])
-          : options.find(opt => opt.value === safeInputs[field.key]);
+        const value = options.find(opt => opt.value === safeInputs[field.key]);
 
         return (
           <Select
@@ -355,7 +333,8 @@ export const InputSection = ({
       }
 
       case 'sectionProfileSelect': {
-        const options = Array.isArray(field.options) ? field.options : toSelectOptions(field.options);
+        const rawOptions = getOptionsForField(field, safeContextData, safeInputs);
+        const options = toSelectOptions(rawOptions);
         const currentValue = safeInputs[field.key] || field.defaultValue;
         const value = options.find(opt => opt.value === currentValue);
         return (
@@ -397,8 +376,8 @@ export const InputSection = ({
       }
 
       case 'sectionProfileList': {
-        let options = safeContextData[field.type];
-        options = options.map((elem) => { return { value: elem, label: elem } });
+        const rawSectionList = getOptionsForField(field, safeContextData, safeInputs);
+        const options = (rawSectionList || []).map((elem) => ({ value: elem, label: elem }));
         const value = options.find(opt => opt.value === inputs.section_profile);
         return (
           <Select
@@ -413,7 +392,7 @@ export const InputSection = ({
           />);
       }
       case 'dynamicSelect': {
-        let options = field.getOptions(inputs);
+        const options = getOptionsForField(field, safeContextData, safeInputs);
         const value = options.find(opt => opt.value === inputs[field.key]);
         return (
           <Select

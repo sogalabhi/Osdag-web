@@ -2,10 +2,8 @@ import { useRef, useState, useEffect } from 'react';
 import yaml from 'js-yaml';
 import { useNavigate } from 'react-router-dom';
 import { MODULE_ROUTES, MODULE_NAME_TO_KEY } from '../../constants/modules';
-import { isGuestUser, getCurrentUser, getCurrentUserEmail } from '../../utils/auth';
+import { isGuestUser } from '../../utils/auth';
 import { useAuth } from '../../hooks/useAuth';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../../Auth/firebase';
 
 const Header = ({ setshowSideBar, active }) => {
   const [isDark, setIsDark] = useState(false);
@@ -14,21 +12,12 @@ const Header = ({ setshowSideBar, active }) => {
   const [showResourcesDropdown, setShowResourcesDropdown] = useState(false);
   const [showAboutDropdown, setShowAboutDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const [firebaseUser, setFirebaseUser] = useState(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user: firebaseUser } = useAuth();
 
   // Check if user is a guest
   const isGuest = isGuestUser();
-
-  // Get user data from Firebase
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setFirebaseUser(user);
-    });
-    return () => unsubscribe();
-  }, []);
 
   // Get user display name and email
   // Priority: Firebase displayName -> localStorage username -> email prefix

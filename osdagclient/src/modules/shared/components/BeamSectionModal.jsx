@@ -1,8 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
-import { ModuleContext } from "../context/ModuleState";
+import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
-import ISection from "../assets/ISection.png";
+import ISection from "../../../assets/ISection.png";
 import CustomSectionModal from "./CustomSectionModal";
+
+const { Option } = Select;
 
 const readOnlyFontStyle = {
   color: "rgb(0 0 0 / 67%)",
@@ -14,7 +16,7 @@ const BeamSectionModal = ({
   supportedSectionData,
   designPrefInputs,
   setDesignPrefInputs,
-  isInputLocked
+  isInputLocked,
 }) => {
   const {
     materialList,
@@ -56,7 +58,7 @@ const BeamSectionModal = ({
                   value={designPrefInputs.supported_material}
                   onSelect={(value) => {
                     if (isInputLocked) return;
-                    if (value == -1) {
+                    if (value === -1) {
                       setShowModal(true);
                       return;
                     }
@@ -260,148 +262,55 @@ const BeamSectionModal = ({
               <h5>Toe Radius, R2 (mm)*</h5>
               <Input
                 type="text"
-                name="tow-radius"
+                name="depth"
                 className="input-design-pref"
                 value={supportedSectionData.R2 || 0}
                 disabled
                 style={readOnlyFontStyle}
               />
             </div>
-          </div>
-          <div className="sub-container">
-            <h4>Section Properties</h4>
+
             <div className="input-cont">
-              <h5>Mass, M (Kg/m)</h5>
+              <h5>Area of Cross Section, (mm2)</h5>
               <Input
                 type="text"
-                name="mass"
+                name="cross-area"
                 className="input-design-pref"
-                value={supportedSectionData.Mass || 0}
+                value={supportedSectionData.A || 0}
                 disabled
                 style={readOnlyFontStyle}
               />
             </div>
             <div className="input-cont">
-              <h5>Sectional Area, a (cm2)</h5>
+              <h5>Moment of Inertia about xx-axis, Ixx (mm4)</h5>
               <Input
                 type="text"
-                name="sectional-area"
+                name="moment-xx"
                 className="input-design-pref"
-                value={supportedSectionData.Area || 0}
+                value={supportedSectionData.IX || 0}
                 disabled
                 style={readOnlyFontStyle}
               />
             </div>
             <div className="input-cont">
-              <h5>2nd Moment of Area, Iz (cm4)</h5>
+              <h5>Moment of Inertia about yy-axis, Iyy (mm4)</h5>
               <Input
                 type="text"
-                name="2nd-moment-area-Iz"
+                name="moment-yy"
                 className="input-design-pref"
-                value={supportedSectionData.Iz || 0}
-                disabled
-                style={readOnlyFontStyle}
-              />
-            </div>
-            <div className="input-cont">
-              <h5>2nd Moment of Area, Iy (cm4)</h5>
-              <Input
-                type="text"
-                name="2nd-moment-area-Iy"
-                className="input-design-pref"
-                value={supportedSectionData.Iy || 0}
-                disabled
-                style={readOnlyFontStyle}
-              />
-            </div>
-            <div className="input-cont">
-              <h5>Radius of Gyration, Rz (cm4)</h5>
-              <Input
-                type="text"
-                name="radius-gyration-Rz"
-                className="input-design-pref"
-                value={supportedSectionData.rz || 0}
-                disabled
-                style={readOnlyFontStyle}
-              />
-            </div>
-            <div className="input-cont">
-              <h5>Radius of Gyration, Ry (cm4)</h5>
-              <Input
-                type="text"
-                name="radius-gyration-Ry"
-                className="input-design-pref"
-                value={supportedSectionData.ry || 0}
-                disabled
-                style={readOnlyFontStyle}
-              />
-            </div>
-            <div className="input-cont">
-              <h5>Elastic Modulus, Zz (cm3)</h5>
-              <Input
-                type="text"
-                name="elastic-modulus"
-                className="input-design-pref"
-                value={supportedSectionData.Zz || 0}
+                value={supportedSectionData.IY || 0}
                 disabled
                 style={readOnlyFontStyle}
               />
             </div>
           </div>
         </div>
-        {/*  */}
-
-        <div>
-          <div className="sub-container">
-            <img src={ISection} alt="image" />
-          </div>
-          <div className="sub-container">
-            <h4>Section Properties</h4>
-            <div className="input-cont">
-              <h5>Plastic Modulus, Zpz (cm3)</h5>
-              <Input
-                type="text"
-                name="plastic-modulus-pz"
-                className="input-design-pref"
-                value={supportedSectionData.Zpz || 0}
-                disabled
-                style={readOnlyFontStyle}
-              />
-            </div>
-            <div className="input-cont">
-              <h5>Plastic Modulus, Zpv (cm3)</h5>
-              <Input
-                type="text"
-                name="plastic-modulus-pv"
-                className="input-design-pref"
-                value={supportedSectionData.Zpy || 0}
-                disabled
-                style={readOnlyFontStyle}
-              />
-            </div>
-            <div className="input-cont">
-              <h5>Torsion Constant, It (cm4)</h5>
-              <Input
-                type="text"
-                name="torsion-constant"
-                className="input-design-pref"
-                value={supportedSectionData.It || 0}
-                disabled
-                style={readOnlyFontStyle}
-              />
-            </div>
-            <div className="input-cont">
-              <h5>Warping Constant, Iw (cm6)</h5>
-              <Input
-                type="text"
-                name="warping-constant"
-                className="input-design-pref"
-                value={supportedSectionData.Iw || 0}
-                disabled
-                style={readOnlyFontStyle}
-              />
-            </div>
-          </div>
+        <div className="section-image">
+          <img
+            src={ISection}
+            alt="Section Diagram"
+            style={{ maxWidth: "100%", height: "auto" }}
+          />
         </div>
       </div>
       <CustomSectionModal
@@ -416,3 +325,4 @@ const BeamSectionModal = ({
 };
 
 export default BeamSectionModal;
+

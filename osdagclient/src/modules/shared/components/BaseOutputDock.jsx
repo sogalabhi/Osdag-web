@@ -1,48 +1,7 @@
 import React, { useState } from 'react';
 import { Input, Modal } from 'antd';
-import spacingIMG from "../../../assets/spacing_3.png";
-import capacityIMG1 from "../../../assets/L_shear1.png";
-import capacityIMG2 from "../../../assets/L.png";
-import Stiffener_BWE from "../../../assets/BB_Stiffener_BWE.png";
-import Stiffener_FP from "../../../assets/BB_Stiffener_FP.png";
-import Stiffener_OWE from "../../../assets/BB_Stiffener_OWE.png";
-import Detailing_BWE from "../../../assets/Detailing-BWE.png";
-import Detailing_FP from "../../../assets/Detailing-Flush.png";
-import Detailing_OWE from "../../../assets/Detailing-OWE.png";
-import GrooveImg from "../../../assets/BB-BC-single_bevel_groove.png";
-import SpacingDiagram from "./SpacingDiagram";
-// Base plate output modals (sketch, detailing, weld, key)
-import Moment_BP from "../../../assets/Moment_BP.png";
-import Moment_BP_C2 from "../../../assets/Moment_BP_C2.png";
-import Moment_BP_C3 from "../../../assets/Moment_BP_C3.png";
-import Welded_BP from "../../../assets/Welded_BP.png";
-import SHS_BP from "../../../assets/SHS_BP.png";
-import RHS_BP from "../../../assets/RHS_BP.png";
-import CHS_BP from "../../../assets/CHS_BP.png";
-import Moment_BP_Detailing from "../../../assets/Moment_BP_Detailing.png";
-import Welded_BP_Detailing from "../../../assets/Welded_BP_Detailing.png";
-import SHS_BP_Detailing from "../../../assets/SHS_BP_Detailing.png";
-import RHS_BP_Detailing from "../../../assets/RHS_BP_Detailing.png";
-import CHS_BP_Detailing from "../../../assets/CHS_BP_Detailing.png";
-import Moment_BP_weld_1_1 from "../../../assets/Moment_BP_weld_details_1-1.png";
-import Moment_BP_weld_1_2 from "../../../assets/Moment_BP_weld_details_1-2.png";
-import Moment_BP_weld_2 from "../../../assets/Moment_BP_weld_details_2.png";
-import Welded_BP_single_bevel from "../../../assets/Welded_BP_single_bevel.png";
-import Welded_BP_double_J from "../../../assets/Welded_BP_double_J.png";
-import SHS_BP_groove_weld from "../../../assets/SHS_BP_groove_weld_details.png";
-import SHS_BP_weld from "../../../assets/SHS_BP_weld_details.png";
-import RHS_BP_groove_weld from "../../../assets/RHS_BP_groove_weld_details.png";
-import RHS_BP_weld from "../../../assets/RHS_BP_weld_details.png";
-import CHS_BP_groove_weld from "../../../assets/CHS_BP_groove_weld_details.png";
-import CHS_BP_weld from "../../../assets/CHS_BP_weld_details.png";
-import BP_welded_weld from "../../../assets/BP_welded_weld_details.png";
-import Key_SHS from "../../../assets/Key_SHS.png";
-import Key_SHS_D from "../../../assets/Key_SHS_D.png";
-import Key_SHS_B from "../../../assets/Key_SHS_B.png";
-import Key_RHS from "../../../assets/Key_RHS.png";
-import Key_RHS_D from "../../../assets/Key_RHS_D.png";
-import Key_RHS_B from "../../../assets/Key_RHS_B.png";
-import Key_CHS from "../../../assets/Key_CHS.png";
+import { getOutputImage } from "../config/outputImageMap";
+import { OUTPUT_LAYOUTS } from "./outputDock/OutputModalLayouts";
 
 export const BaseOutputDock = ({
   output,
@@ -89,93 +48,8 @@ export const BaseOutputDock = ({
     </div>
   );
 
-  const getImageForModal = (imageType, selectedOption, basePlateState = {}) => {
-    const imageMap = {
-      stiffener: {
-        "Flushed - Reversible Moment": Stiffener_FP,
-        "Extended One Way - Irreversible Moment": Stiffener_OWE,
-        "Extended Both Ways - Reversible Moment": Stiffener_BWE,
-      },
-      detailing: {
-        "Flushed - Reversible Moment": Detailing_FP,
-        "Extended One Way - Irreversible Moment": Detailing_OWE,
-        "Extended Both Ways - Reversible Moment": Detailing_BWE,
-      },
-      groove: GrooveImg,
-      spacing: spacingIMG,
-      capacity1: capacityIMG1,
-      capacity2: capacityIMG2,
-      // Base plate: sketch by connectivity (desktop: moment_bp_case for Moment Base Plate)
-      basePlateSketch: {
-        "Moment Base Plate": Moment_BP,
-        "Welded Column Base": Welded_BP,
-        "Hollow/Tubular Column Base": null, // resolved below by section
-      },
-      basePlateDetailing: {
-        "Moment Base Plate": Moment_BP_Detailing,
-        "Welded Column Base": Welded_BP_Detailing,
-        "Hollow/Tubular Column Base": null,
-      },
-      weldDetails: {
-        "Moment Base Plate": Moment_BP_weld_1_1,
-        "Welded Column Base": Welded_BP_single_bevel,
-        "Hollow/Tubular Column Base": null,
-      },
-      keySketch: {
-        SHS: Key_SHS,
-        RHS: Key_RHS,
-        CHS: Key_CHS,
-      },
-    };
-
-    if (imageType === 'groove' || imageType === 'spacing' ||
-      imageType === 'capacity1' || imageType === 'capacity2') {
-      return imageMap[imageType];
-    }
-    if (imageType === 'basePlateSketch') {
-      const conn = basePlateState.connectivity || selectedOption;
-      let img = imageMap.basePlateSketch?.[conn];
-      if (conn === 'Hollow/Tubular Column Base') {
-        const sec = (basePlateState.member_designation || basePlateState.designation || '') + '';
-        if (sec.includes('SHS')) img = SHS_BP;
-        else if (sec.includes('RHS')) img = RHS_BP;
-        else if (sec.includes('CHS')) img = CHS_BP;
-      }
-      return img || Moment_BP;
-    }
-    if (imageType === 'basePlateDetailing') {
-      const conn = basePlateState.connectivity || selectedOption;
-      let img = imageMap.basePlateDetailing?.[conn];
-      if (conn === 'Hollow/Tubular Column Base') {
-        const sec = (basePlateState.member_designation || basePlateState.designation || '') + '';
-        if (sec.includes('SHS')) img = SHS_BP_Detailing;
-        else if (sec.includes('RHS')) img = RHS_BP_Detailing;
-        else if (sec.includes('CHS')) img = CHS_BP_Detailing;
-      }
-      return img || Moment_BP_Detailing;
-    }
-    if (imageType === 'weldDetails') {
-      const conn = basePlateState.connectivity || selectedOption;
-      let img = imageMap.weldDetails?.[conn];
-      if (conn === 'Welded Column Base') return BP_welded_weld || Welded_BP_single_bevel;
-      if (conn === 'Hollow/Tubular Column Base') {
-        const sec = (basePlateState.member_designation || basePlateState.designation || '') + '';
-        const groove = basePlateState.weld_type === 'Groove Weld';
-        if (sec.includes('SHS')) img = groove ? SHS_BP_groove_weld : SHS_BP_weld;
-        else if (sec.includes('RHS')) img = groove ? RHS_BP_groove_weld : RHS_BP_weld;
-        else if (sec.includes('CHS')) img = groove ? CHS_BP_groove_weld : CHS_BP_weld;
-      }
-      return img || Moment_BP_weld_1_1;
-    }
-    if (imageType === 'keySketch') {
-      const sec = (basePlateState.member_designation || basePlateState.designation || '') + '';
-      if (sec.includes('SHS')) return Key_SHS;
-      if (sec.includes('RHS')) return Key_RHS;
-      if (sec.includes('CHS')) return Key_CHS;
-      return Key_SHS;
-    }
-    return imageMap[imageType]?.[selectedOption] || null;
-  };
+  const getImageForModal = (imageType, selectedOption, basePlateState = {}) =>
+    getOutputImage(imageType, selectedOption, basePlateState);
 
   // Helper function to get output value - Works for both module formats
   const getOutputValue = (key, rawOutput) => {
@@ -271,134 +145,23 @@ export const BaseOutputDock = ({
   const renderModalContent = (modalType, activeSection, output) => {
     const config = outputConfig.modalTypes[modalType];
     const { fields, diagram } = resolveModalEntry(modalType, activeSection);
-    const diagramProps = resolveDiagramProps(diagram, output);
+    const LayoutComponent = OUTPUT_LAYOUTS[config.layout] || OUTPUT_LAYOUTS["single-column"];
+    const getImage = (imageType, selectedOption, basePlateState) =>
+      getImageForModal(imageType, selectedOption, basePlateState);
 
-    if (config.layout === "two-column") {
-      return (
-        <div className="spacing-main-body">
-          {config.note && (
-            <p style={{ padding: "20px" }}>
-              Note: {config.note}
-            </p>
-          )}
-          <div className="spacing-main-two">
-            <div className="spacing-left-body">
-              {fields.map(({ key, label }, idx) => (
-                <div key={idx} className="spacing-left-body-align">
-                  <h4>{label}</h4>
-                  <ValueBox value={getOutputValue(key, output)} />
-                </div>
-              ))}
-            </div>
-            {config.hasImage && (
-              <div className="spacing-right-body">
-                <img src={getImageForModal('spacing')} alt="Spacing Image" />
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    } else if (config.layout === "capacity-complex") {
-      // Complex capacity layout with multiple sections and images
-      const groupedFields = fields.reduce((acc, field) => {
-        const section = field.section || 'Default';
-        if (!acc[section]) acc[section] = [];
-        acc[section].push(field);
-        return acc;
-      }, {});
+    const layoutProps = {
+      config,
+      fields,
+      diagram,
+      output,
+      getOutputValue,
+      resolveDiagramProps,
+      ValueBox,
+      getImage,
+      extraState,
+    };
 
-      return (
-        <div className="spacing-main-body">
-          {config.note && (
-            <p style={{ padding: "20px" }}>
-              Note: {config.note}
-            </p>
-          )}
-          <div className="Capacity-main-body">
-            {Object.entries(groupedFields).map(([sectionName, sectionFields], sectionIdx) => (
-              <div key={sectionIdx}>
-                <div className="Capacity-sub-body-title">
-                  <h4>{sectionName}</h4>
-                </div>
-                <div className="Capacity-sub-body">
-                  <div className="Capacity-left-body">
-                    {sectionFields.map(({ key, label }, idx) => (
-                      <div key={idx} className="Capacity-left-body-align">
-                        <p>{label}</p>
-                        <ValueBox value={getOutputValue(key, output)} />
-                      </div>
-                    ))}
-                  </div>
-                  {sectionIdx < 2 && ( // Show images for first two sections
-                    <div className="Capacity-right-body">
-                      <img
-                        src={getImageForModal(sectionIdx === 0 ? 'capacity1' : 'capacity2')}
-                        alt={`Capacity Image ${sectionIdx + 1}`}
-                      />
-                      <h5>Block Shear Pattern</h5>
-                    </div>
-                  )}
-                </div>
-                {sectionIdx < Object.entries(groupedFields).length - 1 && <hr />}
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    } else if (config.layout === "image-only") {
-      const image = getImageForModal(config.imageType, extraState.selectedOption, extraState);
-      return (
-        <div className="spacing-main-body">
-          {image && <img src={image} alt={`${config.imageType} Image`} />}
-        </div>
-      );
-    } else if (config.layout === "spacing-diagram") {
-      return (
-        <div className="flex w-full flex-col justify-center border border-gray-300 p-2">
-          {config.note && (
-            <p className="px-5 py-4 text-sm text-gray-600">Note: {config.note}</p>
-          )}
-          <div className="flex w-full flex-col gap-6 md:flex-row">
-            <div className="flex w-full flex-col gap-3 px-4 md:w-1/2">
-              {fields.map(({ key, label }, idx) => (
-                <div key={idx} className="flex items-center justify-between gap-3 text-sm">
-                  <h4 className="font-medium text-gray-700">{label}</h4>
-                  <div className="min-w-[40%]">
-                    <ValueBox value={getOutputValue(key, output)} />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex w-full items-center justify-center px-4 pb-4 md:w-1/2 md:pb-0">
-              {diagramProps ? (
-                <SpacingDiagram className="md:max-w-2xl" {...diagramProps} />
-              ) : (
-                <div className="flex w-full min-h-[280px] items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500">
-                  No diagram data available.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    } else if (config.layout === "single-column") {
-      return (
-        <div className="details-main-body">
-          <div className="details-main-body-inside">
-            {fields.length > 0 ? (
-              fields.map(({ key, label }, idx) => (
-                <div key={idx} className="details-main-body-align">
-                  <h4 dangerouslySetInnerHTML={{ __html: label }} />
-                  <ValueBox value={getOutputValue(key, output)} />
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500 px-2 py-4">No details available for this section.</p>
-            )}
-          </div>
-        </div>
-      );
-    }
+    return <LayoutComponent {...layoutProps} />;
   };
 
   // Shared field renderer

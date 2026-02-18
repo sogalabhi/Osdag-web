@@ -7,6 +7,7 @@ import {
   MODULE_KEY_BEAM_BEAM_END_PLATE,
   MODULE_KEY_BEAM_COLUMN_END_PLATE,
 } from "../../../constants/DesignKeys";
+import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 
 /**
  * Form/state layer for engineering modules.
@@ -16,16 +17,7 @@ import {
  * - Applies \"Select All\" logic to sync lists into inputs
  */
 export const useModuleForm = (moduleConfig, moduleData) => {
-  const {
-    boltDiameterList,
-    propertyClassList,
-    thicknessList,
-    angleList,
-    weldSizeList,
-    sectionDesignation = [],
-    anchorDiameterList = [],
-    anchorGradeList = [],
-  } = moduleData || {};
+  const safeModuleData = moduleData || {};
 
   // Inputs state
   const [inputs, setInputs] = useState(moduleConfig.defaultInputs);
@@ -166,35 +158,17 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // \"Select All\" logic - syncs lists into inputs when All is active
+  // "Select All" logic - syncs lists into inputs when All is active (uses INPUT_KEY_TO_LIST + moduleData)
   useEffect(() => {
-    const keyToFullListMap = {
-      bolt_diameter: boltDiameterList,
-      bolt_grade: propertyClassList,
-      plate_thickness: thicknessList,
-      flange_plate_thickness: thicknessList,
-      web_plate_thickness: thicknessList,
-      angle_list: angleList,
-      topangle_list: angleList,
-      cleat_section: angleList,
-      weld_size: weldSizeList,
-      // Base Plate and other modules with section / anchor lists
-      member_designation: sectionDesignation,
-      anchor_diameter_ocf: anchorDiameterList,
-      anchor_grade_ocf: anchorGradeList,
-      anchor_diameter_icf: anchorDiameterList,
-      anchor_grade_icf: anchorGradeList,
-    };
-
     const nextInputs = { ...inputs };
     let changed = false;
 
-    Object.entries(keyToFullListMap).forEach(([inputKey, fullList]) => {
+    Object.entries(INPUT_KEY_TO_LIST).forEach(([inputKey, listKey]) => {
       if (!allSelected?.[inputKey]) return;
       const current = inputs?.[inputKey];
       const isEmptyArray = Array.isArray(current) ? current.length === 0 : !current;
       if (!isEmptyArray) return;
-
+      const fullList = safeModuleData[listKey];
       const normalized = Array.isArray(fullList)
         ? fullList.map((val) => {
             if (typeof val === "object" && val !== null) {
@@ -210,7 +184,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     if (changed) {
       setInputs(nextInputs);
     }
-  }, [boltDiameterList, propertyClassList, thicknessList, angleList, weldSizeList, sectionDesignation, anchorDiameterList, anchorGradeList, allSelected, inputs]);
+  }, [safeModuleData, allSelected, inputs]);
 
   // Auto-hide save input popup
   useEffect(() => {
