@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 /**
  * Status state machine types
@@ -28,6 +29,8 @@ export const DESIGN_STATUS = {
  * Encapsulates validation, submission pipeline, and related UI state.
  */
 export const useDesignSubmission = (service, moduleConfig) => {
+  const params = useParams();
+  const projectId = params.projectId ? parseInt(params.projectId, 10) : null;
   const [designData, setDesignData] = useState({});
   const [designLogs, setDesignLogs] = useState([]);
   const [cadModelPaths, setCadModelPaths] = useState({});
@@ -147,7 +150,19 @@ export const useDesignSubmission = (service, moduleConfig) => {
       setDesignLogs(nextLogs);
       setLogs(nextLogs);
       setOutput(formattedOutput);
-      setDisplayOutput(true); // Show output immediately after calculation
+      setDisplayOutput(true);
+
+      // Save outputs to project if projectId exists
+      if (projectId && service.updateProject) {
+        try {
+          await service.updateProject(projectId, {
+            inputs_json: param,
+            outputs_json: designBody.data
+          });
+        } catch (err) {
+          console.error('[useDesignSubmission] Failed to save outputs:', err);
+        }
+      }
 
       // CAD Generation step
       setStatus({
@@ -268,6 +283,35 @@ export const useDesignSubmission = (service, moduleConfig) => {
     });
   };
 
+  const loadSavedOutputs = (outputsData) => {
+    if (!outputsData || Object.keys(outputsData).length === 0) return;
+    
+    const formattedOutput = {};
+    for (const [key, value] of Object.entries(outputsData)) {
+      const label = value?.label ?? key;
+      const val = value?.val ?? value?.value ?? value;
+      formattedOutput[key] = { label, val: val !== undefined && val !== null ? val : "" };
+    }
+    
+    setOutput(formattedOutput);
+    setDisplayOutput(true);
+  };
+
+  const loadOutputs = (outputsData) => {
+    if (!outputsData) return;
+    
+    const formattedOutput = {};
+    for (const [key, value] of Object.entries(outputsData)) {
+      const label = value?.label ?? key;
+      const val = value?.val ?? value?.value ?? value;
+      formattedOutput[key] = { label, val: val !== undefined && val !== null ? val : "" };
+    }
+    
+    setDesignData(outputsData);
+    setOutput(formattedOutput);
+    setDisplayOutput(true);
+  };
+
   return {
     // submission
     submitDesign,
@@ -312,6 +356,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
     // helpers
     resetDesignState,
     clearDesignResults,
+    loadSavedOutputs,
   };
 };
 

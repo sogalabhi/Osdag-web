@@ -23,6 +23,8 @@ class Project(models.Model):
     submodule = models.CharField(max_length=200, blank=True, null=True)
     # Canonical inputs persisted as JSON
     inputs_json = models.JSONField(blank=True, null=True)
+    # Design outputs persisted as JSON
+    outputs_json = models.JSONField(blank=True, null=True)
     osi_file_path = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

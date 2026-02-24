@@ -44,15 +44,22 @@ const TabbedModulePage = () => {
   const handleModuleClick = (optionKey, sectionLabel) => {
     const route = MODULE_ROUTES[optionKey] || "";
 
-    if (isGuestUser()) {
-      route && navigate(route);
-      return;
+    // COMMENTED: Direct navigation without project creation popup
+    // Users can create project later from File menu
+    if (route) {
+      navigate(route);
     }
 
-    if (route) {
-      setSelectedModule({ key: optionKey, label: sectionLabel, route });
-      setShowProjectModal(true);
-    }
+    // OLD FLOW: Show project creation modal before opening design
+    // if (isGuestUser()) {
+    //   route && navigate(route);
+    //   return;
+    // }
+    //
+    // if (route) {
+    //   setSelectedModule({ key: optionKey, label: sectionLabel, route });
+    //   setShowProjectModal(true);
+    // }
   };
 
   const handleProjectModalConfirm = async (projectName) => {
@@ -147,8 +154,8 @@ const TabbedModulePage = () => {
         </div>
       )}
 
-      {/* Project Modal */}
-      <ProjectNameModal
+      {/* COMMENTED: Project creation modal - now handled from File menu in design page */}
+      {/* <ProjectNameModal
         visible={showProjectModal}
         onConfirm={handleProjectModalConfirm}
         onCancel={handleProjectModalCancel}
@@ -157,7 +164,7 @@ const TabbedModulePage = () => {
         moduleName={selectedModule ? selectedModule.label : ""}
         defaultValue=""
         confirmText="Create Project"
-      />
+      /> */}
     </div>
   );
 };

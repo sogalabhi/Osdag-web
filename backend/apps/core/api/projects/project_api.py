@@ -98,6 +98,7 @@ class ProjectAPI(APIView):
                 module=data.get('module'),
                 submodule=data.get('submodule') or data.get('module_id'),
                 inputs_json=data.get('inputs_json'),
+                outputs_json=data.get('outputs_json'),
                 osi_file_path=data.get('osi_file_path'),
                 user_email=user_email
             )
@@ -145,6 +146,7 @@ class ProjectDetailAPI(APIView):
                     'submodule': getattr(project, 'submodule', None),
                     'module_id': getattr(project, 'submodule', None),
                     'inputs_json': getattr(project, 'inputs_json', None),
+                    'outputs_json': getattr(project, 'outputs_json', None),
                     'osi_file_path': project.osi_file_path,
                     'created_at': project.created_at.isoformat(),
                     'updated_at': project.updated_at.isoformat()
@@ -201,6 +203,8 @@ class ProjectDetailAPI(APIView):
                 project.submodule = data.get('submodule') or data.get('module_id')
             if 'inputs_json' in data:
                 project.inputs_json = data['inputs_json']
+            if 'outputs_json' in data:
+                project.outputs_json = data['outputs_json']
             if 'osi_file_path' in data:
                 project.osi_file_path = data['osi_file_path']
             

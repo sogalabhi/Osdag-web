@@ -14,6 +14,7 @@ export const menuItems = [
   {
     label: "File",
     dropdown: [
+      { name: "Create Project", shortcut: "Ctrl+N" },
       { name: "Load Input", shortcut: "Ctrl+L" },
       { name: "Save Input", shortcut: "Ctrl+S" },
       // { name: "Download Input", shortcut: "Alt+D" },
