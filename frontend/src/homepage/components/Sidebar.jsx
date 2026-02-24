@@ -1,100 +1,73 @@
 import React, { useState } from 'react';
 import osdagLogo from '../../assets/homepage/osdag_logo.png';
 import iitbLogo from '../../assets/homepage/iitb_logo.png';
+import homeIcon from '../../assets/homepage/home_default.svg';
+import connectionIcon from '../../assets/homepage/connection.svg';
+import tensionIcon from '../../assets/homepage/tension_member.svg';
+import compressionIcon from '../../assets/homepage/compression_member.svg'
+import flexuralIcon from '../../assets/homepage/flexural_member.svg';
+import beamcolumnIcon from '../../assets/homepage/beam_column.svg';
+import trussIcon from '../../assets/homepage/truss.svg';
+import frame2dIcon from '../../assets/homepage/2d_frame.svg';
+import frame3dIcon from '../../assets/homepage/3d_frame.svg';
 import { Link, useParams } from 'react-router-dom';
 const Sidebar = ({ setshowSideBar, active }) => {
   const [navigationItems, setnavigationItems] = useState(() =>
     [
       {
         name: 'Home',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-          </svg>
-        ),
+        icon: <img src={homeIcon} alt="Home" className="w-10 h-10" />,
         link: '/home',
       },
       {
-        name: 'Connections',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        ),
+        name: 'Connection',
+        icon: <img src={connectionIcon} alt="Connection" className="w-10 h-10" />,
         active: false,
         link: '/Connections',
       },
       {
         name: 'Tension Member',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        ),
+        icon: <img src={tensionIcon} alt="Tension Member" className="w-10 h-10" />,
         active: false,
         link: '/TensionMember',
       },
       {
         name: 'Compression Member',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        ),
+        icon: <img src={compressionIcon} alt="Compression Member" className="w-10 h-10" />,
         active: false,
         link: '/CompressionMember',
       },
       {
-        name: 'Flexure Member',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        ),
+        name: 'Flexural Member',
+        icon: <img src={flexuralIcon} alt="Flexural Member" className="w-10 h-10" />,
         active: false,
         link: '/FlexureMember',
         // comingSoon: true,
       },
       {
         name: 'Beam-Column',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        ),
+        icon: <img src={beamcolumnIcon} alt="Beam-Column" className="w-10 h-10" />,
         active: false,
         link: '/Beam-Column',
         comingSoon: true,
       },
       {
         name: 'Truss',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        ),
+        icon: <img src={trussIcon} alt="Truss" className="w-10 h-10" />,
         active: false,
         link: '/Truss',
         comingSoon: true,
       },
       {
         name: '2D Frame',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        ),
+        icon: <img src={frame2dIcon} alt="2D Frame" className="w-10 h-10" />,
         active: false,
         link: '/2DFrame',
         comingSoon: true,
       },
       {
         name: '3D Frame',
-        icon: (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 6.707 6.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        ),
+        icon: <img src={frame3dIcon} alt="3D Frame" className="w-10 h-10" />,
         active: false,
         link: '/3DFrame',
         comingSoon: true,
@@ -187,7 +160,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
                 <div className="flex items-center space-x-3">
                   <div
                     className={`
-          transition-colors duration-200 flex items-center justify-center h-6 w-6
+          transition-colors duration-200 flex items-center justify-center h-10 w-10
           ${comingSoon
                         ? 'text-gray-400 dark:text-gray-500'
                         : isActive
@@ -195,7 +168,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
                           : 'group-hover:text-osdag-green text-black dark:text-osdag-green'}
         `}
                   >
-                    <span className="h-5 w-5 flex items-center justify-center">
+                    <span className="h-10 w-10 flex items-center justify-center">
                       {item.icon}
                     </span>
                   </div>

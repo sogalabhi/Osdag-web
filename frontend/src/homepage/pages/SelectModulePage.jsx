@@ -3,6 +3,10 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import TabbedModulePage from '../components/ModulesCardLayout';
 import { useParams } from 'react-router-dom';
+import mosLogo from '../../assets/homepage/mos_logo.png';
+import constructSteelLogo from '../../assets/homepage/constructsteel_logo.png';
+import moeLogo from '../../assets/homepage/moe_logo.png';
+import InsdagLogo from '../../assets/homepage/insdag_logo.png';
 
 const SelectModulePage = () => {
   const [showSideBar, setshowSideBar] = useState(false);
@@ -47,6 +51,22 @@ const SelectModulePage = () => {
             {/* Main Content */}
             <div className="flex-1 lg:overflow-y-auto">
               <TabbedModulePage />
+            </div>
+            <div className="pointer-events-none absolute bottom-6">
+             <div className="px-6 py-3 rounded-md shadow-sm">
+              <div className="mb-2">
+               <span className="text-lg font-semibold whitespace-nowrap">
+                 Supported by:
+               </span>
+              </div>
+              <div className="flex items-center gap-6">
+                <img src={moeLogo} alt="MOE Logo" className="h-[4.2rem] pointer-events-auto dark:invert" />
+                <img src={mosLogo} alt="MOS Logo" className="h-[4.2rem] pointer-events-auto dark:invert" />
+                <img src={constructSteelLogo} alt="Construct Steel Logo" className="h-[1.44rem] pointer-events-auto" />
+                <img src={InsdagLogo} alt="Insdag Logo" className="h-[4.2rem] pointer-events-auto" />
+              {/* <img src={fosseeLogo} alt="FOSSEE Logo" className="h-10 pointer-events-auto" /> */}
+              </div>
+             </div>
             </div>
           </div>
         </div>

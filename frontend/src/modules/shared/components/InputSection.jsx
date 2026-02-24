@@ -455,7 +455,7 @@ export const InputSection = ({
                   <img
                     src={imageSource}
                     alt="Connection type"
-                    className="w-[100px] h-[100px] object-contain"
+                    className="w-[150px] h-[100px] object-contain"
                   />
                 </div>
               )}
