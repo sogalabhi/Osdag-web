@@ -22,12 +22,13 @@ import {
     MODULE_KEY_TENSION_BOLTED,
     MODULE_KEY_TENSION_WELDED,
     MODULE_KEY_STRUTS_BOLTED,
+    MODULE_KEY_STRUTS_WELDED,
 } from "./DesignKeys";
 import { UI_STRINGS } from "./UIStrings";
 
 export const MODULE_SUBMODULES = {
     Connections: [
-        { key: "Simple", label: UI_STRINGS.SIMPLE_CONNECTIONS },
+        { key: "Plated", label: UI_STRINGS.PLATED_CONNECTION },
         { key: "Shear", label: UI_STRINGS.SHEAR_CONNECTION },
         { key: "Moment", label: UI_STRINGS.MOMENT_CONNECTION },
         { key: "BasePlate", label: UI_STRINGS.BASE_PLATE },
@@ -39,14 +40,14 @@ export const MODULE_SUBMODULES = {
 };
 
 export const CONNECTIONS_TAB_CONTENT = {
-    Simple: [
+    Plated: [
         {
-            label: UI_STRINGS.SIMPLE_CONNECTIONS,
+            label: UI_STRINGS.PLATED_CONNECTION,
             options: [
-                { key: MODULE_KEY_BUTT_JOINT_WELDED, label: "Butt Joint Welded", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_BUTT_JOINT_BOLTED, label: "Butt Joint Bolted", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_LAP_JOINT_WELDED, label: "Lap Joint Welded", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_LAP_JOINT_BOLTED, label: "Lap Joint Bolted", img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_BUTT_JOINT_WELDED, label: "Butt Joint — Welded", img: "butt_joint_welded_simple_connec.png" },
+                { key: MODULE_KEY_BUTT_JOINT_BOLTED, label: "Butt Joint — Bolted", img: "butt_joint_bolted_simple_connec.png" },
+                { key: MODULE_KEY_LAP_JOINT_WELDED, label: "Lap Joint — Welded", img: "lap_joint_welded_simple_connec.png" },
+                { key: MODULE_KEY_LAP_JOINT_BOLTED, label: "Lap Joint — Bolted", img: "lap_joint_bolted_simple_connec.png" },
             ],
         },
     ],
@@ -54,41 +55,41 @@ export const CONNECTIONS_TAB_CONTENT = {
         {
             label: UI_STRINGS.SHEAR_CONNECTIONS,
             options: [
-                { key: MODULE_KEY_FIN_PLATE, label: UI_STRINGS.FIN_PLATE, img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_CLEAT_ANGLE, label: UI_STRINGS.CLEAT_ANGLE, img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_END_PLATE, label: UI_STRINGS.END_PLATE, img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_SEAT_ANGLE, label: UI_STRINGS.SEATED_ANGLE, img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_FIN_PLATE, label: UI_STRINGS.FIN_PLATE, img: "shear_fin_plate_connec.png" },
+                { key: MODULE_KEY_CLEAT_ANGLE, label: UI_STRINGS.CLEAT_ANGLE, img: "shear_cleat_angle_connec.png" },
+                { key: MODULE_KEY_END_PLATE, label: UI_STRINGS.HEADER_PLATE, img: "header_plate_connec.png" },
+                { key: MODULE_KEY_SEAT_ANGLE, label: UI_STRINGS.SEATED_ANGLE, img: "seated_angle_connec.png" },
             ],
         },
     ],
     Moment: [
         {
-            label: "Beam to Beam Splice",
+            label: "Beam Splices",
             options: [
-                { key: MODULE_KEY_COVER_PLATE_BOLTED, label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_COVER_PLATE_WELDED, label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_BEAM_BEAM_END_PLATE, label: UI_STRINGS.END_PLATE, img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_COVER_PLATE_BOLTED, label: "Cover Plate — Bolted", img: "cover_plate_bolted_btb_moment_connec.png" },
+                { key: MODULE_KEY_COVER_PLATE_WELDED, label: "Cover Plate — Welded", img: "cover_plate_welded_btb_moment_connec.png" },
+                { key: MODULE_KEY_BEAM_BEAM_END_PLATE, label: UI_STRINGS.END_PLATE, img: "end_plate_btb_moment_connec.png" },
             ],
         },
         {
-            label: "Beam to Column Splice",
+            label: "Beam to Column",
             options: [
-                { key: MODULE_KEY_BEAM_COLUMN_END_PLATE, label: UI_STRINGS.END_PLATE, img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_BEAM_COLUMN_END_PLATE, label: UI_STRINGS.END_PLATE, img: "end_plate_btc_moment_connec.png" },
             ],
         },
         {
-            label: "Column to Column Splice",
+            label: "Column Splices",
             options: [
-                { key: MODULE_KEY_CC_COVER_PLATE_BOLTED, label: "Cover Plate Bolted", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_CC_COVER_PLATE_WELDED, label: "Cover Plate Welded", img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_CC_END_PLATE, label: UI_STRINGS.END_PLATE, img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_CC_COVER_PLATE_BOLTED, label: "Cover Plate — Bolted", img: "cover_plate_bolted_ctc_moment_connec.png" },
+                { key: MODULE_KEY_CC_COVER_PLATE_WELDED, label: "Cover Plate — Welded", img: "cover_plate_welded_ctc_moment_connec.png" },
+                { key: MODULE_KEY_CC_END_PLATE, label: UI_STRINGS.END_PLATE, img: "end_plate_ctc_moment_connec.png" },
             ],
         },
     ],
     BasePlate: [
         {
             label: "Base Plates",
-            options: [{ key: "BasePlateConnection", label: UI_STRINGS.BASE_PLATE_CONNECTION, img: "shear_fin_plate_connec.svg" }],
+            options: [{ key: "BasePlateConnection", label: UI_STRINGS.SLAB_AND_GUSSETED_BASES, img: "base_plate_connec.png" }],
         },
     ],
     Truss: [{ label: "Truss Connections", options: [] }],
@@ -99,8 +100,8 @@ export const GENERIC_SUBMODULE_CONTENT = {
         {
             label: UI_STRINGS.TENSION_MEMBER,
             options: [
-                { key: MODULE_KEY_BOLTED_TO_END_GUSSET, label: UI_STRINGS.BOLTED_TO_END_PLATE, img: "shear_fin_plate_connec.svg" },
-                { key: MODULE_KEY_WELDED_TO_END_GUSSET, label: UI_STRINGS.WELDED_TO_END_PLATE, img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_BOLTED_TO_END_GUSSET, label: UI_STRINGS.BOLTED_TO_END_PLATE, img: "bolted_tension_member.png" },
+                { key: MODULE_KEY_WELDED_TO_END_GUSSET, label: UI_STRINGS.WELDED_TO_END_PLATE, img: "welded_tension_member.png" },
             ],
         },
     ],
@@ -108,8 +109,8 @@ export const GENERIC_SUBMODULE_CONTENT = {
         {
             label: UI_STRINGS.COMPRESSION_MEMBER,
             options: [
-                { key: MODULE_KEY_STRUTS_BOLTED, label: "Struts Bolted to End Gusset", img: "shear_fin_plate_connec.svg" },
-                { key: "StrutsInTrusses", label: "Struts in Trusses", img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_STRUTS_BOLTED, label: "Struts Bolted to End Gusset", img: "struts_bolt_end_gusset.png" },
+                { key: "StrutsInTrusses", label: "Struts Welded to End Gusset", img: "struts_weld_end_gusset.png" },
             ],
 
         },
@@ -118,10 +119,9 @@ export const GENERIC_SUBMODULE_CONTENT = {
         {
             label: UI_STRINGS.FLEXURE_MEMBER,
             options: [
-                { key: MODULE_KEY_SIMPLY_SUPPORTED_BEAM, label: "Simply Supported Beam", img: "shear_fin_plate_connec.svg" },
-                { key: "OnCantilever", label: "Cantilever Beam", img: "shear_fin_plate_connec.svg" },
-                { key: "Purlin", label: "Purlin", img: "shear_fin_plate_connec.svg" },
-                { key: "PlateGirder", label: "Plate Girder", img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_SIMPLY_SUPPORTED_BEAM, label: "Simply Supported Beam", img: "ss_beam_flexural_mem.png" },
+                { key: "OnCantilever", label: "Cantilever Beam", img: "cantilever_beam_flexural_mem.png" },
+                { key: "PlateGirder", label: "Plate Girder", img: "plate_girder_flexural_mem.png" },
             ],
         },
     ],
@@ -152,7 +152,7 @@ export const MODULE_ROUTES = {
     [MODULE_KEY_BOLTED_TO_END_GUSSET]: "/design/tension-member/bolted_to_end_gusset",
     [MODULE_KEY_WELDED_TO_END_GUSSET]: "/design/tension-member/welded_to_end_gusset",
     [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: "/design/connections/column-beam/end_plate",
-    StrutsInTrusses: "/design/compression_member/compression_member/struts_in_trusses",
+    [MODULE_KEY_STRUTS_WELDED]: "/design/compression_member/compression_member/struts_welded_to_end_gusset",
     [MODULE_KEY_STRUTS_BOLTED]: "/design/compression-member/struts_bolted_to_end_gusset",
     // Add other needed routes
 };
