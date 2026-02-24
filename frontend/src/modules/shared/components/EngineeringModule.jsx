@@ -34,8 +34,9 @@ import GridSelector from "../utils/GridSelector";
 import { message, Modal as AntdModal } from 'antd';
 import { menuItems } from "../utils/moduleUtils";
 import { UI_STRINGS } from "../../../constants/UIStrings";
-import { isGuestUser } from "../../../utils/auth";
+import { isGuestUser, canCreateProjects } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
+import ProjectNameModal from "../../../homepage/components/ProjectNameModal";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -132,7 +133,9 @@ export const EngineeringModule = ({
     handleCreateDesignReport,
     handleCancelDesignReport,
     clearDesignResults,
-
+    loadSavedOutputs,
+    loadOutputs,
+    resetDesignState,
     // Service API (for project/OSI operations)
     service,
     resetModuleState,
@@ -156,6 +159,9 @@ export const EngineeringModule = ({
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
+  
+  // Project creation modal state
+  const [showProjectModal, setShowProjectModal] = useState(false);
 
   // Normalize CAD path keys to handle case/spacing differences
   const normalizedCadModelPaths = useMemo(() => {
@@ -321,28 +327,30 @@ export const EngineeringModule = ({
   }, [resetModuleState]);
 
   // ===================================================================
-  // PROJECT LOADING - Clear state before loading project inputs
+  // PROJECT LOADING - Load project inputs if project ID exists
   // ===================================================================
-  // Enforce project presence for authenticated users. Only depend on URL so we don't re-run when
-  // service/setInputs/resetModuleState change (which would cause infinite GET /api/projects/1/).
   const projectIdFromUrl = getProjectIdFromUrl();
   useEffect(() => {
+    // Skip project enforcement - allow users to work without project
     if (isGuestUser()) {
-      console.info('[EngineeringModule] Guest mode detected: skipping project enforcement');
+      console.info('[EngineeringModule] Guest mode detected: skipping project loading');
       return;
     }
+    
     const projectId = projectIdFromUrl;
+    // If no project ID, allow user to work without project (they can create one later)
     if (!projectId || Number.isNaN(projectId)) {
+      console.info('[EngineeringModule] No project ID in URL: user can work without project');
       lastLoadedProjectIdRef.current = null;
-      message.warning('No active project. Redirecting to home.');
-      navigate('/home', { replace: true });
       return;
     }
+    
     // Prevent infinite loop: only fetch once per projectId
     if (lastLoadedProjectIdRef.current === projectId) {
       return;
     }
     lastLoadedProjectIdRef.current = projectId;
+    
     (async () => {
       try {
         resetModuleState();
@@ -355,17 +363,31 @@ export const EngineeringModule = ({
         designCompletedRef.current = false;
 
         const result = await service.getProject(projectId);
+        console.log('[EngineeringModule] Project loaded:', result);
         if (!result.success || !result.project) {
           lastLoadedProjectIdRef.current = null;
-          message.warning('Project not found. Redirecting to home.');
-          navigate('/home', { replace: true });
+          message.warning('Project not found.');
           return;
         }
         if (result.project.inputs_json) {
           try {
             setInputs(result.project.inputs_json);
           } catch (_ignored) {
-            // ignore parse issues; user can overwrite via UI
+            // ignore parse issues
+          }
+        }
+        if (result.project.outputs_json) {
+          try {
+            loadSavedOutputs(result.project.outputs_json);
+          } catch (_ignored) {
+            // ignore parse issues
+          }
+        }
+        if (result.project.outputs_json) {
+          try {
+            loadOutputs(result.project.outputs_json);
+          } catch (_ignored) {
+            // ignore parse issues
           }
         }
         // Normalize URL to path form: .../fin_plate/1 instead of .../fin_plate?projectId=1
@@ -378,8 +400,7 @@ export const EngineeringModule = ({
         }
       } catch (_e) {
         lastLoadedProjectIdRef.current = null;
-        message.warning('Cannot verify project. Redirecting to home.');
-        navigate('/home', { replace: true });
+        message.warning('Cannot load project.');
       }
     })();
   }, [projectIdFromUrl]); // eslint-disable-line react-hooks/exhaustive-deps -- intentionally stable deps to avoid infinite GET
@@ -691,7 +712,6 @@ export const EngineeringModule = ({
       setShowCad(true);
     }
   };
-  // Save inputs to OSI file / Project (JSON-first)
   const handleSaveInputs = async () => {
     const userIsGuest = isGuest();
 
@@ -768,6 +788,53 @@ export const EngineeringModule = ({
       console.error('Error saving inputs:', err);
       message.error('Failed to save inputs');
     }
+  };
+
+  // Handle project creation from File menu
+  const handleCreateProject = () => {
+    if (isGuestUser()) {
+      message.warning("Guest users cannot create projects. Please log in to create projects.");
+      return;
+    }
+    if (!canCreateProjects()) {
+      message.error("Please verify your email to create projects. Check your inbox for the verification link.");
+      return;
+    }
+    setShowProjectModal(true);
+  };
+
+  const handleProjectModalConfirm = async (projectName) => {
+    try {
+      const safeProjectName = (projectName || 'Untitled Project').replace(/\s+/g, '_');
+      const module_id = moduleConfig?.designType || inputs?.module;
+      const parent_module = moduleConfig?.parentModule || 'connections';
+      
+      const payload = {
+        name: safeProjectName,
+        module: parent_module,
+        submodule: module_id,
+        inputs_json: inputs || {},
+      };
+      
+      const result = await service.createProject(payload);
+      if (result.success && result.project_id) {
+        message.success(`Project "${safeProjectName}" created successfully`);
+        // Navigate to current path + project ID
+        const currentPath = location.pathname;
+        navigate(`${currentPath}/${result.project_id}`, { replace: true });
+      } else {
+        message.error(result.error || 'Failed to create project');
+      }
+    } catch (err) {
+      console.error('Error creating project:', err);
+      message.error('Failed to create project');
+    } finally {
+      setShowProjectModal(false);
+    }
+  };
+
+  const handleProjectModalCancel = () => {
+    setShowProjectModal(false);
   };
 
   // Get connectivity for FinPlateConnection module
@@ -899,6 +966,7 @@ export const EngineeringModule = ({
               }
               cadModelPaths={cadModelPaths}
               contextData={contextData}
+              onCreateProject={handleCreateProject}
             />
           ))}
 
@@ -1506,6 +1574,17 @@ export const EngineeringModule = ({
           dangerouslySetInnerHTML={{ __html: hoverText }}
         />
       )}
+
+      {/* Project Creation Modal */}
+      <ProjectNameModal
+        visible={showProjectModal}
+        onCancel={handleProjectModalCancel}
+        onConfirm={handleProjectModalConfirm}
+        moduleName={moduleConfig?.title || 'Design'}
+        title="Create New Project"
+        message="Give your project a name to save your work."
+        confirmText="Create Project"
+      />
     </div >
   );
 };

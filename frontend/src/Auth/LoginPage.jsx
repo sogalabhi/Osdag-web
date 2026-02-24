@@ -158,7 +158,7 @@ const LoginPage = () => {
 
                 // Always allow login - verification is for authorization, not authentication
                 navigate('/home');
-
+                
                 // Show informational message if not verified
                 if (!emailVerified) {
                     setSuccessMessage("Login successful! Please verify your email to create and save projects.");
@@ -168,7 +168,7 @@ const LoginPage = () => {
             console.error("Firebase Auth Error:", error);
             const errorMessage = getFirebaseErrorMessage(error.code);
             setGeneralError(errorMessage);
-
+            
             // Handle specific account linking scenarios
             if (error.code === 'auth/email-already-in-use' && !isSignup) {
                 setGeneralError('Account exists with this email. Please log in or use "Login with Google".');
@@ -201,15 +201,15 @@ const LoginPage = () => {
         setIsLoading(true);
         setGeneralError('');
         setSuccessMessage('');
-
+        
         try {
             console.log("Starting Google login...");
             const { user } = await loginWithGoogle();
             console.log("Google login successful. User:", user?.email);
-
+            
             // Always allow login - verification is for authorization, not authentication
             navigate("/home");
-
+            
             // Show informational message if not verified
             if (user && !user.emailVerified) {
                 setSuccessMessage("Login successful! Please verify your email to create and save projects.");
@@ -222,7 +222,7 @@ const LoginPage = () => {
                 response: error.response?.data,
                 status: error.response?.status,
             });
-
+            
             // Handle Firebase auth errors
             if (error.code) {
                 const errorMessage = getFirebaseErrorMessage(error.code);
@@ -261,7 +261,7 @@ const LoginPage = () => {
                         className="mb-8"
                         height={150}
                         width={300}
-                        style={{ padding: '0px 0px 0px 60px', marginBottom: '0px' }}
+                        style={{ padding: '0px 0px 0px 60px', marginBottom: '0px' }}  
                     />
 
                     {/* Alerts */}
@@ -286,7 +286,7 @@ const LoginPage = () => {
                         )}
                         {/* Email Verification Status */}
                         {currentUser && !currentUser.emailVerified && (
-                            <EmailVerificationStatus
+                            <EmailVerificationStatus 
                                 user={currentUser}
                                 onVerified={() => {
                                     setSuccessMessage("Email verified! Redirecting...");
@@ -311,7 +311,7 @@ const LoginPage = () => {
                                     className="w-full flex items-center justify-center gap-3 py-2 bg-white border border-gray-300 rounded-full shadow-sm text-gray-700 font-medium hover:bg-gray-100"
                                 >
                                     <span className="w-5 h-5 text-xl">👤</span>
-                                    Continue as Guest
+                                    Continue as Guest    
                                 </Button>
                             )}
                             <Button
@@ -345,8 +345,9 @@ const LoginPage = () => {
                                     id="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className={`mt-1 block w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green ${errors.email ? "border-red-500" : "border-gray-300"
-                                        }`}
+                                    className={`mt-1 block w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green ${
+                                        errors.email ? "border-red-500" : "border-gray-300"
+                                    }`}
                                     placeholder="Enter your email"
                                 />
                                 {errors.email && (
@@ -364,8 +365,9 @@ const LoginPage = () => {
                                         id="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className={`mt-1 block w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green ${errors.password ? "border-red-500" : "border-gray-300"
-                                            }`}
+                                        className={`mt-1 block w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green ${
+                                            errors.password ? "border-red-500" : "border-gray-300"
+                                        }`}
                                         placeholder="Enter your password"
                                     />
                                     <button
@@ -401,8 +403,9 @@ const LoginPage = () => {
                                             id="confirmPassword"
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
-                                            className={`mt-1 block w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                                                }`}
+                                            className={`mt-1 block w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green ${
+                                                errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                                            }`}
                                             placeholder="Confirm your password"
                                         />
                                         <button

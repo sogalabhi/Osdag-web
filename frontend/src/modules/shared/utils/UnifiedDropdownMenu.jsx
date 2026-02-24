@@ -32,6 +32,8 @@ function UnifiedDropdownMenu({
   cadModelPaths = null,
   contextData = null, // moduleData from hook; used for expandAllSelectedInputs
   onMenuClick,
+  onCreateProject = null, // Handler for creating project from design page
+  isExistingProject = false, // When true, disable "Create Project" menu item
 }) {
   const service = useEngineeringService();
   const BASE_URL = `${apiBase}`;
@@ -198,6 +200,11 @@ function UnifiedDropdownMenu({
 
   const handleClick = (option) => {
     switch (option.name) {
+      case "Create Project":
+        if (onCreateProject) {
+          onCreateProject();
+        }
+        break;
       case "Load Input":
         loadInput();
         break;
