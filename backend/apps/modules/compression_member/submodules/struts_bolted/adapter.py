@@ -162,7 +162,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
 def create_module() -> Compression_bolted:
     """Create an instance of the Compression_bolted module design class and set it up for use"""
     module = Compression_bolted()
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     return module
 
 
