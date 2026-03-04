@@ -51,7 +51,7 @@ export const useEngineeringModule = (moduleConfig) => {
   const navigate = useNavigate();
   const service = useEngineeringService();
   const { getModuleData, getDesignPreferences } = service;
-  
+
   // Access ModuleContext to get resetModuleState function
   const { resetModuleState } = useContext(ModuleContext);
 
@@ -165,7 +165,7 @@ export const useEngineeringModule = (moduleConfig) => {
   const resetToDefaultState = () => {
     // Reset ModuleContext state (designData, logs, CAD paths, etc.)
     resetModuleState();
-    
+
     // Reset design & CAD state (hook-level state)
     resetDesignState();
 
@@ -338,7 +338,10 @@ export const useEngineeringModule = (moduleConfig) => {
 
     clearDesignResults,
     loadSavedOutputs,
-    
+
+    // Explicitly expose reset functions for targeted clears that don't destroy `inputs`
+    resetDesignState,
+
     // Expose resetModuleState for external use (e.g., module change detection)
     resetModuleState,
   };

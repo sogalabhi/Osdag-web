@@ -7,7 +7,7 @@ export const finPlateConfig = {
   designType: MODULE_KEY_FIN_PLATE,
   cameraKey: MODULE_KEY_FIN_PLATE,
   cadOptions: ["Model", "Beam", "Column", "Plate"],
-  
+
   defaultInputs: {
     bolt_diameter: [],
     bolt_grade: [],
@@ -57,8 +57,8 @@ export const finPlateConfig = {
 
     if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
       if (!inputs.beam_section || !inputs.column_section ||
-          inputs.beam_section === "Select Section" ||
-          inputs.column_section === "Select Section") {
+        inputs.beam_section === "Select Section" ||
+        inputs.column_section === "Select Section") {
         return { isValid: false, message: UI_STRINGS.PLEASE_INPUT_ALL_FIELDS };
       }
     } else if (connectivity === "Beam-Beam") {
@@ -66,7 +66,7 @@ export const finPlateConfig = {
         return { isValid: false, message: UI_STRINGS.PLEASE_INPUT_ALL_FIELDS };
       }
     }
-    
+
     return { isValid: true };
   },
 
@@ -78,7 +78,7 @@ export const finPlateConfig = {
     };
 
     const connectivity = extraState?.selectedOption || inputs.connectivity;
-    
+
     if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
       return {
         "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
@@ -144,7 +144,7 @@ export const finPlateConfig = {
           type: "connectivitySelect"
         },
         {
-          key: "column_section", 
+          key: "column_section",
           label: UI_STRINGS.COLUMN_SECTION,
           type: "select",
           options: "columnList",
@@ -155,7 +155,7 @@ export const finPlateConfig = {
         },
         {
           key: "beam_section",
-          label: UI_STRINGS.BEAM_SECTION, 
+          label: UI_STRINGS.BEAM_SECTION,
           type: "select",
           options: "beamList",
           conditionalDisplay: (extraState) => {

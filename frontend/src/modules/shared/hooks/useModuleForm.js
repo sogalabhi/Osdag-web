@@ -20,7 +20,12 @@ export const useModuleForm = (moduleConfig, moduleData) => {
   const safeModuleData = moduleData || {};
 
   // Inputs state
-  const [inputs, setInputs] = useState(moduleConfig.defaultInputs);
+  const [inputs, setInputs] = useState(() => {
+    // If we're loading an existing project, DO NOT populate default inputs.
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasProjectId = urlParams.get('projectId') != null || window.location.pathname.match(/\/\d+$/);
+    return hasProjectId ? {} : moduleConfig.defaultInputs;
+  });
 
   // Initialize extraState based on module type (delegated to config when available)
   const resolveInitialExtraState = () => {
@@ -160,31 +165,36 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
   // "Select All" logic - syncs lists into inputs when All is active (uses INPUT_KEY_TO_LIST + moduleData)
   useEffect(() => {
-    const nextInputs = { ...inputs };
-    let changed = false;
+    setInputs((prev) => {
+      let isChanged = false;
+      const nextInputs = { ...prev };
 
-    Object.entries(INPUT_KEY_TO_LIST).forEach(([inputKey, listKey]) => {
-      if (!allSelected?.[inputKey]) return;
-      const current = inputs?.[inputKey];
-      const isEmptyArray = Array.isArray(current) ? current.length === 0 : !current;
-      if (!isEmptyArray) return;
-      const fullList = safeModuleData[listKey];
-      const normalized = Array.isArray(fullList)
-        ? fullList.map((val) => {
+      Object.entries(INPUT_KEY_TO_LIST).forEach(([inputKey, listKey]) => {
+        if (!allSelected?.[inputKey]) return;
+
+        const current = prev?.[inputKey];
+        const isEmptyArray = Array.isArray(current) ? current.length === 0 : !current;
+        if (!isEmptyArray) return;
+
+        const fullList = safeModuleData[listKey];
+        const normalized = Array.isArray(fullList)
+          ? fullList.map((val) => {
             if (typeof val === "object" && val !== null) {
               return val.value || val.Grade || String(val);
             }
             return String(val);
           })
-        : [];
-      nextInputs[inputKey] = normalized;
-      changed = true;
-    });
+          : [];
 
-    if (changed) {
-      setInputs(nextInputs);
-    }
-  }, [safeModuleData, allSelected, inputs]);
+        if (normalized.length > 0) {
+          nextInputs[inputKey] = normalized;
+          isChanged = true;
+        }
+      });
+
+      return isChanged ? nextInputs : prev;
+    });
+  }, [safeModuleData, allSelected]);
 
   // Auto-hide save input popup
   useEffect(() => {
@@ -226,7 +236,11 @@ export const useModuleForm = (moduleConfig, moduleData) => {
   };
 
   const resetFormState = () => {
-    setInputs(moduleConfig.defaultInputs);
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasProjectId = urlParams.get('projectId') != null || window.location.pathname.match(/\/\d+$/);
+    const resolvedInputs = hasProjectId ? {} : moduleConfig.defaultInputs;
+    console.log(`[useModuleForm] resetFormState: hasProjectId=${hasProjectId}, setting inputs to`, resolvedInputs);
+    setInputs(resolvedInputs);
     setExtraState(resolveInitialExtraState());
     setSelectionStates(
       (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
