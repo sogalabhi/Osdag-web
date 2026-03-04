@@ -31,8 +31,12 @@ function UnifiedDropdownMenu({
   topAngleList = [],
   cadModelPaths = null,
   contextData = null, // moduleData from hook; used for expandAllSelectedInputs
+<<<<<<< HEAD:frontend/src/modules/shared/utils/UnifiedDropdownMenu.jsx
   onMenuClick,
   onCreateProject = null, // Handler for creating project from design page
+=======
+  onCreateProject = null, // NEW: Handler for creating project from design page
+>>>>>>> c871d075 (feat: disable Create Project option when project already exists):osdagclient/src/modules/shared/utils/UnifiedDropdownMenu.jsx
   isExistingProject = false, // When true, disable "Create Project" menu item
 }) {
   const service = useEngineeringService();
@@ -201,6 +205,11 @@ function UnifiedDropdownMenu({
   const handleClick = (option) => {
     switch (option.name) {
       case "Create Project":
+        if (isExistingProject) {
+          message.info("This project is already saved. To create a new project, start a new design.");
+          setIsOpen(false);
+          return;
+        }
         if (onCreateProject) {
           onCreateProject();
         }
@@ -293,18 +302,24 @@ function UnifiedDropdownMenu({
       </div>
       {isOpen && (
         <div className="absolute top-full left-0 bg-white border border-[#ccc] border-t-0 min-w-[350px] z-[1]">
-          {dropdown.map((option, index) => (
-            <div
-              className="flex w-full justify-between text-sm text-black hover:text-white hover:bg-osdag-green cursor-pointer p-1"
-              key={index}
-              onClick={() => handleClick(option)}
-            >
-              {option.name}
-              {option.shortcut && (
-                <span className="shortcut">{option.shortcut}</span>
-              )}
-            </div>
-          ))}
+          {dropdown.map((option, index) => {
+            const isDisabled = option.name === "Create Project" && isExistingProject;
+            return (
+              <div
+                className={`flex w-full justify-between text-sm p-1 ${isDisabled
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-black hover:text-white hover:bg-osdag-green cursor-pointer"
+                  }`}
+                key={index}
+                onClick={() => !isDisabled && handleClick(option)}
+              >
+                {option.name}
+                {option.shortcut && (
+                  <span className="shortcut">{option.shortcut}</span>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
