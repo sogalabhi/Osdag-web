@@ -45,7 +45,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
   const [renderBoolean, setRenderBoolean] = useState(false);
   const [modelKey, setModelKey] = useState(0);
   const [screenshotTrigger, setScreenshotTrigger] = useState(false);
-  
+
   // Status state machine
   const [status, setStatus] = useState({
     step: DESIGN_STATUS.IDLE,
@@ -59,24 +59,24 @@ export const useDesignSubmission = (service, moduleConfig) => {
       inputs,
       allSelected,
     });
-    
+
     // Pass full moduleData as lists so buildSubmissionParams can use sectionDesignation, anchorDiameterList, etc.
     const lists = moduleData;
-    
+
     // Validation step
     setStatus({
       step: DESIGN_STATUS.VALIDATING,
       message: 'Validating inputs...',
       error: null
     });
-    
+
     const validationResult = moduleConfig.validateInputs(
       inputs,
       extraState,
       lists,
       selectionStates
     );
-    
+
     if (!validationResult.isValid) {
       setStatus({
         step: DESIGN_STATUS.ERROR,
@@ -156,7 +156,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
       if (projectId && service.updateProject) {
         try {
           await service.updateProject(projectId, {
-            inputs_json: param,
+            inputs_json: { ...inputs, ...extraState },
             outputs_json: designBody.data
           });
         } catch (err) {
@@ -170,10 +170,10 @@ export const useDesignSubmission = (service, moduleConfig) => {
         message: 'Building 3D model...',
         error: null
       });
-      
+
       const cadResult = await service.createCADModel(moduleConfig.designType, param);
       console.log("[useDesignSubmission] CAD result", cadResult);
-      
+
       if (cadResult?.success) {
         console.log('[useDesignSubmission] CAD success, files:', cadResult.files);
         // Normalize CAD keys to expected case
@@ -183,9 +183,9 @@ export const useDesignSubmission = (service, moduleConfig) => {
           const normKey = key.trim();
           const mapped =
             normKey === 'beam' ? 'Beam' :
-            normKey === 'column' ? 'Column' :
-            normKey === 'plate' ? 'Plate' :
-            normKey;
+              normKey === 'column' ? 'Column' :
+                normKey === 'plate' ? 'Plate' :
+                  normKey;
           normalizedFiles[mapped] = value;
         });
 
@@ -196,14 +196,14 @@ export const useDesignSubmission = (service, moduleConfig) => {
         setDisplayOutput(true);
         setLoading(false);
         setModelKey((prev) => prev + 1);
-        
+
         // Complete
         setStatus({
           step: DESIGN_STATUS.COMPLETE,
           message: 'Design complete!',
           error: null
         });
-        
+
         // Auto-dismiss after 1 second
         setTimeout(() => {
           setStatus({
@@ -228,7 +228,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
       // Determine if this is a calculation error or CAD error
       const hasOutput = output !== null;
       const errorMessage = e.message || 'An error occurred during design';
-      
+
       if (hasOutput) {
         // Partial success: calculation worked, CAD failed
         setStatus({
@@ -244,7 +244,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
           error: e
         });
       }
-      
+
       setLoading(false);
       setRenderBoolean(false);
     }
@@ -285,28 +285,28 @@ export const useDesignSubmission = (service, moduleConfig) => {
 
   const loadSavedOutputs = (outputsData) => {
     if (!outputsData || Object.keys(outputsData).length === 0) return;
-    
+
     const formattedOutput = {};
     for (const [key, value] of Object.entries(outputsData)) {
       const label = value?.label ?? key;
       const val = value?.val ?? value?.value ?? value;
       formattedOutput[key] = { label, val: val !== undefined && val !== null ? val : "" };
     }
-    
+
     setOutput(formattedOutput);
     setDisplayOutput(true);
   };
 
   const loadOutputs = (outputsData) => {
     if (!outputsData) return;
-    
+
     const formattedOutput = {};
     for (const [key, value] of Object.entries(outputsData)) {
       const label = value?.label ?? key;
       const val = value?.val ?? value?.value ?? value;
       formattedOutput[key] = { label, val: val !== undefined && val !== null ? val : "" };
     }
-    
+
     setDesignData(outputsData);
     setOutput(formattedOutput);
     setDisplayOutput(true);

@@ -129,18 +129,17 @@ export const EngineeringModule = ({
     handleReset,
     handleHomeClick,
     performReset,
+
+    // Report
     handleCreateDesignReport,
     handleCancelDesignReport,
     clearDesignResults,
     loadSavedOutputs,
-<<<<<<< HEAD:frontend/src/modules/shared/components/EngineeringModule.jsx
     loadOutputs,
     resetDesignState,
-=======
-
->>>>>>> c871d075 (feat: disable Create Project option when project already exists):osdagclient/src/modules/shared/components/EngineeringModule.jsx
-    // Service API (for project/OSI operations)
     service,
+
+    // Direct access to module context reset
     resetModuleState,
     contextData,
   } = useEngineeringModule(moduleConfig);
@@ -374,6 +373,7 @@ export const EngineeringModule = ({
         }
         if (result.project.inputs_json) {
           try {
+            console.log('[EngineeringModule] Project inputs_json keys:', Object.keys(result.project.inputs_json));
             setInputs(result.project.inputs_json);
           } catch (_ignored) {
             // ignore parse issues
@@ -483,8 +483,9 @@ export const EngineeringModule = ({
         setShowCad(true);
       }
 
-      // Reset all the data that controls model rendering
-      await performReset();
+      // Reset all the data that controls model rendering but PRESERVE inputs
+      clearDesignResults();
+      resetModuleState();
 
       // Small delay to ensure reset is processed
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -806,12 +807,14 @@ export const EngineeringModule = ({
       const safeProjectName = (projectName || 'Untitled Project').replace(/\s+/g, '_');
       const module_id = moduleConfig?.designType || inputs?.module;
       const parent_module = moduleConfig?.parentModule || 'connections';
+      const mergedState = { ...inputs, ...extraState };
+      const inputsForSave = expandAllSelectedInputs(mergedState, allSelected, contextData);
 
       const payload = {
         name: safeProjectName,
         module: parent_module,
         submodule: module_id,
-        inputs_json: inputs || {},
+        inputs_json: inputsForSave || {},
       };
 
       const result = await service.createProject(payload);
@@ -1342,7 +1345,6 @@ export const EngineeringModule = ({
                         }
                         return null;
                       })()}
-<<<<<<< HEAD:frontend/src/modules/shared/components/EngineeringModule.jsx
                       <CadSceneProvider>
                         <CadScene
                           modelPaths={normalizedCadModelPaths}
@@ -1370,28 +1372,6 @@ export const EngineeringModule = ({
                         />
                         <ReportCaptureDev />
                       </CadSceneProvider>
-=======
-                      <Model
-                        modelPaths={normalizedCadModelPaths}
-                        selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
-                        selectedViews={selectedSection}
-                        isMobile={isMobile}
-                        cameraSettings={{
-                          ...cameraSettings,
-                          connectivity: getConnectivity(), // Add connectivity info
-                        }}
-                        hoverDict={hoverDict}
-                        onHoverLabel={handleHoverLabel}
-                        onHoverEnd={handleHoverEnd}
-                        moduleCadConfig={moduleConfig}
-                        key={`${modelKey}-${selectedSection}`}
-                      />
-                      <ScreenshotCapture
-                        screenshotTrigger={screenshotTrigger}
-                        setScreenshotTrigger={setScreenshotTrigger}
-                        selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
-                      />
->>>>>>> c871d075 (feat: disable Create Project option when project already exists):osdagclient/src/modules/shared/components/EngineeringModule.jsx
                     </Suspense>
                   </Canvas>
                 </div>

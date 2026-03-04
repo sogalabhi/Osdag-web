@@ -31,12 +31,8 @@ function UnifiedDropdownMenu({
   topAngleList = [],
   cadModelPaths = null,
   contextData = null, // moduleData from hook; used for expandAllSelectedInputs
-<<<<<<< HEAD:frontend/src/modules/shared/utils/UnifiedDropdownMenu.jsx
   onMenuClick,
   onCreateProject = null, // Handler for creating project from design page
-=======
-  onCreateProject = null, // NEW: Handler for creating project from design page
->>>>>>> c871d075 (feat: disable Create Project option when project already exists):osdagclient/src/modules/shared/utils/UnifiedDropdownMenu.jsx
   isExistingProject = false, // When true, disable "Create Project" menu item
 }) {
   const service = useEngineeringService();
