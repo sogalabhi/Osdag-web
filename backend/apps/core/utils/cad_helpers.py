@@ -42,6 +42,10 @@ SECTION_MAPPINGS = {
     'base-plate': {
         'base-plate': ['Model', 'Column', 'Plate'],
     },
+    'compression-member': {
+        'struts-bolted': ['Model', 'Member'],
+        'axially-loaded-column': ['Model'],
+    },
 }
 
 

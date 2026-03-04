@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny
 from .registry import CompressionMemberRegistry
 from apps.core.utils.module_helpers import handle_design_request
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
-from apps.core.models import Material, CustomMaterials, Bolt, Angles, Channels
+from apps.core.models import Material, CustomMaterials, Bolt, Angles, Channels, Beams, Columns, RHS, SHS, CHS
 
 
 class CompressionMemberViewSet(viewsets.ViewSet):
@@ -34,7 +34,10 @@ class CompressionMemberViewSet(viewsets.ViewSet):
         normalized = raw_slug.replace('_', '-').lower()
         module_id_map = {
             'struts-bolted-design': 'struts-bolted',
-            'compression-member-design': 'struts-bolted',  # Legacy support
+            'compression-member-design': 'struts-bolted',  # Legacy support for old compression-member
+            'axially-loaded-column': 'axially-loaded-column',
+            'axially_loaded_column': 'axially-loaded-column',
+            'axiallyloadedcolumn': 'axially-loaded-column',
         }
         return module_id_map.get(normalized, normalized)
     
@@ -174,6 +177,40 @@ class CompressionMemberViewSet(viewsets.ViewSet):
                 }
                 return Response(data, status=status.HTTP_200_OK)
 
+            if slug == 'axially-loaded-column':
+                section_profile_list = [
+                    "Beams and Columns",
+                    "RHS and SHS",
+                    "CHS",
+                    "Angles",
+                    "Back to Back Angles",
+                    "Channels",
+                    "Back to Back Channels",
+                ]
+                beams_list = list(Beams.objects.values_list("Designation", flat=True))
+                columns_list = list(Columns.objects.values_list("Designation", flat=True))
+                rhs_list = list(RHS.objects.values_list("Designation", flat=True))
+                shs_list = list(SHS.objects.values_list("Designation", flat=True))
+                chs_list = list(CHS.objects.values_list("Designation", flat=True))
+                angles_list = list(Angles.objects.values_list("Designation", flat=True))
+                channels_list = list(Channels.objects.values_list("Designation", flat=True))
+
+                end_condition_list = ["Fixed", "Free", "Hinged", "Roller"]
+
+                data = {
+                    "materialList": material_list(),  # for Member/section material
+                    "sectionProfileList": section_profile_list,
+                    "beamList": [str(x) for x in beams_list],
+                    "columnList": [str(x) for x in columns_list],
+                    "rhsList": [str(x) for x in rhs_list],
+                    "shsList": [str(x) for x in shs_list],
+                    "chsList": [str(x) for x in chs_list],
+                    "angleList": [str(x) for x in angles_list],
+                    "channelList": [str(x) for x in channels_list],
+                    "endConditionList": end_condition_list,
+                }
+                return Response(data, status=status.HTTP_200_OK)
+
             return Response({'error': f'Sub-module {slug} not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as exc:
             return Response({'error': str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -235,6 +272,9 @@ class CompressionMemberViewSet(viewsets.ViewSet):
             try:
                 if normalized_slug == 'struts_bolted':
                     from .submodules.struts_bolted.adapter import create_from_input
+                    create_from_input_func = create_from_input
+                elif normalized_slug == 'axially-loaded-column':
+                    from .submodules.axially_loaded_column.adapter import create_from_input
                     create_from_input_func = create_from_input
             except ImportError as e:
                 print(f"[CompressionMemberViewSet] Could not import create_from_input for {normalized_slug}: {e}")

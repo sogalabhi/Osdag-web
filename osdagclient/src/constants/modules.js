@@ -22,6 +22,7 @@ import {
     MODULE_KEY_TENSION_BOLTED,
     MODULE_KEY_TENSION_WELDED,
     MODULE_KEY_STRUTS_BOLTED,
+    MODULE_KEY_AXIALLY_LOADED_COLUMN,
 } from "./DesignKeys";
 import { UI_STRINGS } from "./UIStrings";
 
@@ -109,6 +110,7 @@ export const GENERIC_SUBMODULE_CONTENT = {
             label: UI_STRINGS.COMPRESSION_MEMBER,
             options: [
                 { key: MODULE_KEY_STRUTS_BOLTED, label: "Struts Bolted to End Gusset", img: "shear_fin_plate_connec.svg" },
+                { key: MODULE_KEY_AXIALLY_LOADED_COLUMN, label: "Axially Loaded Column", img: "shear_fin_plate_connec.svg" },
                 { key: "StrutsInTrusses", label: "Struts in Trusses", img: "shear_fin_plate_connec.svg" },
             ],
 
@@ -154,6 +156,7 @@ export const MODULE_ROUTES = {
     [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: "/design/connections/column-beam/end_plate",
     StrutsInTrusses: "/design/compression_member/compression_member/struts_in_trusses",
     [MODULE_KEY_STRUTS_BOLTED]: "/design/compression-member/struts_bolted_to_end_gusset",
+    [MODULE_KEY_AXIALLY_LOADED_COLUMN]: "/design/compression_member/compression_member/axially_loaded_column",
     // Add other needed routes
 };
 
