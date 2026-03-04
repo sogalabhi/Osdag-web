@@ -133,8 +133,12 @@ export const EngineeringModule = ({
     handleCancelDesignReport,
     clearDesignResults,
     loadSavedOutputs,
+<<<<<<< HEAD:frontend/src/modules/shared/components/EngineeringModule.jsx
     loadOutputs,
     resetDesignState,
+=======
+
+>>>>>>> c871d075 (feat: disable Create Project option when project already exists):osdagclient/src/modules/shared/components/EngineeringModule.jsx
     // Service API (for project/OSI operations)
     service,
     resetModuleState,
@@ -158,7 +162,7 @@ export const EngineeringModule = ({
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
-  
+
   // Project creation modal state
   const [showProjectModal, setShowProjectModal] = useState(false);
 
@@ -335,7 +339,7 @@ export const EngineeringModule = ({
       console.info('[EngineeringModule] Guest mode detected: skipping project loading');
       return;
     }
-    
+
     const projectId = projectIdFromUrl;
     // If no project ID, allow user to work without project (they can create one later)
     if (!projectId || Number.isNaN(projectId)) {
@@ -343,13 +347,13 @@ export const EngineeringModule = ({
       lastLoadedProjectIdRef.current = null;
       return;
     }
-    
+
     // Prevent infinite loop: only fetch once per projectId
     if (lastLoadedProjectIdRef.current === projectId) {
       return;
     }
     lastLoadedProjectIdRef.current = projectId;
-    
+
     (async () => {
       try {
         resetModuleState();
@@ -802,14 +806,14 @@ export const EngineeringModule = ({
       const safeProjectName = (projectName || 'Untitled Project').replace(/\s+/g, '_');
       const module_id = moduleConfig?.designType || inputs?.module;
       const parent_module = moduleConfig?.parentModule || 'connections';
-      
+
       const payload = {
         name: safeProjectName,
         module: parent_module,
         submodule: module_id,
         inputs_json: inputs || {},
       };
-      
+
       const result = await service.createProject(payload);
       if (result.success && result.project_id) {
         message.success(`Project "${safeProjectName}" created successfully`);
@@ -961,6 +965,7 @@ export const EngineeringModule = ({
               cadModelPaths={cadModelPaths}
               contextData={contextData}
               onCreateProject={handleCreateProject}
+              isExistingProject={!!projectIdFromUrl}
             />
           ))}
 
@@ -1337,6 +1342,7 @@ export const EngineeringModule = ({
                         }
                         return null;
                       })()}
+<<<<<<< HEAD:frontend/src/modules/shared/components/EngineeringModule.jsx
                       <CadSceneProvider>
                         <CadScene
                           modelPaths={normalizedCadModelPaths}
@@ -1364,6 +1370,28 @@ export const EngineeringModule = ({
                         />
                         <ReportCaptureDev />
                       </CadSceneProvider>
+=======
+                      <Model
+                        modelPaths={normalizedCadModelPaths}
+                        selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
+                        selectedViews={selectedSection}
+                        isMobile={isMobile}
+                        cameraSettings={{
+                          ...cameraSettings,
+                          connectivity: getConnectivity(), // Add connectivity info
+                        }}
+                        hoverDict={hoverDict}
+                        onHoverLabel={handleHoverLabel}
+                        onHoverEnd={handleHoverEnd}
+                        moduleCadConfig={moduleConfig}
+                        key={`${modelKey}-${selectedSection}`}
+                      />
+                      <ScreenshotCapture
+                        screenshotTrigger={screenshotTrigger}
+                        setScreenshotTrigger={setScreenshotTrigger}
+                        selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
+                      />
+>>>>>>> c871d075 (feat: disable Create Project option when project already exists):osdagclient/src/modules/shared/components/EngineeringModule.jsx
                     </Suspense>
                   </Canvas>
                 </div>
