@@ -39,7 +39,7 @@
   font-style: normal;
   font-variation-settings:
     "wdth" 100;
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .app {
@@ -254,7 +254,7 @@
 }
 
 .design-types-cont {
-  background-color: rgba(128, 128, 128, 0.075); 
+  background-color: rgba(128, 128, 128, 0.075);
   padding: 0.25rem;
   height: 100%;
 }
@@ -416,7 +416,7 @@
 }
 
 .navbar-control-icon {
-  @apply w-5 h-5 cursor-pointer transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)];
+  @apply w-5 h-5 cursor-pointer transition-transform duration-200 ease-in-out;
   filter: brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%);
 }
 
@@ -468,7 +468,7 @@
 
 .navbar-control-icon.active {
   filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(119%) contrast(119%);
-  @apply transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)];
+  @apply transition-all duration-200 ease-in-out;
 }
 
 .options-container {
@@ -485,7 +485,7 @@
 
 .model-container.full-height {
   height: calc(100vh - 60px);
-  @apply transition-[height] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)];
+  @apply transition-[height] duration-500 ease-in-out;
 }
 
 .logs-container {
@@ -793,11 +793,11 @@
 }
 
 .component-grid {
-  @apply flex flex-col w-full p-4 pt-2;
+  @apply flex flex-col w-full px-3 py-1;
 }
 
 .component-grid h4 {
-  @apply w-[40%] text-sm font-medium text-osdag-text-primary dark:text-white;
+  @apply text-sm font-medium text-osdag-text-primary dark:text-white;
 }
 
 .react-select-container {
@@ -971,7 +971,7 @@
 }
 
 .superMain_right {
-  @apply w-1/4 h-full translate-x-0;
+  @apply w-[420px] h-full translate-x-0;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -1216,7 +1216,7 @@
 
 /* Pop Up Spacing - Finplate */
 .spacing-main-body {
-	display: flex;
+  display: flex;
   width: 100%;
   flex-direction: column;
   justify-content: center;
@@ -1231,7 +1231,7 @@
 
 .spacing-left-body {
   width: 50%;
-	display: flex;
+  display: flex;
   flex-direction: column;
   margin: 1rem 0rem 0rem 1rem;
   font-size: 12px;
@@ -1239,14 +1239,14 @@
 
 
 .spacing-right-body {
-	display: flex;
-	width: 55%;
+  display: flex;
+  width: 55%;
   margin: 0.5rem;
   background-color: white;
 }
 
 .grid-container {
-	width: 100%;
+  width: 100%;
 }
 
 /* End */
@@ -1265,16 +1265,16 @@
 }
 
 .Capacity-sub-body {
-	display: flex;
+  display: flex;
   justify-content: space-between;
   width: 100%;
 }
 
 .Capacity-left-body {
   width: 40%;
-	display: flex;
+  display: flex;
   flex-direction: column;
-	align-items: center;
+  align-items: center;
   padding: 0.5rem;
   font-size: 13px;
 }
@@ -1288,9 +1288,9 @@
 
 .Capacity-right-body {
   width: 60%;
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
   flex-direction: column;
 }
 
@@ -1340,7 +1340,7 @@
 /* Design pref container*/
 .design-pref-cont{
   margin-top: 10px;
-  border: 1px solid #000; 
+  border: 1px solid #000;
   width: 100% !important;
   padding: 10px;
   overflow-y: scroll;
@@ -1385,7 +1385,7 @@
 }
 .DesignPrefFooter{
   /* border-top: 1px solid #000; Change the color and thickness as desired */
-  margin-top: 5px; 
+  margin-top: 5px;
   display: flex;
   padding: 1rem;
   flex-direction: row;
@@ -1393,7 +1393,7 @@
   align-items: center;
   column-gap: 5px;
   font-size: 12px;
-  
+
 }
 
 .DesignPrefFooter-btn Button {
@@ -1433,7 +1433,7 @@
 }
 .subDesignPrefFooter{
   border-top: 1px solid #000; /* Change the color and thickness as desired */
-  margin-top: 5px; 
+  margin-top: 5px;
   display: flex;
   padding: 1rem;
   flex-direction: row;
@@ -1441,7 +1441,7 @@
   align-items: center;
   column-gap: 6rem;
   font-size: 12px;
-  
+
 }
 .readonly-textarea {
   border: 1px solid #ccc; /* Add a border to indicate it's a textarea */
