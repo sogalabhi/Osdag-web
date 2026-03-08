@@ -25,7 +25,6 @@ export const OSI = {
 // Reports
 // ----------------------
 export const REPORTS = {
-  generateInitial: `${API_PREFIX}report/generate-initial/`, // POST
   customize: `${API_PREFIX}report/customize/`, // POST (returns PDF stream)
 };
 
@@ -36,6 +35,8 @@ export const MODULES = {
   options: (slug) => `${API_PREFIX}modules/${slug}/options/`, // GET
   design: (slug) => `${API_PREFIX}modules/${slug}/design/`, // POST
   cad: (slug) => `${API_PREFIX}modules/${slug}/cad/`, // POST
+  reportGenerateInitial: (slug) =>
+    `${API_PREFIX}modules/${slug}/report/generate-initial/`, // POST
 };
 
 // ----------------------

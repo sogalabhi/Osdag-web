@@ -332,7 +332,6 @@ export const useEngineeringModule = (moduleConfig) => {
     designReportInputs: report.designReportInputs,
     setDesignReportInputs: report.setDesignReportInputs,
     handleCreateDesignReport: report.open,
-    handleOkDesignReport: report.submit,
     handleCancelDesignReport: report.close,
 
     clearDesignResults,

@@ -1,22 +1,37 @@
 import { apiClient } from "../utils/apiClient";
-import { REPORTS } from "./endpoints";
+import { REPORTS, MODULES } from "./endpoints";
+import { getModuleSlug } from "../constants/apiRoutes";
 
 /**
  * Generate initial report with metadata, module info and inputs.
+ *
+ * Uses slug-based module endpoints only:
+ *   POST /api/modules/{module_slug}/report/generate-initial/
  */
-export async function generateInitialReport(reportData) {
-  const res = await apiClient(REPORTS.generateInitial, {
+export async function generateInitialReport(moduleKey, reportData) {
+  const slug = moduleKey ? getModuleSlug(moduleKey) : null;
+  if (!slug) {
+    return {
+      success: false,
+      error: "Missing or invalid module key for slug-based report endpoint",
+    };
+  }
+
+  const url = MODULES.reportGenerateInitial(slug);
+  const res = await apiClient(url, {
     method: "POST",
     body: JSON.stringify(reportData),
   });
+
   const result = await res.json();
-  if (result.success) {
+  if (res.ok && result.success) {
     return {
       success: true,
       report_id: result.report_id,
       sections: result.sections,
     };
   }
+
   return { success: false, error: result.error || "Failed to generate report" };
 }
 

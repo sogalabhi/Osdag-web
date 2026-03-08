@@ -9,7 +9,7 @@ from apps.core.api import (
     JWTHomeView, GoogleSSOView,
     ProjectAPI, ProjectDetailAPI, ProjectByNameAPI,
     SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
-    ParseReportSections, CustomizeReport, GenerateInitialReport,
+    ParseReportSections, CustomizeReport,
     DesignPreference, MaterialDetails, CompanyLogoView,
     CADGeneration, CADDownload
 )
@@ -51,7 +51,6 @@ urlpatterns = [
     path('api/projects/<int:project_id>/osi', ProjectOsiDownload.as_view()),
     
     # Report customization API endpoints
-    path('api/report/generate-initial/', GenerateInitialReport.as_view(), name='generate-initial-report'),
     path('api/report/parse-sections/', ParseReportSections.as_view(), name='parse-report-sections'),
     path('api/report/customize/', CustomizeReport.as_view(), name='customize-report'),
     # Legacy populate endpoint (kept for frontend compatibility)

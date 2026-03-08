@@ -236,12 +236,13 @@ export const useEngineeringService = () => {
 
   /**
    * Generate initial report
-   * @param {Object} reportData - Report data including metadata, module_id, input_values, etc.
+   * @param {string} moduleKey - Module identifier (e.g., designType)
+   * @param {Object} reportData - Report data including metadata, input_values, etc.
    * @returns {Promise<{success: boolean, report_id?: string, sections?: Object, error?: string}>}
    */
-  const generateInitialReport = useCallback(async (reportData) => {
+  const generateInitialReport = useCallback(async (moduleKey, reportData) => {
     try {
-      return await dsGenerateInitialReport(reportData);
+      return await dsGenerateInitialReport(moduleKey, reportData);
     } catch (error) {
       return { success: false, error: error.message };
     }

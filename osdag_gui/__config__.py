@@ -1,3 +1,0 @@
-VERSION = "2025.01.a.2"
-INSTALLATION_TYPE = "conda"
-CAD_BACKEND = "pyside6"

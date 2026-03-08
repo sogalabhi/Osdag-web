@@ -12,9 +12,18 @@ from apps.core.models import Material, CustomMaterials, Bolt
 from apps.core.utils.module_helpers import handle_design_request
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from apps.core.utils.errors import format_error_response, get_error_status_code
+from apps.core.api.design.report_customization_api import generate_initial_report_core
 from .registry import SimpleConnectionRegistry
 
 logger = logging.getLogger(__name__)
+
+
+# Mapping from simple-connection slug to legacy report module_id (currently none implemented)
+SIMPLE_CONNECTION_REPORT_MODULE_ID_MAP = {
+    # Example (when report support is added):
+    # "butt-joint-bolted": "Simple-Connection-Butt-Joint-Bolted-Report",
+    # "butt-joint-welded": "Simple-Connection-Butt-Joint-Welded-Report",
+}
 
 
 class SimpleConnectionViewSet(viewsets.ViewSet):
@@ -273,3 +282,46 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
                 status=500
             )
 
+    @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
+    def report_generate_initial(self, request, submodule_slug=None):
+        """
+        POST /api/modules/simple-connection/{submodule_slug}/report/generate-initial/
+
+        Currently a placeholder: simple-connection modules do not yet have
+        desktop-style design report support wired into the backend.
+        """
+        module_id = SIMPLE_CONNECTION_REPORT_MODULE_ID_MAP.get(submodule_slug)
+        if not module_id:
+            return Response(
+                {
+                    "success": False,
+                    "error": (
+                        f"Report generation is not yet implemented for simple-connection "
+                        f"sub-module '{submodule_slug}'."
+                    ),
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        input_values = request.data.get("input_values") or request.data.get("inputs")
+        if not input_values:
+            return Response(
+                {"success": False, "error": "input_values are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        mapped_data = {
+            "module_id": module_id,
+            "input_values": input_values,
+            "metadata": request.data.get("metadata"),
+            "design_status": request.data.get("design_status", True),
+            "logs": request.data.get("logs", []),
+        }
+
+        if "sections" in request.data:
+            mapped_data["sections"] = request.data.get("sections")
+        if "customization" in request.data:
+            mapped_data["customization"] = request.data.get("customization")
+
+        payload, status_code = generate_initial_report_core(mapped_data)
+        return Response(payload, status=status_code)
