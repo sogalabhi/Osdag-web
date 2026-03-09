@@ -40,11 +40,12 @@ export const BaseOutputDock = ({
 
   // Read-only value box styled like input (transparent bg, grey border)
   const ValueBox = ({ value }) => (
-    <div
-      className="flex-1 min-w-0 px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/40 text-sm text-gray-800 dark:text-gray-100"
-      style={{ minHeight: 34 }}
-    >
-      {value !== undefined && value !== null && value !== '' ? String(value) : ' '}
+    <div className="w-[45%]">
+      <div
+        className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm flex items-center bg-transparent dark:bg-transparent text-gray-800 dark:text-gray-100"
+      >
+        {value !== undefined && value !== null && value !== '' ? String(value) : ' '}
+      </div>
     </div>
   );
 
@@ -170,17 +171,20 @@ export const BaseOutputDock = ({
     const fieldValue = getOutputValue(field.key, output);
 
     return (
-      <div key={index} className="flex items-center gap-2 py-2 px-1">
-        <h4 style={{ width: '55%', flexShrink: 0 }}>{field.label}</h4>
+      <div key={index} className="flex w-full justify-between items-center mb-3">
+        <h4 className="w-[55%] text-sm font-medium text-osdag-text-primary dark:text-white">
+          {field.label}
+        </h4>
         {isModalTrigger ? (
-          <Input
-            className="btn"
-            style={{ flex: 1 }}
-            type="button"
-            value={outputConfig.modals[field.key].buttonText || field.label}
-            disabled={!output}
-            onClick={() => handleDialog(field.key)}
-          />
+          <div className="w-[45%]">
+            <input
+              type="button"
+              className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-500 cursor-pointer text-gray-800 dark:text-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              value={outputConfig.modals[field.key].buttonText || field.label}
+              disabled={!output}
+              onClick={() => handleDialog(field.key)}
+            />
+          </div>
         ) : (
           <ValueBox value={fieldValue} />
         )}
