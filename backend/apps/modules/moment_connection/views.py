@@ -12,6 +12,19 @@ from .registry import MomentConnectionRegistry
 from apps.core.utils.module_helpers import handle_design_request
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from apps.core.models import Columns, Beams, Bolt, Material, CustomMaterials
+from apps.core.api.design.report_customization_api import generate_initial_report_core
+
+
+# Mapping from moment-connection submodule slug to legacy report module_id
+MOMENT_REPORT_MODULE_ID_MAP = {
+    "beam-beam-cover-plate-bolted": "Cover-Plate-Bolted-Connection",
+    "beam-beam-cover-plate-welded": "Cover-Plate-Welded-Connection",
+    "beam-beam-end-plate": "Beam-Beam-End-Plate-Connection",
+    "beam-column-end-plate": "Beam-to-Column-End-Plate-Connection",
+    "column-column-cover-plate-bolted": "ColumnCoverPlateBolted",
+    "column-column-cover-plate-welded": "Column-to-Column-Cover-Plate-Welded-Connection",
+    "column-column-end-plate": "Column-to-Column-End-Plate-Connection",
+}
 
 
 class MomentConnectionViewSet(viewsets.ViewSet):
@@ -87,6 +100,54 @@ class MomentConnectionViewSet(viewsets.ViewSet):
                 {'error': str(e), 'success': False}, 
                 status=400
             )
+
+    @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
+    def report_generate_initial(self, request, submodule_slug=None):
+        """
+        POST /api/modules/moment-connection/{submodule_slug}/report/generate-initial/
+
+        Request body:
+        {
+            "metadata": {...},
+            "input_values": {...},      # Or "inputs": {...}
+            "design_status": boolean,
+            "logs": [...],
+            "sections": [...],          # Optional
+            "customization": {...}      # Optional
+        }
+        """
+        module_id = MOMENT_REPORT_MODULE_ID_MAP.get(submodule_slug)
+        if not module_id:
+            return Response(
+                {
+                    "success": False,
+                    "error": f"Report generation is not supported for moment-connection sub-module '{submodule_slug}'",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        input_values = request.data.get("input_values") or request.data.get("inputs")
+        if not input_values:
+            return Response(
+                {"success": False, "error": "input_values are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        mapped_data = {
+            "module_id": module_id,
+            "input_values": input_values,
+            "metadata": request.data.get("metadata"),
+            "design_status": request.data.get("design_status", True),
+            "logs": request.data.get("logs", []),
+        }
+
+        if "sections" in request.data:
+            mapped_data["sections"] = request.data.get("sections")
+        if "customization" in request.data:
+            mapped_data["customization"] = request.data.get("customization")
+
+        payload, status_code = generate_initial_report_core(mapped_data)
+        return Response(payload, status=status_code)
     
     @action(detail=False, methods=['get'], url_path='(?P<submodule_slug>[^/.]+)/options')
     def options(self, request, submodule_slug=None):

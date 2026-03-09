@@ -1,12 +1,12 @@
-import psycopg
-from psycopg import sql
+import psycopg2
+from psycopg2 import sql
 
 #########################################################
 # Author : Atharva Pingale ( FOSSEE Summer Fellow '23 ) #
 #########################################################
 
 
-conn = psycopg.connect(dbname='postgres_Intg_osdag', host='localhost',
+conn = psycopg2.connect(database='postgres_Intg_osdag', host='localhost',
                         user='osdagdeveloper', password='password', port='5432')
 cursor = conn.cursor()
 file = open("ResourceFiles/Database/update_sequences.sql", "r+")
@@ -15,6 +15,7 @@ data = file.read()
 
 cursor.execute(data)
 print('SUCCESS : Sequences Updated')
+
 
 
 

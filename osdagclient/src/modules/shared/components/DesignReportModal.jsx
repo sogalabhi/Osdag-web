@@ -20,7 +20,9 @@ export const DesignReportModal = ({
   thicknessList = [],
   angleList = [],
   allSelected = {},
-  extraState = {}
+  extraState = {},
+  selectedSection,
+  setSelectedSection,
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -123,6 +125,28 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           angleList,
         }, extraState) : inputValues;
 
+      // Optionally capture CAD views for report images (frontend-driven).
+      // Force Model view so report shows full assembly, not the current per-part view.
+      let images = {};
+      if (typeof window !== "undefined" && typeof window.captureReportViews === "function") {
+        try {
+          const prevSection = selectedSection;
+          if (setSelectedSection) {
+            setSelectedSection(["Model"]);
+            await new Promise((r) => setTimeout(r, 150));
+          }
+          images = await window.captureReportViews();
+          if (setSelectedSection && prevSection) {
+            setSelectedSection(Array.isArray(prevSection) ? prevSection : [prevSection]);
+          }
+        } catch (e) {
+          console.error("[DesignReportModal] captureReportViews failed", e);
+          if (setSelectedSection && prevSection) {
+            setSelectedSection(Array.isArray(prevSection) ? prevSection : [prevSection]);
+          }
+        }
+      }
+
       // Prepare request data
       const requestData = {
         metadata: {
@@ -142,10 +166,14 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
         input_values: transformedInputValues,
         design_status: designStatus,
         logs: logs,
+        images,
       };
 
       // Generate initial LaTeX report
-      const result = await service.generateInitialReport(requestData);
+      const result = await service.generateInitialReport(
+        moduleConfig?.designType || moduleId,
+        requestData
+      );
 
       if (result.success) {
         setReportId(result.report_id);

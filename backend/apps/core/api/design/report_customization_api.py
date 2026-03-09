@@ -146,7 +146,7 @@ class ParseReportSections(APIView):
                 )
             
             # Check if LaTeX file exists
-            tex_file_path = os.path.join(os.getcwd(), 'file_storage', 'design_report', f'{report_id}.tex')
+            tex_file_path = os.path.join(os.getcwd(), 'file_storage', 'design_report', report_id, f'{report_id}.tex')
             if not os.path.exists(tex_file_path):
                 return Response(
                     {"error": "LaTeX file not found. Please generate report first."}, 
@@ -210,7 +210,7 @@ class CustomizeReport(APIView):
                 )
             
             # Check if LaTeX file exists
-            tex_file_path = os.path.join(os.getcwd(), 'file_storage', 'design_report', f'{report_id}.tex')
+            tex_file_path = os.path.join(os.getcwd(), 'file_storage', 'design_report', report_id, f'{report_id}.tex')
             if not os.path.exists(tex_file_path):
                 return Response(
                     {"error": "LaTeX file not found. Please generate report first."}, 
@@ -374,227 +374,151 @@ class CustomizeReport(APIView):
             )
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class GenerateInitialReport(APIView):
+def generate_initial_report_core(mapped_data):
     """
-    API endpoint to generate initial LaTeX report without PDF compilation.
-    This is used for the first popup to generate LaTeX and get sections.
+    Shared core for initial report generation.
     
-    POST /api/report/generate-initial/
-    Body: {
-        "metadata": {...},
-        "module_id": "string",
-        "input_values": {...},
-        "design_status": boolean,
-        "logs": [...]
-    }
+    Responsibilities:
+    - Call CreateDesignReport with the provided mapped_data
+    - Read the generated LaTeX file
+    - Parse sections using LaTeXParser
+    - Return a (payload, status_code) tuple suitable for DRF Response
     """
-    permission_classes = [AllowAny]
-    
-    def dispatch(self, request, *args, **kwargs):
-        """Override dispatch to log all requests, even if blocked by permissions"""
-        print("\n" + "=" * 60)
-        print("GenerateInitialReport.dispatch() called")
-        print("=" * 60)
-        print(f"   Request method: {request.method}")
-        print(f"   Request path: {request.path}")
-        print(f"   Request user: {request.user}")
-        print(f"   User authenticated: {request.user.is_authenticated if hasattr(request.user, 'is_authenticated') else 'N/A'}")
-        print(f"   Request META keys (sample): {list(request.META.keys())[:10]}")
-        print(f"   Content-Type: {request.META.get('CONTENT_TYPE', 'N/A')}")
-        print(f"   Authorization header: {'Present' if 'HTTP_AUTHORIZATION' in request.META else 'Missing'}")
-        
-        # Check permission classes
-        if hasattr(self, 'permission_classes'):
-            print(f"   Permission classes: {self.permission_classes}")
-        else:
-            print(f"   No permission_classes defined")
-        
-        # Check authentication classes  
-        if hasattr(self, 'authentication_classes'):
-            print(f"   Authentication classes: {self.authentication_classes}")
-        else:
-            print(f"   No authentication_classes defined")
-        
-        try:
-            result = super().dispatch(request, *args, **kwargs)
-            print(f"   ✅ Dispatch completed successfully")
-            print(f"   Response status: {getattr(result, 'status_code', 'N/A')}")
-            print("=" * 60)
-            return result
-        except Exception as e:
-            print(f"   ❌ ERROR in dispatch:")
-            print(f"   Exception type: {type(e).__name__}")
-            print(f"   Exception message: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            print("=" * 60)
-            raise
-    
-    def post(self, request):
-        print("\n" + "=" * 60)
-        print("GenerateInitialReport.post() called")
-        print("=" * 60)
-        try:
-            print(f"[GenerateInitialReport] Step 1: Parsing request...")
-            print(f"   Request data keys: {list(request.data.keys()) if isinstance(request.data, dict) else 'N/A'}")
-            
-            # Map frontend camelCase keys to backend snake_case keys
-            # Also construct metadata dict from individual fields
-            mapped_data = {}
-            metadata_dict = {}
-            
-            if isinstance(request.data, dict):
-                # Map moduleId -> module_id
-                if 'moduleId' in request.data:
-                    mapped_data['module_id'] = request.data['moduleId']
-                    print(f"   ✅ Mapped moduleId -> module_id: {request.data['moduleId']}")
-                elif 'module_id' in request.data:
-                    mapped_data['module_id'] = request.data['module_id']
-                    print(f"   ✅ Using module_id: {request.data['module_id']}")
-                
-                # Map inputValues -> input_values
-                if 'inputValues' in request.data:
-                    mapped_data['input_values'] = request.data['inputValues']
-                    print(f"   ✅ Mapped inputValues -> input_values")
-                elif 'input_values' in request.data:
-                    mapped_data['input_values'] = request.data['input_values']
-                
-                # Map designStatus -> design_status
-                if 'designStatus' in request.data:
-                    mapped_data['design_status'] = request.data['designStatus']
-                    print(f"   ✅ Mapped designStatus -> design_status: {request.data['designStatus']}")
-                elif 'design_status' in request.data:
-                    mapped_data['design_status'] = request.data['design_status']
-                
-                # Construct metadata from individual fields (companyName, groupTeamName, etc.)
-                metadata_fields = {
-                    'companyName': 'CompanyName',
-                    'groupTeamName': 'Group/TeamName',
-                    'designer': 'Designer',
-                    'projectTitle': 'ProjectTitle',
-                    'subtitle': 'Subtitle',
-                    'jobNumber': 'JobNumber',
-                    'client': 'Client',
-                    'additionalComments': 'AdditionalComments',
-                    'companyLogo': 'CompanyLogo',
-                    'companyLogoName': 'CompanyLogoName'
-                }
-                
-                profile_summary = {}
-                for frontend_key, backend_key in metadata_fields.items():
-                    if frontend_key in request.data:
-                        if frontend_key in ['companyName', 'groupTeamName', 'designer', 'companyLogo', 'companyLogoName']:
-                            profile_summary[backend_key] = request.data[frontend_key]
-                        else:
-                            metadata_dict[backend_key] = request.data[frontend_key]
-                
-                if profile_summary:
-                    metadata_dict['ProfileSummary'] = profile_summary
-                
-                # Add metadata to mapped_data
-                if metadata_dict:
-                    mapped_data['metadata'] = metadata_dict
-                    print(f"   ✅ Constructed metadata with keys: {list(metadata_dict.keys())}")
-                    if 'ProfileSummary' in metadata_dict:
-                        print(f"   ProfileSummary keys: {list(metadata_dict['ProfileSummary'].keys())}")
-                
-                # Copy logs if present
-                if 'logs' in request.data:
-                    mapped_data['logs'] = request.data['logs']
-                    print(f"   ✅ Added logs: {len(request.data['logs']) if isinstance(request.data['logs'], list) else 'N/A'} items")
-            
-            print(f"   Mapped data keys: {list(mapped_data.keys())[:10]}")
-            print(f"   module_id: {mapped_data.get('module_id')}")
-            print(f"   input_values keys: {list(mapped_data.get('input_values', {}).keys())[:10] if isinstance(mapped_data.get('input_values'), dict) else 'N/A'}")
-            
-            # Import the existing CreateDesignReport logic
-            print(f"\n[GenerateInitialReport] Step 2: Importing CreateDesignReport...")
-            from .design_report_csv_view import CreateDesignReport
-            
-            # Create a mock request object with the mapped data
-            class MockRequest:
-                def __init__(self, data):
-                    self.data = data
-            
-            # Use existing CreateDesignReport but modify to return LaTeX info instead of PDF
-            print(f"[GenerateInitialReport] Step 3: Creating CreateDesignReport instance...")
-            create_report = CreateDesignReport()
-            mock_request = MockRequest(mapped_data)
-            
-            # Call the existing post method but capture the LaTeX generation
-            print(f"[GenerateInitialReport] Step 4: Calling CreateDesignReport.post()...")
-            response = create_report.post(mock_request)
-            print(f"[GenerateInitialReport] Step 5: CreateDesignReport response received")
-            print(f"   Response status_code: {getattr(response, 'status_code', None)}")
-            print(f"   Response type: {type(response)}")
-            
-            if response.status_code == 201:
-                print(f"[GenerateInitialReport] Step 6: Response status is 201, extracting report_id...")
-                # Extract report_id from response
-                response_data = response.data
-                print(f"   Response data type: {type(response_data)}")
-                print(f"   Response data keys: {list(response_data.keys()) if isinstance(response_data, dict) else 'N/A'}")
-                report_id = response_data.get('report_id')
-                print(f"   Extracted report_id: {report_id}")
-                
-                if report_id:
-                    print(f"\n[GenerateInitialReport] Step 7: Parsing LaTeX sections...")
-                    # Parse sections from the generated LaTeX
-                    tex_file_path = os.path.join(os.getcwd(), 'file_storage', 'design_report', f'{report_id}.tex')
-                    print(f"   LaTeX file path: {tex_file_path}")
-                    print(f"   File exists: {os.path.exists(tex_file_path)}")
-                    
-                    if os.path.exists(tex_file_path):
-                        file_size = os.path.getsize(tex_file_path)
-                        print(f"   File size: {file_size} bytes")
-                        
-                        print(f"   Reading LaTeX file...")
-                        with open(tex_file_path, 'r', encoding='utf-8') as f:
-                            latex_content = f.read()
-                        print(f"   LaTeX content length: {len(latex_content)} characters")
-                        
-                        print(f"   Parsing sections...")
-                        parser = LaTeXParser()
-                        sections = parser.parse_sections(latex_content)
-                        print(f"   ✅ Parsed {len(sections)} sections")
-                        print(f"   Section keys: {list(sections.keys())}")
-                        
-                        response_payload = {
-                            "success": True,
-                            "report_id": report_id,
-                            "sections": sections,
-                            "message": "LaTeX report generated successfully"
-                        }
-                        print(f"[GenerateInitialReport] Step 8: Returning success response")
-                        print(f"   report_id: {report_id}")
-                        print(f"   sections_count: {len(sections)}")
-                        print("=" * 60)
-                        return Response(response_payload, status=status.HTTP_201_CREATED)
-                    else:
-                        print(f"   ❌ ERROR: LaTeX file not found at {tex_file_path}")
-                else:
-                    print(f"   ❌ ERROR: report_id is None or empty")
+    try:
+        print(f"[GenerateInitialReportCore] mapped_data keys: {list(mapped_data.keys())}")
+        from .design_report_csv_view import CreateDesignReport
+
+        class MockRequest:
+            def __init__(self, data):
+                self.data = data
+
+        # Run the existing CreateDesignReport logic
+        print("[GenerateInitialReportCore] Creating CreateDesignReport instance...")
+        create_report = CreateDesignReport()
+        mock_request = MockRequest(mapped_data)
+
+        print("[GenerateInitialReportCore] Calling CreateDesignReport.post()...")
+        response = create_report.post(mock_request)
+        print("[GenerateInitialReportCore] CreateDesignReport response received")
+        status_code = getattr(response, "status_code", None)
+        print(f"[GenerateInitialReportCore] status_code: {status_code}")
+
+        if status_code != status.HTTP_201_CREATED:
+            # Bubble up detailed error info when available
+            error_payload = {}
+            if hasattr(response, "data"):
+                error_payload = response.data
+                print(f"[GenerateInitialReportCore] error response.data: {error_payload}")
             else:
-                print(f"   ❌ ERROR: Response status_code is {response.status_code}, expected 201")
-                if hasattr(response, 'data'):
-                    print(f"   Response data: {response.data}")
-            
-            print(f"\n[GenerateInitialReport] Returning error response")
-            print("=" * 60)
-            return Response(
-                {"error": "Failed to generate initial report"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                error_payload = {"error": "Failed to generate design report"}
+
+            # Prefer any existing message/error keys for client display
+            message = None
+            if isinstance(error_payload, dict):
+                message = (
+                    error_payload.get("error")
+                    or error_payload.get("message")
+                    or str(error_payload)
+                )
+            else:
+                message = str(error_payload)
+
+            return (
+                {
+                    "success": False,
+                    "error": message or "Failed to generate design report",
+                    "details": error_payload if isinstance(error_payload, dict) else None,
+                },
+                status.HTTP_400_BAD_REQUEST,
             )
-            
-        except Exception as e:
-            print(f"\n[GenerateInitialReport] ❌ EXCEPTION occurred:")
-            print(f"   Exception type: {type(e).__name__}")
-            print(f"   Exception message: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            print("=" * 60)
-            return Response(
-                {"error": f"Failed to generate initial report: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        # On success, extract report_id from response
+        response_data = getattr(response, "data", {}) or {}
+        print(
+            "[GenerateInitialReportCore] success response.data keys:",
+            list(response_data.keys()) if isinstance(response_data, dict) else "N/A",
+        )
+        report_id = response_data.get("report_id")
+        print(f"[GenerateInitialReportCore] extracted report_id: {report_id}")
+
+        if not report_id:
+            return (
+                {
+                    "success": False,
+                    "error": "report_id missing from design report response",
+                },
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+        # Locate and read the generated LaTeX file.
+        # New layout (per-report folder):
+        #   file_storage/design_report/{report_id}/{report_id}.tex
+        # Legacy layout (flat):
+        #   file_storage/design_report/{report_id}.tex
+        base_dir = os.path.join(os.getcwd(), "file_storage", "design_report")
+        new_style_path = os.path.join(base_dir, report_id, f"{report_id}.tex")
+        legacy_path = os.path.join(base_dir, f"{report_id}.tex")
+
+        if os.path.exists(new_style_path):
+            tex_file_path = new_style_path
+        else:
+            tex_file_path = legacy_path
+
+        print(f"[GenerateInitialReportCore] LaTeX file path: {tex_file_path}")
+        exists = os.path.exists(tex_file_path)
+        print(f"[GenerateInitialReportCore] LaTeX file exists: {exists}")
+
+        if not exists:
+            return (
+                {
+                    "success": False,
+                    "error": f"LaTeX file not found at {tex_file_path}",
+                    "report_id": report_id,
+                },
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        file_size = os.path.getsize(tex_file_path)
+        print(f"[GenerateInitialReportCore] LaTeX file size: {file_size} bytes")
+
+        with open(tex_file_path, "r", encoding="utf-8") as f:
+            latex_content = f.read()
+        print(
+            "[GenerateInitialReportCore] LaTeX content length:",
+            len(latex_content),
+        )
+
+        # Parse sections using the existing LaTeXParser
+        parser = LaTeXParser()
+        sections = parser.parse_sections(latex_content)
+        print(
+            "[GenerateInitialReportCore] Parsed sections count:",
+            len(sections),
+        )
+        print(
+            "[GenerateInitialReportCore] Section keys:",
+            list(sections.keys()),
+        )
+
+        payload = {
+            "success": True,
+            "report_id": report_id,
+            "sections": sections,
+            "message": "LaTeX report generated successfully",
+        }
+        return payload, status.HTTP_201_CREATED
+
+    except Exception as e:
+        print("[GenerateInitialReportCore] Exception:", str(e))
+        import traceback
+
+        traceback.print_exc()
+        return (
+            {
+                "success": False,
+                "error": f"Failed to generate initial report: {str(e)}",
+            },
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+

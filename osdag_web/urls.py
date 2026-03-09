@@ -23,13 +23,14 @@ BACKEND_DIR = BASE_DIR / 'backend'
 if str(BACKEND_DIR) not in sys.path:
     sys.path.append(str(BACKEND_DIR))
 
-from apps.core.views import FirebaseLoginView, dashboard_view
+from apps.core.views import FirebaseAuthView, dashboard_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', include('osdag.urls')),
     path('', include('apps.core.urls')),
-    path('api/auth/firebase-login/', FirebaseLoginView.as_view(), name="firebase_login"),
+    path('api/modules/', include('apps.modules.urls')),
+    path('api/auth/firebase-login/', FirebaseAuthView.as_view(), name="firebase_auth"),
     # path("api/auth/firebase-login/", views.firebase_login, name="firebase_login"),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

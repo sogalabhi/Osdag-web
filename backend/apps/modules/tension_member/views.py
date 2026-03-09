@@ -11,6 +11,14 @@ from .registry import TensionMemberRegistry
 from apps.core.utils.module_helpers import handle_design_request
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from apps.core.models import Material, CustomMaterials, Bolt, Angles, Channels
+from apps.core.api.design.report_customization_api import generate_initial_report_core
+
+
+# Mapping from tension-member slug to legacy report module_id
+TENSION_REPORT_MODULE_ID_MAP = {
+    "bolted": "Tension-Member-Bolted-Design",
+    "welded": "Tension-Member-Welded-Design",
+}
 
 
 class TensionMemberViewSet(viewsets.ViewSet):
@@ -106,6 +114,55 @@ class TensionMemberViewSet(viewsets.ViewSet):
                 {'error': str(e), 'success': False}, 
                 status=400
             )
+
+    @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
+    def report_generate_initial(self, request, submodule_slug=None):
+        """
+        POST /api/modules/tension-member/{submodule_slug}/report/generate-initial/
+
+        Request body:
+        {
+            "metadata": {...},
+            "input_values": {...},      # Or "inputs": {...}
+            "design_status": boolean,
+            "logs": [...],
+            "sections": [...],          # Optional
+            "customization": {...}      # Optional
+        }
+        """
+        normalized_slug = self._normalize_slug(submodule_slug)
+        module_id = TENSION_REPORT_MODULE_ID_MAP.get(normalized_slug)
+        if not module_id:
+            return Response(
+                {
+                    "success": False,
+                    "error": f"Report generation is not supported for tension-member sub-module '{normalized_slug}'",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        input_values = request.data.get("input_values") or request.data.get("inputs")
+        if not input_values:
+            return Response(
+                {"success": False, "error": "input_values are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        mapped_data = {
+            "module_id": module_id,
+            "input_values": input_values,
+            "metadata": request.data.get("metadata"),
+            "design_status": request.data.get("design_status", True),
+            "logs": request.data.get("logs", []),
+        }
+
+        if "sections" in request.data:
+            mapped_data["sections"] = request.data.get("sections")
+        if "customization" in request.data:
+            mapped_data["customization"] = request.data.get("customization")
+
+        payload, status_code = generate_initial_report_core(mapped_data)
+        return Response(payload, status=status_code)
     
     @action(detail=False, methods=['get'], url_path='(?P<submodule_slug>[^/.]+)/options')
     def options(self, request, submodule_slug=None):

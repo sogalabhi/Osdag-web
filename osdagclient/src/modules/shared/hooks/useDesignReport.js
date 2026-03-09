@@ -63,7 +63,10 @@ export const useDesignReport = (
         payload.sections = selectedSections;
       }
 
-      const result = await service.generateInitialReport(payload);
+      const result = await service.generateInitialReport(
+        moduleConfig?.designType,
+        payload
+      );
       if (result?.success) {
         close();
       } else {

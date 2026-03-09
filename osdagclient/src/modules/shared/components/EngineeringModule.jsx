@@ -19,11 +19,16 @@ import { CustomizationModal } from "../components/CustomizationModal";
 import { DesignReportModal } from "../components/DesignReportModal";
 import { DesignStatusModal } from "./DesignStatusModal";
 import { DESIGN_STATUS } from "../hooks/useDesignSubmission";
-import useViewCamera from "./btobViewCamera";
-import Model from "./CadViewer";
+import {
+  CadScene,
+  useViewCamera,
+  ScreenshotCapture,
+  ReportCaptureDev,
+  CadSceneProvider,
+  CadSceneBbox,
+} from "./cad";
 import Logs from "./Logs";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
-import ScreenshotCapture from "./ScreenShotCapture";
 import DesignPrefSections from "./DesignPrefSections";
 import GridSelector from "../utils/GridSelector";
 import { message, Modal as AntdModal } from 'antd';
@@ -125,7 +130,6 @@ export const EngineeringModule = ({
     handleHomeClick,
     performReset,
     handleCreateDesignReport,
-    handleOkDesignReport,
     handleCancelDesignReport,
     clearDesignResults,
 
@@ -1279,26 +1283,33 @@ export const EngineeringModule = ({
                         }
                         return null;
                       })()}
-                      <Model
-                        modelPaths={normalizedCadModelPaths}
-                        selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
-                        selectedViews={selectedSection}
-                        isMobile={isMobile}
-                        cameraSettings={{
-                          ...cameraSettings,
-                          connectivity: getConnectivity(), // Add connectivity info
-                        }}
-                        hoverDict={hoverDict}
-                        onHoverLabel={handleHoverLabel}
-                        onHoverEnd={handleHoverEnd}
-                        moduleCadConfig={moduleConfig}
-                        key={`${modelKey}-${selectedSection}`}
-                      />
-                      <ScreenshotCapture
-                        screenshotTrigger={screenshotTrigger}
-                        setScreenshotTrigger={setScreenshotTrigger}
-                        selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
-                      />
+                      <CadSceneProvider>
+                        <CadScene
+                          modelPaths={normalizedCadModelPaths}
+                          selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
+                          selectedViews={selectedSection}
+                          isMobile={isMobile}
+                          cameraSettings={{
+                            ...cameraSettings,
+                            connectivity: getConnectivity(), // Add connectivity info
+                          }}
+                          hoverDict={hoverDict}
+                          onHoverLabel={handleHoverLabel}
+                          onHoverEnd={handleHoverEnd}
+                          moduleCadConfig={moduleConfig}
+                          key={`${modelKey}-${selectedSection}`}
+                        />
+                        <CadSceneBbox
+                          modelKey={modelKey}
+                          selectedCameraView={selectedCameraView}
+                        />
+                        <ScreenshotCapture
+                          screenshotTrigger={screenshotTrigger}
+                          setScreenshotTrigger={setScreenshotTrigger}
+                          selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
+                        />
+                        <ReportCaptureDev />
+                      </CadSceneProvider>
                     </Suspense>
                   </Canvas>
                 </div>
@@ -1348,7 +1359,7 @@ export const EngineeringModule = ({
       <DesignReportModal
         isOpen={createDesignReportBool}
         onCancel={handleCancelDesignReport}
-        onOk={handleOkDesignReport}
+        onOk={undefined}
         designReportInputs={designReportInputs}
         setDesignReportInputs={setDesignReportInputs}
         output={output}
@@ -1362,6 +1373,8 @@ export const EngineeringModule = ({
         angleList={angleList}
         allSelected={allSelected}
         extraState={extraState}
+        selectedSection={selectedSection}
+        setSelectedSection={setSelectedSection}
       />
 
       {/* Customization Modals */}

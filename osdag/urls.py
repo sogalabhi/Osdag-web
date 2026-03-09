@@ -27,7 +27,7 @@ from osdag.web_api.beam_to_column_endplate_output import BeamToColumnEndPlateOut
 from osdag.web_api.tensionmemberbolted_outputView import TensionMemberBoltedOutputData
 from osdag.web_api.tensionmemberwelded_outputView import TensionMemberWeldedOutputData
 from osdag.web_api.simplysupportedbeam_outputView import SimplySupportedBeamOutputData
-from osdag.web_api.report_customization_api import ParseReportSections, CustomizeReport, GenerateInitialReport
+from osdag.web_api.report_customization_api import ParseReportSections, CustomizeReport
 # temporary
 app_name = 'osdag-web/'
 
@@ -144,7 +144,6 @@ urlpatterns = [
          SimplySupportedBeamOutputData.as_view(), name="Simply-Supported-Beam"),
     
     # Report customization API endpoints
-    path('api/report/generate-initial/', GenerateInitialReport.as_view(), name='generate-initial-report'),
     path('api/report/parse-sections/', ParseReportSections.as_view(), name='parse-report-sections'),
     path('api/report/customize/', CustomizeReport.as_view(), name='customize-report'),
 ]

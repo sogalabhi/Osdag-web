@@ -102,7 +102,6 @@ urlpatterns = [
          CompressionMemberOutputData.as_view(), name="Compression-Member-Design"),
 
     # Report customization API endpoints
-    path('api/report/generate-initial/', GenerateInitialReport.as_view(), name='generate-initial-report'),
     path('api/report/parse-sections/', ParseReportSections.as_view(), name='parse-report-sections'),
     path('api/report/customize/', CustomizeReport.as_view(), name='customize-report'),
 ]

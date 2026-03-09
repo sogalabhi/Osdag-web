@@ -39,6 +39,7 @@ import json
 import time
 import uuid
 import re
+import base64
 
 # Helper: filter LaTeX content based on selected sections (section or section/subsection)
 def filter_latex_content(latex_content: str, selected_sections):
@@ -111,6 +112,9 @@ class CreateDesignReport(APIView):
         sections = request.data.get('sections')  # e.g., ["Introduction", "Inputs", "Outputs/Spacing"]
         customization = request.data.get('customization')  # generic dict for future options
         
+        # Optional: pre-rendered images from frontend (data URLs or base64)
+        images = request.data.get('images') or {}
+        
         # Map module IDs to their respective create_from_input functions
         module_function_map = {
             'FinPlateConnection': fin_plate_create_from_input,
@@ -156,11 +160,17 @@ class CreateDesignReport(APIView):
             }
             # generate a random string for report id
             report_id = get_random_string(length=16)
-            file_path = os.path.join(os.getcwd(), "file_storage", "design_report", report_id)
+            # Each report gets its own folder:
+            #   file_storage/design_report/{report_id}/{report_id}.tex
+            report_root = os.path.join(os.getcwd(), "file_storage", "design_report", report_id)
+            os.makedirs(report_root, exist_ok=True)
+            file_path = os.path.join(report_root, report_id)
 
-            # appenend the file path in the meta data
+            # append the file path in the meta data
             metadata_final = {
-                "ProfileSummary": metadata_profile, "filename": file_path}
+                "ProfileSummary": metadata_profile,
+                "filename": file_path,
+            }
             for key in metadata_other.keys():
                 metadata_final[key] = metadata_other[key]
 
@@ -180,7 +190,11 @@ class CreateDesignReport(APIView):
         else : 
             # generate a random string for report id
             report_id = get_random_string(length=16)
-            file_path = os.path.join(os.getcwd(), "file_storage", "design_report", report_id)
+            # Each report gets its own folder:
+            #   file_storage/design_report/{report_id}/{report_id}.tex
+            report_root = os.path.join(os.getcwd(), "file_storage", "design_report", report_id)
+            os.makedirs(report_root, exist_ok=True)
+            file_path = os.path.join(report_root, report_id)
             metadata_final = metadata
             metadata_final['does_design_exist'] = design_status
             # Convert logs to string format for LaTeX
@@ -196,11 +210,10 @@ class CreateDesignReport(APIView):
             if customization:
                 metadata_final['customization'] = customization
 
-        # check if the design_report folder has been created or not 
+        # check if the design_report root folder has been created or not 
         # if not, create one 
-        cwd = os.path.join(os.getcwd() , "file_storage/design_report/")
-        if(not os.path.exists(cwd)):
-            os.makedirs(cwd, exist_ok=True)
+        cwd = os.path.join(os.getcwd(), "file_storage", "design_report")
+        os.makedirs(cwd, exist_ok=True)
         
         try:
             module = create_module_func(input_values)
@@ -260,18 +273,52 @@ class CreateDesignReport(APIView):
         except Exception:
             pass
         
+        # ------------------------------------------------------------------
+        # Image handling for reports (frontend-driven only)
+        # ------------------------------------------------------------------
+        # If the frontend sent pre-rendered images, save them to the
+        # per-report directory alongside the .tex/.pdf. We no longer invoke
+        # server-side CAD image generation for web reports; images are
+        # purely frontend-driven.
         try:
-            from apps.core.utils.report_image_generator import generate_cad_images_for_report
-            
-            # Determine report directory
-            report_base_dir = os.path.dirname(file_path)
-            image_result = generate_cad_images_for_report(
-                module=module,
-                input_values=input_values,
-                module_id=module_id,
-                report_dir=report_base_dir
-            )
+            if isinstance(images, dict) and images:
+                report_base_dir = os.path.dirname(file_path)
+                image_base_dir = os.path.join(report_base_dir, "ResourceFiles", "images")
+                os.makedirs(image_base_dir, exist_ok=True)
+
+                # Map canonical frontend keys to the filenames expected by
+                # existing LaTeX templates.
+                filename_map = {
+                    "iso": "3d.png",    # 3D/iso view
+                    "3d": "3d.png",
+                    "front": "front.png",
+                    "side": "side.png",
+                    "top": "top.png",
+                }
+
+                for key, data_url in images.items():
+                    try:
+                        if not isinstance(data_url, str):
+                            continue
+                        # Support both full data URLs and raw base64
+                        if ',' in data_url and data_url.strip().lower().startswith('data:'):
+                            _, b64 = data_url.split(',', 1)
+                        else:
+                            b64 = data_url
+                        img_bytes = base64.b64decode(b64)
+
+                        normalized_key = str(key).lower()
+                        filename = filename_map.get(normalized_key, f"{key}.png")
+                        out_path = os.path.join(image_base_dir, filename)
+                        with open(out_path, "wb") as img_f:
+                            img_f.write(img_bytes)
+                    except Exception as img_exc:
+                        import logging
+                        logging.getLogger(__name__).error(
+                            "Failed to save report image %s: %s", key, img_exc
+                        )
         except Exception:
+            # Image handling is best-effort; ignore failures
             pass
         
         try:
@@ -306,7 +353,8 @@ class CreateDesignReport(APIView):
                 pass
 
             # open and read the file contents (for debug only)
-            f = open(f'{os.getcwd()}/file_storage/design_report/{report_id}.tex', 'rb')
+            tex_path = f'{file_path}.tex'
+            f = open(tex_path, 'rb')
 
             return Response({'success': 'Design report created', 'report_id': report_id, 'fileContents : ': f}, status=status.HTTP_201_CREATED)
 
@@ -320,16 +368,18 @@ class GetPDF(APIView):
         # obtain the param from the Query
         report_id = request.GET.get('report_id')
 
-        # TeX source filename
+        # TeX source filename (inside the per-report folder)
+        report_root = os.path.join(os.getcwd(), "file_storage", "design_report", report_id)
         tex_filename = f'{report_id}.tex'
         filename, ext = os.path.splitext(tex_filename)
-        # the corresponding PDF filename
+        # the corresponding PDF filename (same basename, in the same folder)
         pdf_filename = filename + '.pdf'
 
-        # change the working directory
-        path = os.getcwd()
+        # change the working directory to the per-report folder so pdflatex
+        # reads/writes next to the .tex file
+        path = report_root
         os.chdir(path)
-        pdfFilePath = f'{os.getcwd()}/file_storage/design_report/{report_id}.pdf'
+        pdfFilePath = os.path.join(path, pdf_filename)
 
         # compile TeX file for different operating systems
         if platform.system().lower() == 'windows':
@@ -358,11 +408,18 @@ class GetPDF(APIView):
 
         # delete the extra aux, log files, tex files generated in design_report
         try:
-            # delete the following paths onyl when the pdf file is created 
-            if(os.path.exists(f'{os.getcwd()}/file_storage/design_report/{report_id}.pdf')) : 
-                os.remove(f'{os.getcwd()}/file_storage/design_report/{report_id}.aux')
-                os.remove(f'{os.getcwd()}/file_storage/design_report/{report_id}.log')
-                os.remove(f'{os.getcwd()}/file_storage/design_report/{report_id}.tex')
+            # delete the following paths only when the pdf file is created 
+            if os.path.exists(pdfFilePath):
+                base_no_ext = os.path.join(path, filename)
+                aux_path = f'{base_no_ext}.aux'
+                log_path = f'{base_no_ext}.log'
+                tex_path = f'{base_no_ext}.tex'
+                for p in (aux_path, log_path, tex_path):
+                    try:
+                        if os.path.exists(p):
+                            os.remove(p)
+                    except Exception:
+                        pass
         except Exception:
             pass
 

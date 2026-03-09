@@ -1593,10 +1593,12 @@ class CleatAngleConnection(ShearConnection):
                     self.report_check.append(t1)
 
         Disp_2d_image = []
-        Disp_3D_image = "/ResourceFiles/images/3d.png"
+        # 3D view image is expected directly in the report folder
+        # (e.g. file_storage/design_report/{report_id}/3d.png)
+        Disp_3D_image = "/3d.png"
         fname_no_ext = popup_summary['filename']
         # Use the report directory (where the .tex file is) as rel_path
-        # This ensures images are looked for in: {report_dir}/ResourceFiles/images/
+        # This ensures images are looked for in: {report_dir}/3d.png, etc.
         rel_path = os.path.dirname(fname_no_ext) if fname_no_ext else os.path.abspath(".")
         rel_path = os.path.abspath(rel_path)  # Make it absolute
         rel_path = rel_path.replace("\\", "/")
