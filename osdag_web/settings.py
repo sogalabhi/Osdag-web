@@ -15,9 +15,11 @@ from osdag_web.secret_key import get_secret_key
 from osdag_web.postgres_credentials import get_database_name, get_host, get_password, get_port, get_username
 import os
 from datetime import timedelta
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, os.path.join(BASE_DIR, 'backend'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -35,8 +37,7 @@ HOST = get_host()
 DEBUG = True
 
 
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 CORS_ALLOWED_ORIGINS = ['http://127.0.0.1:5173',
                         'http://localhost:5173',
@@ -79,24 +80,11 @@ INSTALLED_APPS = [
 
     # DRF
     'rest_framework',
-    'rest_framework.authtoken',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
 
     # simpleJWT
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist'
 ]
-
-# Allauth / dj-rest-auth config
-SITE_ID = 1
-
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
 
 CORS_ORIGIN_ALLOW_ALL = True
 ALLOWED_HOSTS = ['*']
@@ -107,7 +95,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -117,15 +104,14 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'osdag_web.urls'
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
 
     "ALGORITHM": "HS256",
-    # Use Django SECRET_KEY for signing JWTs to keep creation and verification consistent
-    "SIGNING_KEY": SECRET_KEY,
+    "SIGNING_KEY": "",  # settings.SIGNING_KEY
     "VERIFYING_KEY": "",
     "AUDIENCE": None,
     "ISSUER": None,
@@ -213,7 +199,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'apps.core.middleware.firebase_auth.FirebaseAuthentication',
     )
 }
 
@@ -239,10 +225,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
-
-# OSI files storage
-OSIFILES_URL = '/osifiles/'
-OSIFILES_ROOT = BASE_DIR / 'osifiles'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -252,3 +234,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'file_storage/')
 
 SECRET_ROOT = os.path.join(BASE_DIR , 'secret/')
 
+OSIFILES_URL = '/osi-files/'
+OSIFILES_ROOT = os.path.join(BASE_DIR, 'osi_files')

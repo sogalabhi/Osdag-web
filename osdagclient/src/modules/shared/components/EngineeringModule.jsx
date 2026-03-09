@@ -132,7 +132,7 @@ export const EngineeringModule = ({
     handleCreateDesignReport,
     handleCancelDesignReport,
     clearDesignResults,
-    
+
     // Service API (for project/OSI operations)
     service,
     resetModuleState,
@@ -188,17 +188,17 @@ export const EngineeringModule = ({
       setIsMobile(mobile);
       // Landscape: width > height and on mobile/tablet
       setIsLandscape(width > window.innerHeight && mobile);
-      
+
       // On desktop, ensure CAD is always visible (only set once on mount/resize, not on every showCad change)
       if (!mobile) {
         setShowCad(true);
       }
     };
-    
+
     checkViewport();
     window.addEventListener('resize', checkViewport);
     window.addEventListener('orientationchange', checkViewport);
-    
+
     return () => {
       window.removeEventListener('resize', checkViewport);
       window.removeEventListener('orientationchange', checkViewport);
@@ -259,17 +259,17 @@ export const EngineeringModule = ({
   useEffect(() => {
     const currentModule = moduleConfig.designType;
     const currentProjectId = getProjectIdFromUrl();
-    
+
     // Check if module changed
     if (prevModuleRef.current && prevModuleRef.current !== currentModule) {
       console.log(`[STATE_CLEANUP] Module changed: ${prevModuleRef.current} -> ${currentModule}`);
-      
+
       // Clear ModuleContext state (designData, logs, CAD paths, etc.)
       resetModuleState();
-      
+
       // Clear hook-level design state
       clearDesignResults();
-      
+
       // Reset UI state
       setIsDesignComplete(false);
       setShowOutputDock(false);
@@ -280,7 +280,7 @@ export const EngineeringModule = ({
       setSelectedCameraView("Model");
       setIsRedesigning(false);
       designCompletedRef.current = false;
-      
+
       // Reset CAD visibility based on device
       if (isMobile) {
         setShowCad(false);
@@ -288,11 +288,11 @@ export const EngineeringModule = ({
         setShowCad(true);
       }
     }
-    
+
     // Check if projectId changed (same module, different project)
     if (prevProjectIdRef.current !== null && prevProjectIdRef.current !== currentProjectId) {
       console.log(`[STATE_CLEANUP] Project changed: ${prevProjectIdRef.current} -> ${currentProjectId}`);
-      
+
       // Clear design state when switching projects
       resetModuleState();
       clearDesignResults();
@@ -303,7 +303,7 @@ export const EngineeringModule = ({
       setIsInputLocked(false);
       designCompletedRef.current = false;
     }
-    
+
     // Update refs
     prevModuleRef.current = currentModule;
     prevProjectIdRef.current = currentProjectId;
@@ -388,7 +388,7 @@ export const EngineeringModule = ({
   useEffect(() => {
     // Check if design just completed (transition to COMPLETE status)
     const designJustCompleted = status.step === DESIGN_STATUS.COMPLETE && !designCompletedRef.current;
-    
+
     if (designJustCompleted) {
       console.log(`[DESIGN_COMPLETE] Design completed | isMobile: ${isMobile}`);
       designCompletedRef.current = true; // Mark as handled
@@ -421,7 +421,7 @@ export const EngineeringModule = ({
       }
     }
   }, [status.step, isRedesigning, isMobile]);
-  
+
   // Show output dock immediately after calculation completes (before CAD)
   useEffect(() => {
     // When status transitions to CAD_GENERATING, calculation just completed
@@ -529,7 +529,7 @@ export const EngineeringModule = ({
       console.log(`[TOGGLE] toggleOutputDock called but output is null`);
       return;
     }
-    
+
     console.log(`[TOGGLE] toggleOutputDock called | isMobile: ${isMobile} | current showOutputDock: ${showOutputDock}`);
     if (isMobile) {
       // Mobile: Close all other docks when opening output dock
@@ -600,7 +600,7 @@ export const EngineeringModule = ({
       console.log(`[TOGGLE] toggleLogs called but output is null`);
       return;
     }
-    
+
     console.log(`[TOGGLE] toggleLogs called | isMobile: ${isMobile} | current showLogs: ${showLogs} | current showCad: ${showCad}`);
     if (isMobile) {
       // Mobile: Special logic for CAD+Logs combination
@@ -1007,8 +1007,8 @@ export const EngineeringModule = ({
             title={output ? `${showOutputDock ? 'Hide' : 'Show'} output dock` : 'Run a design to view outputs'}
             type="button"
             className={`p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${output
-                ? (showOutputDock ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 dark:hover:bg-black/40')
-                : "opacity-40 cursor-not-allowed"
+              ? (showOutputDock ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 dark:hover:bg-black/40')
+              : "opacity-40 cursor-not-allowed"
               }`}
           >
             <svg viewBox="0 0 100 100" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="6">
@@ -1054,7 +1054,7 @@ export const EngineeringModule = ({
               </svg>
             )}
           </button>
-          
+
         </div>
 
         {/* Initial theme detection, run once per mount */}
@@ -1172,7 +1172,7 @@ export const EngineeringModule = ({
                                   return;
                                 }
                               }
-                            } 
+                            }
                             else {
                               // If a non-Model option is selected
                               if (event.target.checked) {
@@ -1207,7 +1207,7 @@ export const EngineeringModule = ({
                     </label>
                   );
                 })}
-               </div>
+              </div>
             </div>
           )}
 
@@ -1215,19 +1215,19 @@ export const EngineeringModule = ({
           {(!isMobile || showCad) && (
             <div className={`
               model-container
-              ${isMobile 
+              ${isMobile
                 ? (showLogs ? 'h-[70%]' : 'h-full')
                 : (showLogs ? 'h-[60%]' : 'h-full')
               }
             `}>
-            {loading || isRedesigning ? (
-              <div className="modelLoading">
-                <p>{isRedesigning ? "Updating Model..." : "Loading Model..."}</p>
-              </div>
-            ) : renderBoolean ? (
-              <div className="cadModel relative   bg-gradient-to-b from-[#FFFFFF] to-[#7E7E7E] dark:from-[#535353] dark:to-[#000000]">
-                {/* Existing background color picker - left side */}
-                {/* <div className="absolute top-2 left-2 flex items-center gap-2 bg-white/90 dark:bg-osdag-dark-color/90 px-3 py-1.5 rounded-lg shadow-md z-10">
+              {loading || isRedesigning ? (
+                <div className="modelLoading">
+                  <p>{isRedesigning ? "Updating Model..." : "Loading Model..."}</p>
+                </div>
+              ) : renderBoolean ? (
+                <div className="cadModel relative   bg-gradient-to-b from-[#FFFFFF] to-[#7E7E7E] dark:from-[#535353] dark:to-[#000000]">
+                  {/* Existing background color picker - left side */}
+                  {/* <div className="absolute top-2 left-2 flex items-center gap-2 bg-white/90 dark:bg-osdag-dark-color/90 px-3 py-1.5 rounded-lg shadow-md z-10">
                   <label htmlFor="bgColorPicker" className="text-xs font-medium text-black dark:text-white mr-1">
                     Background:
                   </label>
@@ -1241,88 +1241,88 @@ export const EngineeringModule = ({
                   />
                 </div> */}
 
-                {/* Grid selector - right side - Hide when docks are open on mobile */}
-                {((isMobile && showCad && !showInputDock && !showOutputDock && !showLogs) || (!isMobile && !showInputDock && !showOutputDock)) && (
-                  <GridSelector onViewChange={handleOrthographicViewChange} />
-                )}
+                  {/* Grid selector - right side - Hide when docks are open on mobile */}
+                  {((isMobile && showCad && !showInputDock && !showOutputDock && !showLogs) || (!isMobile && !showInputDock && !showOutputDock)) && (
+                    <GridSelector onViewChange={handleOrthographicViewChange} />
+                  )}
 
-                <Canvas
-                  gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
-                  style={{ width: "100%", height: "100%", background: 'transparent' }}
-                >
-                  <PerspectiveCamera
-                    ref={cameraRef}
-                    makeDefault
-                    position={cameraPos}
-                    fov={13}
-                    near={0.1}
-                    far={1000}
-                  />
-                  <Suspense
-                    fallback={
-                      <Html>
-                        <p>Loading 3D Model...</p>
-                      </Html>
-                    }
+                  <Canvas
+                    gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
+                    style={{ width: "100%", height: "100%", background: 'transparent' }}
                   >
-                    {renderBoolean && normalizedCadModelPaths && Object.keys(normalizedCadModelPaths).length > 0 && (() => {
-                      const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
-                      const primary = activeViews[0] || "Model";
-                      if (primary && primary !== "Model") {
-                        const hasPart =
-                          normalizedCadModelPaths[primary] ||
-                          normalizedCadModelPaths[primary?.toLowerCase?.()] ||
-                          normalizedCadModelPaths[primary?.toUpperCase?.()];
-                        if (!hasPart) {
-                          return (
-                            <Html>
-                              <p>{`No CAD part found for view "${primary}". Available parts: ${Object.keys(normalizedCadModelPaths).join(", ")}`}</p>
-                            </Html>
-                          );
-                        }
+                    <PerspectiveCamera
+                      ref={cameraRef}
+                      makeDefault
+                      position={cameraPos}
+                      fov={13}
+                      near={0.1}
+                      far={1000}
+                    />
+                    <Suspense
+                      fallback={
+                        <Html>
+                          <p>Loading 3D Model...</p>
+                        </Html>
                       }
-                      return null;
-                    })()}
-                    <CadSceneProvider>
-                      <CadScene
-                        modelPaths={normalizedCadModelPaths}
-                        selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
-                        selectedViews={selectedSection}
-                        isMobile={isMobile}
-                        cameraSettings={{
-                          ...cameraSettings,
-                          connectivity: getConnectivity(), // Add connectivity info
-                        }}
-                        hoverDict={hoverDict}
-                        onHoverLabel={handleHoverLabel}
-                        onHoverEnd={handleHoverEnd}
-                        moduleCadConfig={moduleConfig}
-                        key={`${modelKey}-${selectedSection}`}
+                    >
+                      {renderBoolean && normalizedCadModelPaths && Object.keys(normalizedCadModelPaths).length > 0 && (() => {
+                        const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
+                        const primary = activeViews[0] || "Model";
+                        if (primary && primary !== "Model") {
+                          const hasPart =
+                            normalizedCadModelPaths[primary] ||
+                            normalizedCadModelPaths[primary?.toLowerCase?.()] ||
+                            normalizedCadModelPaths[primary?.toUpperCase?.()];
+                          if (!hasPart) {
+                            return (
+                              <Html>
+                                <p>{`No CAD part found for view "${primary}". Available parts: ${Object.keys(normalizedCadModelPaths).join(", ")}`}</p>
+                              </Html>
+                            );
+                          }
+                        }
+                        return null;
+                      })()}
+                      <CadSceneProvider>
+                        <CadScene
+                          modelPaths={normalizedCadModelPaths}
+                          selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
+                          selectedViews={selectedSection}
+                          isMobile={isMobile}
+                          cameraSettings={{
+                            ...cameraSettings,
+                            connectivity: getConnectivity(), // Add connectivity info
+                          }}
+                          hoverDict={hoverDict}
+                          onHoverLabel={handleHoverLabel}
+                          onHoverEnd={handleHoverEnd}
+                          moduleCadConfig={moduleConfig}
+                          key={`${modelKey}-${selectedSection}`}
                         />
-                      <CadSceneBbox
-                        modelKey={modelKey}
-                        selectedCameraView={selectedCameraView}
-                      />
-                      <ScreenshotCapture
-                        screenshotTrigger={screenshotTrigger}
-                        setScreenshotTrigger={setScreenshotTrigger}
-                        selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
-                      />
-                      <ReportCaptureDev />
-                    </CadSceneProvider>
-                  </Suspense>
-                </Canvas>
-              </div>
-            ) : (
-              <div className="modelback"></div>
-            )}
+                        <CadSceneBbox
+                          modelKey={modelKey}
+                          selectedCameraView={selectedCameraView}
+                        />
+                        <ScreenshotCapture
+                          screenshotTrigger={screenshotTrigger}
+                          setScreenshotTrigger={setScreenshotTrigger}
+                          selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
+                        />
+                        <ReportCaptureDev />
+                      </CadSceneProvider>
+                    </Suspense>
+                  </Canvas>
+                </div>
+              ) : (
+                <div className="modelback"></div>
+              )}
             </div>
           )}
 
           {/* Logs Dock */}
           {showLogs && output && (
             <div className={`
-              ${isMobile 
+              ${isMobile
                 ? (showCad ? 'h-[30%]' : 'fixed inset-0 z-50 h-full pt-[80px]')
                 : 'h-[40%]'
               }
@@ -1339,7 +1339,7 @@ export const EngineeringModule = ({
         {showOutputDock && output && outputConfig && status.step !== DESIGN_STATUS.ERROR && (
           <div className={`
             fixed inset-0 z-50 h-full pt-[80px] sm:relative sm:inset-auto sm:z-auto sm:h-auto sm:pt-0
-            w-full sm:w-[320px] md:w-[300px] lg:w-[260px]
+            w-full sm:w-[320px] md:w-[350px] lg:w-[400px]
             flex flex-col
             bg-white dark:bg-osdag-dark-color
           `}>

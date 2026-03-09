@@ -1,6 +1,6 @@
 from django.http.response import JsonResponse
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -53,6 +53,7 @@ class FirebaseAuthView(APIView):
     Unified endpoint for all Firebase authentication (Google + Email/Password).
     Syncs Firebase users to Django User model and returns user info.
     """
+    authentication_classes = []  # Bypass JWTAuthentication for this endpoint
     permission_classes = []  # Public endpoint
     
     def post(self, request):
@@ -144,46 +145,64 @@ class FirebaseAuthView(APIView):
 
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_design_types(request):
     return JsonResponse({'result': design_type_data}, safe=False)
 
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_connections(request):
     return JsonResponse({'result': connections_data}, safe=False)
 
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_shear_connection(request):
     return JsonResponse({'result': shear_connection}, safe=False)
 
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_moment_connection(request):
     return JsonResponse({'result': moment_connection}, safe=False)
 
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_b2b_splice(request):
     return JsonResponse({'result': b2b_splice}, safe=False)
 
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_b2column(request):
     return JsonResponse({'result': b2column}, safe=False)
 
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_c2c_splice(request):
     return JsonResponse({'result': c2c_splice}, safe=False)
 
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_base_plate(request):
     return JsonResponse({'result': base_plate}, safe=False)
 
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def get_tension_member(request):
     return JsonResponse({'result': tension_member}, safe=False)
 

@@ -44,7 +44,11 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # CORS Configuration (DEV ONLY - Allow all origins for LAN testing)
-CORS_ALLOW_ALL_ORIGINS = True  # Allows phone on same WiFi to access
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://192.168.1.9:5173' # your local network ip
+]
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
@@ -156,7 +160,7 @@ REST_FRAMEWORK = {
         'apps.core.middleware.firebase_auth.FirebaseAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ),
 }
 

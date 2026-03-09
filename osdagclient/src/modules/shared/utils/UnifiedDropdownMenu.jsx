@@ -31,6 +31,7 @@ function UnifiedDropdownMenu({
   topAngleList = [],
   cadModelPaths = null,
   contextData = null, // moduleData from hook; used for expandAllSelectedInputs
+  onMenuClick,
 }) {
   const service = useEngineeringService();
   const BASE_URL = `${apiBase}`;
@@ -58,7 +59,7 @@ function UnifiedDropdownMenu({
 
     element.addEventListener("change", async (e) => {
       const file = e.target.files[0];
-      
+
       // Handle user cancellation
       if (!file) {
         // User cancelled file selection - silently return (expected behavior)
@@ -143,7 +144,7 @@ function UnifiedDropdownMenu({
     try {
       // Call service to generate OSI file (inline=false for local download, no auth required)
       const result = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, false);
-      
+
       if (result.success && result.content_base64) {
         try {
           // Convert base64 to blob and download
@@ -224,12 +225,15 @@ function UnifiedDropdownMenu({
         setDesignPrefModalStatus(true);
         break;
       default:
-        // Default value - ensure inputs is an object before spreading
-        setInputs({
-          ...(inputs || {}),
-          // [inputKey]: option.name,
-          graphicsOption: option.name,
-        });
+        if (onMenuClick) {
+          onMenuClick(option.name);
+        } else {
+          // Default value - ensure inputs is an object before spreading
+          setInputs({
+            ...(inputs || {}),
+            graphicsOption: option.name,
+          });
+        }
         break;
     }
   };
