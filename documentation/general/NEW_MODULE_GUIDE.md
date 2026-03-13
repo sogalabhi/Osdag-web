@@ -148,7 +148,7 @@ Expose via existing endpoints if applicable (see `osdag/web_api/inputData_view.p
 
 ## 5) Frontend: add module and screens
 
-Frontend lives under `osdagclient/src`. Add your module folder and routes similar to existing modules.
+Frontend lives under `frontend/src`. Add your module folder and routes similar to existing modules.
 
 - Add module metadata (key, name, image, path) to the list used by the UI. Backend serves a module list via `osdag_api/__init__.py` `module_dict` array:
 ```16:77:osdag_api/__init__.py
@@ -157,32 +157,32 @@ module_dict = [{"key": "FinPlateConnection", ...}, ..., {"key": "Simply-Supporte
 Consume that list on the client to show the module card and navigate to your screen.
 
 - Create a new folder for your module UI (inputs form, output view) similar to existing ones, e.g.:
-`osdagclient/src/modules/connection/finPlate` or `.../flexuralMember/simplySupportedBeam`
+`frontend/src/modules/connection/finPlate` or `.../flexuralMember/simplySupportedBeam`
 
 - The form should POST JSON to your backend endpoint and include the `Module` key (e.g., `'My-New-Module'`).
 
 ### 5.1 Link your module to the Module Select page
 
-- The module selection page reads static UI config from `osdagclient/src/constants/modules.js`.
+- The module selection page reads static UI config from `frontend/src/constants/modules.js`.
   - Add your module to the right section (Connections/Tension/Flexure) in:
-```1:11:osdagclient/src/constants/modules.js
+```1:11:frontend/src/constants/modules.js
 export const MODULE_SUBMODULES = { ... }
 ```
   - Add a card under the relevant content block with your `key` in:
-```13:54:osdagclient/src/constants/modules.js
+```13:54:frontend/src/constants/modules.js
 export const CONNECTIONS_TAB_CONTENT = { ... }
 ```
 or for flexure/tension:
-```56:82:osdagclient/src/constants/modules.js
+```56:82:frontend/src/constants/modules.js
 export const GENERIC_SUBMODULE_CONTENT = { ... }
 ```
   - Map your `key` to a route under:
-```84:95:osdagclient/src/constants/modules.js
+```84:95:frontend/src/constants/modules.js
 export const MODULE_ROUTES = { ... }
 ```
 
 - The selection page component uses these to navigate when a card is clicked:
-```15:55:osdagclient/src/homepage/components/ModulesCardLayout.jsx
+```15:55:frontend/src/homepage/components/ModulesCardLayout.jsx
 const submodules = MODULE_SUBMODULES[moduleName] || []
 ... handleModuleClick → navigate(MODULE_ROUTES[optionKey])
 ```
@@ -193,7 +193,7 @@ Ensure the route you add matches your React page location.
 
 - Follow an existing page such as Fin Plate or Simply Supported Beam to scaffold your module:
   - Engineering page scaffold using shared shell:
-```32:41:osdagclient/src/modules/shared/components/EngineeringModule.jsx
+```32:41:frontend/src/modules/shared/components/EngineeringModule.jsx
 export const EngineeringModule = ({ moduleConfig, OutputDockComponent, menuItems, title }) => { ... }
 ```
   - Create `YourModule.jsx` under an appropriate folder and render `EngineeringModule` with a `moduleConfig` describing:
@@ -202,7 +202,7 @@ export const EngineeringModule = ({ moduleConfig, OutputDockComponent, menuItems
 ### 5.3 Use BaseOutputDock for outputs
 
 - Use the shared output renderer to avoid duplicating UI:
-```14:269:osdagclient/src/modules/shared/components/BaseOutputDock.jsx
+```14:269:frontend/src/modules/shared/components/BaseOutputDock.jsx
 export const BaseOutputDock = ({ output, outputConfig, title, extraState }) => { ... }
 ```
 - Create `components/YourModuleOutputDock.jsx` that imports and configures `BaseOutputDock` with an `outputConfig` describing:
@@ -211,26 +211,26 @@ export const BaseOutputDock = ({ output, outputConfig, title, extraState }) => {
   - Keep to the flat output `{ key: {key,label,val} }` used in adapters
 
 Example references for output docks:
-```1:...:osdagclient/src/modules/shearConnection/finPlate/components/FinPlateOutputDock.jsx
+```1:...:frontend/src/modules/shearConnection/finPlate/components/FinPlateOutputDock.jsx
 ```
-```1:...:osdagclient/src/modules/flexuralMember/simplySupportedBeam/components/SimplySupportedBeamOutputDock.jsx
+```1:...:frontend/src/modules/flexuralMember/simplySupportedBeam/components/SimplySupportedBeamOutputDock.jsx
 ```
 
 ### 5.4 Wire the route to your page
 
 - Ensure your route path from `MODULE_ROUTES` matches the page mounted in your app router.
 - The module selection page drives navigation via:
-```29:45:osdagclient/src/homepage/components/ModulesCardLayout.jsx
+```29:45:frontend/src/homepage/components/ModulesCardLayout.jsx
 const getRoute = (...) => MODULE_ROUTES[optionKey] || ""
 ```
 - The page frame that shows Module Select is at:
-```1:58:osdagclient/src/homepage/pages/SelectModulePage.jsx
+```1:58:frontend/src/homepage/pages/SelectModulePage.jsx
 ```
 
 ### 5.5 Submitting to backend and rendering output
 
 - `EngineeringModule` uses `useEngineeringModule` to handle inputs, submit to backend, and manage state. Provide the correct `designType` (Module key) so requests include the right `Module` and route to your adapter:
-```32:106:osdagclient/src/modules/shared/components/EngineeringModule.jsx
+```32:106:frontend/src/modules/shared/components/EngineeringModule.jsx
 const { inputs, output, logs, handleSubmit, ... } = useEngineeringModule(moduleConfig)
 ```
 - After a successful submit, `EngineeringModule` toggles the Output dock and renders your `OutputDockComponent` with the `output` object.
@@ -305,7 +305,7 @@ path('design/cad', CADGeneration.as_view()),
 
 1) View options and camera presets
 - Ensure `EngineeringModule` view options match your backend `sections` so users can switch between parts:
-```287:307:osdagclient/src/modules/shared/components/EngineeringModule.jsx
+```287:307:frontend/src/modules/shared/components/EngineeringModule.jsx
 if (moduleConfig.cameraKey === "FinPlateConnection") return ["Model", "Beam", "Column", "Plate"]
 ... (other modules)
 ```
@@ -349,8 +349,8 @@ if (moduleConfig.cameraKey === "FinPlateConnection") return ["Model", "Beam", "C
 - Output API: Add/confirm URL route in `osdag/urls.py` for calculate-output; reuse generic view that reads `Module` from body.
 - Input-data API: If needed, add `osdag/web_api/inputdata/<my_module>_input.py` and serve via existing populate flow.
 - CAD API mapping: In `osdag/web_api/cad_model_api.py`, map your `module_id` to `session_type` and declare `sections` to generate; ensure names match your adapter and frontend view options.
-- Frontend routes/cards: Update `osdagclient/src/constants/modules.js` (`MODULE_SUBMODULES`, `..._CONTENT`, `MODULE_ROUTES`) so the module appears on Module Select and navigates to your page.
-- Frontend page: Create `osdagclient/src/modules/.../<MyModule>.jsx` using `EngineeringModule`; set `moduleConfig.designType` to your backend key and `cameraKey` to enable correct view options.
+- Frontend routes/cards: Update `frontend/src/constants/modules.js` (`MODULE_SUBMODULES`, `..._CONTENT`, `MODULE_ROUTES`) so the module appears on Module Select and navigates to your page.
+- Frontend page: Create `frontend/src/modules/.../<MyModule>.jsx` using `EngineeringModule`; set `moduleConfig.designType` to your backend key and `cameraKey` to enable correct view options.
 - Output UI: Create a thin `.../components/<MyModule>OutputDock.jsx` that uses `BaseOutputDock` with your `outputConfig`.
 - Output shape: Return `{ key: {key,label,val} }` from the adapter for consistency with shared UI components.
 

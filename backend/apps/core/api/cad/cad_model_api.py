@@ -3,7 +3,7 @@
     Update input values in database.
         CAD Model API (class CADGeneration(View)):
             Accepts GET requests.
-            Saves obj file as output in osdagclient/public/output-obj.obj 
+            Saves obj file as output in frontend/public/output-obj.obj 
             Returns ouput dir name as content_type text/plain.
             Request must provide session cookie id.
 """

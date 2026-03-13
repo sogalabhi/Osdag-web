@@ -223,7 +223,7 @@ sudo apt install -y nodejs npm
 ### **19. Install Frontend Dependencies**
 
 ```bash
-cd osdagclient
+cd frontend
 npm install
 cd ..
 ```

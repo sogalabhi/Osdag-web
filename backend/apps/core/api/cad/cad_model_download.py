@@ -27,7 +27,7 @@ class CADDownload(APIView):
 
             # Path setup
             if format_type == "obj":
-                file_path = os.path.join("osdagclient", "public", f"output-{section.lower()}.obj")
+                file_path = os.path.join("frontend", "public", f"output-{section.lower()}.obj")
             else:
                 file_path = os.path.join("file_storage", "cad_models", f"{request_id}_{section}.{format_type.lower()}")
 

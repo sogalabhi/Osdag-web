@@ -37,10 +37,10 @@ ResourceFiles/last_designs/*
 ResourceFiles/html_page/*
 #osdag_web/secret_key.py
 db.sqlite3
-osdagclient/node_modules
+frontend/node_modules
 osdag/migrations
 node_modules
-osdagclient/public/output-obj.obj
+frontend/public/output-obj.obj
 file_storage/design_report/*.pdf
 file_storage/design_report/*.log
 file_storage/design_report/*.tex

@@ -49,7 +49,7 @@ Osdag-web/
 ├── docker-compose.prod.yml       # Production compose file
 ├── requirements.txt             # Python dependencies
 ├── .env                         # Environment variables (create this)
-├── osdagclient/
+├── frontend/
 │   ├── Dockerfile               # Development frontend Dockerfile
 │   ├── Dockerfile.prod          # Production frontend Dockerfile
 │   ├── nginx.conf               # Nginx configuration
@@ -107,7 +107,7 @@ CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120",
 
 ### 2. Frontend Production Dockerfile
 
-Create `osdagclient/Dockerfile.prod`:
+Create `frontend/Dockerfile.prod`:
 
 ```dockerfile
 # Frontend Production Dockerfile
@@ -144,7 +144,7 @@ CMD ["nginx", "-g", "daemon off;"]
 
 ### 3. Nginx Configuration for Frontend
 
-Create `osdagclient/nginx.conf`:
+Create `frontend/nginx.conf`:
 
 ```nginx
 server {
@@ -274,7 +274,7 @@ services:
   # React Frontend
   frontend:
     build:
-      context: ./osdagclient
+      context: ./frontend
       dockerfile: Dockerfile.prod
     container_name: osdag-frontend
     ports:
@@ -345,13 +345,13 @@ services:
 
   frontend:
     build:
-      context: ./osdagclient
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: osdag-frontend-dev
     ports:
       - "5173:5173"
     volumes:
-      - ./osdagclient:/app
+      - ./frontend:/app
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
@@ -567,7 +567,7 @@ For production, you'll want to add SSL. Update the frontend service in `docker-c
 ```yaml
 frontend:
   build:
-    context: ./osdagclient
+    context: ./frontend
     dockerfile: Dockerfile.prod
   container_name: osdag-frontend
   ports:

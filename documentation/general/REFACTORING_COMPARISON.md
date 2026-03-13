@@ -198,7 +198,7 @@ Osdag-web/
 │   │       └── moment_connection/
 │   │           └── ...
 │   └── manage.py
-└── osdagclient/                # Frontend (unchanged)
+└── frontend/                # Frontend (unchanged)
 ```
 
 ### Key Improvements
@@ -612,7 +612,7 @@ Once all modules are migrated:
 ## Related Documentation
 
 - **Adding New Modules (Backend)**: See `documentation/ADDING_MODULES_AND_SUBMODULES_BACKEND.md`
-- **Adding New Modules (Frontend)**: See `osdagclient/src/modules/shearConnection/CREATE_NEW_MODULE.md`
+- **Adding New Modules (Frontend)**: See `frontend/src/modules/shearConnection/CREATE_NEW_MODULE.md`
 - **Refactoring Plan**: See `documentation/refactoring/19.11.md`
 
 ---

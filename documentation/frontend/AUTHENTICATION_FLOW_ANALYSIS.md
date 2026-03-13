@@ -248,7 +248,7 @@ user_email = request.auth.get('email')  # Returns None for guests
 
 ### Fix 1: Add Explicit Guest Check in Project Creation
 
-**File:** `osdagclient/src/homepage/components/ModulesCardLayout.jsx`
+**File:** `frontend/src/homepage/components/ModulesCardLayout.jsx`
 
 **Change:**
 ```javascript
@@ -272,7 +272,7 @@ const handleProjectModalConfirm = async (projectName) => {
 
 ### Fix 2: Ensure userType is Always Updated
 
-**File:** `osdagclient/src/context/UserState.jsx`
+**File:** `frontend/src/context/UserState.jsx`
 
 **Check:** Ensure `userType` is set correctly on all login paths:
 - ✅ Regular login: Sets `userType: "user"` (line 297)

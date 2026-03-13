@@ -150,7 +150,7 @@ The validator automatically normalizes values:
 
 ### Location
 
-- **Shared Validator**: `osdagclient/src/modules/SimpleConnection/shared/validation.js`
+- **Shared Validator**: `frontend/src/modules/SimpleConnection/shared/validation.js`
 
 ### Function
 
@@ -337,7 +337,7 @@ class YourViewSet(viewsets.ViewSet):
 
 ### Step 4: Create Frontend Validator (if needed)
 
-**File**: `osdagclient/src/modules/YourModule/shared/validation.js`
+**File**: `frontend/src/modules/YourModule/shared/validation.js`
 
 ```javascript
 /**
@@ -372,7 +372,7 @@ export function validateYourModuleInputs(inputs, options = {}) {
 
 ### Step 5: Update Frontend Config
 
-**File**: `osdagclient/src/modules/YourModule/YourSubmodule/config/yourConfig.js`
+**File**: `frontend/src/modules/YourModule/YourSubmodule/config/yourConfig.js`
 
 ```javascript
 import { validateYourModuleInputs } from "../../shared/validation";

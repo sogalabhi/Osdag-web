@@ -1,6 +1,6 @@
 ## Osdag Web Client – Improvements Roadmap
 
-This document lists potential improvements for the `osdagclient` frontend, with **priority** and **difficulty** levels to help plan work.
+This document lists potential improvements for the `frontend` frontend, with **priority** and **difficulty** levels to help plan work.
 
 ### Legend
 - **Priority**: P0 (critical), P1 (high), P2 (medium), P3 (low)
