@@ -176,7 +176,8 @@ class LapJointWelded(MomentConnection):
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
             self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
-        
+        if isinstance(self.logger, CustomLogger):
+            self.logger.clear_logs()
         # Clear any existing handlers
         self.logger.handlers.clear()
         self.logger.setLevel(logging.DEBUG)

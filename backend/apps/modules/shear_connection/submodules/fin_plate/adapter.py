@@ -605,14 +605,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         print(f"First log entry (original order): {logs[0] if len(logs) > 0 else 'N/A'}")
         print(f"Last log entry (original order):  {logs[-1] if len(logs) > 0 else 'N/A'}")
 
-        # Reverse logs so that the latest message appears first (more natural for UI and reports)
-        try:
-            logs = list(reversed(logs))
-            print("✅ Reversed logs order so newest entries come first")
-            print(f"First log entry (reversed): {logs[0] if len(logs) > 0 else 'N/A'}")
-        except Exception as e:
-            print(f"⚠️ Failed to reverse logs order: {type(e).__name__}: {e}")
-
     print("=" * 60)
     
     return output, logs

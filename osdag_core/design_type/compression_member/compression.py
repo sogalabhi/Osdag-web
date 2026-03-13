@@ -315,7 +315,8 @@ class Compression(Member):
             logging.getLogger('Osdag').manager.loggerDict.pop('Osdag', None)
             # clear any existing handlers
             self.logger = logging.getLogger('Osdag')
-        
+        if isinstance(self.logger, CustomLogger):
+            self.logger.clear_logs()
         self.logger.handlers.clear()
 
         self.logger.setLevel(logging.DEBUG)
