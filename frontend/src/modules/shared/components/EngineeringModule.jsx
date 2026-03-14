@@ -30,7 +30,6 @@ import {
 import Logs from "./Logs";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import DesignPrefSections from "./DesignPrefSections";
-import GridSelector from "../utils/GridSelector";
 import { message, Modal as AntdModal } from 'antd';
 import { menuItems } from "../utils/moduleUtils";
 import { UI_STRINGS } from "../../../constants/UIStrings";
@@ -436,11 +435,6 @@ export const EngineeringModule = ({
 
   const handleGridToggle = () => {
     setIsGridActive(!isGridActive);
-  };
-
-  // Handle orthographic view changes from GridSelector
-  const handleOrthographicViewChange = (viewType) => {
-    setSelectedCameraView(viewType);
   };
 
   const handleSubmitEnhanced = async () => {
@@ -1240,11 +1234,6 @@ export const EngineeringModule = ({
                     title="Change Background Color"
                   />
                 </div> */}
-
-                  {/* Grid selector - right side - Hide when docks are open on mobile */}
-                  {((isMobile && showCad && !showInputDock && !showOutputDock && !showLogs) || (!isMobile && !showInputDock && !showOutputDock)) && (
-                    <GridSelector onViewChange={handleOrthographicViewChange} />
-                  )}
 
                   <Canvas
                     gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
