@@ -205,7 +205,7 @@ Wire the route in the app router to render `<YourModuleName>` at the same `route
 
 1. Populate on mount: the hook calls `getModuleData(designType)`, reducer sets lists (materials, bolts, thickness, grades, connectivity, beam/column).
 2. Inputs: `InputSection` binds to lists by `options: "<listName>"`; All/Customized supported for arrays.
-3. Design click: the hook validates, builds submission params, calls `calculate-output/<module>`, mirrors output to Output Dock, then auto-calls `design/cad` to render the 3D model.
+3. Design click: the hook validates, builds submission params, calls the module design endpoint under `api/modules/.../design/`, mirrors output to Output Dock, then auto-calls the module CAD endpoint under `api/modules/.../cad/` to render the 3D model.
 
 ### 8) Key mapping tips
 
@@ -215,6 +215,6 @@ Wire the route in the app router to render `<YourModuleName>` at the same `route
 
 ### 9) Troubleshooting
 
-- Lists empty in UI: check `/populate` runs once, `SET_ALL_MODULE_DATA` in reducer sets all lists, and `EngineeringModule.jsx` passes `contextData` to `InputSection`.
+- Lists empty in UI: check the module options endpoint under `api/modules/.../options/` runs once, `SET_ALL_MODULE_DATA` in reducer sets all lists, and `EngineeringModule.jsx` passes `contextData` to `InputSection`.
 - Dropdowns empty: verify `InputSection` field `options` references a known list name; material uses `Grade` as value.
-- Output empty: confirm `calculate-output` returns flat `{ key: { label, val } }` and the hook normalization is active; `BaseOutputDock` logs `normalizedOutput` keys in console.
+- Output empty: confirm the module `.../design/` endpoint returns `{ data: {...}, logs: [...] }` and the hook normalization is active; `BaseOutputDock` logs `normalizedOutput` keys in console.
