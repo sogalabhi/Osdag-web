@@ -79,7 +79,7 @@ const Homepage = () => {
                  Supported by:
                </span>
               </div>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-wrap items-center gap-6">
                 <img src={moeLogo} alt="MOE Logo" className="h-[4.2rem] pointer-events-auto dark:invert" />
                 <img src={mosLogo} alt="MOS Logo" className="h-[4.2rem] pointer-events-auto dark:invert" /> 
                 <img src={constructSteelLogo} alt="Construct Steel Logo" className="h-[1.44rem] pointer-events-auto" />
