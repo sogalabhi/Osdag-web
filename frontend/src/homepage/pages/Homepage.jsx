@@ -58,7 +58,7 @@ const Homepage = () => {
             {/* Email Verification Banner */}
             {currentUser && !currentUser.emailVerified && (
               <div className="px-6 pt-4">
-                <EmailVerificationBanner 
+                <EmailVerificationBanner
                   user={currentUser}
                   onVerified={() => {
                     // Reload user to get updated verification status
@@ -73,9 +73,9 @@ const Homepage = () => {
               <MainContent />
             </div>
             <div className="pointer-events-none absolute bottom-6 left-6 flex flex-wrap items-center gap-4">
-              
+
               <img src={moeLogo} alt="MOE Logo" className="h-[4.2rem] pointer-events-auto dark:invert" />
-              <img src={mosLogo} alt="MOS Logo" className="h-[4.2rem] pointer-events-auto dark:invert" /> 
+              <img src={mosLogo} alt="MOS Logo" className="h-[4.2rem] pointer-events-auto dark:invert" />
               <img src={constructSteelLogo} alt="Construct Steel Logo" className="h-[1.44rem] pointer-events-auto" />
               <img src={InsdagLogo} alt="Insdag Logo" className="h-[4.2rem] pointer-events-auto" />
               {/* <img src={fosseeLogo} alt="FOSSEE Logo" className="h-10 pointer-events-auto" /> */}
