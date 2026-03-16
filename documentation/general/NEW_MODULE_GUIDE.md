@@ -95,41 +95,22 @@ For new modules, prefer `osdag_core` classes where available.
 
 ---
 
-## 3) Add URL route and view (Django)
+## 3) Add module endpoints (Django)
 
-- Add an endpoint in `osdag/urls.py` pointing to a view class:
-```101:131:osdag/urls.py
-path('calculate-output/FinPlateConnection', OutputData.as_view(), name='FinPlateConnection')
-...
-path('calculate-output/Simply-Supported-Beam', SimplySupportedBeamOutputData.as_view(), name='Simply-Supported-Beam')
-```
+The current web backend uses the refactored modules API under `backend/apps/modules/` and does **not** wire per-module `calculate-output/*` routes anymore.
 
-- You can reuse the generic view pattern used by Fin Plate, Cleat Angle, etc.:
-```53:96:osdag/web_api/outputCalc_view.py
-class OutputData(APIView):
-    def post(self, request):
-        input_values = request.data
-        module_name = input_values.get('Module', 'FinPlateConnection')
-        module_api = get_module_api(module_name)
-        output, logs = module_api.generate_output(input_values)
-        return JsonResponse({"data": output, "logs": new_logs, "success": True}, ...)
-```
+- Add your module’s routes under the aggregated modules URL tree:
+  - `POST /api/modules/<parent>/<submodule>/design/`
+  - `POST /api/modules/<parent>/<submodule>/cad/` (optional)
+  - `GET /api/modules/<parent>/<submodule>/options/` (for UI lists)
 
-- Or create a dedicated view per module (as done for Simply Supported Beam):
-```9:40:osdag/web_api/simplysupportedbeam_outputView.py
-class SimplySupportedBeamOutputData(APIView):
-    def post(self, request):
-        module_api = get_module_api('Simply-Supported-Beam')
-        output, logs = module_api.generate_output(request.data)
-```
-
-Recommendation: Use one generic view that reads `Module` from the request to reduce boilerplate.
+Recommendation: Follow the existing `backend/apps/modules/*/views.py` + `service.py` + `adapter.py` pattern for new modules.
 
 ---
 
 ## 4) Input-data API (populate dropdowns, lists)
 
-If your module needs UI-populating data (section lists, materials), add a handler under `osdag/web_api/inputdata/` and wire it in the populate flow.
+If your module needs UI-populating data (section lists, materials), implement it in the module `options` endpoint under `backend/apps/modules/.../`.
 
 Example (Simply Supported Beam):
 ```6:71:osdag/web_api/inputdata/simply_supported_beam_input.py
@@ -293,10 +274,8 @@ for section in sections:
 ```
 
 3) Expose the CAD endpoint
-```36:39:osdag/urls.py
-path('design/cad/', CADGeneration.as_view()),
-path('design/cad', CADGeneration.as_view()),
-```
+
+The current backend exposes CAD endpoints under the `backend/` project (see `backend/apps/core/urls.py` for the core CAD handlers and `backend/apps/modules/...` for per-module CAD endpoints).
 
 4) Formats
 - Adapters currently write `.brep` (and for Model: `.step`/`.iges`). The CAD API returns base64 data per section under `files[section]`.
@@ -346,8 +325,8 @@ if (moduleConfig.cameraKey === "FinPlateConnection") return ["Model", "Beam", "C
 
 - Backend adapter: Add `osdag_api/modules/<my_module>.py` targeting an `osdag_core` class; implement `get_required_keys`, `create_from_input`, `generate_output`, and `create_cad_model`.
 - Resolver: Register key in `osdag_api/module_finder.py` (`module_dict`) and `osdag_api/__init__.py` (`developed_modules`, `module_dict` array for UI).
-- Output API: Add/confirm URL route in `osdag/urls.py` for calculate-output; reuse generic view that reads `Module` from body.
-- Input-data API: If needed, add `osdag/web_api/inputdata/<my_module>_input.py` and serve via existing populate flow.
+- Output API: Add your module `design` endpoint under `backend/apps/modules/.../views.py` (served under `/api/modules/.../design/`).
+- Input-data API: Add/update the module `options` endpoint under `backend/apps/modules/...` (served under `/api/modules/.../options/`).
 - CAD API mapping: In `osdag/web_api/cad_model_api.py`, map your `module_id` to `session_type` and declare `sections` to generate; ensure names match your adapter and frontend view options.
 - Frontend routes/cards: Update `frontend/src/constants/modules.js` (`MODULE_SUBMODULES`, `..._CONTENT`, `MODULE_ROUTES`) so the module appears on Module Select and navigates to your page.
 - Frontend page: Create `frontend/src/modules/.../<MyModule>.jsx` using `EngineeringModule`; set `moduleConfig.designType` to your backend key and `cameraKey` to enable correct view options.
@@ -358,9 +337,9 @@ if (moduleConfig.cameraKey === "FinPlateConnection") return ["Model", "Beam", "C
 
 ## 9) Examples to mirror
 
-- Shear connections: Fin Plate route + adapter + outputs
-  - URL route: `osdag/urls.py` at `102-118`
-  - Adapter: `osdag_api/modules/fin_plate_connection.py` (see `generate_output`, `create_cad_model`)
+- Shear connections: Fin Plate service/adapter + outputs
+  - View/service: `backend/apps/modules/shear_connection/...`
+  - Core engine: `osdag_core/design_type/connection/...`
 
 - Tension (bolted):
   - Adapter: `osdag_api/modules/bolted_tension_member.py` (see `get_required_keys`, `create_from_input`, `generate_output`)

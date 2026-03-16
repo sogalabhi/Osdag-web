@@ -6,13 +6,14 @@ This document explains how the Simply Supported Beam module flows through Django
 
 ## URL → View
 
-- Endpoint (POST): `calculate-output/Simply-Supported-Beam`
-- Route is defined in `osdag/urls.py` and points to `SimplySupportedBeamOutputData`.
+- Legacy endpoint (removed): `calculate-output/Simply-Supported-Beam`
+- Current endpoint uses the modules API under `api/modules/.../design/`.
 
 ```text
-osdag/urls.py
-path('calculate-output/Simply-Supported-Beam',
-     SimplySupportedBeamOutputData.as_view(), name="Simply-Supported-Beam"),
+The current web backend no longer wires `calculate-output/*` routes. Use the refactored modules API.
+
+Example (shape only; module path depends on how this module is registered):
+- `POST /api/modules/<parent>/<submodule>/design/`
 ```
 
 View handler (Django REST Framework `APIView`):
@@ -157,7 +158,7 @@ class SimplySupportedBeamInputData(InputDataBase):
 
 ## Minimal Request/Response
 
-- POST `calculate-output/Simply-Supported-Beam`
+- (Removed) POST `calculate-output/Simply-Supported-Beam`
 
 Request body must include at least (keys shown are the module’s required inputs):
 
@@ -200,7 +201,7 @@ Response (shape):
 
 ## Sequence Summary
 
-1. Client POSTs to `calculate-output/Simply-Supported-Beam` with required inputs
+1. (Removed) Client POSTed to `calculate-output/Simply-Supported-Beam` with required inputs
 2. DRF view resolves module via `get_module_api('Simply-Supported-Beam')`
 3. Module adapter maps inputs → `Flexure` keys and calls `Flexure`
 4. `Flexure` performs calculations and returns rows
