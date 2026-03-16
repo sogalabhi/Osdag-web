@@ -532,12 +532,12 @@ The codebase is in a **transitional state**:
 
 2. **Legacy modules** still use old system:
    - Some modules still in `osdag_old/`
-   - Old `calculate-output/` URLs still work
+   - Old `calculate-output/` URLs were removed in the refactored backend
    - `osdag_api/module_finder.py` still exists for backward compatibility
 
 3. **Backward Compatibility**:
    - `apps/core/module_finder.py` falls back to old system
-   - Old URLs still work during migration
+   - Old URLs do not exist in the refactored backend; migrate callers to `api/modules/...`
    - Gradual migration possible
 
 ### Future State

@@ -189,13 +189,13 @@ curl -X POST http://localhost:8000/api/modules/shear-connection/fin-plate/design
 ## Migration Notes
 
 ### From Old Endpoint
-**Old:**
+**Old (removed):**
 ```
-POST /calculate-output/FinPlateConnection
+(Removed) POST /calculate-output/FinPlateConnection
 Body: { "Module": "FinPlateConnection", ...inputs }
 ```
 
-**New:**
+**New (current):**
 ```
 POST /api/modules/shear-connection/fin-plate/design/
 Body: { "inputs": {...} } or just {...inputs}
