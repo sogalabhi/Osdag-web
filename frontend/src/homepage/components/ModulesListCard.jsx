@@ -14,17 +14,7 @@ const ModulesListCard = ({ items }) => {
   const handleModuleClick = (item) => {
     const route = getModuleRoute(item.module_id);
     if (!route) return;
-    // COMMENTED: Direct navigation without project creation popup
-    // Users can create project later from File menu
     navigate(route);
-    
-    // OLD FLOW: Show project creation modal before opening design
-    // if (isGuestUser()) {
-    //   navigate(route);
-    //   return;
-    // }
-    // setSelectedModule(item);
-    // setShowProjectModal(true);
   };
 
   const handleProjectModalConfirm = async (projectName) => {
@@ -103,12 +93,6 @@ const ModulesListCard = ({ items }) => {
         </div>
       ))}
 
-      {/* COMMENTED: Project creation modal - now handled from File menu in design page */}
-      {/* <ProjectNameModal
-        visible={showProjectModal}
-        onCancel={handleProjectModalCancel}
-        onConfirm={handleProjectModalConfirm}
-      /> */}
     </>
   );
 };
