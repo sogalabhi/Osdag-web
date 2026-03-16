@@ -58,7 +58,7 @@ const Homepage = () => {
             {/* Email Verification Banner */}
             {currentUser && !currentUser.emailVerified && (
               <div className="px-6 pt-4">
-                <EmailVerificationBanner 
+                <EmailVerificationBanner
                   user={currentUser}
                   onVerified={() => {
                     // Reload user to get updated verification status
