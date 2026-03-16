@@ -1,5 +1,6 @@
 import { OrbitControls } from "@react-three/drei";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
+import { useFrame } from "@react-three/fiber";
 import ViewCubeWidget from "./widgets/ViewCubeWidget";
 import { getPartColor, getRenderOrder } from "./config/partConfig";
 import { createViewMapper } from "./config/viewMappings";
@@ -49,6 +50,14 @@ function CadScene({
   const { orbitTarget } = useCadSceneContext();
   const target = orbitTarget && orbitTarget.length === 3 ? orbitTarget : [0, 0, 0];
   const controlsRef = useRef();
+  const [isAutoRotate, setIsAutoRotate] = useState(false);
+
+  useFrame(() => {
+    if (controlsRef.current) {
+      controlsRef.current.update();
+    }
+  });
+
 
 
   useEffect(() => {
@@ -83,7 +92,8 @@ function CadScene({
         controls.target.x += 0.05;
         camera.position.x += 0.05;
         controls.update();
-
+      } else if (e.detail === 'auto-rotate') {
+        setIsAutoRotate(prev => !prev);
       } else if (e.detail === 'front-view') {
         const dist = camera.position.distanceTo(controls.target);
         camera.position.set(controls.target.x, controls.target.y, controls.target.z + dist);
@@ -139,7 +149,7 @@ function CadScene({
         primaryView={primaryView}
       />
 
-      <OrbitControls ref={controlsRef} enableDamping={false} enableRotate={false} target={target} />
+      <OrbitControls ref={controlsRef} enableDamping={false} enableRotate={true} autoRotate={isAutoRotate} target={target} />
     </group>
   );
 }
