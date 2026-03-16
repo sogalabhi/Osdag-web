@@ -37,6 +37,7 @@ import { UI_STRINGS } from "../../../constants/UIStrings";
 import { isGuestUser, canCreateProjects } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 import ProjectNameModal from "../../../homepage/components/ProjectNameModal";
+import { useProjectCreation } from '../hooks/useProjectCreation';
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -163,8 +164,13 @@ export const EngineeringModule = ({
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
 
-  // Project creation modal state
-  const [showProjectModal, setShowProjectModal] = useState(false);
+  const { handleCreateProject, projectCreationModal } = useProjectCreation({
+    inputs,
+    extraState,
+    allSelected,
+    contextData,
+    moduleConfig,
+  });
 
   // Normalize CAD path keys to handle case/spacing differences
   const normalizedCadModelPaths = useMemo(() => {
@@ -376,24 +382,20 @@ export const EngineeringModule = ({
           try {
             console.log('[EngineeringModule] Project inputs_json keys:', Object.keys(result.project.inputs_json));
             setInputs(result.project.inputs_json);
-          } catch (_ignored) {
-            // ignore parse issues
+          } catch (err) {
+            console.error('[EngineeringModule] Error parsing inputs_json:', err);
+            message.error('Failed to parse saved project inputs.');
           }
         }
         if (result.project.outputs_json) {
           try {
             loadSavedOutputs(result.project.outputs_json);
-          } catch (_ignored) {
-            // ignore parse issues
+          } catch (err) {
+            console.error('[EngineeringModule] Error loading saved outputs:', err);
+            message.error('Failed to load saved project outputs.');
           }
         }
-        if (result.project.outputs_json) {
-          try {
-            loadOutputs(result.project.outputs_json);
-          } catch (_ignored) {
-            // ignore parse issues
-          }
-        }
+          // Deduplicated block
         // Normalize URL to path form: .../fin_plate/1 instead of .../fin_plate?projectId=1
         const pathname = location.pathname;
         const pathEndsWithId = pathname.endsWith(`/${projectId}`);
@@ -404,7 +406,12 @@ export const EngineeringModule = ({
         }
       } catch (_e) {
         lastLoadedProjectIdRef.current = null;
-        message.warning('Cannot load project.');
+        console.error('[EngineeringModule] Error loading project:', _e);
+        message.warning('Cannot load project. Redirecting to module base.');
+        
+        // Navigate back to the base module path (e.g. /Connections, /Member)
+        const basePath = moduleConfig.routePath || '/home';
+        navigate(basePath, { replace: true });
       }
     })();
   }, [projectIdFromUrl]); // eslint-disable-line react-hooks/exhaustive-deps -- intentionally stable deps to avoid infinite GET
@@ -793,55 +800,6 @@ export const EngineeringModule = ({
       console.error('Error saving inputs:', err);
       message.error('Failed to save inputs');
     }
-  };
-
-  // Handle project creation from File menu
-  const handleCreateProject = () => {
-    if (isGuestUser()) {
-      message.warning("Guest users cannot create projects. Please log in to create projects.");
-      return;
-    }
-    if (!canCreateProjects()) {
-      message.error("Please verify your email to create projects. Check your inbox for the verification link.");
-      return;
-    }
-    setShowProjectModal(true);
-  };
-
-  const handleProjectModalConfirm = async (projectName) => {
-    try {
-      const safeProjectName = (projectName || 'Untitled Project').replace(/\s+/g, '_');
-      const module_id = moduleConfig?.designType || inputs?.module;
-      const parent_module = moduleConfig?.parentModule || 'connections';
-      const mergedState = { ...inputs, ...extraState };
-      const inputsForSave = expandAllSelectedInputs(mergedState, allSelected, contextData);
-
-      const payload = {
-        name: safeProjectName,
-        module: parent_module,
-        submodule: module_id,
-        inputs_json: inputsForSave || {},
-      };
-
-      const result = await service.createProject(payload);
-      if (result.success && result.project_id) {
-        message.success(`Project "${safeProjectName}" created successfully`);
-        // Navigate to current path + project ID
-        const currentPath = location.pathname;
-        navigate(`${currentPath}/${result.project_id}`, { replace: true });
-      } else {
-        message.error(result.error || 'Failed to create project');
-      }
-    } catch (err) {
-      console.error('Error creating project:', err);
-      message.error('Failed to create project');
-    } finally {
-      setShowProjectModal(false);
-    }
-  };
-
-  const handleProjectModalCancel = () => {
-    setShowProjectModal(false);
   };
 
   // Get connectivity for FinPlateConnection module
@@ -1582,17 +1540,7 @@ export const EngineeringModule = ({
           dangerouslySetInnerHTML={{ __html: hoverText }}
         />
       )}
-
-      {/* Project Creation Modal */}
-      <ProjectNameModal
-        visible={showProjectModal}
-        onCancel={handleProjectModalCancel}
-        onConfirm={handleProjectModalConfirm}
-        moduleName={moduleConfig?.title || 'Design'}
-        title="Create New Project"
-        message="Give your project a name to save your work."
-        confirmText="Create Project"
-      />
-    </div >
+      {projectCreationModal}
+    </div>
   );
 };

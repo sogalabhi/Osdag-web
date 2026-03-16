@@ -32,7 +32,7 @@ function UnifiedDropdownMenu({
   cadModelPaths = null,
   contextData = null, // moduleData from hook; used for expandAllSelectedInputs
   onMenuClick,
-  onCreateProject = null, // Handler for creating project from design page
+  onCreateProject = null,
   isExistingProject = false, // When true, disable "Create Project" menu item
 }) {
   const service = useEngineeringService();

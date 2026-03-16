@@ -165,29 +165,6 @@ export const useEngineeringService = () => {
   // ===================================================================
 
   /**
-   * Create new project
-   * @param {Object} payload - Project data (name, module, submodule, inputs_json)
-   * @returns {Promise<{success: boolean, project_id?: number, error?: string}>}
-   */
-  const createProject = useCallback(async (payload) => {
-    try {
-      const response = await apiCall('api/projects/', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      if (data.success && data.project_id) {
-        return { success: true, project_id: data.project_id };
-      } else {
-        return { success: false, error: data.error || 'Failed to create project' };
-      }
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  }, [apiCall]);
-
-  /**
    * Get project by ID
    * @param {number} projectId - Project ID
    * @returns {Promise<{success: boolean, project?: Object, error?: string}>}
@@ -364,7 +341,6 @@ export const useEngineeringService = () => {
     downloadCADModel,
 
     // Projects
-    createProject,
     getProject,
     updateProject,
 
