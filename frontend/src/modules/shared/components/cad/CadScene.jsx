@@ -1,11 +1,7 @@
 import { OrbitControls } from "@react-three/drei";
 import { useMemo, useEffect, useRef, useState } from "react";
-<<<<<<< HEAD
 import { useFrame } from "@react-three/fiber";
-=======
-import AxisHelperWidget from "./widgets/AxisHelperWidget";
-import { useMemo, useEffect, useRef } from "react";
->>>>>>> 4117ef4c3d9968b3a39eff3c3823419a1d7018a3
+import AxisHelperWidget from "./widgets/AxisHelperWidget";  
 import ViewCubeWidget from "./widgets/ViewCubeWidget";
 import { getPartColor, getRenderOrder } from "./config/partConfig";
 import { createViewMapper } from "./config/viewMappings";
@@ -154,12 +150,7 @@ function CadScene({
         primaryView={primaryView}
       />
 
-<<<<<<< HEAD
       <OrbitControls ref={controlsRef} enableDamping={false} enableRotate={true} autoRotate={isAutoRotate} target={target} />
-=======
-      <OrbitControls ref={controlsRef} enableDamping={false} autoRotate={isAutoRotate} target={target} />
-      <OrbitControls ref={controlsRef} enableDamping={false} enableRotate={false} target={target} />
->>>>>>> 4117ef4c3d9968b3a39eff3c3823419a1d7018a3
     </group>
   );
 }
