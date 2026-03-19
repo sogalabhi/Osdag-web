@@ -62,6 +62,8 @@ export const SmartPart = ({
       'end plate': 'Plate',
       'end-plate': 'Plate',
       'cleatangle': 'Angle',
+      'seatedangle': 'Angle',
+      'coverplate': 'Cover Plate',
     };
 
     // Try multiple key variations in hoverDict first
