@@ -451,13 +451,36 @@ class FinPlateConnection(ShearConnection):
         out_list.append(t16)
 
         # Populate hover dict
-        self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.plate.bolts_one_line)*int(self.plate.bolt_line) if flag else ''}"
-        
-        self.hover_dict["Plate"]= f"Plate: {float(self.plate.length) if flag else ''} mm x {float(self.plate.height) if flag else ''} mm x {self.plate.thickness_provided if flag else ''} mm"
-            
-        self.hover_dict["Weld"]= f"<b>Weld</b><br>Size: {self.weld.size if flag else ''} mm<br>Length: {self.plate.height if flag else ''} mm"
+        self.hover_dict["Column"] = f"Column: {self.supporting_section.designation if flag else ''}"
+        self.hover_dict["Beam"] = f"Beam: {self.supported_section.designation if flag else ''}"
+
+        # In the web 3D viewer, bolts and welds are fused into the Plate STL
+        # (unlike the desktop OCC viewer which can distinguish sub-shapes).
+        # So the Plate hover shows combined Plate + Bolt + Weld details.
+        bolt_count = int(self.plate.bolts_one_line) * int(self.plate.bolt_line) if flag else ''
+        self.hover_dict["Plate"] = (
+            f"<b>Plate</b>: {float(self.plate.length) if flag else ''} mm x "
+            f"{float(self.plate.height) if flag else ''} mm x "
+            f"{self.plate.thickness_provided if flag else ''} mm"
+            f"<br><b>Bolt</b> Grade: {self.bolt.bolt_grade_provided if flag else ''}, "
+            f"Dia: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm, "
+            f"Nos: {bolt_count}"
+            f"<br><b>Weld</b> Size: {self.weld.size if flag else ''} mm, "
+            f"Length: {self.plate.height if flag else ''} mm"
+        )
+        # Keep separate keys for future per-part meshes
+        self.hover_dict["Bolt"] = (
+            f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}"
+            f"<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm"
+            f"<br>No. of Bolts: {bolt_count}"
+        )
+        self.hover_dict["Weld"] = (
+            f"<b>Weld</b><br>Size: {self.weld.size if flag else ''} mm"
+            f"<br>Length: {self.plate.height if flag else ''} mm"
+        )
 
         return out_list
+
 
     ####################################
     # Setting input values and start of Calculations

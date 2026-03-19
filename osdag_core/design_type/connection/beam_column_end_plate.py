@@ -594,9 +594,27 @@ class BeamColumnEndPlate(MomentConnection):
 
         # Populate Hover Dict
 
-        self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.bolt_numbers) if flag else ''}"
+        self.hover_dict["Column"] = f"<b>Column</b>: {self.supporting_section.designation if flag else ''}"
+        self.hover_dict["Beam"] = f"<b>Beam</b>: {self.supported_section.designation if flag else ''}"
+
+        self.hover_dict["Plate"] = (
+            f"<b>Plate</b>: {float(self.ep_width_provided) if flag else ''} mm x "
+            f"{float(self.ep_height_provided) if flag else ''} mm x "
+            f"{self.plate_thickness if flag else ''} mm"
+            f"<br><b>Bolt</b> Grade: {self.bolt.bolt_grade_provided if flag else ''}, "
+            f"Dia: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm, "
+            f"Nos: {int(self.bolt_numbers) if flag else ''}"
+            f"<br><b>Weld</b> Size (Web): {self.weld_size_web if flag else ''} mm"
+        )
         
-        self.hover_dict["Plate"]= f"Plate: {float(self.ep_width_provided) if flag else ''} mm x {float(self.ep_height_provided) if flag else ''} mm x {self.plate_thickness if flag else ''} mm"
+        self.hover_dict["Bolt"] = (
+            f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}"
+            f"<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm"
+            f"<br>No. of Bolts: {int(self.bolt_numbers) if flag else ''}"
+        )
+        self.hover_dict["Weld"] = (
+            f"<b>Weld</b><br>Size (Web): {self.weld_size_web if flag else ''} mm"
+        )
         
         return out_list
 

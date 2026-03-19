@@ -492,21 +492,17 @@ class BeamBeamEndPlateSplice(MomentConnection):
         # Populate hover dict
 
         # Beam
-        self.hover_dict["Beam"] = (
-            f"<b>Beam</b><br>"
-            f"Depth: {self.beam_D if flag else ''} mm<br>"
-            f"Flange Width: {self.beam_bf if flag else ''} mm<br>"
-            f"Web Thickness: {self.beam_tw if flag else ''} mm<br>"
-            f"Flange Thickness: {self.beam_tf if flag else ''} mm"
-        )
+        self.hover_dict["Beam"] = f"<b>Beam</b>: {self.supported_section.designation if flag else ''}"
 
         # End Plate
         self.hover_dict["Plate"] = (
-            f"<b>End Plate</b><br>"
-            f"Width: {self.ep_width_provided if flag else ''} mm<br>"
-            f"Height: {self.ep_height_provided if flag else ''} mm<br>"
-            f"Thickness: {self.plate_thickness if flag else ''} mm<br>"
-            f"Moment Capacity: {self.call_helper.plate_moment_capacity if flag else ''}"
+            f"<b>End Plate</b>: {self.ep_width_provided if flag else ''} mm x "
+            f"{self.ep_height_provided if flag else ''} mm x "
+            f"{self.plate_thickness if flag else ''} mm"
+            f"<br><b>Bolt</b> Grade: {self.bolt_grade_provided if flag else ''}, "
+            f"Dia: {self.bolt_diameter_provided if flag else ''} mm, "
+            f"Nos: {self.bolt_numbers if flag else ''}"
+            f"<br><b>Weld</b> Size (Web): {self.weld_size_web if flag else ''} mm"
         )
 
         # Bolt

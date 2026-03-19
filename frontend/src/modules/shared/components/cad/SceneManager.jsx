@@ -60,7 +60,9 @@ export const SceneManager = forwardRef(({
 
               const mesh = new THREE.Mesh(geometry);
               mesh.name = key;
-              mesh.userData.hoverLabel = hoverDict?.[key] || key;
+              // Don't pre-bake hoverLabel at load time: hoverDict may be empty.
+              // SmartPart will look up the label from hoverDict at render time.
+              mesh.userData.hoverLabel = null;
 
               parsedData[key] = mesh;
               disposables.push(geometry);
@@ -221,7 +223,7 @@ export const SceneManager = forwardRef(({
                 rotation={finalRotation}
                 scale={modelScale}
                 hoverDict={hoverDict}
-                hoverLabel={m.hoverLabel}
+                hoverLabel={null}
                 isHovered={hoveredMeshId === meshId}
                 onHover={handlePartHover}
                 onHoverEnd={handlePartHoverEnd}
