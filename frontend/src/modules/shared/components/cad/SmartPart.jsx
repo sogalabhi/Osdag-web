@@ -91,8 +91,10 @@ export const SmartPart = ({
       }
 
       // Try semantic alias (e.g., "Connector" -> look up hoverDict["Plate"])
-      if (!label && PART_ALIASES[lower]) {
-        const aliasKey = PART_ALIASES[lower];
+      // Also try with spaces stripped so "Cleat Angle" matches alias key "cleatangle"
+      const lowerNoSpace = lower.replace(/\s+/g, '');
+      const aliasKey = PART_ALIASES[lower] || PART_ALIASES[lowerNoSpace];
+      if (!label && aliasKey) {
         label = hoverDict[aliasKey] || hoverDict[aliasKey.toLowerCase()];
       }
     }
