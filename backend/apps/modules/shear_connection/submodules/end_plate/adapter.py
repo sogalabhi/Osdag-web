@@ -17,6 +17,7 @@ import sys
 import os
 import typing
 from typing import Dict, Any, List
+import traceback
 old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
 sys.stdout = old_stdout  # Reset log
@@ -294,24 +295,36 @@ def create_module() -> EndPlateConnection:
 def create_from_input(input_values: Dict[str, Any]) -> EndPlateConnection:
     """Create an instance of the End plate connection module design class from input values."""
     # validate_input(input_values)
-    try : 
+    print("\n[EndPlateAdapter.create_from_input] called")
+    print(f"[EndPlateAdapter.create_from_input] input keys={list(input_values.keys()) if isinstance(input_values, dict) else type(input_values)}")
+    try:
         module = create_module()  # Create module instance.
-    except Exception as e : 
-        print('e in create_module : ' , e) 
+        print(f"[EndPlateAdapter.create_from_input] module created={type(module).__name__}")
+    except Exception as e:
+        print('e in create_module : ' , e)
         print('error in creating module')
+        traceback.print_exc()
+        raise
     
     # Map frontend keys to osdag_core keys
     # Frontend sends 'Connectivity' but osdag_core expects 'Connectivity *' (KEY_CONN)
     design_dictionary = input_values.copy()
     if 'Connectivity' in design_dictionary and KEY_CONN not in design_dictionary:
         design_dictionary[KEY_CONN] = design_dictionary.pop('Connectivity')
+        print(f"[EndPlateAdapter.create_from_input] mapped 'Connectivity' -> {KEY_CONN!r} value={design_dictionary.get(KEY_CONN)!r}")
+    else:
+        print(f"[EndPlateAdapter.create_from_input] connectivity mapping skipped; has KEY_CONN={KEY_CONN in design_dictionary}")
     
     # Set the input values on the module instance.
-    try : 
+    try:
+        print(f"[EndPlateAdapter.create_from_input] set_input_values with keys={list(design_dictionary.keys())[:20]}")
         module.set_input_values(design_dictionary)
-    except Exception as e : 
+        print("[EndPlateAdapter.create_from_input] set_input_values passed")
+    except Exception as e:
         print('e in set_input_values : ' , e)
         print('error in setting the input values')
+        traceback.print_exc()
+        raise
 
     return module
 
@@ -327,13 +340,28 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         }
     }
     """
+    print("\n[EndPlateAdapter.generate_output] called")
     output = {}  # Dictionary for formatted values
     module = create_from_input(input_values)  # Create module from input.
+    if module is None:
+        raise RuntimeError("create_from_input returned None module")
+
+    print(f"[EndPlateAdapter.generate_output] module={type(module).__name__}")
+    print(f"[EndPlateAdapter.generate_output] has logger={hasattr(module, 'logger')}")
     # Generate output values in unformatted form.
-    raw_output_text = module.output_values(True)
-    raw_output_spacing = module.spacing(True)  # Generate output val
-    raw_output_capacities = module.capacities(True)
-    raw_output_bolt_capacity = module.bolt_capacity_details(True)
+    try:
+        raw_output_text = module.output_values(True)
+        print(f"[EndPlateAdapter.generate_output] raw_output_text={len(raw_output_text)}")
+        raw_output_spacing = module.spacing(True)  # Generate output val
+        print(f"[EndPlateAdapter.generate_output] raw_output_spacing={len(raw_output_spacing)}")
+        raw_output_capacities = module.capacities(True)
+        print(f"[EndPlateAdapter.generate_output] raw_output_capacities={len(raw_output_capacities)}")
+        raw_output_bolt_capacity = module.bolt_capacity_details(True)
+        print(f"[EndPlateAdapter.generate_output] raw_output_bolt_capacity={len(raw_output_bolt_capacity)}")
+    except Exception as e:
+        print(f"[EndPlateAdapter.generate_output] error while collecting raw outputs: {type(e).__name__}: {e}")
+        traceback.print_exc()
+        raise
 
     # Prefer CustomLogger if attached
     if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
@@ -345,9 +373,16 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         logs = ["No logs generated"]
 
     raw_output = raw_output_capacities + raw_output_spacing + raw_output_text + raw_output_bolt_capacity
+    print(f"[EndPlateAdapter.generate_output] total_raw_output={len(raw_output)}")
     # os.system("clear")
     # Loop over all the text values and add them to ouptut dict.
-    for param in raw_output:
+    for idx, param in enumerate(raw_output):
+        if not isinstance(param, (tuple, list)):
+            print(f"[EndPlateAdapter.generate_output] skipping non-sequence param at idx={idx}: {type(param)}")
+            continue
+        if len(param) < 4:
+            print(f"[EndPlateAdapter.generate_output] skipping short param at idx={idx}: {param}")
+            continue
         if param[2] == "TextBox":  # If the parameter is a text output,
             key = param[0]  # id/key
             label = param[1]  # label text.
@@ -357,6 +392,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "label": label,
                 "val": value  # Changed from "value" to "val" to match frontend expectations
             }  # Set label, key and value in output
+    print(f"[EndPlateAdapter.generate_output] output keys count={len(output)}")
     return output, logs
 
 

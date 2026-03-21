@@ -8,6 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
+import traceback
 from .registry import ShearConnectionRegistry
 from apps.core.utils.module_helpers import handle_design_request
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
@@ -74,6 +75,11 @@ class ShearConnectionViewSet(viewsets.ViewSet):
         )
         
         try:
+            print("\n" + "=" * 80)
+            print(f"[ShearConnectionViewSet.design] slug={submodule_slug}")
+            print(f"[ShearConnectionViewSet.design] ServiceClass={getattr(ServiceClass, '__name__', ServiceClass)}")
+            print(f"[ShearConnectionViewSet.design] input keys={list(inputs.keys()) if isinstance(inputs, dict) else type(inputs)}")
+            print(f"[ShearConnectionViewSet.design] project_id={project_id}, guest={context.get('is_guest')}")
             # Call the service with request context
             result = ServiceClass.calculate(
                 inputs=inputs,
@@ -81,6 +87,8 @@ class ShearConnectionViewSet(viewsets.ViewSet):
                 project_id=project_id if not context['is_guest'] else None,
                 user_email=context['user_email']
             )
+            print(f"[ShearConnectionViewSet.design] success result keys={list(result.keys()) if isinstance(result, dict) else type(result)}")
+            print("=" * 80 + "\n")
             
             # Add project saving result to response
             if context['project_result']:
@@ -92,6 +100,23 @@ class ShearConnectionViewSet(viewsets.ViewSet):
             
             return Response(result, status=200)
         except Exception as e:
+            print("\n" + "=" * 80)
+            print(f"[ShearConnectionViewSet.design] ERROR slug={submodule_slug}")
+            print(f"[ShearConnectionViewSet.design] exception={type(e).__name__}: {e}")
+            if isinstance(inputs, dict):
+                print(f"[ShearConnectionViewSet.design] inputs sample keys={list(inputs.keys())[:15]}")
+                for k in [
+                    "Connectivity",
+                    "Bolt.Type",
+                    "Member.Supported_Section.Designation",
+                    "Member.Supporting_Section.Designation",
+                    "Connector.Plate.Thickness_List",
+                    "Module",
+                ]:
+                    if k in inputs:
+                        print(f"[ShearConnectionViewSet.design] {k}={inputs.get(k)!r}")
+            traceback.print_exc()
+            print("=" * 80 + "\n")
             return Response(
                 {'error': str(e), 'success': False}, 
                 status=400
