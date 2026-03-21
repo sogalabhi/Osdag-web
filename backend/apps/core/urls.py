@@ -13,8 +13,6 @@ from apps.core.api import (
     DesignPreference, MaterialDetails, CompanyLogoView,
     CADGeneration, CADDownload
 )
-# Legacy input-data handler (kept under apps.core.api.legacy)
-from apps.core.api.legacy.inputData_view import InputData as LegacyInputData
 from apps.core import views
 
 app_name = 'core'
@@ -53,8 +51,6 @@ urlpatterns = [
     # Report customization API endpoints
     path('api/report/parse-sections/', ParseReportSections.as_view(), name='parse-report-sections'),
     path('api/report/customize/', CustomizeReport.as_view(), name='customize-report'),
-    # Legacy populate endpoint (kept for frontend compatibility)
-    path('api/populate', LegacyInputData.as_view()),
 
     # CAD generation & download (new backend handlers)
     path('api/design/cad', CADGeneration.as_view()),

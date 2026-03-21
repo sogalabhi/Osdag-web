@@ -48,6 +48,7 @@ from ...design_report.reportGenerator_latex import CreateLatex
 from ...Report_functions import *
 import logging
 from importlib.resources import files
+from pathlib import Path
 from ...custom_logger import CustomLogger
 
 
@@ -61,6 +62,19 @@ class EndPlateConnection(ShearConnection):
         self.design_status = False
         # To capture all the hover labels required
         self.hover_dict = {}
+
+    @staticmethod
+    def _image_path(filename: str) -> str:
+        """
+        Resolve image path robustly.
+        Prefer importlib.resources, but fall back to filesystem path when package
+        metadata is not available (e.g., namespace/editable runtime).
+        """
+        try:
+            return str(files("osdag_core.data.ResourceFiles.images").joinpath(filename))
+        except Exception:
+            fallback = Path(__file__).resolve().parents[2] / "data" / "ResourceFiles" / "images" / filename
+            return str(fallback)
 
     ###############################################
     # Design Preference Functions Start
@@ -272,7 +286,7 @@ class EndPlateConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cf_bw.png")), True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, self._image_path("fin_cf_bw.png"), True, 'No Validator')
         options_list.append(t15)
 
         t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, VALUES_COLSEC, True, 'No Validator')
@@ -1404,7 +1418,7 @@ class EndPlateConnection(ShearConnection):
         spacing.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("ep_shear.png")), 400, 277, ""])  # [image, width, height, caption]
+               [self._image_path("ep_shear.png"), 400, 277, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.output[0][13] if status else '')
@@ -1786,6 +1800,7 @@ class EndPlateConnection(ShearConnection):
         rel_path = rel_path.replace("\\", "/")
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+        return True
 
     def get_plate_status(self):
         if self.plate.plate_moment < self.plate.plate_moment_capacity \

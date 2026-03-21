@@ -1,6 +1,6 @@
 import { OrbitControls } from "@react-three/drei";
 import { useMemo, useEffect, useRef } from "react";
-import AxisHelperWidget from "./widgets/AxisHelperWidget";
+import ViewCubeWidget from "./widgets/ViewCubeWidget";
 import { getPartColor, getRenderOrder } from "./config/partConfig";
 import { createViewMapper } from "./config/viewMappings";
 import { SceneManager } from "./SceneManager";
@@ -98,7 +98,7 @@ function CadScene({
       <pointLight position={[-10, -10, -10]} intensity={1.5} />
       <spotLight position={[0, 10, 0]} angle={0.3} penumbra={1} intensity={1.0} />
 
-      <AxisHelperWidget orthographicView={orthographicView} />
+      <ViewCubeWidget controlsRef={controlsRef} />
 
       <SceneManager
         modelPaths={modelPaths}
@@ -119,7 +119,7 @@ function CadScene({
         primaryView={primaryView}
       />
 
-      <OrbitControls ref={controlsRef} enableDamping={false} target={target} />
+      <OrbitControls ref={controlsRef} enableDamping={false} enableRotate={false} target={target} />
     </group>
   );
 }

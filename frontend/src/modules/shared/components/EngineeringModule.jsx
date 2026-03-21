@@ -30,7 +30,6 @@ import {
 import Logs from "./Logs";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import DesignPrefSections from "./DesignPrefSections";
-import GridSelector from "../utils/GridSelector";
 import { message, Modal as AntdModal } from 'antd';
 import { menuItems } from "../utils/moduleUtils";
 import { UI_STRINGS } from "../../../constants/UIStrings";
@@ -468,11 +467,6 @@ export const EngineeringModule = ({
 
   const handleGridToggle = () => {
     setIsGridActive(!isGridActive);
-  };
-
-  // Handle orthographic view changes from GridSelector
-  const handleOrthographicViewChange = (viewType) => {
-    setSelectedCameraView(viewType);
   };
 
   const handleSubmitEnhanced = async () => {
@@ -943,26 +937,20 @@ export const EngineeringModule = ({
           )}
         </div>
 
-        <div className="flex flex-row flex-wrap justify-center items-center gap-2 text-black dark:text-white pr-4">
+        <div className="flex flex-row justify-center items-center gap-2 text-black dark:text-white pr-4">
 
           {/* Input Dock Button */}
           <button
             onClick={toggleInputDock}
-            className={`group p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${showInputDock
-              ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
-              : 'hover:bg-black/10 dark:hover:bg-black/40'
-              }`}
+            className={`w-9 h-9 flex items-center justify-center transition`}
             title={`${showInputDock ? 'Hide' : 'Show'} input dock`}
             type="button"
           >
-            <svg viewBox="0 0 100 100" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="6">
-              {/* Frame */}
-              <rect x="8" y="8" width="84" height="84" />
-              {/* Divider line */}
-              <line x1="38" y1="8" x2="38" y2="92" />
-              {/* LEFT panel fill only when active */}
+            <svg viewBox="0 0 100 100" className="w-5 h-5">
+              <rect x="10" y="10" width="80" height="80" fill="none" stroke="currentColor" strokeWidth="6" />
+              <line x1="40" y1="10" x2="40" y2="90" stroke="currentColor" strokeWidth="6" />
               {showInputDock && (
-                <rect x="8" y="8" width="30" height="84" fill="currentColor" stroke="none" />
+                <rect x="10" y="10" width="30" height="80" fill="currentColor" />
               )}
             </svg>
 
@@ -972,38 +960,44 @@ export const EngineeringModule = ({
           <button
             onClick={toggleLogs}
             disabled={!output}
-            className={`p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${output
-              ? (showLogs ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40')
-              : 'opacity-40 cursor-not-allowed'
-              }`}
+            className={`w-9 h-9 flex items-center justify-center transition`}
             title={output ? `${showLogs ? 'Hide' : 'Show'} logs` : 'Run a design to view logs'}
             type="button"
           >
             <svg
-              xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 100 100"
               className="w-5 h-5"
+              fill="none"
             >
-              {/* Outer border */}
               <rect
-                x="5"
-                y="5"
-                width="90"
-                height="90"
+                x="10"
+                y="10"
+                width="80"
+                height="80"
                 stroke="currentColor"
-                strokeWidth="10"
+                strokeWidth="6"
                 fill="none"
               />
 
-              {/* Bottom section fill */}
+              <line
+                x1="10"
+                y1="60"
+                x2="90"
+                y2="60"
+                stroke="currentColor"
+                strokeWidth="6"
+              />
+
+             {showLogs && (
               <rect
-                x="5"
-                y="65"
-                width="90"
+                x="10"
+                y="60"
+                width="80"
                 height="30"
                 fill="currentColor"
                 stroke="none"
               />
+             )}
             </svg>
           </button>
 
@@ -1045,14 +1039,11 @@ export const EngineeringModule = ({
               : "opacity-40 cursor-not-allowed"
               }`}
           >
-            <svg viewBox="0 0 100 100" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="6">
-              {/* Frame */}
-              <rect x="8" y="8" width="84" height="84" />
-              {/* Divider line */}
-              <line x1="62" y1="8" x2="62" y2="92" />
-              {/* RIGHT panel fill only when active */}
+            <svg viewBox="0 0 100 100" className="w-5 h-5">
+              <rect x="10" y="10" width="80" height="80" fill="none" stroke="currentColor" strokeWidth="6" />
+              <line x1="60" y1="10" x2="60" y2="90" stroke="currentColor" strokeWidth="6" />
               {showOutputDock && (
-                <rect x="62" y="8" width="30" height="84" fill="currentColor" stroke="none" />
+                <rect x="60" y="10" width="30" height="80" fill="currentColor" />
               )}
             </svg>
           </button>
@@ -1274,11 +1265,6 @@ export const EngineeringModule = ({
                     title="Change Background Color"
                   />
                 </div> */}
-
-                  {/* Grid selector - right side - Hide when docks are open on mobile */}
-                  {((isMobile && showCad && !showInputDock && !showOutputDock && !showLogs) || (!isMobile && !showInputDock && !showOutputDock)) && (
-                    <GridSelector onViewChange={handleOrthographicViewChange} />
-                  )}
 
                   <Canvas
                     gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
