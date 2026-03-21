@@ -64,7 +64,8 @@ export const basePlateConfig = {
 
   buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
     const section = inputs.member_designation;
-    const sectionList = (section && String(section).trim() !== "") ? [section] : [];
+    const memberDesignation =
+      section != null && String(section).trim() !== "" ? String(section).trim() : "";
     const toArr = (v) => (Array.isArray(v) && v.length ? v : []);
     const diameterOcf = allSelected?.anchor_diameter_ocf ? (lists.anchorDiameterList || []) : toArr(inputs.anchor_diameter_ocf);
     const gradeOcf = allSelected?.anchor_grade_ocf ? (lists.anchorGradeList || []) : toArr(inputs.anchor_grade_ocf);
@@ -72,7 +73,7 @@ export const basePlateConfig = {
     const gradeIcf = allSelected?.anchor_grade_icf ? (lists.anchorGradeList || []) : toArr(inputs.anchor_grade_icf);
     return {
       Module: "BasePlateConnection",
-      "Member.Designation": sectionList,
+      "Member.Designation": memberDesignation,
       Material: inputs.material || "E 165 (Fe 290)",
       Connectivity: inputs.connectivity || "Welded Column Base",
       "End Condition": inputs.end_condition || "Pinned",

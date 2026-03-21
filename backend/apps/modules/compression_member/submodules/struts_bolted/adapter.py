@@ -129,9 +129,23 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     if not isinstance(input_values["Member.Profile"], str):
         raise InvalidInputTypeError("Member.Profile", "str")
 
-    # Validate Member.Designation
-    if not isinstance(input_values["Member.Designation"], str):
-        raise InvalidInputTypeError("Member.Designation", "str")
+    # Validate Member.Designation — osdag_core expects KEY_SECSIZE as a list of section designations
+    member_designation = input_values.get("Member.Designation")
+    if isinstance(member_designation, list):
+        if not validate_list_type(member_designation, str):
+            raise InvalidInputTypeError("Member.Designation", "non-empty List[str]")
+        stripped = [str(x).strip() for x in member_designation if str(x).strip() != ""]
+        if not stripped:
+            raise InvalidInputTypeError("Member.Designation", "non-empty List[str]")
+    elif isinstance(member_designation, str):
+        s = member_designation.strip()
+        if not s or s.lower() == "all":
+            raise InvalidInputTypeError(
+                "Member.Designation",
+                "non-empty str (single section) or non-empty List[str]",
+            )
+    else:
+        raise InvalidInputTypeError("Member.Designation", "str or List[str]")
 
     # Validate Member.Length
     if not isinstance(input_values["Member.Length"], str):
@@ -174,6 +188,15 @@ def create_from_input(input_values: Dict[str, Any]) -> Compression_bolted:
         input_values["Plate.Thickness"] = input_values["Connector.Plate.Thickness_List"][0]
     else:
         input_values["Plate.Thickness"] = ""
+
+    # Core assigns self.sizelist = design_dictionary[KEY_SECSIZE]; must be a list of designation strings
+    md = input_values.get("Member.Designation")
+    if isinstance(md, str):
+        input_values["Member.Designation"] = [md.strip()]
+    elif isinstance(md, list):
+        input_values["Member.Designation"] = [
+            str(x).strip() for x in md if x is not None and str(x).strip() != ""
+        ]
     
     module.set_input_values(input_values)
     return module
