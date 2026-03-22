@@ -33,8 +33,10 @@ import DesignPrefSections from "./DesignPrefSections";
 import { message, Modal as AntdModal } from 'antd';
 import { menuItems } from "../utils/moduleUtils";
 import { UI_STRINGS } from "../../../constants/UIStrings";
-import { isGuestUser } from "../../../utils/auth";
+import { isGuestUser, canCreateProjects } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
+import ProjectNameModal from "../../../homepage/components/ProjectNameModal";
+import { useProjectCreation } from '../hooks/useProjectCreation';
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -128,12 +130,17 @@ export const EngineeringModule = ({
     handleReset,
     handleHomeClick,
     performReset,
+
+    // Report
     handleCreateDesignReport,
     handleCancelDesignReport,
     clearDesignResults,
-
-    // Service API (for project/OSI operations)
+    loadSavedOutputs,
+    loadOutputs,
+    resetDesignState,
     service,
+
+    // Direct access to module context reset
     resetModuleState,
     contextData,
   } = useEngineeringModule(moduleConfig);
@@ -156,50 +163,13 @@ export const EngineeringModule = ({
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
 
-  // Hooking Graphics Options (Model / Selected Section & Bg Color)
-  const colorPickerRef = useRef(null);
-  const [customBgColor, setCustomBgColor] = useState(null);
-
-  useEffect(() => {
-    if (inputs?.graphicsOption) {
-      const opt = inputs.graphicsOption;
-      if (["Model", "Beam", "Column", "Seated Angle", "Cleat Angle"].includes(opt)) {
-        if (opt === "Model") {
-          setSelectedSection(["Model"]);
-          setSelectedView("Model");
-          setSelectedCameraView("Model");
-        } else {
-          // If a non-Model option is selected, add it
-          const newSelection = selectedSection.filter(s => s !== "Model");
-          if (!newSelection.includes(opt)) {
-            newSelection.push(opt);
-          }
-          if (newSelection.length > 0) {
-            setSelectedSection(newSelection);
-            setSelectedView(newSelection[0]);
-            setSelectedCameraView(newSelection[0]);
-          }
-        }
-      } else if (opt === "Change Background") {
-        if (colorPickerRef.current) {
-          colorPickerRef.current.click();
-        }
-      } else if (opt === "Show front view") {
-        setSelectedCameraView("XY");
-      } else if (opt === "Show side view") {
-        setSelectedCameraView("YZ");
-      } else if (opt === "Show top view") {
-        setSelectedCameraView("ZX");
-      }
-
-      // Cleanup graphicOption to allow consecutive clicks of same option
-      setInputs(prev => {
-        const next = { ...prev };
-        delete next.graphicsOption;
-        return next;
-      });
-    }
-  }, [inputs?.graphicsOption, selectedSection]);
+  const { handleCreateProject, projectCreationModal } = useProjectCreation({
+    inputs,
+    extraState,
+    allSelected,
+    contextData,
+    moduleConfig,
+  });
 
   // Normalize CAD path keys to handle case/spacing differences
   const normalizedCadModelPaths = useMemo(() => {
@@ -365,28 +335,30 @@ export const EngineeringModule = ({
   }, [resetModuleState]);
 
   // ===================================================================
-  // PROJECT LOADING - Clear state before loading project inputs
+  // PROJECT LOADING - Load project inputs if project ID exists
   // ===================================================================
-  // Enforce project presence for authenticated users. Only depend on URL so we don't re-run when
-  // service/setInputs/resetModuleState change (which would cause infinite GET /api/projects/1/).
   const projectIdFromUrl = getProjectIdFromUrl();
   useEffect(() => {
+    // Skip project enforcement - allow users to work without project
     if (isGuestUser()) {
-      console.info('[EngineeringModule] Guest mode detected: skipping project enforcement');
+      console.info('[EngineeringModule] Guest mode detected: skipping project loading');
       return;
     }
+
     const projectId = projectIdFromUrl;
+    // If no project ID, allow user to work without project (they can create one later)
     if (!projectId || Number.isNaN(projectId)) {
+      console.info('[EngineeringModule] No project ID in URL: user can work without project');
       lastLoadedProjectIdRef.current = null;
-      message.warning('No active project. Redirecting to home.');
-      navigate('/home', { replace: true });
       return;
     }
+
     // Prevent infinite loop: only fetch once per projectId
     if (lastLoadedProjectIdRef.current === projectId) {
       return;
     }
     lastLoadedProjectIdRef.current = projectId;
+
     (async () => {
       try {
         resetModuleState();
@@ -399,19 +371,30 @@ export const EngineeringModule = ({
         designCompletedRef.current = false;
 
         const result = await service.getProject(projectId);
+        console.log('[EngineeringModule] Project loaded:', result);
         if (!result.success || !result.project) {
           lastLoadedProjectIdRef.current = null;
-          message.warning('Project not found. Redirecting to home.');
-          navigate('/home', { replace: true });
+          message.warning('Project not found.');
           return;
         }
         if (result.project.inputs_json) {
           try {
+            console.log('[EngineeringModule] Project inputs_json keys:', Object.keys(result.project.inputs_json));
             setInputs(result.project.inputs_json);
-          } catch (_ignored) {
-            // ignore parse issues; user can overwrite via UI
+          } catch (err) {
+            console.error('[EngineeringModule] Error parsing inputs_json:', err);
+            message.error('Failed to parse saved project inputs.');
           }
         }
+        if (result.project.outputs_json) {
+          try {
+            loadSavedOutputs(result.project.outputs_json);
+          } catch (err) {
+            console.error('[EngineeringModule] Error loading saved outputs:', err);
+            message.error('Failed to load saved project outputs.');
+          }
+        }
+          // Deduplicated block
         // Normalize URL to path form: .../fin_plate/1 instead of .../fin_plate?projectId=1
         const pathname = location.pathname;
         const pathEndsWithId = pathname.endsWith(`/${projectId}`);
@@ -422,8 +405,12 @@ export const EngineeringModule = ({
         }
       } catch (_e) {
         lastLoadedProjectIdRef.current = null;
-        message.warning('Cannot verify project. Redirecting to home.');
-        navigate('/home', { replace: true });
+        console.error('[EngineeringModule] Error loading project:', _e);
+        message.warning('Cannot load project. Redirecting to module base.');
+        
+        // Navigate back to the base module path (e.g. /Connections, /Member)
+        const basePath = moduleConfig.routePath || '/home';
+        navigate(basePath, { replace: true });
       }
     })();
   }, [projectIdFromUrl]); // eslint-disable-line react-hooks/exhaustive-deps -- intentionally stable deps to avoid infinite GET
@@ -503,8 +490,9 @@ export const EngineeringModule = ({
         setShowCad(true);
       }
 
-      // Reset all the data that controls model rendering
-      await performReset();
+      // Reset all the data that controls model rendering but PRESERVE inputs
+      clearDesignResults();
+      resetModuleState();
 
       // Small delay to ensure reset is processed
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -730,7 +718,6 @@ export const EngineeringModule = ({
       setShowCad(true);
     }
   };
-  // Save inputs to OSI file / Project (JSON-first)
   const handleSaveInputs = async () => {
     const userIsGuest = isGuest();
 
@@ -938,6 +925,8 @@ export const EngineeringModule = ({
               }
               cadModelPaths={cadModelPaths}
               contextData={contextData}
+              onCreateProject={handleCreateProject}
+              isExistingProject={!!projectIdFromUrl}
             />
           ))}
 
@@ -948,26 +937,20 @@ export const EngineeringModule = ({
           )}
         </div>
 
-        <div className="flex flex-row flex-wrap justify-center items-center gap-2 text-black dark:text-white pr-4">
+        <div className="flex flex-row justify-center items-center gap-2 text-black dark:text-white pr-4">
 
           {/* Input Dock Button */}
           <button
             onClick={toggleInputDock}
-            className={`group p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${showInputDock
-              ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
-              : 'hover:bg-black/10 dark:hover:bg-black/40'
-              }`}
+            className={`w-9 h-9 flex items-center justify-center transition`}
             title={`${showInputDock ? 'Hide' : 'Show'} input dock`}
             type="button"
           >
-            <svg viewBox="0 0 100 100" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="6">
-              {/* Frame */}
-              <rect x="8" y="8" width="84" height="84" />
-              {/* Divider line */}
-              <line x1="38" y1="8" x2="38" y2="92" />
-              {/* LEFT panel fill only when active */}
+            <svg viewBox="0 0 100 100" className="w-5 h-5">
+              <rect x="10" y="10" width="80" height="80" fill="none" stroke="currentColor" strokeWidth="6" />
+              <line x1="40" y1="10" x2="40" y2="90" stroke="currentColor" strokeWidth="6" />
               {showInputDock && (
-                <rect x="8" y="8" width="30" height="84" fill="currentColor" stroke="none" />
+                <rect x="10" y="10" width="30" height="80" fill="currentColor" />
               )}
             </svg>
 
@@ -977,38 +960,44 @@ export const EngineeringModule = ({
           <button
             onClick={toggleLogs}
             disabled={!output}
-            className={`p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${output
-              ? (showLogs ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 hover:text-osdag-green dark:hover:bg-black/40')
-              : 'opacity-40 cursor-not-allowed'
-              }`}
+            className={`w-9 h-9 flex items-center justify-center transition`}
             title={output ? `${showLogs ? 'Hide' : 'Show'} logs` : 'Run a design to view logs'}
             type="button"
           >
             <svg
-              xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 100 100"
               className="w-5 h-5"
+              fill="none"
             >
-              {/* Outer border */}
               <rect
-                x="5"
-                y="5"
-                width="90"
-                height="90"
+                x="10"
+                y="10"
+                width="80"
+                height="80"
                 stroke="currentColor"
-                strokeWidth="10"
+                strokeWidth="6"
                 fill="none"
               />
 
-              {/* Bottom section fill */}
+              <line
+                x1="10"
+                y1="60"
+                x2="90"
+                y2="60"
+                stroke="currentColor"
+                strokeWidth="6"
+              />
+
+             {showLogs && (
               <rect
-                x="5"
-                y="65"
-                width="90"
+                x="10"
+                y="60"
+                width="80"
                 height="30"
                 fill="currentColor"
                 stroke="none"
               />
+             )}
             </svg>
           </button>
 
@@ -1050,14 +1039,11 @@ export const EngineeringModule = ({
               : "opacity-40 cursor-not-allowed"
               }`}
           >
-            <svg viewBox="0 0 100 100" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="6">
-              {/* Frame */}
-              <rect x="8" y="8" width="84" height="84" />
-              {/* Divider line */}
-              <line x1="62" y1="8" x2="62" y2="92" />
-              {/* RIGHT panel fill only when active */}
+            <svg viewBox="0 0 100 100" className="w-5 h-5">
+              <rect x="10" y="10" width="80" height="80" fill="none" stroke="currentColor" strokeWidth="6" />
+              <line x1="60" y1="10" x2="60" y2="90" stroke="currentColor" strokeWidth="6" />
               {showOutputDock && (
-                <rect x="62" y="8" width="30" height="84" fill="currentColor" stroke="none" />
+                <rect x="60" y="10" width="30" height="80" fill="currentColor" />
               )}
             </svg>
           </button>
@@ -1550,6 +1536,7 @@ export const EngineeringModule = ({
           dangerouslySetInnerHTML={{ __html: hoverText }}
         />
       )}
-    </div >
+      {projectCreationModal}
+    </div>
   );
 };

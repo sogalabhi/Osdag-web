@@ -134,27 +134,34 @@ export const InputSection = ({
 
   // Set default selected values when lists/options arrive
   useEffect(() => {
-    section.fields.forEach((field) => {
-      if (field.type !== 'select') return;
+    setInputs((prev) => {
+      let isChanged = false;
+      const nextInputs = { ...prev };
 
-      const rawList = getOptionsForField(field, safeContextData, safeInputs);
-      if (!rawList || rawList.length === 0) return;
+      section.fields.forEach((field) => {
+        if (field.type !== 'select') return;
 
-      const isCustomizable = Boolean(field.selectionKey);
-      if (isCustomizable) return;
+        const rawList = getOptionsForField(field, safeContextData, prev);
+        if (!rawList || rawList.length === 0) return;
 
-      // Determine first option value
-      const first = rawList[0];
-      const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
-        : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
+        const isCustomizable = Boolean(field.selectionKey);
+        if (isCustomizable) return;
 
-      const current = safeInputs[field.key];
-      const opts = toSelectOptions(rawList);
-      const currentExistsInOptions = opts.some(opt => opt.value === current);
+        // Determine first option value
+        const first = rawList[0];
+        const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
+          : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
 
-      if (current === undefined || current === null || current === '' || !currentExistsInOptions) {
-        setInputs((prev) => ({ ...prev, [field.key]: firstValue }));
-      }
+        const current = nextInputs[field.key];
+        const opts = toSelectOptions(rawList);
+        const currentExistsInOptions = opts.some(opt => opt.value === current || String(opt.value) === String(current));
+
+        if (current === undefined || current === null || current === '' || !currentExistsInOptions) {
+          nextInputs[field.key] = firstValue;
+          isChanged = true;
+        }
+      });
+      return isChanged ? nextInputs : prev;
     });
 
     // Set default for connectivity / endplate dropdowns
@@ -455,7 +462,7 @@ export const InputSection = ({
                   <img
                     src={imageSource}
                     alt="Connection type"
-                    className="w-[100px] h-[100px] object-contain"
+                    className="w-[150px] h-[100px] object-contain"
                   />
                 </div>
               )}

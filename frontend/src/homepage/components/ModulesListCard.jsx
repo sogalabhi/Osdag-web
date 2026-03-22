@@ -14,12 +14,7 @@ const ModulesListCard = ({ items }) => {
   const handleModuleClick = (item) => {
     const route = getModuleRoute(item.module_id);
     if (!route) return;
-    if (isGuestUser()) {
-      navigate(route);
-      return;
-    }
-    setSelectedModule(item);
-    setShowProjectModal(true);
+    navigate(route);
   };
 
   const handleProjectModalConfirm = async (projectName) => {
@@ -98,11 +93,6 @@ const ModulesListCard = ({ items }) => {
         </div>
       ))}
 
-      <ProjectNameModal
-        visible={showProjectModal}
-        onCancel={handleProjectModalCancel}
-        onConfirm={handleProjectModalConfirm}
-      />
     </>
   );
 };

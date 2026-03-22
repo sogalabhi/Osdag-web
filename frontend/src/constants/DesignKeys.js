@@ -158,4 +158,6 @@ export const KEY_ALLOW_LOAD = 'Member.AllowLoadType';
 
 // Module Keys - Compression
 export const MODULE_KEY_STRUTS_BOLTED = 'Struts-Bolted-Design';
-export const MODULE_KEY_AXIALLY_LOADED_COLUMN = 'Axially-Loaded-Column';
+export const MODULE_KEY_STRUTS_WELDED = 'Struts-Welded-Design';
+
+export const MODULE_KEY_AXIALLY_LOADED_COLUMN = 'AxiallyLoadedColumn';

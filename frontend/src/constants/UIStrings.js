@@ -63,17 +63,18 @@ export const UI_STRINGS = {
   ADDITIONAL_COMMENTS: "Additional Comments:",
 
   // Module & Connection Labels (for cards, tabs, titles)
-  SIMPLE_CONNECTIONS: "Simple Connections",
+  PLATED_CONNECTION: "Plated Connection",
   SHEAR_CONNECTION: "Shear Connection",
   SHEAR_CONNECTIONS: "Shear Connections",
   MOMENT_CONNECTION: "Moment Connection",
   BASE_PLATE: "Base Plate",
-  BASE_PLATE_CONNECTION: "Base Plate Connection",
+  SLAB_AND_GUSSETED_BASES: "Slab and Gusseted Bases",
 
   FIN_PLATE: "Fin Plate",
   CLEAT_ANGLE: "Cleat Angle",
-  END_PLATE: "End Plate",
+  HEADER_PLATE: "Header Plate",
   SEATED_ANGLE: "Seated Angle",
+  END_PLATE: "End Plate",
 
   TENSION_MEMBER: "Tension Member",
   COMPRESSION_MEMBER: "Compression Member",

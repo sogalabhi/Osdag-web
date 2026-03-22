@@ -25,8 +25,8 @@ const Header = ({ setshowSideBar, active }) => {
   const userDisplayName = firebaseUser?.displayName || storedUsername || firebaseUser?.email?.split('@')[0] || '';
   const userEmail = firebaseUser?.email || (!isGuest ? localStorage.getItem('email') : '') || '';
   // Get initial: from displayName, or email first letter, or 'G' for guest
-  const userInitial = userDisplayName 
-    ? userDisplayName[0].toUpperCase() 
+  const userInitial = userDisplayName
+    ? userDisplayName[0].toUpperCase()
     : (isGuest ? 'G' : (userEmail ? userEmail[0].toUpperCase() : 'U'));
 
   const toggleTheme = () => {

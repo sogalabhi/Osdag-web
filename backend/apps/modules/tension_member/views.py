@@ -127,7 +127,8 @@ class TensionMemberViewSet(viewsets.ViewSet):
             "design_status": boolean,
             "logs": [...],
             "sections": [...],          # Optional
-            "customization": {...}      # Optional
+            "customization": {...},    # Optional
+            "images": {...}               # Optional CAD captures (iso/front/side/top)
         }
         """
         normalized_slug = self._normalize_slug(submodule_slug)
@@ -160,6 +161,8 @@ class TensionMemberViewSet(viewsets.ViewSet):
             mapped_data["sections"] = request.data.get("sections")
         if "customization" in request.data:
             mapped_data["customization"] = request.data.get("customization")
+        if "images" in request.data:
+            mapped_data["images"] = request.data.get("images")
 
         payload, status_code = generate_initial_report_core(mapped_data)
         return Response(payload, status=status_code)

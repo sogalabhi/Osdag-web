@@ -14,7 +14,7 @@ const SectionCards = ({ section, onModuleClick }) => (
         >
           <div
             style={{ backgroundImage: `url(/images/${opt.img})` }}
-            className="h-20 w-20 mt-5 mb-2 bg-cover bg-center bg-no-repeat"
+            className="h-40 w-40 mt-5 mb-2 bg-cover bg-center bg-no-repeat"
           ></div>
           <div className="font-semibold mb-2 text-black dark:text-white group-hover:text-white">
             {opt.label}

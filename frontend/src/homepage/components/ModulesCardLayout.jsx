@@ -44,14 +44,8 @@ const TabbedModulePage = () => {
   const handleModuleClick = (optionKey, sectionLabel) => {
     const route = MODULE_ROUTES[optionKey] || "";
 
-    if (isGuestUser()) {
-      route && navigate(route);
-      return;
-    }
-
     if (route) {
-      setSelectedModule({ key: optionKey, label: sectionLabel, route });
-      setShowProjectModal(true);
+      navigate(route);
     }
   };
 
@@ -113,8 +107,8 @@ const TabbedModulePage = () => {
             key={key}
             onClick={() => setActiveSubmodule(key)}
             className={`flex-shrink-0 flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border-2 rounded-xl transition-colors duration-150 ${activeSubmodule === key
-                ? "bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green"
-                : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300 dark:hover:text-osdag-green"
+              ? "bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green"
+              : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300 dark:hover:text-osdag-green"
               }`}
           >
             {label}
@@ -123,14 +117,14 @@ const TabbedModulePage = () => {
       </div>
 
       {/* Sub-SubModules Tabs */}
-      {activeSubmodule==="Moment" && <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2">
+      {activeSubmodule === "Moment" && <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2">
         {content.map(({ label }) => (
           <button
             key={label}
             onClick={() => setActiveSubSubmodule(label)}
             className={`flex-shrink-0 flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border-2 rounded-xl transition-colors duration-150 ${activeSubSubmodule === label
-                ? "bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green"
-                : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300 dark:hover:text-osdag-green"
+              ? "bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green"
+              : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300 dark:hover:text-osdag-green"
               }`}
           >
             {label}
@@ -147,17 +141,6 @@ const TabbedModulePage = () => {
         </div>
       )}
 
-      {/* Project Modal */}
-      <ProjectNameModal
-        visible={showProjectModal}
-        onConfirm={handleProjectModalConfirm}
-        onCancel={handleProjectModalCancel}
-        title="Name Your Project"
-        message="Please give your project a name to save it for later access."
-        moduleName={selectedModule ? selectedModule.label : ""}
-        defaultValue=""
-        confirmText="Create Project"
-      />
     </div>
   );
 };

@@ -12,14 +12,6 @@ import FIXED_FIXED from "../../../assets/CompressionMember/RRRRstrut.png";
 import FIXED_HINGED from "../../../assets/CompressionMember/RFRFstrut.png";
 import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
 
-import {
-  KEY_MODULE, KEY_SEC_PROFILE, KEY_LOCATION, KEY_SECSIZE, KEY_MATERIAL,
-  KEY_LENGTH, KEY_AXIAL, KEY_D, KEY_TYP, KEY_GRD, KEY_DP_BOLT_HOLE_TYPE,
-  KEY_DP_BOLT_SLIP_FACTOR, KEY_CONNECTOR_MATERIAL, KEY_DP_DETAILING_EDGE_TYPE,
-  KEY_DP_DETAILING_GAP, KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-  KEY_DP_DESIGN_METHOD, KEY_PLATETHK, KEY_SEC_MATERIAL, KEY_END1, KEY_END2
-} from "../../../constants/DesignKeys";
-
 export const strutsBoltedConfig = {
   sessionName: "Struts Bolted to End Gusset",
   routePath: "/design/compression-member/struts_bolted_to_end_gusset",
@@ -122,23 +114,41 @@ export const strutsBoltedConfig = {
       return val ? [String(val)] : [];
     };
 
-    // Resolve Member.Designation (Backend expects str)
-    let designation = "";
-    if (allSelected?.section_designation) {
-      designation = "All";
-    } else {
-      const val = inputs.section_designation;
-      if (Array.isArray(val)) {
-        designation = val.length > 0 ? val[0] : "";
-      } else {
-        designation = val ? String(val) : "";
-      }
-    }
+    // Normalize section list items to designation strings (matches All/Customized list patterns elsewhere)
+    const normalizeSectionItem = (item) => {
+      if (item == null) return "";
+      if (typeof item === "string") return item.trim();
+      return String(
+        item.designation ?? item.Designation ?? item.value ?? item.Grade ?? item
+      ).trim();
+    };
+    const normalizeSectionList = (list) => {
+      if (!Array.isArray(list)) return [];
+      return list.map(normalizeSectionItem).filter((s) => s !== "");
+    };
+
+    const dynamicSectionList = normalizeSectionList(
+      strutsBoltedConfig.getDynamicSectionList(
+        inputs.section_profile,
+        lists?.angleList,
+        lists?.channelList
+      )
+    );
+
+    const memberDesignation = allSelected?.section_designation
+      ? dynamicSectionList
+      : normalizeSectionList(
+          Array.isArray(inputs.section_designation)
+            ? inputs.section_designation
+            : inputs.section_designation
+              ? [inputs.section_designation]
+              : []
+        );
 
     return {
       "Module": "Struts-Bolted-Design",
       "Member.Profile": inputs.section_profile,
-      "Member.Designation": designation,
+      "Member.Designation": memberDesignation,
 
       "Material": inputs.material,
       "Member.Material": inputs.material,

@@ -128,23 +128,38 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
       // Optionally capture CAD views for report images (frontend-driven).
       // Force Model view so report shows full assembly, not the current per-part view.
       let images = {};
+      const prevSection = selectedSection;
       if (typeof window !== "undefined" && typeof window.captureReportViews === "function") {
         try {
-          const prevSection = selectedSection;
           if (setSelectedSection) {
             setSelectedSection(["Model"]);
-            await new Promise((r) => setTimeout(r, 150));
+            await new Promise((r) => setTimeout(r, 400));
           }
           images = await window.captureReportViews();
-          if (setSelectedSection && prevSection) {
+          const keys = images && typeof images === "object" ? Object.keys(images) : [];
+          console.log(
+            "[DesignReportModal] captureReportViews keys:",
+            keys,
+            keys.map((k) => [k, (images[k] && String(images[k]).length) || 0])
+          );
+          if (keys.length === 0) {
+            console.warn(
+              "[DesignReportModal] No screenshots captured — check 3D canvas (Model), ReportCaptureDev, and scene bbox."
+            );
+          }
+          if (setSelectedSection) {
             setSelectedSection(Array.isArray(prevSection) ? prevSection : [prevSection]);
           }
         } catch (e) {
           console.error("[DesignReportModal] captureReportViews failed", e);
-          if (setSelectedSection && prevSection) {
+          if (setSelectedSection) {
             setSelectedSection(Array.isArray(prevSection) ? prevSection : [prevSection]);
           }
         }
+      } else {
+        console.warn(
+          "[DesignReportModal] window.captureReportViews is not available — open CAD view first; report will use broken placeholders."
+        );
       }
 
       // Prepare request data

@@ -112,6 +112,11 @@ export const ReportCaptureDev = () => {
       try {
         const originalPos = camera.position.clone();
         const bbox = computeSceneBoundingBox(scene);
+        if (!bbox) {
+          console.warn(
+            "[captureReportViews] computeSceneBoundingBox returned null/undefined — scene may be empty; captures may be blank."
+          );
+        }
         const center = bbox ? bbox.center : new THREE.Vector3(0, 0, 0);
         const fovDeg = typeof camera.fov === "number" ? camera.fov : 13;
         const computedDistance = bbox ? distanceForFov(bbox.size, fovDeg) : DEFAULT_DISTANCE;

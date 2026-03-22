@@ -31,6 +31,7 @@ import { useDesignReport } from "./useDesignReport";
  * @param {Function} moduleConfig.validateInputs - Input validation function
  * @param {Function} moduleConfig.buildSubmissionParams - Parameter building function
  * @param {string} moduleConfig.routePath - Route path for navigation
+ * @param {number|null} projectId - Current project ID (optional)
  * 
  * @returns {Object} State and action functions
  * @returns {Array} returns.beamList - List of beam sections
@@ -50,7 +51,7 @@ export const useEngineeringModule = (moduleConfig) => {
   const navigate = useNavigate();
   const service = useEngineeringService();
   const { getModuleData, getDesignPreferences } = service;
-  
+
   // Access ModuleContext to get resetModuleState function
   const { resetModuleState } = useContext(ModuleContext);
 
@@ -101,6 +102,7 @@ export const useEngineeringModule = (moduleConfig) => {
     clearDesignResults: clearDesignResultsState,
     screenshotTrigger,
     setScreenshotTrigger,
+    loadSavedOutputs,
   } = useDesignSubmission(service, moduleConfig);
 
   // Form & selection state (moved into dedicated hook)
@@ -116,6 +118,7 @@ export const useEngineeringModule = (moduleConfig) => {
     modalDynamicSrc,
     setModalDynamicSrc,
     designPrefModalStatus,
+    setDesignPrefModalStatus, // ✅ ADD
     confirmationModal,
     setConfirmationModal,
     displaySaveInputPopup,
@@ -163,7 +166,7 @@ export const useEngineeringModule = (moduleConfig) => {
   const resetToDefaultState = () => {
     // Reset ModuleContext state (designData, logs, CAD paths, etc.)
     resetModuleState();
-    
+
     // Reset design & CAD state (hook-level state)
     resetDesignState();
 
@@ -285,6 +288,7 @@ export const useEngineeringModule = (moduleConfig) => {
     modalDynamicSrc,
     setModalDynamicSrc,
     designPrefModalStatus,
+    setDesignPrefModalStatus, // ✅ ADD
     confirmationModal,
     setConfirmationModal,
     displaySaveInputPopup,
@@ -335,7 +339,11 @@ export const useEngineeringModule = (moduleConfig) => {
     handleCancelDesignReport: report.close,
 
     clearDesignResults,
-    
+    loadSavedOutputs,
+
+    // Explicitly expose reset functions for targeted clears that don't destroy `inputs`
+    resetDesignState,
+
     // Expose resetModuleState for external use (e.g., module change detection)
     resetModuleState,
   };
