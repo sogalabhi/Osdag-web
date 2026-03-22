@@ -295,22 +295,25 @@ class LapJointWelded(MomentConnection):
             self.plate2.height = plate_width
             self.plate2.thickness_provided = plate2_thk
 
-        self.hover_dict["Plate 1"] = (
-            f"<b>Plate 1</b><br>"
-            f"Width: {round(float(self.plate1.height), 2) if flag and self.plate1.height else ''} mm<br>"
-            f"Thickness: {round(float(self.plate1.thickness_provided), 2) if flag and self.plate1.thickness_provided else ''} mm"
-        )
-        self.hover_dict["Plate 2"] = (
-            f"<b>Plate 2</b><br>"
-            f"Width: {round(float(self.plate2.height), 2) if flag and self.plate2.height else ''} mm<br>"
-            f"Thickness: {round(float(self.plate2.thickness_provided), 2) if flag and self.plate2.thickness_provided else ''} mm"
-        )
-        self.hover_dict["Weld"] = (
-            f"<b>Fillet Weld</b><br>"
-            f"Size: {round(float(self.weld_size), 1) if flag and self.weld_size else ''} mm<br>"
-            f"Type: {getattr(self.weld, 'type', 'Fillet') if flag else ''}<br>"
-            f"Effective Length: {round(float(self.weld_length_effective), 1) if flag and self.weld_length_effective else ''} mm"
-        )
+        try:
+            self.hover_dict["Plate 1"] = (
+                f"<b>Plate 1</b><br>"
+                f"Width: {round(float(self.plate1.height), 2) if flag and self.plate1.height else ''} mm<br>"
+                f"Thickness: {round(float(self.plate1.thickness_provided), 2) if flag and self.plate1.thickness_provided else ''} mm"
+            )
+            self.hover_dict["Plate 2"] = (
+                f"<b>Plate 2</b><br>"
+                f"Width: {round(float(self.plate2.height), 2) if flag and self.plate2.height else ''} mm<br>"
+                f"Thickness: {round(float(self.plate2.thickness_provided), 2) if flag and self.plate2.thickness_provided else ''} mm"
+            )
+            self.hover_dict["Weld"] = (
+                f"<b>Fillet Weld</b><br>"
+                f"Size: {round(float(self.weld_size), 1) if flag and self.weld_size else ''} mm<br>"
+                f"Type: {getattr(self.weld, 'type', 'Fillet') if flag else ''}<br>"
+                f"Effective Length: {round(float(self.weld_length_effective), 1) if flag and self.weld_length_effective else ''} mm"
+            )
+        except Exception:
+            pass
 
         return out_list
 

@@ -282,7 +282,7 @@ export const SceneManager = forwardRef(({
             rotation={finalRotation}
             scale={modelScale}
             hoverDict={hoverDict}
-            hoverLabel={hoverDict?.[name] || name}
+            hoverLabel={null}
             isHovered={hoveredMeshId === meshId}
             onHover={handlePartHover}
             onHoverEnd={handlePartHoverEnd}

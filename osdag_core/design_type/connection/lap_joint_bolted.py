@@ -379,24 +379,27 @@ class LapJointBolted(MomentConnection):
         out_list.append(t21)
 
         # Populate Hover Dict (Lap Joint Bolted)
-        self.hover_dict["Plate 1"] = (
-            f"<b>Plate 1</b><br>"
-            f"Width: {round(float(self.plate1.height), 2) if flag and self.plate1 and self.plate1.height else ''} mm<br>"
-            f"Thickness: {round(float(self.plate1.thickness_provided), 2) if flag and self.plate1 and self.plate1.thickness_provided else ''} mm"
-        )
+        try:
+            self.hover_dict["Plate 1"] = (
+                f"<b>Plate 1</b><br>"
+                f"Width: {round(float(self.plate1.height), 2) if flag and self.plate1 and self.plate1.height else ''} mm<br>"
+                f"Thickness: {round(float(self.plate1.thickness_provided), 2) if flag and self.plate1 and self.plate1.thickness_provided else ''} mm"
+            )
 
-        self.hover_dict["Plate 2"] = (
-            f"<b>Plate 2</b><br>"
-            f"Width: {round(float(self.plate2.height), 2) if flag and self.plate2 and self.plate2.height else ''} mm<br>"
-            f"Thickness: {round(float(self.plate2.thickness_provided), 2) if flag and self.plate2 and self.plate2.thickness_provided else ''} mm"
-        )
+            self.hover_dict["Plate 2"] = (
+                f"<b>Plate 2</b><br>"
+                f"Width: {round(float(self.plate2.height), 2) if flag and self.plate2 and self.plate2.height else ''} mm<br>"
+                f"Thickness: {round(float(self.plate2.thickness_provided), 2) if flag and self.plate2 and self.plate2.thickness_provided else ''} mm"
+            )
 
-        self.hover_dict["Bolt"] = (
-            f"<b>Bolts</b><br>"
-            f"Grade: {self.bolt.bolt_grade_provided if flag and self.bolt else ''}<br>"
-            f"Diameter: {int(self.bolt.bolt_diameter_provided) if flag and self.bolt else ''} mm<br>"
-            f"No. of Bolts: {self.number_bolts if flag else ''}"
-        )
+            self.hover_dict["Bolt"] = (
+                f"<b>Bolts</b><br>"
+                f"Grade: {self.bolt.bolt_grade_provided if flag and self.bolt else ''}<br>"
+                f"Diameter: {int(self.bolt.bolt_diameter_provided) if flag and self.bolt else ''} mm<br>"
+                f"No. of Bolts: {self.number_bolts if flag else ''}"
+            )
+        except Exception:
+            pass
 
         return out_list
     

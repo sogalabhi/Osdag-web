@@ -585,7 +585,10 @@ class ColumnDesign(Member):
         out_list.append(t1)
 
         # Populate hover dict
-        self.hover_dict["Column"] = f"Column: {self.result_designation if flag else ''}"
+        self.hover_dict["Column"] = (
+            f"<b>Column</b><br>"
+            f"{self.result_designation if flag else ''}"
+        )
         
         return out_list
 

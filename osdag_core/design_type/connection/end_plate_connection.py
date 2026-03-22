@@ -1363,25 +1363,33 @@ class EndPlateConnection(ShearConnection):
         self.hover_dict["Beam"] = f"Beam: {self.supported_section.designation if flag else ''}"
 
         # In the web 3D viewer, bolts and welds are fused into the Plate STL.
-        bolt_count = self.output[0][12] if flag else ''
+        try:
+            bolt_count = self.output[0][12] if flag and self.output else ''
+            plate_width = self.output[0][5] if flag and self.output else ''
+            plate_height = self.output[0][4] if flag and self.output else ''
+            plate_thk = self.output[0][3] if flag and self.output else ''
+            weld_size = self.output[0][23] if flag and self.output else ''
+        except (IndexError, TypeError, ValueError):
+            bolt_count = plate_width = plate_height = plate_thk = weld_size = ''
+
         self.hover_dict["Plate"] = (
-            f"<b>Plate</b>: {float(self.output[0][5]) if flag else ''} mm x "
-            f"{float(self.output[0][4]) if flag else ''} mm x "
-            f"{self.output[0][3] if flag else ''} mm"
+            f"<b>Plate</b>: {plate_width} mm x "
+            f"{plate_height} mm x "
+            f"{plate_thk} mm"
             f"<br><b>Bolt</b> Grade: {self.bolt.bolt_grade_provided if flag else ''}, "
-            f"Dia: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm, "
+            f"Dia: {self.bolt.bolt_diameter_provided if flag else ''} mm, "
             f"Nos: {bolt_count}"
-            f"<br><b>Weld</b> Size: {self.output[0][23] if flag else ''} mm, "
+            f"<br><b>Weld</b> Size: {weld_size} mm, "
             f"Length: {self.plate.height if flag else ''} mm"
         )
         # Keep separate keys for future per-part meshes
         self.hover_dict["Bolt"] = (
             f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}"
-            f"<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm"
+            f"<br>Diameter: {self.bolt.bolt_diameter_provided if flag else ''} mm"
             f"<br>No. of Bolts: {bolt_count}"
         )
         self.hover_dict["Weld"] = (
-            f"<b>Weld</b><br>Size: {self.output[0][23] if flag else ''} mm"
+            f"<b>Weld</b><br>Size: {weld_size} mm"
             f"<br>Length: {self.plate.height if flag else ''} mm"
         )
 

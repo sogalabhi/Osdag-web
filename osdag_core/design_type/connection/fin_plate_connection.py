@@ -457,13 +457,17 @@ class FinPlateConnection(ShearConnection):
         # In the web 3D viewer, bolts and welds are fused into the Plate STL
         # (unlike the desktop OCC viewer which can distinguish sub-shapes).
         # So the Plate hover shows combined Plate + Bolt + Weld details.
-        bolt_count = int(self.plate.bolts_one_line) * int(self.plate.bolt_line) if flag else ''
+        try:
+            bolt_count = int(self.plate.bolts_one_line) * int(self.plate.bolt_line) if flag else ''
+        except (ValueError, TypeError, AttributeError):
+            bolt_count = ''
+            
         self.hover_dict["Plate"] = (
-            f"<b>Plate</b>: {float(self.plate.length) if flag else ''} mm x "
-            f"{float(self.plate.height) if flag else ''} mm x "
+            f"<b>Plate</b>: {self.plate.length if flag else ''} mm x "
+            f"{self.plate.height if flag else ''} mm x "
             f"{self.plate.thickness_provided if flag else ''} mm"
             f"<br><b>Bolt</b> Grade: {self.bolt.bolt_grade_provided if flag else ''}, "
-            f"Dia: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm, "
+            f"Dia: {self.bolt.bolt_diameter_provided if flag else ''} mm, "
             f"Nos: {bolt_count}"
             f"<br><b>Weld</b> Size: {self.weld.size if flag else ''} mm, "
             f"Length: {self.plate.height if flag else ''} mm"
@@ -471,7 +475,7 @@ class FinPlateConnection(ShearConnection):
         # Keep separate keys for future per-part meshes
         self.hover_dict["Bolt"] = (
             f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}"
-            f"<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm"
+            f"<br>Diameter: {self.bolt.bolt_diameter_provided if flag else ''} mm"
             f"<br>No. of Bolts: {bolt_count}"
         )
         self.hover_dict["Weld"] = (

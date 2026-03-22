@@ -147,6 +147,8 @@ export const EngineeringModule = ({
 
   const [showResetButton, setShowResetButton] = useState(false);
   const [showInputDock, setShowInputDock] = useState(true);
+  const colorPickerRef = useRef(null);
+  const [customBgColor, setCustomBgColor] = useState("");
   const [showOutputDock, setShowOutputDock] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
   const [isDesignComplete, setIsDesignComplete] = useState(false);
@@ -856,10 +858,9 @@ export const EngineeringModule = ({
     // Only keep truly generic part-name labels for parts
     // the backend never annotates (e.g. SeatedAngle, Member).
     const staticFallbacks = {
-      cleatAngle: "Cleat Angle",
-      SeatedAngle: "Seated Angle",
-      Member: "Member",
-      Angle: "Angle",
+      "Cleat Angle": "Cleat Angle",
+      "Seated Angle": "Seated Angle",
+      "Member": "Member",
     };
 
     const final = {

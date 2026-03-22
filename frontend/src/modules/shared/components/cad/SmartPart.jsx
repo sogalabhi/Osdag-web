@@ -61,8 +61,10 @@ export const SmartPart = ({
       'endplate': 'Plate',
       'end plate': 'Plate',
       'end-plate': 'Plate',
-      'cleatangle': 'Angle',
-      'seatedangle': 'Angle',
+      'cleatangle': 'Cleat Angle',
+      'cleat angle': 'Cleat Angle',
+      'seatedangle': 'Seated Angle',
+      'seated angle': 'Seated Angle',
       'coverplate': 'Cover Plate',
     };
 
