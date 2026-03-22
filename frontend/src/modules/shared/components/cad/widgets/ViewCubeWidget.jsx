@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
+import { Hud, Html, OrthographicCamera } from "@react-three/drei";
 import * as THREE from "three";
 import {
   VC_OFFSET,
@@ -14,96 +15,74 @@ import {
   VC_LABELS,
   makeLabelTexture,
   snapFromCoord,
+  applyCubeQuaternionToOrbitCamera,
+  easeInOutCubic,
+  getOrbitDistance,
+  syncOrbitControlsFromCamera,
+  projectOnTrackball,
 } from "./viewCubeUtils";
 import { useCadSceneContext } from "../context/CadSceneContext";
 
 const VC_ORTHO_SIZE = 3.1;
+const CUBE_PX = 150;
 const DRAG_THRESHOLD_PX = 5;
-const SNAP_LERP = 0.12;
-const SNAP_EPS = 0.001;
+const SNAP_MS = 350;
+
+const _qYaw180 = new THREE.Quaternion();
+const _axisWorldY = new THREE.Vector3(0, 1, 0);
+const _tempPersp = new THREE.PerspectiveCamera();
+/** Arcball drag (AIS_ViewCube-style): P₁ and quaternion(P₀→P₁); see projectOnTrackball in viewCubeUtils.js */
+const _pTrackballNext = new THREE.Vector3();
+const _qArcball = new THREE.Quaternion();
+
+/**
+ * Pointer (client) → cube widget local pixels [0,CUBE_PX]² origin top-left of widget square.
+ */
+function clientToCubeLocal(clientX, clientY, gl, size, cubeCenterPxX, cubeCenterPxY) {
+  const rect = gl.domElement.getBoundingClientRect();
+  const x = ((clientX - rect.left) / rect.width) * size.width;
+  const y = ((clientY - rect.top) / rect.height) * size.height;
+  const half = CUBE_PX / 2;
+  return {
+    localX: x - (cubeCenterPxX - half),
+    localY: y - (cubeCenterPxY - half),
+  };
+}
 
 /**
  * ViewCubeWidget — 26-piece chamfered navigation cube (AIS_ViewCube-style).
- * Uses correct geometry orientation (top/bottom up, edge up, corner rotateX),
- * emissive hover, drag-vs-click disambiguation, sync with main camera, and click-to-snap.
+ * Renders inside Drei `Hud` (single WebGL context with main scene).
  */
 const ViewCubeWidget = ({ controlsRef = null }) => {
-  const { gl, camera: mainCamera } = useThree();
+  const { camera: mainCamera } = useThree();
   const { orbitTarget } = useCadSceneContext();
 
+  const controlsRefBox = useRef(controlsRef);
+  controlsRefBox.current = controlsRef;
+
   const orbitTargetRef = useRef(orbitTarget);
+  const mainCameraRef = useRef(mainCamera);
   useEffect(() => {
     orbitTargetRef.current = orbitTarget;
   }, [orbitTarget]);
-
-  const containerRef = useRef(null);
-  const rendererRef = useRef(null);
-  const sceneRef = useRef(null);
-  const cameraRef = useRef(null);
-  const cubeGroupRef = useRef(null);
-  const piecesRef = useRef([]);
-  const raycasterRef = useRef(new THREE.Raycaster());
-  const qDeltaYRef = useRef(new THREE.Quaternion());
-  const qDeltaXRef = useRef(new THREE.Quaternion());
-  const axisYRef = useRef(new THREE.Vector3(0, 1, 0));
-  const axisXRef = useRef(new THREE.Vector3(1, 0, 0));
-
-  const hoveredRef = useRef(null);
-  const dragRef = useRef(null);
-  const dragDistRef = useRef(0);
-  const isDraggingRef = useRef(false);
-  const snapTargetRef = useRef(null);
+  mainCameraRef.current = mainCamera;
 
   useEffect(() => {
-    const parent = gl.domElement.parentElement;
-    if (!parent) return;
+    return () => {
+      const c = controlsRefBox.current?.current;
+      if (c) c.enabled = true;
+    };
+  }, []);
 
-    const container = document.createElement("div");
-    container.style.position = "absolute";
-    container.style.top = "80px";
-    container.style.right = "15px";
-    container.style.width = "150px";
-    container.style.height = "150px";
-    container.style.pointerEvents = "auto";
-    container.style.zIndex = "1000";
-    container.style.background = "transparent";
+  const cubeGroupRef = useRef(null);
+  const piecesRef = useRef([]);
+  const snapTargetRef = useRef(null);
+  const dragDistRef = useRef(0);
+  const isDraggingRef = useRef(false);
+  const hoveredRef = useRef(null);
+  const radiusFrozenRef = useRef(null);
 
-    parent.style.position = parent.style.position || "relative";
-    parent.appendChild(container);
-    containerRef.current = container;
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(150, 150);
-    renderer.setClearColor(0x000000, 0);
-    renderer.domElement.style.background = "transparent";
-    container.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
-
-    const scene = new THREE.Scene();
-    sceneRef.current = scene;
-
-    const cam = new THREE.OrthographicCamera(
-      -VC_ORTHO_SIZE,
-      VC_ORTHO_SIZE,
-      VC_ORTHO_SIZE,
-      -VC_ORTHO_SIZE,
-      0.1,
-      100
-    );
-    cam.position.set(0, 0, 10);
-    cam.lookAt(0, 0, 0);
-    cameraRef.current = cam;
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-    const sun = new THREE.DirectionalLight(0xffffff, 0.6);
-    sun.position.set(4, 6, 5);
-    scene.add(sun);
-
-    const cubeGroup = new THREE.Group();
-    cubeGroupRef.current = cubeGroup;
-    scene.add(cubeGroup);
-
+  const meshes = useMemo(() => {
     const allPieces = [];
 
     for (let x = -1; x <= 1; x++) {
@@ -159,218 +138,602 @@ const ViewCubeWidget = ({ controlsRef = null }) => {
           const outward = new THREE.Vector3(x, y, z).normalize().multiplyScalar(100);
           mesh.lookAt(outward);
 
-          cubeGroup.add(mesh);
           allPieces.push(mesh);
         }
       }
     }
 
     piecesRef.current = allPieces;
+    return allPieces;
+  }, []);
 
-    const el = renderer.domElement;
-
-    const ndc = (e) => {
-      const r = el.getBoundingClientRect();
-      return new THREE.Vector2(
-        ((e.clientX - r.left) / r.width) * 2 - 1,
-        ((e.clientY - r.top) / r.height) * -2 + 1
-      );
-    };
-
-    const hit = (e) => {
-      raycasterRef.current.setFromCamera(ndc(e), cam);
-      const hits = raycasterRef.current.intersectObjects(allPieces, false);
-      return hits.length ? hits[0].object : null;
-    };
-
-    const setHover = (mesh, on) => {
-      if (!mesh?.material?.emissive) return;
-      mesh.material.emissive.set(on ? VC_COL_HOVER : 0x000000);
-    };
-
-    const onMove = (e) => {
-      const h = hit(e);
-      if (h !== hoveredRef.current) {
-        setHover(hoveredRef.current, false);
-        hoveredRef.current = h;
-        setHover(hoveredRef.current, true);
-        el.style.cursor = h ? "pointer" : "default";
-      }
-      // Only rotate while button is actually down (stops rotation when trackpad/mouse released elsewhere)
-      if (e.buttons === 0) {
-        if (dragRef.current) {
-          dragRef.current = null;
-          isDraggingRef.current = false;
+  useEffect(
+    () => () => {
+      meshes.forEach((obj) => {
+        if (obj.geometry) obj.geometry.dispose();
+        const mat = obj.material;
+        if (mat) {
+          if (mat.map) mat.map.dispose();
+          mat.dispose();
         }
+      });
+      piecesRef.current = [];
+    },
+    [meshes]
+  );
+
+  const setHover = useCallback((mesh, on) => {
+    if (!mesh?.material?.emissive) return;
+    mesh.material.emissive.set(on ? VC_COL_HOVER : 0x000000);
+  }, []);
+
+  const applyFlip180 = useCallback(() => {
+    const cg = cubeGroupRef.current;
+    if (!cg) return;
+
+    const ot = orbitTargetRef.current;
+    const targetVec =
+      Array.isArray(ot) && ot.length === 3
+        ? new THREE.Vector3(ot[0], ot[1], ot[2])
+        : new THREE.Vector3(0, 0, 0);
+
+    const ctrl = controlsRefBox.current?.current;
+    const radius = ctrl
+      ? getOrbitDistance(ctrl) ?? ctrl.object.position.distanceTo(ctrl.target)
+      : mainCameraRef.current.position.distanceTo(targetVec);
+
+    const fromQuat = cg.quaternion.clone();
+    _qYaw180.setFromAxisAngle(_axisWorldY, Math.PI);
+    const toQuat = fromQuat.clone();
+    toQuat.premultiply(_qYaw180);
+
+    snapTargetRef.current = {
+      startTimeMs: performance.now(),
+      fromQuat,
+      toQuat,
+      lookAt: targetVec.clone(),
+      radius,
+    };
+  }, []);
+
+  /** Mirror cube group orientation to main orbit camera (call after each arcball step + in useFrame while dragging). */
+  const syncDragFromCube = useCallback(() => {
+    const group = cubeGroupRef.current;
+    if (!group) return;
+    const controls = controlsRefBox.current?.current;
+    if (controls) {
+      const orbitTargetVec = controls.target;
+      const radius =
+        radiusFrozenRef.current ??
+        getOrbitDistance(controls) ??
+        controls.object.position.distanceTo(orbitTargetVec);
+      applyCubeQuaternionToOrbitCamera(
+        controls.object,
+        orbitTargetVec,
+        group.quaternion,
+        radius
+      );
+      syncOrbitControlsFromCamera(controls);
+    } else {
+      const ot = orbitTargetRef.current;
+      const targetVec =
+        Array.isArray(ot) && ot.length === 3
+          ? new THREE.Vector3(ot[0], ot[1], ot[2])
+          : new THREE.Vector3(0, 0, 0);
+      const radius =
+        radiusFrozenRef.current ?? mainCameraRef.current.position.distanceTo(targetVec);
+      applyCubeQuaternionToOrbitCamera(
+        mainCameraRef.current,
+        targetVec,
+        group.quaternion,
+        radius
+      );
+    }
+  }, []);
+
+  const handleFaceSnap = useCallback((coord) => {
+    const ot = orbitTargetRef.current;
+    const target =
+      Array.isArray(ot) && ot.length === 3
+        ? new THREE.Vector3(ot[0], ot[1], ot[2])
+        : new THREE.Vector3(0, 0, 0);
+    const cam = mainCameraRef.current;
+    const radius = cam.position.distanceTo(target);
+    const { position, up } = snapFromCoord(coord);
+    const targetPosition = position.clone().multiplyScalar(radius).add(target);
+    _tempPersp.position.copy(targetPosition);
+    _tempPersp.up.copy(up);
+    _tempPersp.lookAt(target);
+    const toQuat = _tempPersp.quaternion.clone();
+    const group = cubeGroupRef.current;
+    if (!group) return;
+    const fromQuat = group.quaternion.clone();
+
+    const ctrl = controlsRefBox.current?.current;
+    if (ctrl) ctrl.enabled = false;
+
+    snapTargetRef.current = {
+      startTimeMs: performance.now(),
+      fromQuat,
+      toQuat,
+      lookAt: target.clone(),
+      radius,
+    };
+  }, []);
+
+  useFrame(() => {
+    const group = cubeGroupRef.current;
+    if (!group) return;
+
+    const snap = snapTargetRef.current;
+    if (snap) {
+      const elapsed = performance.now() - snap.startTimeMs;
+      const t = Math.min(1, elapsed / SNAP_MS);
+      const eased = easeInOutCubic(t);
+      group.quaternion.slerpQuaternions(snap.fromQuat, snap.toQuat, eased);
+
+      const controls = controlsRefBox.current?.current;
+      if (controls) {
+        controls.target.copy(snap.lookAt);
+        applyCubeQuaternionToOrbitCamera(
+          controls.object,
+          controls.target,
+          group.quaternion,
+          snap.radius
+        );
+        syncOrbitControlsFromCamera(controls);
+      } else {
+        const ot = orbitTargetRef.current;
+        const targetVec =
+          Array.isArray(ot) && ot.length === 3
+            ? new THREE.Vector3(ot[0], ot[1], ot[2])
+            : new THREE.Vector3(0, 0, 0);
+        applyCubeQuaternionToOrbitCamera(
+          mainCameraRef.current,
+          targetVec,
+          group.quaternion,
+          snap.radius
+        );
+      }
+
+      if (t >= 1) {
+        group.quaternion.copy(snap.toQuat);
+        const controlsDone = controlsRefBox.current?.current;
+        if (controlsDone) {
+          controlsDone.target.copy(snap.lookAt);
+          applyCubeQuaternionToOrbitCamera(
+            controlsDone.object,
+            controlsDone.target,
+            group.quaternion,
+            snap.radius
+          );
+          syncOrbitControlsFromCamera(controlsDone);
+          // Match lookAt/controls.update() quaternion (may differ slightly from slerp toQuat roll).
+          group.quaternion.copy(controlsDone.object.quaternion);
+          controlsDone.enabled = true;
+          syncOrbitControlsFromCamera(controlsDone);
+        } else {
+          const ot = orbitTargetRef.current;
+          const targetVec =
+            Array.isArray(ot) && ot.length === 3
+              ? new THREE.Vector3(ot[0], ot[1], ot[2])
+              : new THREE.Vector3(0, 0, 0);
+          applyCubeQuaternionToOrbitCamera(
+            mainCameraRef.current,
+            targetVec,
+            group.quaternion,
+            snap.radius
+          );
+          group.quaternion.copy(mainCameraRef.current.quaternion);
+        }
+        snapTargetRef.current = null;
+      }
+    } else if (isDraggingRef.current) {
+      syncDragFromCube();
+    } else {
+      group.quaternion.copy(mainCameraRef.current.quaternion);
+    }
+  });
+
+  return (
+    <Hud renderPriority={1}>
+      <ViewCubeHudScene
+        cubeGroupRef={cubeGroupRef}
+        meshes={meshes}
+        controlsRefBox={controlsRefBox}
+        orbitTargetRef={orbitTargetRef}
+        mainCameraRef={mainCameraRef}
+        snapTargetRef={snapTargetRef}
+        dragDistRef={dragDistRef}
+        isDraggingRef={isDraggingRef}
+        hoveredRef={hoveredRef}
+        radiusFrozenRef={radiusFrozenRef}
+        setHover={setHover}
+        applyFlip180={applyFlip180}
+        handleFaceSnap={handleFaceSnap}
+        syncDragFromCube={syncDragFromCube}
+      />
+    </Hud>
+  );
+};
+
+function ViewCubeHudScene({
+  cubeGroupRef,
+  meshes,
+  controlsRefBox,
+  orbitTargetRef,
+  mainCameraRef,
+  snapTargetRef,
+  dragDistRef,
+  isDraggingRef,
+  hoveredRef,
+  radiusFrozenRef,
+  setHover,
+  applyFlip180,
+  handleFaceSnap,
+  syncDragFromCube,
+}) {
+  const { size, gl } = useThree();
+  const pointerDownMeshRef = useRef(null);
+  /** P₀ on the virtual unit sphere at press / previous move (incremental arcball). */
+  const dragSpherePrevRef = useRef(new THREE.Vector3());
+  const lastClientRef = useRef({ x: 0, y: 0 });
+  const pointerCaptureRef = useRef(null);
+
+  const layout = useMemo(() => {
+    const worldPerPixel = (2 * VC_ORTHO_SIZE) / CUBE_PX;
+    const worldW = worldPerPixel * size.width;
+    const worldH = worldPerPixel * size.height;
+    const left = -worldW / 2;
+    const right = worldW / 2;
+    const top = worldH / 2;
+    const bottom = -worldH / 2;
+
+    const margin = 15;
+    const marginTop = 80;
+    const cubeHalfPx = CUBE_PX / 2;
+    const pixelX = size.width - margin - cubeHalfPx;
+    const pixelY = marginTop + cubeHalfPx;
+    const worldX = left + (pixelX / size.width) * (right - left);
+    const worldY = top - (pixelY / size.height) * (top - bottom);
+
+    /**
+     * Approximate half-extent of the 26-piece mesh in HUD world units (much smaller than
+     * the 150px layout box). Keeps toolbar/hint visually tight to the cube, not floating high.
+     */
+    const CUBE_MESH_HALF_WORLD = 1.35;
+    const gapPx = 4;
+    const gapWorld = gapPx * worldPerPixel;
+    const btnPx = 32;
+    const btnWorld = btnPx * worldPerPixel;
+    const gapBetweenPx = 4;
+    const gapBetweenWorld = gapBetweenPx * worldPerPixel;
+    /** Vertical stack: ↻, +, − (same column, above cube mesh). */
+    const toolbarStackWorldH = 3 * btnWorld + 2 * gapBetweenWorld;
+    const toolbarCenterY = CUBE_MESH_HALF_WORLD + gapWorld + toolbarStackWorldH / 2;
+    const hintLinePx = 14;
+    const hintWorld = hintLinePx * worldPerPixel;
+    const hintCenterY = -(CUBE_MESH_HALF_WORLD + gapWorld + hintWorld / 2);
+
+    return {
+      left,
+      right,
+      top,
+      bottom,
+      worldX,
+      worldY,
+      worldPerPixel,
+      toolbarCenterY,
+      hintCenterY,
+      cubeCenterPxX: pixelX,
+      cubeCenterPxY: pixelY,
+    };
+  }, [size.width, size.height]);
+
+  const onPointerMove = useCallback(
+    (e) => {
+      e.stopPropagation();
+      const mesh = e.object;
+      if (mesh !== hoveredRef.current) {
+        setHover(hoveredRef.current, false);
+        hoveredRef.current = mesh;
+        setHover(mesh, true);
+      }
+
+      if (e.buttons === 0) {
+        isDraggingRef.current = false;
         return;
       }
-      if (dragRef.current) {
-        const dx = e.clientX - dragRef.current.x;
-        const dy = e.clientY - dragRef.current.y;
-        // World Y then world X (arcball); premultiply applies argument before current rotation
-        qDeltaYRef.current.setFromAxisAngle(axisYRef.current, -dx * 0.012);
-        qDeltaXRef.current.setFromAxisAngle(axisXRef.current, -dy * 0.012);
-        cubeGroup.quaternion.premultiply(qDeltaYRef.current).premultiply(qDeltaXRef.current);
-        dragRef.current.x = e.clientX;
-        dragRef.current.y = e.clientY;
-        dragDistRef.current += Math.hypot(dx, dy);
-        isDraggingRef.current = dragDistRef.current > 3;
+
+      if (pointerDownMeshRef.current) {
+        const { localX, localY } = clientToCubeLocal(
+          e.clientX,
+          e.clientY,
+          gl,
+          size,
+          layout.cubeCenterPxX,
+          layout.cubeCenterPxY
+        );
+        projectOnTrackball(localX, localY, CUBE_PX, _pTrackballNext);
+
+        const p0 = dragSpherePrevRef.current;
+        if (p0.distanceToSquared(_pTrackballNext) > 1e-8) {
+          // AIS arcball: rotation that takes P₀ → P₁; world-first with premultiply
+          _qArcball.setFromUnitVectors(p0, _pTrackballNext);
+          const cg = cubeGroupRef.current;
+          if (cg) {
+            cg.quaternion.premultiply(_qArcball);
+          }
+          p0.copy(_pTrackballNext);
+          // Immediate mirror to main camera (same frame as pointer; not only on useFrame)
+          syncDragFromCube();
+        }
+
+        const last = lastClientRef.current;
+        dragDistRef.current += Math.hypot(e.clientX - last.x, e.clientY - last.y);
+        lastClientRef.current = { x: e.clientX, y: e.clientY };
+        isDraggingRef.current = true;
       }
-    };
+    },
+    [
+      cubeGroupRef,
+      dragDistRef,
+      gl,
+      hoveredRef,
+      isDraggingRef,
+      layout.cubeCenterPxX,
+      layout.cubeCenterPxY,
+      setHover,
+      size,
+      syncDragFromCube,
+    ]
+  );
 
-    const onDown = (e) => {
+  const onPointerDown = useCallback(
+    (e) => {
       e.stopPropagation();
-      dragRef.current = { x: e.clientX, y: e.clientY };
+      if (e.target?.setPointerCapture) {
+        e.target.setPointerCapture(e.pointerId);
+        pointerCaptureRef.current = { element: e.target, pointerId: e.pointerId };
+      }
+      pointerDownMeshRef.current = e.object;
       dragDistRef.current = 0;
-      isDraggingRef.current = false;
-    };
+      isDraggingRef.current = true;
+      snapTargetRef.current = null;
 
-    const endDrag = () => {
-      dragRef.current = null;
-      isDraggingRef.current = false;
-    };
+      const { localX, localY } = clientToCubeLocal(
+        e.clientX,
+        e.clientY,
+        gl,
+        size,
+        layout.cubeCenterPxX,
+        layout.cubeCenterPxY
+      );
+      projectOnTrackball(localX, localY, CUBE_PX, dragSpherePrevRef.current);
+      lastClientRef.current = { x: e.clientX, y: e.clientY };
 
-    const onUp = () => {
-      endDrag();
-    };
+      const ctrl = controlsRefBox.current?.current;
+      if (ctrl) {
+        radiusFrozenRef.current =
+          getOrbitDistance(ctrl) ?? ctrl.object.position.distanceTo(ctrl.target);
+      } else {
+        const ot = orbitTargetRef.current;
+        const targetVec =
+          Array.isArray(ot) && ot.length === 3
+            ? new THREE.Vector3(ot[0], ot[1], ot[2])
+            : new THREE.Vector3(0, 0, 0);
+        radiusFrozenRef.current = mainCameraRef.current.position.distanceTo(targetVec);
+      }
+    },
+    [
+      controlsRefBox,
+      dragDistRef,
+      gl,
+      isDraggingRef,
+      layout.cubeCenterPxX,
+      layout.cubeCenterPxY,
+      mainCameraRef,
+      orbitTargetRef,
+      snapTargetRef,
+      radiusFrozenRef,
+      size,
+    ]
+  );
 
-    // Catch release when it happens outside the ViewCube (e.g. trackpad release)
-    const onUpGlobal = () => {
-      if (dragRef.current) endDrag();
-    };
+  const endDrag = useCallback(() => {
+    const cap = pointerCaptureRef.current;
+    if (cap?.element?.releasePointerCapture) {
+      try {
+        cap.element.releasePointerCapture(cap.pointerId);
+      } catch {
+        /* already released */
+      }
+    }
+    pointerCaptureRef.current = null;
+    pointerDownMeshRef.current = null;
+    isDraggingRef.current = false;
+    radiusFrozenRef.current = null;
+  }, [isDraggingRef, radiusFrozenRef]);
 
-    const onClick = (e) => {
-      e.stopPropagation();
-      if (dragDistRef.current > DRAG_THRESHOLD_PX) return;
-      const h = hit(e);
-      if (!h) return;
-      const { type, coord } = h.userData;
+  const finishPointerInteraction = useCallback(() => {
+    const mesh = pointerDownMeshRef.current;
+    if (!mesh) return;
+    if (mesh.userData?.coord && dragDistRef.current <= DRAG_THRESHOLD_PX) {
+      const { coord } = mesh.userData;
       const key = coord.join(",");
       const name = VC_LABELS[key] || key;
       if (process.env.NODE_ENV !== "production") {
         // eslint-disable-next-line no-console
-        console.log(`ViewCube → ${type.toUpperCase()} [${coord.join(", ")}] (${name})`);
+        console.log(
+          `ViewCube → ${mesh.userData.type.toUpperCase()} [${coord.join(", ")}] (${name})`
+        );
       }
-      const ot = orbitTargetRef.current;
-      const target =
-        Array.isArray(ot) && ot.length === 3
-          ? new THREE.Vector3(ot[0], ot[1], ot[2])
-          : new THREE.Vector3(0, 0, 0);
-      const radius = mainCamera.position.distanceTo(target);
-      const { position, up } = snapFromCoord(coord);
-      snapTargetRef.current = {
-        targetPosition: position.clone().multiplyScalar(radius).add(target),
-        targetUp: up.clone(),
-        lookAt: target,
-      };
-    };
-
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mousedown", onDown);
-    el.addEventListener("mouseup", onUp);
-    el.addEventListener("click", onClick);
-    window.addEventListener("mouseup", onUpGlobal);
-
-    const handleResize = () => {
-      if (!containerRef.current || !rendererRef.current || !cameraRef.current) return;
-      const { clientWidth, clientHeight } = containerRef.current;
-      rendererRef.current.setSize(clientWidth, clientHeight);
-      const aspect = clientWidth / clientHeight || 1;
-      const S = VC_ORTHO_SIZE;
-      const c = cameraRef.current;
-      c.left = -S * aspect;
-      c.right = S * aspect;
-      c.top = S;
-      c.bottom = -S;
-      c.updateProjectionMatrix();
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mouseup", onUpGlobal);
-      el.removeEventListener("mousemove", onMove);
-      el.removeEventListener("mousedown", onDown);
-      el.removeEventListener("mouseup", onUp);
-      el.removeEventListener("click", onClick);
-
-      if (rendererRef.current) {
-        rendererRef.current.dispose();
-      }
-      scene.traverse((obj) => {
-        if (obj.isMesh) {
-          if (obj.geometry) obj.geometry.dispose();
-          if (obj.material) obj.material.dispose();
-        }
-      });
-      if (containerRef.current?.parentElement) {
-        containerRef.current.parentElement.removeChild(containerRef.current);
-      }
-      containerRef.current = null;
-      rendererRef.current = null;
-      sceneRef.current = null;
-      cameraRef.current = null;
-      cubeGroupRef.current = null;
-      piecesRef.current = [];
-    };
-  }, [gl, mainCamera]);
-
-  useFrame(() => {
-    const renderer = rendererRef.current;
-    const scene = sceneRef.current;
-    const vcCam = cameraRef.current;
-    const group = cubeGroupRef.current;
-    if (!renderer || !scene || !vcCam || !group) return;
-
-    const snap = snapTargetRef.current;
-    if (snap) {
-      const controls = controlsRef?.current;
-      if (controls) {
-        controls.target.copy(snap.lookAt);
-        controls.object.position.lerp(snap.targetPosition, SNAP_LERP);
-        controls.object.up.lerp(snap.targetUp, SNAP_LERP);
-        controls.update();
-        if (
-          controls.object.position.distanceTo(snap.targetPosition) < SNAP_EPS &&
-          controls.object.up.angleTo(snap.targetUp) < SNAP_EPS
-        ) {
-          controls.object.position.copy(snap.targetPosition);
-          controls.object.up.copy(snap.targetUp);
-          snapTargetRef.current = null;
-        }
-      } else {
-        mainCamera.position.lerp(snap.targetPosition, SNAP_LERP);
-        mainCamera.up.lerp(snap.targetUp, SNAP_LERP);
-        mainCamera.lookAt(snap.lookAt);
-        if (
-          mainCamera.position.distanceTo(snap.targetPosition) < SNAP_EPS &&
-          mainCamera.up.angleTo(snap.targetUp) < SNAP_EPS
-        ) {
-          mainCamera.position.copy(snap.targetPosition);
-          mainCamera.up.copy(snap.targetUp);
-          mainCamera.lookAt(snap.lookAt);
-          snapTargetRef.current = null;
-        }
-      }
-    } else if (isDraggingRef.current) {
-      // User is dragging the cube: drive main camera so STL rotates with the cube
-      const controls = controlsRef?.current;
-      if (controls) {
-        controls.object.quaternion.copy(group.quaternion);
-        controls.update();
-      } else {
-        mainCamera.quaternion.copy(group.quaternion);
-      }
-    } else {
-      // Idle: sync cube to main camera
-      group.quaternion.copy(mainCamera.quaternion);
+      handleFaceSnap(coord);
     }
+    pointerDownMeshRef.current = null;
+    endDrag();
+  }, [dragDistRef, endDrag, handleFaceSnap]);
 
-    renderer.render(scene, vcCam);
-  });
+  useEffect(() => {
+    window.addEventListener("pointerup", finishPointerInteraction);
+    window.addEventListener("pointercancel", finishPointerInteraction);
+    return () => {
+      window.removeEventListener("pointerup", finishPointerInteraction);
+      window.removeEventListener("pointercancel", finishPointerInteraction);
+    };
+  }, [finishPointerInteraction]);
 
-  return null;
-};
+  const onPointerLeave = useCallback(
+    (e) => {
+      setHover(hoveredRef.current, false);
+      hoveredRef.current = null;
+      if (e.buttons === 0) endDrag();
+    },
+    [endDrag, hoveredRef, setHover]
+  );
+
+  return (
+    <>
+      <OrthographicCamera
+        makeDefault
+        left={layout.left}
+        right={layout.right}
+        top={layout.top}
+        bottom={layout.bottom}
+        near={0.1}
+        far={100}
+        position={[0, 0, 10]}
+      />
+      <ambientLight intensity={0.75} />
+      <directionalLight position={[4, 6, 5]} intensity={0.6} />
+
+      <group position={[layout.worldX, layout.worldY, 0]}>
+        <Html
+          position={[0, layout.toolbarCenterY, 0]}
+          transform
+          style={{ pointerEvents: "auto" }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            <button
+              type="button"
+              aria-label="Rotate view 180 degrees — show opposite side"
+              title="Rotate 180° (back ↔ front)"
+              onClick={(ev) => {
+                ev.stopPropagation();
+                applyFlip180();
+              }}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                border: "1px solid rgba(0,0,0,0.18)",
+                background: "rgba(245,245,245,0.95)",
+                cursor: "pointer",
+                fontSize: 16,
+                lineHeight: 1,
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
+              }}
+            >
+              ↻
+            </button>
+            <button
+              type="button"
+              aria-label="Zoom in on model"
+              title="Zoom in on model"
+              onClick={(ev) => {
+                ev.stopPropagation();
+                document.dispatchEvent(
+                  new CustomEvent("cad-camera-action", { detail: "zoom-in" })
+                );
+              }}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 6,
+                border: "1px solid rgba(0,0,0,0.18)",
+                background: "rgba(245,245,245,0.95)",
+                cursor: "pointer",
+                fontSize: 18,
+                lineHeight: 1,
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
+              }}
+            >
+              +
+            </button>
+            <button
+              type="button"
+              aria-label="Zoom out on model"
+              title="Zoom out on model"
+              onClick={(ev) => {
+                ev.stopPropagation();
+                document.dispatchEvent(
+                  new CustomEvent("cad-camera-action", { detail: "zoom-out" })
+                );
+              }}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 6,
+                border: "1px solid rgba(0,0,0,0.18)",
+                background: "rgba(245,245,245,0.95)",
+                cursor: "pointer",
+                fontSize: 18,
+                lineHeight: 1,
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
+              }}
+            >
+              −
+            </button>
+          </div>
+        </Html>
+
+        <group
+          ref={cubeGroupRef}
+          onPointerMove={onPointerMove}
+          onPointerDown={onPointerDown}
+          onPointerLeave={onPointerLeave}
+        >
+          {meshes.map((mesh) => (
+            <primitive key={mesh.uuid} object={mesh} />
+          ))}
+        </group>
+
+        <Html position={[0, layout.hintCenterY, 0]} transform style={{ pointerEvents: "none" }}>
+          <div
+            style={{
+              fontSize: 10,
+              color: "rgba(80, 80, 80, 0.95)",
+              textAlign: "center",
+              marginTop: 4,
+              userSelect: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Drag to rotate view
+          </div>
+        </Html>
+      </group>
+    </>
+  );
+}
 
 export default ViewCubeWidget;

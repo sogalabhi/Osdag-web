@@ -1,6 +1,7 @@
 import { OrbitControls } from "@react-three/drei";
 import { useMemo, useEffect, useRef } from "react";
 import ViewCubeWidget from "./widgets/ViewCubeWidget";
+import { syncOrbitControlsFromCamera } from "./widgets/viewCubeUtils";
 import { getPartColor, getRenderOrder } from "./config/partConfig";
 import { createViewMapper } from "./config/viewMappings";
 import { SceneManager } from "./SceneManager";
@@ -58,30 +59,29 @@ function CadScene({
       const { camera } = controls.object;
 
       if (e.detail === 'zoom-in') {
-        // Dolly in (zoom in)
+        // UI: + / "zoom in" = larger model on screen (move camera closer to target)
         controls.dollyIn(1.2);
-        controls.update();
+        syncOrbitControlsFromCamera(controls);
       } else if (e.detail === 'zoom-out') {
-        // Dolly out (zoom out)
         controls.dollyOut(1.2);
-        controls.update();
+        syncOrbitControlsFromCamera(controls);
       } else if (e.detail === 'pan-up') {
         // Actually, panning via OrbitControls needs mouse events, but we can shift the target slightly.
         controls.target.y += 0.05;
         camera.position.y += 0.05;
-        controls.update();
+        syncOrbitControlsFromCamera(controls);
       } else if (e.detail === 'pan-down') {
         controls.target.y -= 0.05;
         camera.position.y -= 0.05;
-        controls.update();
+        syncOrbitControlsFromCamera(controls);
       } else if (e.detail === 'pan-left') {
         controls.target.x -= 0.05;
         camera.position.x -= 0.05;
-        controls.update();
+        syncOrbitControlsFromCamera(controls);
       } else if (e.detail === 'pan-right') {
         controls.target.x += 0.05;
         camera.position.x += 0.05;
-        controls.update();
+        syncOrbitControlsFromCamera(controls);
       }
     };
 
@@ -119,7 +119,7 @@ function CadScene({
         primaryView={primaryView}
       />
 
-      <OrbitControls ref={controlsRef} enableDamping={false} enableRotate={false} target={target} />
+      <OrbitControls ref={controlsRef} enableDamping={false} enableRotate target={target} />
     </group>
   );
 }
