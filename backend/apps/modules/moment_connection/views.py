@@ -113,7 +113,8 @@ class MomentConnectionViewSet(viewsets.ViewSet):
             "design_status": boolean,
             "logs": [...],
             "sections": [...],          # Optional
-            "customization": {...}      # Optional
+            "customization": {...},    # Optional
+            "images": {...}               # Optional CAD captures (iso/front/side/top)
         }
         """
         module_id = MOMENT_REPORT_MODULE_ID_MAP.get(submodule_slug)
@@ -145,6 +146,8 @@ class MomentConnectionViewSet(viewsets.ViewSet):
             mapped_data["sections"] = request.data.get("sections")
         if "customization" in request.data:
             mapped_data["customization"] = request.data.get("customization")
+        if "images" in request.data:
+            mapped_data["images"] = request.data.get("images")
 
         payload, status_code = generate_initial_report_core(mapped_data)
         return Response(payload, status=status_code)

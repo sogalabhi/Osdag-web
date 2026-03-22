@@ -288,8 +288,7 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
         """
         POST /api/modules/simple-connection/{submodule_slug}/report/generate-initial/
 
-        Currently a placeholder: simple-connection modules do not yet have
-        desktop-style design report support wired into the backend.
+        Optional body fields: sections, customization, images (CAD view captures).
         """
         module_id = SIMPLE_CONNECTION_REPORT_MODULE_ID_MAP.get(submodule_slug)
         if not module_id:
@@ -323,6 +322,9 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
             mapped_data["sections"] = request.data.get("sections")
         if "customization" in request.data:
             mapped_data["customization"] = request.data.get("customization")
+        # CAD view captures from the browser (same as shear_connection)
+        if "images" in request.data:
+            mapped_data["images"] = request.data.get("images")
 
         payload, status_code = generate_initial_report_core(mapped_data)
         return Response(payload, status=status_code)

@@ -36,6 +36,7 @@ from rest_framework import status
 
 
 # other imports
+import logging
 import os
 import platform
 import subprocess
@@ -44,6 +45,8 @@ import time
 import uuid
 import re
 import base64
+
+logger = logging.getLogger(__name__)
 
 # Helper: filter LaTeX content based on selected sections (section or section/subsection)
 def filter_latex_content(latex_content: str, selected_sections):
@@ -288,10 +291,31 @@ class CreateDesignReport(APIView):
         # per-report directory alongside the .tex/.pdf. We no longer invoke
         # server-side CAD image generation for web reports; images are
         # purely frontend-driven.
+        report_base_dir = os.path.dirname(file_path)
+        image_base_dir = os.path.join(report_base_dir, "ResourceFiles", "images")
         try:
-            if isinstance(images, dict) and images:
-                report_base_dir = os.path.dirname(file_path)
-                image_base_dir = os.path.join(report_base_dir, "ResourceFiles", "images")
+            if not isinstance(images, dict):
+                logger.warning(
+                    "[ReportImages] module_id=%s images is not a dict: %s",
+                    module_id,
+                    type(images).__name__,
+                )
+            elif not images:
+                msg = (
+                    "[ReportImages] module_id=%s empty images dict — "
+                    "browser did not send captures (captureReportViews missing, failed, or empty scene). "
+                    "report_dir=%s"
+                    % (module_id, report_base_dir)
+                )
+                logger.warning(msg)
+                print(msg, flush=True)
+            else:
+                msg = (
+                    "[ReportImages] module_id=%s saving %d keys: %s → %s"
+                    % (module_id, len(images), list(images.keys()), image_base_dir)
+                )
+                logger.info(msg)
+                print(msg, flush=True)
                 os.makedirs(image_base_dir, exist_ok=True)
 
                 # Map canonical frontend keys to the filenames expected by
@@ -307,6 +331,11 @@ class CreateDesignReport(APIView):
                 for key, data_url in images.items():
                     try:
                         if not isinstance(data_url, str):
+                            logger.warning(
+                                "[ReportImages] skip key=%r (not str): %s",
+                                key,
+                                type(data_url).__name__,
+                            )
                             continue
                         # Support both full data URLs and raw base64
                         if ',' in data_url and data_url.strip().lower().startswith('data:'):
@@ -320,14 +349,23 @@ class CreateDesignReport(APIView):
                         out_path = os.path.join(image_base_dir, filename)
                         with open(out_path, "wb") as img_f:
                             img_f.write(img_bytes)
-                    except Exception as img_exc:
-                        import logging
-                        logging.getLogger(__name__).error(
-                            "Failed to save report image %s: %s", key, img_exc
+                        ok = os.path.isfile(out_path) and os.path.getsize(out_path) > 0
+                        line = (
+                            "[ReportImages] wrote %s bytes=%s ok=%s path=%s"
+                            % (filename, len(img_bytes), ok, out_path)
                         )
-        except Exception:
-            # Image handling is best-effort; ignore failures
-            pass
+                        logger.info(line)
+                        print(line, flush=True)
+                    except Exception as img_exc:
+                        logger.exception(
+                            "[ReportImages] failed to save key=%r: %s", key, img_exc
+                        )
+        except Exception as outer_img_exc:
+            logger.exception(
+                "[ReportImages] unexpected error module_id=%s: %s",
+                module_id,
+                outer_img_exc,
+            )
         
         try:
             resultBoolean = module.save_design(metadata_final)

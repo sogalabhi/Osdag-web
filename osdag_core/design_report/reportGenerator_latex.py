@@ -453,73 +453,83 @@ class CreateLatex(Document):
                                 image_5.add_caption('Typical Shear Key Details')
                                 # doc.append(NewPage())
 
-        # Check if images actually exist before using them
-        images_exist = False
+        # Views: web saves captures under {report_dir}/ResourceFiles/images/ (3d.png, top.png, ...)
+        # Previously required ALL four files or every slot showed "broken" — too strict for some modules.
+        # Use per-view fallback to broken.png only for missing files.
         view_3dimg_path = None
         view_topimg_path = None
         view_sideimg_path = None
         view_frontimg_path = None
-        
-        # Handle None or empty Disp_3d_image
+
         if Disp_3d_image is None:
             Disp_3d_image = ''
-        
+
+        imgpath_broken = str((pkg_images / "broken.png").resolve())
+
+        def _report_asset_path(base, posix_fragment):
+            """Join rel_path with e.g. '/ResourceFiles/images/3d.png' without broken string concat."""
+            frag = (posix_fragment or "").strip().replace("\\", "/").lstrip("/")
+            if not frag:
+                return os.path.normpath(base)
+            return os.path.normpath(os.path.join(base, *frag.split("/")))
+
+        def _view_or_placeholder(candidate_path, label):
+            p = str(candidate_path)
+            exists = os.path.isfile(p)
+            use = p if exists else imgpath_broken
+            try:
+                print(
+                    "[ReportViews] %s candidate=%r exists=%s use_broken=%s size=%s"
+                    % (
+                        label,
+                        p,
+                        exists,
+                        not exists,
+                        os.path.getsize(p) if exists else None,
+                    )
+                )
+            except Exception as _log_exc:
+                print("[ReportViews] log error for %s: %s" % (label, _log_exc))
+            return use
+
         if does_design_exist and sys.platform != 'darwin' and Disp_3d_image != '':
             Disp_top_image = "/ResourceFiles/images/top.png"
             Disp_side_image = "/ResourceFiles/images/side.png"
             Disp_front_image = "/ResourceFiles/images/front.png"
-            
-            # Use ONLY the provided rel_path (which should be the report directory)
-            # Images are stored at: {report_dir}/ResourceFiles/images/
-            # No fallback checks - deterministic path resolution
-            view_3dimg_path = rel_path + Disp_3d_image
-            view_topimg_path = rel_path + Disp_top_image
-            view_sideimg_path = rel_path + Disp_side_image
-            view_frontimg_path = rel_path + Disp_front_image
-            
-            images_exist = (
-                os.path.exists(view_3dimg_path) and
-                os.path.exists(view_topimg_path) and
-                os.path.exists(view_sideimg_path) and
-                os.path.exists(view_frontimg_path)
+
+            print(
+                "[ReportViews] rel_path=%r does_design_exist=%s sys.platform=%s"
+                % (rel_path, does_design_exist, sys.platform)
             )
-            
-            if not images_exist:
-                # Try to find images in common locations
-                possible_image_dir = os.path.join(rel_path, "ResourceFiles", "images")
-        
-        if does_design_exist and sys.platform != 'darwin' and Disp_3d_image != '' and images_exist and view_3dimg_path:
+            raw_3d = _report_asset_path(rel_path, Disp_3d_image)
+            raw_top = _report_asset_path(rel_path, Disp_top_image)
+            raw_side = _report_asset_path(rel_path, Disp_side_image)
+            raw_front = _report_asset_path(rel_path, Disp_front_image)
+
+            view_3dimg_path = _view_or_placeholder(raw_3d, "3d")
+            view_topimg_path = _view_or_placeholder(raw_top, "top")
+            view_sideimg_path = _view_or_placeholder(raw_side, "side")
+            view_frontimg_path = _view_or_placeholder(raw_front, "front")
+
             doc.append(NewPage())
             with doc.create(Section('Views')):
                 doc.append(pyl.Command('setlength', arguments=[NoEscape(r'\arrayrulewidth'), NoEscape(r'1pt')]))
                 with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.1)) as table:
-                    view_3dimg_path = rel_path + Disp_3d_image
-                    view_topimg_path = rel_path + Disp_top_image
-                    view_sideimg_path = rel_path + Disp_side_image
-                    view_frontimg_path = rel_path + Disp_front_image
                     table.add_hline()
-                    table.add_row([StandAloneGraphic(image_options="height=4cm",filename=str(view_3dimg_path)),
-                                  StandAloneGraphic(image_options="height=4cm",filename=str(view_topimg_path))])
+                    table.add_row([StandAloneGraphic(image_options="height=4cm", filename=str(view_3dimg_path)),
+                                  StandAloneGraphic(image_options="height=4cm", filename=str(view_topimg_path))])
                     table.add_row('(a) 3D View', '(b) Top View')
                     table.add_hline()
                     table.add_row([StandAloneGraphic(image_options="height=4cm", filename=str(view_sideimg_path)),
                                   StandAloneGraphic(image_options="height=4cm", filename=str(view_frontimg_path))])
                     table.add_row('(c) Side View', '(d) Front View')
                     table.add_hline()
-                # with doc.create(Figure(position='h!')) as view_3D:
-                #     view_3dimg_path = rel_path + Disp_3d_image
-                #     # view_3D.add_image(filename=view_3dimg_path, width=NoEscape(r'\linewidth'))
-                #
-                #     view_3D.add_image(filename=view_3dimg_path,width=NoEscape(r'\linewidth,height=6.5cm'))
-                #
-                #     view_3D.add_caption('3D View')
         else:
+            print(
+                "[ReportViews] using placeholder grid: does_design_exist=%s platform=%s Disp_3d_image=%r"
+                % (does_design_exist, sys.platform, Disp_3d_image)
+            )
             doc.append(NewPage())
-            imgpath_broken = pkg_images / "broken.png"
-            view_3dimg_path = imgpath_broken
-            view_topimg_path = imgpath_broken
-            view_sideimg_path = imgpath_broken
-            view_frontimg_path = imgpath_broken
             with doc.create(Section('Views')):
                 doc.append(pyl.Command('setlength', arguments=[NoEscape(r'\arrayrulewidth'), NoEscape(r'1pt')]))
                 with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.1)) as table:
