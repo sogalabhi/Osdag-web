@@ -18,11 +18,12 @@ from .registry import SimpleConnectionRegistry
 logger = logging.getLogger(__name__)
 
 
-# Mapping from simple-connection slug to legacy report module_id (currently none implemented)
+# Mapping from simple-connection slug to module_id used by CreateDesignReport
 SIMPLE_CONNECTION_REPORT_MODULE_ID_MAP = {
-    # Example (when report support is added):
-    # "butt-joint-bolted": "Simple-Connection-Butt-Joint-Bolted-Report",
-    # "butt-joint-welded": "Simple-Connection-Butt-Joint-Welded-Report",
+    "butt-joint-bolted": "ButtJointBolted",
+    "butt-joint-welded": "ButtJointWelded",
+    "lap-joint-bolted": "LapJointBolted",
+    "lap-joint-welded": "LapJointWelded",
 }
 
 

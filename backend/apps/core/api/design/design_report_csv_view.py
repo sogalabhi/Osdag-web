@@ -20,6 +20,10 @@ from apps.modules.moment_connection.submodules.column_column_cover_plate_welded.
 from apps.modules.moment_connection.submodules.column_column_end_plate.adapter import create_from_input as column_end_plate_create_from_input
 from apps.modules.tension_member.submodules.bolted.adapter import create_from_input as tension_member_bolted_create_from_input
 from apps.modules.tension_member.submodules.welded.adapter import create_from_input as tension_member_welded_create_from_input
+from apps.modules.simple_connection.submodules.butt_joint_bolted.adapter import create_from_input as butt_joint_bolted_create_from_input
+from apps.modules.simple_connection.submodules.butt_joint_welded.adapter import create_from_input as butt_joint_welded_create_from_input
+from apps.modules.simple_connection.submodules.lap_joint_bolted.adapter import create_from_input as lap_joint_bolted_create_from_input
+from apps.modules.simple_connection.submodules.lap_joint_welded.adapter import create_from_input as lap_joint_welded_create_from_input
 # importing models
 from apps.core.models import Design
 
@@ -129,7 +133,11 @@ class CreateDesignReport(APIView):
             'Column-to-Column-Cover-Plate-Welded-Connection': column_cover_plate_welded_create_from_input,
             'Column-to-Column-End-Plate-Connection': column_end_plate_create_from_input,
             'Tension-Member-Bolted-Design': tension_member_bolted_create_from_input,
-            'Tension-Member-Welded-Design': tension_member_welded_create_from_input
+            'Tension-Member-Welded-Design': tension_member_welded_create_from_input,
+            'ButtJointBolted': butt_joint_bolted_create_from_input,
+            'ButtJointWelded': butt_joint_welded_create_from_input,
+            'LapJointBolted': lap_joint_bolted_create_from_input,
+            'LapJointWelded': lap_joint_welded_create_from_input,
         }
         
         if not module_id or module_id not in module_function_map:

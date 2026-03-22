@@ -905,7 +905,7 @@ export const EngineeringModule = ({
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       {/* Navigation */}
-      <div className="sticky top-0 z-[60] md:h-[15%] min-h-[48px] max-h-[80px] flex flex-row flex-wrap justify-center md:justify-between items-center bg-[#d2d4d2] gap-x-4 w-full text-sm flex-shrink-0 pl-4">
+      <div className="sticky top-0 z-[60] min-h-[48px] max-h-[80px] flex flex-row flex-wrap justify-center md:justify-between items-center bg-[#d2d4d2] gap-x-4 w-full text-sm flex-shrink-0 pl-4">
         <div className="flex flex-row flex-wrap justify-center md:justify-start items-center gap-x-4">
           {menuItems.map((item, index) => (
             <UnifiedDropdownMenu
