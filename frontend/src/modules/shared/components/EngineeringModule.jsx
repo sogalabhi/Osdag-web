@@ -1077,7 +1077,7 @@ export const EngineeringModule = ({
         }, [])}
       </div>
 
-      <div className="relative flex flex-row h-full w-full">
+      <div className="relative flex flex-row flex-1 overflow-hidden w-full">
         {/* Input Dock Toggle Button - Fixed to left, shows when dock is closed (Desktop only) */}
         {!showInputDock && !isMobile && (
           <button
