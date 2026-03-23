@@ -16,7 +16,7 @@ export const boltedToEndConfig = {
   routePath: "/design/tension-member/bolted_to_end_gusset",
   designType: "Tension-Member-Bolted-Design",
   cameraKey: "TensionMember",
-  cadOptions: ["Model", "Member", "Plate", "Endplate"],
+  cadOptions: ["Model", "Member", "Plate"],
 
   defaultInputs: {
     bolt_diameter: [],
