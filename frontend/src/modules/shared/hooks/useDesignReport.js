@@ -37,7 +37,7 @@ export const useDesignReport = (
     }
 
     try {
-      const { boltDiameterList, propertyClassList, thicknessList, angleList } = moduleData || {};
+      const { beamList, columnList, angleList, boltDiameterList, propertyClassList, thicknessList, channelList, weldSizeList } = moduleData || {};
 
       const submissionParams = moduleConfig.buildSubmissionParams(
         inputs,
@@ -47,6 +47,10 @@ export const useDesignReport = (
           propertyClassList,
           thicknessList,
           angleList,
+          beamList,
+          columnList,
+          channelList,
+          weldSizeList
         },
         extraState
       );
