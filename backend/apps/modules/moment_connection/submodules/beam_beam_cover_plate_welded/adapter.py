@@ -256,8 +256,8 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     Connector for CAD routing, but keep the external section name for file
     naming and response keys.
     """
-    if section not in ("Model", "Beam", "CoverPlate"):
-        raise InvalidInputTypeError("section", "'Model', 'Beam' or 'CoverPlate'")
+    if section not in ("Model", "Beam", "Connector"):
+        raise InvalidInputTypeError("section", "'Model', 'Beam' or 'Connector'")
 
     module = create_from_input(input_values)
 
@@ -273,8 +273,6 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 
     # Map external section names to internal component names expected by CommonDesignLogic
     internal_section = section
-    if section == "CoverPlate":
-        internal_section = "Connector"
 
     cld.component = internal_section
     print(f"[cadissue] BB cover plate welded: cld.component set to {internal_section} for section={section}")

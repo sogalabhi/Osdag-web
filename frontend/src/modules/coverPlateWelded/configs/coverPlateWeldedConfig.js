@@ -102,33 +102,7 @@ export const coverPlateWeldedConfig = {
         { key: "load_axial", label: "Axial Force(kN)", type: "number" }
       ]
     },
-    {
-      title: "Weld",
-      fields: [
-        {
-          key: "weld_type",
-          label: "Type",
-          type: "select",
-          options: [
-            { value: "Fillet Weld", label: "Fillet Weld" }
-          ]
-        },
-        {
-          key: "weld_fab",
-          label: "Fabrication",
-          type: "select",
-          options: [
-            { value: "Shop Weld", label: "Shop Weld" },
-            { value: "Field Weld", label: "Field Weld" }
-          ]
-        },
-        {
-          key: "weld_material_grade_overwrite",
-          label: "Material Grade Overwrite",
-          type: "number"
-        }
-      ]
-    },
+    
     {
       title: "Flange Splice Plate",
       fields: [

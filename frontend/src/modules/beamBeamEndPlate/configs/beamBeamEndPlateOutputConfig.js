@@ -25,6 +25,12 @@ export const beamBeamEndPlateOutputConfig = {
       { key: "Detailing.EdgeDistanceOut", label: "Edge Distance (mm)" },
       { key: "DetailingModal", label: "Typical Detailing" }
     ],
+    "End Plate": [
+      { key: "Plate.Thickness", label: "Thickness (mm)" },
+      { key: "Plate.Height", label: "Height (mm)" },
+      { key: "Plate.Width", label: "Width (mm)" },
+      { key: "Plate.MomentCapacity", label: "Moment Capacity (kNm)" }
+    ],
     "Stiffener Plate": [
       { key: "DimensionsModal", label: "Details" },
       { key: "SketchModal", label: "Typical Sketch" }

@@ -19,7 +19,7 @@ from ...Report_functions import *
 import logging
 from ...utils.common.load import Load
 from ...custom_logger import CustomLogger
-
+from django.conf import settings
 
 class ColumnEndPlate(MomentConnection):
 
@@ -241,8 +241,7 @@ class ColumnEndPlate(MomentConnection):
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
             self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
-        if isinstance(self.logger, CustomLogger):
-            self.logger.clear_logs()
+        
         # Clear any existing handlers
         self.logger.handlers.clear()
         self.logger.setLevel(logging.DEBUG)
@@ -388,8 +387,24 @@ class ColumnEndPlate(MomentConnection):
         # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
         # spacing.append(t99)
 
-        t99 = (None, 'Spacing Details', TYPE_SECTION,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_4.png")), 400, 411, "Web Bolt Spacing for (n) Bolts"])  # [image, width, height, caption]
+        # t99 = (None, 'Spacing Details', TYPE_SECTION,
+        #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_4.png")), 400, 411, "Web Bolt Spacing for (n) Bolts"])  # [image, width, height, caption]
+
+        image_path = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images",
+            "spacing_4.png"
+        )
+
+        t99 = (
+            None,
+            'Spacing Details',
+            TYPE_SECTION,
+            [image_path, 400, 411, "Web Bolt Spacing for (n) Bolts"]
+        )
         web_bolt_spacing.append(t99)
         # t2 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.pitch if flag else '', True)
         # web_bolt_spacing.append(t2)
@@ -426,11 +441,26 @@ class ColumnEndPlate(MomentConnection):
         flange_bolt_spacing = []
 
         if self.connection == 'Flush End Plate':
-            image = str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_5.png"))
-            x,y = 401,248
-            bolts = int(self.n_bf_output/4)
+            image = os.path.join(
+                settings.BASE_DIR,
+                "osdag_core",
+                "data",
+                "ResourceFiles",
+                "images",
+                "spacing_5.png"
+            )
+            x, y = 401, 248
+            bolts = int(self.n_bf_output / 4)
+
         else:
-            image = str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_6.png"))
+            image = os.path.join(
+                settings.BASE_DIR,
+                "osdag_core",
+                "data",
+                "ResourceFiles",
+                "images",
+                "spacing_6.png"
+            )
             x, y = 401, 321
             bolts = int(self.n_bf_output / 8)
 
@@ -1276,44 +1306,55 @@ class ColumnEndPlate(MomentConnection):
             ##  added images to reflect in output dock
             #############################################################
 
+            IMAGE_DIR = os.path.join(
+                settings.BASE_DIR,
+                "osdag_core",
+                "data",
+                "ResourceFiles",
+                "images"
+            )
             if self.n_bw % 2 == 0:
                 if self.n_bw == 2:
-                    self.image_web = str(files("osdag_core.data.ResourceFiles.images").joinpath("flush_2rows.png"))
+                    self.image_web = os.path.join(IMAGE_DIR, "flush_2rows.png")
                 else:
-                    self.image_web = str(files("osdag_core.data.ResourceFiles.images").joinpath("flush_n_even.png"))
+                    self.image_web = os.path.join(IMAGE_DIR, "flush_n_even.png")
             else:
                 if self.n_bw == 3:
-                    self.image_web = str(files("osdag_core.data.ResourceFiles.images").joinpath("flush_3_rows.png"))
+                    self.image_web = os.path.join(IMAGE_DIR, "flush_3_rows.png")
                 else:
-                    self.image_web = str(files("osdag_core.data.ResourceFiles.images").joinpath("flush_n_odd.png"))
+                    self.image_web = os.path.join(IMAGE_DIR, "flush_n_odd.png")
 
 
+            # FLANGE IMAGE
             if self.connection == 'Flush End Plate':
+
                 if self.n_bf % 2 == 0:
                     if self.n_bf == 2:
-                        self.image_flange = str(files("osdag_core.data.ResourceFiles.images").joinpath("flange_2_bolt_flush.png"))
+                        self.image_flange = os.path.join(IMAGE_DIR, "flange_2_bolt_flush.png")
                     else:
-                        self.image_flange = str(files("osdag_core.data.ResourceFiles.images").joinpath("flange_even_bolt_flush.png"))
+                        self.image_flange = os.path.join(IMAGE_DIR, "flange_even_bolt_flush.png")
                 else:
                     if self.n_bf == 1:
-                        self.image_flange = str(files("osdag_core.data.ResourceFiles.images").joinpath("flange_1_bolt.png"))
+                        self.image_flange = os.path.join(IMAGE_DIR, "flange_1_bolt.png")
                     elif self.n_bf == 3:
-                        self.image_flange = str(files("osdag_core.data.ResourceFiles.images").joinpath("flange_3_bolt_flush.png"))
+                        self.image_flange = os.path.join(IMAGE_DIR, "flange_3_bolt_flush.png")
                     else:
-                        self.image_flange = str(files("osdag_core.data.ResourceFiles.images").joinpath("flange_odd_bolt_flush.png"))
+                        self.image_flange = os.path.join(IMAGE_DIR, "flange_odd_bolt_flush.png")
+
             else:
+
                 if self.n_bf % 2 == 0:
                     if self.n_bf == 2:
-                        self.image_flange = str(files("osdag_core.data.ResourceFiles.images").joinpath("flange_2_bolt_extended.png"))
+                        self.image_flange = os.path.join(IMAGE_DIR, "flange_2_bolt_extended.png")
                     else:
-                        self.image_flange = str(files("osdag_core.data.ResourceFiles.images").joinpath("flange_even_bolt_extended.png"))
+                        self.image_flange = os.path.join(IMAGE_DIR, "flange_even_bolt_extended.png")
                 else:
                     if self.n_bf == 1:
-                        self.image_flange = str(files("osdag_core.data.ResourceFiles.images").joinpath("flange_1_bolt_extended.png"))
+                        self.image_flange = os.path.join(IMAGE_DIR, "flange_1_bolt_extended.png")
                     elif self.n_bf == 3:
-                        self.image_flange = str(files("osdag_core.data.ResourceFiles.images").joinpath("flange_3_bolt_extended.png"))
+                        self.image_flange = os.path.join(IMAGE_DIR, "flange_3_bolt_extended.png")
                     else:
-                        self.image_flange = str(files("osdag_core.data.ResourceFiles.images").joinpath("flange_odd_bolt_extended.png"))
+                        self.image_flange = os.path.join(IMAGE_DIR, "flange_odd_bolt_extended.png")
 
             if self.connection == 'Flush End Plate':
                 # if self.n_bf == 1:
@@ -2417,13 +2458,17 @@ class ColumnEndPlate(MomentConnection):
         # config = configparser.ConfigParser()
         # config.read_file(open(r'Osdag.config'))
         # desktop_path = config.get("desktop_path", "path1")
-        fname_no_ext = popup_summary['filename']
-        rel_path = os.path.dirname(fname_no_ext) if fname_no_ext else os.path.abspath(".")
-        rel_path = os.path.abspath(rel_path)
+        # print("desk:", desktop_path)
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = os.path.abspath(".") # TEMP
         rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                    rel_path, Disp_2d_image, Disp_3d_image, module=self.module)
+        return True
 
 
 # def save_latex(self, uiObj, Desigxn_Check, reportsummary, filename, rel_path, Disp_3d_image):
