@@ -15,7 +15,7 @@ export const weldedToEndConfig = {
     routePath: "/design/tension-member/welded_to_end_gusset",
     designType: "Tension-Member-Welded-Design",
     cameraKey: "TensionMember",
-    cadOptions: ["Model", "Member", "Plate", "Endplate"],
+    cadOptions: ["Model", "Member", "Plate"],
 
     defaultInputs: {
         connector_material: "E 250 (Fe 410 W)A",
