@@ -11,6 +11,7 @@ export const coverPlateWeldedOutputConfig = {
       { key: "Web_Plate.Width", label: "Width (mm)" },
       { key: "Connector.Web_Plate.Thickness_List", label: "Thickness (mm)" },
       { key: "WebCapacityModal", label: "Capacity Details" },
+      { key: "BlockShearPatternModal", label: "Pattern" },
       { key: "WebWeldDetailsModal", label: "Weld Details" }
     ],
     "Flange Splice Plate": [
@@ -19,9 +20,6 @@ export const coverPlateWeldedOutputConfig = {
       { key: "Connector.Flange_Plate.Thickness_list", label: "Thickness (mm)" },
       { key: "FlangeCapacityModal", label: "Capacity Details" },
       { key: "FlangeWeldDetailsModal", label: "Weld Details" }
-    ],
-    "Block Shear Pattern": [
-      { key: "BlockShearPatternModal", label: "View Details" }
     ]
   },
   modals: {

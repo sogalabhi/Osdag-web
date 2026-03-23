@@ -24,6 +24,9 @@ from apps.modules.simple_connection.submodules.butt_joint_bolted.adapter import 
 from apps.modules.simple_connection.submodules.butt_joint_welded.adapter import create_from_input as butt_joint_welded_create_from_input
 from apps.modules.simple_connection.submodules.lap_joint_bolted.adapter import create_from_input as lap_joint_bolted_create_from_input
 from apps.modules.simple_connection.submodules.lap_joint_welded.adapter import create_from_input as lap_joint_welded_create_from_input
+from apps.modules.flexure_member.submodules.simply_supported_beam.adapter import create_from_input as simply_supported_beam_create_from_input
+from apps.modules.flexure_member.submodules.purlin.adapter import create_from_input as purlin_create_from_input
+
 # importing models
 from apps.core.models import Design
 
@@ -128,11 +131,11 @@ class CreateDesignReport(APIView):
             'EndPlateConnection': end_plate_create_from_input,
             'CleatAngleConnection': cleat_angle_create_from_input,
             'Seated-Angle-Connection': seated_angle_create_from_input,
-            'Cover-Plate-Bolted-Connection': cover_plate_bolted_create_from_input,
+            'Beam-to-Beam-Cover-Plate-Bolted-Connection': cover_plate_bolted_create_from_input,
             'Beam-Beam-End-Plate-Connection': beam_beam_end_plate_create_from_input,
-            'Cover-Plate-Welded-Connection': cover_plate_welded_create_from_input,
+            'Beam-to-Beam-Cover-Plate-Welded-Connection': cover_plate_welded_create_from_input,
             'Beam-to-Column-End-Plate-Connection': beam_to_column_end_plate_create_from_input,
-            'ColumnCoverPlateBolted': column_cover_plate_bolted_create_from_input,
+            'Column-to-Column-Cover-Plate-Bolted-Connection': column_cover_plate_bolted_create_from_input,
             'Column-to-Column-Cover-Plate-Welded-Connection': column_cover_plate_welded_create_from_input,
             'Column-to-Column-End-Plate-Connection': column_end_plate_create_from_input,
             'Tension-Member-Bolted-Design': tension_member_bolted_create_from_input,
@@ -141,6 +144,8 @@ class CreateDesignReport(APIView):
             'ButtJointWelded': butt_joint_welded_create_from_input,
             'LapJointBolted': lap_joint_bolted_create_from_input,
             'LapJointWelded': lap_joint_welded_create_from_input,
+            'Simply-Supported-Beam': simply_supported_beam_create_from_input,
+            'Purlin': purlin_create_from_input
         }
         
         if not module_id or module_id not in module_function_map:

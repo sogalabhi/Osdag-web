@@ -1782,7 +1782,6 @@ class CADGroove(object):
 
     def get_connector_models(self):
         """
-
         :return: CAD models of the connecting components
         """
 
@@ -1790,11 +1789,13 @@ class CADGroove(object):
         welds = self.get_welded_models()
         nut_bolt_array = self.get_nut_bolt_array_models()
 
-        CAD_list = [plate_connectors, welds, nut_bolt_array]
-        CAD = CAD_list[0]
+        CAD = []
 
-        for model in CAD_list[1:]:
-            CAD = BRepAlgoAPI_Fuse(CAD, model).Shape()
+        for group in [plate_connectors, welds, nut_bolt_array]:
+            if isinstance(group, list):
+                CAD.extend(group)
+            elif group is not None:
+                CAD.append(group)
 
         return CAD
 

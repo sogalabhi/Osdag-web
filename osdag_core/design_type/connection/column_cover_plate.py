@@ -23,7 +23,7 @@ from ...Report_functions import *
 from ...utils.common.load import Load
 import logging
 from ...custom_logger import CustomLogger
-
+from django.conf import settings
 class ColumnCoverPlate(MomentConnection):
 
     def __init__(self):
@@ -251,8 +251,7 @@ class ColumnCoverPlate(MomentConnection):
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
             self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
-        if isinstance(self.logger, CustomLogger):
-            self.logger.clear_logs()
+        
         # Clear any existing handlers
         self.logger.handlers.clear()
         self.logger.setLevel(logging.DEBUG)
@@ -405,8 +404,24 @@ class ColumnCoverPlate(MomentConnection):
         # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
         # spacing.append(t99)
 
-        t99 = (None, 'Spacing Details', TYPE_SECTION,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_2.png")), 400, 352, ""])  # [image, width, height, caption]
+        # t99 = (None, 'Spacing Details', TYPE_SECTION,
+        #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_2.png")), 400, 352, ""])  # [image, width, height, caption]
+
+        image_path = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images",
+            "spacing_2.png"
+        )
+
+        t99 = (
+            None,
+            'Spacing Details',
+            TYPE_SECTION,
+            [image_path, 400, 352, ""]
+        )
         flangespacing.append(t99)
 
         t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
@@ -437,8 +452,24 @@ class ColumnCoverPlate(MomentConnection):
         # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
         # spacing.append(t99)
 
-        t99 = (None, 'Spacing Details', TYPE_SECTION,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_2.png")), 400, 352, ""])  # [image, width, height, caption]
+        # t99 = (None, 'Spacing Details', TYPE_SECTION,
+        #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_2.png")), 400, 352, ""])  # [image, width, height, caption]
+
+        image_path = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images",
+            "spacing_2.png"
+        )
+
+        t99 = (
+            None,
+            'Spacing Details',
+            TYPE_SECTION,
+            [image_path, 400, 352, ""]
+        )
         webspacing.append(t99)
 
         t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX, self.web_plate.pitch_provided if flag else '')
@@ -465,8 +496,24 @@ class ColumnCoverPlate(MomentConnection):
         # flangecapacity.append(t99)
         t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)")
         flangecapacity.append(t00)
-        t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("2L_V.png")), 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
+        # t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
+        #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("2L_V.png")), 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
+
+        image_path = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images",
+            "2L_V.png"
+        )
+
+        t99 = (
+            None,
+            'Failure Pattern due to Tension in Plate and Member',
+            TYPE_SECTION,
+            [image_path, 211, 350, "Block Shear Pattern"]
+        )
         flangecapacity.append(t99)
         # t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
         #        ['./ResourceFiles/images/L_V.jpg', 211, 349, "Block Shear Pattern"])  # [image, width, height, caption]
@@ -490,8 +537,24 @@ class ColumnCoverPlate(MomentConnection):
         None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)")
         webcapacity.append(t00)
 
-        t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("U_V.png")), 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
+        # t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
+        #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("U_V.png")), 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
+
+        image_path = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images",
+            "U_V.png"
+        )
+
+        t99 = (
+            None,
+            'Failure Pattern due to tension in Member and Plate',
+            TYPE_SECTION,
+            [image_path, 211, 350, "Block Shear Pattern"]
+        )
         webcapacity.append(t99)
 
 
@@ -503,9 +566,25 @@ class ColumnCoverPlate(MomentConnection):
                round(self.web_plate.tension_capacity_web_plate / 1000, 2) if flag else '')
         webcapacity.append(t30)
 
-        t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("L_Vshear.png")), 239 , 350,
-                "Block Shear Pattern"])  # [image, width, height, caption]
+        # t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
+        #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("L_Vshear.png")), 239 , 350,
+        #         "Block Shear Pattern"])  # [image, width, height, caption]
+
+        image_path = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images",
+            "L_Vshear.png"
+        )
+
+        t99 = (
+            None,
+            'Failure Pattern due to Shear in Plate',
+            TYPE_SECTION,
+            [image_path, 239, 350, "Block Shear Pattern"]
+        )
         webcapacity.append(t99)
 
         t30 = (KEY_WEBPLATE_SHEAR_CAPACITY_PLATE, KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, TYPE_TEXTBOX,
@@ -4083,11 +4162,15 @@ class ColumnCoverPlate(MomentConnection):
         # config = configparser.ConfigParser()
         # config.read_file(open(r'Osdag.config'))
         # desktop_path = config.get("desktop_path", "path1")
-        fname_no_ext = popup_summary['filename']
-        rel_path = os.path.dirname(fname_no_ext) if fname_no_ext else os.path.abspath(".")
-        rel_path = os.path.abspath(rel_path)
+        # print("desk:", desktop_path)
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = os.path.abspath(".") # TEMP
         rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+        return True
         
