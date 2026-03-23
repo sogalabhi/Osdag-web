@@ -26,7 +26,7 @@ export const SceneManager = forwardRef(({
 }, ref) => {
   const [parsedModels, setParsedModels] = useState(null);
   const [hoveredMeshId, setHoveredMeshId] = useState(null);
-
+  
   // Refs for internal state
   const groupRef = useRef();
   const activeMeshRef = useRef(null);
@@ -37,7 +37,7 @@ export const SceneManager = forwardRef(({
   // --- 1. MODEL LOADING & MEMORY MANAGEMENT ---
   useEffect(() => {
     let isMounted = true;
-    const disposables = [];
+    const disposables = []; 
 
     const loadModels = () => {
       try {
@@ -48,6 +48,8 @@ export const SceneManager = forwardRef(({
 
         Object.entries(modelPaths).forEach(([key, dataUrl]) => {
           if (!dataUrl) return;
+          
+          if (key === 'Model') return;
 
           try {
             // STL Handling
@@ -55,23 +57,23 @@ export const SceneManager = forwardRef(({
               const base64 = dataUrl.split(',')[1];
               const binary = atob(base64);
               const arrayBuffer = new Uint8Array(binary.length).map((_, i) => binary.charCodeAt(i)).buffer;
-
+              
               const geometry = stlLoader.parse(arrayBuffer);
-
+              
               const mesh = new THREE.Mesh(geometry);
               mesh.name = key;
-              mesh.userData.hoverLabel = hoverDict?.[key] || key;
+              mesh.userData.hoverLabel = hoverDict?.[key] || key; 
 
               parsedData[key] = mesh;
               disposables.push(geometry);
 
               if (VALID_PART_KEYS.has(key)) partsGroup.add(mesh);
-            }
+            } 
             // OBJ Handling
             else if (typeof dataUrl === 'string' && dataUrl.includes('v ')) {
               const objGroup = objLoader.parse(dataUrl);
               parsedData[key] = objGroup;
-
+              
               objGroup.traverse(c => {
                 if (c.geometry) disposables.push(c.geometry);
                 if (c.material) disposables.push(c.material);
@@ -82,12 +84,15 @@ export const SceneManager = forwardRef(({
           }
         });
 
-        if (!parsedData.Model && partsGroup.children.length > 0) {
+        // Build parsedData.Model from the individual named-part meshes so that
+        // the Model view inherits per-part colors and hover labels.
+        if (parsedData.Model && partsGroup.children.length > 0) {
           parsedData.Model = partsGroup;
-        } else if (parsedData.Model && partsGroup.children.length > 0) {
-           parsedData.Model = partsGroup;
         }
-
+        else if (!parsedData.Model && partsGroup.children.length > 0) {
+          parsedData.Model = partsGroup;
+        }
+        
         if (isMounted) setParsedModels(parsedData);
       } catch (error) {
         console.error('[SceneManager] Error parsing model data:', error);
@@ -101,15 +106,16 @@ export const SceneManager = forwardRef(({
       disposables.forEach(d => d.dispose());
       setParsedModels(null);
     };
-  }, [modelPaths, moduleCadConfig]);
+  }, [modelPaths, moduleCadConfig]); 
+
 
   // --- 2. OPTIMIZED HELPERS ---
-
+  
   const getGeometry = useCallback((obj) => {
     let g = null;
     if (obj) {
       obj.traverse((c) => {
-        if (c.isMesh && !g) g = c.geometry;
+        if (c.isMesh && !g) g = c.geometry; 
       });
     }
     return g;
@@ -129,11 +135,11 @@ export const SceneManager = forwardRef(({
   }, []);
 
   // --- 3. MEMOIZED GEOMETRIES ---
-
+  
   const modelMeshes = useMemo(() => {
     if (!parsedModels?.Model) return [];
     return getMeshes(parsedModels.Model);
-  }, [parsedModels, getMeshes]);
+  }, [parsedModels, getMeshes]); 
 
   const geometries = useMemo(() => ({
     beam: getGeometry(parsedModels?.Beam),
@@ -186,7 +192,8 @@ export const SceneManager = forwardRef(({
 
   return (
     <group name="scene" ref={groupRef}>
-      {/* Render per-part meshes from Model group (available for Model or individual parts) */}
+      {/* Render per-part meshes from partsGroup (Model view shows all; individual views filter by shouldShowPart).
+           These meshes carry their real names (Beam, Connector, etc.) so colors and hover work correctly. */}
       {modelMeshes.length > 0 && (
         <>
           {modelMeshes.map((m, idx) => {
@@ -203,10 +210,10 @@ export const SceneManager = forwardRef(({
 
             let partPosition = finalPosition;
             if (name === "Member" || name === "EndPlate" || name === "Endplate") {
-               partPosition = [0, 0, 4];
+               partPosition = [0, 0, 0];
             }
             else if (["CleatAngle", "SeatedAngle", "Connector", "CoverPlate"].includes(name)) {
-               partPosition = [finalPosition[0], finalPosition[1], finalPosition[2] + 1];
+               partPosition = [finalPosition[0], finalPosition[1], finalPosition[2]];
             }
 
             return (
@@ -217,7 +224,7 @@ export const SceneManager = forwardRef(({
                 name={name}
                 color={color}
                 renderOrder={renderOrder}
-                position={partPosition}
+                position={partPosition} 
                 rotation={finalRotation}
                 scale={modelScale}
                 hoverDict={hoverDict}
@@ -260,13 +267,8 @@ export const SceneManager = forwardRef(({
         const meshId = `${name}-geom`;
         const renderOrder = getPartRenderOrder ? getPartRenderOrder(name) : 0;
 
-        let partPosition = finalPosition;
-        if (name === "Member" || name === "EndPlate" || name === "Endplate" || name === "EndPlate") {
-           partPosition = [0, 0, 4];
-        }
-        else if (["CleatAngle", "SeatedAngle", "Connector", "CoverPlate"].includes(name)) {
-           partPosition = [finalPosition[0], finalPosition[1], finalPosition[2] + 1];
-        }
+        // All parts share the same coordinate system from the backend.
+        const partPosition = finalPosition;
 
         return (
           <SmartPart

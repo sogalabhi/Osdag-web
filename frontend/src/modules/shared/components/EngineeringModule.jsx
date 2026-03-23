@@ -51,6 +51,7 @@ export const EngineeringModule = ({
   const prevModuleRef = useRef(null); // Track previous module for change detection
   const prevProjectIdRef = useRef(null); // Track previous projectId for change detection
   const lastLoadedProjectIdRef = useRef(null); // Prevent re-fetching same project (stops infinite GET loop)
+  const colorPickerRef = useRef(null);
 
   const {
     // Module data
@@ -1296,23 +1297,30 @@ export const EngineeringModule = ({
                       }
                     >
                       {renderBoolean && normalizedCadModelPaths && Object.keys(normalizedCadModelPaths).length > 0 && (() => {
-                        const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
-                        const primary = activeViews[0] || "Model";
-                        if (primary && primary !== "Model") {
-                          const hasPart =
-                            normalizedCadModelPaths[primary] ||
-                            normalizedCadModelPaths[primary?.toLowerCase?.()] ||
-                            normalizedCadModelPaths[primary?.toUpperCase?.()];
-                          if (!hasPart) {
-                            return (
-                              <Html>
-                                <p>{`No CAD part found for view "${primary}". Available parts: ${Object.keys(normalizedCadModelPaths).join(", ")}`}</p>
-                              </Html>
-                            );
-                          }
+                      const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
+                      const primary = activeViews[0] || "Model";
+                      if (primary && primary !== "Model") {
+                        let hasPart =
+                          normalizedCadModelPaths[primary] ||
+                          normalizedCadModelPaths[primary?.toLowerCase?.()] ||
+                          normalizedCadModelPaths[primary?.toUpperCase?.()];
+
+                        if (!hasPart && primary === "EndPlate" || !hasPart && primary === "CoverPlate") {
+                          hasPart =
+                            normalizedCadModelPaths["Connector"] ||
+                            normalizedCadModelPaths["connector"];
                         }
-                        return null;
-                      })()}
+                        
+                        if (!hasPart) {
+                          return (
+                            <Html>
+                              <p>{`No CAD part found for view "${primary}". Available parts: ${Object.keys(normalizedCadModelPaths).join(", ")}`}</p>
+                            </Html>
+                          );
+                        }
+                      }
+                      return null;
+                    })()}
                       <CadSceneProvider>
                         <CadScene
                           modelPaths={normalizedCadModelPaths}
