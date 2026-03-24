@@ -38,6 +38,7 @@ SECTION_MAPPINGS = {
     },
     'flexure-member': {
         'simply-supported-beam': ['Model', 'Beam'],
+        'on-cantilever': ['Model', 'Beam'],
         'purlin': ['Model'],
     },
     'base-plate': {

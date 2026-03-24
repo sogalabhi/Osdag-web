@@ -395,7 +395,7 @@ export const EngineeringModule = ({
             message.error('Failed to load saved project outputs.');
           }
         }
-          // Deduplicated block
+        // Deduplicated block
         // Normalize URL to path form: .../fin_plate/1 instead of .../fin_plate?projectId=1
         const pathname = location.pathname;
         const pathEndsWithId = pathname.endsWith(`/${projectId}`);
@@ -408,7 +408,7 @@ export const EngineeringModule = ({
         lastLoadedProjectIdRef.current = null;
         console.error('[EngineeringModule] Error loading project:', _e);
         message.warning('Cannot load project. Redirecting to module base.');
-        
+
         // Navigate back to the base module path (e.g. /Connections, /Member)
         const basePath = moduleConfig.routePath || '/home';
         navigate(basePath, { replace: true });
@@ -989,16 +989,16 @@ export const EngineeringModule = ({
                 strokeWidth="6"
               />
 
-             {showLogs && (
-              <rect
-                x="10"
-                y="60"
-                width="80"
-                height="30"
-                fill="currentColor"
-                stroke="none"
-              />
-             )}
+              {showLogs && (
+                <rect
+                  x="10"
+                  y="60"
+                  width="80"
+                  height="30"
+                  fill="currentColor"
+                  stroke="none"
+                />
+              )}
             </svg>
           </button>
 
@@ -1251,7 +1251,7 @@ export const EngineeringModule = ({
                   <p>{isRedesigning ? "Updating Model..." : "Loading Model..."}</p>
                 </div>
               ) : renderBoolean ? (
-                <div 
+                <div
                   className={`cadModel relative ${!customBgColor ? 'bg-gradient-to-b from-[#FFFFFF] to-[#7E7E7E] dark:from-[#535353] dark:to-[#000000]' : ''}`}
                   style={customBgColor ? { backgroundColor: customBgColor } : {}}
                 >
@@ -1287,7 +1287,7 @@ export const EngineeringModule = ({
                       position={cameraPos}
                       fov={13}
                       near={0.1}
-                      far={1000}
+                      far={2000}
                     />
                     <Suspense
                       fallback={
@@ -1297,30 +1297,30 @@ export const EngineeringModule = ({
                       }
                     >
                       {renderBoolean && normalizedCadModelPaths && Object.keys(normalizedCadModelPaths).length > 0 && (() => {
-                      const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
-                      const primary = activeViews[0] || "Model";
-                      if (primary && primary !== "Model") {
-                        let hasPart =
-                          normalizedCadModelPaths[primary] ||
-                          normalizedCadModelPaths[primary?.toLowerCase?.()] ||
-                          normalizedCadModelPaths[primary?.toUpperCase?.()];
+                        const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
+                        const primary = activeViews[0] || "Model";
+                        if (primary && primary !== "Model") {
+                          let hasPart =
+                            normalizedCadModelPaths[primary] ||
+                            normalizedCadModelPaths[primary?.toLowerCase?.()] ||
+                            normalizedCadModelPaths[primary?.toUpperCase?.()];
 
-                        if (!hasPart && primary === "EndPlate" || !hasPart && primary === "CoverPlate") {
-                          hasPart =
-                            normalizedCadModelPaths["Connector"] ||
-                            normalizedCadModelPaths["connector"];
+                          if (!hasPart && primary === "EndPlate" || !hasPart && primary === "CoverPlate") {
+                            hasPart =
+                              normalizedCadModelPaths["Connector"] ||
+                              normalizedCadModelPaths["connector"];
+                          }
+
+                          if (!hasPart) {
+                            return (
+                              <Html>
+                                <p>{`No CAD part found for view "${primary}". Available parts: ${Object.keys(normalizedCadModelPaths).join(", ")}`}</p>
+                              </Html>
+                            );
+                          }
                         }
-                        
-                        if (!hasPart) {
-                          return (
-                            <Html>
-                              <p>{`No CAD part found for view "${primary}". Available parts: ${Object.keys(normalizedCadModelPaths).join(", ")}`}</p>
-                            </Html>
-                          );
-                        }
-                      }
-                      return null;
-                    })()}
+                        return null;
+                      })()}
                       <CadSceneProvider>
                         <CadScene
                           modelPaths={normalizedCadModelPaths}

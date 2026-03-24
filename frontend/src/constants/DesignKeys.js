@@ -80,8 +80,8 @@ export const KEY_DISP_COVER_PLT = 'Cover Plate *';
 export const KEY_DISP_DP_DETAILING_PACKING_PLATE = 'Packing Plate';
 
 // Flexural Member Constants - Must match exactly with Common.py backend constants
-export const KEY_ALLOW_CLASS = 'Design.Allowable_Class';
-export const KEY_EFFECTIVE_AREA_PARA = 'Design.Effective_Area_Parameter';
+export const KEY_ALLOW_CLASS = 'Optimum.Class';
+export const KEY_EFFECTIVE_AREA_PARA = 'Effective.Area_Para';
 export const KEY_LENGTH_OVERWRITE = 'Length.Overwrite';           // Matches Common.py KEY_LENGTH_OVERWRITE = 'Length.Overwrite'
 export const KEY_BEARING_LENGTH = 'Bearing.Length';               // Matches Common.py KEY_BEARING_LENGTH = 'Bearing.Length'
 export const KEY_SUPPORT = 'Support.Type';
@@ -150,6 +150,8 @@ export const MODULE_KEY_WELDED_TO_END_GUSSET = 'WeldedToEndGusset';
 
 // Module Keys - Flexure
 export const MODULE_KEY_SIMPLY_SUPPORTED_BEAM = 'Simply-Supported-Beam';
+export const MODULE_KEY_PURLIN = 'Purlin';
+export const MODULE_KEY_ON_CANTILEVER_BEAM = 'On-Cantilever-Beam';
 
 // Compression Member Keys
 export const KEY_END1 = 'Member.End_1';

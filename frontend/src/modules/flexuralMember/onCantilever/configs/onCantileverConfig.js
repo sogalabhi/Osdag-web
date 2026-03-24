@@ -1,114 +1,117 @@
-// Config for On Cantilever Beam (Flexural Member)
-// Based on simplySupportedBeamConfig — adjust as needed
-
-import ISECTION from "../../../../assets/ISection.png";
-import ErrorImg from "../../../../assets/notSelected.png";
-import {
-  KEY_MODULE, KEY_SEC_PROFILE, KEY_SECSIZE, KEY_MATERIAL, KEY_SEC_MATERIAL,
-  KEY_DP_DESIGN_METHOD, KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA,
-  KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH, KEY_SHEAR, KEY_MOMENT,
-  KEY_LENGTH, KEY_SUPPORT, KEY_TORSIONAL_RES, KEY_WARPING_RES, KEY_DESIGN_TYPE_FLEXURE
-} from "../../../../constants/DesignKeys";
 
 export const onCantileverConfig = {
   sessionName: "On Cantilever Beam Design",
   routePath: "/design/flexure/on_cantilever",
   designType: "On-Cantilever-Beam",
   cameraKey: "FlexuralMember",
-  cadOptions: ["Model", "Beam"],
+
+  cadOptions: ["Model"],
 
   defaultInputs: {
     module: "On-Cantilever-Beam",
+
     section_profile: "Beams and Columns",
     section_designation: ["ISMB 200"],
     material: "E 250 (Fe 410 W)A",
     section_material: "E 250 (Fe 410 W)A",
-    design_method: "Limit State Design",
-    allowable_class: "Plastic",
-    effective_area_parameter: "1.0",
-    length_overwrite: "NA",
-    bearing_length: "NA",
+
+    support_type: "Major Laterally Supported",
+    support_restraint: "Continuous, with lateral restraint to top flange",
+    top_restraint: "Free",
+
+    member_length: "5000",
     shear_force: "50",
     bending_moment: "100",
-    member_length: "3000",
-    beam_support_type: "Cantilever",
-    torsional_restraint: "Fully Restrained",
-    warping_restraint: "Both flanges fully restrained",
   },
 
   modalConfig: [
-    { key: "sectionDesignation", inputKey: "section_designation", dataSource: null },
+    {
+      key: "sectionDesignation",
+      inputKey: "section_designation",
+      dataSource: null,
+    },
   ],
 
   selectionConfig: [
-    { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
+    {
+      key: "sectionDesignationSelect",
+      inputKey: "section_designation",
+      defaultValue: "All",
+    },
   ],
 
-  getSectionImage: (profile) => {
-    switch (profile) {
-      case "Beams":
-      case "Columns":
-      case "Beams and Columns":
-        return ISECTION;
-      default:
-        return ErrorImg;
-    }
-  },
-
+  // Helper: get list of sections based on profile (mirrors simply-supported beam)
   getDynamicSectionList: (profile, beamList, columnList) => {
-    // For cantilever, use beam list primarily
-    return beamList || [];
+    // Cantilever beam uses column list (like simply-supported beam)
+    return columnList || [];
   },
 
   validateInputs: (inputs) => {
-    if (!inputs.section_designation || !inputs.member_length || !inputs.shear_force || !inputs.bending_moment) {
-      return { isValid: false, message: "Please input all the required fields" };
+    if (
+      !inputs.section_designation ||
+      inputs.section_designation.length === 0 ||
+      inputs.member_length === "" ||
+      inputs.shear_force === "" ||
+      inputs.bending_moment === ""
+    ) {
+      return { isValid: false, message: "Please input all the fields" };
     }
     if (isNaN(parseFloat(inputs.member_length)) || parseFloat(inputs.member_length) <= 0) {
       return { isValid: false, message: "Member length must be a positive number" };
     }
+    if (isNaN(parseFloat(inputs.shear_force)) || parseFloat(inputs.shear_force) <= 0) {
+      return { isValid: false, message: "Shear force must be a positive number" };
+    }
+    if (isNaN(parseFloat(inputs.bending_moment)) || parseFloat(inputs.bending_moment) <= 0) {
+      return { isValid: false, message: "Bending moment must be a positive number" };
+    }
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
-    const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
-      if (allSelectedFlag) {
-        return fullList.filter(item => item !== "All");
-      }
-      if (Array.isArray(selectedList)) {
-        return selectedList.filter(item => item !== "All");
-      }
-      return [selectedList].filter(item => item !== "All");
-    };
-
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     const dynamicSectionList = onCantileverConfig.getDynamicSectionList(
       inputs.section_profile,
       lists.beamList,
       lists.columnList
     );
 
+    const sectionList = allSelected.section_designation
+      ? dynamicSectionList.filter((item) => item !== "All")
+      : Array.isArray(inputs.section_designation)
+        ? inputs.section_designation.filter((item) => item !== "All")
+        : [inputs.section_designation].filter(Boolean);
+
     return {
-      [KEY_MODULE]: "On-Cantilever-Beam",
-      [KEY_SEC_PROFILE]: String(inputs.section_profile),
-      [KEY_SECSIZE]: allSelected.section_designation
-        ? dynamicSectionList
-        : (Array.isArray(inputs.section_designation)
-          ? inputs.section_designation
-          : [inputs.section_designation || ""]),
-      [KEY_MATERIAL]: String(inputs.material),
-      [KEY_SEC_MATERIAL]: String(inputs.section_material),
-      [KEY_DP_DESIGN_METHOD]: String(inputs.design_method),
-      [KEY_ALLOW_CLASS]: String(inputs.allowable_class),
-      [KEY_EFFECTIVE_AREA_PARA]: String(inputs.effective_area_parameter),
-      [KEY_LENGTH_OVERWRITE]: String(inputs.length_overwrite),
-      [KEY_BEARING_LENGTH]: String(inputs.bearing_length),
-      [KEY_SHEAR]: String(inputs.shear_force),
-      [KEY_MOMENT]: String(inputs.bending_moment),
-      [KEY_LENGTH]: String(inputs.member_length),
-      "Flexure.Type": String(inputs.beam_support_type),
-      "Flexure.Support": "Cantilever",
-      [KEY_TORSIONAL_RES]: String(inputs.torsional_restraint),
-      [KEY_WARPING_RES]: String(inputs.warping_restraint),
+      // Module identification
+      "Module": "On-Cantilever-Beam",
+
+      // Section
+      "Member.Profile": inputs.section_profile || "Beams and Columns",
+      "Member.Designation": sectionList,
+
+      // Material
+      "Material": inputs.material || "",
+      "Member.Material": inputs.section_material || inputs.material || "",
+
+      // Cantilever-specific restraints
+      "Flexure.Type": inputs.support_type || "Major Laterally Supported",
+      "Cantilever.Support": inputs.support_restraint || "Continuous, with lateral restraint to top flange",
+      "Cantilever.Top": inputs.top_restraint || "Free",
+
+      // Geometry
+      "Member.Length": inputs.member_length,
+
+      // Loads
+      "Load.Shear": inputs.shear_force,
+      "Load.Moment": inputs.bending_moment,
+
+      // Design preferences (defaults sent from frontend)
+      "Design.Design_Method": "Limit State Design",
+      "Optimum.Class": "Yes",
+      "Effective.Area_Para": "1.0",
+      "Length.Overwrite": "NA",
+      "Bearing.Length": "NA",
+      "Loading.Condition": "Normal",
     };
   },
 
@@ -119,30 +122,16 @@ export const onCantileverConfig = {
         {
           key: "section_profile",
           label: "Section Profile*",
-          type: "sectionProfileList",
+          type: "select",
+          options: "sectionProfileList",
           defaultValue: "Beams and Columns",
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
-            const imageSource = onCantileverConfig.getSectionImage(value);
-            setExtraState({
-              ...extraState,
-              selectedProfile: value,
-              imageSource: imageSource
-            });
+          onChange: (value, inputs, setInputs) => {
             setInputs({
               ...inputs,
               section_profile: value,
               section_designation: [],
             });
-          }
-        },
-        {
-          key: "profile_image",
-          label: "",
-          type: "image",
-          conditionalDisplay: () => true,
-          imageSource: (extraState) => extraState?.imageSource || ISECTION,
-          height: "100px",
-          width: "100px"
+          },
         },
         {
           key: "section_designation",
@@ -157,7 +146,7 @@ export const onCantileverConfig = {
               contextData.beamList,
               contextData.columnList
             );
-          }
+          },
         },
         {
           key: "material",
@@ -165,59 +154,92 @@ export const onCantileverConfig = {
           type: "select",
           options: "materialList",
           onChange: (value, inputs, setInputs, materialList) => {
-            const material = materialList.find(item => item.id === value);
+            const material = materialList.find((m) => m.id === value);
             setInputs({
               ...inputs,
-              material: material.Grade,
-              section_material: material.Grade,
+              material: material?.Grade || "",
+              section_material: material?.Grade || "",
             });
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
+
     {
       title: "Section Data",
       fields: [
         {
-          key: "beam_support_type",
+          key: "support_type",
           label: "Support Type*",
           type: "select",
           options: [
-            { value: "Cantilever", label: "Cantilever" },
-            { value: "Major Laterally Supported", label: "Major Laterally Supported" },
-            { value: "Minor Laterally Unsupported", label: "Minor Laterally Unsupported" }
-          ]
+            {
+              value: "Major Laterally Supported",
+              label: "Major Laterally Supported",
+            },
+            {
+              value: "Minor Laterally Unsupported",
+              label: "Minor Laterally Unsupported",
+            },
+            {
+              value: "Major Laterally Unsupported",
+              label: "Major Laterally Unsupported",
+            },
+          ],
         },
         {
-          key: "torsional_restraint",
-          label: "Torsional Restraint*",
+          key: "support_restraint",
+          label: "Support Restraint*",
           type: "select",
           options: [
-            { value: "Fully Restrained", label: "Fully Restrained" },
-            { value: "Partially Restrained-support connection", label: "Partially Restrained-support connection" },
-            { value: "Partially Restrained-bearing support", label: "Partially Restrained-bearing support" }
-          ]
+            {
+              value: "Continuous, with lateral restraint to top flange",
+              label: "Continuous, with lateral restraint to top flange",
+            },
+            {
+              value: "Continuous, with partial torsional restraint",
+              label: "Continuous, with partial torsional restraint",
+            },
+            {
+              value: "Continuous, with lateral and torsional restraint",
+              label: "Continuous, with lateral and torsional restraint",
+            },
+            {
+              value: "Restrained laterally, torsionally and against rotation on flange",
+              label: "Restrained laterally, torsionally and against rotation on flange",
+            },
+          ],
         },
         {
-          key: "warping_restraint",
-          label: "Warping Restraint*",
+          key: "top_restraint",
+          label: "Top Restraint*",
           type: "select",
           options: [
-            { value: "Both flanges fully restrained", label: "Both flanges fully restrained" },
-            { value: "Compression flange fully restrained", label: "Compression flange fully restrained" },
-            { value: "Compressicm flange partially restrained", label: "Compressicm flange partially restrained" },
-            { value: "Warping not restrained in both flanges", label: "Warping not restrained in both flanges" }
-          ]
+            { value: "Free", label: "Free" },
+            {
+              value: "Lateral restraint to top flange",
+              label: "Lateral restraint to top flange",
+            },
+            {
+              value: "Torsional restraint",
+              label: "Torsional restraint",
+            },
+            {
+              value: "Lateral and Torsional restraint",
+              label: "Lateral and Torsional restraint",
+            },
+          ],
         },
         {
           key: "member_length",
-          label: "Effective Span (m)*",
+          label: "Effective Span (mm)*",
           type: "number",
           validation: "positive_number",
-          placeholder: "Enter member length"
-        }
-      ]
+          placeholder: "Enter member length",
+        },
+      ],
     },
+
     {
       title: "Factored Loads",
       fields: [
@@ -226,83 +248,16 @@ export const onCantileverConfig = {
           label: "Bending Moment (kNm)*",
           type: "number",
           validation: "positive_number",
-          placeholder: "Enter bending moment"
+          placeholder: "Enter bending moment",
         },
         {
           key: "shear_force",
           label: "Shear Force (kN)*",
           type: "number",
           validation: "positive_number",
-          placeholder: "Enter shear force"
-        }
-      ]
+          placeholder: "Enter shear force",
+        },
+      ],
     },
-    {
-      title: "Design Preferences",
-      fields: [
-        {
-          key: "design_method",
-          label: "Design Method",
-          type: "select",
-          options: [
-            { value: "Limit State Design", label: "Limit State Design" }
-          ],
-          defaultValue: "Limit State Design"
-        },
-        {
-          key: "allowable_class",
-          label: "Allowable Class",
-          type: "select",
-          options: [
-            { value: "Yes", label: "Yes" },
-            { value: "No", label: "No" }
-          ],
-          defaultValue: "Yes"
-        },
-        {
-          key: "effective_area_parameter",
-          label: "Effective Area Parameter",
-          type: "number",
-          defaultValue: "1.0",
-          placeholder: "Enter effective area parameter"
-        },
-        {
-          key: "length_overwrite",
-          label: "Length Overwrite",
-          type: "select",
-          options: [
-            { value: "NA", label: "NA" }
-          ],
-          defaultValue: "NA"
-        },
-        {
-          key: "bearing_length",
-          label: "Bearing Length",
-          type: "select",
-          options: [
-            { value: "NA", label: "NA" }
-          ],
-          defaultValue: "NA"
-        }
-      ]
-    }
   ],
-
-  backendKeys: {
-    "Member.Profile": KEY_SEC_PROFILE,
-    "Member.Designation": KEY_SECSIZE,
-    "Material": KEY_MATERIAL,
-    "Member.Material": KEY_SEC_MATERIAL,
-    "Design.Design_Method": "Flexure.Type",
-    "Design.Allowable_Class": KEY_ALLOW_CLASS,
-    "Design.Effective_Area_Parameter": KEY_EFFECTIVE_AREA_PARA,
-    "Design.Length_Overwrite": KEY_LENGTH_OVERWRITE,
-    "Design.Bearing_Length": KEY_BEARING_LENGTH,
-    "Load.Shear": KEY_SHEAR,
-    "Load.Moment": KEY_MOMENT,
-    "Member.Length": KEY_LENGTH,
-    "Support.Type": KEY_SUPPORT,
-    "Torsional.Restraint": KEY_TORSIONAL_RES,
-    "Warping.Restraint": KEY_WARPING_RES,
-  },
 };

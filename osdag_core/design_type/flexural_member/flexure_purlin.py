@@ -3402,5 +3402,5 @@ class Flexure_Purlin(Member):
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, [], '', module=self.module)  #
 
-
+        return True
 

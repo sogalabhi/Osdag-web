@@ -1,13 +1,13 @@
 import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
 import { purlinConfig } from './configs/purlinConfig';
-import { simplySupportedBeamOutputConfig } from '../simplySupportedBeam/configs/simplySupportedBeamOutputConfig';
+import { purlinOutputConfig } from './configs/purlinOutputConfig';
 
 function Purlin() {
   return (
     <EngineeringModule
       moduleConfig={purlinConfig}
-      outputConfig={simplySupportedBeamOutputConfig}
+      outputConfig={purlinOutputConfig}
       title="Purlin (Flexural Member)"
     />
   );
