@@ -15,7 +15,7 @@ export const simplySupportedBeamConfig = {
   routePath: "/design/flexure/simply_supported_beam",
   designType: "Simply-Supported-Beam",
   cameraKey: "FlexuralMember", 
-  cadOptions: ["Model", "Beam"],
+  cadOptions: ["Model"],
 
   defaultInputs: {
     module: "Simply-Supported-Beam",
@@ -137,7 +137,8 @@ export const simplySupportedBeamConfig = {
         {
           key: "section_profile",
           label: "Section Profile*",
-          type: "sectionProfileList",
+          type: "select",
+          options: "sectionProfileList",
           defaultValue: "Beams and Columns", // Default to the only available option
           onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
             const imageSource = simplySupportedBeamConfig.getSectionImage(value);
@@ -152,15 +153,6 @@ export const simplySupportedBeamConfig = {
               section_designation: [], // Reset section designation
             });
           }
-        },
-        {
-          key: "profile_image",
-          label: "",
-          type: "image",
-          conditionalDisplay: () => true,
-          imageSource: (extraState) => extraState?.imageSource || ISECTION,
-          height: "100px",
-          width: "100px"
         },
         {
           key: "section_designation",
@@ -257,55 +249,6 @@ export const simplySupportedBeamConfig = {
           placeholder: "Enter shear force"
         }
       ]
-    },
-    {
-      title: "Design Preferences",
-      fields: [
-        {
-          key: "design_method",
-          label: "Design Method",
-          type: "select",
-          options: [
-            { value: "Limit State Design", label: "Limit State Design" }
-          ],
-          defaultValue: "Limit State Design"
-        },
-        {
-          key: "allowable_class",
-          label: "Allowable Class",
-          type: "select",
-          options: [
-            { value: "Yes", label: "Yes" },
-            { value: "No", label: "No" }
-          ],
-          defaultValue: "Yes"
-        },
-        {
-          key: "effective_area_parameter",
-          label: "Effective Area Parameter",
-          type: "number",
-          defaultValue: "1.0",
-          placeholder: "Enter effective area parameter"
-        },
-        {
-          key: "length_overwrite",
-          label: "Length Overwrite",
-          type: "select",
-          options: [
-            { value: "NA", label: "NA" }
-          ],
-          defaultValue: "NA"
-        },
-        {
-          key: "bearing_length",
-          label: "Bearing Length",
-          type: "select",
-          options: [
-            { value: "NA", label: "NA" }
-          ],
-          defaultValue: "NA"
-        }
-      ]
     }
   ],
 
@@ -315,8 +258,8 @@ export const simplySupportedBeamConfig = {
     "Material": KEY_MATERIAL,
     "Member.Material": KEY_SEC_MATERIAL,
     "Design.Design_Method": "Flexure.Type",      // KEY_DESIGN_TYPE_FLEXURE actual value
-    "Design.Allowable_Class": KEY_ALLOW_CLASS,
-    "Design.Effective_Area_Parameter": KEY_EFFECTIVE_AREA_PARA,
+    "Optimum.Class": KEY_ALLOW_CLASS,
+    "Effective.Area_Para": KEY_EFFECTIVE_AREA_PARA,
     "Design.Length_Overwrite": KEY_LENGTH_OVERWRITE,
     "Design.Bearing_Length": KEY_BEARING_LENGTH,
     "Load.Shear": KEY_SHEAR,

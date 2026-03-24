@@ -10,6 +10,8 @@ from rest_framework.permissions import AllowAny
 from .registry import FlexureMemberRegistry
 from apps.core.utils.module_helpers import handle_design_request
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
+from rest_framework import status
+from apps.core.models import Columns, Beams, Material, CustomMaterials
 
 
 class FlexureMemberViewSet(viewsets.ViewSet):
@@ -42,6 +44,9 @@ class FlexureMemberViewSet(viewsets.ViewSet):
         """
         # Use URL slug to find service (not POST body)
         ServiceClass = FlexureMemberRegistry.get_service_by_slug(submodule_slug)
+
+        
+        print(f"[FlexureMemberViewSet] design called with slug={submodule_slug}, ServiceClass={ServiceClass}")
         
         if not ServiceClass:
             return Response(
@@ -90,11 +95,118 @@ class FlexureMemberViewSet(viewsets.ViewSet):
     def options(self, request, submodule_slug=None):
         """
         GET /api/modules/flexure-member/{submodule_slug}/options/
-        
-        Returns input options for the sub-module (e.g., section lists, materials)
+
+        Returns dropdown/options data for flexural sub-modules.
         """
-        # TODO: Implement options endpoint if needed
-        return Response({'message': 'Options endpoint not yet implemented'}, status=501)
+        email = request.query_params.get("email")
+        slug = submodule_slug
+
+        # ---- Common Helpers ---- #
+
+        def material_list():
+            mats = list(Material.objects.all().values())
+            if email:
+                mats += list(CustomMaterials.objects.filter(email=email).values())
+            mats.append({"id": -1, "Grade": "Custom"})
+            return mats
+
+        def beam_list():
+            return list(Beams.objects.values_list('Designation', flat=True))
+
+        def column_list():
+            return list(Columns.objects.values_list('Designation', flat=True))
+
+        support_types = [
+            {'value': 'Laterally Supported', 'label': 'Laterally Supported'},
+            {'value': 'Laterally Unsupported', 'label': 'Laterally Unsupported'}
+        ]
+
+        restraint_types = [
+            {'value': 'Fixed', 'label': 'Fixed'},
+            {'value': 'Free', 'label': 'Free'}
+        ]
+
+        allowable_class_list = [
+            'Plastic',
+            'Compact',
+            'Semi-Compact',
+            'Slender'
+        ]
+
+        design_methods = [
+            {'value': 'Limit State Design', 'label': 'Limit State Design'}
+        ]
+
+        try:
+            # -------------------------------
+            # Simply Supported Beam
+            # -------------------------------
+            if slug == 'simply-supported-beam':
+                data = {
+                    'beamList': beam_list(),
+                    'columnList': column_list(),  # Optional if profile switch supported
+                    'sectionProfileList': ["Beams and Columns"],
+                    'materialList': material_list(),
+                    'designMethodList': design_methods,
+                    'supportTypeList': support_types,
+                    'torsionalRestraintList': restraint_types,
+                    'warpingRestraintList': restraint_types,
+                    'allowableClassList': allowable_class_list
+                }
+                return Response(data, status=status.HTTP_200_OK)
+            if slug == 'purlin':
+                data = {
+                    'beamList': beam_list(),
+                    'columnList': column_list(),
+                    'sectionProfileList': ["Beams and Columns"],
+                    'materialList': material_list(),
+                    'designMethodList': design_methods,
+                    'supportTypeList': support_types,
+                    'torsionalRestraintList': restraint_types,
+                    'warpingRestraintList': restraint_types,
+                    'allowableClassList': allowable_class_list
+                }
+                return Response(data, status=status.HTTP_200_OK)
+            if slug == 'on-cantilever':
+                cantilever_support_types = [
+                    {'value': 'Major Laterally Supported', 'label': 'Major Laterally Supported'},
+                    {'value': 'Minor Laterally Unsupported', 'label': 'Minor Laterally Unsupported'},
+                    {'value': 'Major Laterally Unsupported', 'label': 'Major Laterally Unsupported'},
+                ]
+                support_restraint_list = [
+                    {'value': 'Continuous, with lateral restraint to top flange', 'label': 'Continuous, with lateral restraint to top flange'},
+                    {'value': 'Continuous, with partial torsional restraint', 'label': 'Continuous, with partial torsional restraint'},
+                    {'value': 'Continuous, with lateral and torsional restraint', 'label': 'Continuous, with lateral and torsional restraint'},
+                    {'value': 'Restrained laterally, torsionally and against rotation on flange', 'label': 'Restrained laterally, torsionally and against rotation on flange'},
+                ]
+                top_restraint_list = [
+                    {'value': 'Free', 'label': 'Free'},
+                    {'value': 'Lateral restraint to top flange', 'label': 'Lateral restraint to top flange'},
+                    {'value': 'Torsional restraint', 'label': 'Torsional restraint'},
+                    {'value': 'Lateral and Torsional restraint', 'label': 'Lateral and Torsional restraint'},
+                ]
+                data = {
+                    'beamList': beam_list(),
+                    'columnList': column_list(),
+                    'sectionProfileList': ["Beams and Columns"],
+                    'materialList': material_list(),
+                    'designMethodList': design_methods,
+                    'supportTypeList': cantilever_support_types,
+                    'supportRestraintList': support_restraint_list,
+                    'topRestraintList': top_restraint_list,
+                    'allowableClassList': allowable_class_list
+                }
+                return Response(data, status=status.HTTP_200_OK)
+            return Response(
+                {'error': f'Sub-module {slug} not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/cad')
     def cad(self, request, submodule_slug=None):
@@ -150,6 +262,9 @@ class FlexureMemberViewSet(viewsets.ViewSet):
             try:
                 if submodule_slug == 'simply-supported-beam':
                     from .submodules.simply_supported_beam.adapter import create_from_input
+                    create_from_input_func = create_from_input
+                elif submodule_slug == 'on-cantilever':
+                    from .submodules.on_cantilever.adapter import create_from_input
                     create_from_input_func = create_from_input
             except ImportError as e:
                 print(f"[FlexureMemberViewSet] Could not import create_from_input for {submodule_slug}: {e}")
