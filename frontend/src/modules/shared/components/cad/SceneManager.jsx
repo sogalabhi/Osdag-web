@@ -49,7 +49,7 @@ export const SceneManager = forwardRef(({
         Object.entries(modelPaths).forEach(([key, dataUrl]) => {
           if (!dataUrl) return;
           
-          if (key === 'Model') return;
+          if (key === 'Model' && Object.keys(modelPaths).length > 1) return;
 
           try {
             // STL Handling

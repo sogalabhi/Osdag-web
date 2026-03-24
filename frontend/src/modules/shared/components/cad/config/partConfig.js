@@ -81,6 +81,7 @@ export const VALID_PART_KEYS = new Set([
   "Connector",
   "Cover Plate",
   "CoverPlate",
+  "Model",
 ]);
 
 /**
