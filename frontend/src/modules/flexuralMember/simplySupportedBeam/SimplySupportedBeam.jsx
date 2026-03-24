@@ -8,7 +8,7 @@ function SimplySupportedBeam() {
     <EngineeringModule
       moduleConfig={simplySupportedBeamConfig}
       outputConfig={simplySupportedBeamOutputConfig}
-      title="Simply Supported Beam(Flexural M ember)"
+      title="Simply Supported Beam(Flexural Member)"
     />
   );
 }
