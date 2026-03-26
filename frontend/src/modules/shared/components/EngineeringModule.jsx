@@ -37,6 +37,7 @@ import { isGuestUser, canCreateProjects } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 import ProjectNameModal from "../../../homepage/components/ProjectNameModal";
 import { useProjectCreation } from '../hooks/useProjectCreation';
+import DesktopModuleIconSidebar from "./DesktopModuleIconSidebar";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -162,6 +163,9 @@ export const EngineeringModule = ({
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const isSidebarOpen = isSidebarHovered;
 
   const { handleCreateProject, projectCreationModal } = useProjectCreation({
     inputs,
@@ -904,8 +908,27 @@ export const EngineeringModule = ({
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
+      <DesktopModuleIconSidebar
+        active={moduleConfig?.sessionName}
+        isOpen={isSidebarOpen}
+        onMouseEnter={() => setIsSidebarHovered(true)}
+        onMouseLeave={() => setIsSidebarHovered(false)}
+      />
+      {showMobileSidebar && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/40 z-[75]"
+          onClick={() => setShowMobileSidebar(false)}
+        />
+      )}
+      <DesktopModuleIconSidebar
+        variant="mobile"
+        active={moduleConfig?.sessionName}
+        isOpen={showMobileSidebar}
+        onItemClick={() => setShowMobileSidebar(false)}
+      />
+
       {/* Navigation */}
-      <div className="sticky top-0 z-[60] min-h-[48px] max-h-[80px] flex flex-row flex-wrap justify-center md:justify-between items-center bg-[#d2d4d2] gap-x-4 w-full text-sm flex-shrink-0 pl-4">
+      <div className="sticky top-0 z-[60] min-h-[48px] max-h-[80px] flex flex-row flex-wrap justify-center md:justify-between items-center bg-[#d2d4d2] gap-x-4 w-full text-sm flex-shrink-0">
         <div className="flex flex-row flex-wrap justify-center md:justify-start items-center gap-x-4">
           {menuItems.map((item, index) => (
             <UnifiedDropdownMenu
@@ -937,7 +960,19 @@ export const EngineeringModule = ({
           )}
         </div>
 
-        <div className="flex flex-row justify-center items-center gap-2 text-black dark:text-white pr-4">
+        <div className="flex flex-row justify-center items-center gap-2 text-black dark:text-white">
+
+          {/* Sidebar Menu Button - Mobile Only */}
+          <button
+            onClick={() => setShowMobileSidebar(true)}
+            className="md:hidden p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors hover:bg-black/10 dark:hover:bg-black/40 flex items-center justify-center"
+            title="Open sidebar menu"
+            type="button"
+          >
+            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
 
           {/* Input Dock Button */}
           <button
@@ -1004,10 +1039,7 @@ export const EngineeringModule = ({
           {/* CAD Toggle Button - Mobile Only */}
           <button
             onClick={toggleCad}
-            className={`md:hidden p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${showCad
-              ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
-              : 'hover:bg-black/10 dark:hover:bg-black/40'
-              }`}
+            className="md:hidden w-9 h-9 flex items-center justify-center transition hover:bg-black/10 dark:hover:bg-black/40"
             title={`${showCad ? 'Hide' : 'Show'} CAD`}
             type="button"
           >
@@ -1034,8 +1066,8 @@ export const EngineeringModule = ({
             disabled={!output}
             title={output ? `${showOutputDock ? 'Hide' : 'Show'} output dock` : 'Run a design to view outputs'}
             type="button"
-            className={`p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${output
-              ? (showOutputDock ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 dark:hover:bg-black/40')
+            className={`w-9 h-9 flex items-center justify-center transition ${output
+              ? 'hover:bg-black/10 dark:hover:bg-black/40'
               : "opacity-40 cursor-not-allowed"
               }`}
           >

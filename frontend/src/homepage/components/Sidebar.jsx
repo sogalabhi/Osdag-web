@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import osdagLogo from '../../assets/homepage/osdag_logo.png';
+import React from 'react';
 import iitbLogo from '../../assets/homepage/iitb_logo.png';
 import homeIcon from '../../assets/homepage/home_default.svg';
 import connectionIcon from '../../assets/homepage/connection.svg';
@@ -11,82 +10,39 @@ import trussIcon from '../../assets/homepage/truss.svg';
 import frame2dIcon from '../../assets/homepage/2d_frame.svg';
 import frame3dIcon from '../../assets/homepage/3d_frame.svg';
 import { Link, useParams } from 'react-router-dom';
-const Sidebar = ({ setshowSideBar, active }) => {
-  const [navigationItems, setnavigationItems] = useState(() =>
-    [
-      {
-        name: 'Home',
-        icon: <img src={homeIcon} alt="Home" className="w-10 h-10" />,
-        link: '/home',
-      },
-      {
-        name: 'Connection',
-        icon: <img src={connectionIcon} alt="Connection" className="w-10 h-10" />,
-        active: false,
-        link: '/Connections',
-      },
-      {
-        name: 'Tension Member',
-        icon: <img src={tensionIcon} alt="Tension Member" className="w-10 h-10" />,
-        active: false,
-        link: '/TensionMember',
-      },
-      {
-        name: 'Compression Member',
-        icon: <img src={compressionIcon} alt="Compression Member" className="w-10 h-10" />,
-        active: false,
-        link: '/CompressionMember',
-      },
-      {
-        name: 'Flexural Member',
-        icon: <img src={flexuralIcon} alt="Flexural Member" className="w-10 h-10" />,
-        active: false,
-        link: '/FlexureMember',
-        // comingSoon: true,
-      },
-      {
-        name: 'Beam-Column',
-        icon: <img src={beamcolumnIcon} alt="Beam-Column" className="w-10 h-10" />,
-        active: false,
-        link: '/Beam-Column',
-        comingSoon: true,
-      },
-      {
-        name: 'Truss',
-        icon: <img src={trussIcon} alt="Truss" className="w-10 h-10" />,
-        active: false,
-        link: '/Truss',
-        comingSoon: true,
-      },
-      {
-        name: '2D Frame',
-        icon: <img src={frame2dIcon} alt="2D Frame" className="w-10 h-10" />,
-        active: false,
-        link: '/2DFrame',
-        comingSoon: true,
-      },
-      {
-        name: '3D Frame',
-        icon: <img src={frame3dIcon} alt="3D Frame" className="w-10 h-10" />,
-        active: false,
-        link: '/3DFrame',
-        comingSoon: true,
-      },
-    ].map(item =>
-      item.name === active
-        ? { ...item, highlight: true }
-        : item
-    )
-  );
+import { SIDEBAR_NAV_ITEMS } from './sidebarNavItems';
+
+const ICONS = {
+  home: homeIcon,
+  connection: connectionIcon,
+  tension: tensionIcon,
+  compression: compressionIcon,
+  flexural: flexuralIcon,
+  beamcolumn: beamcolumnIcon,
+  truss: trussIcon,
+  frame2d: frame2dIcon,
+  frame3d: frame3dIcon,
+};
+
+const Sidebar = ({
+  setshowSideBar,
+  active,
+  className = '',
+  openInNewTab = false,
+  onItemNavigate,
+  showCloseButton = true,
+}) => {
 
   const handleCloseSidebar = () => {
-    setshowSideBar(false);
-  }
+    if (setshowSideBar) {
+      setshowSideBar(false);
+    }
+  };
 
   const { moduleName } = useParams();
 
   return (
-    <div className="w-sidebar h-screen border-r border-osdag-border dark:border-gray-700 flex flex-col bg-white dark:bg-osdag-dark-color">
+    <div className={`w-sidebar h-screen border-r border-osdag-border dark:border-gray-700 flex flex-col bg-white dark:bg-osdag-dark-color ${className}`}>
       {/* Logo Section */}
       <div className=" border-b border-osdag-border dark:border-gray-700">
         <div className="flex items-center justify-center relative">
@@ -101,30 +57,32 @@ const Sidebar = ({ setshowSideBar, active }) => {
             </div>
           </div>
 
-          <button
-            className="absolute right-5 top-5 md:block lg:hidden xl:hidden 2xl:hidden p-2 rounded transition 
+          {showCloseButton && (
+            <button
+              className="absolute right-5 top-5 md:block lg:hidden xl:hidden 2xl:hidden p-2 rounded transition 
              hover:bg-gray-200 dark:hover:bg-osdag-dark-color"
-            aria-label="Close sidebar"
-            onClick={handleCloseSidebar}
-            type="button"
-          >
-            <svg
-              className="w-6 h-6 text-osdag-text dark:text-osdag-text-dark"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
+              aria-label="Close sidebar"
+              onClick={handleCloseSidebar}
+              type="button"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+              <svg
+                className="w-6 h-6 text-osdag-text dark:text-osdag-text-dark"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
 
         </div>
       </div>
 
       {/* Navigation Items */}
       <div className="flex-1 py-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
-        {navigationItems.map((item, index) => {
+        {SIDEBAR_NAV_ITEMS.map((item, index) => {
           // Normalize for comparison: remove spaces, lowercase, etc.
           const itemKey = item.link.replace('/', '').toLowerCase();
           const paramKey = (moduleName || '').toLowerCase();
@@ -137,12 +95,17 @@ const Sidebar = ({ setshowSideBar, active }) => {
             <Link
               to={item.link}
               key={index}
+              target={openInNewTab ? "_blank" : undefined}
+              rel={openInNewTab ? "noopener noreferrer" : undefined}
               onClick={(event) => {
                 if (comingSoon) {
                   event.preventDefault();
                   event.stopPropagation();
                   alert('Module under development');
                   return;
+                }
+                if (onItemNavigate) {
+                  onItemNavigate(item);
                 }
                 handleCloseSidebar();
               }}
@@ -169,7 +132,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
         `}
                   >
                     <span className="h-10 w-10 flex items-center justify-center">
-                      {item.icon}
+                      <img src={ICONS[item.iconKey]} alt={item.name} className="w-10 h-10" />
                     </span>
                   </div>
                   <span
