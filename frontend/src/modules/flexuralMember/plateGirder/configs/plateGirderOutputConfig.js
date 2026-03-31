@@ -1,58 +1,49 @@
-﻿// Output configuration for Plate Girder
-// Based on documentation/plate-girder.md outputs section
+// Output configuration for Plate Girder
+// Sections match desktop UI exactly
 
 export const plateGirderOutputConfig = {
   sections: {
     "Section Details": [
-      { key: "Optimum.Designation", label: "Optimum Designation" },
-      { key: "Optimum.UR_Compression", label: "Utilization Ratio" },
-      { key: "Optimum.SC", label: "Section Classification" },
-      { key: "betab_constatnt", label: "Beta_b Constant" },
-      { key: "Eff.Sec.Area", label: "Effective Section Area (mm┬▓)" },
-    ],
-    "Dimensions": [
+      { key: "Optimum.Designation", label: "Designation" },
+      { key: "Optimum.SectionClassification", label: "Section Classification" },
+      { key: "Optimum.UR", label: "Utilization Ratio" },
+      { key: "MajorEffSecArea", label: "Eff. Sectional Area (cm²)" },
       { key: "Web.Thickness", label: "Web Thickness (mm)" },
       { key: "TopFlange.Thickness", label: "Top Flange Thickness (mm)" },
       { key: "BottomFlange.Thickness", label: "Bottom Flange Thickness (mm)" },
-      { key: "Total.Depth", label: "Total Depth (mm)" },
-      { key: "Topflange.Width", label: "Top Flange Width (mm)" },
-      { key: "Bottomflange.Width", label: "Bottom Flange Width (mm)" },
     ],
-    "Stiffeners": [
-      { key: "IntermediateStiffener.Thickness", label: "Intermediate Stiffener Thickness (mm)" },
-      { key: "IntermediateStiffener.Spacing", label: "Intermediate Stiffener Spacing (mm)" },
-      { key: "LongitudnalStiffener.Thickness", label: "Longitudinal Stiffener Thickness (mm)" },
-      { key: "LongitudnalStiffener.Numbers", label: "Longitudinal Stiffener Numbers" },
-      { key: "EndpanelStiffener.Thickness", label: "End Panel Stiffener Thickness (mm)" },
-    ],
-    "Design Results": [
+    "Moment Design Details": [
+      { key: "Beta.Constant", label: "Beta_b" },
+      { key: "W.Constant", label: "Warping Constant (mm⁶)" },
+      { key: "T.Constant", label: "Torsional Constant (mm⁴)" },
+      { key: "Elastic.Moment", label: "Critical Moment (M_cr) (kNm)" },
       { key: "Moment.Strength", label: "Design Bending Strength (kNm)" },
-      { key: "Shear.Strength", label: "Design Shear Strength (kN)" },
-      { key: "Buckling.Strength", label: "Web Buckling Strength (kN)" },
+    ],
+    "Shear Design Details": [
+      { key: "Shear.Strength", label: "Shear Capacity (kN)" },
+      { key: "Buckling.Strength", label: "Shear Buckling Resistance (kN)" },
       { key: "Crippling.Strength", label: "Web Crippling Strength (kN)" },
     ],
-    "Welds": [
-      { key: "WeldWebtoflange.Data", label: "Weld for Web to Flange (mm)" },
-      { key: "WeldStiffenertoweb.Data", label: "Weld for Stiffener to Web (mm)" },
+    "Stiffener Design": [
+      { key: "ShearBucklingMethod", label: "Method" },
+      { key: "EndpanelStiffener.Thickness", label: "End Panel Stiffener Thickness (mm)" },
+      { key: "EndPanelStiffenerNo", label: "Number of End Panel Stiffeners" },
+      { key: "IntermediateStiffener.Thickness", label: "Intermediate Stiffener Thickness (mm)" },
+      { key: "IntermediateStiffener.Spacing", label: "Intermediate Stiffener Spacing (mm)" },
+      { key: "LongitudnalStiffner.Thickness", label: "Longitudnal Stiffener Thickness (mm)" },
+      { key: "LongitudnalStiffener.Numbers", label: "Number of Longitudnal Stiffeners" },
+      { key: "LongitudnalStiffener1.Position", label: "Stiffener 1 Pos. from Comp. Flange (mm)" },
+      { key: "LongitudnalStiffener2.Position", label: "Stiffener 2 Pos. from Comp. Flange (mm)" },
     ],
-    "Lateral Torsional Buckling": [
-      { key: "T.Constant", label: "T Constant (mmΓü┤)" },
-      { key: "W.Constant", label: "W Constant (mmΓü╢)" },
-      { key: "Elastic.Moment", label: "Elastic Critical Moment (kNm)" },
-      { key: "L.T.B.Details", label: "LTB Details" },
+    "Deflection Check": [
+      { key: "Deflection.Max", label: "Calculated Deflection (mm)" },
+      { key: "DeflectionLimit", label: "Permissible Deflection (mm)" },
     ],
-    "Longitudinal Stiffeners": [
-      { key: "LongitudinalStiffener1.pos", label: "Longitudinal Stiffener 1 Position (mm)" },
-      { key: "LongitudinalStiffener2.pos", label: "Longitudinal Stiffener 2 Position (mm)" },
+    "Weld Details": [
+      { key: "WeldTopFlange", label: "Web-to-Top Flange Weld Size (mm)" },
+      { key: "WeldBotFlange", label: "Web-to-Bottom Flange Weld Size (mm)" },
+      { key: "WeldStiffener", label: "Stiffener Weld Size (mm)" },
     ],
-    "Deflection": [
-      { key: "Max.Deflection", label: "Calculated Deflection (mm)" },
-      { key: "DeflectionLimit", label: "Deflection Limit (mm)" },
-      { key: "Deflection.Ratio", label: "Deflection Ratio" },
-    ],
-    "Design Status": [
-      { key: "Design.Status", label: "Design Status" }
-    ]
   },
 
   modals: {
@@ -89,8 +80,8 @@ export const plateGirderOutputConfig = {
     ltb: {
       LTBModal: [
         { key: "Elastic.Moment", label: "Elastic Critical Moment (kNm)" },
-        { key: "T.Constant", label: "Torsional Constant (mmΓü┤)" },
-        { key: "W.Constant", label: "Warping Constant (mmΓü╢)" },
+        { key: "T.Constant", label: "Torsional Constant (mm⁴)" },
+        { key: "W.Constant", label: "Warping Constant (mm⁶)" },
         { key: "Imperfection.LTB", label: "Imperfection Factor" },
         { key: "SR.LTB", label: "Slenderness Ratio" },
       ]
@@ -105,10 +96,9 @@ export const plateGirderOutputConfig = {
       StiffenerModal: [
         { key: "IntermediateStiffener.Thickness", label: "Intermediate Stiffener Thickness (mm)" },
         { key: "IntermediateStiffener.Spacing", label: "Intermediate Stiffener Spacing (mm)" },
-        { key: "LongitudnalStiffener.Thickness", label: "Longitudinal Stiffener Thickness (mm)" },
+        { key: "LongitudnalStiffner.Thickness", label: "Longitudinal Stiffener Thickness (mm)" },
         { key: "LongitudnalStiffener.Numbers", label: "Number of Longitudinal Stiffeners" },
       ]
     }
   }
 };
-

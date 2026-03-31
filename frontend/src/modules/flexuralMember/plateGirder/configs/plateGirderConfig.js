@@ -262,22 +262,55 @@ export const plateGirderConfig = {
     // Convert member_length from mm to m (backend expects m)
     const memberLengthM = inputs.member_length ? (parseFloat(inputs.member_length) / 1000).toString() : "5";
 
-    // Get thickness lists
-    const webThicknessList = getArrayParam(
-      allSelected.web_thickness,
-      lists.thicknessList || [],
-      inputs.web_thickness
-    );
-    const topFlangeThicknessList = getArrayParam(
-      allSelected.top_flange_thickness,
-      lists.thicknessList || [],
-      inputs.top_flange_thickness
-    );
-    const bottomFlangeThicknessList = getArrayParam(
-      allSelected.bottom_flange_thickness,
-      lists.thicknessList || [],
-      inputs.bottom_flange_thickness
-    );
+    console.log('[buildSubmissionParams] Raw inputs:', {
+      web_thickness: inputs.web_thickness,
+      top_flange_thickness: inputs.top_flange_thickness,
+      bottom_flange_thickness: inputs.bottom_flange_thickness,
+      design_type: inputs.design_type,
+      allSelected: allSelected
+    });
+
+    // For Customized design with number inputs, use the direct value
+    // For Optimized design with customizable inputs, use getArrayParam
+    let webThicknessList, topFlangeThicknessList, bottomFlangeThicknessList;
+    
+    if (inputs.design_type === "Customized") {
+      // Direct values for Customized (user entered specific numbers)
+      webThicknessList = inputs.web_thickness ? [String(inputs.web_thickness)] : ["6"];
+      topFlangeThicknessList = inputs.top_flange_thickness ? [String(inputs.top_flange_thickness)] : ["6"];
+      bottomFlangeThicknessList = inputs.bottom_flange_thickness ? [String(inputs.bottom_flange_thickness)] : ["6"];
+    } else {
+      // Use getArrayParam for Optimized (All/Customized selection)
+      webThicknessList = getArrayParam(
+        allSelected.web_thickness,
+        lists.thicknessList || [],
+        inputs.web_thickness
+      );
+      topFlangeThicknessList = getArrayParam(
+        allSelected.top_flange_thickness,
+        lists.thicknessList || [],
+        inputs.top_flange_thickness
+      );
+      bottomFlangeThicknessList = getArrayParam(
+        allSelected.bottom_flange_thickness,
+        lists.thicknessList || [],
+        inputs.bottom_flange_thickness
+      );
+    }
+
+    // Backend validation expects thickness to ALWAYS be List[str]
+    // Backend's _thickness_val() function handles conversion:
+    // - Customized: extracts first element as string
+    // - Optimized: uses full array
+    const webThickness = webThicknessList.length > 0 ? webThicknessList : ["6"];
+    const topFlangeThickness = topFlangeThicknessList.length > 0 ? topFlangeThicknessList : ["6"];
+    const bottomFlangeThickness = bottomFlangeThicknessList.length > 0 ? bottomFlangeThicknessList : ["6"];
+    
+    console.log('[buildSubmissionParams] Final thickness arrays:', {
+      webThickness,
+      topFlangeThickness,
+      bottomFlangeThickness
+    });
 
     // Build base params - using exact backend key strings
     // const params = {
@@ -323,10 +356,10 @@ export const plateGirderConfig = {
         // --- Design Type ---
         "Total.Design_Type": String(inputs.design_type || "Customized"),
       
-        // --- Thicknesses (Must be Arrays) ---
-        "Web.Thickness": webThicknessList.length > 0 ? webThicknessList : ["6"],
-        "TopFlange.Thickness": topFlangeThicknessList.length > 0 ? topFlangeThicknessList : ["6"],
-        "BottomFlange.Thickness": bottomFlangeThicknessList.length > 0 ? bottomFlangeThicknessList : ["6"],
+        // --- Thicknesses (String for Customized, Array for Optimized) ---
+        "Web.Thickness": webThickness,
+        "TopFlange.Thickness": topFlangeThickness,
+        "BottomFlange.Thickness": bottomFlangeThickness,
       
         // --- Design Preferences ---
         "Design.Design_Type_Flexure": String(inputs.support_type || "Major Laterally Supported"),
@@ -456,11 +489,15 @@ export const plateGirderConfig = {
         {
           key: "web_thickness",
           label: "Web Thickness (mm)*",
-          type: "customizable",
+          type: "number", // Will be overridden by conditionalType
           selectionKey: "webThicknessSelect",
           modalKey: "webThickness",
           options: "thicknessList",
-          defaultValue: ["6"]
+          defaultValue: "20",
+          placeholder: "Enter web thickness",
+          // For Customized design: show as number input (single value)
+          // For Optimized design: show as customizable (All/Customized)
+          conditionalType: (inputs) => inputs.design_type === "Optimized" ? "customizable" : "number"
         },
         {
           key: "top_flange_width",
@@ -472,11 +509,13 @@ export const plateGirderConfig = {
         {
           key: "top_flange_thickness",
           label: "Top Flange Thickness (mm)*",
-          type: "customizable",
+          type: "number",
           selectionKey: "topFlangeThicknessSelect",
           modalKey: "topFlangeThickness",
           options: "thicknessList",
-          defaultValue: ["6"]
+          defaultValue: "40",
+          placeholder: "Enter top flange thickness",
+          conditionalType: (inputs) => inputs.design_type === "Optimized" ? "customizable" : "number"
         },
         {
           key: "bottom_flange_width",
@@ -488,11 +527,13 @@ export const plateGirderConfig = {
         {
           key: "bottom_flange_thickness",
           label: "Bottom Flange Thickness (mm)*",
-          type: "customizable",
+          type: "number",
           selectionKey: "bottomFlangeThicknessSelect",
           modalKey: "bottomFlangeThickness",
           options: "thicknessList",
-          defaultValue: ["6"]
+          defaultValue: "40",
+          placeholder: "Enter bottom flange thickness",
+          conditionalType: (inputs) => inputs.design_type === "Optimized" ? "customizable" : "number"
         },
         {
           key: "member_length",

@@ -1645,8 +1645,10 @@ class PlateGirderWelded(Member):
         if not SKIP_DEFLECTION:
             # Note: self.load.moment is in N·mm, but evaluate_deflection_kNm_mm expects kN·m
             moment_kNm = self.load.moment / 1e6  # Convert N·mm to kN·m
+            # Note: self.length is in meters, but evaluate_deflection_kNm_mm expects mm
+            length_mm = self.length * 1000  # Convert m to mm
             is_safe, self.deflection_ratio, delta, allowable = evaluate_deflection_kNm_mm(
-                moment_kNm, self.length, self.material.modulus_of_elasticity,
+                moment_kNm, length_mm, self.material.modulus_of_elasticity,
                 self.loading_case, self.deflection_criteria, self.total_depth,
                 self.top_flange_width, self.bottom_flange_width, self.web_thickness,
                 self.top_flange_thickness, self.bottom_flange_thickness,
@@ -2148,7 +2150,9 @@ class PlateGirderWelded(Member):
         if not SKIP_DEFLECTION:
             # Note: self.load.moment is in N·mm, but evaluate_deflection_kNm_mm expects kN·m
             moment_kNm = self.load.moment / 1e6  # Convert N·mm to kN·m
-            is_safe, self.deflection_ratio, delta, allowable = evaluate_deflection_kNm_mm(moment_kNm, self.length, self.material.modulus_of_elasticity, self.loading_case, self.deflection_criteria, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
+            # Note: self.length is in meters, but evaluate_deflection_kNm_mm expects mm
+            length_mm = self.length * 1000  # Convert m to mm
+            is_safe, self.deflection_ratio, delta, allowable = evaluate_deflection_kNm_mm(moment_kNm, length_mm, self.material.modulus_of_elasticity, self.loading_case, self.deflection_criteria, self.total_depth, self.top_flange_width, self.bottom_flange_width, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness)
             self.calculated_deflection = round(delta, 2)
             self.deflection_limit = round(allowable, 2)
             if is_safe:
