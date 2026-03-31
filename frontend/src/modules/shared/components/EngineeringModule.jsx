@@ -37,6 +37,8 @@ import { isGuestUser, canCreateProjects } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 import ProjectNameModal from "../../../homepage/components/ProjectNameModal";
 import { useProjectCreation } from '../hooks/useProjectCreation';
+import { ThicknessSelectionModal } from "../../flexuralMember/plateGirder/components/ThicknessSelectionModal";
+import PSODashboard from "../../flexuralMember/plateGirder/components/PSODashboard";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -164,6 +166,20 @@ export const EngineeringModule = ({
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
+
+  // --- Plate Girder PSO state ---
+  const [showOptimizationGraph, setShowOptimizationGraph] = useState(false);
+  const [optimizationDone, setOptimizationDone] = useState(false);
+  const [optimizationData, setOptimizationData] = useState({
+    current_iter: 0,
+    variableNames: [],
+    bounds: { lb: [], ub: [] },
+    history: [],
+    currentSwarm: [],
+    globalBest: null,
+  });
+  // Opens the PSO real-time graph overlay
+  const openOptiGraph = () => setShowOptimizationGraph(true);
 
   const { handleCreateProject, projectCreationModal } = useProjectCreation({
     inputs,
@@ -904,6 +920,7 @@ export const EngineeringModule = ({
               setCreateDesignReportBool={setCreateDesignReportBool}
               triggerScreenshotCapture={triggerScreenshotCapture}
               selectedOption={extraState.selectedOption}
+              openOptiGraph={openOptiGraph}
               setSelectedOption={(value) =>
                 setExtraState({ ...extraState, selectedOption: value })
               }
@@ -1391,21 +1408,29 @@ export const EngineeringModule = ({
         setSelectedSection={setSelectedSection}
       />
 
-      {/* Customization Modals */}
+      {/* Customization Modals (includes ThicknessSelectionModal for plate girder) */}
       {
-        moduleConfig.modalConfig.map((modal) => (
-          <CustomizationModal
-            key={modal.key}
-            isOpen={modalStates[modal.key]}
-            onClose={() => updateModalState(modal.key, false)}
-            title="Customized"
-            dataSource={contextData[modal.dataSource] || (modalDynamicSrc[modal.inputKey] || [])} // FIXED: This now includes angleList
-            selectedItems={selectedItems[modal.inputKey]}
-            onTransferChange={(nextTargetKeys) =>
-              updateSelectedItems(modal.inputKey, nextTargetKeys)
-            }
-          />
-        ))
+        moduleConfig.modalConfig.map((modal) => {
+          const ModalComponent = modal.type === "thickness"
+            ? ThicknessSelectionModal
+            : CustomizationModal;
+          return (
+            <ModalComponent
+              key={modal.key}
+              isOpen={modalStates[modal.key]}
+              onClose={() => updateModalState(modal.key, false)}
+              title="Customized"
+              dataSource={contextData[modal.dataSource] || (modalDynamicSrc[modal.inputKey] || [])}
+              selectedItems={selectedItems[modal.inputKey]}
+              onTransferChange={(nextTargetKeys) =>
+                updateSelectedItems(modal.inputKey, nextTargetKeys)
+              }
+              thicknessList={thicknessList}
+              inputs={inputs}
+              setInputs={setInputs}
+            />
+          );
+        })
       }
 
       {/* Design Preferences Modal (Additional Inputs) */}
@@ -1521,6 +1546,16 @@ export const EngineeringModule = ({
         />
       )}
       {projectCreationModal}
+
+      {/* Plate Girder: PSO real-time dashboard */}
+      {showOptimizationGraph && (
+        <PSODashboard
+          open={showOptimizationGraph}
+          optimizationData={optimizationData}
+          optimizationDone={optimizationDone}
+          onClose={() => setShowOptimizationGraph(false)}
+        />
+      )}
     </div>
   );
 };
