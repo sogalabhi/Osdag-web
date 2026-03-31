@@ -71,7 +71,7 @@ class FirebaseAuthView(APIView):
         logger.info(f"FirebaseAuthView: Token received (length: {len(token) if token else 0})")
         
         try:
-            decoded = firebase_auth.verify_id_token(token)
+            decoded = firebase_auth.verify_id_token(token, clock_skew_seconds=10)
             logger.info(f"FirebaseAuthView: Token verified successfully. UID: {decoded.get('uid')}, Email: {decoded.get('email')}")
             
             uid = decoded.get('uid')
