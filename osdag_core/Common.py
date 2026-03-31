@@ -11,6 +11,7 @@ import logging
 from importlib.resources import files
 from pathlib import Path
 import platform
+import os
 
 # Helper function to get resource path with fallback
 def _get_resource_path(*path_parts):
@@ -595,6 +596,7 @@ KEY_SHEAR_STRENGTH_ZZ = 'Shear.Strength_ZZ'
 KEY_MOMENT_STRENGTH = 'Moment.Strength'
 KEY_MOMENT_STRENGTH_YY = 'Moment.Strength_YY'
 KEY_MOMENT_STRENGTH_ZZ = 'Moment.Strength_ZZ'
+KEY_DISP_DESIGN_BENDING_STRENGTH = 'Design Bending Strength'
 KEY_DISP_HIGH_SHEAR= 'High Shear Check'
 KEY_DISP_HIGH_SHEAR_YY= 'High Shear Check (y-y)'
 KEY_DISP_HIGH_SHEAR_ZZ= 'High Shear Check (z-z)'
@@ -861,10 +863,26 @@ KEY_DISP_LongitudnalStiffener_thickness = 'Longitudnal Stiffener Thickness (mm)'
 KEY_IntermediateStiffener_thickness = 'IntermediateStiffener.Thickness'
 KEY_IntermediateStiffener_thickness_val = 'IntermediateStiffener.Thickness.val'
 KEY_DISP_IntermediateStiffener_thickness = 'Intermediate Stiffener Thickness (mm)'
+KEY_IntermediateStiffener_thickness_val = 'IntermediateStiffener.Thickness.Val'
+KEY_LongitudnalStiffener_thickness_val = 'LongitudnalStiffener.Thickness.Val'
+KEY_LongitudnalStiffener_numbers = 'LongitudnalStiffener.Numbers'
+KEY_DISP_LongitudnalStiffener_numbers = 'Longitudnal Stiffener Numbers'
+KEY_EndpanelStiffener_thickness = 'EndpanelStiffener.Thickness'
+KEY_DISP_EndpanelStiffener_thickness = 'Endpanel Stiffener Thickness'
+KEY_LongitudinalStiffener1_pos = 'LongitudinalStiffener1.Position'
+KEY_DISP_LongitudinalStiffener1_pos = 'Longitudinal Stiffener 1 Position'
+KEY_LongitudinalStiffener2_pos = 'LongitudinalStiffener2.Position'
+KEY_DISP_LongitudinalStiffener2_pos = 'Longitudinal Stiffener 2 Position'
 KEY_WeldWebtoflange= 'WeldWebtoflange.Data'
 KEY_DISP_WeldWebtoflange= 'Weld for Web to Flange (mm)'
 KEY_WeldStiffenertoweb= 'WeldStiffenertoweb.Data'
 KEY_DISP_WeldStiffenertoweb= 'Weld for Stiffener to Web (mm)'
+KEY_EndpanelStiffener_thickness = 'EndpanelStiffener.Thickness'
+KEY_DISP_EndpanelStiffener_thickness = 'End Panel Stiffener Thickness'
+KEY_LongitudinalStiffener1_pos = 'LongitudnalStiffener1.Position'
+KEY_DISP_LongitudinalStiffener1_pos = 'Longitudnal Stiffener 1 Position'
+KEY_LongitudinalStiffener2_pos = 'LongitudnalStiffener2.Position'
+KEY_DISP_LongitudinalStiffener2_pos = 'Longitudnal Stiffener 2 Position'
 KEY_IS_IT_SYMMETRIC = 'Girder.Symmetry'
 KEY_DISP_IS_IT_SYMMETRIC = 'Symmetry'
 KEY_DISP_SYM = 'Symmetric Girder'

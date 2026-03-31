@@ -44,6 +44,7 @@ export const menuItems = [
       { name: "Column" },
       { name: "Seated Angle" },
       { name: "Change Background" },
+      { name: "Open Optimization Graph", shortcut: "Alt+G" }
     ],
   },
   {

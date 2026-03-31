@@ -41,9 +41,16 @@ class BaseModuleRegistry:
                     # Convert module name to slug (e.g., 'fin_plate' -> 'fin-plate')
                     slug = name.replace('_', '-')
                     cls.register(slug, mod.MODULE_ID, mod.Service)
-                    print(f"[auto_discover] Registered: {slug}")
+                    print(f"✅ Registered {package_name}.{name} as slug '{slug}' (MODULE_ID: {mod.MODULE_ID})")
+                else:
+                    print(f"⚠️  Skipped {package_name}.{name}: missing MODULE_ID or Service")
             except ImportError as e:
-                print(f"[auto_discover] ImportError for {name}: {e}")
+                print(f"❌ Failed to import {package_name}.{name}: {e}")
+                import traceback
+                traceback.print_exc()
+                continue
+            except Exception as e:
+                print(f"❌ Error discovering {package_name}.{name}: {e}")
                 import traceback
                 traceback.print_exc()
                 continue

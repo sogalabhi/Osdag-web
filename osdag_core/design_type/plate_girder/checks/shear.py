@@ -757,4 +757,3 @@ def design_longitudinal_stiffener(d, tw, c, num_stiffeners, thickness_list, web_
             continue
 
     return False, selected_thickness, selected_width, x1, x2, I_req_1, I_provided_1, I_req_2, I_provided_2
-

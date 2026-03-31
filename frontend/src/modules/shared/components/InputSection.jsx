@@ -31,6 +31,9 @@ export const InputSection = ({
   setExtraState = () => { },
   updateSelectedItems = () => { },
   setModalDynamicSrc,
+  isOptimized = () => { },
+  setOptimizedModal = () => { },
+  setModalValues = () => { },
 }) => {
   const safeInputs = inputs || {};
   const safeContextData = contextData || {};
@@ -204,17 +207,12 @@ export const InputSection = ({
       return getListForInputKey(inputKey, safeContextData, field.dataSource);
     };
 
+
     if (value === "Customized") {
       // Get all available values
-      const allValues = getAllValuesForInputKey(field.key);
+      const allValues = getAllValuesForInputKey(field.key, field);
       // Convert to array of keys/strings for Transfer component
-      const allKeys = allValues.map(val => {
-        // Handle different data formats (object with value/Grade property, or plain string/number)
-        if (typeof val === 'object' && val !== null) {
-          return val.value || val.Grade || val.toString();
-        }
-        return val.toString();
-      });
+      const allKeys = normalizeValueList(allValues);
 
       // Set all items as selected (moved to right side) - this populates the Transfer component
       updateSelectedItems(field.key, allKeys);
@@ -225,20 +223,31 @@ export const InputSection = ({
       toggleAllSelected(field.key, false);
     } else {
       // "All" option - get all values and set them in inputs 
-      const allValues = getAllValuesForInputKey(field.key);
+      const allValues = getAllValuesForInputKey(field.key, field);
       // Convert to array format if needed
-      const allValuesArray = allValues.map(val => {
-        if (typeof val === 'object' && val !== null) {
-          return val.value || val.Grade || val.toString();
-        }
-        return val.toString();
-      });
+      const allValuesArray = normalizeValueList(allValues);
       setInputs({ ...safeInputs, [field.key]: allValuesArray });
       // Clear selectedItems since we're using "All" (not managed via Transfer)
       updateSelectedItems(field.key, []);
       updateSelectionState(field.selectionKey, "All");
       updateModalState(field.modalKey, false);
       toggleAllSelected(field.key, true); // fix allSelected flag not triggering
+    }
+  };
+
+  const handleThicknessSelection = (field, value) => {
+    if (value === "Customized") {
+      const allValues = getAllValuesForInputKey(field.customizableInputKey, field);
+      const allKeys = normalizeValueList(allValues);
+      const existingValues = Array.isArray(safeInputs[field.customizableInputKey])
+        ? safeInputs[field.customizableInputKey]
+        : [];
+      const selectedValues = existingValues.length > 0 ? existingValues : allKeys;
+      updateSelectedItems(field.customizableInputKey, selectedValues);
+      updateModalState(field.modalKey, true);
+    } else {
+      updateSelectedItems(field.customizableInputKey, []);
+      updateModalState(field.modalKey, false);
     }
   };
 
@@ -306,7 +315,18 @@ export const InputSection = ({
             options={options}
             value={value}
             isSearchable={false}
-            onChange={(selected) => setInputs({ ...safeInputs, [field.key]: selected.value })}
+            onChange={(selected) => {
+              if (field.key === "design_type") { // For Optimized Inputs
+                setExtraState({
+                  ...extraState,
+                  optimizedInputs: selected.value === "Optimized",
+                });
+              }
+              setInputs({ ...safeInputs, [field.key]: selected.value })
+              if (field.modalKey && field.customizableInputKey) {
+                handleThicknessSelection(field, selected.value);
+              }
+            }}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
             classNamePrefix="react-select"
@@ -314,7 +334,6 @@ export const InputSection = ({
           />
         );
       }
-
       case 'connectivitySelect':
       case 'endPlateSelect': {
         const list = field.type === 'connectivitySelect' ? (safeContextData.connectivityList || []) : Object.keys({
@@ -399,13 +418,19 @@ export const InputSection = ({
           />);
       }
       case 'dynamicSelect': {
-        const options = getOptionsForField(field, safeContextData, safeInputs);
-        const value = options.find(opt => opt.value === inputs[field.key]);
+        let options = field.getOptions(safeInputs);
+        const value = options.find(opt => opt.value === safeInputs[field.key]);
         return (
           <Select
             options={options}
             value={value}
-            onChange={(selected) => setInputs({ ...inputs, [field.key]: selected.value })}
+            onChange={(selected) => {
+              if (field.onChange) {
+                field.onChange(selected.value, safeInputs, setInputs, safeContextData, extraState, setExtraState);
+              } else {
+                setInputs({ ...safeInputs, [field.key]: selected.value });
+              }
+            }}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
             classNamePrefix="react-select"
@@ -422,13 +447,31 @@ export const InputSection = ({
               alt="Connection type"
               style={{ width: field.width || '100px', height: field.height || '100px', objectFit: 'contain' }}
             /></div>}</>);
-
+      case 'optimized_number': // If the current input is optimized, shows a button or falls through to number input
+        if (isOptimized(safeInputs)) return (
+          <button
+            onClick={() => {
+              setOptimizedModal({
+                state: true,
+                key: field.key,
+              })
+              setModalValues({
+                lb: safeInputs[`${field.key}_lb`],
+                ub: safeInputs[`${field.key}_ub`],
+                inc: safeInputs[`${field.key}_inc`],
+              });
+            }
+            }
+            className="flex flex-1 items-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-opacity-90 transition-opacity"
+          >
+            Set Bounds
+          </button >);
       case 'number':
       default:
         return (
           <div className="w-[60%]">
             <input
-              type={field.type === 'number' ? 'number' : 'text'}
+              type={(field.type === 'number' || field.type === 'optimized_number') ? 'number' : 'text'}
               value={safeInputs[field.key] ?? ""}
               onChange={(e) => setInputs({ ...safeInputs, [field.key]: e.target.value })}
               placeholder={field.placeholder || `ex. ${field.label}`}
@@ -439,7 +482,7 @@ export const InputSection = ({
         );
     }
   };
-
+  
   return (
     <div className="bg-white dark:bg-osdag-dark-color/90 border-2 border-osdag-green rounded-xl mb-5 mx-4 shadow-sm relative pt-4">
       <h3 className="text-base font-bold text-osdag-text-primary dark:text-white bg-white dark:bg-osdag-dark-color px-1 absolute -top-4 left-4">

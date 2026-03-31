@@ -3810,7 +3810,6 @@ class CommonDesignLogic(object):
                 self.display_3DModel("Model", "gradient_bg")
             else:
                 self.display.EraseAll()
-
         elif self.mainmodule == KEY_DISP_LAPJOINTWELDED:
             if flag is True:
                 self.display_3DModel("Model", "gradient_bg")

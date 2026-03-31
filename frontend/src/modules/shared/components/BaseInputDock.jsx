@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { InputSection } from "./InputSection";
+import { OptimizedBoundsModal } from "./OptimizedBoundsModal";
 
 export const BaseInputDock = ({
   moduleConfig,
@@ -30,6 +31,40 @@ export const BaseInputDock = ({
   // Use external ref if provided, otherwise create internal one
   const internalLockBtnRef = useRef(null);
   const lockBtnRef = externalLockBtnRef || internalLockBtnRef;
+
+  // This contains all the data regarding the optimized modal, like if its open,
+  // which key it bounds and also the values for setting the inputs
+  const [optimizedModal, setOptimizedModal] = useState({ state: false, key: '' });
+  const [modalValues, setModalValues] = useState({ lb: '', ub: '', inc: '' });
+
+  const resolveOptimizedFieldLabel = (fieldKey) => {
+    if (!fieldKey || !moduleConfig?.inputSections) return "";
+    for (const section of moduleConfig.inputSections) {
+      const match = section?.fields?.find((field) => field.key === fieldKey);
+      if (match) return match.label || "";
+    }
+    return "";
+  };
+
+  const handleOptimizedModalCancel = () => {
+    setOptimizedModal({ state: false, key: "" });
+    setModalValues({ lb: "", ub: "", inc: "" });
+  };
+
+  const handleOptimizedModalSave = () => {
+    const { key } = optimizedModal;
+    if (!key) {
+      handleOptimizedModalCancel();
+      return;
+    }
+    setInputs({
+      ...inputs,
+      [`${key}_lb`]: modalValues.lb ?? "",
+      [`${key}_ub`]: modalValues.ub ?? "",
+      [`${key}_inc`]: modalValues.inc ?? "",
+    });
+    handleOptimizedModalCancel();
+  };
 
   return (
     <div className={`
@@ -119,6 +154,15 @@ export const BaseInputDock = ({
               </div>
             </div>
           )}
+
+          <OptimizedBoundsModal
+            isOpen={optimizedModal.state}
+            fieldLabel={resolveOptimizedFieldLabel(optimizedModal.key)}
+            values={modalValues}
+            onChange={(nextValues) => setModalValues(nextValues)}
+            onCancel={handleOptimizedModalCancel}
+            onSave={handleOptimizedModalSave}
+          />
         </div>
       </div>
 
@@ -180,6 +224,9 @@ export const BaseInputDock = ({
               setExtraState={setExtraState}
               updateSelectedItems={updateSelectedItems}
               setModalDynamicSrc={setModalDynamicSrc}
+              isOptimized={moduleConfig.isOptimized}
+              setOptimizedModal={setOptimizedModal}
+              setModalValues={setModalValues}
             />
           ))}
         </div>
