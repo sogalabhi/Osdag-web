@@ -109,6 +109,18 @@ const ColumnSectionModal = ({
   alert("rr");
 };
 
+  const handleDownload = () => {
+    const fileName = "Columns_Details.xlsx";
+  
+    const link = document.createElement("a");
+    link.href = `/downloads/${fileName}`;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+
   return (
     <>
   

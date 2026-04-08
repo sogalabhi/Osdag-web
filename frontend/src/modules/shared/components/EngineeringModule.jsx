@@ -51,7 +51,7 @@ export const EngineeringModule = ({
   const prevModuleRef = useRef(null); // Track previous module for change detection
   const prevProjectIdRef = useRef(null); // Track previous projectId for change detection
   const lastLoadedProjectIdRef = useRef(null); // Prevent re-fetching same project (stops infinite GET loop)
-
+  console.log('moduleConfig:', moduleConfig)
   const {
     // Module data
     beamList,
