@@ -51,7 +51,6 @@ export const EngineeringModule = ({
   const prevModuleRef = useRef(null); // Track previous module for change detection
   const prevProjectIdRef = useRef(null); // Track previous projectId for change detection
   const lastLoadedProjectIdRef = useRef(null); // Prevent re-fetching same project (stops infinite GET loop)
-  const colorPickerRef = useRef(null);
 
   const {
     // Module data
@@ -1241,7 +1240,6 @@ export const EngineeringModule = ({
                 >
                   <input
                     type="color"
-                    ref={colorPickerRef}
                     className="absolute opacity-0 pointer-events-none w-0 h-0"
                     value={customBgColor || "#ffffff"}
                     onChange={(e) => setCustomBgColor(e.target.value)}
