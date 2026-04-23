@@ -23,12 +23,11 @@ from ...Report_functions import *
 from ...utils.common.load import Load
 import logging
 from ...custom_logger import CustomLogger
-<<<<<<< HEAD
 from django.conf import settings
-=======
 
 
->>>>>>> beaf3edc (updated osdag-core)
+
+
 class ColumnCoverPlate(MomentConnection):
 
     def __init__(self):
@@ -261,11 +260,7 @@ class ColumnCoverPlate(MomentConnection):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(
                 unique_logger_name, None)
             self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> beaf3edc (updated osdag-core)
         # Clear any existing handlers
         self.logger.handlers.clear()
         self.logger.setLevel(logging.DEBUG)
@@ -435,7 +430,7 @@ class ColumnCoverPlate(MomentConnection):
         # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
         # spacing.append(t99)
 
-<<<<<<< HEAD
+
         # t99 = (None, 'Spacing Details', TYPE_SECTION,
         #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_2.png")), 400, 352, ""])  # [image, width, height, caption]
 
@@ -454,11 +449,8 @@ class ColumnCoverPlate(MomentConnection):
             TYPE_SECTION,
             [image_path, 400, 352, ""]
         )
-=======
-        t99 = (None, 'Spacing Details', TYPE_SECTION,
-               # [image, width, height, caption]
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_2.png")), 400, 352, ""])
->>>>>>> beaf3edc (updated osdag-core)
+
+
         flangespacing.append(t99)
 
         t21 = (KEY_FLANGE_PITCH, KEY_DISP_FLANGE_PLATE_PITCH, TYPE_TEXTBOX,
@@ -490,7 +482,7 @@ class ColumnCoverPlate(MomentConnection):
         # t99 = (None, 'Spacing Details', TYPE_SECTION, './ResourceFiles/images/spacing_1.png')
         # spacing.append(t99)
 
-<<<<<<< HEAD
+
         # t99 = (None, 'Spacing Details', TYPE_SECTION,
         #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_2.png")), 400, 352, ""])  # [image, width, height, caption]
 
@@ -509,11 +501,7 @@ class ColumnCoverPlate(MomentConnection):
             TYPE_SECTION,
             [image_path, 400, 352, ""]
         )
-=======
-        t99 = (None, 'Spacing Details', TYPE_SECTION,
-               # [image, width, height, caption]
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_2.png")), 400, 352, ""])
->>>>>>> beaf3edc (updated osdag-core)
+
         webspacing.append(t99)
 
         t8 = (KEY_WEB_PITCH, KEY_DISP_WEB_PLATE_PITCH, TYPE_TEXTBOX,
@@ -543,7 +531,7 @@ class ColumnCoverPlate(MomentConnection):
         t00 = (None, "", TYPE_NOTE,
                "Representative image for Failure Pattern \n (Half Plate)")
         flangecapacity.append(t00)
-<<<<<<< HEAD
+
         # t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
         #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("2L_V.png")), 211, 350, "Block Shear Pattern"])  # [image, width, height, caption]
 
@@ -562,11 +550,7 @@ class ColumnCoverPlate(MomentConnection):
             TYPE_SECTION,
             [image_path, 211, 350, "Block Shear Pattern"]
         )
-=======
-        t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
-               # [image, width, height, caption]
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("2L_V.png")), 211, 350, "Block Shear Pattern"])
->>>>>>> beaf3edc (updated osdag-core)
+
         flangecapacity.append(t99)
         # t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
         #        ['./ResourceFiles/images/L_V.jpg', 211, 349, "Block Shear Pattern"])  # [image, width, height, caption]
@@ -590,7 +574,7 @@ class ColumnCoverPlate(MomentConnection):
             None, "", TYPE_NOTE, "Representative image for Failure Pattern \n (Half Plate)")
         webcapacity.append(t00)
 
-<<<<<<< HEAD
+
         # t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
         #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("U_V.png")), 211,350, "Block Shear Pattern"])  # [image, width, height, caption]
 
@@ -609,12 +593,9 @@ class ColumnCoverPlate(MomentConnection):
             TYPE_SECTION,
             [image_path, 211, 350, "Block Shear Pattern"]
         )
-=======
-        t99 = (None, 'Failure Pattern due to tension in Member and Plate', TYPE_SECTION,
-               # [image, width, height, caption]
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("U_V.png")), 211, 350, "Block Shear Pattern"])
->>>>>>> beaf3edc (updated osdag-core)
+
         webcapacity.append(t99)
+
 
         t30 = (KEY_WEB_TEN_CAPACITY, KEY_DISP_WEB_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_web / 1000, 2) if flag else '')
@@ -624,7 +605,7 @@ class ColumnCoverPlate(MomentConnection):
                round(self.web_plate.tension_capacity_web_plate / 1000, 2) if flag else '')
         webcapacity.append(t30)
 
-<<<<<<< HEAD
+
         # t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
         #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("L_Vshear.png")), 239 , 350,
         #         "Block Shear Pattern"])  # [image, width, height, caption]
@@ -644,11 +625,7 @@ class ColumnCoverPlate(MomentConnection):
             TYPE_SECTION,
             [image_path, 239, 350, "Block Shear Pattern"]
         )
-=======
-        t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("L_Vshear.png")), 239, 350,
-                "Block Shear Pattern"])  # [image, width, height, caption]
->>>>>>> beaf3edc (updated osdag-core)
+
         webcapacity.append(t99)
 
         t30 = (KEY_WEBPLATE_SHEAR_CAPACITY_PLATE, KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, TYPE_TEXTBOX,
@@ -4414,19 +4391,16 @@ class ColumnCoverPlate(MomentConnection):
         # print("desk:", desktop_path)
         print(sys.path[0])
         rel_path = str(sys.path[0])
-<<<<<<< HEAD
+
         rel_path = os.path.abspath(".") # TEMP
-=======
-        rel_path = os.path.abspath(".")  # TEMP
->>>>>>> beaf3edc (updated osdag-core)
+
         rel_path = rel_path.replace("\\", "/")
 
         fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
-<<<<<<< HEAD
+
+
         return True
-        
-=======
->>>>>>> beaf3edc (updated osdag-core)
+
