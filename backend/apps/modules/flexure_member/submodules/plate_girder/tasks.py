@@ -7,6 +7,7 @@ progress updates to a WebSocket channel via Django Channels.
 import time
 import logging
 import traceback
+import json
 from typing import Any, Dict, List, Tuple
 
 from celery import shared_task
@@ -21,6 +22,10 @@ from apps.modules.flexure_member.submodules.plate_girder.adapter import (
     create_optimization_input,
     determine_optimization_flags,
     create_module,
+)
+from osdag_core.Common import (
+    KEY_MATERIAL, KEY_LENGTH, KEY_SHEAR, KEY_MOMENT, KEY_WEB_PHILOSOPHY,
+    KEY_TOP_FLANGE_THICKNESS_PG, KEY_BOTTOM_FLANGE_THICKNESS_PG, KEY_WEB_THICKNESS_PG
 )
 
 logger = logging.getLogger(__name__)
@@ -149,6 +154,9 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
     try:
         # Build design dictionary and flags
         logger.info("📋 Building design dictionary from input data...")
+        logger.info(f"📋 Input data keys: {list(input_data.keys())}")
+        logger.info(f"📋 Input data sample: {json.dumps({k: v for k, v in list(input_data.items())[:10]}, indent=2)}")
+        
         design_dict = create_optimization_input(input_data)
         is_thick_web, is_symmetric = determine_optimization_flags(input_data)
         
@@ -170,7 +178,37 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
         from .adapter import apply_optimization_bounds
         apply_optimization_bounds(module, input_data)
         
-        module.set_input_values(design_dict)
+        # CRITICAL: For optimization, we need to call set_input_values() BUT with scalar thickness values
+        # Then override the thickness lists for PSO to use
+        logger.info("⚙️ Calling set_input_values with scalar thickness values...")
+        
+        # Create a modified design_dict with scalar thickness values (first element of each list)
+        scalar_design_dict = design_dict.copy()
+        scalar_design_dict[KEY_TOP_FLANGE_THICKNESS_PG] = design_dict[KEY_TOP_FLANGE_THICKNESS_PG][0] if isinstance(design_dict[KEY_TOP_FLANGE_THICKNESS_PG], list) else design_dict[KEY_TOP_FLANGE_THICKNESS_PG]
+        scalar_design_dict[KEY_BOTTOM_FLANGE_THICKNESS_PG] = design_dict[KEY_BOTTOM_FLANGE_THICKNESS_PG][0] if isinstance(design_dict[KEY_BOTTOM_FLANGE_THICKNESS_PG], list) else design_dict[KEY_BOTTOM_FLANGE_THICKNESS_PG]
+        scalar_design_dict[KEY_WEB_THICKNESS_PG] = design_dict[KEY_WEB_THICKNESS_PG][0] if isinstance(design_dict[KEY_WEB_THICKNESS_PG], list) else design_dict[KEY_WEB_THICKNESS_PG]
+        
+        # Call set_input_values with scalar values to initialize all attributes
+        module.set_input_values(scalar_design_dict)
+        
+        # Now override the thickness lists for PSO optimization
+        logger.info("⚙️ Overriding thickness lists for PSO optimization...")
+        module.top_flange_thickness_list = design_dict[KEY_TOP_FLANGE_THICKNESS_PG]
+        module.bottom_flange_thickness_list = design_dict[KEY_BOTTOM_FLANGE_THICKNESS_PG]
+        module.web_thickness_list = design_dict[KEY_WEB_THICKNESS_PG]
+        
+        # Import stiffener thickness keys
+        from osdag_core.Common import KEY_IntermediateStiffener_thickness_val, KEY_LongitudnalStiffener_thickness_val
+        
+        # Override stiffener thickness lists
+        module.int_thickness_list = design_dict.get(KEY_IntermediateStiffener_thickness_val, [])
+        module.long_thickness_list = design_dict.get(KEY_LongitudnalStiffener_thickness_val, [])
+        
+        logger.info(f"  Top flange thicknesses: {module.top_flange_thickness_list}")
+        logger.info(f"  Bottom flange thicknesses: {module.bottom_flange_thickness_list}")
+        logger.info(f"  Web thicknesses: {module.web_thickness_list}")
+        logger.info(f"  Intermediate stiffener thicknesses: {module.int_thickness_list}")
+        logger.info(f"  Longitudinal stiffener thicknesses: {module.long_thickness_list}")
         
         # Log initial bounds (if available from module)
         if hasattr(module, 'bounds_map'):

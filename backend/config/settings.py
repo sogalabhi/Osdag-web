@@ -224,7 +224,26 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             "hosts": [('127.0.0.1', 6379)],
+            # Increase channel capacity to handle high-frequency PSO updates
+            # Default is 100, but PSO sends ~5000 messages (100 iters × 50 particles)
+            "capacity": 10000,  # Max messages in channel before blocking
+            "expiry": 60,  # Message TTL in seconds (auto-cleanup old messages)
         },
     },
 }
 
+# --- Firebase Admin SDK Initialization ---
+try:
+    import firebase_admin
+    from firebase_admin import credentials as firebase_credentials
+
+    if not firebase_admin._apps:
+        _firebase_cred_path = Path(__file__).resolve().parent.parent / 'firebase-service-account.json'
+        if _firebase_cred_path.exists():
+            _cred = firebase_credentials.Certificate(str(_firebase_cred_path))
+            firebase_admin.initialize_app(_cred)
+            print(f"[Firebase] ✅ Admin SDK initialized (project: {firebase_admin.get_app().project_id})")
+        else:
+            print(f"[Firebase] ⚠️  Service account not found at: {_firebase_cred_path}")
+except Exception as _e:
+    print(f"[Firebase] ❌ Failed to initialize: {_e}")

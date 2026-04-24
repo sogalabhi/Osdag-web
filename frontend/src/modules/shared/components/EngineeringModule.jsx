@@ -145,6 +145,12 @@ export const EngineeringModule = ({
     // Direct access to module context reset
     resetModuleState,
     contextData,
+    
+    // PSO optimization
+    optimizationData,
+    optimizationDone,
+    showOptimizationGraph,
+    setShowOptimizationGraph,
   } = useEngineeringModule(moduleConfig);
 
   const [showResetButton, setShowResetButton] = useState(false);
@@ -167,17 +173,6 @@ export const EngineeringModule = ({
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
 
-  // --- Plate Girder PSO state ---
-  const [showOptimizationGraph, setShowOptimizationGraph] = useState(false);
-  const [optimizationDone, setOptimizationDone] = useState(false);
-  const [optimizationData, setOptimizationData] = useState({
-    current_iter: 0,
-    variableNames: [],
-    bounds: { lb: [], ub: [] },
-    history: [],
-    currentSwarm: [],
-    globalBest: null,
-  });
   // Opens the PSO real-time graph overlay
   const openOptiGraph = () => setShowOptimizationGraph(true);
 
@@ -1509,20 +1504,22 @@ export const EngineeringModule = ({
         </div>
       </Modal>
 
-      {/* Design Status Modal */}
-      <DesignStatusModal
-        status={status}
-        isMobile={isMobile}
-        onRetry={() => {
-          // Retry logic - could trigger handleSubmitEnhanced again
-          setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
-        }}
-        onClose={() => {
-          if (status.step === DESIGN_STATUS.ERROR) {
+      {/* Design Status Modal - Hide when PSO Dashboard is open */}
+      {!showOptimizationGraph && (
+        <DesignStatusModal
+          status={status}
+          isMobile={isMobile}
+          onRetry={() => {
+            // Retry logic - could trigger handleSubmitEnhanced again
             setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
-          }
-        }}
-      />
+          }}
+          onClose={() => {
+            if (status.step === DESIGN_STATUS.ERROR) {
+              setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
+            }
+          }}
+        />
+      )}
 
       {/* Hover tooltip overlay */}
       {hoverText && (
@@ -1550,8 +1547,7 @@ export const EngineeringModule = ({
       {/* Plate Girder: PSO real-time dashboard */}
       {showOptimizationGraph && (
         <PSODashboard
-          open={showOptimizationGraph}
-          optimizationData={optimizationData}
+          data={optimizationData}
           optimizationDone={optimizationDone}
           onClose={() => setShowOptimizationGraph(false)}
         />

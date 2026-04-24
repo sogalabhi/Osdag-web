@@ -103,6 +103,15 @@ export const useEngineeringModule = (moduleConfig) => {
     screenshotTrigger,
     setScreenshotTrigger,
     loadSavedOutputs,
+    // PSO optimization
+    optimizationData,
+    optimizationDone,
+    showOptimizationGraph,
+    setShowOptimizationGraph,
+    connectWebSocket,
+    disconnectWebSocket,
+    isWebSocketConnected,
+    isWebSocketOptimizing,
   } = useDesignSubmission(service, moduleConfig);
 
   // Form & selection state (moved into dedicated hook)
@@ -346,5 +355,15 @@ export const useEngineeringModule = (moduleConfig) => {
 
     // Expose resetModuleState for external use (e.g., module change detection)
     resetModuleState,
+    
+    // PSO optimization state
+    optimizationData,
+    optimizationDone,
+    showOptimizationGraph,
+    setShowOptimizationGraph,
+    connectWebSocket,
+    disconnectWebSocket,
+    isWebSocketConnected,
+    isWebSocketOptimizing,
   };
 };
