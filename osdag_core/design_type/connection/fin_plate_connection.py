@@ -6,6 +6,17 @@ from ...Report_functions import *
 from ...custom_logger import CustomLogger
 
 
+def _safe_image_path(filename: str) -> str:
+    """
+    Resolve image resource path without breaking design output generation when
+    importlib package metadata is unavailable in some runtime setups.
+    """
+    try:
+        return str(files("osdag_core.data.ResourceFiles.images").joinpath(filename))
+    except Exception:
+        return ""
+
+
 class FinPlateConnection(ShearConnection):
 
     def __init__(self):
@@ -209,7 +220,7 @@ class FinPlateConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, VALUES_CONN, True, 'No Validator')
         options_list.append(t2)
 
-        t15 = (KEY_IMAGE, None, TYPE_IMAGE, str(files("osdag_core.data.ResourceFiles.images").joinpath("fin_cf_bw.png")), True, 'No Validator')
+        t15 = (KEY_IMAGE, None, TYPE_IMAGE, _safe_image_path("fin_cf_bw.png"), True, 'No Validator')
         options_list.append(t15)
 
         t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, VALUE_BEAM_COL, True, 'No Validator')
@@ -258,7 +269,7 @@ class FinPlateConnection(ShearConnection):
         spacing.append(t00)
 
         t99 = (None, 'Spacing Details', TYPE_SECTION,
-            [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_3.png")), 400, 277, ""])  # [image, width, height, caption]
+            [_safe_image_path("spacing_3.png"), 400, 277, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
@@ -282,7 +293,7 @@ class FinPlateConnection(ShearConnection):
         capacities.append(t00)
 
         t99 = (None, 'Failure Pattern due to Shear in Plate', TYPE_SECTION,
-            [str(files("osdag_core.data.ResourceFiles.images").joinpath("L_shear1.png")), 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
+            [_safe_image_path("L_shear1.png"), 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.plate.shear_yielding_capacity/1000,2) if status else '')
@@ -295,7 +306,7 @@ class FinPlateConnection(ShearConnection):
         capacities.append(t17)
 
         t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_SECTION,
-            [str(files("osdag_core.data.ResourceFiles.images").joinpath("U.png")), 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+            [_safe_image_path("U.png"), 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
@@ -330,7 +341,7 @@ class FinPlateConnection(ShearConnection):
         capacities.append(t00)
 
         t99 = (None, 'Failure Pattern due to Shear in Member', TYPE_SECTION,
-            [str(files("osdag_core.data.ResourceFiles.images").joinpath("L_shear1.png")), 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
+            [_safe_image_path("L_shear1.png"), 400, 210, "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_SHEAR_YIELDCAPACITY, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, round(self.supported_section.shear_yielding_capacity/1000,2) if status else '')
@@ -343,7 +354,7 @@ class FinPlateConnection(ShearConnection):
         capacities.append(t17)
 
         t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
-            [str(files("osdag_core.data.ResourceFiles.images").joinpath("U.png")), 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
+            [_safe_image_path("U.png"), 400, 202, "Block Shear Pattern"])  # [image, width, height, caption]
         capacities.append(t99)
 
         t17 = (KEY_TENSION_YIELDCAPACITY, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,

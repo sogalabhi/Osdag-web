@@ -498,8 +498,6 @@ class ButtJointWelded(MomentConnection):
                 f"Type: {'Shop weld' if flag else ''}<br>"
                 f"Effective Length: {round(float(self.weld_length_effective), 1) if flag and hasattr(self, 'weld_length_effective') and self.weld_length_effective else ''} mm"
             )
-        except Exception:
-            pass
 
         return out_list
 

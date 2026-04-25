@@ -50,7 +50,7 @@ from typing import Dict, Any, List
 import traceback
 import json
 from apps.core.utils import write_stl
-
+import traceback
 old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
 sys.stdout = old_stdout  # Reset log
@@ -588,7 +588,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         raise
         
         print("\nFull traceback:")
-        import traceback
         traceback.print_exc()
         print("=" * 60)
         

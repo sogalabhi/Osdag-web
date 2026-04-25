@@ -832,7 +832,8 @@ class BeamCoverPlate(MomentConnection):
             )
             self.hover_dict["Plate"] = cover_plate_info
             self.hover_dict["Cover Plate"] = cover_plate_info  # alias for SmartPart.jsx 'coverplate' mesh
-
+        except Exception:
+            pass
         return out_list
 
     def warn_text(self):
