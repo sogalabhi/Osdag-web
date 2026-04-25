@@ -13,9 +13,9 @@ export const DEFAULT_VIEW_MAPPINGS = {
   "Connector": ["Connector", "cleatAngle", "SeatedAngle", "EndPlate"],
   "CleatAngle": ["cleatAngle"],
   "SeatedAngle": ["SeatedAngle"],
-  "EndPlate": ["EndPlate"],
+  "EndPlate": ["EndPlate", "Connector"],
   "Member": ["Member"],
-  "CoverPlate": ["CoverPlate", "Cover Plate"],
+  "CoverPlate": ["CoverPlate", "Cover Plate", "Connector"],
   // Simple connections (desktop parity): Plate 1, Plate 2, Cover Plate, Bolts, Welds
   "Plate 1": ["Plate 1"],
   "Plate 2": ["Plate 2"],

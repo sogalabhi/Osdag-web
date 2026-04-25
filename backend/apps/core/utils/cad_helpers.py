@@ -19,8 +19,8 @@ SECTION_MAPPINGS = {
     },
     'moment-connection': {
         'beam-beam-cover-plate-bolted': ['Model', 'Beam', 'CoverPlate'],
-        'beam-beam-cover-plate-welded': ['Model', 'Beam', 'CoverPlate'],
-        'beam-beam-end-plate': ['Model', 'Beam', 'EndPlate'],
+        'beam-beam-cover-plate-welded': ['Model', 'Beam', 'Connector'],
+        'beam-beam-end-plate': ['Model', 'Beam', 'Connector'],
         'beam-column-end-plate': ['Model', 'Beam', 'Column', 'Connector'],
         'column-column-cover-plate-bolted': ['Model', 'Column', 'CoverPlate'],
         'column-column-cover-plate-welded': ['Model', 'Column', 'CoverPlate'],
@@ -37,7 +37,9 @@ SECTION_MAPPINGS = {
         'welded': ['Model', 'Member', 'Plate', 'Endplate'],
     },
     'flexure-member': {
-        'simply-supported-beam': [],  # TODO: Add sections when available
+        'simply-supported-beam': ['Model', 'Beam'],
+        'on-cantilever': ['Model', 'Beam'],
+        'purlin': ['Model'],
     },
     'base-plate': {
         'base-plate': ['Model', 'Column', 'Plate'],

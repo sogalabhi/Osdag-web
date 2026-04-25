@@ -26,6 +26,7 @@ from ...Report_functions import *
 import logging
 from ...custom_logger import CustomLogger
 
+from django.conf import settings
 
 class BeamCoverPlateWeld(MomentConnection):
 
@@ -246,8 +247,7 @@ class BeamCoverPlateWeld(MomentConnection):
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
             self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
-        if isinstance(self.logger, CustomLogger):
-            self.logger.clear_logs()
+        
         # Clear any existing handlers
         self.logger.handlers.clear()
         self.logger.setLevel(logging.DEBUG)
@@ -429,8 +429,20 @@ class BeamCoverPlateWeld(MomentConnection):
         t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)")
         pattern.append(t00)
 
-        t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("Uw.png")), 400, 202, "Web Block Shear Pattern"])  # [image, width, height, caption]
+        image_path = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images",
+            "Uw.png"
+        )
+        t99 = (
+            None,
+            'Failure Pattern due to Tension in Member',
+            TYPE_SECTION,
+            [image_path, 400, 202, "Web Block Shear Pattern"]
+        )  # [image, width, height, caption]
         pattern.append(t99)
 
         t9 = (KEY_OUT_Lw, KEY_OUT_DISP_Lw, TYPE_TEXTBOX, round(int((self.web_plate.length-self.flange_plate.gap - (4 *self.web_weld.size))/2),2) if status else '')
@@ -2792,12 +2804,10 @@ class BeamCoverPlateWeld(MomentConnection):
 
         Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"
-        fname_no_ext = popup_summary['filename']
-        # Use the report directory (where the .tex file is) as rel_path
-        # This ensures images are looked for in: {report_dir}/ResourceFiles/images/
-        rel_path = os.path.dirname(fname_no_ext) if fname_no_ext else os.path.abspath(".")
-        rel_path = os.path.abspath(rel_path)  # Make it absolute
+        rel_path = str(sys.path[0])
+        rel_path = os.path.abspath(".") # TEMP
         rel_path = rel_path.replace("\\", "/")
+        fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext, rel_path, Disp_2d_image, Disp_3D_image)
         return True
 

@@ -1,42 +1,37 @@
 // Output configuration for Simply Supported Beam
-// Comprehensive configuration matching the required fields
+// Updated to match backend response keys exactly
 
 export const simplySupportedBeamOutputConfig = {
   sections: {
     "Section Details": [
-      { key: "section_size.designation", label: "Designation" },
-      { key: "UtilizationRatio", label: "Utilization Ratio" },
-      { key: "SectionClass", label: "Section Classification" },
-      { key: "Beta_b", label: "Beta_b" },
-      { key: "EffectiveArea", label: "Eff. Sectional Area (mm²)" },
-      { key: "EffectiveLength", label: "Eff. Length (m)" }
+      { key: "Optimum.Designation", label: "Designation" },
+      { key: "Optimum.UR", label: "Utilization Ratio" },
+      { key: "Optimum.SectionClassification", label: "Section Classification" },
+      { key: "Beta.Constant", label: "Beta_b" },
+      { key: "MajorEffSecArea", label: "Eff. Sectional Area (mm²)" },
+      { key: "Major.Effective_Length", label: "Eff. Length (mm)" }
     ],
+
     "Design Results": [
-      { key: "ShearStrength", label: "Shear Strength (kN)" },
-      { key: "MomentStrength", label: "Moment Strength (kNm)" },
-      { key: "BucklingResistance", label: "Buckling Resistance (kN)" },
-      { key: "CripplingStrength", label: "Crippling Strength (kN)" },
-      { key: "HighShearCheck", label: "High Shear Check" }
+      { key: "Shear.Strength", label: "Shear Strength (kN)" },
+      { key: "Moment.Strength", label: "Moment Strength (kNm)" },
+      { key: "Buckling.Strength", label: "Buckling Resistance (kN)" },
+      { key: "Crippling.Strength", label: "Crippling Strength (kN)" },
+      { key: "Shear.High", label: "High Shear Check" }
     ],
+
     "Web Buckling Details": [
-      { key: "EffectiveSR", label: "Effective SR" },
-      { key: "BucklingStress", label: "Buckling Stress (MPa)" },
+      { key: "ESR", label: "Effective Slenderness Ratio" },
+      { key: "MajorBucklingStress", label: "Buckling Stress (MPa)" },
       { key: "BucklingCurve", label: "Buckling Curve" },
-      { key: "Imperfection", label: "Imperfection" },
-      { key: "StressReduction", label: "Stress Reduction" },
-      { key: "NDEffSenderness", label: "ND Eff. Senderness" }
-    ],
-    "Design Status": [
-      { key: "Status", label: "Design Status" }
-    ],
-    "Lateral Torsional Buckling": [
-      { key: "LateralTorsionalBuckling", label: "LTB Details" }
+      { key: "ImperfectionFactor", label: "Imperfection Factor" },
+      { key: "StressReductionFactor", label: "Stress Reduction Factor" },
+      { key: "NDESR", label: "ND Effective Slenderness" }
     ]
   },
 
   modals: {
     StrengthModal: { type: "strength", buttonText: "Strength Details" },
-    LTBModal: { type: "ltb", buttonText: "LTB Details" },
     WebBucklingModal: { type: "webbuckling", buttonText: "Web Buckling Details" }
   },
 
@@ -48,17 +43,10 @@ export const simplySupportedBeamOutputConfig = {
       hasImage: false,
       note: "Detailed strength calculations for flexural member"
     },
-    ltb: {
-      title: "Lateral Torsional Buckling Details", 
-      width: "70%",
-      layout: "two-column",
-      hasImage: true,
-      note: "Lateral torsional buckling analysis details"
-    },
     webbuckling: {
       title: "Web Buckling Analysis",
       width: "70%",
-      layout: "two-column", 
+      layout: "two-column",
       hasImage: false,
       note: "Web buckling and crippling analysis details"
     }
@@ -67,24 +55,20 @@ export const simplySupportedBeamOutputConfig = {
   modalData: {
     strength: {
       StrengthModal: [
-        { key: "MomentStrength", label: "Bending Strength (kNm)" },
-        { key: "ShearStrength", label: "Shear Strength (kN)" },
-        { key: "BucklingResistance", label: "Buckling Resistance (kN)" }
+        { key: "Moment.Strength", label: "Bending Strength (kNm)" },
+        { key: "Shear.Strength", label: "Shear Strength (kN)" },
+        { key: "Buckling.Strength", label: "Buckling Resistance (kN)" }
       ]
     },
-    ltb: {
-      LTBModal: [
-        { key: "LateralTorsionalBuckling", label: "Lateral Torsional Buckling Details" }
-      ]
-    },
+
     webbuckling: {
       WebBucklingModal: [
-        { key: "EffectiveSR", label: "Effective Slenderness Ratio" },
-        { key: "BucklingStress", label: "Buckling Stress (MPa)" },
+        { key: "ESR", label: "Effective Slenderness Ratio" },
+        { key: "MajorBucklingStress", label: "Buckling Stress (MPa)" },
         { key: "BucklingCurve", label: "Buckling Curve" },
-        { key: "Imperfection", label: "Imperfection Factor" },
-        { key: "StressReduction", label: "Stress Reduction Factor" }
+        { key: "ImperfectionFactor", label: "Imperfection Factor" },
+        { key: "StressReductionFactor", label: "Stress Reduction Factor" }
       ]
     }
   }
-}; 
+};

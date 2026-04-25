@@ -42,11 +42,9 @@ export const beamToColumnEndPlateOutputConfig = {
     ],
     "Continuity Plate": [
       { key: "ContinuityPlateModal", label: "Continuity Plate Details" },
-      { key: "ContinuityPlate.Number", label: "Number of Plates" }
     ],
     "Column Web Stiffener Plate": [
       { key: "WebStiffenerModal", label: "Web Stiffener Details" },
-      { key: "WebStiffener.Number", label: "Number of Stiffener(s)" }
     ],
     "Stiffener": [
         { key: "Stiffener.Length", label: "Length (mm)" },
@@ -78,11 +76,13 @@ export const beamToColumnEndPlateOutputConfig = {
   modalData: {
     details: {
       ContinuityPlateModal: [
+        { key: "ContinuityPlate.Number", label: "Number of Plates" },
         { key: "ContinuityPlate.Length", label: "Length (mm)" },
         { key: "ContinuityPlate.Width", label: "Width (mm)" },
         { key: "ContinuityPlate.Thickness", label: "Thickness (mm)" }
       ],
       WebStiffenerModal: [
+        { key: "WebStiffener.Number", label: "Number of Stiffener(s)" },
         { key: "WebStiffener.Length", label: "Length (mm)" },
         { key: "WebStiffener.Width", label: "Width (mm)" },
         { key: "WebStiffener.Thickness", label: "Thickness (mm)" }

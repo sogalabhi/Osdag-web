@@ -23,12 +23,13 @@ from ...utils.common.Section_Properties_Calculator import *
 
 from ...custom_logger import CustomLogger
 from ..member import Member
-
+from django.conf import settings
 class Tension_bolted(Member):
 
     def __init__(self):
         print(f'Entering Tension_bolted')
         super(Tension_bolted, self).__init__()
+        self.mainmodule = "Member"
         self.design_status = False
 
         self.hover_dict = {}
@@ -239,8 +240,7 @@ class Tension_bolted(Member):
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
             self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
-        if isinstance(self.logger, CustomLogger):
-            self.logger.clear_logs()
+        
         # Clear any existing handlers
         self.logger.handlers.clear()
         self.logger.setLevel(logging.DEBUG)
@@ -505,8 +505,25 @@ class Tension_bolted(Member):
         t00 = (None, "", TYPE_NOTE, "Representative image for Spacing Details based on member's depth \n (root radius not included in edge distance)")
         spacing.append(t00)
 
-        t99 = (None, 'Spacing Details', TYPE_SECTION,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_1.png")), 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
+        # t99 = (None, 'Spacing Details', TYPE_SECTION,
+        #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("spacing_1.png")), 400, 278, "3 x 3 pattern considered"])  # [image, width, height, caption]
+
+        image_path = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images",
+            "spacing_1.png"
+        )
+
+        t99 = (
+            None,
+            "Spacing Details",
+            TYPE_SECTION,
+            [image_path, 400, 278, "3 x 3 pattern considered"]
+        )
+
         spacing.append(t99)
 
         if self.sec_profile == 'Star Angles':
@@ -539,11 +556,24 @@ class Tension_bolted(Member):
     def memb_pattern(self, status):
 
         if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
-            image = str(files("osdag_core.data.ResourceFiles.images").joinpath("L.png"))
+            image = os.path.join(
+                settings.BASE_DIR,
+                "osdag_core",
+                "data",
+                "ResourceFiles",
+                "images",
+                "L.png"
+            )
             x, y = 400, 202
-
         else:
-            image = str(files("osdag_core.data.ResourceFiles.images").joinpath("U.png"))
+            image = os.path.join(
+                settings.BASE_DIR,
+                "osdag_core",
+                "data",
+                "ResourceFiles",
+                "images",
+                "U.png"
+            )
             x, y = 400, 202
 
 
@@ -565,8 +595,23 @@ class Tension_bolted(Member):
         t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern")
         pattern.append(t00)
 
-        t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("L.png")),400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
+        # t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_IMAGE,
+        #        [str(files("osdag_core.data.ResourceFiles.images").joinpath("L.png")),400,202, "Plate Block Shear Pattern"])  # [image, width, height, caption]
+        image_path = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images",
+            "L.png"
+        )
+
+        t99 = (
+            None,
+            'Failure Pattern due to Tension in Plate',
+            TYPE_IMAGE,
+            [image_path, 400, 202, "Plate Block Shear Pattern"]
+        )
         pattern.append(t99)
 
         return pattern
@@ -2771,11 +2816,16 @@ class Tension_bolted(Member):
 
         Disp_2d_image = []
         Disp_3D_image = "/ResourceFiles/images/3d.png"
-        fname_no_ext = popup_summary['filename']
-        rel_path = os.path.dirname(fname_no_ext) if fname_no_ext else os.path.abspath(".")
-        rel_path = os.path.abspath(rel_path)
+
+
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = os.path.abspath(".") # TEMP
         rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
 
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+        return True

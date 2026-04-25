@@ -4,7 +4,7 @@ const DEFAULT_ORBIT_TARGET = [0, 0, 0];
 
 const CadSceneContext = createContext({
   orbitTarget: DEFAULT_ORBIT_TARGET,
-  setOrbitTarget: () => {},
+  setOrbitTarget: () => { },
 });
 
 export function CadSceneProvider({ children }) {
@@ -22,5 +22,5 @@ export function CadSceneProvider({ children }) {
 
 export function useCadSceneContext() {
   const ctx = useContext(CadSceneContext);
-  return ctx || { orbitTarget: DEFAULT_ORBIT_TARGET, setOrbitTarget: () => {} };
+  return ctx || { orbitTarget: DEFAULT_ORBIT_TARGET, setOrbitTarget: () => { } };
 }

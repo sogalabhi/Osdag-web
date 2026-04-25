@@ -259,8 +259,7 @@ class BeamColumnEndPlate(MomentConnection):
         if not isinstance(self.logger, CustomLogger):
             logging.getLogger(unique_logger_name).manager.loggerDict.pop(unique_logger_name, None)
             self.logger = logging.getLogger(f"{unique_logger_name}_{id}")
-        if isinstance(self.logger, CustomLogger):
-            self.logger.clear_logs()
+        
         # Clear any existing handlers
         self.logger.handlers.clear()
         self.logger.setLevel(logging.DEBUG)
@@ -699,32 +698,43 @@ class BeamColumnEndPlate(MomentConnection):
 
         detailing = []
 
+        from django.conf import settings
+
+        BASE_IMAGE_PATH = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images"
+        )
+
         if self.connectivity == VALUES_CONN_1[1]:  # CW-BW
             if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC-CW-BW_Flush.png"))
+                detailing_path = os.path.join(BASE_IMAGE_PATH, "BC-CW-BW_Flush.png")
                 width = 880
                 height = 493
             elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC-CW-BW_EOW.png"))
+                detailing_path = os.path.join(BASE_IMAGE_PATH, "BC-CW-BW_EOW.png")
                 width = 612
                 height = 568
             else:  # Both-way
-                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC-CW-BW_EBW.png"))
+                detailing_path = os.path.join(BASE_IMAGE_PATH, "BC-CW-BW_EBW.png")
                 width = 620
                 height = 592
         else:  # CF-BW
-            if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_Stiffener_Flush.png"))
+            if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:
+                detailing_path = os.path.join(BASE_IMAGE_PATH, "BC_Stiffener_Flush.png")
                 width = 938
                 height = 478
-            elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_Stiffener_OWE.png"))
+            elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:
+                detailing_path = os.path.join(BASE_IMAGE_PATH, "BC_Stiffener_OWE.png")
                 width = 636
                 height = 562
-            else:  # Both-way
-                detailing_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("BC_Stiffener_BWE.png"))
+            else:
+                detailing_path = os.path.join(BASE_IMAGE_PATH, "BC_Stiffener_BWE.png")
                 width = 710
                 height = 550
+
 
         t1 = (None, 'Typical Stiffener Details', TYPE_IMAGE, [detailing_path, width, height, 'Typical stiffener details'])
         detailing.append(t1)
@@ -736,9 +746,28 @@ class BeamColumnEndPlate(MomentConnection):
 
         weld = []
 
-        t99 = (None, 'Weld Detail - Beam Flange to End Plate Connection', TYPE_IMAGE,
-               [str(files("osdag_core.data.ResourceFiles.images").joinpath("BB-BC-single_bevel_groove.png")), 575.75, 519.4,
-                'Weld Detail - beam to end plate connection'])
+        from django.conf import settings
+
+        image_path = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images",
+            "BB-BC-single_bevel_groove.png"
+        )
+
+        t99 = (
+            None,
+            'Weld Detail - Beam Flange to End Plate Connection',
+            TYPE_IMAGE,
+            [
+                image_path,
+                575.75,
+                519.4,
+                'Weld Detail - beam to end plate connection'
+            ]
+        )
         weld.append(t99)
 
         return weld
@@ -747,16 +776,28 @@ class BeamColumnEndPlate(MomentConnection):
 
         detailing = []
 
+        from django.conf import settings
+
+        BASE_IMAGE_PATH = os.path.join(
+            settings.BASE_DIR,
+            "osdag_core",
+            "data",
+            "ResourceFiles",
+            "images"
+        )
+
         if self.endplate_type == VALUES_ENDPLATE_TYPE[0]:  # Flush EP
-            path = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-Flush.png"))
+            path = os.path.join(BASE_IMAGE_PATH, "Detailing-Flush.png")
             width = 502
             height = 551
+
         elif self.endplate_type == VALUES_ENDPLATE_TYPE[1]:  # One-way
-            path = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-OWE.png"))
+            path = os.path.join(BASE_IMAGE_PATH, "Detailing-OWE.png")
             width = 437
             height = 552
+
         else:  # Both-way
-            path = str(files("osdag_core.data.ResourceFiles.images").joinpath("Detailing-BWE.png"))
+            path = os.path.join(BASE_IMAGE_PATH, "Detailing-BWE.png")
             width = 387
             height = 551
 
@@ -3337,10 +3378,13 @@ class BeamColumnEndPlate(MomentConnection):
 
         Disp_2d_image = [path_weld, path_detailing, path_stiffener]
         Disp_3d_image = "/ResourceFiles/images/3d.png"
-        fname_no_ext = popup_summary['filename']
-        rel_path = os.path.dirname(fname_no_ext) if fname_no_ext else os.path.abspath(".")
-        rel_path = os.path.abspath(rel_path)
+        print(sys.path[0])
+        rel_path = str(sys.path[0])
+        rel_path = os.path.abspath(".") # TEMP
         rel_path = rel_path.replace("\\", "/")
+
+        fname_no_ext = popup_summary['filename']
 
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3d_image, module=self.module)
+        return True

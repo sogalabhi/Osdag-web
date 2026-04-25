@@ -127,8 +127,11 @@ def validate_input(input_values: Dict[str, Any]) -> None:
         raise InvalidInputTypeError("Member.Profile", "str")
 
     # Validate Member.Designation
-    if not isinstance(input_values["Member.Designation"], str):
-        raise InvalidInputTypeError("Member.Designation", "str")
+    section_designation = input_values["Member.Designation"]
+
+    if (not isinstance(section_designation, list)
+            or not validate_list_type(section_designation, str)):
+        raise InvalidInputTypeError("Member.Designation", "List[str]")
 
     # Validate Member.Length
     if not isinstance(input_values["Member.Length"], str):
@@ -174,10 +177,20 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     """Generate, format and return the output values from the given input values."""
     output = {}
     module = create_from_input(input_values)
+
+    # Get raw output data
     raw_output_text = module.output_values(True)
     raw_output_spacing = module.spacing(True)
-    logs = module.logs
+
+    from osdag_core.custom_logger import CustomLogger
+
+    if hasattr(module, "logger") and isinstance(module.logger, CustomLogger):
+        logs = module.logger.get_logs() or []
+    else:
+        logs = getattr(module, "logs", []) or []
+
     raw_output = raw_output_spacing + raw_output_text
+
     for param in raw_output:
         if param[2] == "TextBox":
             key = param[0]

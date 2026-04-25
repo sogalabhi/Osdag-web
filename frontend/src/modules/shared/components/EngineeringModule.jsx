@@ -51,6 +51,7 @@ export const EngineeringModule = ({
   const prevModuleRef = useRef(null); // Track previous module for change detection
   const prevProjectIdRef = useRef(null); // Track previous projectId for change detection
   const lastLoadedProjectIdRef = useRef(null); // Prevent re-fetching same project (stops infinite GET loop)
+  const colorPickerRef = useRef(null);
 
   const {
     // Module data
@@ -396,7 +397,7 @@ export const EngineeringModule = ({
             message.error('Failed to load saved project outputs.');
           }
         }
-          // Deduplicated block
+        // Deduplicated block
         // Normalize URL to path form: .../fin_plate/1 instead of .../fin_plate?projectId=1
         const pathname = location.pathname;
         const pathEndsWithId = pathname.endsWith(`/${projectId}`);
@@ -409,7 +410,7 @@ export const EngineeringModule = ({
         lastLoadedProjectIdRef.current = null;
         console.error('[EngineeringModule] Error loading project:', _e);
         message.warning('Cannot load project. Redirecting to module base.');
-        
+
         // Navigate back to the base module path (e.g. /Connections, /Member)
         const basePath = moduleConfig.routePath || '/home';
         navigate(basePath, { replace: true });
@@ -972,16 +973,16 @@ export const EngineeringModule = ({
                 strokeWidth="6"
               />
 
-             {showLogs && (
-              <rect
-                x="10"
-                y="60"
-                width="80"
-                height="30"
-                fill="currentColor"
-                stroke="none"
-              />
-             )}
+              {showLogs && (
+                <rect
+                  x="10"
+                  y="60"
+                  width="80"
+                  height="30"
+                  fill="currentColor"
+                  stroke="none"
+                />
+              )}
             </svg>
           </button>
 
@@ -1234,7 +1235,7 @@ export const EngineeringModule = ({
                   <p>{isRedesigning ? "Updating Model..." : "Loading Model..."}</p>
                 </div>
               ) : renderBoolean ? (
-                <div 
+                <div
                   className={`cadModel relative ${!customBgColor ? 'bg-gradient-to-b from-[#FFFFFF] to-[#7E7E7E] dark:from-[#535353] dark:to-[#000000]' : ''}`}
                   style={customBgColor ? { backgroundColor: customBgColor } : {}}
                 >
@@ -1270,7 +1271,7 @@ export const EngineeringModule = ({
                       position={cameraPos}
                       fov={13}
                       near={0.1}
-                      far={1000}
+                      far={2000}
                     />
                     <Suspense
                       fallback={
@@ -1283,10 +1284,17 @@ export const EngineeringModule = ({
                         const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
                         const primary = activeViews[0] || "Model";
                         if (primary && primary !== "Model") {
-                          const hasPart =
+                          let hasPart =
                             normalizedCadModelPaths[primary] ||
                             normalizedCadModelPaths[primary?.toLowerCase?.()] ||
                             normalizedCadModelPaths[primary?.toUpperCase?.()];
+
+                          if (!hasPart && primary === "EndPlate" || !hasPart && primary === "CoverPlate") {
+                            hasPart =
+                              normalizedCadModelPaths["Connector"] ||
+                              normalizedCadModelPaths["connector"];
+                          }
+
                           if (!hasPart) {
                             return (
                               <Html>

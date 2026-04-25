@@ -2237,7 +2237,7 @@ class CommonDesignLogic(object):
         column_R2 = float(Flex.section_property.toe_radius)
         print(f"Flex.section_property.toe_radius : {Flex.section_property.toe_radius}")
         column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
-        column_length = float(Flex.result_eff_len)*1000
+        column_length = float(Flex.result_eff_len)
 
         sec = ISection(B=column_B, T=column_T, D=column_d, t=column_tw, R1=column_R1, R2=column_R2,
                               alpha=column_alpha, length=column_length, notchObj=None)

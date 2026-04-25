@@ -959,7 +959,7 @@ KEY_DISP_DESIGN_BENDING_STRENGTH = 'Design Bending Strength (kNm)'
 # All Input Keys
 ###################################
 KEY_MODULE = 'Module'
-KEY_CONN = 'Connectivity *'
+KEY_CONN = 'Connectivity'
 KEY_TABLE = 'Table'
 KEY_MEMBERS = 'No of Members'
 KEY_LOCATION = 'Conn_Location'

@@ -44,6 +44,7 @@ import Key_RHS from "../../../assets/Key_RHS.png";
 import Key_RHS_D from "../../../assets/Key_RHS_D.png";
 import Key_RHS_B from "../../../assets/Key_RHS_B.png";
 import Key_CHS from "../../../assets/Key_CHS.png";
+import plateBlockShear from "../../../assets/U.png";
 
 const imageMap = {
   stiffener: {
@@ -80,6 +81,7 @@ const imageMap = {
     RHS: Key_RHS,
     CHS: Key_CHS,
   },
+  plate_block_shear: plateBlockShear,
 };
 
 /**
@@ -90,7 +92,7 @@ const imageMap = {
  * @returns {string | null} Image src or null
  */
 export function getOutputImage(imageType, selectedOption, basePlateState = {}) {
-  if (imageType === "groove" || imageType === "spacing" || imageType === "capacity1" || imageType === "capacity2") {
+  if (imageType === "groove" || imageType === "spacing" || imageType === "capacity1" || imageType === "capacity2" ||  imageType === "plate_block_shear") {
     return imageMap[imageType] ?? null;
   }
   if (imageType === "basePlateSketch") {
