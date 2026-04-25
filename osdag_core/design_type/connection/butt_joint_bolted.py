@@ -403,45 +403,48 @@ class ButtJointBolted(MomentConnection):
         out_list.append(t20)
 
         # Populate Hover Dict (Butt Joint Bolted)
-        self.hover_dict["Plate 1"] = (
-            f"<b>Plate 1</b><br>"
-            f"Width: {round(float(self.plate1.height), 2) if flag else ''} mm<br>"
-            f"Thickness: {round(float(self.plate1.thickness_provided), 2) if flag and self.plate1.thickness_provided else ''} mm"
-        )
-
-        self.hover_dict["Plate 2"] = (
-            f"<b>Plate 2</b><br>"
-            f"Width: {round(float(self.plate2.height), 2) if flag else ''} mm<br>"
-            f"Thickness: {round(float(self.plate2.thickness_provided), 2) if flag and self.plate2.thickness_provided else ''} mm"
-        )
-
-        self.hover_dict["Cover Plate"] = (
-            f"<b>Cover Plate</b><br>"
-            f"Width: {round(float(self.platec.height), 2) if flag else ''} mm<br>"
-            f"Thickness: {round(float(self.platec.thickness_provided), 2) if flag and self.platec.thickness_provided else ''} mm"
-        )
-
-        # Packing plate - only show if thickness > 0
-        packing_thk = getattr(self, 'packing_plate_thickness', 0.0)
-        if flag and packing_thk > 0:
-            self.hover_dict["Packing Plate"] = (
-                f"<b>Packing Plate</b><br>"
-                f"Width: {round(float(self.platec.height), 2)} mm<br>"
-                f"Thickness: {round(float(packing_thk), 2)} mm"
-            )
-        else:
-            self.hover_dict["Packing Plate"] = (
-                f"<b>Packing Plate</b><br>"
-                f"Not required for this configuration"
+        try:
+            self.hover_dict["Plate 1"] = (
+                f"<b>Plate 1</b><br>"
+                f"Width: {round(float(self.plate1.height), 2) if flag else ''} mm<br>"
+                f"Thickness: {round(float(self.plate1.thickness_provided), 2) if flag and self.plate1.thickness_provided else ''} mm"
             )
 
-        self.hover_dict["Bolt"] = (
-            f"<b>Bolts</b><br>"
-            f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>"
-            f"Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>"
-            f"No. of Bolts: "
-            f"{self.number_bolts if flag else ''}"
-        )
+            self.hover_dict["Plate 2"] = (
+                f"<b>Plate 2</b><br>"
+                f"Width: {round(float(self.plate2.height), 2) if flag else ''} mm<br>"
+                f"Thickness: {round(float(self.plate2.thickness_provided), 2) if flag and self.plate2.thickness_provided else ''} mm"
+            )
+
+            self.hover_dict["Cover Plate"] = (
+                f"<b>Cover Plate</b><br>"
+                f"Width: {round(float(self.platec.height), 2) if flag else ''} mm<br>"
+                f"Thickness: {round(float(self.platec.thickness_provided), 2) if flag and self.platec.thickness_provided else ''} mm"
+            )
+
+            # Packing plate - only show if thickness > 0
+            packing_thk = getattr(self, 'packing_plate_thickness', 0.0)
+            if flag and packing_thk > 0:
+                self.hover_dict["Packing Plate"] = (
+                    f"<b>Packing Plate</b><br>"
+                    f"Width: {round(float(self.platec.height), 2)} mm<br>"
+                    f"Thickness: {round(float(packing_thk), 2)} mm"
+                )
+            else:
+                self.hover_dict["Packing Plate"] = (
+                    f"<b>Packing Plate</b><br>"
+                    f"Not required for this configuration"
+                )
+
+            self.hover_dict["Bolt"] = (
+                f"<b>Bolts</b><br>"
+                f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>"
+                f"Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>"
+                f"No. of Bolts: "
+                f"{self.number_bolts if flag else ''}"
+            )
+        except Exception:
+            pass
         return out_list
 
     @staticmethod

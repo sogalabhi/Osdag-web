@@ -777,9 +777,9 @@ class Tension_bolted(Member):
         # Populate Hover Dict
         self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.plate.bolts_one_line)*int(self.plate.bolt_line) if flag else ''}"
         
-        self.hover_dict["Plate"]= f"Plate: {float(self.plate.length) if flag else ''} mm x {float(self.plate.height) if flag else ''} mm x {self.plate.thickness_provided if flag else ''} mm"
+        self.hover_dict["Plate"] = f"<b>Plate</b><br>{float(self.plate.length) if flag else ''} mm x {float(self.plate.height) if flag else ''} mm x {self.plate.thickness_provided if flag else ''} mm"
         
-        self.hover_dict["Member"] = f"Member: {self.section_size_1.designation if flag else ''}"
+        self.hover_dict["Member"] = f"<b>Member</b>: {self.section_size_1.designation if flag else ''}"
 
         return out_list
 

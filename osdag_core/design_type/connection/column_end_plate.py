@@ -619,50 +619,47 @@ class ColumnEndPlate(MomentConnection):
         # out_list.append(t22)
         
         # Populate hover dict
+        try:
+            # Column
+            self.hover_dict["Column"] = f"<b>Column</b>: {self.section.designation if flag else ''}"
 
-        # Column
-        self.hover_dict["Column"] = (
-            f"<b>Column</b><br>"
-            f"Section: {self.section.designation if flag else ''}<br>"
-            f"Depth: {self.section.depth if flag else ''} mm<br>"
-            f"Flange Width: {self.section.flange_width if flag else ''} mm<br>"
-            f"Web Thickness: {self.section.web_thickness if flag else ''} mm<br>"
-            f"Flange Thickness: {self.section.flange_thickness if flag else ''} mm"
-        )
+            # End Plate
+            self.hover_dict["Plate"] = (
+                f"<b>End Plate</b>: {self.plate_width if flag else ''} mm x "
+                f"{self.plate_height if flag else ''} mm x "
+                f"{self.plate_thickness_provided if flag else ''} mm"
+                f"<br><b>Bolt</b> Grade: {self.bolt_grade_provided if flag else ''}, "
+                f"Dia: {self.bolt_diam_provided if flag else ''} mm, "
+                f"Nos: {self.no_bolts if flag else ''}"
+                f"<br><b>Weld</b> Size: {self.weld_size_prov if flag else ''} mm"
+            )
 
-        # End Plate
-        self.hover_dict["Plate"] = (
-            f"<b>End Plate</b><br>"
-            f"Width: {self.plate_width if flag else ''} mm<br>"
-            f"Height: {self.plate_height if flag else ''} mm<br>"
-            f"Thickness: {self.plate_thickness_provided if flag else ''} mm<br>"
-            f"Moment Capacity: {round(self.m_dp_prov / 1e6, 2) if flag else ''} kNm"
-        )
+            # Bolts
+            self.hover_dict["Bolt"] = (
+                f"<b>Bolts</b><br>"
+                f"Diameter: {self.bolt_diam_provided if flag else ''} mm<br>"
+                f"Grade: {self.bolt_grade_provided if flag else ''}<br>"
+                f"No. of Bolts: {self.no_bolts if flag else ''}<br>"
+                f"Shear Capacity: {round(self.bolt_cap / 1000, 2) if flag else ''} kN"
+            )
 
-        # Bolts
-        self.hover_dict["Bolt"] = (
-            f"<b>Bolts</b><br>"
-            f"Diameter: {self.bolt_diam_provided if flag else ''} mm<br>"
-            f"Grade: {self.bolt_grade_provided if flag else ''}<br>"
-            f"Total Bolts: {self.no_bolts if flag else ''}<br>"
-            f"Shear Capacity: {round(self.bolt_cap / 1000, 2) if flag else ''} kN"
-        )
+            # Welds
+            self.hover_dict["Weld"] = (
+                f"<b>Weld</b><br>"
+                f"Type: {self.weld_type if flag else ''}<br>"
+                f"Stiffener Weld Type: Groove Weld<br>"
+                f"Weld Size: {self.weld_size_prov if flag else ''} mm"
+            )
 
-        # Welds
-        self.hover_dict["Weld"] = (
-            f"<b>Weld</b><br>"
-            f"Type: {self.weld_type if flag else ''}<br>"
-            f"Stiffener Weld Type: Groove Weld<br>"
-            f"Weld Size: {self.weld_size_prov if flag else ''} mm"
-        )
-
-        # Stiffener
-        self.hover_dict["Stiffener"] = (
-            f"<b>Stiffener Plate</b><br>"
-            f"Height: {self.stiff_ht if flag else ''} mm<br>"
-            f"Width: {self.stiff_wt if flag else ''} mm<br>"
-            f"Thickness: {self.t_s if flag else ''} mm"
-        )
+            # Stiffener
+            self.hover_dict["Stiffener"] = (
+                f"<b>Stiffener Plate</b><br>"
+                f"Height: {self.stiff_ht if flag else ''} mm<br>"
+                f"Width: {self.stiff_wt if flag else ''} mm<br>"
+                f"Thickness: {self.t_s if flag else ''} mm"
+            )
+        except Exception:
+            pass
 
         return out_list
 

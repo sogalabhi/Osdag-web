@@ -796,11 +796,11 @@ class ColumnCoverPlate(MomentConnection):
         out_list.append(t18)
 
         t19 = (KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-               self.plate_out_len if flag else '', True)
+               getattr(self, 'plate_out_len', '') if flag else '', True)
         out_list.append(t19)
 
         t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               int(self.flange_out_plate_tk) if flag else '', True)
+               int(getattr(self, 'flange_out_plate_tk', 0) or 0) if flag else '', True)
         out_list.append(t20)
         t21 = (
         KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing],
@@ -818,11 +818,11 @@ class ColumnCoverPlate(MomentConnection):
         out_list.append(t18)
 
         t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-               self.plate_in_len if flag else '', False)
+               getattr(self, 'plate_in_len', '') if flag else '', False)
         out_list.append(t19)
         # if flag is True:
         t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_in_plate_tk if flag else '', False)
+               getattr(self, 'flange_in_plate_tk', '') if flag else '', False)
         out_list.append(t20)
         
         # Populate hover dict
@@ -838,15 +838,17 @@ class ColumnCoverPlate(MomentConnection):
         )
 
         # Cover Plates (Flange + Web)
-        self.hover_dict["Plate"] = (
+        cover_plate_info = (
             f"<b>Cover Plates</b><br>"
             f"Flange Plate: {self.flange_plate.length if flag else ''} × "
             f"{self.flange_plate.height if flag else ''} × "
-            f"{self.flange_plate.thickness_provided if flag else ''} mm<br>"
+            f"{getattr(self, 'flange_out_plate_tk', self.flange_plate.thickness_provided) if flag else ''} mm<br>"
             f"Web Plate: {self.web_plate.length if flag else ''} × "
             f"{self.web_plate.height if flag else ''} × "
             f"{self.web_plate.thickness_provided if flag else ''} mm"
         )
+        self.hover_dict["Plate"] = cover_plate_info
+        self.hover_dict["Cover Plate"] = cover_plate_info  # alias for SmartPart.jsx 'coverplate' mesh
 
         # Bolts
         self.hover_dict["Bolt"] = (

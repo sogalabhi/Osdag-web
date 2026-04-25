@@ -622,12 +622,13 @@ class Tension_welded(Member):
         )
 
         self.hover_dict["Plate"] = (
-            f"Plate: {float(self.plate.length) if flag else ''} mm x "
+            f"<b>Plate</b><br>"
+            f"{float(self.plate.length) if flag else ''} mm x "
             f"{float(self.plate.height) if flag else ''} mm x "
             f"{self.plate.thickness_provided if flag else ''} mm"
         )
 
-        self.hover_dict["Member"] = f"Member: {self.section_size_1.designation if flag else ''}"
+        self.hover_dict["Member"] = f"<b>Member</b>: {self.section_size_1.designation if flag else ''}"
 
         return out_list
 

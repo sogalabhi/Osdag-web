@@ -694,6 +694,7 @@ class Flexure_Purlin(Member):
         t2 = ()
 
         self.hover_dict["Flexural Members"] = (
+            f"<b>Flexural Members</b><br>"
             f"{self.result_designation if flag else ''}"
         )
 

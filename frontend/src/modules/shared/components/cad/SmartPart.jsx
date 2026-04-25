@@ -46,12 +46,27 @@ export const SmartPart = ({
   useCursor(localHovered || isHovered);
 
   // 2. LABEL RESOLUTION
-  // Your original complex logic preserved exactly as requested
   const resolvedLabel = useMemo(() => {
     if (hoverLabel) return hoverLabel;
 
     const lower = name?.toLowerCase() || '';
     const capitalized = name?.charAt(0).toUpperCase() + name?.slice(1).toLowerCase();
+
+    // Semantic aliases: map 3D section/part names to hover_dict keys.
+    // The CAD backend uses section names like "Connector" or "EndPlate" for
+    // what the Python modules call "Plate" in hover_dict. This mapping bridges
+    // that naming gap so hover details always display correctly.
+    const PART_ALIASES = {
+      'connector': 'Plate',
+      'endplate': 'Plate',
+      'end plate': 'Plate',
+      'end-plate': 'Plate',
+      'cleatangle': 'Cleat Angle',
+      'cleat angle': 'Cleat Angle',
+      'seatedangle': 'Seated Angle',
+      'seated angle': 'Seated Angle',
+      'coverplate': 'Cover Plate',
+    };
 
     // Try multiple key variations in hoverDict first
     let label = null;
@@ -60,14 +75,10 @@ export const SmartPart = ({
       label = hoverDict[name];
 
       // Try lowercase
-      if (!label) {
-        label = hoverDict[lower];
-      }
+      if (!label) label = hoverDict[lower];
 
       // Try capitalized (first letter uppercase, rest lowercase)
-      if (!label) {
-        label = hoverDict[capitalized];
-      }
+      if (!label) label = hoverDict[capitalized];
 
       // Try singular if plural (e.g., "Bolts" -> "Bolt")
       if (!label && lower.endsWith('s') && lower.length > 1) {
@@ -79,6 +90,14 @@ export const SmartPart = ({
       if (!label && !lower.endsWith('s')) {
         const plural = name + 's';
         label = hoverDict[plural] || hoverDict[plural.toLowerCase()];
+      }
+
+      // Try semantic alias (e.g., "Connector" -> look up hoverDict["Plate"])
+      // Also try with spaces stripped so "Cleat Angle" matches alias key "cleatangle"
+      const lowerNoSpace = lower.replace(/\s+/g, '');
+      const aliasKey = PART_ALIASES[lower] || PART_ALIASES[lowerNoSpace];
+      if (!label && aliasKey) {
+        label = hoverDict[aliasKey] || hoverDict[aliasKey.toLowerCase()];
       }
     }
 

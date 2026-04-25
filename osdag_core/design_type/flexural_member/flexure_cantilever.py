@@ -603,6 +603,7 @@ class Flexure_Cantilever(Member):
         # Populate hover dict
 
         self.hover_dict["Flexure Member"] = (
+            f"<b>Flexure Member</b><br>"
             f"{self.result_designation if flag else ''}"
         )
 

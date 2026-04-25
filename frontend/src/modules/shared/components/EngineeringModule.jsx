@@ -148,6 +148,8 @@ export const EngineeringModule = ({
 
   const [showResetButton, setShowResetButton] = useState(false);
   const [showInputDock, setShowInputDock] = useState(true);
+  const colorPickerRef = useRef(null);
+  const [customBgColor, setCustomBgColor] = useState("");
   const [showOutputDock, setShowOutputDock] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
   const [isDesignComplete, setIsDesignComplete] = useState(false);
@@ -848,49 +850,31 @@ export const EngineeringModule = ({
     setScreenshotTrigger(true);
   };
 
-  // Default hover dictionary mapping per-part names to labels
-  // Prioritize ctxHoverDict values from backend over defaults
-  // Use useMemo to recalculate when ctxHoverDict changes
+  // Build the hover dictionary: backend values take priority.
+  // We intentionally do NOT include default fallback strings for parts like
+  // Beam/Column/Plate so that when the backend provides nothing, SmartPart
+  // falls back to just the part name (clean), rather than a static string.
   const hoverDict = useMemo(() => {
-    const defaults = {
-      // Defaults (fallback if backend doesn't provide)
-      Beam: "Beam",
-      Column: "Column",
-      Plate: "Plate",
-      Weld: "Weld",
-      Welds: "Welds",
-      Bolt: "Bolt",
-      Bolts: "Bolts",
-      cleatAngle: "Cleat Angle",
-      SeatedAngle: "Seated Angle",
-      Connector: "Connector",
-      EndPlate: "End Plate",
-      Member: "Member",
-      Angle: "Angle",
+    // Backend hover_dict values are the source of truth.
+    // Only keep truly generic part-name labels for parts
+    // the backend never annotates (e.g. SeatedAngle, Member).
+    const staticFallbacks = {
+      "Cleat Angle": "Cleat Angle",
+      "Seated Angle": "Seated Angle",
+      "Member": "Member",
     };
 
-    // Backend hover_dict values override defaults
     const final = {
-      ...defaults,
+      ...staticFallbacks,
       ...(ctxHoverDict || {}),
     };
 
-    // Debug: log hoverDict to see what we have
     if (ctxHoverDict && Object.keys(ctxHoverDict).length > 0) {
-      console.log('[EngineeringModule] ctxHoverDict:', ctxHoverDict);
-      console.log('[EngineeringModule] Final hoverDict:', final);
+      console.log('[EngineeringModule] hoverDict from backend:', final);
     }
 
     return final;
   }, [ctxHoverDict]);
-
-  // If backend provided bolt details but no separate Bolt mesh exists,
-  // enrich the Plate hover to include bolt info as a fallback.
-  const hasBoltMesh = Boolean(cadModelPaths?.Bolt || cadModelPaths?.Bolts);
-  if (!hasBoltMesh && (ctxHoverDict && ctxHoverDict.Bolt)) {
-    const boltText = String(ctxHoverDict.Bolt).replace(/<br\s*\/?>/gi, ' ');
-    hoverDict.Plate = hoverDict.Plate ? `${hoverDict.Plate}: ${boltText}` : boltText;
-  }
 
   const handleHoverLabel = (label, clientX, clientY) => {
     if (!label) return;
@@ -1094,7 +1078,7 @@ export const EngineeringModule = ({
         }, [])}
       </div>
 
-      <div className="relative flex flex-row h-full w-full">
+      <div className="relative flex flex-row flex-1 overflow-hidden w-full">
         {/* Input Dock Toggle Button - Fixed to left, shows when dock is closed (Desktop only) */}
         {!showInputDock && !isMobile && (
           <button

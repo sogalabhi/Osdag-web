@@ -437,9 +437,27 @@ class CleatAngleConnection(ShearConnection):
         """"""""""""""""""""""""""""""""""""""""""""""""""""""""
         
         # Populate hover dict
-        self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.spting_leg.bolt_line)*int(self.spting_leg.bolts_one_line) if flag else ''}"
+        self.hover_dict["Column"] = f"<b>Column</b><br>{self.supporting_section.designation if flag else ''}"
+        self.hover_dict["Beam"] = f"<b>Beam</b><br>{self.supported_section.designation if flag else ''}"
+
+        # In the web 3D viewer, bolts are fused into the Angle STL mesh.
+        try:
+            bolt_count = int(self.spting_leg.bolt_line) * int(self.spting_leg.bolts_one_line) if flag else ''
+        except (ValueError, TypeError, AttributeError):
+            bolt_count = ''
         
-        self.hover_dict["Angle"]= f"Angle: ISA {self.cleat.designation if flag else ''}"
+        self.hover_dict["Cleat Angle"] = (
+            f"<b>Cleat Angle</b><br>ISA {self.cleat.designation if flag else ''}"
+            f"<br>Bolt Grade: {self.bolt.bolt_grade_provided if flag else ''}, "
+            f"Dia: {self.bolt.bolt_diameter_provided if flag else ''} mm, "
+            f"Nos: {bolt_count}"
+        )
+        # Keep separate key for future per-part meshes
+        self.hover_dict["Bolt"] = (
+            f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}"
+            f"<br>Diameter: {self.bolt.bolt_diameter_provided if flag else ''} mm"
+            f"<br>No. of Bolts: {bolt_count}"
+        )
         
         return out_list
 
