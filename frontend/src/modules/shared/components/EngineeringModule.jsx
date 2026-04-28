@@ -35,8 +35,13 @@ import { menuItems } from "../utils/moduleUtils";
 import { UI_STRINGS } from "../../../constants/UIStrings";
 import { isGuestUser, canCreateProjects } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
+import {
+  downloadGroupedInputsCsv,
+  downloadGroupedOutputsCsv,
+} from "../utils/groupedCsvExport";
 import ProjectNameModal from "../../../homepage/components/ProjectNameModal";
 import { useProjectCreation } from '../hooks/useProjectCreation';
+import { deleteAllCustomSections } from "../../../datasources/sectionsDataSource";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -205,7 +210,6 @@ export const EngineeringModule = ({
       } else if (opt === "Show top view") {
         setSelectedCameraView("ZX");
       }
-      alert("QQ");
       // Cleanup graphicOption to allow consecutive clicks of same option
       setInputs(prev => {
         const next = { ...prev };
@@ -557,20 +561,6 @@ export const EngineeringModule = ({
     try {
       await handleSubmit();
       setShowResetButton(true);
-
-      // Persist latest inputs to project after design
-      if (!isGuestUser()) {
-        const pid = getProjectIdFromUrl();
-        if (pid && !Number.isNaN(pid)) {
-          try {
-            await service.updateProject(pid, {
-              inputs_json: { dock: inputs, pref: designPrefOverrides || {} },
-            });
-          } catch (_e) {
-            // ignore persistence errors; UI will still show outputs
-          }
-        }
-      }
     } catch (error) {
     } finally {
       // Reset the redesigning state after completion
@@ -756,6 +746,23 @@ export const EngineeringModule = ({
   };
 
   const performResetEnhanced = async () => {
+    // Guests never store custom sections in backend.
+    if (isGuestUser()) {
+      message.info("Guest users do not have custom sections stored in the backend.");
+    } else {
+      try {
+        await deleteAllCustomSections();
+        // Ensure dropdown options no longer include deleted user sections.
+        try {
+          await refetchModuleOptions?.();
+        } catch (_e) {
+          // ignore refetch errors; local reset still proceeds
+        }
+      } catch (e) {
+        message.error(e?.message || "Failed to delete custom sections.");
+      }
+    }
+
     performReset();
     setShowResetButton(false);
     setShowResetConfirmation(false);
@@ -776,82 +783,39 @@ export const EngineeringModule = ({
     }
   };
   const handleSaveInputs = async () => {
-    const userIsGuest = isGuest();
-
     // Determine module_id - use designType from moduleConfig, or fallback to inputs.module
     const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || MODULE_KEY_SEAT_ANGLE;
     const projectName = inputs?.project_name || inputs?.name || moduleConfig?.sessionName || 'project';
 
     try {
       const inputsForSave = expandAllSelectedInputs(inputs, allSelected, contextData);
-      if (userIsGuest) {
-        // Guest: OSI download flow using service
-        const result = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, false);
-        if (result.success && result.is_guest && result.content_base64) {
-          try {
-            const binaryString = atob(result.content_base64);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
-            const blob = new Blob([bytes], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = result.filename || `${projectName}.osi`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            message.success('OSI file downloaded successfully');
-          } catch (err) {
-            console.error('Error downloading OSI file:', err);
-            message.error('Failed to download OSI file');
-          }
-          return;
-        }
-        message.error(result.error || 'Failed to save inputs');
-        return;
-      }
-
-      // Authenticated: persist inputs_json to project
-      const projectId = getProjectIdFromUrl();
-      if (!projectId || Number.isNaN(projectId)) {
-        message.warning('No active project. Open or create a project first.');
-        return;
-      }
-      const updateResult = await service.updateProject(projectId, {
-        inputs_json: { dock: inputsForSave, pref: designPrefOverrides || {} },
-      });
-      if (!updateResult.success) {
-        message.error(updateResult.error || 'Failed to save inputs');
-        return;
-      }
-
-      // Also provide a local OSI download for logged-in users (same as guest)
-      try {
-        const saveResult = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, true);
-        if (saveResult.success && saveResult.content_base64) {
-          const binaryString = atob(saveResult.content_base64);
+      // Always download-only (no backend persistence). Force inline/base64 response.
+      const result = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, true);
+      if (result.success && result.content_base64) {
+        try {
+          const binaryString = atob(result.content_base64);
           const bytes = new Uint8Array(binaryString.length);
           for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
           const blob = new Blob([bytes], { type: 'text/plain' });
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = saveResult.filename || `${projectName}.osi`;
+          link.download = result.filename || `${projectName}.osi`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
-          message.success('Inputs saved and OSI downloaded');
-        } else {
-          message.success('Inputs saved');
+          message.success('OSI file downloaded successfully');
+        } catch (err) {
+          console.error('Error downloading OSI file:', err);
+          message.error('Failed to download OSI file');
         }
-      } catch (_e) {
-        message.success('Inputs saved');
+        return;
       }
+      message.error(result.error || 'Failed to download OSI');
     } catch (err) {
       console.error('Error saving inputs:', err);
-      message.error('Failed to save inputs');
+      message.error('Failed to download OSI');
     }
   };
 
@@ -943,6 +907,41 @@ export const EngineeringModule = ({
     setHoverText("");
   };
 
+  const handleNavbarMenuClick = async (name) => {
+    // Database menu actions (desktop-style)
+    if (name === "Download Inputs CSV") {
+      const inputsExpanded = expandAllSelectedInputs(inputs, allSelected, contextData);
+      const effectiveInputs = { ...inputsExpanded, ...(designPrefOverrides || {}) };
+      const moduleId = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || MODULE_KEY_SEAT_ANGLE;
+      return downloadGroupedInputsCsv({
+        moduleConfig,
+        inputs: inputsExpanded,
+        effectiveInputs,
+        designPrefOverrides,
+        extraState,
+        filename: `${moduleId}_inputs.csv`,
+      });
+    }
+    if (name === "Download Outputs CSV") {
+      const moduleId = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || MODULE_KEY_SEAT_ANGLE;
+      return downloadGroupedOutputsCsv({
+        output,
+        outputConfig,
+        logs,
+        filename: `${moduleId}_outputs.csv`,
+      });
+    }
+    if (name === "Download Inputs OSI") {
+      return handleSaveInputs();
+    }
+    if (name === "Reset") {
+      return handleResetEnhanced();
+    }
+
+    // Reset/Downloads are handled elsewhere (existing handlers or upcoming reset work).
+    return undefined;
+  };
+
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
       {/* Navigation */}
@@ -967,6 +966,8 @@ export const EngineeringModule = ({
               cadModelPaths={cadModelPaths}
               contextData={contextData}
               selectionStates={selectionStates}
+              hasOutput={!!output}
+              onMenuClick={handleNavbarMenuClick}
               onCreateProject={handleCreateProject}
               isExistingProject={!!projectIdFromUrl}
             />
@@ -1296,26 +1297,12 @@ export const EngineeringModule = ({
                   className={`cadModel relative ${!customBgColor ? 'bg-gradient-to-b from-[#FFFFFF] to-[#7E7E7E] dark:from-[#535353] dark:to-[#000000]' : ''}`}
                   style={customBgColor ? { backgroundColor: customBgColor } : {}}
                 >
-                  <input
+                  {/* <input
                     type="color"
                     className="absolute opacity-0 pointer-events-none w-0 h-0"
                     value={customBgColor || "#ffffff"}
                     onChange={(e) => setCustomBgColor(e.target.value)}
-                  />
-                  {/* Existing background color picker - left side */}
-                  {/* <div className="absolute top-2 left-2 flex items-center gap-2 bg-white/90 dark:bg-osdag-dark-color/90 px-3 py-1.5 rounded-lg shadow-md z-10">
-                  <label htmlFor="bgColorPicker" className="text-xs font-medium text-black dark:text-white mr-1">
-                    Background:
-                  </label>
-                  <input
-                    type="color"
-                    id="bgColorPicker"
-                    value={bgColor}
-                    onChange={(e) => handleColorChange(e.target.value)}
-                    className="bg-color-picker"
-                    title="Change Background Color"
-                  />
-                </div> */}
+                  /> */}
 
                   <Canvas
                     gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
@@ -1390,6 +1377,23 @@ export const EngineeringModule = ({
                       </CadSceneProvider>
                     </Suspense>
                   </Canvas>
+                  <div className="absolute right-[18px] top-[108px] z-10 flex flex-col gap-2">
+                    {[
+                      { label: "+", action: "zoom-in", title: "Zoom in" },
+                      { label: "-", action: "zoom-out", title: "Zoom out" },
+                    ].map(({ label, action, title }) => (
+                      <button
+                        key={action}
+                        type="button"
+                        aria-label={title}
+                        title={title}
+                        className="h-8 w-8 rounded-lg border border-white/35 bg-[rgba(32,32,32,0.78)] text-[20px] font-semibold leading-none text-white shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
+                        onClick={() => document.dispatchEvent(new CustomEvent("cad-camera-action", { detail: action }))}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <div className="modelback"></div>

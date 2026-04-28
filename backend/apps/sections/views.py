@@ -5,6 +5,7 @@ from __future__ import annotations
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Tuple
 
+from django.db import transaction
 from django.http import FileResponse
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -20,6 +21,7 @@ from apps.sections.serializers import get_user_section_serializer
 from apps.sections.validation import (
     assert_allowed_table,
     can_insert_custom_section,
+    get_catalog_model_for_table,
     get_db_header,
     headers_match_table,
     import_db_validation,
@@ -79,6 +81,60 @@ class SectionTemplateView(APIView):
         wb.save(buf)
         buf.seek(0)
         filename = f"{table}_SectionTemplate.xlsx"
+        return FileResponse(
+            buf,
+            as_attachment=True,
+            filename=filename,
+            content_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+        )
+
+
+class SectionCatalogExportView(APIView):
+    """GET xlsx export of full global catalog table (guest allowed)."""
+
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "sections_export"
+
+    def get(self, request):
+        from openpyxl import Workbook
+
+        table, err = _safe_table(request, source="query")
+        if err:
+            return err
+
+        Model = get_catalog_model_for_table(table)
+        headers = get_db_header(table)
+        rows = list(Model.objects.values_list(*headers))
+
+        if len(rows) > SECTION_EXPORT_MAX_ROWS:
+            return Response(
+                {
+                    "detail": (
+                        f"Too many rows to export ({len(rows)}); "
+                        f"maximum is {SECTION_EXPORT_MAX_ROWS}."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = table
+
+        for col_idx, name in enumerate(headers, start=1):
+            ws.cell(row=1, column=col_idx, value=name)
+
+        for row_idx, row in enumerate(rows, start=2):
+            for col_idx, value in enumerate(row, start=1):
+                ws.cell(row=row_idx, column=col_idx, value=value)
+
+        buf = BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+        filename = f"{table}_Catalog.xlsx"
         return FileResponse(
             buf,
             as_attachment=True,
@@ -286,6 +342,28 @@ class SectionCustomView(APIView):
         if total_deleted == 0:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SectionCustomBulkDeleteView(APIView):
+    """DELETE all user custom sections across Columns/Beams/Angles/Channels."""
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        deleted: Dict[str, int] = {}
+        total_deleted = 0
+
+        with transaction.atomic():
+            for table, Model in TABLE_TO_USER_MODEL.items():
+                qs = Model.objects.filter(user=request.user)
+                count, _ = qs.delete()
+                deleted[table] = int(count)
+                total_deleted += int(count)
+
+        return Response(
+            {"success": True, "deleted": deleted, "total_deleted": total_deleted},
+            status=status.HTTP_200_OK,
+        )
 
 
 class SectionExportView(APIView):

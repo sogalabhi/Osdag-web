@@ -67,10 +67,14 @@ export const DESIGN_PREFERENCES = {
 export const SECTIONS = {
   /** GET xlsx — query: table=Columns|Beams|Angles|Channels */
   template: `${API_PREFIX}sections/template/`,
+  /** GET xlsx — query: table=Columns|Beams|Angles|Channels (full global catalog rows) */
+  catalogExport: `${API_PREFIX}sections/catalog-export/`,
   /** POST multipart — form: file, table */
   import: `${API_PREFIX}sections/import/`,
   /** POST JSON — query: table=… */
   customCreate: `${API_PREFIX}sections/custom/`,
+  /** DELETE — delete all custom rows for current user */
+  customDeleteAll: `${API_PREFIX}sections/custom/all/`,
   /** GET xlsx — query: table=…&scope=user */
   export: `${API_PREFIX}sections/export/`,
   /** DELETE — query: table=…&designation=… */

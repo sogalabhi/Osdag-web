@@ -49,7 +49,10 @@ export const menuItems = [
   {
     label: "Database",
     dropdown: [
-      { name: "Downloads", options: ["Column", "Beam", "Angle", "Channel"] },
+      { name: "Download Inputs CSV" },
+      { name: "Download Outputs CSV" },
+      { name: "Download Inputs OSI" },
+      { name: "Download Database", options: ["Column", "Beam", "Angle", "Channel"] },
       { name: "Reset" },
     ],
   },

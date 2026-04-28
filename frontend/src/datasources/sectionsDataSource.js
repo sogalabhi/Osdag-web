@@ -55,6 +55,17 @@ export async function downloadSectionTemplate(table) {
 }
 
 /**
+ * Download full global catalog data for `table`.
+ * @param {string} table - Columns | Beams | Angles | Channels
+ */
+export async function downloadSectionCatalog(table) {
+  const url = `${SECTIONS.catalogExport}?${new URLSearchParams({ table }).toString()}`;
+  const { blob, filename } = await fetchBlobWithFilename(url);
+  triggerBrowserDownload(blob, filename || `${table}_Catalog.xlsx`);
+  return { success: true };
+}
+
+/**
  * Export current user's custom rows for `table` (scope=user).
  * @param {string} table
  */
@@ -106,4 +117,14 @@ export async function deleteCustomSection(table, designation) {
   const url = `${SECTIONS.customDelete}?${qs}`;
   const res = await apiClient(url, { method: "DELETE" });
   return { success: true, status: res.status };
+}
+
+/**
+ * Delete all custom sections for current user (all tables).
+ * @returns {Promise<{success: true, data: {success: boolean, deleted: object, total_deleted: number}}>}
+ */
+export async function deleteAllCustomSections() {
+  const res = await apiClient(SECTIONS.customDeleteAll, { method: "DELETE" });
+  const data = await res.json();
+  return { success: true, status: res.status, data };
 }

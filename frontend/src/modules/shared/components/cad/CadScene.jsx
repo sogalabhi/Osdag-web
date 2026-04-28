@@ -69,12 +69,10 @@ function CadScene({
       const { camera } = controls.object;
 
       if (e.detail === 'zoom-in') {
-        // Dolly in (zoom in)
-        controls.dollyIn(1.2);
+        controls.dollyOut(1.2);
         controls.update();
       } else if (e.detail === 'zoom-out') {
-        // Dolly out (zoom out)
-        controls.dollyOut(1.2);
+        controls.dollyIn(1.2);
         controls.update();
       } else if (e.detail === 'pan-up') {
         // Actually, panning via OrbitControls needs mouse events, but we can shift the target slightly.
@@ -129,7 +127,7 @@ function CadScene({
       <pointLight position={[-10, -10, -10]} intensity={1.5} />
       <spotLight position={[0, 10, 0]} angle={0.3} penumbra={1} intensity={1.0} />
 
-      <ViewCube controlsRef={controlsRef} focusRef={modelRef} placement="top-right" showPan={false} showRotate={false} showZoom={false}/>
+      <ViewCube controlsRef={controlsRef} focusRef={modelRef} placement="top-right" showPan={false} showRotate={false} showZoom={false} showViewCube={false}/>
 
       <group ref={modelRef}>
         <SceneManager

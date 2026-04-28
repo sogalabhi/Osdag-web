@@ -5,6 +5,7 @@ import { MODULE_KEY_FIN_PLATE } from '../../../constants/DesignKeys';
 import { message } from 'antd';
 import { apiBase } from "../../../api";
 import { openOsiFile } from "../../../datasources/osiDataSource";
+import { downloadSectionCatalog } from "../../../datasources/sectionsDataSource";
 import { getModuleConfig } from "./moduleConfig";
 import { expandAllSelectedInputs, buildOsiContent } from "./osiInputSerializer";
 import { buildLogFileContent } from "./logExport";
@@ -37,12 +38,14 @@ function UnifiedDropdownMenu({
   onMenuClick,
   onCreateProject = null,
   isExistingProject = false, // When true, disable "Create Project" menu item
+  hasOutput = false,
 }) {
   const service = useEngineeringService();
   const BASE_URL = `${apiBase}`;
 
 
   const [isOpen, setIsOpen] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState(null);
   const parentRef = useRef(null);
 
   const getModuleConfig = () => {
@@ -52,6 +55,7 @@ function UnifiedDropdownMenu({
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
+    if (isOpen) setOpenSubmenu(null);
   };
 
   const loadInput = () => {
@@ -147,8 +151,7 @@ function UnifiedDropdownMenu({
     const projectName = inputs?.project_name || inputs?.name || 'project';
 
     try {
-      // Call service to generate OSI file (inline=false for local download, no auth required)
-      const result = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, false);
+      const result = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, true);
 
       if (result.success && result.content_base64) {
         try {
@@ -220,7 +223,12 @@ function UnifiedDropdownMenu({
       //   downloadInput();
       //   break;
       case "Download Osi":
+      case "Download Inputs OSI":
         saveInput();
+        break;
+      case "Download Inputs CSV":
+      case "Download Outputs CSV":
+        if (onMenuClick) onMenuClick(option.name);
         break;
       case "Save Log Messages":
         saveLogMessages();
@@ -279,6 +287,25 @@ function UnifiedDropdownMenu({
     }
   };
 
+  const handleDatabaseTemplateDownload = async (label) => {
+    const tableMap = {
+      Column: "Columns",
+      Beam: "Beams",
+      Angle: "Angles",
+      Channel: "Channels",
+    };
+    const table = tableMap[label];
+    if (!table) return;
+    try {
+      await downloadSectionCatalog(table);
+      message.success(`${label} database downloaded.`);
+      setOpenSubmenu(null);
+      setIsOpen(false);
+    } catch (err) {
+      message.error(err?.message || `Failed to download ${label} template.`);
+    }
+  };
+
   // UTILITY FUNCTIONS
   const formatArrayForText = (arr) => {
     if (!arr || arr.length === 0) return "";
@@ -308,6 +335,7 @@ function UnifiedDropdownMenu({
     const handleOutsideClick = (event) => {
       if (parentRef.current && !parentRef.current.contains(event.target)) {
         setIsOpen(false);
+        setOpenSubmenu(null);
       }
     };
 
@@ -328,19 +356,52 @@ function UnifiedDropdownMenu({
       {isOpen && (
         <div className="absolute top-full left-0 bg-white border border-[#ccc] border-t-0 min-w-[350px] z-[1]">
           {dropdown.map((option, index) => {
-            const isDisabled = option.name === "Create Project" && isExistingProject;
+            const isDisabled =
+              (option.name === "Create Project" && isExistingProject) ||
+              (option.name === "Download Outputs CSV" && !hasOutput);
+            const hasSubmenu = Array.isArray(option.options) && option.options.length > 0;
+            const isSubmenuOpen = openSubmenu === option.name;
             return (
               <div
-                className={`flex w-full justify-between text-sm p-1 ${isDisabled
-                    ? "text-gray-400 cursor-not-allowed"
-                    : "text-black hover:text-white hover:bg-osdag-green cursor-pointer"
-                  }`}
                 key={index}
-                onClick={() => !isDisabled && handleClick(option)}
+                className="relative"
+                onMouseEnter={() => hasSubmenu && setOpenSubmenu(option.name)}
+                onMouseLeave={() => hasSubmenu && setOpenSubmenu((prev) => (prev === option.name ? null : prev))}
               >
-                {option.name}
-                {option.shortcut && (
-                  <span className="shortcut">{option.shortcut}</span>
+                <div
+                  className={`flex w-full justify-between text-sm p-1 ${isDisabled
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-black hover:text-white hover:bg-osdag-green cursor-pointer"
+                    }`}
+                  onClick={() => {
+                    if (isDisabled) return;
+                    if (hasSubmenu) {
+                      setOpenSubmenu((prev) => (prev === option.name ? null : option.name));
+                      return;
+                    }
+                    handleClick(option);
+                  }}
+                >
+                  {option.name}
+                  <span className="flex items-center gap-2">
+                    {option.shortcut && (
+                      <span className="shortcut">{option.shortcut}</span>
+                    )}
+                    {hasSubmenu && <span aria-hidden="true">›</span>}
+                  </span>
+                </div>
+                {hasSubmenu && isSubmenuOpen && (
+                  <div className="absolute top-0 left-full ml-[1px] bg-white border border-[#ccc] min-w-[220px] z-[2]">
+                    {option.options.map((subOption) => (
+                      <div
+                        key={`${option.name}-${subOption}`}
+                        className="flex w-full justify-between text-sm px-3 py-1 text-black hover:text-white hover:bg-osdag-green cursor-pointer"
+                        onClick={() => handleDatabaseTemplateDownload(subOption)}
+                      >
+                        <span>{subOption}</span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             );
