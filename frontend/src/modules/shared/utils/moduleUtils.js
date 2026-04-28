@@ -62,8 +62,7 @@ export const menuItems = [
       { name: "Video Tutorials" },
       { name: "Design Examples" },
       { name: "Ask us a question" },
-      { name: "About Osdag" },
-      { name: "Check For Update" }
+      { name: "About Osdag" }
     ],
   },
 ];

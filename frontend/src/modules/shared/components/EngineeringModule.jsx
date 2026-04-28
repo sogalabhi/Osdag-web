@@ -42,6 +42,9 @@ import {
 import ProjectNameModal from "../../../homepage/components/ProjectNameModal";
 import { useProjectCreation } from '../hooks/useProjectCreation';
 import { deleteAllCustomSections } from "../../../datasources/sectionsDataSource";
+import HelpLinkModal from "./help/HelpLinkModal";
+import AboutOsdagModal from "./help/AboutOsdagModal";
+import { ASK_QUESTION_LINK, DESIGN_EXAMPLES_URL } from "./help/helpContent";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -56,6 +59,8 @@ export const EngineeringModule = ({
   const prevModuleRef = useRef(null); // Track previous module for change detection
   const prevProjectIdRef = useRef(null); // Track previous projectId for change detection
   const lastLoadedProjectIdRef = useRef(null); // Prevent re-fetching same project (stops infinite GET loop)
+  const [showAskQuestionModal, setShowAskQuestionModal] = useState(false);
+  const [showAboutOsdagModal, setShowAboutOsdagModal] = useState(false);
 
   const {
     // Module data
@@ -934,6 +939,18 @@ export const EngineeringModule = ({
     if (name === "Download Inputs OSI") {
       return handleSaveInputs();
     }
+    if (name === "Design Examples") {
+      window.open(DESIGN_EXAMPLES_URL, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (name === "Ask us a question") {
+      setShowAskQuestionModal(true);
+      return;
+    }
+    if (name === "About Osdag") {
+      setShowAboutOsdagModal(true);
+      return;
+    }
     if (name === "Reset") {
       return handleResetEnhanced();
     }
@@ -1603,6 +1620,17 @@ export const EngineeringModule = ({
         />
       )}
       {projectCreationModal}
+      <HelpLinkModal
+        open={showAskQuestionModal}
+        onClose={() => setShowAskQuestionModal(false)}
+        title="Ask us a question"
+        helperText="Please visit:"
+        link={ASK_QUESTION_LINK}
+      />
+      <AboutOsdagModal
+        open={showAboutOsdagModal}
+        onClose={() => setShowAboutOsdagModal(false)}
+      />
     </div>
   );
 };
