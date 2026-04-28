@@ -27,6 +27,21 @@ class CreateLatex(Document):
     def __init__(self):
         super().__init__()
 
+    @staticmethod
+    def _resolve_report_image_path(filename, rel_path, image_path):
+        image_path = (image_path or "").replace("\\", "/")
+        report_dir = os.path.dirname(os.path.abspath(filename))
+        relative_image = image_path.lstrip("/")
+        report_image_path = os.path.join(report_dir, relative_image).replace("\\", "/")
+
+        if os.path.exists(report_image_path):
+            return report_image_path
+
+        if image_path.startswith("/"):
+            return (rel_path + image_path).replace("\\", "/")
+
+        return os.path.join(rel_path, image_path).replace("\\", "/")
+
     def save_latex(self, uiObj, Design_Check, reportsummary, filename, rel_path, Disp_2d_image, Disp_3d_image, module=''):
         companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
         companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
@@ -460,16 +475,12 @@ class CreateLatex(Document):
             Disp_top_image = "/ResourceFiles/images/top.png"
             Disp_side_image = "/ResourceFiles/images/side.png"
             Disp_front_image = "/ResourceFiles/images/front.png"
-            view_3dimg_path = rel_path + Disp_3d_image
-            view_topimg_path = rel_path + Disp_top_image
-            view_sideimg_path = rel_path + Disp_side_image
-            view_frontimg_path = rel_path + Disp_front_image
+            view_3dimg_path = self._resolve_report_image_path(filename, rel_path, Disp_3d_image)
+            view_topimg_path = self._resolve_report_image_path(filename, rel_path, Disp_top_image)
+            view_sideimg_path = self._resolve_report_image_path(filename, rel_path, Disp_side_image)
+            view_frontimg_path = self._resolve_report_image_path(filename, rel_path, Disp_front_image)
             with doc.create(Section('Views')):
                 with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.1)) as table:
-                    view_3dimg_path = rel_path + Disp_3d_image
-                    view_topimg_path = rel_path + Disp_top_image
-                    view_sideimg_path = rel_path + Disp_side_image
-                    view_frontimg_path = rel_path + Disp_front_image
                     table.add_hline()
                     table.add_row([StandAloneGraphic(image_options="height=4cm",filename=view_3dimg_path),
                                   StandAloneGraphic(image_options="height=4cm",filename=view_topimg_path)])

@@ -80,3 +80,4 @@ backend/file_storage/cad_models/*.parts.json
 backend/file_storage/cad_models/*.aux
 
 backend/firebase-service-account.json
+file_storage
