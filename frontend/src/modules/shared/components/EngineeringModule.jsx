@@ -987,6 +987,8 @@ export const EngineeringModule = ({
               onMenuClick={handleNavbarMenuClick}
               onCreateProject={handleCreateProject}
               isExistingProject={!!projectIdFromUrl}
+              moduleConfig={moduleConfig}
+              extraState={extraState}
             />
           ))}
 

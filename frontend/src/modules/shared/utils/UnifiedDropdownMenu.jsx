@@ -9,7 +9,11 @@ import { downloadSectionCatalog } from "../../../datasources/sectionsDataSource"
 import { getModuleConfig } from "./moduleConfig";
 import { expandAllSelectedInputs, buildOsiContent } from "./osiInputSerializer";
 import { buildLogFileContent } from "./logExport";
-import { downloadCadSectionsAsStl } from "./cadExport";
+import {
+  downloadCadSectionsAsStl,
+  downloadCachedModelByFormat,
+  downloadExportCadResponse,
+} from "./cadExport";
 import { canOpenAdditionalInputs } from "./designPrefOpenGuard";
 
 function UnifiedDropdownMenu({
@@ -39,6 +43,8 @@ function UnifiedDropdownMenu({
   onCreateProject = null,
   isExistingProject = false, // When true, disable "Create Project" menu item
   hasOutput = false,
+  moduleConfig = null,
+  extraState = {},
 }) {
   const service = useEngineeringService();
   const BASE_URL = `${apiBase}`;
@@ -241,6 +247,71 @@ function UnifiedDropdownMenu({
           await downloadCadSectionsAsStl(cadModelPaths, message);
         })();
         break;
+      case "Export BREP":
+      case "Export STL":
+      case "Export STEP":
+      case "Export IGS":
+        (async () => {
+          const formatMap = {
+            "Export BREP": "brep",
+            "Export STL": "stl",
+            "Export STEP": "step",
+            "Export IGS": "iges",
+          };
+          const format = formatMap[option.name];
+          const moduleId = moduleConfig?.designType || inputs?.module;
+          if (!moduleId) {
+            message.error("Module ID is missing. Unable to export CAD.");
+            return;
+          }
+
+          if (format === "brep" || format === "stl") {
+            const downloaded = await downloadCachedModelByFormat({
+              cadModelPaths,
+              format,
+              moduleId,
+              message,
+            });
+            if (downloaded) return;
+          }
+
+          if (typeof moduleConfig?.buildSubmissionParams !== "function") {
+            message.error("Module export configuration is missing.");
+            return;
+          }
+
+          try {
+            const inputValues = moduleConfig.buildSubmissionParams(
+              inputs,
+              allSelected,
+              contextData || {},
+              extraState || {}
+            );
+
+            const result = await service.exportCADModel(
+              moduleId,
+              inputValues,
+              format,
+              "Model"
+            );
+
+            if (!result?.success || !result?.blob) {
+              message.error(result?.error || "CAD export failed");
+              return;
+            }
+
+            downloadExportCadResponse({
+              blob: result.blob,
+              disposition: result.disposition,
+              fallbackFilename: `${moduleId}_Model.${format}`,
+            });
+            message.success(`${format.toUpperCase()} exported successfully`);
+          } catch (error) {
+            console.error("CAD export error:", error);
+            message.error(error?.message || "Failed to export CAD");
+          }
+        })();
+        break;
       case "Save Cad Image":
         triggerScreenshotCapture();
         break;
@@ -396,7 +467,15 @@ function UnifiedDropdownMenu({
                       <div
                         key={`${option.name}-${subOption}`}
                         className="flex w-full justify-between text-sm px-3 py-1 text-black hover:text-white hover:bg-osdag-green cursor-pointer"
-                        onClick={() => handleDatabaseTemplateDownload(subOption)}
+                        onClick={() => {
+                          if (option.name === "Download Database") {
+                            handleDatabaseTemplateDownload(subOption);
+                            return;
+                          }
+                          handleClick({ name: subOption });
+                          setOpenSubmenu(null);
+                          setIsOpen(false);
+                        }}
                       >
                         <span>{subOption}</span>
                       </div>
