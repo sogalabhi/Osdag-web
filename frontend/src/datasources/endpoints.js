@@ -44,6 +44,7 @@ export const MODULES = {
 // ----------------------
 export const CAD = {
   download: `${API_PREFIX}design/downloadCad/`, // POST
+  export: `${API_PREFIX}design/exportCad`, // POST (binary attachment)
 };
 
 // ----------------------

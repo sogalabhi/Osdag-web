@@ -20,7 +20,11 @@ export const menuItems = [
       // { name: "Download Input", shortcut: "Alt+D" },
       { name: "Save Log Messages", shortcut: "Alt+M" },
       { name: "Create Design Report", shortcut: "Alt+C" },
-      { name: "Save 3D Model", shortcut: "Alt+3" },
+      {
+        name: "Save 3D Model",
+        shortcut: "Alt+3",
+        options: ["Export BREP", "Export STL", "Export STEP", "Export IGS"],
+      },
       { name: "Save Cad Image", shortcut: "Alt+I" },
       { name: "Quit", shortcut: "Shift+Q" }
     ],

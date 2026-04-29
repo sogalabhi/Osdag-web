@@ -63,6 +63,24 @@ export async function downloadCad(format) {
 }
 
 /**
+ * Export CAD for requested format by regenerating from input_values.
+ */
+export async function exportCad(module_id, input_values, format, section = "Model") {
+  const res = await apiClient(CAD.export, {
+    method: "POST",
+    body: JSON.stringify({
+      module_id,
+      section,
+      format,
+      input_values,
+    }),
+  });
+  const blob = await res.blob();
+  const disposition = res.headers.get("Content-Disposition");
+  return { success: true, blob, disposition };
+}
+
+/**
  * Add a custom material via materialDetails API.
  */
 export async function addCustomMaterial(materialData) {

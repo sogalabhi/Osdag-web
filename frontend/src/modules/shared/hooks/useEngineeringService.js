@@ -18,6 +18,7 @@ import {
   createDesign as dsCreateDesign,
   createCad as dsCreateCad,
   downloadCad as dsDownloadCad,
+  exportCad as dsExportCad,
   addCustomMaterial as dsAddCustomMaterial,
   fetchDesignPreferences as dsFetchDesignPreferences,
 } from '../../../datasources/modulesDataSource';
@@ -123,6 +124,20 @@ export const useEngineeringService = () => {
       return { success: false, error: error.message };
     }
   }, []);
+
+  /**
+   * Export CAD in requested format using module inputs.
+   */
+  const exportCADModel = useCallback(
+    async (moduleId, inputValues, format, section = "Model") => {
+      try {
+        return await dsExportCad(moduleId, inputValues, format, section);
+      } catch (error) {
+        return { success: false, error: error.message };
+      }
+    },
+    []
+  );
 
   /**
    * Design and generate CAD in one call
@@ -339,6 +354,7 @@ export const useEngineeringService = () => {
     // CAD
     createCADModel,
     downloadCADModel,
+    exportCADModel,
 
     // Projects
     getProject,
