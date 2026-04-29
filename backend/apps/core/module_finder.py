@@ -4,7 +4,7 @@ Replaces the old osdag_api/module_finder.py with registry-based discovery
 """
 import importlib
 import pkgutil
-from typing import Dict, Any, List, Protocol
+from typing import Dict, Any, List, Protocol, Optional
 from types import ModuleType
 
 
@@ -40,7 +40,13 @@ class ModuleApiType(Protocol):
         """
         pass
     
-    def create_cad_model(self, input_values: Dict[str, Any], section: str, session: str) -> str:
+    def create_cad_model(
+        self,
+        input_values: Dict[str, Any],
+        section: str,
+        session: str,
+        export_formats: Optional[List[str]] = None,
+    ) -> str:
         """Generate the CAD model from input values as a BREP file. Return file path."""
         pass
 
@@ -80,9 +86,18 @@ class ModuleApiAdapter:
         """Delegate to adapter's generate_output function"""
         return self._adapter.generate_output(input_values)
     
-    def create_cad_model(self, input_values: Dict[str, Any], section: str, session: str) -> str:
-        """Delegate to adapter's create_cad_model function"""
-        return self._adapter.create_cad_model(input_values, section, session)
+    def create_cad_model(
+        self,
+        input_values: Dict[str, Any],
+        section: str,
+        session: str,
+        export_formats: Optional[List[str]] = None,
+    ) -> str:
+        """Delegate to adapter's create_cad_model function (best-effort)."""
+        try:
+            return self._adapter.create_cad_model(input_values, section, session, export_formats=export_formats)
+        except TypeError:
+            return self._adapter.create_cad_model(input_values, section, session)
 
 
 # Global module dictionary - auto-populated on import

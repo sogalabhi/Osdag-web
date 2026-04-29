@@ -11,7 +11,7 @@ from apps.core.api import (
     SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
     ParseReportSections, CustomizeReport,
     DesignPreference, DesignPreferenceSync, DesignPreferenceDefaults, MaterialDetails, CompanyLogoView,
-    CADGeneration, CADDownload
+    CADGeneration, CADDownload, CADExport
 )
 from apps.core import views
 
@@ -59,6 +59,8 @@ urlpatterns = [
     path('api/design/cad/', CADGeneration.as_view()),
     path('api/design/downloadCad', CADDownload.as_view()),
     path('api/design/downloadCad/', CADDownload.as_view()),
+    path('api/design/exportCad', CADExport.as_view()),
+    path('api/design/exportCad/', CADExport.as_view()),
     
     # Legacy design type views (temporary - may be moved later)
     path('osdag-web/', views.get_design_types, name='index'),

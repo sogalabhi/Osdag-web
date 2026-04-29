@@ -204,7 +204,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     return output, logs
 
 
-def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
+def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
     if section not in ("Model", "Member", "Plate", "Endplate"):
         raise InvalidInputTypeError("section", "'Model', 'Member', 'Plate', 'Endplate'")
@@ -292,6 +292,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 
         # If it's "Model" section, write a manifest referencing per-part breps and save extra formats
         if section == "Model":
+            export_formats_lc = {f.lower() for f in export_formats} if export_formats else set()
             try:
                 manifest = {
                     "session": session,
@@ -312,25 +313,18 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
             except Exception as me:
                 print(f"Warning: Failed to write manifest: {me}")
 
-            # Save STEP
-            step_writer = STEPControl_Writer()
-            step_writer.Transfer(model, STEPControl_AsIs)
-            step_file_path = file_path.replace(".brep", ".step")
-            full_step_file_path = os.path.join(os.getcwd(), step_file_path)
-            if step_writer.Write(full_step_file_path) == 1:
-                print(f"STEP file saved at {full_step_file_path}")
-            else:
-                print("Warning: Failed to save STEP file!")
-
-            # Save IGES
-            iges_writer = IGESControl_Writer()
-            iges_writer.AddShape(model)
-            iges_file_path = file_path.replace(".brep", ".iges")
-            full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
-            if iges_writer.Write(full_iges_file_path) == 1:
-                print(f"IGES file saved at {full_iges_file_path}")
-            else:
-                print("Warning: Failed to save IGES file!")
+            # Optional on-demand STEP/IGES exports (only when frontend requests them)
+            try:
+                if export_formats_lc:
+                    from apps.core.utils.cad_export import export_step, export_iges
+                    if "step" in export_formats_lc:
+                        step_rel = file_path.replace(".brep", ".step")
+                        export_step(model, os.path.join(os.getcwd(), step_rel))
+                    if "iges" in export_formats_lc:
+                        iges_rel = file_path.replace(".brep", ".iges")
+                        export_iges(model, os.path.join(os.getcwd(), iges_rel))
+            except Exception as e:
+                print(f"Warning: Optional STEP/IGES export failed: {e}")
             # Write merged STL for Model
             try:
                 merged_stl_rel = file_path.replace(".brep", ".stl")

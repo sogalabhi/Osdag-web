@@ -618,7 +618,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     return output, logs
 
 
-def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
+def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
     if section not in ("Model", "Beam", "Column", "Plate"):  # Error checking: If section is valid.
         raise InvalidInputTypeError(

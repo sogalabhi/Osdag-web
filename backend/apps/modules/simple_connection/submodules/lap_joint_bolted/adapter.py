@@ -157,7 +157,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         traceback.print_exc()
     return output, logs
 
-def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
+def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
     print(f"[LapJointBolted CAD] Starting CAD generation for section='{section}', session='{session}'")
     # Two separate plate options: Plate 1 and Plate 2 (each returns only that plate's geometry)
@@ -344,6 +344,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
 
         if section == "Model":
             print(f"[LapJointBolted CAD] Generating additional formats for Model")
+            export_formats_lc = {f.lower() for f in export_formats} if export_formats else set()
             try:
                 manifest = {
                     "session": session,
@@ -361,31 +362,20 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
             except Exception as me:
                 print(f"[LapJointBolted CAD] Warning: Failed to write manifest: {me}")
 
+            # Optional on-demand STEP/IGES exports (only when frontend requests them)
             try:
-                print(f"[LapJointBolted CAD] Exporting STEP format")
-                step_writer = STEPControl_Writer()
-                step_writer.Transfer(model, STEPControl_AsIs)
-                step_file_path = file_path.replace(".brep", ".step")
-                full_step_file_path = os.path.join(os.getcwd(), step_file_path)
-                if step_writer.Write(full_step_file_path) != 1:
-                    print(f"[LapJointBolted CAD] Warning: Failed to save STEP file")
-                else:
-                    print(f"[LapJointBolted CAD] STEP file written: {step_file_path}")
-            except Exception as stepe:
-                print(f"[LapJointBolted CAD] Warning: STEP export failed: {stepe}")
+                if export_formats_lc:
+                    from apps.core.utils.cad_export import export_step, export_iges
 
-            try:
-                print(f"[LapJointBolted CAD] Exporting IGES format")
-                iges_writer = IGESControl_Writer()
-                iges_writer.AddShape(model)
-                iges_file_path = file_path.replace(".brep", ".iges")
-                full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
-                if iges_writer.Write(full_iges_file_path) != 1:
-                    print(f"[LapJointBolted CAD] Warning: Failed to save IGES file")
-                else:
-                    print(f"[LapJointBolted CAD] IGES file written: {iges_file_path}")
-            except Exception as igee:
-                print(f"[LapJointBolted CAD] Warning: IGES export failed: {igee}")
+                    if "step" in export_formats_lc:
+                        step_rel = file_path.replace(".brep", ".step")
+                        export_step(model, os.path.join(os.getcwd(), step_rel))
+
+                    if "iges" in export_formats_lc:
+                        iges_rel = file_path.replace(".brep", ".iges")
+                        export_iges(model, os.path.join(os.getcwd(), iges_rel))
+            except Exception as e:
+                print(f"[LapJointBolted CAD] Warning: Optional STEP/IGES export failed: {e}")
 
             try:
                 merged_stl_rel = file_path.replace(".brep", ".stl")

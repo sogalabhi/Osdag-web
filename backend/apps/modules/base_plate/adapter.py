@@ -350,7 +350,7 @@ def generate_output(input_values: Dict[str, Any]):
 BASE_PLATE_CAD_SECTIONS = ("Model", "Column", "Plate")
 
 
-def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
+def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate CAD model from input values as BREP/STL. Returns file path or empty string.
     Desktop options: Model, Column, Base Plate (Plate).
     """

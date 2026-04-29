@@ -239,7 +239,7 @@ def generate_output(input_values: Dict[str, Any]):
     return output, logs
 
 
-def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
+def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """
     Generate CAD model for On-Cantilever-Beam.
     Uses createSimplySupportedBeam as the cantilever beam shape is structurally similar.

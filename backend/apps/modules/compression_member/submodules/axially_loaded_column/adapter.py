@@ -245,7 +245,7 @@ def generate_output(
 
 
 def create_cad_model(
-    input_values: Dict[str, Any], section: str, session: str
+    input_values: Dict[str, Any], section: str, session: str, export_formats=None
 ) -> str:
     """
     Generate a CAD model for the given section and return the file path.
@@ -259,6 +259,8 @@ def create_cad_model(
         raise InvalidInputTypeError(
             "section", "'Model' or 'Column'"
         )
+
+    export_formats_lc = {f.lower() for f in export_formats} if export_formats else set()
 
     try:
         module = create_from_input(input_values)
@@ -331,11 +333,11 @@ def create_cad_model(
         except Exception:
             traceback.print_exc()
 
-    if not wrote_any and STEPControl_Writer is not None:
+    # Optional STEP export only when requested
+    if "step" in export_formats_lc:
         try:
-            writer = STEPControl_Writer()
-            writer.Transfer(final_shape, STEPControl_AsIs)
-            writer.Write(step_path)
+            from apps.core.utils.cad_export import export_step
+            export_step(final_shape, step_path)
             wrote_any = os.path.exists(step_path)
         except Exception:
             traceback.print_exc()

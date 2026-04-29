@@ -321,7 +321,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     return output, logs
 
 
-def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
+def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP/STL file.
 
     External API uses section names: "Model", "Column", "CoverPlate".
@@ -388,25 +388,21 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
             print(f"Warning: Failed to save STL at {file_path}: {stle}")
 
         if section == "Model":
-            # Save STEP
-            step_writer = STEPControl_Writer()
-            step_writer.Transfer(model, STEPControl_AsIs)
-            step_file_path = file_path.replace(".brep", ".step")
-            full_step_file_path = os.path.join(os.getcwd(), step_file_path)
-            if step_writer.Write(full_step_file_path) == 1:
-                print(f"STEP file saved at {full_step_file_path}")
-            else:
-                print("Warning: Failed to save STEP file!")
+            export_formats_lc = {f.lower() for f in export_formats} if export_formats else set()
 
-            # Save IGES
-            iges_writer = IGESControl_Writer()
-            iges_writer.AddShape(model)
-            iges_file_path = file_path.replace(".brep", ".iges")
-            full_iges_file_path = os.path.join(os.getcwd(), iges_file_path)
-            if iges_writer.Write(full_iges_file_path) == 1:
-                print(f"IGES file saved at {full_iges_file_path}")
-            else:
-                print("Warning: Failed to save IGES file!")
+            # Optional on-demand STEP/IGES exports
+            if export_formats_lc:
+                try:
+                    from apps.core.utils.cad_export import export_step, export_iges
+
+                    if "step" in export_formats_lc:
+                        step_rel = file_path.replace(".brep", ".step")
+                        export_step(model, os.path.join(os.getcwd(), step_rel))
+                    if "iges" in export_formats_lc:
+                        iges_rel = file_path.replace(".brep", ".iges")
+                        export_iges(model, os.path.join(os.getcwd(), iges_rel))
+                except Exception as e:
+                    print(f"Warning: Optional STEP/IGES export failed: {e}")
 
     except Exception as e:
         print('Writing to BREP/STL file failed e : ', e)

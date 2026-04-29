@@ -22,6 +22,7 @@ from .design.report_customization_api import ParseReportSections, CustomizeRepor
 # CAD exports
 from .cad.cad_model_api import CADGeneration
 from .cad.cad_model_download import CADDownload
+from .cad.cad_model_export import CADExport
 
 # Modules exports
 from .modules.modules_api import GetModules
@@ -38,7 +39,7 @@ __all__ = [
     'CreateDesignReport', 'GetPDF',
     'ParseReportSections', 'CustomizeReport',
     # CAD
-    'CADGeneration', 'CADDownload',
+    'CADGeneration', 'CADDownload', 'CADExport',
     # Modules
     'GetModules',
 ]

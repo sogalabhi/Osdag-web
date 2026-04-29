@@ -609,7 +609,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     return output, logs
 
 
-def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
+def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
     if section not in ("Model", "Beam", "Column", "Plate"):  # Error checking: If section is valid.
         raise InvalidInputTypeError(
@@ -647,24 +647,77 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
         raise  # Re-raise to prevent using undefined cld
 
     # The section of the module that will be generated.
-    # Explicitly skip merged Model generation; only per-part files are needed.
     if section == "Model":
-        print("[CAD Adapter] Skipping Model generation (per requirement: only per-part files)")
-        return None
+        # Build merged compound from Beam + Column + Plate and write *_Model.brep + *_Model.stl.
+        try:
+            part_names = ["Beam", "Column", "Plate"]
+            builder = BRep_Builder()
+            compound = TopoDS_Compound()
+            builder.MakeCompound(compound)
+
+            for part in part_names:
+                cld.component = part
+                print(f'[CAD Adapter] Generating merged Model part: cld.component = {part}')
+                part_shape = cld.create2Dcad()
+                if part_shape is None:
+                    continue
+                builder.Add(compound, part_shape)
+
+            model = compound
+        except Exception as e:
+            print('Error while building merged Model compound in fin-plate:', e)
+            traceback.print_exc()
+            raise
+
+        # Ensure output directory exists
+        cad_models_path = os.path.join(os.getcwd(), "file_storage", "cad_models")
+        if not os.path.exists(cad_models_path):
+            print('path does not exists cad_models , creating one')
+            os.makedirs(cad_models_path, exist_ok=True)
+
+        file_name = f"{session}_Model.brep"
+        file_path = f"file_storage/cad_models/{file_name}"
+        print('brep file path in create_cad_model : ' , file_path)
+
+        # Write merged BREP
+        try:
+            BRepTools.breptools.Write(model, file_path, Message_ProgressRange())
+        except Exception as e:
+            print('Writing to merged BREP file failed e : ' , e)
+            raise
+
+        # Write merged STL next to BREP
+        try:
+            merged_stl_rel = file_path.replace(".brep", ".stl")
+            write_stl(model, os.path.join(os.getcwd(), merged_stl_rel))
+            print(f"STL file saved at {os.path.join(os.getcwd(), merged_stl_rel)}")
+        except Exception as stle:
+            print(f"Warning: Failed to save merged STL for {section}: {stle}")
+
+        try:
+            from apps.core.utils.cad_export import export_step, export_iges
+
+            export_formats_lc = {f.lower() for f in export_formats} if export_formats else set()
+            if "step" in export_formats_lc:
+                step_rel = file_path.replace(".brep", ".step")
+                export_step(model, os.path.join(os.getcwd(), step_rel))
+            if "iges" in export_formats_lc:
+                iges_rel = file_path.replace(".brep", ".iges")
+                export_iges(model, os.path.join(os.getcwd(), iges_rel))
+        except Exception as e:
+            # If export fails, keep the brep/stl exports as long as the core CAD exists.
+            print(f"Warning: Optional step/iges export failed for fin-plate Model: {e}")
+
+        return file_path
 
     cld.component = section
     print(f'[CAD Adapter] Setting cld.component = {section}')
-
-    # Only per-part generation
-    part_names = []
-    part_files = {}
-    compound_model = None
 
     try:
         print(f'[CAD Adapter] Generating individual part: cld.component = {cld.component}')
         model = cld.create2Dcad()
         print(f'[CAD Adapter] Generated model type: {type(model)}')
-    except Exception as e :
+    except Exception as e:
         print('Error in cld.create2Dcad() e : ' , e)
         return False
 
@@ -674,16 +727,15 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
     if not os.path.exists(cad_models_path):
         print('path does not exists cad_models , creating one')
         os.makedirs(cad_models_path, exist_ok=True)
-      
+
     print('2d model : ' , model)
-    # os.system("clear")  # clear the terminal
     file_name = session + "_" + section + ".brep"
     file_path = "file_storage/cad_models/" + file_name
     print('brep file path in create_cad_model : ' , file_path)
 
-    try : 
-        BRepTools.breptools.Write(model, file_path, Message_ProgressRange()) # Generate CAD Model
-    except Exception as e : 
+    try:
+        BRepTools.breptools.Write(model, file_path, Message_ProgressRange())
+    except Exception as e:
         print('Writing to BREP file failed e : ' , e)
 
     # Export single STL next to BREP

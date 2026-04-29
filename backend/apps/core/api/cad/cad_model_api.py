@@ -22,6 +22,7 @@ from io import BytesIO
 # rest_framework
 from rest_framework import status
 from rest_framework.response import Response
+from .cad_module_aliases import resolve_module_id
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CADGeneration(View):
@@ -48,48 +49,7 @@ class CADGeneration(View):
                 return JsonResponse({"status": "error", "message": "input_values are required"}, status=400)
             
             # Normalize hyphenated ids to backend ids
-            module_aliases = {
-                # legacy hyphenated
-                "ButtJointWelded": "ButtJointWelded",
-                "ButtJointBolted": "ButtJointBolted",
-                "LapJointWelded": "LapJointWelded",
-                "LapJointBolted": "LapJointBolted",
-                "Beam-to-Beam-Cover-Plate-Bolted-Connection": "Cover-Plate-Bolted-Connection",
-                "Beam-to-Beam-Cover-Plate-Welded-Connection": "Cover-Plate-Welded-Connection",
-                "Beam-Beam-End-Plate-Connection": "Beam-Beam-End-Plate-Connection",
-                "Beam-to-Column-End-Plate-Connection": "Beam-to-Column-End-Plate-Connection",
-                "Column-to-Column-Cover-Plate-Bolted-Connection": "ColumnCoverPlateBolted",
-                "Column-to-Column-Cover-Plate-Welded-Connection": "Column-to-Column-Cover-Plate-Welded-Connection",
-                "Column-to-Column-End-Plate-Connection": "Column-to-Column-End-Plate-Connection",
-                # slug forms
-                "butt-joint-welded": "ButtJointWelded",
-                "butt-joint-bolted": "ButtJointBolted",
-                "lap-joint-welded": "LapJointWelded",
-                "lap-joint-bolted": "LapJointBolted",
-                # shear slugs
-                "shear-connection/fin-plate": "FinPlateConnection",
-                "shear-connection/cleat-angle": "CleatAngleConnection",
-                "shear-connection/end-plate": "EndPlateConnection",
-                "shear-connection/seated-angle": "SeatedAngleConnection",
-                # moment slugs
-                "moment-connection/beam-beam-cover-plate-bolted": "Cover-Plate-Bolted-Connection",
-                "moment-connection/beam-beam-cover-plate-welded": "Cover-Plate-Welded-Connection",
-                "moment-connection/beam-beam-end-plate": "Beam-Beam-End-Plate-Connection",
-                "moment-connection/beam-column-end-plate": "Beam-to-Column-End-Plate-Connection",
-                "moment-connection/column-column-cover-plate-bolted": "ColumnCoverPlateBolted",
-                "moment-connection/column-column-cover-plate-welded": "Column-to-Column-Cover-Plate-Welded-Connection",
-                "moment-connection/column-column-end-plate": "Column-to-Column-End-Plate-Connection",
-                # moment keys
-                "CoverPlateBolted": "Cover-Plate-Bolted-Connection",
-                "CoverPlateWelded": "Cover-Plate-Welded-Connection",
-                "BeamBeamEndPlate": "Beam-Beam-End-Plate-Connection",
-                "BeamColumnEndPlate": "Beam-to-Column-End-Plate-Connection",
-                "CCCoverPlateBolted": "ColumnCoverPlateBolted",
-                "CCCoverPlateWelded": "Column-to-Column-Cover-Plate-Welded-Connection",
-                "CCEndPlate": "Column-to-Column-End-Plate-Connection",
-                # simple slugs already mapped above
-            }
-            resolved_module_id = module_aliases.get(module_id, module_id)
+            resolved_module_id = resolve_module_id(module_id)
 
             # Get module API
             module_api = get_module_api(resolved_module_id)
@@ -133,7 +93,7 @@ class CADGeneration(View):
     
         # Determine sections based on the session type and what each backend module expects
         if session_type == "FinPlateConnection":
-            sections = ["Beam", "Column", "Plate"]
+            sections = ["Model", "Beam", "Column", "Plate"]
         elif session_type == "CleatAngle":
             sections = ["Model", "Beam", "Column", "cleatAngle"]
         elif session_type == "EndPlate":

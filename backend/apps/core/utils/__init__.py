@@ -8,6 +8,7 @@ from .validation import (
     validate_string, validate_num, validate_arr
 )
 from .mesh_export import write_stl
+from .cad_export import export_step, export_iges
 
 __all__ = [
     # Errors
@@ -18,5 +19,7 @@ __all__ = [
     'validate_string', 'validate_num', 'validate_arr',
     # Mesh export
     'write_stl',
+    # CAD export
+    'export_step', 'export_iges',
 ]
 

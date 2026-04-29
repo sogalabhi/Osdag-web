@@ -396,7 +396,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     return output, logs
 
 
-def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
+def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
     from apps.core.utils import write_stl
     from OCC.Core.BRep import BRep_Builder
@@ -487,6 +487,20 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -
                     pass
             except Exception as e:
                 print("Failed to write Model STL for EndPlate:", e)
+
+            # Optional on-demand exports (only when frontend requests them)
+            try:
+                from apps.core.utils.cad_export import export_step, export_iges
+
+                export_formats_lc = {f.lower() for f in export_formats} if export_formats else set()
+                if "step" in export_formats_lc:
+                    step_rel = compound_file_path_rel.replace(".brep", ".step")
+                    export_step(model, os.path.join(os.getcwd(), step_rel))
+                if "iges" in export_formats_lc:
+                    iges_rel = compound_file_path_rel.replace(".brep", ".iges")
+                    export_iges(model, os.path.join(os.getcwd(), iges_rel))
+            except Exception as e:
+                print(f"Warning: Optional step/iges export failed for EndPlate Model: {e}")
             return compound_file_path_rel
         else:
             try : 

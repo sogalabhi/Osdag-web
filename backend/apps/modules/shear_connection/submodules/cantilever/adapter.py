@@ -339,7 +339,7 @@ def generate_output(input_values: Dict[str, Any]) -> tuple:
         return output, logs
 
 
-def create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
+def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
     print("\n" + "=" * 60)
     print("create_cad_model() called")
