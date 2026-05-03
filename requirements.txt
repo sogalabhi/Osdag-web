@@ -100,6 +100,9 @@ tinycss2==1.0.2
 defusedxml==0.6.0
 webencodings==0.5.1
 
+# --- BIM / IFC export (CAD exportCad .ifc) ---
+ifcopenshell>=0.8.0,<0.9
+
 # --- PDF / LaTeX / Reporting extras (project-specific) ---
 pdfkit==0.6.1
 pdflatex==0.1.3

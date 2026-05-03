@@ -2,14 +2,17 @@
 On-demand CAD export endpoint.
 
 This regenerates the merged CAD shape from `input_values` in the module adapter and
-exports only the requested format (step/iges/brep/stl) without reading previously
-saved .brep files back from disk.
+exports the requested format (step/iges/brep/stl/ifc). IFC is produced in this view
+from the generated BREP via `cad_export.export_ifc` (IfcOpenShell mesh).
 """
 
 import json
+import logging
 import os
 import uuid
 from typing import Any, Dict, Optional
+
+logger = logging.getLogger(__name__)
 
 from django.http import FileResponse, JsonResponse, HttpRequest
 from django.views import View
@@ -46,7 +49,7 @@ class CADExport(View):
         "module_id": "...",
         "input_values": {...},
         "section": "Model" (optional),
-        "format": "step" | "iges" | "brep" | "stl"
+        "format": "step" | "iges" | "brep" | "stl" | "ifc"
       }
     """
 
@@ -67,7 +70,7 @@ class CADExport(View):
             return JsonResponse({"status": "error", "message": "input_values are required"}, status=400)
         if not format_type:
             return JsonResponse({"status": "error", "message": "format is required"}, status=400)
-        if format_type not in ("step", "iges", "brep", "stl"):
+        if format_type not in ("step", "iges", "brep", "stl", "ifc"):
             return JsonResponse({"status": "error", "message": "Invalid format type requested"}, status=400)
 
         resolved_module_id = resolve_module_id(module_id)
@@ -100,7 +103,7 @@ class CADExport(View):
 
         # Derive output path even if adapter returns non-brep (some adapters prefer STL/STEP).
         def _swap_ext(abs_path: str, new_ext: str) -> str:
-            for ext in (".brep", ".stl", ".step", ".iges"):
+            for ext in (".brep", ".stl", ".step", ".iges", ".ifc"):
                 if abs_path.lower().endswith(ext):
                     return abs_path[: -len(ext)] + new_ext
             # Fallback: attempt brep replace
@@ -108,7 +111,26 @@ class CADExport(View):
                 return abs_path.replace(".brep", new_ext)
             return abs_path
 
-        if format_type == "brep":
+        if format_type == "ifc":
+            from apps.core.utils.cad_export import export_ifc
+            from apps.core.utils.report_image_generator import read_brep_file
+
+            out_abs_path = os.path.normpath(_swap_ext(brep_abs, ".ifc"))
+            try:
+                shape = read_brep_file(brep_abs)
+                export_ifc(shape, out_abs_path)
+            except Exception as e:
+                logger.exception(
+                    "IFC export failed (module_id=%s, brep=%s, out=%s)",
+                    module_id,
+                    brep_abs,
+                    out_abs_path,
+                )
+                return JsonResponse(
+                    {"status": "error", "message": f"IFC export failed: {e!s}"},
+                    status=500,
+                )
+        elif format_type == "brep":
             out_abs_path = _swap_ext(brep_abs, ".brep")
         elif format_type == "stl":
             out_abs_path = _swap_ext(brep_abs, ".stl")

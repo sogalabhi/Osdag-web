@@ -104,7 +104,7 @@ def read_brep_file(brep_path: str):
         FileNotFoundError: If BREP file doesn't exist
         ValueError: If BREP file is invalid or can't be read
     """
-    from OCC.Core.BRepTools import BRepTools
+    from OCC.Core.BRepTools import breptools
     from OCC.Core.BRep import BRep_Builder
     from OCC.Core.TopoDS import TopoDS_Shape
     
@@ -120,7 +120,7 @@ def read_brep_file(brep_path: str):
     try:
         shape = TopoDS_Shape()
         builder = BRep_Builder()
-        result = BRepTools.Read(shape, brep_path, builder)
+        result = breptools.Read(shape, brep_path, builder)
         
         if not result:
             raise ValueError(f"Failed to read BREP file: {brep_path}")
