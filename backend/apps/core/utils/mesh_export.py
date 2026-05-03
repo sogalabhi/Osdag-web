@@ -20,8 +20,10 @@ def write_stl(shape, stl_path: str, linear_deflection: float = 0.3, angular_defl
     mesh = BRepMesh_IncrementalMesh(shape, linear_deflection, parallel, angular_deflection, parallel)
     mesh.Perform()
 
-    # Write STL
+    # Write STL (binary — matches readers that expect 80-byte header + uint32 count)
     writer = StlAPI_Writer()
+    if hasattr(writer, "SetASCIIMode"):
+        writer.SetASCIIMode(False)
     ok = writer.Write(shape, stl_path)
     if not ok:
         raise RuntimeError(f"Failed to write STL: {stl_path}")

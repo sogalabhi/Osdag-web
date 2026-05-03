@@ -251,12 +251,14 @@ function UnifiedDropdownMenu({
       case "Export STL":
       case "Export STEP":
       case "Export IGS":
+      case "Export IFC":
         (async () => {
           const formatMap = {
             "Export BREP": "brep",
             "Export STL": "stl",
             "Export STEP": "step",
             "Export IGS": "iges",
+            "Export IFC": "ifc",
           };
           const format = formatMap[option.name];
           const moduleId = moduleConfig?.designType || inputs?.module;

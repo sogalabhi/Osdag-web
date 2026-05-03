@@ -23,7 +23,7 @@ export const menuItems = [
       {
         name: "Save 3D Model",
         shortcut: "Alt+3",
-        options: ["Export BREP", "Export STL", "Export STEP", "Export IGS"],
+        options: ["Export BREP", "Export STL", "Export STEP", "Export IGS", "Export IFC"],
       },
       { name: "Save Cad Image", shortcut: "Alt+I" },
       { name: "Quit", shortcut: "Shift+Q" }
