@@ -4,6 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import { MODULE_ROUTES, MODULE_NAME_TO_KEY } from '../../constants/modules';
 import { isGuestUser } from '../../utils/auth';
 import { useAuth } from '../../hooks/useAuth';
+import dayButton from '../../assets/homepage/day_button.svg';
+import infoDefault from '../../assets/homepage/info_default.svg';
+import infoHover from '../../assets/homepage/info_hover.svg';
+import loadDefault from '../../assets/homepage/load_default.svg'
+import loadHover from '../../assets/homepage/load_hover.svg';
+import nightButton from '../../assets/homepage/night_button.svg';
+import pluginDefault from '../../assets/homepage/plugin_default.svg';
+import pluginHover from '../../assets/homepage/plugin_hover.svg';
+import resourcesDefault from '../../assets/homepage/resources_default.svg';
+import resourcesHover from '../../assets/homepage/resources_hover.svg';
+import AboutOsdag from "./AboutOsdag";
+import AskQuestion from "./AskQuestion";
+import CheckUpdate from "./CheckUpdate";
 
 const Header = ({ setshowSideBar, active }) => {
   const [isDark, setIsDark] = useState(false);
@@ -15,6 +28,11 @@ const Header = ({ setshowSideBar, active }) => {
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const { logout, user: firebaseUser } = useAuth();
+  const [activeSubmenu, setActiveSubmenu] = useState(null);
+  const [showAbout, setShowAbout] = useState(false);
+  const [showAskQuestion, setShowAskQuestion] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [showCheckUpdate, setShowCheckUpdate] = useState(false);
 
   // Check if user is a guest
   const isGuest = isGuestUser();
@@ -139,6 +157,28 @@ const Header = ({ setshowSideBar, active }) => {
   }, []);
 
   const searchResults = getSearchResults();
+
+  const fileMap = {
+    Column: "Columns_Details.xlsx",
+    Beam: "Beams_Details.xlsx",
+    Channel: "Channels_Details.xlsx",
+    Angle: "Angles_Details.xlsx",
+    SHS: "SHS_Details.xlsx",
+    RHS: "RHS_Details.xlsx",
+    CHS: "CHS_Details.xlsx",
+    "Download xlsx": "Beams_Details.xlsx"
+  };
+
+  const handleDownload = (item) => {
+    const fileName = fileMap[item];
+
+    const link = document.createElement("a");
+    link.href = `/downloads/${fileName}`; // <-- path where XLSX is served
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="border-osdag-border dark:border-gray-700">
@@ -353,135 +393,268 @@ const Header = ({ setshowSideBar, active }) => {
           </div>
 
           {/* Desktop Icons */}
-          <div className="hidden md:flex items-center space-x-1 mb-6 border-black p-2 bg-white dark:bg-osdag-dark-color rounded-lg justify-center" >
-            {/* About Button with Dropdown */}
+          <div className="hidden md:flex items-center space-x-1 mb-6 border-black p-2 dark:bg-osdag-dark-color justify-center" >
             <div className="relative about-dropdown group ">
               <button
                 onClick={() => setShowAboutDropdown(!showAboutDropdown)}
-                className={`p-3 transition-all duration-300 rounded-xl group-hover:px-6 ${showAboutDropdown
+                className={`p-3 transition-all duration-300 group-hover:px-6 border border-black ${showAboutDropdown
                   ? 'bg-osdag-green text-white'
                   : 'text-black dark:text-white  hover:text-white hover:bg-osdag-green'
                   }`}
               >
-                <div className="flex items-center space-x-2">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                <div className="group flex items-center space-x-2">
+                  <div className="relative w-6 h-6">
+                    {/* Default icon */}
+                    <img
+                      src={infoDefault}
+                      alt="Info"
+                      className="absolute inset-0 w-6 h-6 opacity-100 group-hover:opacity-0 transition-opacity duration-200"
                     />
-                  </svg>
-                  <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
-                    About
+                  {/* Hover icon */}
+                    <img
+                      src={infoHover}
+                      alt="Info Hover"
+                      className="absolute inset-0 w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    />
+                  </div>
+                  <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transition-all duration-300 w-0 group-hover:w-auto overflow-hidden">
+                    Info
                   </span>
-                  <svg
-                    className={`w-4 h-4 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-all duration-300 ${showAboutDropdown ? 'rotate-180' : ''
-                      }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
                 </div>
               </button>
               {(showAboutDropdown || false) && (
-                <div className="absolute right-0 top-full mt-2 bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green rounded-xl shadow-lg z-20 min-w-48 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute top-full bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green shadow-lg z-20 min-w-48 animate-in fade-in duration-200">
                   <div className="py-2">
-                    <button className="w-full px-4 py-2 text-left text-osdag-green  hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
-                      Help
+                    <button
+                      onClick={() => {
+                        setShowAbout(true);
+                        setShowAboutDropdown(false); // close dropdown
+                      }}
+                      className="w-full px-4 py-2 hover:bg-osdag-green hover:text-white whitespace-nowrap text-left"
+                    >
+                     About Osdag
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-osdag-green  hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
-                      Info
+                    <button 
+                      onClick={() => {
+                        setShowAskQuestion(true);
+                        setShowAboutDropdown(false); // close dropdown
+                      }}
+                      className="w-full px-4 py-2 hover:bg-osdag-green hover:text-white whitespace-nowrap text-left">
+                      Ask us a question
                     </button>
+                    <button
+                      onClick={() => setShowCheckUpdate(true)}
+                      className="w-full px-4 py-2 hover:bg-osdag-green hover:text-white whitespace-nowrap text-left">
+                      Check for Update
+                    </button>
+                  </div>
+                </div>
+              )}
+              {showAbout && (
+                <AboutOsdag onClose={() => setShowAbout(false)} />
+              )}
+              {showAskQuestion && (
+                <AskQuestion onClose={() => setShowAskQuestion(false)} />
+              )}
+              {showCheckUpdate && (
+                <CheckUpdate onClose={() => setShowCheckUpdate(false)} />
+              )}
+            </div>
+            
+            {/* Resources Button with Dropdown */}
+            <div className="relative resources-dropdown group ">
+              <button
+                onClick={() => setShowResourcesDropdown(!showResourcesDropdown)}
+                className={`p-3 transition-all duration-300 group-hover:px-6 border border-black ${showResourcesDropdown
+                  ? 'bg-osdag-green text-white'
+                  : 'text-black dark:text-white hover:text-white hover:bg-osdag-green'
+                  }`}
+              >
+                <div className="group flex items-center space-x-2">
+                  <div className="relative w-6 h-6">
+                  {/* Default icon */}
+                  <img
+                    src={resourcesDefault}
+                    alt="Resources"
+                    className="w-6 h-6 block group-hover:hidden"
+                  />
+
+                  {/* Hover icon */}
+                  <img
+                    src={resourcesHover}
+                    alt="Resources Hover"
+                    className="w-6 h-6 hidden group-hover:block"
+                  />
+                </div>
+                  <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
+                    Resources
+                  </span>
+                </div>
+              </button>
+              {(showResourcesDropdown || false) && (
+                <div className="absolute top-full bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green shadow-lg z-20 min-w-64 animate-in fade-in slide-in-from-top-2 duration-200 whitespace-nowrap">
+                  <div className="py-2">
+                    <ul className="py-1 text-sm text-gray-800">
+                    
+                     <li className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left"
+                      onMouseEnter={() => setActiveSubmenu(null)}
+                     >
+                      Design Examples
+                     </li>
+                     <li className="relative"
+                         onMouseEnter={() => setActiveSubmenu("database")}
+                         onMouseLeave={() => setActiveSubmenu(null)}
+                     >
+                      <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
+                       Databases (IS 808:2021)
+                        <span className="ml-2 text-right">›</span>
+                      </div>
+
+                      {/* Submenu */}
+                      {activeSubmenu === "database" && (
+                       <div className="absolute left-full top-0 ml-1 w-24 bg-white border border-osdag-border shadow-md">
+                        {["Column", "Beam", "Channel", "Angle"].map(item => (
+                          <div
+                            key={item}
+                            onClick={() => handleDownload(item)}
+                            className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left"
+                          >
+                           {item}
+                          </div>
+                        ))}
+                      </div>
+                      )}
+                     </li>
+                     <li className="relative"
+                         onMouseEnter={() => setActiveSubmenu("is4923")}
+                         onMouseLeave={() => setActiveSubmenu(null)}
+                     >
+                      <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
+                       Databases (IS 4923:2017)
+                        <span className="ml-2">›</span>
+                      </div>
+
+                      {/* Submenu */}
+                      {activeSubmenu === "is4923" && (
+                       <div className="absolute left-full top-0 ml-1 w-20 bg-white border border-osdag-border shadow-md">
+                        {["SHS", "RHS"].map(item => (
+                          <div
+                            key={item}
+                            onClick={() => handleDownload(item)}
+                            className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
+                          >
+                           {item}
+                          </div>
+                        ))}
+                       </div>
+                       )}
+                     </li>
+                     <li className="relative"
+                         onMouseEnter={() => setActiveSubmenu("is1161")}
+                         onMouseLeave={() => setActiveSubmenu(null)}
+                     >
+                      <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
+                       Databases (IS 1161:2014)
+                        <span className="ml-2">›</span>
+                      </div>
+
+                      {/* Submenu */}
+                      {activeSubmenu === "is1161" && (
+                       <div className="absolute left-full top-0 ml-1 w-20 bg-white border border-osdag-border shadow-md">
+                        {["CHS"].map(item => (
+                          <div
+                            key={item}
+                            onClick={() => handleDownload(item)}
+                            className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
+                          >
+                           {item}
+                          </div>
+                        ))}
+                       </div>
+                       )}
+                     </li>
+                     <li className="relative"
+                         onMouseEnter={() => setActiveSubmenu("customdb")}
+                         onMouseLeave={() => setActiveSubmenu(null)}
+                     >
+                      <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
+                       Custom Database
+                        <span className="ml-2">›</span>
+                      </div>
+
+                      {/* Submenu */}
+                      {activeSubmenu === "customdb" && (
+                       <div className="absolute left-full top-0 ml-1 w-32 bg-white border border-osdag-border shadow-md">
+                        <div onClick={() => handleDownload("Download xlsx")} className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center">
+                         Download xlsx
+                        </div>
+                        <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
+                             onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                        >
+                         Import xlsx
+                        </div>
+                       </div>
+                       )}
+                     </li>
+                    </ul>
                   </div>
                 </div>
               )}
             </div>
             {/* Settings Button */}
             <div className="relative group">
-              <button className="p-3 text-black dark:text-white hover:text-white dark:hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6">
+              <button className="p-3 text-black dark:text-white hover:text-white dark:hover:text-white bg-white border border-black transition-all duration-300 hover:bg-osdag-green group-hover:px-6">
                 <div className="flex items-center space-x-2">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                    />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                  <div className="relative w-6 h-6">
+                  {/* Default icon */}
+                  <img
+                    src={pluginDefault}
+                    alt="Plugin"
+                    className="w-6 h-6 block group-hover:hidden"
+                  />
+
+                  {/* Hover icon */}
+                  <img
+                    src={pluginHover}
+                    alt="Plugin Hover"
+                    className="w-6 h-6 hidden group-hover:block"
+                  />
+                </div>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
                     Plugins
                   </span>
                 </div>
               </button>
-            </div>
-            {/* Resources Button with Dropdown */}
-            <div className="relative resources-dropdown group ">
-              <button
-                onClick={() => setShowResourcesDropdown(!showResourcesDropdown)}
-                className={`p-3 transition-all duration-300 rounded-xl group-hover:px-6 ${showResourcesDropdown
-                  ? 'bg-osdag-green text-white'
-                  : 'text-black dark:text-white hover:text-white hover:bg-osdag-green'
-                  }`}
+              <div
+               className="absolute left-1/2 -translate-x-1/2 top-full mt-2
+               opacity-0 group-hover:opacity-100
+               transition-opacity duration-300
+               bg-white text-black text-xs px-2 py-1
+               border border-gray-300 shadow-sm
+               whitespace-nowrap pointer-events-none"
               >
-                <div className="flex items-center space-x-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="currentColor"
-                  >
-                    <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-640v560h560v-560h-80v280l-100-60-100 60v-280H200Zm0 560v-560 560Z" />
-                  </svg>
-                  <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
-                    Resources
-                  </span>
-                  <svg
-                    className={`w-4 h-4 hidden group-hover:block opacity-0 group-hover:opacity-100 transition-all duration-300 ${showResourcesDropdown ? 'rotate-180' : ''
-                      }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </button>
-              {(showResourcesDropdown || false) && (
-                <div className="absolute right-0 top-full mt-2 bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green rounded-xl shadow-lg z-20 min-w-48 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="py-2">
-                    <button className="w-full px-4 py-2 text-left text-osdag-green  hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
-                      Videos
-                    </button>
-                    <button className="w-full px-4 py-2 text-left text-osdag-green  hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
-                      Osi File
-                    </button>
-                    <button className="w-full px-4 py-2 text-left text-osdag-green  hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
-                      Documentation
-                    </button>
-                    <button className="w-full px-4 py-2 text-left text-osdag-green  hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
-                      Databases
-                    </button>
-                  </div>
-                </div>
-              )}
+               Under Development
+              </div>
             </div>
             {/* Documents Button */}
             <div className="relative group">
-              <button className="p-3 text-black dark:text-white hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl group-hover:px-6" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
+              <button className="p-3 text-black dark:text-white hover:text-white bg-white border border-black transition-all duration-300 hover:bg-osdag-green group-hover:px-6" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
                 <div className="flex items-center space-x-2">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
+                  <div className="relative w-6 h-6">
+                  {/* Default icon */}
+                  <img
+                    src={loadDefault}
+                    alt="Load"
+                    className="w-6 h-6 block group-hover:hidden"
+                  />
+
+                  {/* Hover icon */}
+                  <img
+                    src={loadHover}
+                    alt="Load Hover"
+                    className="w-6 h-6 hidden group-hover:block"
+                  />
+                </div>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
                     Import
                   </span>
@@ -491,25 +664,35 @@ const Header = ({ setshowSideBar, active }) => {
             {/* Theme Toggle Button */}
             <div className="relative group">
               <button
-                onClick={toggleTheme}
-                className="p-2 text-black transition-colors dark:text-white hover:text-osdag-green"
+                // onClick={toggleTheme}
+                className="p-2 text-black transition-colors dark:text-white"
               >
-                {isDark ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="currentColor"
-                  >
-                    <path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M21.64 13.64a1 1 0 00-1.05-.24 8 8 0 01-10-10 1 1 0 00-.24-1.05A1 1 0 008.73 2 10 10 0 1022 15.27a1 1 0 00-.36-1.63z" />
-                  </svg>
-                )}
+                <div className="relative w-6 h-6">
+                  {/* Default icon */}
+                  <img
+                    src={dayButton}
+                    alt="Day"
+                    className="w-6 h-6 block group-hover:block"
+                  />
+
+                  {/* Hover icon */}
+                  <img
+                    src={nightButton}
+                    alt="Night Hover"
+                    className="w-6 h-6 hidden group-hover:block"
+                  />
+                </div>
               </button>
+                <div
+               className="absolute left-1/2 -translate-x-1/2 top-full mt-2
+               opacity-0 group-hover:opacity-100
+               transition-opacity duration-300
+               bg-white text-black text-xs px-2 py-1
+               border border-gray-300 shadow-sm
+               whitespace-nowrap pointer-events-none"
+              >
+               Under Development
+              </div>
             </div>
           </div>
           {/* user details, logout */}
