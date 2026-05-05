@@ -19,7 +19,7 @@ RUN mkdir -p /opt/conda && \
 COPY requirements.txt /app/requirements.txt
 
 RUN bash -c "source /opt/miniconda/etc/profile.d/conda.sh && \
-    conda create -n myenv python=3.7.6 -y && \
+    conda create -n myenv python=3.11 -y && \
     conda activate myenv && \
     pip install --upgrade pip pyopenssl && \
     pip install -r requirements.txt"
