@@ -16,7 +16,6 @@ export const BaseOutputDock = ({
   // Shared state management
   const [activeModals, setActiveModals] = useState({});
   const [activeSections, setActiveSections] = useState({});
-  const [showOutputDock, setShowOutputDock] = useState(true);
 
   // Shared modal management
   const openModal = (modalType, sectionKey = null) => {
