@@ -56,6 +56,7 @@ import BasePlate from "./modules/basePlate/BasePlate";
 
 import "./App.css";
 import BeamToColumnEndPlate from "./modules/beamToColumnEndPlate/BeamToColumnEndPlate";
+import ShortcutHelpModal from "./components/ShortcutHelpModal";
 
 function App() {
   let loggedIn = false;
@@ -102,6 +103,7 @@ function App() {
         <ModuleProvider>
           <ShortcutProvider>
             <div className="app">
+              <ShortcutHelpModal />
               <RouterProvider router={router} />
             </div>
           </ShortcutProvider>
