@@ -31,20 +31,17 @@ class BaseModuleRegistry:
     @classmethod
     def auto_discover(cls, package_name: str, package_path: str):
         """Auto-discover sub-modules in a package"""
-        print(f"[auto_discover] Starting for {package_name} at {package_path}")
         for _, name, _ in pkgutil.iter_modules([package_path]):
-            print(f"[auto_discover] Found module: {name}")
             try:
                 mod = importlib.import_module(f'{package_name}.{name}')
-                print(f"[auto_discover] Imported {name}, has MODULE_ID: {hasattr(mod, 'MODULE_ID')}, has Service: {hasattr(mod, 'Service')}")
                 if hasattr(mod, 'MODULE_ID') and hasattr(mod, 'Service'):
                     # Convert module name to slug (e.g., 'fin_plate' -> 'fin-plate')
                     slug = name.replace('_', '-')
                     cls.register(slug, mod.MODULE_ID, mod.Service)
-                    print(f"[auto_discover] Registered: {slug}")
-            except ImportError as e:
-                print(f"[auto_discover] ImportError for {name}: {e}")
-                import traceback
-                traceback.print_exc()
+            except ImportError as exc:
+                print(f"Module discovery import error in {package_name}.{name}: {exc}")
+                continue
+            except Exception as exc:
+                print(f"Module discovery error in {package_name}.{name}: {exc}")
                 continue
 

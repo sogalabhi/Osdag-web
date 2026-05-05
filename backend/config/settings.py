@@ -29,7 +29,7 @@ if str(BASE_DIR) not in sys.path:
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_secret_key()
+SECRET_KEY = os.getenv('SECRET_KEY', get_secret_key())
 DATABASE_NAME = get_database_name()
 USER = get_username()
 PASSWORD = get_password()
@@ -37,11 +37,11 @@ PORT = get_port()
 HOST = get_host()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 
 # SECURITY WARNING: DEV ONLY - Never use ['*'] in production!
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 # CORS Configuration (DEV ONLY - Allow all origins for LAN testing)
 CORS_ALLOWED_ORIGINS = [
@@ -128,13 +128,35 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres_Intg_osdag',
-        'USER': 'osdagdeveloper',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',  # This should be the name of the service
-        'PORT': '5432',
+        'NAME': os.getenv('DATABASE_NAME', DATABASE_NAME or 'postgres_Intg_osdag'),
+        'USER': os.getenv('DATABASE_USER', USER or 'osdagdeveloper'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', PASSWORD or 'password'),
+        'HOST': os.getenv('DATABASE_HOST', HOST or 'localhost'),
+        'PORT': os.getenv('DATABASE_PORT', PORT or '5432'),
     }
 }
+
+# Redis/Celery settings
+REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', REDIS_URL)
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', REDIS_URL)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = os.getenv('CELERY_TIMEZONE', 'UTC')
+
+# Optional Redis cache backend (toggle with USE_REDIS_CACHE=true)
+USE_REDIS_CACHE = os.getenv('USE_REDIS_CACHE', 'false').lower() == 'true'
+if USE_REDIS_CACHE:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': os.getenv('REDIS_CACHE_URL', 'redis://redis:6379/1'),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            },
+        }
+    }
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -189,9 +211,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-]
+_static_dir = BASE_DIR / "static"
+STATICFILES_DIRS = [_static_dir] if _static_dir.exists() else []
 
 # OSI files storage
 OSIFILES_URL = '/osifiles/'

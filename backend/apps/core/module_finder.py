@@ -184,9 +184,8 @@ def _discover_modules():
             try:
                 adapter = ModuleApiAdapter(adapter_module)
                 _module_dict[module_id] = adapter
-                print(f"✅ Discovered module: {module_id} from {parent_module_name}/{submodule_name}")
             except Exception as e:
-                print(f"Warning: Error creating adapter for {module_id}: {e}")
+                print(f"Module finder adapter error for {module_id}: {e}")
                 continue
 
 

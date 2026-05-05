@@ -3,49 +3,48 @@ services:
     image: postgres:14-alpine
     environment:
       POSTGRES_USER: ${DATABASE_USER:-osdagdeveloper}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-password}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-changeme}
       POSTGRES_DB: ${DATABASE_NAME:-postgres_Intg_osdag}
-    ports:
-      - "5432:5432"
     volumes:
-      - postgres_data_dev:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-osdagdeveloper}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   backend:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
     environment:
-      DEBUG: ${DEBUG:-True}
-      SECRET_KEY: ${SECRET_KEY:-dev-secret-key}
+      DEBUG: "False"
+      SECRET_KEY: ${SECRET_KEY:-changeme}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
       DATABASE_NAME: ${DATABASE_NAME:-postgres_Intg_osdag}
       DATABASE_USER: ${DATABASE_USER:-osdagdeveloper}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-changeme}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
-      USE_REDIS_CACHE: ${USE_REDIS_CACHE:-false}
+      USE_REDIS_CACHE: ${USE_REDIS_CACHE:-true}
+    volumes:
+      - ./file_storage:/app/file_storage
+      - ./osifiles:/app/osifiles
     depends_on:
       db:
         condition: service_healthy
@@ -55,26 +54,28 @@ services:
       bash -c "source /opt/miniconda/etc/profile.d/conda.sh &&
       conda activate myenv &&
       python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
       python manage.py runserver 0.0.0.0:8000"
+    expose:
+      - "8000"
+    restart: unless-stopped
 
   celery_worker:
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - .:/app
     environment:
-      DEBUG: ${DEBUG:-True}
-      SECRET_KEY: ${SECRET_KEY:-dev-secret-key}
+      DEBUG: "False"
+      SECRET_KEY: ${SECRET_KEY:-changeme}
       DATABASE_NAME: ${DATABASE_NAME:-postgres_Intg_osdag}
       DATABASE_USER: ${DATABASE_USER:-osdagdeveloper}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-changeme}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
-      USE_REDIS_CACHE: ${USE_REDIS_CACHE:-false}
+      USE_REDIS_CACHE: ${USE_REDIS_CACHE:-true}
     depends_on:
       db:
         condition: service_healthy
@@ -84,22 +85,18 @@ services:
       bash -c "source /opt/miniconda/etc/profile.d/conda.sh &&
       conda activate myenv &&
       celery -A config worker --loglevel=info"
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      - "80:80"
     depends_on:
       - backend
-    command: npm run dev -- --host 0.0.0.0 --port 5173
+    restart: unless-stopped
 
 volumes:
-  postgres_data_dev:
+  postgres_data:
+  redis_data:

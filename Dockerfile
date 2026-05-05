@@ -1,6 +1,5 @@
 FROM ubuntu:22.04
 
-
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Kolkata
 
@@ -9,6 +8,7 @@ RUN apt update && \
     mkdir -p /snap/bin && \
     ln -s /usr/bin/freecad /snap/bin/freecad.cmd
 
+WORKDIR /app
 
 RUN mkdir -p /opt/conda && \
     wget https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.2-Linux-x86_64.sh -O /opt/conda/miniconda.sh && \
@@ -16,8 +16,7 @@ RUN mkdir -p /opt/conda && \
     rm -f /opt/conda/miniconda.sh && \
     /opt/miniconda/bin/conda init bash
 
-COPY install_dependencies.sh /app/install_dependencies.sh
-COPY ./conda_packages/ /app/conda_packages/
+COPY requirements.txt /app/requirements.txt
 
 RUN bash -c "source /opt/miniconda/etc/profile.d/conda.sh && \
     conda create -n myenv python=3.7.6 -y && \
@@ -35,13 +34,6 @@ RUN bash -c "source /opt/miniconda/etc/profile.d/conda.sh && \
     #              /app/conda_packages/pandas-1.0.5-cp37-cp37m-manylinux1_x86_64.whl \
     #              /app/conda_packages/pynput-1.6.8-py2.py3-none-any.whl \
     #              /app/conda_packages/PyGithub-1.54.1.tar.gz"
-
-WORKDIR /app
-
-RUN chmod +x /app/install_dependencies.sh && \
-    bash -c "source /opt/miniconda/etc/profile.d/conda.sh && \
-    conda activate myenv && \
-    /app/install_dependencies.sh"
 
 COPY . /app
 
