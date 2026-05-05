@@ -10,7 +10,7 @@ export default function AskQuestion({ onClose }) {
         <div className="flex justify-between items-center px-3 py-2 border-b">
           <div className="flex items-center gap-2">
             <img
-              src={osdagLogo}   // import your logo
+              src={osdagLogo}
               alt="Osdag Logo"
               className="w-6 h-6"
             />

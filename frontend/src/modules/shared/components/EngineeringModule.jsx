@@ -1207,84 +1207,36 @@ export const EngineeringModule = ({
             setModalDynamicSrc={setModalDynamicSrc}
           />
         ) : (
-          <div            
-            style={{
-              position: "fixed",
-              left: 0,
-              top: 0,
-              height: "105vh",
-              width: "40px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "bold",
-              zIndex: 1000,
-            }}
-          >
-           <div
-            style={{
-              position:"relative",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "30px",
-              padding: "10px 0",
-              gap: "14px",
-            }}
-           >
-             <span style={{ display: "inline-block", transform: "rotate(270deg)" }}><b>T</b></span>
-             <span style={{ display: "inline-block", transform: "rotate(270deg)" }}><b>U</b></span>
-             <span style={{ display: "inline-block", transform: "rotate(270deg)" }}><b>P</b></span>
-             <span style={{ display: "inline-block", transform: "rotate(270deg)" }}><b>N</b></span>
-             <span style={{ display: "inline-block", transform: "rotate(270deg)" }}><b>I</b></span>
-           </div>
+          <div className="fixed left-0 top-0 h-[105vh] w-[40px] flex flex-col items-center justify-center font-bold z-[1000]">
+            <div className="relative flex flex-col items-center w-[30px] py-[10px] gap-[14px]">
+              <span className="inline-block rotate-[270deg]"><b>T</b></span>
+              <span className="inline-block rotate-[270deg]"><b>U</b></span>
+              <span className="inline-block rotate-[270deg]"><b>P</b></span>
+              <span className="inline-block rotate-[270deg]"><b>N</b></span>
+              <span className="inline-block rotate-[270deg]"><b>I</b></span>
+            </div>
           </div>
-)}
-{/* EDGE BAR (always visible) */}
-  <div
-    style={{
-      position: "absolute",
-      left: showInputDock ? "400px" : "30px",
-      top: 0,
-      height: "100vh",
-      width: "40px",
-      zIndex: 1000,
-    }}
-  >
-    {/* GREEN LINE */}
-    <div
-      style={{
-        position: "absolute",
-        left: 0,
-        top: 0,
-        width: "8px",
-        height: "100%",
-        background: "#84bd00",
-      }}
-    >
-    {/* TOGGLE HANDLE */}
-      <div
-        onClick={() => setShowInputDock((prev) => !prev)}
-        style={{
-          position: "absolute",
-          right: 0,
-          top: "40%",
-          width: "8px",
-          height: "80px",
-          background: "#6a8f00",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-        }}
-      >
-        <span style={{ color: "white", fontSize: "14px" }}>
-          {showInputDock ? "❮" : "❯"}
-        </span>
-      </div>
-    </div>
-  </div>
+        )}
+        {/* EDGE BAR (always visible) */}
+        <div
+          className={`absolute top-0 h-screen w-[40px] z-[1000] ${
+            showInputDock ? "left-[400px]" : "left-[30px]"
+          }`}
+        >
+          {/* GREEN LINE */}
+          <div className="absolute left-0 top-0 w-[8px] h-full bg-[#84bd00]">
+            
+            {/* TOGGLE HANDLE */}
+            <div
+              onClick={() => setShowInputDock((prev) => !prev)}
+              className="absolute right-0 top-[40%] w-[8px] h-[80px] bg-[#6a8f00] flex items-center justify-center cursor-pointer"
+            >
+              <span className="text-white text-[14px]">
+                {showInputDock ? "❮" : "❯"}
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* Middle - 3D Model and Logs Container */}
         <div className={`
@@ -1529,62 +1481,58 @@ export const EngineeringModule = ({
           weld_type: inputs?.weld_type }}
           handleCreateDesignReport={handleCreateDesignReport}
           saveOutput={saveOutput}
-         />
+        />
          {/* GREEN STRIP (attached to dock edge) */}
-      <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
-        <div
-          onClick={() => setShowOutputDock((prev) => !prev)}
-          className="
-            absolute left-0 top-[40%]
-            w-[8px] h-[80px]
-            bg-[#6a8f00]
-            flex items-center justify-center
-            cursor-pointer
-          "
-        >
-          <span className="text-white text-sm">
-            ❯
-          </span>
+          <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
+            <div
+              onClick={() => setShowOutputDock((prev) => !prev)}
+              className="
+                absolute left-0 top-[40%]
+                w-[8px] h-[80px]
+                bg-[#6a8f00]
+                flex items-center justify-center
+                cursor-pointer
+              "
+            >
+              <span className="text-white text-sm">
+                ❯
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
-        </div>
-       ) : (
+      ) : (
         /* COLLAPSED STRIP */
-    <div
-      className="
-        fixed right-0 top-0 h-screen w-[40px]
-        flex flex-col items-center justify-center
-        z-[1000]
-      "
-    >
-      <div className="relative flex flex-col items-center w-[30px] py-[10px] gap-[14px]">
-        {"OUTPUT".split("").map((ch, i) => (
-          <span key={i} className="rotate-90 font-bold">{ch}</span>
-        ))}
-      </div>
-      {/* GREEN STRIP (collapsed state) */}
-      <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
         <div
-          onClick={() => setShowOutputDock(true)}
           className="
-            absolute left-0 top-[40%]
-            w-[8px] h-[80px]
-            bg-[#6a8f00]
-            flex items-center justify-center
-            cursor-pointer
+            fixed right-0 top-0 h-screen w-[40px]
+            flex flex-col items-center justify-center
+            z-[1000]
           "
         >
-          <span className="text-white text-sm">❮</span>
+          <div className="relative flex flex-col items-center w-[30px] py-[10px] gap-[14px]">
+            {"OUTPUT".split("").map((ch, i) => (
+              <span key={i} className="rotate-90 font-bold">{ch}</span>
+            ))}
+          </div>
+          {/* GREEN STRIP (collapsed state) */}
+          <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
+            <div
+              onClick={() => setShowOutputDock(true)}
+              className="
+                absolute left-0 top-[40%]
+                w-[8px] h-[80px]
+                bg-[#6a8f00]
+                flex items-center justify-center
+                cursor-pointer
+              "
+            >
+              <span className="text-white text-sm">❮</span>
+            </div>
+          </div>
         </div>
-      </div>
-       </div>
- 
 
       )}
-     </div>
-
-    
-
+    </div>
 
       {/* Design Report Modal */}
       <DesignReportModal

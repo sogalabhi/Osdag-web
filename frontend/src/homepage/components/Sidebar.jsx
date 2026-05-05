@@ -11,6 +11,7 @@ import trussIcon from '../../assets/homepage/truss.svg';
 import frame2dIcon from '../../assets/homepage/2d_frame.svg';
 import frame3dIcon from '../../assets/homepage/3d_frame.svg';
 import { Link, useParams } from 'react-router-dom';
+import { APP_METADATA } from "../../constants/metadata";
 const Sidebar = ({ setshowSideBar, active }) => {
   const [navigationItems, setnavigationItems] = useState(() =>
     [
@@ -97,7 +98,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
               className="w-20 h-20 mx-6 my-3"
             />
             <div className="text-center mb-2">
-              <p className="text-xs text-osdag-text-muted font-medium">2026.03.0.0</p>
+              <p className="text-xs text-osdag-text-muted font-medium">{APP_METADATA.VERSION}</p>
             </div>
           </div>
 
