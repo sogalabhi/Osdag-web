@@ -50,17 +50,18 @@ export const BaseInputDock = ({
   };
 
   return (
-    <div
-      className={`
-        flex
-        fixed md:relative inset-0 md:inset-auto md:left-auto md:right-auto md:top-auto md:bottom-auto z-50 md:z-auto
-        w-full md:w-[400px] h-full
-        pt-[80px] md:pt-0
-        bg-white dark:bg-osdag-dark-color
-        flex-col
-        transform transition-transform duration-300 ease-in-out
-        ${showInputDock ? "translate-x-0" : "-translate-x-full"}
-      `}
+    <div className={`
+      flex
+      fixed md:relative inset-0 md:inset-auto md:left-auto md:right-auto md:top-auto md:bottom-auto z-50 md:z-auto
+      w-full md:w-[400px] h-full
+      pt-[80px] md:pt-0
+      bg-white dark:bg-osdag-dark-color
+      flex-col
+    `}
+      style={{
+      transform: showInputDock ? "translateX(0)" : "translateX(-100%)",
+      transition: "transform 0.3s ease"
+    }}
     >
       {/* Header */}
       <div className="sticky top-0 z-30 bg-white dark:bg-osdag-dark-color border-b border-gray-200 dark:border-gray-700 flex items-center justify-between inputRow">

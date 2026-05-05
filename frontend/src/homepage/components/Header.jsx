@@ -16,6 +16,7 @@ import resourcesDefault from '../../assets/homepage/resources_default.svg';
 import resourcesHover from '../../assets/homepage/resources_hover.svg';
 import AboutOsdag from "./AboutOsdag";
 import AskQuestion from "./AskQuestion";
+import CheckUpdate from "./CheckUpdate";
 
 const Header = ({ setshowSideBar, active }) => {
   const [isDark, setIsDark] = useState(false);
@@ -31,6 +32,7 @@ const Header = ({ setshowSideBar, active }) => {
   const [showAbout, setShowAbout] = useState(false);
   const [showAskQuestion, setShowAskQuestion] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [showCheckUpdate, setShowCheckUpdate] = useState(false);
 
   // Check if user is a guest
   const isGuest = isGuestUser();
@@ -440,6 +442,11 @@ const Header = ({ setshowSideBar, active }) => {
                       className="w-full px-4 py-2 hover:bg-osdag-green hover:text-white whitespace-nowrap text-left">
                       Ask us a question
                     </button>
+                    <button
+                      onClick={() => setShowCheckUpdate(true)}
+                      className="w-full px-4 py-2 hover:bg-osdag-green hover:text-white whitespace-nowrap text-left">
+                      Check for Update
+                    </button>
                   </div>
                 </div>
               )}
@@ -448,6 +455,9 @@ const Header = ({ setshowSideBar, active }) => {
               )}
               {showAskQuestion && (
                 <AskQuestion onClose={() => setShowAskQuestion(false)} />
+              )}
+              {showCheckUpdate && (
+                <CheckUpdate onClose={() => setShowCheckUpdate(false)} />
               )}
             </div>
             
