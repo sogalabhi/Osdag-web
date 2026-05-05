@@ -117,7 +117,7 @@ const TabbedModulePage = () => {
       </div>
 
       {/* Sub-SubModules Tabs */}
-      {/* {activeSubmodule === "Moment" && <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2">
+      {activeSubmodule === "Moment" && <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2">
         {content.map(({ label }) => (
           <button
             key={label}
@@ -130,60 +130,8 @@ const TabbedModulePage = () => {
             {label}
           </button>
         ))}
-      </div>} */}
-       {/* {activeSubmodule==="Moment" && (
-        <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2">
-          {content.map(({ label }) => (
-            <div key={label} className="flex flex-col items-center">
-              <button
-                key={label}
-                onClick={() => setActiveSubSubmodule(label)}
-                className={`flex-shrink-0 flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border-2 rounded-xl transition-colors duration-150 ${activeSubSubmodule === label
-                  ? "bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green"
-                  : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300 dark:hover:text-osdag-green"
-                 }`}
-            >
-              {label}
-            </button>
-            {label === "PEB" && (
-              <div
-                style={{
-                  marginTop: "6px",
-                  padding: "4px 10px",
-                  border: "1px solid #9ACD32",
-                  backgroundColor: "#f3f7e6",
-                  fontSize: "12px",
-                  borderRadius: "2px",
-                 }}
-              >
-               Under Development
-              </div>
-            )}
-           </div>
-        ))}
+      </div>}
 
-      </div>)} */}
-       {activeSubmodule === "Moment" && (
-          <div className="flex flex-row mb-8 gap-3">
-            {content.map(({ label }) => (
-              <button
-                key={label}
-                onClick={() => label !== "PEB" && setActiveSubSubmodule(label)}
-                disabled={label === "PEB"}
-                className={`flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border rounded-md transition-colors duration-150
-                ${
-                  label === "PEB"
-                  ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
-                  : activeSubSubmodule === label
-                  ? "bg-osdag-green text-white border-osdag-green"
-                  : "text-black border-gray-300 hover:bg-osdag-light-green/20"
-                  }`}
-              >
-                {label}
-              </button>
-            ))}
-           </div>
-          )}
       {/* Section Cards */}
       {selectedModule !== "Moment Connection" && (
         <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row flex-wrap gap-4 justify-center md:justify-start">

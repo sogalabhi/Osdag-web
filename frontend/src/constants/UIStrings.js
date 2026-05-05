@@ -80,6 +80,6 @@ export const UI_STRINGS = {
   COMPRESSION_MEMBER: "Compression Member",
   FLEXURE_MEMBER: "Flexure Member",
 
-  BOLTED_TO_END_GUSSET: "Bolted to End Gusset",
-  WELDED_TO_END_GUSSET: "Welded to End Gusset",
+  BOLTED_TO_END_PLATE: "Bolted to End Plate",
+  WELDED_TO_END_PLATE: "Welded to End Plate",
 };

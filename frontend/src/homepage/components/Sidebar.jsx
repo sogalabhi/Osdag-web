@@ -97,7 +97,7 @@ const Sidebar = ({ setshowSideBar, active }) => {
               className="w-20 h-20 mx-6 my-3"
             />
             <div className="text-center mb-2">
-              <p className="text-xs text-osdag-text-muted font-medium">2026.03.0.0</p>
+              <p className="text-xs text-osdag-text-muted font-medium">Version 1.0.0</p>
             </div>
           </div>
 

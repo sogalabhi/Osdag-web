@@ -164,7 +164,7 @@ export const EngineeringModule = ({
 
   const [showResetButton, setShowResetButton] = useState(false);
   const [showInputDock, setShowInputDock] = useState(true);
-  const [showOutputDock, setShowOutputDock] = useState(true);
+  const [showOutputDock, setShowOutputDock] = useState(false);
   const [showLogs, setShowLogs] = useState(false);
   const [isDesignComplete, setIsDesignComplete] = useState(false);
   const [isInputLocked, setIsInputLocked] = useState(false);
@@ -1122,10 +1122,10 @@ export const EngineeringModule = ({
           </button>
           {/* theme mode */}
           <button
-            // onClick={toggleTheme}
+            onClick={toggleTheme}
             className="p-2 md:p-2 min-w-[44px] min-h-[44px] text-black transition-colors dark:text-white"
           >
-            {/* {isDark ? (
+            {isDark ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 height="24px"
@@ -1135,11 +1135,11 @@ export const EngineeringModule = ({
               >
                 <path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
               </svg>
-            ) : ( */}
+            ) : (
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M21.64 13.64a1 1 0 00-1.05-.24 8 8 0 01-10-10 1 1 0 00-.24-1.05A1 1 0 008.73 2 10 10 0 1022 15.27a1 1 0 00-.36-1.63z" />
               </svg>
-            {/* )} */}
+            )}
           </button>
 
         </div>
@@ -1160,10 +1160,13 @@ export const EngineeringModule = ({
         {!showInputDock && !isMobile && (
           <button
             onClick={toggleInputDock}
-            className="hidden md:flex absolute left-0 top-0 h-full w-10 bg-white dark:bg-osdag-dark-color border-r border-gray-300 dark:border-osdag-border items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
+            className="hidden md:flex absolute left-0 top-0 h-full w-8 bg-white dark:bg-osdag-dark-color border-r border-gray-300 dark:border-osdag-border items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
             title="Open Input Dock"
             type="button"
           >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="currentColor">
+              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+            </svg>
           </button>
         )}
 
@@ -1171,15 +1174,18 @@ export const EngineeringModule = ({
         {!showOutputDock && output && !isMobile && (
           <button
             onClick={toggleOutputDock}
-            className="hidden md:flex absolute right-0 top-0 h-full w-10 bg-white dark:bg-osdag-dark-color border-l border-gray-300 dark:border-gray-700 items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
+            className="hidden md:flex absolute right-0 top-0 h-full w-8 bg-white dark:bg-osdag-dark-color border-l border-gray-300 dark:border-gray-700 items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
             title="Open Output Dock"
             type="button"
           >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="currentColor">
+              <path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6 1.41 1.41z" />
+            </svg>
           </button>
         )}
 
         {/* Left - Input Dock */}
-        {showInputDock ? (
+        {showInputDock && (
           <BaseInputDock
             moduleConfig={moduleConfig}
             inputs={inputs}
@@ -1206,85 +1212,7 @@ export const EngineeringModule = ({
             updateSelectedItems={updateSelectedItems}
             setModalDynamicSrc={setModalDynamicSrc}
           />
-        ) : (
-          <div            
-            style={{
-              position: "fixed",
-              left: 0,
-              top: 0,
-              height: "105vh",
-              width: "40px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "bold",
-              zIndex: 1000,
-            }}
-          >
-           <div
-            style={{
-              position:"relative",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "30px",
-              padding: "10px 0",
-              gap: "14px",
-            }}
-           >
-             <span style={{ display: "inline-block", transform: "rotate(270deg)" }}><b>T</b></span>
-             <span style={{ display: "inline-block", transform: "rotate(270deg)" }}><b>U</b></span>
-             <span style={{ display: "inline-block", transform: "rotate(270deg)" }}><b>P</b></span>
-             <span style={{ display: "inline-block", transform: "rotate(270deg)" }}><b>N</b></span>
-             <span style={{ display: "inline-block", transform: "rotate(270deg)" }}><b>I</b></span>
-           </div>
-          </div>
-)}
-{/* EDGE BAR (always visible) */}
-  <div
-    style={{
-      position: "absolute",
-      left: showInputDock ? "400px" : "30px",
-      top: 0,
-      height: "100vh",
-      width: "40px",
-      zIndex: 1000,
-    }}
-  >
-    {/* GREEN LINE */}
-    <div
-      style={{
-        position: "absolute",
-        left: 0,
-        top: 0,
-        width: "8px",
-        height: "100%",
-        background: "#84bd00",
-      }}
-    >
-    {/* TOGGLE HANDLE */}
-      <div
-        onClick={() => setShowInputDock((prev) => !prev)}
-        style={{
-          position: "absolute",
-          right: 0,
-          top: "40%",
-          width: "8px",
-          height: "80px",
-          background: "#6a8f00",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-        }}
-      >
-        <span style={{ color: "white", fontSize: "14px" }}>
-          {showInputDock ? "❮" : "❯"}
-        </span>
-      </div>
-    </div>
-  </div>
+        )}
 
         {/* Middle - 3D Model and Logs Container */}
         <div className={`
@@ -1508,83 +1436,25 @@ export const EngineeringModule = ({
           )}
         </div>
 
-      {/* Right - Output Dock */}
-      {showOutputDock && outputConfig && status.step !== DESIGN_STATUS.ERROR ? (
-       <div className={`
-         fixed inset-0 z-50 h-full pt-[80px] sm:relative sm:inset-auto sm:z-auto sm:h-auto sm:pt-0
-         w-full sm:w-[320px] md:w-[350px] lg:w-[400px]
-         flex flex-col bg-white dark:bg-osdag-dark-color
-        `}>
-        <BaseOutputDock
-         output={output}
-         outputConfig={outputConfig}
-         title={title || UI_STRINGS.OUTPUT_DOCK}
-         extraState={{
-          ...extraState,
-          cadModelPaths,
-          renderCadModel: renderBoolean,
-          connectivity: inputs?.connectivity,
-          member_designation: inputs?.member_designation,
-          designation: inputs?.member_designation,
-          weld_type: inputs?.weld_type }}
-          handleCreateDesignReport={handleCreateDesignReport}
-          saveOutput={saveOutput}
-         />
-         {/* GREEN STRIP (attached to dock edge) */}
-      <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
-        <div
-          onClick={() => setShowOutputDock((prev) => !prev)}
-          className="
-            absolute left-0 top-[40%]
-            w-[8px] h-[80px]
-            bg-[#6a8f00]
-            flex items-center justify-center
-            cursor-pointer
-          "
-        >
-          <span className="text-white text-sm">
-            ❯
-          </span>
-        </div>
+        {/* Right - Output Dock */}
+        {showOutputDock && output && outputConfig && status.step !== DESIGN_STATUS.ERROR && (
+          <div className={`
+            fixed inset-0 z-50 h-full pt-[80px] sm:relative sm:inset-auto sm:z-auto sm:h-auto sm:pt-0
+            w-full sm:w-[320px] md:w-[350px] lg:w-[400px]
+            flex flex-col
+            bg-white dark:bg-osdag-dark-color
+          `}>
+            <BaseOutputDock
+              output={output}
+              outputConfig={outputConfig}
+              title={title || UI_STRINGS.OUTPUT_DOCK}
+              extraState={{ ...extraState, cadModelPaths, renderCadModel: renderBoolean, connectivity: inputs?.connectivity, member_designation: inputs?.member_designation, designation: inputs?.member_designation, weld_type: inputs?.weld_type }}
+              handleCreateDesignReport={handleCreateDesignReport}
+              saveOutput={saveOutput}
+            />
+          </div>
+        )}
       </div>
-        </div>
-       ) : (
-        /* COLLAPSED STRIP */
-    <div
-      className="
-        fixed right-0 top-0 h-screen w-[40px]
-        flex flex-col items-center justify-center
-        z-[1000]
-      "
-    >
-      <div className="relative flex flex-col items-center w-[30px] py-[10px] gap-[14px]">
-        {"OUTPUT".split("").map((ch, i) => (
-          <span key={i} className="rotate-90 font-bold">{ch}</span>
-        ))}
-      </div>
-      {/* GREEN STRIP (collapsed state) */}
-      <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
-        <div
-          onClick={() => setShowOutputDock(true)}
-          className="
-            absolute left-0 top-[40%]
-            w-[8px] h-[80px]
-            bg-[#6a8f00]
-            flex items-center justify-center
-            cursor-pointer
-          "
-        >
-          <span className="text-white text-sm">❮</span>
-        </div>
-      </div>
-       </div>
- 
-
-      )}
-     </div>
-
-    
-
 
       {/* Design Report Modal */}
       <DesignReportModal
