@@ -1121,7 +1121,7 @@ export const EngineeringModule = ({
   });
 
   useShortcutLayer({
-    id: "engineering-v1-shortcuts",
+    id: "engineering-core-shortcuts",
     priority: 50,
     enabled: true,
     bindings: [
@@ -1203,7 +1203,7 @@ export const EngineeringModule = ({
   });
 
   useShortcutLayer({
-    id: "engineering-v2-shortcuts",
+    id: "engineering-extended-shortcuts",
     priority: 45,
     enabled: true,
     bindings: [

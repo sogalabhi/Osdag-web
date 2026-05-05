@@ -10,24 +10,16 @@ export const SHORTCUT_SCOPE = {
   MODAL: 'modal',
 };
 
-export const SHORTCUT_PHASE = {
-  V1: 'v1',
-  V1_5: 'v1_5',
-  V2: 'v2',
-  V3: 'v3',
-};
-
 /**:
  * - One source of truth for action IDs, scopes, per-platform mappings,
  *   enablement conditions, and conflict notes.
- * - Runtime engine wiring is intentionally deferred to later phases.
+ * - Runtime engine wiring is centralized via the shortcut provider/layers.
  */
 export const SHORTCUT_ACTIONS = [
-  // V1 - Global
+  // Global shortcuts
   {
     id: 'global.search.focus',
     label: 'Focus Search',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.GLOBAL,
     shortcuts: {
       winLinux: ['/', 'Ctrl+K'],
@@ -40,7 +32,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'global.shortcuts.help',
     label: 'Shortcuts Help',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.GLOBAL,
     shortcuts: {
       winLinux: ['?'],
@@ -53,7 +44,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'global.nav.home',
     label: 'Go Home',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.GLOBAL,
     shortcuts: {
       winLinux: ['Alt+Shift+H'],
@@ -64,11 +54,10 @@ export const SHORTCUT_ACTIONS = [
     conflictRisk: 'low',
   },
 
-  // V1 - Engineering
+  // Engineering shortcuts
   {
     id: 'eng.dock.input.toggle',
     label: 'Toggle Input Dock',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['Alt+Shift+I'],
@@ -81,7 +70,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.dock.output.toggle',
     label: 'Toggle Output Dock',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['Alt+Shift+O'],
@@ -94,7 +82,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.logs.toggle',
     label: 'Toggle Logs',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['Alt+Shift+L'],
@@ -107,7 +94,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.design.submit',
     label: 'Submit Design',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['Ctrl+Enter'],
@@ -120,7 +106,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.design.reset',
     label: 'Reset Design',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['Alt+Shift+R'],
@@ -133,7 +118,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.input.lockToggle',
     label: 'Lock / Unlock',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['Alt+Shift+U'],
@@ -146,7 +130,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.cad.zoomIn',
     label: 'CAD Zoom In',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['+', 'Alt+='],
@@ -159,7 +142,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.cad.zoomOut',
     label: 'CAD Zoom Out',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['-', 'Alt+-'],
@@ -172,7 +154,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.cad.view.front',
     label: 'CAD Front View',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['Alt+1'],
@@ -185,7 +166,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.cad.view.top',
     label: 'CAD Top View',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['Alt+2'],
@@ -198,7 +178,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.cad.view.side',
     label: 'CAD Side View',
-    phase: SHORTCUT_PHASE.V1,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: {
       winLinux: ['Alt+3'],
@@ -209,11 +188,10 @@ export const SHORTCUT_ACTIONS = [
     conflictRisk: 'low',
   },
 
-  // V1.5 - Module selection/navigation
+  // Module selection/navigation shortcuts
   {
     id: 'modsel.focus.moveLeft',
     label: 'Move Focus Left',
-    phase: SHORTCUT_PHASE.V1_5,
     scope: SHORTCUT_SCOPE.MODULE_SELECTION,
     shortcuts: { winLinux: ['ArrowLeft'], mac: ['ArrowLeft'] },
     whenEnabled: 'Module selection tabs/cards are focused.',
@@ -223,7 +201,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'modsel.focus.moveRight',
     label: 'Move Focus Right',
-    phase: SHORTCUT_PHASE.V1_5,
     scope: SHORTCUT_SCOPE.MODULE_SELECTION,
     shortcuts: { winLinux: ['ArrowRight'], mac: ['ArrowRight'] },
     whenEnabled: 'Module selection tabs/cards are focused.',
@@ -233,7 +210,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'modsel.focus.moveUp',
     label: 'Move Focus Up',
-    phase: SHORTCUT_PHASE.V1_5,
     scope: SHORTCUT_SCOPE.MODULE_SELECTION,
     shortcuts: { winLinux: ['ArrowUp'], mac: ['ArrowUp'] },
     whenEnabled: 'Module selection cards are focused.',
@@ -243,7 +219,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'modsel.focus.moveDown',
     label: 'Move Focus Down',
-    phase: SHORTCUT_PHASE.V1_5,
     scope: SHORTCUT_SCOPE.MODULE_SELECTION,
     shortcuts: { winLinux: ['ArrowDown'], mac: ['ArrowDown'] },
     whenEnabled: 'Module selection cards are focused.',
@@ -253,7 +228,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'modsel.activate',
     label: 'Select / Open',
-    phase: SHORTCUT_PHASE.V1_5,
     scope: SHORTCUT_SCOPE.MODULE_SELECTION,
     shortcuts: { winLinux: ['Enter', 'Space'], mac: ['Enter', 'Space'] },
     whenEnabled: 'Module selection target is focused.',
@@ -263,7 +237,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'modsel.tab.prev',
     label: 'Previous Tab',
-    phase: SHORTCUT_PHASE.V1_5,
     scope: SHORTCUT_SCOPE.MODULE_SELECTION,
     shortcuts: { winLinux: ['['], mac: ['['] },
     whenEnabled: 'Module selection tab set is visible.',
@@ -273,7 +246,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'modsel.tab.next',
     label: 'Next Tab',
-    phase: SHORTCUT_PHASE.V1_5,
     scope: SHORTCUT_SCOPE.MODULE_SELECTION,
     shortcuts: { winLinux: [']'], mac: [']'] },
     whenEnabled: 'Module selection tab set is visible.',
@@ -283,7 +255,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'global.dismiss',
     label: 'Close Modal / Search',
-    phase: SHORTCUT_PHASE.V1_5,
     scope: SHORTCUT_SCOPE.GLOBAL,
     shortcuts: { winLinux: ['Escape'], mac: ['Escape'] },
     whenEnabled: 'At least one dismissible overlay/context is open.',
@@ -291,11 +262,10 @@ export const SHORTCUT_ACTIONS = [
     conflictRisk: 'low',
   },
 
-  // V2 - Extended map
+  // Extended shortcuts
   {
     id: 'eng.project.create',
     label: 'Create Project',
-    phase: SHORTCUT_PHASE.V2,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: { winLinux: ['Alt+Shift+N'], mac: ['Option+Shift+N'] },
     whenEnabled: 'Project creation is allowed by auth/verification rules.',
@@ -306,7 +276,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.input.load',
     label: 'Load Input',
-    phase: SHORTCUT_PHASE.V2,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: { winLinux: ['Alt+Shift+M'], mac: ['Option+Shift+M'] },
     whenEnabled: 'Engineering module route is active.',
@@ -317,7 +286,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.model.save3d',
     label: 'Save 3D Model',
-    phase: SHORTCUT_PHASE.V2,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: { winLinux: ['Alt+Shift+S'], mac: ['Option+Shift+S'] },
     whenEnabled: 'CAD data/model paths are available.',
@@ -328,7 +296,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.report.download',
     label: 'Download Report',
-    phase: SHORTCUT_PHASE.V2,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: { winLinux: ['Alt+Shift+D'], mac: ['Option+Shift+D'] },
     whenEnabled: 'Output exists and report prerequisites are met.',
@@ -338,7 +305,6 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'eng.pref.open',
     label: 'Design Preferences',
-    phase: SHORTCUT_PHASE.V2,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: { winLinux: ['Alt+Shift+P'], mac: ['Option+Shift+P'] },
     whenEnabled: 'Design preferences guard allows opening.',
@@ -348,21 +314,19 @@ export const SHORTCUT_ACTIONS = [
   {
     id: 'global.theme.toggle',
     label: 'Toggle Theme',
-    phase: SHORTCUT_PHASE.V2,
     scope: SHORTCUT_SCOPE.GLOBAL,
     shortcuts: { winLinux: ['Alt+Shift+T'], mac: ['Option+Shift+T'] },
     whenEnabled: 'Theme toggle control is available in current page shell.',
     blockedWhen: 'Never.',
     conflictRisk: 'low',
   },
-  // V3 - Complete map staging policy
+  // Complete map staging policy
   {
     id: 'eng.menu.completeMap',
     label: 'Menubar Complete Map',
-    phase: SHORTCUT_PHASE.V3,
     scope: SHORTCUT_SCOPE.ENGINEERING,
     shortcuts: { winLinux: [], mac: [] },
-    whenEnabled: 'After V1/V1.5/V2 validation and QA sign-off.',
+    whenEnabled: 'After core shortcut set validation and QA sign-off.',
     blockedWhen: 'Before engine hardening and discoverability UX are complete.',
     conflictRisk: 'n/a',
   },
