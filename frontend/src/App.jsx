@@ -10,6 +10,7 @@ import { Worker } from "@react-pdf-viewer/core";
 
 import { GlobalProvider } from "./context/GlobalState";
 import { ModuleProvider } from "./context/ModuleState";
+import { ShortcutProvider } from "./utils/shortcuts/ShortcutProvider";
 
 // User components
 import LoginPage from "./Auth/LoginPage";
@@ -99,9 +100,11 @@ function App() {
     <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
       <GlobalProvider>
         <ModuleProvider>
-          <div className="app">
-            <RouterProvider router={router} />
-          </div>
+          <ShortcutProvider>
+            <div className="app">
+              <RouterProvider router={router} />
+            </div>
+          </ShortcutProvider>
         </ModuleProvider>
       </GlobalProvider>
     </Worker>

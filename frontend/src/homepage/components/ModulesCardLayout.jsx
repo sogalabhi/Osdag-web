@@ -1,9 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCurrentUserEmail, isGuestUser, getAccessToken, canCreateProjects } from "../../utils/auth";
-import { message } from 'antd';
-import ProjectNameModal from "./ProjectNameModal";
-
 import {
   MODULE_SUBMODULES,
   CONNECTIONS_TAB_CONTENT,
@@ -12,7 +8,6 @@ import {
 } from "../../constants/modules";
 
 import SectionCards from "./SectionCards";
-import { createProject } from "../../datasources/projectsDataSource";
 
 const TabbedModulePage = () => {
   const moduleName = window.location.pathname.split("/")[1];
@@ -21,8 +16,8 @@ const TabbedModulePage = () => {
   const submodules = MODULE_SUBMODULES[moduleName] || [];
   const [activeSubmodule, setActiveSubmodule] = useState(submodules[0]?.key);
   const [activeSubSubmodule, setActiveSubSubmodule] = useState("");
-  const [selectedModule, setSelectedModule] = useState(null);
-  const [showProjectModal, setShowProjectModal] = useState(false);
+  const submoduleTabRefs = useRef({});
+  const subSubmoduleTabRefs = useRef({});
 
   // Update activeSubmodule when moduleName or submodules change
   useEffect(() => {
@@ -41,7 +36,7 @@ const TabbedModulePage = () => {
     setActiveSubSubmodule(firstLabel);
   }, [activeSubmodule, content]);
 
-  const handleModuleClick = (optionKey, sectionLabel) => {
+  const handleModuleClick = (optionKey) => {
     const route = MODULE_ROUTES[optionKey] || "";
 
     if (route) {
@@ -49,46 +44,79 @@ const TabbedModulePage = () => {
     }
   };
 
-  const handleProjectModalConfirm = async (projectName) => {
-    if (!selectedModule) return;
+  const toDomId = (value) =>
+    String(value || "default")
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, "-");
 
-    // Check if user can create projects (guests and unverified users cannot)
-    if (!canCreateProjects()) {
-      if (isGuestUser()) {
-        message.warning("Guest users cannot create projects. Please log in to create projects.");
-      } else {
-        message.error("Please verify your email to create projects. Check your inbox for the verification link.");
-      }
-      setShowProjectModal(false);
-      setSelectedModule(null);
-      return;
-    }
-
-    const safeProjectName = (projectName || `${selectedModule.label} Project`).replace(/\s+/g, "_");
-    try {
-      const payload = {
-        name: safeProjectName,
-        module_id: selectedModule.key,
-        module_name: selectedModule.label,
-        user_email: getCurrentUserEmail(),
-      };
-      const data = await createProject(payload);
-      if (data.success) {
-        navigate(`${selectedModule.route}/${data.project_id}`);
-      } else {
-        navigate(selectedModule.route);
-      }
-    } catch {
-      navigate(selectedModule.route);
-    } finally {
-      setShowProjectModal(false);
-      setSelectedModule(null);
-    }
+  const isEditableTarget = (target) => {
+    if (!target) return false;
+    const tag = target.tagName?.toLowerCase();
+    return (
+      tag === "input" ||
+      tag === "textarea" ||
+      tag === "select" ||
+      target.isContentEditable
+    );
   };
 
-  const handleProjectModalCancel = () => {
-    setShowProjectModal(false);
-    setSelectedModule(null);
+  const handleSubmoduleKeyDown = (event, index) => {
+    if (!submodules.length) return;
+    const isPrev = event.key === "ArrowLeft" || event.key === "ArrowUp";
+    const isNext = event.key === "ArrowRight" || event.key === "ArrowDown";
+    if (!isPrev && !isNext) return;
+
+    const delta = isNext ? 1 : -1;
+    const nextIndex = index + delta;
+    if (nextIndex < 0 || nextIndex >= submodules.length) return;
+    event.preventDefault();
+    const next = submodules[nextIndex];
+    if (!next) return;
+
+    setActiveSubmodule(next.key);
+    requestAnimationFrame(() => {
+      submoduleTabRefs.current[next.key]?.focus();
+    });
+  };
+
+  const handleSubSubmoduleKeyDown = (event, index) => {
+    if (!content.length) return;
+    const isPrev = event.key === "ArrowLeft" || event.key === "ArrowUp";
+    const isNext = event.key === "ArrowRight" || event.key === "ArrowDown";
+    if (!isPrev && !isNext) return;
+
+    const delta = isNext ? 1 : -1;
+    const nextIndex = index + delta;
+    if (nextIndex < 0 || nextIndex >= content.length) return;
+    event.preventDefault();
+    const next = content[nextIndex];
+    if (!next) return;
+
+    setActiveSubSubmodule(next.label);
+    requestAnimationFrame(() => {
+      subSubmoduleTabRefs.current[next.label]?.focus();
+    });
+  };
+
+  const handleWrapperKeyDown = (event) => {
+    if (isEditableTarget(event.target)) return;
+    const isPrev = event.key === "[" || event.code === "BracketLeft";
+    const isNext = event.key === "]" || event.code === "BracketRight";
+    if (!isPrev && !isNext) return;
+    const delta = isNext ? 1 : -1;
+    if (!submodules.length) return;
+    const currentSubmoduleIndex = submodules.findIndex(({ key }) => key === activeSubmodule);
+    const fallbackSubmoduleIndex = currentSubmoduleIndex === -1 ? 0 : currentSubmoduleIndex;
+    const nextSubmoduleIndex = fallbackSubmoduleIndex + delta;
+    if (nextSubmoduleIndex < 0 || nextSubmoduleIndex >= submodules.length) return;
+    event.preventDefault();
+    const nextSubmodule = submodules[nextSubmoduleIndex];
+    if (!nextSubmodule) return;
+
+    setActiveSubmodule(nextSubmodule.key);
+    requestAnimationFrame(() => {
+      submoduleTabRefs.current[nextSubmodule.key]?.focus();
+    });
   };
 
   if (!moduleName || !MODULE_SUBMODULES[moduleName]) {
@@ -99,13 +127,23 @@ const TabbedModulePage = () => {
   const filteredContent = content.filter((section) => section.label === activeSubSubmodule);
 
   return (
-    <div className="w-full p-4 sm:p-8 dark:text-gray-300">
+    <div className="w-full p-4 sm:p-8 dark:text-gray-300" onKeyDown={handleWrapperKeyDown}>
       {/* Submodules Tabs */}
-      <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2">
-        {submodules.map(({ key, label }) => (
+      <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2" role="tablist" aria-label="Submodules">
+        {submodules.map(({ key, label }, index) => (
           <button
             key={key}
             onClick={() => setActiveSubmodule(key)}
+            onFocus={() => setActiveSubmodule(key)}
+            onKeyDown={(event) => handleSubmoduleKeyDown(event, index)}
+            ref={(element) => {
+              submoduleTabRefs.current[key] = element;
+            }}
+            role="tab"
+            aria-selected={activeSubmodule === key}
+            aria-controls={`submodule-panel-${toDomId(key)}`}
+            id={`submodule-tab-${toDomId(key)}`}
+            tabIndex={activeSubmodule === key ? 0 : -1}
             className={`flex-shrink-0 flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border-2 rounded-xl transition-colors duration-150 ${activeSubmodule === key
               ? "bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green"
               : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300 dark:hover:text-osdag-green"
@@ -117,35 +155,46 @@ const TabbedModulePage = () => {
       </div>
 
       {/* Sub-SubModules Tabs */}
-       {activeSubmodule === "Moment" && (
-          <div className="flex flex-row mb-8 gap-3">
-            {content.map(({ label }) => (
-              <button
-                key={label}
-                onClick={() => label !== "PEB" && setActiveSubSubmodule(label)}
-                disabled={label === "PEB"}
-                className={`flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border rounded-md transition-colors duration-150
-                ${
-                  label === "PEB"
-                  ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
-                  : activeSubSubmodule === label
-                  ? "bg-osdag-green text-white border-osdag-green"
-                  : "text-black border-gray-300 hover:bg-osdag-light-green/20"
-                  }`}
-              >
-                {label}
-              </button>
-            ))}
-           </div>
-          )}
-      {/* Section Cards */}
-      {selectedModule !== "Moment Connection" && (
-        <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row flex-wrap gap-4 justify-center md:justify-start">
-          {filteredContent.map((section) => (
-            <SectionCards key={section.label} section={section} onModuleClick={handleModuleClick} />
+      {activeSubmodule === "Moment" && (
+        <div
+          className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2"
+          role="tablist"
+          aria-label="Moment connection options"
+        >
+          {content.map(({ label }, index) => (
+            <button
+              key={label}
+              onClick={() => setActiveSubSubmodule(label)}
+              onFocus={() => setActiveSubSubmodule(label)}
+              onKeyDown={(event) => handleSubSubmoduleKeyDown(event, index)}
+              ref={element => {
+                subSubmoduleTabRefs.current[label] = element;
+              }}
+              role="tab"
+              aria-selected={activeSubSubmodule === label}
+              id={`subsubmodule-tab-${toDomId(label)}`}
+              tabIndex={activeSubSubmodule === label ? 0 : -1}
+              className={`flex-shrink-0 flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border-2 rounded-xl transition-colors duration-150 ${activeSubSubmodule === label
+                  ? "bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green"
+                  : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300 dark:hover:text-osdag-green"
+                }`}
+            >
+              {label}
+            </button>
           ))}
         </div>
       )}
+      {/* Section Cards */}
+      <div
+        className="flex flex-col sm:flex-col md:flex-row lg:flex-row flex-wrap gap-4 justify-center md:justify-start"
+        role="region"
+        id={`submodule-panel-${toDomId(activeSubmodule)}`}
+        aria-labelledby={activeSubmodule ? `submodule-tab-${toDomId(activeSubmodule)}` : undefined}
+      >
+        {filteredContent.map((section) => (
+          <SectionCards key={section.label} section={section} onModuleClick={handleModuleClick} />
+        ))}
+      </div>
 
     </div>
   );

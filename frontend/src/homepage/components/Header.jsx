@@ -16,6 +16,8 @@ import resourcesDefault from '../../assets/homepage/resources_default.svg';
 import resourcesHover from '../../assets/homepage/resources_hover.svg';
 import AboutOsdag from "./AboutOsdag";
 import AskQuestion from "./AskQuestion";
+import { useShortcutLayer } from '../../utils/shortcuts/ShortcutProvider';
+import { SHORTCUT_ACTION_BY_ID } from '../../constants/shortcuts';
 
 const Header = ({ setshowSideBar, active }) => {
   const [isDark, setIsDark] = useState(false);
@@ -111,27 +113,37 @@ const Header = ({ setshowSideBar, active }) => {
     return { modules: filteredModules, projects: filteredProjects };
   };
 
-  // Handle Ctrl+K shortcut
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
+  useShortcutLayer({
+    id: 'header-global-shortcuts',
+    priority: 10,
+    enabled: true,
+    bindings: [
+      {
+        combos: SHORTCUT_ACTION_BY_ID['global.search.focus']?.shortcuts,
+        when: () => !active && !isGuest,
+        handler: () => {
+          const searchInput = document.getElementById('search-input');
+          if (!searchInput) return;
           searchInput.focus();
           setIsSearchFocused(true);
-        }
-      }
-      // Close search on Escape
-      if (e.key === 'Escape') {
-        setIsSearchFocused(false);
-        setSearchQuery('');
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID['global.dismiss']?.shortcuts,
+        when: () => isSearchFocused,
+        handler: () => {
+          setIsSearchFocused(false);
+          setSearchQuery('');
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID['global.theme.toggle']?.shortcuts,
+        handler: () => {
+          toggleTheme();
+        },
+      },
+    ],
+  });
 
   // Close search when clicking outside
   useEffect(() => {

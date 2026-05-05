@@ -1,4 +1,5 @@
 // Utility functions for module operations
+import { getMenuShortcutLabel } from "../../../constants/shortcuts";
 
 export const convertToCSV = (data) => {
   const keys = Object.keys(data);
@@ -14,19 +15,19 @@ export const menuItems = [
   {
     label: "File",
     dropdown: [
-      { name: "Create Project", shortcut: "Ctrl+N" },
-      { name: "Load Input", shortcut: "Ctrl+L" },
-      { name: "Download Osi", shortcut: "Ctrl+S" },
+      { name: "Create Project", shortcut: getMenuShortcutLabel("Create Project") },
+      { name: "Load Input", shortcut: getMenuShortcutLabel("Load Input") },
+      { name: "Download Osi" },
       // { name: "Download Input", shortcut: "Alt+D" },
-      { name: "Save Log Messages", shortcut: "Alt+M" },
-      { name: "Create Design Report", shortcut: "Alt+C" },
+      { name: "Save Log Messages" },
+      { name: "Create Design Report", shortcut: getMenuShortcutLabel("Create Design Report") },
       {
         name: "Save 3D Model",
-        shortcut: "Alt+3",
+        shortcut: getMenuShortcutLabel("Save 3D Model"),
         options: ["Export BREP", "Export STL", "Export STEP", "Export IGS", "Export IFC"],
-      },
-      { name: "Save Cad Image", shortcut: "Alt+I" },
-      { name: "Quit", shortcut: "Shift+Q" }
+      },      
+      { name: "Save Cad Image" },
+      { name: "Quit" }
     ],
   },
   // {
@@ -36,13 +37,13 @@ export const menuItems = [
   {
     label: "Graphics",
     dropdown: [
-      { name: "Zoom In", shortcut: "Ctrl+I" },
-      { name: "Zoom Out", shortcut: "Ctrl+O" },
-      { name: "Pan", shortcut: "Ctrl+P" },
-      { name: "Rotate 3D Model", shortcut: "Ctrl+R" },
-      { name: "Show front view", shortcut: "Alt+Shift+F" },
-      { name: "Show top view", shortcut: "Alt+Shift+T" },
-      { name: "Show side view", shortcut: "Alt+Shift+S" },
+      { name: "Zoom In", shortcut: getMenuShortcutLabel("Zoom In") },
+      { name: "Zoom Out", shortcut: getMenuShortcutLabel("Zoom Out") },
+      { name: "Pan" },
+      { name: "Rotate 3D Model" },
+      { name: "Show front view", shortcut: getMenuShortcutLabel("Show front view") },
+      { name: "Show top view", shortcut: getMenuShortcutLabel("Show top view") },
+      { name: "Show side view", shortcut: getMenuShortcutLabel("Show side view") },
       { name: "Model" },
       { name: "Beam" },
       { name: "Column" },
@@ -57,7 +58,7 @@ export const menuItems = [
       { name: "Download Outputs CSV" },
       { name: "Download Inputs OSI" },
       { name: "Download Database", options: ["Column", "Beam", "Angle", "Channel"] },
-      { name: "Reset" },
+      { name: "Reset", shortcut: getMenuShortcutLabel("Reset") },
     ],
   },
   {
@@ -70,5 +71,3 @@ export const menuItems = [
     ],
   },
 ];
-
-// ...other utility functions as needed

@@ -4,7 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import { Modal, Button } from "antd";
+import { Modal, Button, Radio } from "antd";
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
 import {
   MODULE_KEY_FIN_PLATE,
@@ -45,6 +45,15 @@ import { deleteAllCustomSections } from "../../../datasources/sectionsDataSource
 import HelpLinkModal from "./help/HelpLinkModal";
 import AboutOsdagModal from "./help/AboutOsdagModal";
 import { ASK_QUESTION_LINK, DESIGN_EXAMPLES_URL } from "./help/helpContent";
+import { openOsiFile } from "../../../datasources/osiDataSource";
+import {
+  downloadCachedModelByFormat,
+  downloadExportCadResponse,
+} from "../utils/cadExport";
+import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
+import { getModuleConfig as getDesignPrefModuleConfig } from "../utils/moduleConfig";
+import { useShortcutLayer } from "../../../utils/shortcuts/ShortcutProvider";
+import { SHORTCUT_ACTION_BY_ID } from "../../../constants/shortcuts";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -61,6 +70,8 @@ export const EngineeringModule = ({
   const lastLoadedProjectIdRef = useRef(null); // Prevent re-fetching same project (stops infinite GET loop)
   const [showAskQuestionModal, setShowAskQuestionModal] = useState(false);
   const [showAboutOsdagModal, setShowAboutOsdagModal] = useState(false);
+  const [showSave3dTypeModal, setShowSave3dTypeModal] = useState(false);
+  const [selectedSave3dType, setSelectedSave3dType] = useState("Export STL");
 
   const {
     // Module data
@@ -875,6 +886,56 @@ export const EngineeringModule = ({
     setScreenshotTrigger(true);
   };
 
+  const handleLoadInputFromShortcut = async () => {
+    const element = document.createElement("input");
+    element.setAttribute("type", "file");
+    element.accept = ".osi,application/json";
+    element.style.display = "none";
+    document.body.appendChild(element);
+    element.click();
+
+    element.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) {
+        document.body.removeChild(element);
+        return;
+      }
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const data = await openOsiFile(formData);
+        if (data.ok && data.success) {
+          setInputs(data.inputs || {});
+          message.success("Input loaded from OSI");
+        } else {
+          message.error(data.error || "Failed to open OSI file");
+        }
+      } catch (err) {
+        message.error("Failed to open OSI file");
+      } finally {
+        if (document.body.contains(element)) {
+          document.body.removeChild(element);
+        }
+      }
+    });
+  };
+
+  const handleOpenDesignPrefFromShortcut = () => {
+    const mod = getDesignPrefModuleConfig(inputs?.module);
+    const guard = canOpenAdditionalInputs(
+      mod,
+      inputs,
+      { selectedOption: extraState?.selectedOption },
+      contextData,
+      selectionStates
+    );
+    if (!guard.ok) {
+      message.warning(guard.message);
+      return;
+    }
+    setDesignPrefModalStatus(true);
+  };
+
   // Build the hover dictionary: backend values take priority.
   // We intentionally do NOT include default fallback strings for parts like
   // Beam/Column/Plate so that when the backend provides nothing, SmartPart
@@ -913,6 +974,78 @@ export const EngineeringModule = ({
   };
 
   const handleNavbarMenuClick = async (name) => {
+    const exportCadByType = async (optionName) => {
+      const formatMap = {
+        "Export BREP": "brep",
+        "Export STL": "stl",
+        "Export STEP": "step",
+        "Export IGS": "iges",
+        "Export IFC": "ifc",
+      };
+      const format = formatMap[optionName];
+      if (!format) {
+        message.error("Unsupported export type.");
+        return;
+      }
+
+      const moduleId = moduleConfig?.designType || inputs?.module;
+      if (!moduleId) {
+        message.error("Module ID is missing. Unable to export CAD.");
+        return;
+      }
+
+      if (!cadModelPaths || Object.keys(cadModelPaths).length === 0) {
+        message.warning("Run design first to generate CAD output.");
+        return;
+      }
+
+      if (format === "brep" || format === "stl") {
+        const downloaded = await downloadCachedModelByFormat({
+          cadModelPaths,
+          format,
+          moduleId,
+          message,
+        });
+        if (downloaded) return;
+      }
+
+      if (typeof moduleConfig?.buildSubmissionParams !== "function") {
+        message.error("Module export configuration is missing.");
+        return;
+      }
+
+      try {
+        const inputValues = moduleConfig.buildSubmissionParams(
+          inputs,
+          allSelected,
+          contextData || {},
+          extraState || {}
+        );
+
+        const result = await service.exportCADModel(
+          moduleId,
+          inputValues,
+          format,
+          "Model"
+        );
+
+        if (!result?.success || !result?.blob) {
+          message.error(result?.error || "CAD export failed");
+          return;
+        }
+
+        downloadExportCadResponse({
+          blob: result.blob,
+          disposition: result.disposition,
+          fallbackFilename: `${moduleId}_Model.${format}`,
+        });
+        message.success(`${format.toUpperCase()} exported successfully`);
+      } catch (error) {
+        console.error("CAD export error:", error);
+        message.error(error?.message || "Failed to export CAD");
+      }
+    };
+
     // Database menu actions (desktop-style)
     if (name === "Download Inputs CSV") {
       const inputsExpanded = expandAllSelectedInputs(inputs, allSelected, contextData);
@@ -939,6 +1072,15 @@ export const EngineeringModule = ({
     if (name === "Download Inputs OSI") {
       return handleSaveInputs();
     }
+    if (
+      name === "Export BREP" ||
+      name === "Export STL" ||
+      name === "Export STEP" ||
+      name === "Export IGS" ||
+      name === "Export IFC"
+    ) {
+      return exportCadByType(name);
+    }
     if (name === "Design Examples") {
       window.open(DESIGN_EXAMPLES_URL, "_blank", "noopener,noreferrer");
       return;
@@ -958,6 +1100,158 @@ export const EngineeringModule = ({
     // Reset/Downloads are handled elsewhere (existing handlers or upcoming reset work).
     return undefined;
   };
+
+  const hasModalContext =
+    !!createDesignReportBool ||
+    !!designPrefModalStatus ||
+    !!showResetConfirmation ||
+    !!showUnlockWarning ||
+    !!showAskQuestionModal ||
+    !!showAboutOsdagModal ||
+    !!confirmationModal ||
+    Object.values(modalStates || {}).some(Boolean) ||
+    status.step === DESIGN_STATUS.ERROR;
+
+  useShortcutLayer({
+    id: "engineering-modal-blocker",
+    priority: 100,
+    enabled: hasModalContext,
+    blockLower: true,
+    bindings: [],
+  });
+
+  useShortcutLayer({
+    id: "engineering-v1-shortcuts",
+    priority: 50,
+    enabled: true,
+    bindings: [
+      {
+        combos: SHORTCUT_ACTION_BY_ID["global.nav.home"]?.shortcuts,
+        handler: () => navigate("/home"),
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.dock.input.toggle"]?.shortcuts,
+        handler: () => toggleInputDock(),
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.dock.output.toggle"]?.shortcuts,
+        when: () => !!output,
+        handler: () => toggleOutputDock(),
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.logs.toggle"]?.shortcuts,
+        when: () => !!output,
+        handler: () => toggleLogs(),
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.design.submit"]?.shortcuts,
+        when: () =>
+          status.step !== DESIGN_STATUS.CALCULATING &&
+          status.step !== DESIGN_STATUS.CAD_GENERATING,
+        handler: () => {
+          handleSubmitEnhanced();
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.design.reset"]?.shortcuts,
+        handler: () => {
+          handleResetEnhanced();
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.input.lockToggle"]?.shortcuts,
+        handler: () => {
+          handleLockToggle();
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.cad.zoomIn"]?.shortcuts,
+        when: () => !!showCad,
+        handler: () => {
+          document.dispatchEvent(new CustomEvent("cad-camera-action", { detail: "zoom-in" }));
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.cad.zoomOut"]?.shortcuts,
+        when: () => !!showCad,
+        handler: () => {
+          document.dispatchEvent(new CustomEvent("cad-camera-action", { detail: "zoom-out" }));
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.cad.view.front"]?.shortcuts,
+        when: () => !!showCad,
+        handler: () => {
+          setSelectedCameraView("XY");
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.cad.view.top"]?.shortcuts,
+        when: () => !!showCad,
+        handler: () => {
+          setSelectedCameraView("ZX");
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.cad.view.side"]?.shortcuts,
+        when: () => !!showCad,
+        handler: () => {
+          setSelectedCameraView("YZ");
+        },
+      },
+    ],
+  });
+
+  useShortcutLayer({
+    id: "engineering-v2-shortcuts",
+    priority: 45,
+    enabled: true,
+    bindings: [
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.project.create"]?.shortcuts,
+        when: () => !projectIdFromUrl,
+        handler: () => {
+          handleCreateProject();
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.input.load"]?.shortcuts,
+        handler: () => {
+          handleLoadInputFromShortcut();
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.model.save3d"]?.shortcuts,
+        handler: () => {
+          if (!cadModelPaths || Object.keys(cadModelPaths).length === 0) {
+            message.warning("No 3D model available. Run design first to enable Save 3D Model.");
+            return;
+          }
+          setSelectedSave3dType("Export STL");
+          setShowSave3dTypeModal(true);
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.report.download"]?.shortcuts,
+        when: () => !!output,
+        handler: () => {
+          setCreateDesignReportBool(true);
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["eng.pref.open"]?.shortcuts,
+        handler: () => {
+          handleOpenDesignPrefFromShortcut();
+        },
+      },
+      {
+        combos: SHORTCUT_ACTION_BY_ID["global.theme.toggle"]?.shortcuts,
+        handler: () => {
+          toggleTheme();
+        },
+      },
+    ],
+  });
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
@@ -1711,6 +2005,34 @@ export const EngineeringModule = ({
         open={showAboutOsdagModal}
         onClose={() => setShowAboutOsdagModal(false)}
       />
+      <Modal
+        open={showSave3dTypeModal}
+        title="Save 3D Model"
+        onCancel={() => setShowSave3dTypeModal(false)}
+        onOk={async () => {
+          await handleNavbarMenuClick(selectedSave3dType);
+          setShowSave3dTypeModal(false);
+        }}
+        okText="Export"
+        cancelText="Cancel"
+        width={isMobile ? "90%" : 520}
+        className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
+      >
+        <div className="space-y-3">
+          <p className="text-sm">Choose CAD file type to export:</p>
+          <Radio.Group
+            value={selectedSave3dType}
+            onChange={(event) => setSelectedSave3dType(event.target.value)}
+            className="flex flex-col gap-2"
+          >
+            <Radio value="Export BREP">BREP</Radio>
+            <Radio value="Export STL">STL</Radio>
+            <Radio value="Export STEP">STEP</Radio>
+            <Radio value="Export IGS">IGS</Radio>
+            <Radio value="Export IFC">IFC</Radio>
+          </Radio.Group>
+        </div>
+      </Modal>
     </div>
   );
 };
