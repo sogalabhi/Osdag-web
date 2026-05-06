@@ -12,6 +12,8 @@ The development stack starts:
 - `db` (PostgreSQL)
 - `redis` (broker/cache)
 
+Note: Redis is used only inside Docker networking. You do not need to expose Redis port `6379` to your host.
+
 ## Prerequisites
 
 - Docker Engine 20.10+
@@ -31,6 +33,8 @@ cd /path/to/Osdag-web
 ```
 
 ## 2) Create `.env` (Recommended)
+
+This is a one-time setup step per developer machine.
 
 Create `.env` at project root:
 
@@ -53,13 +57,19 @@ USE_REDIS_CACHE=false
 
 ## 3) Build Images
 
+This is a one-time setup step (Docker cache will make later builds faster).
+
 ```bash
 docker compose build backend celery_worker frontend
 ```
 
 First build can take a while because backend includes heavy dependencies.
 
+After that, normal code changes are picked up automatically (source mounts / frontend dev server). Rebuild only if you change `Dockerfile`, `requirements.txt`, or `frontend/package.json` / `frontend/package-lock.json`.
+
 ## 4) Start Services
+
+Do this every time you open the project to start the local dev stack.
 
 ```bash
 docker compose up -d db redis backend celery_worker frontend
@@ -110,11 +120,14 @@ docker compose down -v
 ## Stop / Restart
 
 ```bash
-# stop
-docker compose down
+# stop containers (keeps volumes/data)
+docker compose stop
 
-# restart
+# start again
 docker compose up -d
+
+# full reset (optional, deletes volumes/data)
+docker compose down -v
 ```
 
 ## Related Docs
