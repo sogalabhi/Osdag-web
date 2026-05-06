@@ -21,10 +21,12 @@ export default function AskQuestion({ onClose }) {
         </div>
 
           <button
+            type="button"
+            aria-label="Close"
             onClick={onClose}
             className="px-4 py-2 text-black hover:bg-red-500 hover:text-white transition-colors"
           >
-           x
+           ×
           </button>
         </div>
 

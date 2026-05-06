@@ -28,11 +28,11 @@ export const BaseInputDock = ({
   setExtraState,
   updateSelectedItems,
   setModalDynamicSrc,
+  isOpen,
 }) => {
   // Use external ref if provided, otherwise create internal one
   const internalLockBtnRef = useRef(null);
   const lockBtnRef = externalLockBtnRef || internalLockBtnRef;
-  const [showInputDock, setShowInputDock] = useState(true);
 
   const openAdditionalInputs = () => {
     const guard = canOpenAdditionalInputs(
@@ -59,7 +59,7 @@ export const BaseInputDock = ({
         bg-white dark:bg-osdag-dark-color
         flex-col
         transform transition-transform duration-300 ease-in-out
-        ${showInputDock ? "translate-x-0" : "-translate-x-full"}
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
       `}
     >
       {/* Header */}

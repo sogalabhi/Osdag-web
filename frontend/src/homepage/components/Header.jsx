@@ -32,7 +32,6 @@ const Header = ({ setshowSideBar, active }) => {
   const [activeSubmenu, setActiveSubmenu] = useState(null);
   const [showAbout, setShowAbout] = useState(false);
   const [showAskQuestion, setShowAskQuestion] = useState(false);
-  const [checking, setChecking] = useState(false);
 
   // Check if user is a guest
   const isGuest = isGuestUser();
@@ -666,8 +665,9 @@ const Header = ({ setshowSideBar, active }) => {
             {/* Theme Toggle Button */}
             <div className="relative group">
               <button
-                // onClick={toggleTheme}
-                className="p-2 text-black transition-colors dark:text-white"
+                onClick={toggleTheme}
+                disabled
+                className="p-2 text-black transition-colors dark:text-white opacity-50 cursor-not-allowed"
               >
                 <div className="relative w-6 h-6">
                   {/* Default icon */}
