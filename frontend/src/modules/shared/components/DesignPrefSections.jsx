@@ -372,6 +372,7 @@ const DesignPrefSections = ({
               materialList={materialListForModals}
               isGuest={isGuest}
               onRefetchModuleOptions={onRefetchModuleOptions}
+              supportedSectionData={sectionDetails.connector || {}}
               {...modalCommon}
             />
           )}

@@ -18,25 +18,25 @@ def _material_row_for_grade(material_models, grade: str) -> List[Dict[str, Any]]
     return list(qs.values()[:1])
 
 
-# (session_name) -> (supporting_key, supporting_source, supported_key, supported_source)
-# source is one of: "columns", "beams"
-_SECTION_KEY_MAP: Dict[str, Tuple[Optional[str], Optional[str], Optional[str], Optional[str]]] = {
-    "FinPlateConnection": ("column_section", "columns", "beam_section", "beams"),
-    "EndPlateConnection": ("column_section", "columns", "beam_section", "beams"),
-    "CleatAngleConnection": ("column_section", "columns", "beam_section", "beams"),
-    "SeatedAngleConnection": ("column_section", "columns", "beam_section", "beams"),
-    "Beam to Column End Plate Connection": ("column_section", "columns", "beam_section", "beams"),
-    "Beam Beam End Plate Connection": ("beam_section", "beams", "beam_section", "beams"),
-    "Column Cover Plate Bolted Connection": ("member_designation", "columns", None, None),
-    "Beam Cover Plate Bolted Connection": (None, None, "member_designation", "beams"),
-    "Column Cover Plate Welded Connection": ("member_designation", "columns", None, None),
-    "Beam Cover Plate Welded Connection": (None, None, "member_designation", "beams"),
-    "Column Column End Plate Connection": ("member_designation", "columns", None, None),
-    "Base Plate": ("member_designation", "columns", None, None),
-    "Simply Supported Beam Design": (None, None, "member_designation", "beams"),
-    "On Cantilever Beam Design": (None, None, "member_designation", "beams"),
-    "Compression Member Design": (None, None, "member_designation", "beams"),
-    "Axially Loaded Column": ("member_designation", "columns", None, None),
+# (session_name) -> (supporting_key, supporting_source, supported_key, supported_source, connector_key, connector_source)
+# source is one of: "columns", "beams", "angles"
+_SECTION_KEY_MAP: Dict[str, Tuple[Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Optional[str]]] = {
+    "FinPlateConnection": ("column_section", "columns", "beam_section", "beams", None, None),
+    "EndPlateConnection": ("column_section", "columns", "beam_section", "beams", None, None),
+    "CleatAngleConnection": ("column_section", "columns", "beam_section", "beams", "cleat_section", "angles"),
+    "SeatedAngleConnection": ("column_section", "columns", "beam_section", "beams", None, None),
+    "Beam to Column End Plate Connection": ("column_section", "columns", "beam_section", "beams", None, None),
+    "Beam Beam End Plate Connection": ("beam_section", "beams", "beam_section", "beams", None, None),
+    "Column Cover Plate Bolted Connection": ("member_designation", "columns", None, None, None, None),
+    "Beam Cover Plate Bolted Connection": (None, None, "member_designation", "beams", None, None),
+    "Column Cover Plate Welded Connection": ("member_designation", "columns", None, None, None, None),
+    "Beam Cover Plate Welded Connection": (None, None, "member_designation", "beams", None, None),
+    "Column Column End Plate Connection": ("member_designation", "columns", None, None, None, None),
+    "Base Plate": ("member_designation", "columns", None, None, None, None),
+    "Simply Supported Beam Design": (None, None, "member_designation", "beams", None, None),
+    "On Cantilever Beam Design": (None, None, "member_designation", "beams", None, None),
+    "Compression Member Design": (None, None, "member_designation", "beams", None, None),
+    "Axially Loaded Column": ("member_designation", "columns", None, None, None, None),
 }
 
 
@@ -52,13 +52,14 @@ def _resolve_section_details(
     inputs: Dict[str, Any],
     beams_model=None,
     columns_model=None,
+    angles_model=None,
 ) -> Dict[str, Dict[str, Any]]:
-    details: Dict[str, Dict[str, Any]] = {"supporting": {}, "supported": {}}
+    details: Dict[str, Dict[str, Any]] = {"supporting": {}, "supported": {}, "connector": {}}
     mapping = _SECTION_KEY_MAP.get(module_session_name)
     if not mapping:
         return details
 
-    support_key, support_source, supported_key, supported_source = mapping
+    support_key, support_source, supported_key, supported_source, connector_key, connector_source = mapping
     if support_key and support_source:
         support_designation = str(inputs.get(support_key) or "")
         support_model = columns_model if support_source == "columns" else beams_model
@@ -68,6 +69,19 @@ def _resolve_section_details(
         supported_designation = str(inputs.get(supported_key) or "")
         supported_model = columns_model if supported_source == "columns" else beams_model
         details["supported"] = _section_row_for_designation(supported_model, supported_designation)
+
+    if connector_key and connector_source:
+        connector_val = inputs.get(connector_key)
+        # connector_val can be a list or a string. If list, use the first element.
+        connector_designation = ""
+        if isinstance(connector_val, list) and len(connector_val) > 0:
+            connector_designation = str(connector_val[0])
+        elif connector_val:
+            connector_designation = str(connector_val)
+            
+        if connector_source == "angles":
+            norm_desig = connector_designation.replace("ISA ", "").replace("X", " x ").replace("  ", " ").strip()
+            details["connector"] = _section_row_for_designation(angles_model, norm_desig)
 
     return details
 
@@ -186,6 +200,7 @@ def merge_design_pref_sync(
     material_model=None,
     beams_model=None,
     columns_model=None,
+    angles_model=None,
 ) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, List[Dict[str, Any]]], Dict[str, Dict[str, Any]]]:
     """
     Returns (resolved_inputs, metadata, material_details_by_role, section_details_by_role).
@@ -228,6 +243,7 @@ def merge_design_pref_sync(
         inputs=out,
         beams_model=beams_model,
         columns_model=columns_model,
+        angles_model=angles_model,
     )
 
     metadata = {
@@ -261,6 +277,7 @@ def build_design_pref_defaults(
         material_model=material_model,
         beams_model=beams_model,
         columns_model=columns_model,
+        angles_model=None,
     )
 
 

@@ -66,8 +66,8 @@ const CleatAngleSectionModal = ({
               type="text"
               name="Designation"
               className="input-design-pref"
-              // value={supportedSectionData.Designation}
-              // disabled
+              value={supportedSectionData.Designation || ''}
+              disabled={true}
               style={readOnlyFontStyle}
             />
           </div>
@@ -163,7 +163,7 @@ const CleatAngleSectionModal = ({
               />
             </div>
             <div className="input-cont">
-              <h5>Poisson's Ratio, v</h5>
+              <h5>Poisson&apos;s Ratio, v</h5>
               <Input
                 type="text"
                 name="poisson-ratio"
@@ -189,12 +189,8 @@ const CleatAngleSectionModal = ({
               <div>
                 <Select
                   style={{ width: "132px", height: "25px", fontSize: "12px" }}
-                  // value={
-                  //   supportedSectionData.Type
-                  //     ? supportedSectionData.Type
-                  //     : "Rolled"
-                  // }
-                  // disabled
+                  value={supportedSectionData.Type || "Rolled"}
+                  disabled={true}
                 >
                   {["Rolled", "Welded"].map((item, index) => (
                     <Option key={index} value={item}>
@@ -210,8 +206,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="source"
                 className="input-design-pref"
-                // value={supportedSectionData.Source || 0}
-                // disabled
+                value={supportedSectionData.Source || ''}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -228,8 +224,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportedSectionData.D || 0}
-                // disabled
+                value={supportedSectionData.a || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -239,8 +235,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="flange-widht"
                 className="input-design-pref"
-                // value={supportedSectionData.B || 0}
-                // disabled
+                value={supportedSectionData.b || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -250,8 +246,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="flange-thickness"
                 className="input-design-pref"
-                // value={supportedSectionData.T || 0}
-                // disabled
+                value={supportedSectionData.t || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -261,8 +257,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportedSectionData.R1 || 0}
-                // disabled
+                value={supportedSectionData.R1 || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -272,8 +268,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportedSectionData.R2 || 0}
-                // disabled
+                value={supportedSectionData.R2 || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -285,8 +281,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportedSectionData.D || 0}
-                // disabled
+                value={supportedSectionData.Mass || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -296,7 +292,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.Area || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -306,17 +303,19 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.Cz || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
             <div className="input-cont">
-              <h5>Cz(cm)</h5>
+              <h5>Cy(cm)</h5>
               <Input
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.Cy || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -326,7 +325,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.Iz || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -336,7 +336,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.Iy || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -346,7 +347,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.lumax || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -356,7 +358,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.lvmin || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -366,7 +369,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.rz || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -376,7 +380,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.ry || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -403,7 +408,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.rumax || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -414,7 +420,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.rvmin || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -425,18 +432,20 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.Zz || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
 
             <div className="input-cont">
-              <h5>Elastic Modulus, Zy (ccm³)</h5>
+              <h5>Elastic Modulus, Zy (cm³)</h5>
               <Input
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.Zy || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -447,7 +456,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.Zpz || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -458,7 +468,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.Zpy || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -469,7 +480,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={supportedSectionData.It || 0}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -480,7 +492,8 @@ const CleatAngleSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                // value={supportingSectionData.R2 || 0}
+                value={''}
+                disabled={true}
                 style={readOnlyFontStyle}
               />
             </div>
