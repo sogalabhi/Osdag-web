@@ -3,7 +3,7 @@ import { message } from "antd";
 import { InputSection } from "./InputSection";
 import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
 
-export const BaseInputDock = ({
+export const BaseInputDock = React.memo(({
   moduleConfig,
   inputs,
   setInputs,
@@ -236,5 +236,5 @@ export const BaseInputDock = ({
       </div>
     </div>
   );
-};
+});
 

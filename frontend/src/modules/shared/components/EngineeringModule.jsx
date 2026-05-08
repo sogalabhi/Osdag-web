@@ -1,5 +1,12 @@
 
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { useViewport } from "../hooks/useViewport";
+import { useHover } from "../hooks/useHover";
+import { useDockPanels } from "../hooks/useDockPanels";
+import { useProjectLoader } from "../hooks/useProjectLoader";
+import { useEngineeringShortcuts } from "../hooks/useEngineeringShortcuts";
+import { CadViewer } from "./CadViewer";
+
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { Html, PerspectiveCamera } from "@react-three/drei";
@@ -69,6 +76,20 @@ export const EngineeringModule = ({
   const prevProjectIdRef = useRef(null); // Track previous projectId for change detection
   const lastLoadedProjectIdRef = useRef(null); // Prevent re-fetching same project (stops infinite GET loop)
   const [showAskQuestionModal, setShowAskQuestionModal] = useState(false);
+  const { isMobile, isLandscape } = useViewport();
+  const {
+    docks,
+    toggleInputDock,
+    toggleOutputDock,
+    toggleLogs,
+    toggleCad,
+    setDesignComplete: setDocksDesignComplete,
+    setEarlyOutput: setDocksEarlyOutput,
+    resetDocks,
+    setDocks
+  } = useDockPanels(isMobile);
+  const { hoverText, setHoverText, hoverPos, setHoverPos, handleHoverLabel, handleHoverEnd } = useHover();
+
   const [showAboutOsdagModal, setShowAboutOsdagModal] = useState(false);
   const [showSave3dTypeModal, setShowSave3dTypeModal] = useState(false);
   const [selectedSave3dType, setSelectedSave3dType] = useState("Export STL");
@@ -123,8 +144,6 @@ export const EngineeringModule = ({
     saveInputFileName,
     designPrefOverrides,
     setDesignPrefOverrides,
-    selectedView,
-    setSelectedView,
     screenshotTrigger,
     setScreenshotTrigger,
     extraState,
@@ -174,9 +193,6 @@ export const EngineeringModule = ({
   });
 
   const [showResetButton, setShowResetButton] = useState(false);
-  const [showInputDock, setShowInputDock] = useState(true);
-  const [showOutputDock, setShowOutputDock] = useState(true);
-  const [showLogs, setShowLogs] = useState(false);
   const [isDesignComplete, setIsDesignComplete] = useState(false);
   const [isInputLocked, setIsInputLocked] = useState(false);
   const [showUnlockWarning, setShowUnlockWarning] = useState(false);
@@ -187,9 +203,6 @@ export const EngineeringModule = ({
   const [selectedCameraView, setSelectedCameraView] = useState("Model");
   const [lockZoom, setLockZoom] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const [isLandscape, setIsLandscape] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
 
   // Hooking Graphics Options (Model / Selected Section & Bg Color)
   const colorPickerRef = useRef(null);
@@ -201,7 +214,7 @@ export const EngineeringModule = ({
       if (["Model", "Beam", "Column", "Seated Angle", "Cleat Angle"].includes(opt)) {
         if (opt === "Model") {
           setSelectedSection(["Model"]);
-          setSelectedView("Model");
+
           setSelectedCameraView("Model");
         } else {
           // If a non-Model option is selected, add it
@@ -211,7 +224,7 @@ export const EngineeringModule = ({
           }
           if (newSelection.length > 0) {
             setSelectedSection(newSelection);
-            setSelectedView(newSelection[0]);
+
             setSelectedCameraView(newSelection[0]);
           }
         }
@@ -235,7 +248,7 @@ export const EngineeringModule = ({
     }
   }, [inputs?.graphicsOption, selectedSection]);
 
-  // Normalize CAD path keys to handle case/spacing differences
+  const prevPathsRef = useRef(null);
   const normalizedCadModelPaths = useMemo(() => {
     const out = {};
     Object.entries(cadModelPaths || {}).forEach(([key, value]) => {
@@ -245,6 +258,9 @@ export const EngineeringModule = ({
       out[trimmed.toLowerCase()] = value;
       out[trimmed.toUpperCase()] = value;
     });
+    const nextStr = JSON.stringify(out);
+    if (prevPathsRef.current === nextStr) return JSON.parse(nextStr);
+    prevPathsRef.current = nextStr;
     return out;
   }, [cadModelPaths]);
 
@@ -257,56 +273,11 @@ export const EngineeringModule = ({
     }
   }, [normalizedCadModelPaths, selectedSection]);
 
-  // Detect mobile/desktop and landscape orientation
-  useEffect(() => {
-    const checkViewport = () => {
-      const width = window.innerWidth;
-      const mobile = width < 768;
-      console.log(`[VIEWPORT] Width changed: ${width}px | isMobile: ${mobile}`);
-      setIsMobile(mobile);
-      // Landscape: width > height and on mobile/tablet
-      setIsLandscape(width > window.innerHeight && mobile);
 
-      // On desktop, ensure CAD is always visible (only set once on mount/resize, not on every showCad change)
-      if (!mobile) {
-        setShowCad(true);
-      }
-    };
 
-    checkViewport();
-    window.addEventListener('resize', checkViewport);
-    window.addEventListener('orientationchange', checkViewport);
 
-    return () => {
-      window.removeEventListener('resize', checkViewport);
-      window.removeEventListener('orientationchange', checkViewport);
-    };
-  }, []); // Empty dependency array - only run on mount and resize
 
-  // Log isMobile state changes
-  useEffect(() => {
-    console.log(`[STATE] isMobile changed: ${isMobile} | Window width: ${window.innerWidth}px`);
-  }, [isMobile]);
 
-  // Log showInputDock state changes
-  useEffect(() => {
-    console.log(`[DOCK] showInputDock changed: ${showInputDock}`);
-  }, [showInputDock]);
-
-  // Log showOutputDock state changes
-  useEffect(() => {
-    console.log(`[DOCK] showOutputDock changed: ${showOutputDock}`);
-  }, [showOutputDock]);
-
-  // Log showLogs state changes
-  useEffect(() => {
-    console.log(`[DOCK] showLogs changed: ${showLogs}`);
-  }, [showLogs]);
-
-  // Log showCad state changes
-  useEffect(() => {
-    console.log(`[DOCK] showCad changed: ${showCad}`);
-  }, [showCad]);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -314,8 +285,6 @@ export const EngineeringModule = ({
   };
 
   // Hover tooltip state for 3D parts
-  const [hoverText, setHoverText] = useState("");
-  const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
   const location = useLocation();
   const params = useParams();
 
@@ -350,8 +319,8 @@ export const EngineeringModule = ({
 
       // Reset UI state
       setIsDesignComplete(false);
-      setShowOutputDock(false);
-      setShowLogs(false);
+      setDocks({ output: false });
+      setDocks({ logs: false });
       setShowOptionsContainer(false);
       setIsInputLocked(false);
       setSelectedSection(["Model"]);
@@ -361,9 +330,9 @@ export const EngineeringModule = ({
 
       // Reset CAD visibility based on device
       if (isMobile) {
-        setShowCad(false);
+        setDocks({ cad: false });
       } else {
-        setShowCad(true);
+        setDocks({ cad: true });
       }
     }
 
@@ -375,8 +344,8 @@ export const EngineeringModule = ({
       resetModuleState();
       clearDesignResults();
       setIsDesignComplete(false);
-      setShowOutputDock(false);
-      setShowLogs(false);
+      setDocks({ output: false });
+      setDocks({ logs: false });
       setShowOptionsContainer(false);
       setIsInputLocked(false);
       designCompletedRef.current = false;
@@ -402,93 +371,23 @@ export const EngineeringModule = ({
   // PROJECT LOADING - Load project inputs if project ID exists
   // ===================================================================
   const projectIdFromUrl = getProjectIdFromUrl();
-  useEffect(() => {
-    // Skip project enforcement - allow users to work without project
-    if (isGuestUser()) {
-      console.info('[EngineeringModule] Guest mode detected: skipping project loading');
-      return;
-    }
-
-    const projectId = projectIdFromUrl;
-    // If no project ID, allow user to work without project (they can create one later)
-    if (!projectId || Number.isNaN(projectId)) {
-      console.info('[EngineeringModule] No project ID in URL: user can work without project');
-      lastLoadedProjectIdRef.current = null;
-      return;
-    }
-
-    // Prevent infinite loop: only fetch once per projectId
-    if (lastLoadedProjectIdRef.current === projectId) {
-      return;
-    }
-    lastLoadedProjectIdRef.current = projectId;
-
-    (async () => {
-      try {
-        resetModuleState();
-        clearDesignResults();
-        setIsDesignComplete(false);
-        setShowOutputDock(false);
-        setShowLogs(false);
-        setShowOptionsContainer(false);
-        setIsInputLocked(false);
-        designCompletedRef.current = false;
-
-        const result = await service.getProject(projectId);
-        console.log('[EngineeringModule] Project loaded:', result);
-        if (!result.success || !result.project) {
-          lastLoadedProjectIdRef.current = null;
-          message.warning('Project not found.');
-          return;
-        }
-        if (result.project.inputs_json) {
-          try {
-            const savedInputs = result.project.inputs_json;
-            if (
-              savedInputs &&
-              typeof savedInputs === "object" &&
-              Object.prototype.hasOwnProperty.call(savedInputs, "dock")
-            ) {
-              setInputs(savedInputs.dock || {});
-              setDesignPrefOverrides(savedInputs.pref || {});
-            } else {
-              // Backward compatibility for older projects that stored a flat inputs_json.
-              setInputs(savedInputs || {});
-              setDesignPrefOverrides({});
-            }
-          } catch (err) {
-            console.error('[EngineeringModule] Error parsing inputs_json:', err);
-            message.error('Failed to parse saved project inputs.');
-          }
-        }
-        if (result.project.outputs_json) {
-          try {
-            loadSavedOutputs(result.project.outputs_json);
-          } catch (err) {
-            console.error('[EngineeringModule] Error loading saved outputs:', err);
-            message.error('Failed to load saved project outputs.');
-          }
-        }
-        // Deduplicated block
-        // Normalize URL to path form: .../fin_plate/1 instead of .../fin_plate?projectId=1
-        const pathname = location.pathname;
-        const pathEndsWithId = pathname.endsWith(`/${projectId}`);
-        const hasQueryProjectId = new URLSearchParams(location.search).get('projectId') != null;
-        if (!pathEndsWithId && hasQueryProjectId && moduleConfig.routePath) {
-          const basePath = moduleConfig.routePath.replace(/\/$/, '');
-          navigate(`${basePath}/${projectId}`, { replace: true });
-        }
-      } catch (_e) {
-        lastLoadedProjectIdRef.current = null;
-        console.error('[EngineeringModule] Error loading project:', _e);
-        message.warning('Cannot load project. Redirecting to module base.');
-
-        // Navigate back to the base module path (e.g. /Connections, /Member)
-        const basePath = moduleConfig.routePath || '/home';
-        navigate(basePath, { replace: true });
-      }
-    })();
-  }, [projectIdFromUrl]); // eslint-disable-line react-hooks/exhaustive-deps -- intentionally stable deps to avoid infinite GET
+  useProjectLoader({
+    projectIdFromUrl,
+    service,
+    moduleConfig,
+    navigate,
+    location,
+    setInputs,
+    setDesignPrefOverrides,
+    loadSavedOutputs,
+    resetModuleState,
+    clearDesignResults,
+    resetDocks,
+    setIsDesignComplete,
+    setShowOptionsContainer,
+    setIsInputLocked,
+    designCompletedRef,
+  });
 
   // Only change dock visibility after design is complete
   useEffect(() => {
@@ -504,15 +403,15 @@ export const EngineeringModule = ({
       if (isMobile) {
         // Mobile: Auto-open CAD+Logs so results are visible immediately
         console.log(`[DESIGN_COMPLETE] Setting mobile docks: CAD=true, Logs=true, Input=false, Output=false`);
-        setShowInputDock(false);
-        setShowOutputDock(false);
-        setShowCad(true);
-        setShowLogs(true);
+        setDocks({ input: false });
+        setDocks({ output: false });
+        setDocks({ cad: true });
+        setDocks({ logs: true });
       } else {
         // Desktop: Auto-open output dock and logs
         console.log(`[DESIGN_COMPLETE] Setting desktop docks: Output=opening, Logs=opening`);
-        setShowOutputDock(true);
-        setShowLogs(true);
+        setDocks({ output: true });
+        setDocks({ logs: true });
       }
 
       // Lock inputs after successful design
@@ -534,8 +433,8 @@ export const EngineeringModule = ({
     if (status.step === DESIGN_STATUS.CAD_GENERATING && output && !isRedesigning && !designCompletedRef.current) {
       console.log(`[EARLY_OUTPUT] Calculation complete, showing output dock early`);
       if (!isMobile) {
-        setShowOutputDock(true);
-        setShowLogs(true);
+        setDocks({ output: true });
+        setDocks({ logs: true });
       }
     }
   }, [status.step, output, isRedesigning, isMobile]);
@@ -544,7 +443,7 @@ export const EngineeringModule = ({
     setIsGridActive(!isGridActive);
   };
 
-  const handleSubmitEnhanced = async () => {
+  const handleSubmitEnhanced = useCallback(async () => {
     setIsInputLocked(false);
     // If there's already an existing design, completely reset everything
     if (isDesignComplete || renderBoolean || output) {
@@ -553,16 +452,16 @@ export const EngineeringModule = ({
       designCompletedRef.current = false; // Reset completion flag
       setIsRedesigning(true);
       setIsDesignComplete(false);
-      setShowOutputDock(false);
-      setShowLogs(false);
+      setDocks({ output: false });
+      setDocks({ logs: false });
       setShowOptionsContainer(false);
       setSelectedSection(["Model"]);
       setSelectedCameraView("Model");
       // Reset CAD state based on device type
       if (isMobile) {
-        setShowCad(false);
+        setDocks({ cad: false });
       } else {
-        setShowCad(true);
+        setDocks({ cad: true });
       }
 
       // Reset all the data that controls model rendering but PRESERVE inputs
@@ -582,7 +481,7 @@ export const EngineeringModule = ({
       // Reset the redesigning state after completion
       setIsRedesigning(false);
     }
-  };
+  }, [isDesignComplete, renderBoolean, output, isMobile, clearDesignResults, resetModuleState, handleSubmit, resetDocks]);
 
   // Toggle reset button visibility
   const toggleResetButton = () => {
@@ -590,59 +489,9 @@ export const EngineeringModule = ({
   };
 
   // Toggle functions for SVG clicks
-  const toggleInputDock = () => {
-    console.log(`[TOGGLE] toggleInputDock called | isMobile: ${isMobile} | current showInputDock: ${showInputDock}`);
-    if (isMobile) {
-      // Mobile: Close all other docks when opening input dock
-      if (showInputDock) {
-        // Closing input dock
-        console.log(`[TOGGLE] Closing input dock (mobile)`);
-        setShowInputDock(false);
-      } else {
-        // Opening input dock - close all others first
-        console.log(`[TOGGLE] Opening input dock (mobile) - closing others`);
-        setShowOutputDock(false);
-        setShowLogs(false);
-        setShowCad(false);
-        setShowInputDock(true);
-      }
-    } else {
-      // Desktop: Independent toggle
-      console.log(`[TOGGLE] Toggling input dock (desktop): ${!showInputDock}`);
-      setShowInputDock(prev => !prev);
-    }
-  };
 
-  const toggleOutputDock = () => {
-    // Only check if output exists, not isDesignComplete
-    if (!output) {
-      console.log(`[TOGGLE] toggleOutputDock called but output is null`);
-      return;
-    }
 
-    console.log(`[TOGGLE] toggleOutputDock called | isMobile: ${isMobile} | current showOutputDock: ${showOutputDock}`);
-    if (isMobile) {
-      // Mobile: Close all other docks when opening output dock
-      if (showOutputDock) {
-        // Closing output dock
-        console.log(`[TOGGLE] Closing output dock (mobile)`);
-        setShowOutputDock(false);
-      } else {
-        // Opening output dock - close all others first
-        console.log(`[TOGGLE] Opening output dock (mobile) - closing others`);
-        setShowInputDock(false);
-        setShowLogs(false);
-        setShowCad(false);
-        setShowOutputDock(true);
-      }
-    } else {
-      // Desktop: Independent toggle
-      console.log(`[TOGGLE] Toggling output dock (desktop): ${!showOutputDock}`);
-      setShowOutputDock(prev => !prev);
-    }
-  };
-
-  const handleLockToggle = () => {
+  const handleLockToggle = useCallback(() => {
     if (isInputLocked) {
       // Show warning modal first
       setShowUnlockWarning(true);
@@ -650,7 +499,7 @@ export const EngineeringModule = ({
       setIsInputLocked(true);
       // Don't close the dock when locking - keep it open but locked
     }
-  };
+  }, [isInputLocked]);
 
   const confirmUnlock = () => {
     console.log(`[UNLOCK] confirmUnlock called | isMobile: ${isMobile}`);
@@ -658,24 +507,24 @@ export const EngineeringModule = ({
     clearDesignResults();
     setIsDesignComplete(false);
     setShowOptionsContainer(false);
-    setShowOutputDock(false);
-    setShowLogs(false);
+    setDocks({ output: false });
+    setDocks({ logs: false });
     setSelectedSection(["Model"]);
     setSelectedCameraView("Model");
     setShowResetButton(false);
     setHoverText("");
     setHoverPos({ x: 0, y: 0 });
     setIsInputLocked(false);
-    setShowInputDock(true);
+    setDocks({ input: true });
     setIsRedesigning(false);
     setShowUnlockWarning(false);
     // Reset CAD state based on device type
     if (isMobile) {
       console.log(`[UNLOCK] Resetting docks for mobile: Input=true, CAD=false`);
-      setShowCad(false);
+      setDocks({ cad: false });
     } else {
       console.log(`[UNLOCK] Resetting docks for desktop: Input=true, CAD=true`);
-      setShowCad(true);
+      setDocks({ cad: true });
     }
   };
 
@@ -684,82 +533,13 @@ export const EngineeringModule = ({
     setIsInputLocked(true);
   };
 
-  const toggleLogs = () => {
-    // Only check if output exists
-    if (!output) {
-      console.log(`[TOGGLE] toggleLogs called but output is null`);
-      return;
-    }
-
-    console.log(`[TOGGLE] toggleLogs called | isMobile: ${isMobile} | current showLogs: ${showLogs} | current showCad: ${showCad}`);
-    if (isMobile) {
-      // Mobile: Special logic for CAD+Logs combination
-      if (showLogs) {
-        // Closing logs
-        console.log(`[TOGGLE] Closing logs (mobile)`);
-        setShowLogs(false);
-      } else {
-        // Opening logs
-        if (showCad) {
-          // If CAD is open, keep it open (CAD+Logs case)
-          console.log(`[TOGGLE] Opening logs with CAD (mobile) - CAD+Logs case`);
-          setShowInputDock(false);
-          setShowOutputDock(false);
-          setShowLogs(true);
-        } else {
-          // Open logs only, close all other docks
-          console.log(`[TOGGLE] Opening logs only (mobile) - closing others`);
-          setShowInputDock(false);
-          setShowOutputDock(false);
-          setShowCad(false);
-          setShowLogs(true);
-        }
-      }
-    } else {
-      // Desktop: Independent toggle
-      console.log(`[TOGGLE] Toggling logs (desktop): ${!showLogs}`);
-      setShowLogs(prev => !prev);
-    }
-  };
 
   // New CAD toggle function
-  const toggleCad = () => {
-    console.log(`[TOGGLE] toggleCad called | isMobile: ${isMobile} | current showCad: ${showCad} | current showLogs: ${showLogs}`);
-    if (isMobile) {
-      // Mobile: Special logic for CAD+Logs combination
-      if (showCad) {
-        // Closing CAD
-        console.log(`[TOGGLE] Closing CAD (mobile)`);
-        setShowCad(false);
-      } else {
-        // Opening CAD
-        if (showLogs) {
-          // If logs are open, keep them open (CAD+Logs case)
-          console.log(`[TOGGLE] Opening CAD with logs (mobile) - CAD+Logs case`);
-          setShowInputDock(false);
-          setShowOutputDock(false);
-          setShowCad(true);
-        } else {
-          // Open CAD only, close all other docks
-          console.log(`[TOGGLE] Opening CAD only (mobile) - closing others`);
-          setShowInputDock(false);
-          setShowOutputDock(false);
-          setShowLogs(false);
-          setShowCad(true);
-        }
-      }
-    } else {
-      // Desktop: CAD is always visible, no toggle needed
-      // This shouldn't be called on desktop, but handle gracefully
-      console.log(`[TOGGLE] toggleCad called on desktop - setting showCad to true`);
-      setShowCad(true);
-    }
-  };
 
-  const handleResetEnhanced = async () => {
+  const handleResetEnhanced = useCallback(async () => {
     setShowResetConfirmation(true);
     setConfirmationType("reset");
-  };
+  }, []);
 
   const performResetEnhanced = async () => {
     // Guests never store custom sections in backend.
@@ -782,20 +562,20 @@ export const EngineeringModule = ({
     performReset();
     setShowResetButton(false);
     setShowResetConfirmation(false);
-    setShowOutputDock(false);
-    setShowInputDock(true);
+    setDocks({ output: false });
+    setDocks({ input: true });
     setIsDesignComplete(false);
-    setShowLogs(false); // Reset logs visibility
-    setShowOptionsContainer(false); // Hide options container on reset
-    setSelectedSection("Model"); // Reset selected section
-    setSelectedCameraView("Model"); // Reset selected camera view
-    setIsRedesigning(false); // Reset redesigning state
+    setDocks({ logs: false });
+    setShowOptionsContainer(false);
+    setSelectedSection("Model");
+    setSelectedCameraView("Model");
+    setIsRedesigning(false);
     setIsInputLocked(false);
     // Reset CAD state based on device type
     if (isMobile) {
-      setShowCad(false);
+      setDocks({ cad: false });
     } else {
-      setShowCad(true);
+      setDocks({ cad: true });
     }
   };
   const handleSaveInputs = async () => {
@@ -962,16 +742,7 @@ export const EngineeringModule = ({
     return final;
   }, [ctxHoverDict]);
 
-  const handleHoverLabel = (label, clientX, clientY) => {
-    if (!label) return;
-    if (typeof clientX === 'number' && typeof clientY === 'number') {
-      setHoverPos({ x: clientX + 12, y: clientY + 12 });
-    }
-    setHoverText(label);
-  };
-  const handleHoverEnd = () => {
-    setHoverText("");
-  };
+
 
   const handleNavbarMenuClick = async (name) => {
     const exportCadByType = async (optionName) => {
@@ -1112,145 +883,29 @@ export const EngineeringModule = ({
     Object.values(modalStates || {}).some(Boolean) ||
     status.step === DESIGN_STATUS.ERROR;
 
-  useShortcutLayer({
-    id: "engineering-modal-blocker",
-    priority: 100,
-    enabled: hasModalContext,
-    blockLower: true,
-    bindings: [],
-  });
-
-  useShortcutLayer({
-    id: "engineering-core-shortcuts",
-    priority: 50,
-    enabled: true,
-    bindings: [
-      {
-        combos: SHORTCUT_ACTION_BY_ID["global.nav.home"]?.shortcuts,
-        handler: () => navigate("/home"),
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.dock.input.toggle"]?.shortcuts,
-        handler: () => toggleInputDock(),
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.dock.output.toggle"]?.shortcuts,
-        when: () => !!output,
-        handler: () => toggleOutputDock(),
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.logs.toggle"]?.shortcuts,
-        when: () => !!output,
-        handler: () => toggleLogs(),
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.design.submit"]?.shortcuts,
-        when: () =>
-          status.step !== DESIGN_STATUS.CALCULATING &&
-          status.step !== DESIGN_STATUS.CAD_GENERATING,
-        handler: () => {
-          handleSubmitEnhanced();
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.design.reset"]?.shortcuts,
-        handler: () => {
-          handleResetEnhanced();
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.input.lockToggle"]?.shortcuts,
-        handler: () => {
-          handleLockToggle();
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.cad.zoomIn"]?.shortcuts,
-        when: () => !!showCad,
-        handler: () => {
-          document.dispatchEvent(new CustomEvent("cad-camera-action", { detail: "zoom-in" }));
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.cad.zoomOut"]?.shortcuts,
-        when: () => !!showCad,
-        handler: () => {
-          document.dispatchEvent(new CustomEvent("cad-camera-action", { detail: "zoom-out" }));
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.cad.view.front"]?.shortcuts,
-        when: () => !!showCad,
-        handler: () => {
-          setSelectedCameraView("XY");
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.cad.view.top"]?.shortcuts,
-        when: () => !!showCad,
-        handler: () => {
-          setSelectedCameraView("ZX");
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.cad.view.side"]?.shortcuts,
-        when: () => !!showCad,
-        handler: () => {
-          setSelectedCameraView("YZ");
-        },
-      },
-    ],
-  });
-
-  useShortcutLayer({
-    id: "engineering-extended-shortcuts",
-    priority: 45,
-    enabled: true,
-    bindings: [
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.project.create"]?.shortcuts,
-        when: () => !projectIdFromUrl,
-        handler: () => {
-          handleCreateProject();
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.input.load"]?.shortcuts,
-        handler: () => {
-          handleLoadInputFromShortcut();
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.model.save3d"]?.shortcuts,
-        handler: () => {
-          if (!cadModelPaths || Object.keys(cadModelPaths).length === 0) {
-            message.warning("No 3D model available. Run design first to enable Save 3D Model.");
-            return;
-          }
-          setSelectedSave3dType("Export STL");
-          setShowSave3dTypeModal(true);
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.report.download"]?.shortcuts,
-        when: () => !!output,
-        handler: () => {
-          setCreateDesignReportBool(true);
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["eng.pref.open"]?.shortcuts,
-        handler: () => {
-          handleOpenDesignPrefFromShortcut();
-        },
-      },
-      {
-        combos: SHORTCUT_ACTION_BY_ID["global.theme.toggle"]?.shortcuts,
-        handler: () => {
-          toggleTheme();
-        },
-      },
-    ],
+  useEngineeringShortcuts({
+    navigate,
+    toggleInputDock,
+    toggleOutputDock,
+    toggleLogs,
+    handleSubmitEnhanced,
+    handleResetEnhanced,
+    handleLockToggle,
+    showCad: docks.cad,
+    selectedCameraView,
+    setSelectedCameraView,
+    hasModalContext,
+    output,
+    status,
+    handleCreateProject,
+    projectIdFromUrl,
+    handleLoadInputFromShortcut,
+    cadModelPaths,
+    setSelectedSave3dType,
+    setShowSave3dTypeModal,
+    setCreateDesignReportBool,
+    handleOpenDesignPrefFromShortcut,
+    toggleTheme,
   });
 
   return (
@@ -1299,13 +954,13 @@ export const EngineeringModule = ({
           <button
             onClick={toggleInputDock}
             className={`w-9 h-9 flex items-center justify-center transition`}
-            title={`${showInputDock ? 'Hide' : 'Show'} input dock`}
+            title={`${docks.input ? 'Hide' : 'Show'} input dock`}
             type="button"
           >
             <svg viewBox="0 0 100 100" className="w-5 h-5">
               <rect x="10" y="10" width="80" height="80" fill="none" stroke="currentColor" strokeWidth="6" />
               <line x1="40" y1="10" x2="40" y2="90" stroke="currentColor" strokeWidth="6" />
-              {showInputDock && (
+              {docks.input && (
                 <rect x="10" y="10" width="30" height="80" fill="currentColor" />
               )}
             </svg>
@@ -1317,7 +972,7 @@ export const EngineeringModule = ({
             onClick={toggleLogs}
             disabled={!output}
             className={`w-9 h-9 flex items-center justify-center transition`}
-            title={output ? `${showLogs ? 'Hide' : 'Show'} logs` : 'Run a design to view logs'}
+            title={output ? `${docks.logs ? 'Hide' : 'Show'} logs` : 'Run a design to view logs'}
             type="button"
           >
             <svg
@@ -1344,7 +999,7 @@ export const EngineeringModule = ({
                 strokeWidth="6"
               />
 
-              {showLogs && (
+              {docks.logs && (
                 <rect
                   x="10"
                   y="60"
@@ -1360,11 +1015,11 @@ export const EngineeringModule = ({
           {/* CAD Toggle Button - Mobile Only */}
           <button
             onClick={toggleCad}
-            className={`md:hidden p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${showCad
+            className={`md:hidden p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${docks.cad
               ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
               : 'hover:bg-black/10 dark:hover:bg-black/40'
               }`}
-            title={`${showCad ? 'Hide' : 'Show'} CAD`}
+            title={`${docks.cad ? 'Hide' : 'Show'} CAD`}
             type="button"
           >
             <svg
@@ -1388,17 +1043,17 @@ export const EngineeringModule = ({
           <button
             onClick={toggleOutputDock}
             disabled={!output}
-            title={output ? `${showOutputDock ? 'Hide' : 'Show'} output dock` : 'Run a design to view outputs'}
+            title={output ? `${docks.output ? 'Hide' : 'Show'} output dock` : 'Run a design to view outputs'}
             type="button"
             className={`p-2 md:p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${output
-              ? (showOutputDock ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 dark:hover:bg-black/40')
+              ? (docks.output ? 'bg-osdag-green text-white dark:bg-osdag-dark-green' : 'hover:bg-black/10 dark:hover:bg-black/40')
               : "opacity-40 cursor-not-allowed"
               }`}
           >
             <svg viewBox="0 0 100 100" className="w-5 h-5">
               <rect x="10" y="10" width="80" height="80" fill="none" stroke="currentColor" strokeWidth="6" />
               <line x1="60" y1="10" x2="60" y2="90" stroke="currentColor" strokeWidth="6" />
-              {showOutputDock && (
+              {docks.output && (
                 <rect x="60" y="10" width="30" height="80" fill="currentColor" />
               )}
             </svg>
@@ -1434,7 +1089,7 @@ export const EngineeringModule = ({
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M21.64 13.64a1 1 0 00-1.05-.24 8 8 0 01-10-10 1 1 0 00-.24-1.05A1 1 0 008.73 2 10 10 0 1022 15.27a1 1 0 00-.36-1.63z" />
               </svg>
-            )} 
+            )}
           </button>
 
         </div>
@@ -1452,7 +1107,7 @@ export const EngineeringModule = ({
 
       <div className="relative flex flex-row flex-1 overflow-hidden w-full">
         {/* Input Dock Toggle Button - Fixed to left, shows when dock is closed (Desktop only) */}
-        {!showInputDock && !isMobile && (
+        {!docks.input && !isMobile && (
           <button
             onClick={toggleInputDock}
             className="hidden md:flex absolute left-0 top-0 h-full w-10 bg-white dark:bg-osdag-dark-color border-r border-gray-300 dark:border-osdag-border items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
@@ -1463,7 +1118,7 @@ export const EngineeringModule = ({
         )}
 
         {/* Output Dock Toggle Button - Fixed to right, shows when dock is closed and output exists (Desktop only) */}
-        {!showOutputDock && output && !isMobile && (
+        {!docks.output && output && !isMobile && (
           <button
             onClick={toggleOutputDock}
             className="hidden md:flex absolute right-0 top-0 h-full w-10 bg-white dark:bg-osdag-dark-color border-l border-gray-300 dark:border-gray-700 items-center justify-center z-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
@@ -1474,7 +1129,7 @@ export const EngineeringModule = ({
         )}
 
         {/* Left - Input Dock */}
-        {showInputDock ? (
+        {docks.input ? (
           <BaseInputDock
             moduleConfig={moduleConfig}
             inputs={inputs}
@@ -1500,7 +1155,7 @@ export const EngineeringModule = ({
             setExtraState={setExtraState}
             updateSelectedItems={updateSelectedItems}
             setModalDynamicSrc={setModalDynamicSrc}
-            isOpen={showInputDock}
+            isOpen={docks.input}
           />
         ) : (
           <div className="fixed left-0 top-0 h-[105vh] w-[40px] flex flex-col items-center justify-center font-bold z-[1000]">
@@ -1515,20 +1170,19 @@ export const EngineeringModule = ({
         )}
         {/* EDGE BAR (always visible) */}
         <div
-          className={`absolute top-0 h-screen w-[40px] z-[1000] ${
-            showInputDock ? "left-[400px]" : "left-[30px]"
-          }`}
+          className={`absolute top-0 h-screen w-[40px] z-[1000] ${docks.input ? "left-[400px]" : "left-[30px]"
+            }`}
         >
           {/* GREEN LINE */}
           <div className="absolute left-0 top-0 w-[8px] h-full bg-[#84bd00]">
-            
+
             {/* TOGGLE HANDLE */}
             <div
               onClick={toggleInputDock}
               className="absolute right-0 top-[40%] w-[8px] h-[80px] bg-[#6a8f00] flex items-center justify-center cursor-pointer"
             >
               <span className="text-white text-[14px]">
-                {showInputDock ? "❮" : "❯"}
+                {docks.input ? "❮" : "❯"}
               </span>
             </div>
           </div>
@@ -1537,10 +1191,10 @@ export const EngineeringModule = ({
         {/* Middle - 3D Model and Logs Container */}
         <div className={`
           flex-1 flex flex-col relative min-w-0
-          ${isMobile && (showInputDock || showOutputDock) ? 'hidden' : 'flex'}
+          ${isMobile && (docks.input || docks.output) ? 'hidden' : 'flex'}
         `}>
           {/* Options Container - Show after design is complete. On desktop, show even when docks are open. On mobile, only show when CAD is visible */}
-          {showOptionsContainer && output && (isMobile ? showCad : true) && (
+          {showOptionsContainer && output && (isMobile ? docks.cad : true) && (
             <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 max-w-[95%] w-fit overflow-x-auto overflow-y-hidden flex flex-row items-center gap-2 p-1 bg-white/90 dark:bg-osdag-dark-color/90 rounded-md border border-gray-200 dark:border-gray-700 shadow-md">
               <div className="flex flex-row items-center gap-2 whitespace-nowrap">
                 {options.map((option) => {
@@ -1571,7 +1225,7 @@ export const EngineeringModule = ({
                               // If Model is selected, clear all others and select only Model
                               if (event.target.checked) {
                                 setSelectedSection(["Model"]);
-                                setSelectedView("Model");
+
                                 setSelectedCameraView("Model");
                               } else {
                                 // Don't allow unchecking Model if it's the only one
@@ -1590,7 +1244,7 @@ export const EngineeringModule = ({
                                 }
                                 setSelectedSection(newSelection);
                                 // Use first selected for camera/view if needed
-                                setSelectedView(newSelection[0]);
+
                                 setSelectedCameraView(newSelection[0]);
                               } else {
                                 // Uncheck: remove this option
@@ -1598,11 +1252,11 @@ export const EngineeringModule = ({
                                 // If nothing left, default to Model
                                 if (newSelection.length === 0) {
                                   setSelectedSection(["Model"]);
-                                  setSelectedView("Model");
+
                                   setSelectedCameraView("Model");
                                 } else {
                                   setSelectedSection(newSelection);
-                                  setSelectedView(newSelection[0]);
+
                                   setSelectedCameraView(newSelection[0]);
                                 }
                               }
@@ -1619,216 +1273,119 @@ export const EngineeringModule = ({
           )}
 
           {/* CAD Window Container */}
-          {(!isMobile || showCad) && (
-            <div className={`
-              model-container
-              ${isMobile
-                ? (showLogs ? 'h-[70%]' : 'h-full')
-                : (showLogs ? 'h-[60%]' : 'h-full')
-              }
-            `}>
-              {loading || isRedesigning ? (
-                <div className="modelLoading">
-                  <p>{isRedesigning ? "Updating Model..." : "Loading Model..."}</p>
-                </div>
-              ) : renderBoolean ? (
-                <div 
-                  className={`cadModel relative ${!customBgColor ? 'bg-gradient-to-b from-[#FFFFFF] to-[#7E7E7E] dark:from-[#535353] dark:to-[#000000]' : ''}`}
-                  style={customBgColor ? { backgroundColor: customBgColor } : {}}
-                >
-                  {/* <input
-                    type="color"
-                    className="absolute opacity-0 pointer-events-none w-0 h-0"
-                    value={customBgColor || "#ffffff"}
-                    onChange={(e) => setCustomBgColor(e.target.value)}
-                  /> */}
-
-                  <Canvas
-                    gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
-                    style={{ width: "100%", height: "100%", background: 'transparent' }}
-                  >
-                    <PerspectiveCamera
-                      ref={cameraRef}
-                      makeDefault
-                      position={cameraPos}
-                      fov={13}
-                      near={0.1}
-                      far={2000}
-                    />
-                    <Suspense
-                      fallback={
-                        <Html>
-                          <p>Loading 3D Model...</p>
-                        </Html>
-                      }
-                    >
-                      {renderBoolean && normalizedCadModelPaths && Object.keys(normalizedCadModelPaths).length > 0 && (() => {
-                        const activeViews = Array.isArray(selectedSection) ? selectedSection : [selectedSection];
-                        const primary = activeViews[0] || "Model";
-                        if (primary && primary !== "Model") {
-                          let hasPart =
-                            normalizedCadModelPaths[primary] ||
-                            normalizedCadModelPaths[primary?.toLowerCase?.()] ||
-                            normalizedCadModelPaths[primary?.toUpperCase?.()];
-
-                          if (!hasPart && primary === "EndPlate" || !hasPart && primary === "CoverPlate") {
-                            hasPart =
-                              normalizedCadModelPaths["Connector"] ||
-                              normalizedCadModelPaths["connector"];
-                          }
-
-                          if (!hasPart) {
-                            return (
-                              <Html>
-                                <p>{`No CAD part found for view "${primary}". Available parts: ${Object.keys(normalizedCadModelPaths).join(", ")}`}</p>
-                              </Html>
-                            );
-                          }
-                        }
-                        return null;
-                      })()}
-                      <CadSceneProvider>
-                        <CadScene
-                          modelPaths={normalizedCadModelPaths}
-                          selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
-                          selectedViews={selectedSection}
-                          isMobile={isMobile}
-                          cameraSettings={{
-                            ...cameraSettings,
-                            connectivity: getConnectivity(), // Add connectivity info
-                          }}
-                          hoverDict={hoverDict}
-                          onHoverLabel={handleHoverLabel}
-                          onHoverEnd={handleHoverEnd}
-                          moduleCadConfig={moduleConfig}
-                          key={`${modelKey}-${selectedSection}`}
-                        />
-                        <CadSceneBbox
-                          modelKey={modelKey}
-                          selectedCameraView={selectedCameraView}
-                        />
-                        <ScreenshotCapture
-                          screenshotTrigger={screenshotTrigger}
-                          setScreenshotTrigger={setScreenshotTrigger}
-                          selectedView={Array.isArray(selectedSection) ? selectedSection[0] : selectedSection}
-                        />
-                        <ReportCaptureDev />
-                      </CadSceneProvider>
-                    </Suspense>
-                  </Canvas>
-                  <div className="absolute right-[18px] top-[108px] z-10 flex flex-col gap-2">
-                    {[
-                      { label: "+", action: "zoom-in", title: "Zoom in" },
-                      { label: "-", action: "zoom-out", title: "Zoom out" },
-                    ].map(({ label, action, title }) => (
-                      <button
-                        key={action}
-                        type="button"
-                        aria-label={title}
-                        title={title}
-                        className="h-8 w-8 rounded-lg border border-white/35 bg-[rgba(32,32,32,0.78)] text-[20px] font-semibold leading-none text-white shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
-                        onClick={() => document.dispatchEvent(new CustomEvent("cad-camera-action", { detail: action }))}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="modelback"></div>
-              )}
-            </div>
-          )}
+          <CadViewer
+            isMobile={isMobile}
+            showCad={docks.cad}
+            showLogs={docks.logs}
+            loading={loading}
+            isRedesigning={isRedesigning}
+            renderBoolean={renderBoolean}
+            customBgColor={customBgColor}
+            cameraPos={cameraPos}
+            normalizedCadModelPaths={normalizedCadModelPaths}
+            selectedSection={selectedSection}
+            modelKey={modelKey}
+            cameraSettings={cameraSettings}
+            getConnectivity={getConnectivity}
+            hoverDict={hoverDict}
+            handleHoverLabel={handleHoverLabel}
+            handleHoverEnd={handleHoverEnd}
+            moduleConfig={moduleConfig}
+            selectedCameraView={selectedCameraView}
+            screenshotTrigger={screenshotTrigger}
+            setScreenshotTrigger={setScreenshotTrigger}
+          />
 
           {/* Logs Dock */}
-          {showLogs && output && (
+          {docks.logs && output && (
             <div className={`
               ${isMobile
-                ? (showCad ? 'h-[30%]' : 'fixed inset-0 z-50 h-full pt-[80px]')
+                ? (docks.cad ? 'h-[30%]' : 'fixed inset-0 z-50 h-full pt-[80px]')
                 : 'h-[40%]'
               }
-              ${isMobile && !showCad ? 'bg-white dark:bg-osdag-dark-color' : ''}
-              ${!isMobile && !showInputDock ? 'md:pl-0' : 'md:pl-[30px]'}
-              ${!isMobile && !showOutputDock && output ? 'md:pr-0' : ''}
+              ${isMobile && !docks.cad ? 'bg-white dark:bg-osdag-dark-color' : ''}
+              ${!isMobile && !docks.input ? 'md:pl-0' : 'md:pl-[30px]'}
+              ${!isMobile && !docks.output && output ? 'md:pr-0' : ''}
             `}>
               <Logs logs={logs} />
             </div>
           )}
         </div>
 
-      {/* Right - Output Dock */}
-      {showOutputDock && outputConfig && status.step !== DESIGN_STATUS.ERROR ? (
-       <div className={`
+        {/* Right - Output Dock */}
+        {docks.output && outputConfig && status.step !== DESIGN_STATUS.ERROR ? (
+          <div className={`
          fixed inset-0 z-50 h-full pt-[80px] sm:relative sm:inset-auto sm:z-auto sm:h-auto sm:pt-0
          w-full sm:w-[320px] md:w-[350px] lg:w-[400px]
          flex flex-col bg-white dark:bg-osdag-dark-color
         `}>
-        <BaseOutputDock
-         output={output}
-         outputConfig={outputConfig}
-         title={title || UI_STRINGS.OUTPUT_DOCK}
-         extraState={{
-          ...extraState,
-          cadModelPaths,
-          renderCadModel: renderBoolean,
-          connectivity: inputs?.connectivity,
-          member_designation: inputs?.member_designation,
-          designation: inputs?.member_designation,
-          weld_type: inputs?.weld_type }}
-          handleCreateDesignReport={handleCreateDesignReport}
-          saveOutput={saveOutput}
-        />
-         {/* GREEN STRIP (attached to dock edge) */}
-          <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
-            <div
-              onClick={() => setShowOutputDock((prev) => !prev)}
-              className="
+            <BaseOutputDock
+              output={output}
+              outputConfig={outputConfig}
+              title={title || UI_STRINGS.OUTPUT_DOCK}
+              extraState={{
+                ...extraState,
+                cadModelPaths,
+                renderCadModel: renderBoolean,
+                connectivity: inputs?.connectivity,
+                member_designation: inputs?.member_designation,
+                designation: inputs?.member_designation,
+                weld_type: inputs?.weld_type
+              }}
+              handleCreateDesignReport={handleCreateDesignReport}
+              saveOutput={saveOutput}
+            />
+            {/* GREEN STRIP (attached to dock edge) */}
+            <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
+              <div
+                onClick={() => toggleOutputDock(!!output)}
+                className="
                 absolute left-0 top-[40%]
                 w-[8px] h-[80px]
                 bg-[#6a8f00]
                 flex items-center justify-center
                 cursor-pointer
               "
-            >
-              <span className="text-white text-sm">
-                ❯
-              </span>
+              >
+                <span className="text-white text-sm">
+                  ❯
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      ) : (
-        /* COLLAPSED STRIP */
-        <div
-          className="
+        ) : (
+          /* COLLAPSED STRIP */
+          <div
+            className="
             fixed right-0 top-0 h-screen w-[40px]
             flex flex-col items-center justify-center
             z-[1000]
           "
-        >
-          <div className="relative flex flex-col items-center w-[30px] py-[10px] gap-[14px]">
-            {"OUTPUT".split("").map((ch, i) => (
-              <span key={i} className="rotate-90 font-bold">{ch}</span>
-            ))}
-          </div>
-          {/* GREEN STRIP (collapsed state) */}
-          <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
-            <div
-              onClick={() => setShowOutputDock(true)}
-              className="
+          >
+            <div className="relative flex flex-col items-center w-[30px] py-[10px] gap-[14px]">
+              {"OUTPUT".split("").map((ch, i) => (
+                <span key={i} className="rotate-90 font-bold">{ch}</span>
+              ))}
+            </div>
+            {/* GREEN STRIP (collapsed state) */}
+            <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
+              <div
+                onClick={() => setDocks({ output: true })}
+                className="
                 absolute left-0 top-[40%]
                 w-[8px] h-[80px]
                 bg-[#6a8f00]
                 flex items-center justify-center
                 cursor-pointer
               "
-            >
-              <span className="text-white text-sm">❮</span>
+              >
+                <span className="text-white text-sm">❮</span>
+              </div>
             </div>
           </div>
-        </div>
 
-      )}
-    </div>
+        )}
+      </div>
 
       {/* Design Report Modal */}
       <DesignReportModal
@@ -1875,18 +1432,11 @@ export const EngineeringModule = ({
           <Modal
             title="Additional Inputs"
             open={designPrefModalStatus}
-            // onCancel={() =>
-            //   isInputLocked
-            //     ? setDesignPrefModalStatus(false)   // Directly close
-            //     : setConfirmationModal(true)        // Ask confirmation
-            // }
-            onCancel={(e) => {
-              e.preventDefault(); // prevent default close
-          
+            onCancel={() => {
               if (isInputLocked) {
-                setDesignPrefModalStatus(false); // Direct close when locked
+                setDesignPrefModalStatus(false);
               } else {
-                setConfirmationModal(true); // Show Save dialog
+                setConfirmationModal(true);
               }
             }}
             footer={null}

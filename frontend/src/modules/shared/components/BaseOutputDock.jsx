@@ -3,7 +3,7 @@ import { Input, Modal } from 'antd';
 import { getOutputImage } from "../config/outputImageMap";
 import { OUTPUT_LAYOUTS } from "./outputDock/OutputModalLayouts";
 
-export const BaseOutputDock = ({
+export const BaseOutputDock = React.memo(({
   output,
   outputConfig,
   title = "Output Dock",
@@ -255,4 +255,4 @@ export const BaseOutputDock = ({
       ))}
     </>
   );
-};
+});
