@@ -1,31 +1,13 @@
-import { Select, Input } from "antd";
+import { Select } from "antd";
+import GenericConfigView from "./GenericConfigView";
 
 const { Option } = Select;
 
 const BOLT_SLIP_FACTOR_OPTIONS = [
-  "0.2",
-  "0.5",
-  "0.1",
-  "0.25",
-  "0.3",
-  "0.33",
-  "0.48",
-  "0.52",
-  "0.55",
+  "0.2", "0.5", "0.1", "0.25", "0.3", "0.33", "0.48", "0.52", "0.55",
 ];
 
-// const PLATED_CONNECTION_BOLT_MODULES = ["Butt Joint Bolted", "Lap Joint Bolted"];
-
-const BoltSectionModal = ({
-  module,
-  designPrefInputs,
-  setDesignPrefInputs,
-  isInputLocked,
-}) => {
-  // const isPlatedConnection =
-  //   module && PLATED_CONNECTION_BOLT_MODULES.includes(module);
-
-  const Bolt_discription = `
+const Bolt_discription = `
 IS 800 Table 20 Typical Average Values for Coefficient of Friction (µf)
 
 Treatment of Surfaces     µ_f
@@ -43,105 +25,78 @@ xi) Sand blasted surface      0.48
 xii) Red lead painted surface     0.1
 `;
 
+const BoltSectionModal = ({
+  designPrefInputs,
+  setDesignPrefInputs,
+  isInputLocked,
+}) => {
   return (
-    <>
-      <div className="Connector-col-beam-cont">
-        {/* Left Section */}
-        <div className="connector-left">
-          <h4>Inputs</h4>
-          <div className="sub-container">
-              <div className="input-cont">
-                <h5>Type *</h5>
-                <div>
-                  <Select
-                    disabled={isInputLocked}
-                    style={{ width: "132px", height: "25px", fontSize: "12px" }}
-                    value={designPrefInputs.bolt_tension_type}
-                    onSelect={(value) =>
-                      setDesignPrefInputs({
-                        ...designPrefInputs,
-                        bolt_tension_type: value,
-                      })
-                    }
-                  >
-                    <Option value="Pre-tensioned">Pre-tensioned</Option>
-                    <Option value="Non Pre-tensioned">Non Pre-tensioned</Option>
-                  </Select>
-                </div>
-              </div>
-              <div className="input-cont">
-                <h5>Hole Type</h5>
-                <div>
-                  <Select
-                    disabled={isInputLocked}
-                    style={{ width: "132px", height: "25px", fontSize: "12px" }}
-                    value={designPrefInputs.bolt_hole_type}
-                    onSelect={(value) =>
-                      setDesignPrefInputs({
-                        ...designPrefInputs,
-                        bolt_hole_type: value,
-                      })
-                    }
-                  >
-                    <Option value="Standard">Standard</Option>
-                    <Option value="Over-Sized">Over-Sized</Option>
-                  </Select>
-                </div>
-              </div>
-              <div className="input-cont">
-                <h5>
-                  Slip Factor, (µ
-                  <span style={{ verticalAlign: "sub", fontSize: "smaller" }}>
-                    f
-                  </span>
-                  )
-                </h5>
-                <Select
-                  disabled={isInputLocked}
-                  style={{ width: "132px", height: "25px", fontSize: "12px" }}
-                  value={designPrefInputs.bolt_slip_factor}
-                  onSelect={(value) =>
-                    setDesignPrefInputs({
-                      ...designPrefInputs,
-                      bolt_slip_factor: value,
-                    })
-                  }
-                >
-                  {BOLT_SLIP_FACTOR_OPTIONS.map((v) => (
-                    <Option key={v} value={v}>
-                      {v}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-            </div>
-          </div>
-          {/* Right Section */}
-          {/* {!isPlatedConnection && ( */}
-            <div className="connector-right">
-              <h4>Description</h4>
-
-              <div className="sub-container">
-                <Input.TextArea
-                  rows={18}
-                  value={Bolt_discription}
-                  readOnly
-                />
-              </div>
-            </div>
-          {/* )} */}
-        </div>
-        
-      {/* Bottom Note */}
-      <div className="connector-note">
-         
-            NOTE: If slip is permitted under the design load, design the bolt
-            as a bearing bolt select corresponding bolt grade.
-          
-        </div>
-    </>
+    <GenericConfigView
+      description={Bolt_discription}
+      note="NOTE: If slip is permitted under the design load, design the bolt as a bearing bolt select corresponding bolt grade."
+    >
+      <div className="input-cont">
+        <h5>Type *</h5>
+        <Select
+          disabled={isInputLocked}
+          style={{ width: "132px", height: "25px", fontSize: "12px" }}
+          value={designPrefInputs.bolt_tension_type}
+          onSelect={(value) =>
+            setDesignPrefInputs({
+              ...designPrefInputs,
+              bolt_tension_type: value,
+            })
+          }
+        >
+          <Option value="Pre-tensioned">Pre-tensioned</Option>
+          <Option value="Non Pre-tensioned">Non Pre-tensioned</Option>
+        </Select>
+      </div>
+      <div className="input-cont">
+        <h5>Hole Type</h5>
+        <Select
+          disabled={isInputLocked}
+          style={{ width: "132px", height: "25px", fontSize: "12px" }}
+          value={designPrefInputs.bolt_hole_type}
+          onSelect={(value) =>
+            setDesignPrefInputs({
+              ...designPrefInputs,
+              bolt_hole_type: value,
+            })
+          }
+        >
+          <Option value="Standard">Standard</Option>
+          <Option value="Over-Sized">Over-Sized</Option>
+        </Select>
+      </div>
+      <div className="input-cont">
+        <h5>
+          Slip Factor, (µ
+          <span style={{ verticalAlign: "sub", fontSize: "smaller" }}>
+            f
+          </span>
+          )
+        </h5>
+        <Select
+          disabled={isInputLocked}
+          style={{ width: "132px", height: "25px", fontSize: "12px" }}
+          value={designPrefInputs.bolt_slip_factor}
+          onSelect={(value) =>
+            setDesignPrefInputs({
+              ...designPrefInputs,
+              bolt_slip_factor: value,
+            })
+          }
+        >
+          {BOLT_SLIP_FACTOR_OPTIONS.map((v) => (
+            <Option key={v} value={v}>
+              {v}
+            </Option>
+          ))}
+        </Select>
+      </div>
+    </GenericConfigView>
   );
 };
 
 export default BoltSectionModal;
-

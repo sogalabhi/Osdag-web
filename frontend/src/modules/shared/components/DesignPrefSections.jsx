@@ -1,11 +1,8 @@
 import React, { useRef, useState, useContext, useEffect, useCallback } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
-import ColumnSectionModal from "./ColumnSectionModal";
-import BeamSectionModal from "./BeamSectionModal";
+import GenericSectionView from "./GenericSectionView";
+import { BEAM_DISPLAY_CONFIG, COLUMN_DISPLAY_CONFIG, ANGLE_DISPLAY_CONFIG } from "../config/sectionDisplayConfig";
 import ConnectorSectionModal from "./ConnectorSectionModal";
-import CleatAngleSectionModal from "./CleatAngleSectionModal";
-import SeatedAngleSectionModal from "./SeatedAngleSectionModal";
-import AngleSectionModal from "./AngleSectionModal";
 import BoltSectionModal from "./BoltSectionModal";
 import BasePlateSectionModal from "./BasePlateSectionModal";
 import StiffenerSectionModal from "./StiffenerSectionModal";
@@ -271,6 +268,9 @@ const DesignPrefSections = ({
 
   const modalCommon = { suppressInitialMaterialDispatch };
 
+  // Safety fallback
+  const safeSectionDetails = sectionDetails || { supporting: {}, supported: {} };
+
   return (
     <div>
       <Spin spinning={syncLoading} tip="Syncing preferences…">
@@ -298,17 +298,20 @@ const DesignPrefSections = ({
         </div>
         <div className="design-pref-cont">
           {activeTab === 0 && (
-            <ColumnSectionModal
+            <GenericSectionView
+              sectionType="supporting"
+              sectionTableName="Columns"
+              displayConfig={COLUMN_DISPLAY_CONFIG}
               module={module}
               inputs={inputs}
-              supportingSectionData={sectionDetails.supporting}
+              sectionData={safeSectionDetails.supporting}
               designPrefInputs={designPrefInputs}
               setDesignPrefInputs={setDesignPrefInputs}
               isInputLocked={isInputLocked}
               materialList={materialListForModals}
               isGuest={isGuest}
               onRefetchModuleOptions={onRefetchModuleOptions}
-              onClearSupportingSection={() =>
+              onClearSection={() =>
                 setSectionDetails((prev) => ({
                   ...prev,
                   supporting: {},
@@ -318,17 +321,20 @@ const DesignPrefSections = ({
             />
           )}
           {activeTab === 1 && (
-            <BeamSectionModal
+            <GenericSectionView
+              sectionType="supported"
+              sectionTableName="Beams"
+              displayConfig={BEAM_DISPLAY_CONFIG}
               module={module}
               inputs={inputs}
-              supportedSectionData={sectionDetails.supported}
+              sectionData={safeSectionDetails.supported}
               designPrefInputs={designPrefInputs}
               setDesignPrefInputs={setDesignPrefInputs}
               isInputLocked={isInputLocked}
               materialList={materialListForModals}
               isGuest={isGuest}
               onRefetchModuleOptions={onRefetchModuleOptions}
-              onClearSupportingSection={() =>
+              onClearSection={() =>
                 setSectionDetails((prev) => ({
                   ...prev,
                   supported: {},
@@ -338,15 +344,25 @@ const DesignPrefSections = ({
             />
           )}
           {activeTab === 2 && (
-            <AngleSectionModal
+            <GenericSectionView
+              sectionType="supporting"
+              sectionTableName="Angles"
+              displayConfig={ANGLE_DISPLAY_CONFIG}
               module={module}
               inputs={inputs}
+              sectionData={safeSectionDetails.supporting}
               designPrefInputs={designPrefInputs}
               setDesignPrefInputs={setDesignPrefInputs}
               isInputLocked={isInputLocked}
               materialList={materialListForModals}
               isGuest={isGuest}
               onRefetchModuleOptions={onRefetchModuleOptions}
+              onClearSection={() =>
+                setSectionDetails((prev) => ({
+                  ...prev,
+                  supporting: {},
+                }))
+              }
               {...modalCommon}
             />
           )}
@@ -362,31 +378,50 @@ const DesignPrefSections = ({
           )}
 
           {activeTab === 4 && (
-            <CleatAngleSectionModal
+             <GenericSectionView
+              sectionType="supported"
+              sectionTableName="Angles"
+              displayConfig={ANGLE_DISPLAY_CONFIG}
               module={module}
               inputs={inputs}
-              supportingSectionData={sectionDetails.supporting}
+              sectionData={safeSectionDetails.connector || safeSectionDetails.supported}
+              onClearSection={() =>
+                setSectionDetails((prev) => ({
+                  ...prev,
+                  supported: {},
+                  connector: {},
+                }))
+              }
               designPrefInputs={designPrefInputs}
               setDesignPrefInputs={setDesignPrefInputs}
               isInputLocked={isInputLocked}
               materialList={materialListForModals}
               isGuest={isGuest}
               onRefetchModuleOptions={onRefetchModuleOptions}
-              supportedSectionData={sectionDetails.connector || {}}
               {...modalCommon}
             />
           )}
 
           {activeTab === 5 && (
-            <SeatedAngleSectionModal
+            <GenericSectionView
+              sectionType="supported"
+              sectionTableName="Angles"
+              displayConfig={ANGLE_DISPLAY_CONFIG}
               module={module}
               inputs={inputs}
+              sectionData={safeSectionDetails.supported}
               designPrefInputs={designPrefInputs}
               setDesignPrefInputs={setDesignPrefInputs}
               isInputLocked={isInputLocked}
               materialList={materialListForModals}
               isGuest={isGuest}
               onRefetchModuleOptions={onRefetchModuleOptions}
+              onClearSection={() =>
+                setSectionDetails((prev) => ({
+                  ...prev,
+                  supported: {},
+                }))
+              }
               {...modalCommon}
             />
           )}
