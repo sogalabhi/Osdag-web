@@ -15,6 +15,7 @@ const readOnlyFontStyle = {
 
 const BeamSectionModal = ({
   supportedSectionData,
+  onClearSupportingSection,
   designPrefInputs,
   setDesignPrefInputs,
   isInputLocked,
@@ -65,15 +66,35 @@ const BeamSectionModal = ({
   };
 
   const handleClearSectionTab = () => {
+    onClearSupportingSection?.();
+  
     setDesignPrefInputs((prev) => ({
       ...prev,
-      supported_material:
-        inputs.supported_material ??
+  
+      supporting_material:
+        inputs.supporting_material ??
         inputs.connector_material ??
         inputs.material ??
-        prev.supported_material,
+        prev.supporting_material,
+  
+      material:
+        inputs.material ?? prev.material,
+  
+      connector_material:
+        inputs.connector_material ?? prev.connector_material,
+  
+      fu: prev.fu,
+      fy: prev.fy,
+      E: prev.E,
+      G: prev.G,
+      poisson_ratio: prev.poisson_ratio,
+      thermal_expansion: prev.thermal_expansion,
+  
+      type: prev.type,
+      source: prev.source,
     }));
   };
+  
 
   return (
     <>
@@ -281,7 +302,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.D || 0}
+                value={supportedSectionData.D ?? ""}
                 // disabled
                 style={readOnlyFontStyle}
               />
@@ -292,7 +313,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="flange-widht"
                 className="input-design-pref"
-                value={supportedSectionData.B || 0}
+                value={supportedSectionData.B ?? ""}
                 // disabled
                 style={readOnlyFontStyle}
               />
@@ -303,7 +324,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="flange-thickness"
                 className="input-design-pref"
-                value={supportedSectionData.T || 0}
+                value={supportedSectionData.T ?? ""}
                 // disabled
                 style={readOnlyFontStyle}
               />
@@ -314,7 +335,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="web-thickness"
                 className="input-design-pref"
-                value={supportedSectionData.tw || 0}
+                value={supportedSectionData.tw ?? ""}
                 // disabled
                 style={readOnlyFontStyle}
               />
@@ -325,7 +346,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="flange-slope"
                 className="input-design-pref"
-                value={supportedSectionData.FlangeSlope || 0}
+                value={supportedSectionData.FlangeSlope ?? ""}
                 // disabled
                 style={readOnlyFontStyle}
               />
@@ -336,7 +357,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.R1 || 0}
+                value={supportedSectionData.R1 ?? ""}
                 // disabled
                 style={readOnlyFontStyle}
               />
@@ -347,7 +368,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.R2 || 0}
+                value={supportedSectionData.R2 ?? ""}
                 // disabled
                 style={readOnlyFontStyle}
               />
@@ -360,7 +381,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.Mass || 0}
+                value={supportedSectionData.Mass ?? ""}
                 // disabled
                 style={readOnlyFontStyle}
               />
@@ -371,7 +392,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.Area || 0}
+                value={supportedSectionData.Area ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -381,7 +402,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.Iz || 0}
+                value={supportedSectionData.Iz ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -391,7 +412,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.Iy || 0}
+                value={supportedSectionData.Iy ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -401,7 +422,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.rz || 0}
+                value={supportedSectionData.rz ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -411,7 +432,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.ry || 0}
+                value={supportedSectionData.ry ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -421,7 +442,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.Zz || 0}
+                value={supportedSectionData.Zz ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -431,7 +452,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.Zy || 0}
+                value={supportedSectionData.Zy ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -458,7 +479,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.Zpz || 0}
+                value={supportedSectionData.Zpz ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -469,7 +490,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.Zpy || 0}
+                value={supportedSectionData.Zpy ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -480,7 +501,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.It || 0}
+                value={supportedSectionData.It ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -491,7 +512,7 @@ const BeamSectionModal = ({
                 type="text"
                 name="depth"
                 className="input-design-pref"
-                value={supportedSectionData.Iw || 0}
+                value={supportedSectionData.Iw ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>

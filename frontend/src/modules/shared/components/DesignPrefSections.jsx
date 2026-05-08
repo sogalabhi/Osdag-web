@@ -308,6 +308,12 @@ const DesignPrefSections = ({
               materialList={materialListForModals}
               isGuest={isGuest}
               onRefetchModuleOptions={onRefetchModuleOptions}
+              onClearSupportingSection={() =>
+                setSectionDetails((prev) => ({
+                  ...prev,
+                  supporting: {},
+                }))
+              }
               {...modalCommon}
             />
           )}
@@ -322,6 +328,12 @@ const DesignPrefSections = ({
               materialList={materialListForModals}
               isGuest={isGuest}
               onRefetchModuleOptions={onRefetchModuleOptions}
+              onClearSupportingSection={() =>
+                setSectionDetails((prev) => ({
+                  ...prev,
+                  supported: {},
+                }))
+              }
               {...modalCommon}
             />
           )}
@@ -353,6 +365,7 @@ const DesignPrefSections = ({
             <CleatAngleSectionModal
               module={module}
               inputs={inputs}
+              supportingSectionData={sectionDetails.supporting}
               designPrefInputs={designPrefInputs}
               setDesignPrefInputs={setDesignPrefInputs}
               isInputLocked={isInputLocked}

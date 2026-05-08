@@ -16,6 +16,7 @@ const readOnlyFontStyle = {
 
 const ColumnSectionModal = ({
   supportingSectionData,
+  onClearSupportingSection,
   designPrefInputs,
   setDesignPrefInputs,
   isInputLocked,
@@ -67,21 +68,12 @@ const ColumnSectionModal = ({
     });
   };
 
-  // const handleClearSectionTab = () => {
-  //   setDesignPrefInputs((prev) => ({
-  //     ...prev,
-  //     supporting_material:
-  //       inputs.supporting_material ??
-  //       inputs.connector_material ??
-  //       inputs.material ??
-  //       prev.supporting_material,
-  //   }));
-  // };
-  const handleClearSectionTab = () => {
+const handleClearSectionTab = () => {
+  onClearSupportingSection?.();
+
   setDesignPrefInputs((prev) => ({
     ...prev,
 
-    // Preserve material related values (like desktop)
     supporting_material:
       inputs.supporting_material ??
       inputs.connector_material ??
@@ -94,7 +86,6 @@ const ColumnSectionModal = ({
     connector_material:
       inputs.connector_material ?? prev.connector_material,
 
-    // Preserve mechanical properties
     fu: prev.fu,
     fy: prev.fy,
     E: prev.E,
@@ -102,11 +93,9 @@ const ColumnSectionModal = ({
     poisson_ratio: prev.poisson_ratio,
     thermal_expansion: prev.thermal_expansion,
 
-    // Preserve type/source
     type: prev.type,
     source: prev.source,
   }));
-  alert("rr");
 };
 
   return (
@@ -323,7 +312,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.D || 0}
-                value={supportingSectionData.D || 0}
+                value={supportingSectionData.D ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -334,7 +323,7 @@ const ColumnSectionModal = ({
                 name="flange-widht"
                 className="input-design-pref"
                 // value={supportingSectionData.B || 0}
-                value={supportingSectionData.B || 0}
+                value={supportingSectionData.B ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -345,7 +334,7 @@ const ColumnSectionModal = ({
                 name="flange-thickness"
                 className="input-design-pref"
                 // value={supportingSectionData.T || 0}
-                value={supportingSectionData.T || 0}
+                value={supportingSectionData.T ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -356,7 +345,7 @@ const ColumnSectionModal = ({
                 name="web-thickness"
                 className="input-design-pref"
                 // value={supportingSectionData.tw || 0}
-                value={supportingSectionData.tw || 0}
+                value={supportingSectionData.tw ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -367,7 +356,7 @@ const ColumnSectionModal = ({
                 name="flange-slope"
                 className="input-design-pref"
                 // value={supportingSectionData.FlangeSlope || 0}
-                value={supportingSectionData.FlangeSlope || 0}
+                value={supportingSectionData.FlangeSlope ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -378,7 +367,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R1 || 0}
-                value={supportingSectionData.R1 || 0}
+                value={supportingSectionData.R1 ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -389,7 +378,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.R2 || 0}
+                value={supportingSectionData.R2 ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -402,7 +391,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.Mass || 0}
+                value={supportingSectionData.Mass ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -413,7 +402,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.Area || 0}
+                value={supportingSectionData.Area ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -424,7 +413,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.Iz || 0}
+                value={supportingSectionData.Iz ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -435,7 +424,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.Iy || 0}
+                value={supportingSectionData.Iy ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -446,7 +435,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.rz || 0}
+                value={supportingSectionData.rz ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -457,7 +446,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.ry || 0}
+                value={supportingSectionData.ry ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -468,7 +457,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.Zz || 0}
+                value={supportingSectionData.Zz ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -479,7 +468,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.Zy || 0}
+                value={supportingSectionData.Zy ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -505,7 +494,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.Zpz || 0}
+                value={supportingSectionData.Zpz ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -517,7 +506,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.Zpy || 0}
+                value={supportingSectionData.Zpy ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -529,7 +518,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.It || 0}
+                value={supportingSectionData.It ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
@@ -541,7 +530,7 @@ const ColumnSectionModal = ({
                 name="depth"
                 className="input-design-pref"
                 // value={supportingSectionData.R2 || 0}
-                value={supportingSectionData.Iw || 0}
+                value={supportingSectionData.Iw ?? ""}
                 style={readOnlyFontStyle}
               />
             </div>
