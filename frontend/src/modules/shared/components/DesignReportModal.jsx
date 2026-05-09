@@ -381,6 +381,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
             <Upload
               beforeUpload={handleProfileFileChange}
               showUploadList={false}
+              accept=".txt"
             >
               <Button>Select Profile File</Button>
             </Upload>
