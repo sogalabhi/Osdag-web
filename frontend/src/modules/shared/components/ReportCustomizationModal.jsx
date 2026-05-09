@@ -17,7 +17,8 @@ export const ReportCustomizationModal = ({
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [checkedKeys, setCheckedKeys] = useState([]);
   const [autoExpandParent, setAutoExpandParent] = useState(true);
-  const [compilingPDF, setCompilingPDF] = useState(false);
+  const [openingPDF, setOpeningPDF] = useState(false);
+  const [savingPDF, setSavingPDF] = useState(false);
 
   // Initialize checked keys when sections change
   useEffect(() => {
@@ -92,13 +93,13 @@ export const ReportCustomizationModal = ({
       return;
     }
 
-    setCompilingPDF(true);
+    setOpeningPDF(true);
     try {
       await onOpenPDF(selectedSections);
     } catch (error) {
       message.error("Failed to open PDF. Please try again.");
     } finally {
-      setCompilingPDF(false);
+      setOpeningPDF(false);
     }
   };
 
@@ -108,13 +109,13 @@ export const ReportCustomizationModal = ({
       return;
     }
 
-    setCompilingPDF(true);
+    setSavingPDF(true);
     try {
       await onSavePDF(selectedSections);
     } catch (error) {
       message.error("Failed to save PDF. Please try again.");
     } finally {
-      setCompilingPDF(false);
+      setSavingPDF(false);
     }
   };
 
@@ -194,7 +195,7 @@ export const ReportCustomizationModal = ({
       <div className="flex justify-between items-center mt-5 pt-4 border-t border-gray-200">
         <Button 
           onClick={handleOpenPDF}
-          loading={compilingPDF}
+          loading={openingPDF}
           className="text-sm font-medium text-black bg-white rounded-lg border border-black hover:bg-osdag-dark-green transition-colors p-2"
         >
           Open PDF
@@ -203,7 +204,7 @@ export const ReportCustomizationModal = ({
         <div style={{ display: 'flex', gap: '10px' }}>
           <Button 
             onClick={handleSavePDF}
-            loading={compilingPDF}
+            loading={savingPDF}
             style={{
               backgroundColor: 'white',
               color: 'black',
