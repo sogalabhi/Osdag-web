@@ -115,7 +115,8 @@ export const GENERIC_SUBMODULE_CONTENT = {
             label: UI_STRINGS.COMPRESSION_MEMBER,
             options: [
                 { key: MODULE_KEY_STRUTS_BOLTED, label: "Struts Bolted to End Gusset", img: "struts_bolt_end_gusset.png" },
-                { key: "StrutsInTrusses", label: "Struts Welded to End Gusset", img: "struts_weld_end_gusset.png" },
+                { key: MODULE_KEY_STRUTS_WELDED, label: "Struts Welded to End Gusset", img: "struts_weld_end_gusset.png" },
+                { key: MODULE_KEY_AXIALLY_LOADED_COLUMN, label: "Axially Loaded Column", img: "axially_loaded_column.png" },
             ],
 
         },
