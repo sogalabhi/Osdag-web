@@ -1357,6 +1357,8 @@ export const EngineeringModule = ({
             selectedCameraView={selectedCameraView}
             screenshotTrigger={screenshotTrigger}
             setScreenshotTrigger={setScreenshotTrigger}
+            showOutputDock={docks.output}
+            hasOutput={!!output}
           />
 
           {/* Logs Dock */}
