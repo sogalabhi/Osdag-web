@@ -323,55 +323,36 @@ def create_module() -> FinPlateConnection:
     print("\n[create_module] Creating FinPlateConnection instance...")
     try:
         module = FinPlateConnection()  # Create an instance of the FinPlateConnection
-        print(f"   ✅ FinPlateConnection instance created: {id(module)}")
+        print(f"   FinPlateConnection instance created: {id(module)}")
         
         print(f"   Setting logger with id='web'...")
         module.set_osdaglogger(None, id="web")
-        print(f"   ✅ Logger set successfully")
+        print(f"   Logger set successfully")
         print(f"   Logger name: {getattr(module.logger, 'name', 'N/A') if hasattr(module, 'logger') else 'No logger'}")
         
         return module
     except Exception as e:
-        print(f"   ❌ ERROR in create_module: {type(e).__name__}: {e}")
+        print(f"    ERROR in create_module: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
 
 
 def create_from_input(input_values: Dict[str, Any]) -> FinPlateConnection:
     """Create an instance of the beam beam end plate connection module design class from input values."""
-    print("\n" + "=" * 60)
-    print("create_from_input() called")
-    print("=" * 60)
-    print(f"Input values received: {len(input_values)} keys")
-    print(f"Sample keys: {list(input_values.keys())[:5]}")
-    
+
     module = None
     print("\n[create_from_input] Step 1: Creating module instance...")
     try:
         module = create_module()  # Create module instance.
-        print(f"✅ Module created successfully: {type(module).__name__}")
-        print(f"   Module ID: {id(module)}")
     except Exception as e:
-        print(f"❌ ERROR in create_module: {type(e).__name__}: {e}")
-        print('error in creating module')
+        print(f" ERROR in create_module: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
-    
-    # Map frontend keys to osdag_core keys
-    # Frontend sends 'Connectivity' but osdag_core expects 'Connectivity *' (KEY_CONN)
-    print(f"\n[create_from_input] Step 2: Mapping frontend keys to osdag_core keys...")
-    print(f"   KEY_CONN constant value: '{KEY_CONN}'")
-    print(f"   'Connectivity' in input_values: {'Connectivity' in input_values}")
-    print(f"   KEY_CONN in input_values: {KEY_CONN in input_values}")
-    
     design_dictionary = input_values.copy()
     if 'Connectivity' in design_dictionary and KEY_CONN not in design_dictionary:
         connectivity_value = design_dictionary.pop('Connectivity')
         design_dictionary[KEY_CONN] = connectivity_value
-        print(f"   ✅ Mapped 'Connectivity' -> '{KEY_CONN}'")
-        print(f"   Connectivity value: '{connectivity_value}'")
     else:
-        print(f"   ℹ️  No mapping needed (Connectivity already mapped or not present)")
         if KEY_CONN in design_dictionary:
             print(f"   KEY_CONN value: '{design_dictionary[KEY_CONN]}'")
     
@@ -384,21 +365,17 @@ def create_from_input(input_values: Dict[str, Any]) -> FinPlateConnection:
     try:
         if module is None:
             raise RuntimeError('Module instance was not created')
-        
-        print(f"   Calling module.set_input_values() with {len(design_dictionary)} keys...")
-        print(f"   Sample keys being passed: {list(design_dictionary.keys())[:5]}")
-        
         module.set_input_values(design_dictionary)
-        print(f"   ✅ set_input_values() completed successfully")
+        print(f"   set_input_values() completed successfully")
         
         # Verify key was set correctly
         if hasattr(module, 'connectivity'):
-            print(f"   ✅ Module connectivity attribute: '{module.connectivity}'")
+            print(f"   Module connectivity attribute: '{module.connectivity}'")
         else:
-            print(f"   ⚠️  Module has no 'connectivity' attribute")
+            print(f"     Module has no 'connectivity' attribute")
             
     except Exception as e:
-        print(f"\n❌ ERROR in set_input_values:")
+        print(f"\n ERROR in set_input_values:")
         print(f"   Exception type: {type(e).__name__}")
         print(f"   Exception message: {str(e)}")
         print(f"   Design dictionary keys: {list(design_dictionary.keys())[:10]}")
@@ -434,7 +411,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     print("\n[Step 1] Creating module from input...")
     try:
         module = create_from_input(input_values)  # Create module from input.
-        print(f"✅ Module created: {type(module).__name__}")
+        print(f"Module created: {type(module).__name__}")
         print(f"Module object: {module}")
     except Exception as e:
         print(f"Failed to create module: {e}")
@@ -449,11 +426,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         print(f"   Module has output_values method: {hasattr(module, 'output_values')}")
         try:
             raw_output_text = module.output_values(True)
-            print(f"✅ output_values() returned {len(raw_output_text)} parameters")
+            print(f"output_values() returned {len(raw_output_text)} parameters")
             if len(raw_output_text) > 0:
                 print(f"   First parameter sample: {raw_output_text[0] if isinstance(raw_output_text[0], (list, tuple)) else 'N/A'}")
         except Exception as e:
-            print(f"❌ ERROR in output_values(): {type(e).__name__}: {e}")
+            print(f" ERROR in output_values(): {type(e).__name__}: {e}")
             traceback.print_exc()
             raise
         
@@ -461,11 +438,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         print(f"   Module has spacing method: {hasattr(module, 'spacing')}")
         try:
             raw_output_spacing = module.spacing(True)
-            print(f"✅ spacing() returned {len(raw_output_spacing)} parameters")
+            print(f"spacing() returned {len(raw_output_spacing)} parameters")
             if len(raw_output_spacing) > 0:
                 print(f"   First spacing parameter: {raw_output_spacing[0] if isinstance(raw_output_spacing[0], (list, tuple)) else 'N/A'}")
         except Exception as e:
-            print(f"❌ ERROR in spacing(): {type(e).__name__}: {e}")
+            print(f" ERROR in spacing(): {type(e).__name__}: {e}")
             print(f"   Error details: {str(e)}")
             traceback.print_exc()
             raise
@@ -474,11 +451,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         print(f"   Module has capacities method: {hasattr(module, 'capacities')}")
         try:
             raw_output_capacities = module.capacities(True)
-            print(f"✅ capacities() returned {len(raw_output_capacities)} parameters")
+            print(f"capacities() returned {len(raw_output_capacities)} parameters")
             if len(raw_output_capacities) > 0:
                 print(f"   First capacity parameter: {raw_output_capacities[0] if isinstance(raw_output_capacities[0], (list, tuple)) else 'N/A'}")
         except Exception as e:
-            print(f"❌ ERROR in capacities(): {type(e).__name__}: {e}")
+            print(f" ERROR in capacities(): {type(e).__name__}: {e}")
             traceback.print_exc()
             raise
         
@@ -486,11 +463,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         print(f"   Module has section_capacities method: {hasattr(module, 'section_capacities')}")
         try:
             raw_output_section_capacities = module.section_capacities(True)
-            print(f"✅ section_capacities() returned {len(raw_output_section_capacities)} parameters")
+            print(f"section_capacities() returned {len(raw_output_section_capacities)} parameters")
             if len(raw_output_section_capacities) > 0:
                 print(f"   First section_capacity parameter: {raw_output_section_capacities[0] if isinstance(raw_output_section_capacities[0], (list, tuple)) else 'N/A'}")
         except Exception as e:
-            print(f"❌ ERROR in section_capacities(): {type(e).__name__}: {e}")
+            print(f" ERROR in section_capacities(): {type(e).__name__}: {e}")
             traceback.print_exc()
             raise
         
@@ -502,17 +479,17 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             if isinstance(module.logger, CustomLogger):
                 try:
                     logs = module.logger.get_logs()
-                    print(f"   ✅ Retrieved {len(logs) if logs else 0} logs from custom logger")
+                    print(f"   Retrieved {len(logs) if logs else 0} logs from custom logger")
                     if logs and len(logs) > 0:
                         print(f"   First log entry: {logs[0] if isinstance(logs[0], (str, dict)) else 'N/A'}")
                 except Exception as e:
-                    print(f"   ⚠️ Error getting logs: {e}")
+                    print(f"    Error getting logs: {e}")
                     logs = []
             else:
-                print(f"   ⚠️ Logger is not CustomLogger instance, type: {type(module.logger)}")
+                print(f"    Logger is not CustomLogger instance, type: {type(module.logger)}")
                 logs = []
         else:
-            print("   ⚠️ Module has no logger attribute")
+            print("    Module has no logger attribute")
             logs = []
 
         print("\n[Step 7] Combining all raw outputs...")
@@ -521,7 +498,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         print(f"   raw_output_capacities length: {len(raw_output_capacities)}")
         print(f"   raw_output_section_capacities length: {len(raw_output_section_capacities)}")
         raw_output = raw_output_text + raw_output_spacing + raw_output_capacities + raw_output_section_capacities
-        print(f"✅ Combined raw_output length: {len(raw_output)}")
+        print(f"Combined raw_output length: {len(raw_output)}")
 
         print("\n[Step 8] Processing parameters into output dict...")
         processed_count = 0
@@ -554,9 +531,9 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 else:
                     skipped_count += 1
                     if i < 5:  # Only print details for first few
-                        print(f"    ⚠️ Skipped: type={param_type}, key={key}")
+                        print(f"     Skipped: type={param_type}, key={key}")
         
-        print(f"✅ Processed {processed_count} parameters, skipped {skipped_count}")
+        print(f"Processed {processed_count} parameters, skipped {skipped_count}")
     except Exception as e:
         print("\n" + "=" * 60)
         print("ERROR in generate_output()")
@@ -580,7 +557,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         if hasattr(e, 'error'):
             print(f"Exception has 'error' attribute: {e.error}")
             if e.error is None:
-                print("⚠️ WARNING: Exception.error is None!")
+                print(" WARNING: Exception.error is None!")
         
         print(f"\nFull traceback:")
         traceback.print_exc()
@@ -595,7 +572,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         raise
     
     print("\n" + "=" * 60)
-    print("✅ generate_output() completed successfully")
+    print("generate_output() completed successfully")
     print("=" * 60)
     print(f"Final output dict has {len(output)} keys")
     print(f"Output keys (first 10): {list(output.keys())[:10]}")

@@ -12,6 +12,7 @@ from apps.core.utils.module_helpers import handle_design_request
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from rest_framework import status
 from apps.core.models import Columns, Beams, Material, CustomMaterials
+from apps.sections.options_merge import merge_user_sections_into_options
 
 
 class FlexureMemberViewSet(viewsets.ViewSet):
@@ -98,15 +99,14 @@ class FlexureMemberViewSet(viewsets.ViewSet):
 
         Returns dropdown/options data for flexural sub-modules.
         """
-        email = request.query_params.get("email")
         slug = submodule_slug
 
         # ---- Common Helpers ---- #
 
         def material_list():
             mats = list(Material.objects.all().values())
-            if email:
-                mats += list(CustomMaterials.objects.filter(email=email).values())
+            if hasattr(request, "user") and request.user.is_authenticated:
+                mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 
@@ -153,7 +153,10 @@ class FlexureMemberViewSet(viewsets.ViewSet):
                     'warpingRestraintList': restraint_types,
                     'allowableClassList': allowable_class_list
                 }
-                return Response(data, status=status.HTTP_200_OK)
+                return Response(
+                    merge_user_sections_into_options(request, data),
+                    status=status.HTTP_200_OK,
+                )
             if slug == 'purlin':
                 data = {
                     'beamList': beam_list(),
@@ -166,7 +169,10 @@ class FlexureMemberViewSet(viewsets.ViewSet):
                     'warpingRestraintList': restraint_types,
                     'allowableClassList': allowable_class_list
                 }
-                return Response(data, status=status.HTTP_200_OK)
+                return Response(
+                    merge_user_sections_into_options(request, data),
+                    status=status.HTTP_200_OK,
+                )
             if slug == 'on-cantilever':
                 cantilever_support_types = [
                     {'value': 'Major Laterally Supported', 'label': 'Major Laterally Supported'},
@@ -196,7 +202,10 @@ class FlexureMemberViewSet(viewsets.ViewSet):
                     'topRestraintList': top_restraint_list,
                     'allowableClassList': allowable_class_list
                 }
-                return Response(data, status=status.HTTP_200_OK)
+                return Response(
+                    merge_user_sections_into_options(request, data),
+                    status=status.HTTP_200_OK,
+                )
             return Response(
                 {'error': f'Sub-module {slug} not found'},
                 status=status.HTTP_404_NOT_FOUND
@@ -303,4 +312,3 @@ class FlexureMemberViewSet(viewsets.ViewSet):
                 {'error': str(e), 'status': 'error'},
                 status=500
             )
-

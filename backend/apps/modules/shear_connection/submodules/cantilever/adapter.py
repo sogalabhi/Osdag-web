@@ -262,16 +262,16 @@ def create_module() -> CantileverConnection:
     print("\n[create_module] Creating CantileverConnection instance...")
     try:
         module = CantileverConnection()  # Create an instance of the CantileverConnection
-        print(f"   ✅ CantileverConnection instance created: {id(module)}")
+        print(f"   CantileverConnection instance created: {id(module)}")
         
         print(f"   Setting logger with id='web'...")
         module.set_osdaglogger(None, id="web")
-        print(f"   ✅ Logger set successfully")
+        print(f"   Logger set successfully")
         print(f"   Logger name: {getattr(module.logger, 'name', 'N/A') if hasattr(module, 'logger') else 'No logger'}")
         
         return module
     except Exception as e:
-        print(f"   ❌ ERROR in create_module: {type(e).__name__}: {e}")
+        print(f"    ERROR in create_module: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
 
@@ -288,22 +288,22 @@ def create_from_input(input_values: Dict[str, Any]) -> CantileverConnection:
     print("\n[create_from_input] Step 1: Creating module instance...")
     try:
         module = create_module()
-        print("   ✅ Module instance created")
+        print("   Module instance created")
     except Exception as e:
-        print(f"   ❌ ERROR creating module: {type(e).__name__}: {e}")
+        print(f"    ERROR creating module: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
 
     print("\n[create_from_input] Step 2: Setting input values...")
     try:
         module.set_input_values(input_values)
-        print("   ✅ Input values set successfully")
+        print("   Input values set successfully")
     except Exception as e:
-        print(f"   ❌ ERROR setting input values: {type(e).__name__}: {e}")
+        print(f"    ERROR setting input values: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
 
-    print(f"\n✅ create_from_input() completed successfully. Module: {id(module)}")
+    print(f"\ncreate_from_input() completed successfully. Module: {id(module)}")
     return module
 
 
@@ -319,21 +319,21 @@ def generate_output(input_values: Dict[str, Any]) -> tuple:
     try:
         print("\n[generate_output] Step 1: Creating and calculating module...")
         module = create_from_input(input_values)
-        print("   ✅ Module created and calculated")
+        print("   Module created and calculated")
         
         print("\n[generate_output] Step 2: Extracting output values...")
         output = module.output_values(True)
-        print(f"   ✅ Output values extracted: {len(output)} items")
+        print(f"   Output values extracted: {len(output)} items")
         
         print("\n[generate_output] Step 3: Extracting logs...")
         logs = module.logs if hasattr(module, 'logs') else []
-        print(f"   ✅ Logs extracted: {len(logs)} items")
+        print(f"   Logs extracted: {len(logs)} items")
         
-        print("\n✅ generate_output() completed successfully")
+        print("\ngenerate_output() completed successfully")
         return output, logs
         
     except Exception as e:
-        print(f"\n❌ ERROR in generate_output(): {type(e).__name__}: {e}")
+        print(f"\n ERROR in generate_output(): {type(e).__name__}: {e}")
         traceback.print_exc()
         logs.append({"msg": f"Error in generate_output: {str(e)}", "type": "error"})
         return output, logs
@@ -349,7 +349,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     try:
         print("\n[create_cad_model] Step 1: Creating module from input...")
         module = create_from_input(input_values)
-        print("   ✅ Module created")
+        print("   Module created")
         
         print("\n[create_cad_model] Step 2: Generating CAD model...")
         # Ensure module.module is set correctly for CAD generation
@@ -364,12 +364,12 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
         
         # Generate CAD model
         cad_file_path = module.create_3d_model(connection_key, section, session)
-        print(f"   ✅ CAD model generated: {cad_file_path}")
+        print(f"   CAD model generated: {cad_file_path}")
         
-        print("\n✅ create_cad_model() completed successfully")
+        print("\ncreate_cad_model() completed successfully")
         return cad_file_path
         
     except Exception as e:
-        print(f"\n❌ ERROR in create_cad_model(): {type(e).__name__}: {e}")
+        print(f"\n ERROR in create_cad_model(): {type(e).__name__}: {e}")
         traceback.print_exc()
         raise

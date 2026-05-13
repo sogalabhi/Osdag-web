@@ -37,13 +37,13 @@ class AxiallyLoadedColumnService:
             # 1) Validate inputs
             print("\n[1/3] Validating inputs...")
             validate_input(inputs)
-            print("✅ Input validation passed")
+            print("Input validation passed")
 
             # 2) Generate output (creates ColumnDesign instance and runs calculation)
             print("\n[2/3] Generating output from ColumnDesign...")
             output, logs = generate_output(inputs)
-            print(f"✅ Output generated: {len(output)} parameters")
-            print(f"✅ Logs count: {len(logs) if logs else 0}")
+            print(f"Output generated: {len(output)} parameters")
+            print(f"Logs count: {len(logs) if logs else 0}")
 
             # 3) Prepare response
             print("\n[3/3] Preparing response payload...")
@@ -52,13 +52,13 @@ class AxiallyLoadedColumnService:
                 "logs": logs or [],
                 "success": True,
             }
-            print("✅ AxiallyLoadedColumnService.calculate() completed successfully")
+            print("AxiallyLoadedColumnService.calculate() completed successfully")
             print("=" * 60)
             return result
 
         except Exception as e:
             print("\n" + "=" * 60)
-            print("❌ ERROR in AxiallyLoadedColumnService.calculate()")
+            print(" ERROR in AxiallyLoadedColumnService.calculate()")
             print("=" * 60)
             print(f"Exception type: {type(e).__name__}")
             print(f"Exception message: {str(e)}")

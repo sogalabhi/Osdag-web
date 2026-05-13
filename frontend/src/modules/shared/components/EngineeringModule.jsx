@@ -1155,6 +1155,7 @@ export const EngineeringModule = ({
             setExtraState={setExtraState}
             updateSelectedItems={updateSelectedItems}
             setModalDynamicSrc={setModalDynamicSrc}
+            onRefetchModuleOptions={refetchModuleOptions}
             isOpen={docks.input}
           />
         ) : (

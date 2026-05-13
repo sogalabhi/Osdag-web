@@ -795,7 +795,7 @@ class PSOVisualizerWidget(QDialog):
             self.btn_save.setText("✓ Saved!")
         except Exception as e:
             print(f"[WARNING] Failed to save: {e}")
-            self.btn_save.setText("❌ Failed")
+            self.btn_save.setText(" Failed")
         finally:
             QTimer.singleShot(2000, lambda: self.btn_save.setText("💾 Save Plot"))
             QTimer.singleShot(2000, lambda: self.btn_save.setEnabled(True))

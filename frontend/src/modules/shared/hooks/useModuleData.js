@@ -1,6 +1,36 @@
 import { useEffect, useState } from "react";
 import { MODULE_DATA_LIST_KEYS, API_KEY_MAP } from "../constants/moduleDataKeys";
 
+const CUSTOM_SECTION_EVENT = "osdag:custom-section-added";
+
+const SECTION_TABLE_TO_LIST_KEYS = {
+  Columns: ["columnList", "sectionDesignation"],
+  Beams: ["beamList", "sectionDesignation"],
+  Angles: ["angleList", "topAngleList"],
+  Channels: ["channelList"],
+};
+
+const appendUnique = (list = [], value) => {
+  if (!value) return list || [];
+  const safeList = Array.isArray(list) ? list : [];
+  const stringValue = String(value);
+  if (safeList.some((item) => String(item) === stringValue)) return safeList;
+  return [...safeList, value];
+};
+
+const mergeLocalCustomSections = (data, localCustomSections) => {
+  const next = { ...data };
+  Object.entries(localCustomSections || {}).forEach(([table, designations]) => {
+    const listKeys = SECTION_TABLE_TO_LIST_KEYS[table] || [];
+    listKeys.forEach((key) => {
+      designations.forEach((designation) => {
+        next[key] = appendUnique(next[key], designation);
+      });
+    });
+  });
+  return next;
+};
+
 /**
  * Data layer for engineering modules.
  * Fetches dropdown/static lists for the given design type.
@@ -8,6 +38,21 @@ import { MODULE_DATA_LIST_KEYS, API_KEY_MAP } from "../constants/moduleDataKeys"
 export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) => {
   const initialState = MODULE_DATA_LIST_KEYS.reduce((acc, k) => ({ ...acc, [k]: [] }), {});
   const [moduleData, setModuleData] = useState(initialState);
+  const [localCustomSections, setLocalCustomSections] = useState({});
+
+  useEffect(() => {
+    const handleCustomSectionAdded = (event) => {
+      const { table, designation } = event.detail || {};
+      if (!table || !designation || !SECTION_TABLE_TO_LIST_KEYS[table]) return;
+      setLocalCustomSections((prev) => ({
+        ...prev,
+        [table]: appendUnique(prev[table], designation),
+      }));
+    };
+
+    window.addEventListener(CUSTOM_SECTION_EVENT, handleCustomSectionAdded);
+    return () => window.removeEventListener(CUSTOM_SECTION_EVENT, handleCustomSectionAdded);
+  }, []);
 
   useEffect(() => {
     const loadModuleData = async () => {
@@ -21,7 +66,7 @@ export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) 
             acc[camel] = pick(camel, API_KEY_MAP[camel]);
             return acc;
           }, {});
-          setModuleData(next);
+          setModuleData(mergeLocalCustomSections(next, localCustomSections));
         }
       } catch (error) {
         console.error("Failed to load module data:", error);
@@ -29,8 +74,15 @@ export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) 
     };
 
     loadModuleData();
-  }, [designType, getModuleData, optionsRefetchKey]);
+  }, [designType, getModuleData, optionsRefetchKey, localCustomSections]);
 
   return moduleData;
 };
 
+export const notifyCustomSectionAdded = ({ table, designation }) => {
+  window.dispatchEvent(
+    new CustomEvent(CUSTOM_SECTION_EVENT, {
+      detail: { table, designation },
+    })
+  );
+};

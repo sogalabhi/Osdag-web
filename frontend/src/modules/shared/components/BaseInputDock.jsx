@@ -28,6 +28,7 @@ export const BaseInputDock = React.memo(({
   setExtraState,
   updateSelectedItems,
   setModalDynamicSrc,
+  onRefetchModuleOptions,
   isOpen,
 }) => {
   // Use external ref if provided, otherwise create internal one
@@ -203,6 +204,7 @@ export const BaseInputDock = React.memo(({
               setExtraState={setExtraState}
               updateSelectedItems={updateSelectedItems}
               setModalDynamicSrc={setModalDynamicSrc}
+              onRefetchModuleOptions={onRefetchModuleOptions}
             />
           ))}
         </div>
@@ -237,4 +239,3 @@ export const BaseInputDock = React.memo(({
     </div>
   );
 });
-

@@ -25,6 +25,7 @@ export default function SectionTabToolbar({
   isGuest: isGuestProp,
   onRefetchModuleOptions,
   onClearTab,
+  onAddSection,
 }) {
   const isGuest = isGuestProp !== undefined ? isGuestProp : isGuestUser();
   const inputId = useId();
@@ -47,29 +48,13 @@ export default function SectionTabToolbar({
   }, [sectionTable]);
 
 
-  const handleAddClick = useCallback(() => {
-    Modal.info({
-      title: "Add custom section",
-      width: 520,
-      content: (
-        <div>
-          <p style={{ marginBottom: 12 }}>
-            Signed-in users can save custom {sectionTable} rows to their account. Fill the
-            Excel template (one row or many), then use <strong>Import xlsx file</strong>.
-          </p>
-          <Button
-            type="primary"
-            onClick={() => {
-              Modal.destroyAll();
-              void runTemplateDownload();
-            }}
-          >
-            Download template
-          </Button>
-        </div>
-      ),
-    });
-  }, [sectionTable, runTemplateDownload]);
+  const handleAddClick = useCallback(async () => {
+    if (onAddSection) {
+      setBusy("add");
+      await onAddSection();
+      setBusy(null);
+    }
+  }, [onAddSection]);
 
   const onFileSelected = async (e) => {
     const file = e.target.files?.[0];

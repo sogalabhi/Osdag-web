@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Select from 'react-select';
 import { getOptionsForField, getListForInputKey } from '../utils/fieldOptionUtils';
+import { ModuleContext } from "../../../context/ModuleState";
+import CustomMaterialModal from "./CustomMaterialModal";
 import FRM from "../../../assets/flush_ep.png";
 import EOWIM from "../../../assets/owe_ep.png";
 import EBWRM from "../../../assets/extended.png";
@@ -31,10 +33,20 @@ export const InputSection = ({
   setExtraState = () => { },
   updateSelectedItems = () => { },
   setModalDynamicSrc,
+  onRefetchModuleOptions,
 }) => {
   const safeInputs = inputs || {};
-  const safeContextData = contextData || {};
   const [imageSource, setImageSource] = useState("");
+  const [showCustomMaterialModal, setShowCustomMaterialModal] = useState(false);
+  const [customMaterialType, setCustomMaterialType] = useState("connector");
+  const { materialList: contextMaterialList = [] } = useContext(ModuleContext);
+  const safeContextData = {
+    ...(contextData || {}),
+    materialList:
+      contextMaterialList.length > 0
+        ? contextMaterialList
+        : contextData?.materialList || [],
+  };
 
   // Styling object for react-select to fix z-index and other container issues
   const customSelectStyles = {
@@ -299,6 +311,8 @@ export const InputSection = ({
           );
         }
 
+        const isMaterialField = field.key?.includes('material');
+
         const value = options.find(opt => opt.value === safeInputs[field.key]);
 
         return (
@@ -306,7 +320,16 @@ export const InputSection = ({
             options={options}
             value={value}
             isSearchable={false}
-            onChange={(selected) => setInputs({ ...safeInputs, [field.key]: selected.value })}
+            onChange={(selected) => {
+              if (isMaterialField && selected.value === 'Custom') {
+                if (field.key.includes('supported')) setCustomMaterialType('supported');
+                else if (field.key.includes('supporting')) setCustomMaterialType('supporting');
+                else setCustomMaterialType('connector');
+                setShowCustomMaterialModal(true);
+                return;
+              }
+              setInputs({ ...safeInputs, [field.key]: selected.value });
+            }}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
             classNamePrefix="react-select"
@@ -470,6 +493,17 @@ export const InputSection = ({
           );
         })}
       </div>
+      {showCustomMaterialModal && (
+        <CustomMaterialModal
+          showModal={showCustomMaterialModal}
+          setShowModal={setShowCustomMaterialModal}
+          setInputValues={setInputs}
+          inputValues={safeInputs}
+          type={customMaterialType}
+          materialList={safeContextData.materialList || []}
+          onRefetchModuleOptions={onRefetchModuleOptions}
+        />
+      )}
     </div>
   );
 };

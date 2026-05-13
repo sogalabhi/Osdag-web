@@ -2,11 +2,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from apps.core.models import Design
 from apps.core.models import Beams
 from apps.core.models import Columns
-from apps.core.models import Material, CustomMaterials
-from apps.core.serializers import Material_Serializer, CustomMaterials_Serializer
+from apps.core.models import Material
 
 
 class DesignPreference(APIView):
@@ -36,63 +34,3 @@ class DesignPreference(APIView):
             supporting_section_results = Columns.objects.filter(Designation=supporting_section).values()
 
         return Response({"supported_section_results": supported_section_results, "supporting_section_results":supporting_section_results}, status=status.HTTP_200_OK)
-
-
-class MaterialDetails(APIView):
-
-    def get(self, request):
-        email = request.GET.get("email")
-        material = request.GET.get("material")
-        # Session validation removed - now stateless
-
-        material_qs = Material.objects.all()
-        if material:
-            material_qs = material_qs.filter(Grade=material)
-        material_details = list(material_qs.values())
-
-        custom_materials = []
-        if email:
-            custom_materials = list(
-                CustomMaterials.objects.filter(email=email).values()
-            )
-
-        # Same ordering as module `options` `material_list()`: standard, then custom, then sentinel.
-        material_list = material_details + custom_materials + [{"id": -1, "Grade": "Custom"}]
-
-        return Response(
-            {
-                "materialList": material_list,
-                "material_details": material_details,
-                "custom_materials": custom_materials,
-            },
-            status=status.HTTP_200_OK,
-        )
-
-    def post(self, request):
-        email = request.data.get("email")
-        materialName = request.data.get("materialName")
-        fy_20 = request.data.get("fy_20")
-        fy_20_40 = request.data.get("fy_20_40")
-        fy_40 = request.data.get("fy_40")
-        fu = request.data.get("fu")
-        # Session validation removed - now stateless
-
-        alreadyExists = CustomMaterials.objects.filter(email=email, Grade=materialName).exists()
-        if alreadyExists:
-            return Response({"message": "The material already exists", "success": False}, status=403)
-
-        serializer = CustomMaterials_Serializer(data = {
-            "email": email,
-            "Grade": materialName,
-            "Yield_Stress_less_than_20": fy_20,
-            "Yield_Stress_between_20_and_neg40": fy_20_40,
-            "Yield_Stress_greater_than_40": fy_40,
-            "Ultimate_Tensile_Stress": fu,
-        })
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message" : "Material added successfuly", "success": True} , status=201) 
-        else:
-            print('serializer.errors : ' , serializer.errors)
-        return Response({"message" : "Something went wrong", "success": True} , status=500)

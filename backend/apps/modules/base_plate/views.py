@@ -78,12 +78,11 @@ class BasePlateViewSet(viewsets.ViewSet):
         GET /api/modules/base-plate/options/
         Returns dropdown/options data for base plate (sectionDesignation, materialList, etc.).
         """
-        email = request.query_params.get('email')
-
+        
         def material_list():
             mats = list(Material.objects.all().values())
-            if email:
-                mats += list(CustomMaterials.objects.filter(email=email).values())
+            if hasattr(request, "user") and request.user.is_authenticated:
+                mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({'id': -1, 'Grade': 'Custom'})
             return mats
 

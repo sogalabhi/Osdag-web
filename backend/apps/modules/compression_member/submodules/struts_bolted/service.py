@@ -32,13 +32,13 @@ class StrutsBoltedService:
             # Validate inputs
             print("\n[1/3] Validating inputs...")
             validate_input(inputs)
-            print("✅ Input validation passed")
+            print("Input validation passed")
             
             # Generate formatted output (this handles module creation and calculation)
             print("\n[2/3] Generating output (creates module and runs calculation)...")
             output, logs = generate_output(inputs)
-            print(f"✅ Output generated: {len(output)} output parameters")
-            print(f"✅ Logs retrieved: {len(logs) if logs else 0} log entries")
+            print(f"Output generated: {len(output)} output parameters")
+            print(f"Logs retrieved: {len(logs) if logs else 0} log entries")
             
             print("\n[3/3] Preparing response...")
             result = {
@@ -46,14 +46,14 @@ class StrutsBoltedService:
                 'logs': logs or [],  # Ensure logs is always a list
                 'success': True
             }
-            print("✅ Response prepared successfully")
+            print("Response prepared successfully")
             print("=" * 60)
             
             return result
             
         except Exception as e:
             print("\n" + "=" * 60)
-            print("❌ ERROR in StrutsBoltedService.calculate()")
+            print(" ERROR in StrutsBoltedService.calculate()")
             print("=" * 60)
             print(f"Exception type: {type(e).__name__}")
             print(f"Exception message: {str(e)}")

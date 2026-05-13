@@ -123,14 +123,13 @@ class CompressionMemberViewSet(viewsets.ViewSet):
         
         Returns input options for the sub-module (e.g., section lists, materials)
         """
-        email = request.query_params.get("email")
         slug = self._normalize_slug(submodule_slug)
 
         # Shared helpers
         def material_list():
             mats = list(Material.objects.all().values())
-            if email:
-                mats += list(CustomMaterials.objects.filter(email=email).values())
+            if hasattr(request, "user") and request.user.is_authenticated:
+                mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 

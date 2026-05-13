@@ -32,16 +32,10 @@ export default (state, action) => {
         weldSizeList = [],
       } = action.payload;
 
-      // Merge with existing custom materials from localStorage if needed
-      const existingCustomMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials") || "[]");
-      const mergedMaterialList = existingCustomMaterials.length > 0
-        ? [...materialList, ...existingCustomMaterials]
-        : materialList;
-
       return {
         ...state,
         // Core data lists
-        materialList: mergedMaterialList,
+        materialList,
         coverPlateList,
         boltDiameterList,
         thicknessList,

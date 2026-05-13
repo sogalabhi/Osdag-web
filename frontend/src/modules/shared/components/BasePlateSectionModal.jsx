@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select, Button } from "antd";
-import CustomSectionModal from "./CustomSectionModal";
+import CustomMaterialModal from "./CustomMaterialModal";
 import Slope_Beam from "../../../assets/Slope_Beam.png";
 
 const { Option } = Select;
@@ -164,7 +164,7 @@ const BasePlateSectionModal = ({
         </div>
               </div>
       
-      <CustomSectionModal
+      <CustomMaterialModal
         showModal={showModal}
         setShowModal={setShowModal}
         setInputValues={setDesignPrefInputs}

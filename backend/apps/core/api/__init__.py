@@ -13,7 +13,8 @@ from .projects.project_api import ProjectAPI, ProjectDetailAPI, ProjectByNameAPI
 from .projects.osi_api import SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload
 
 # Design exports
-from .design.design_pref_api import DesignPreference, MaterialDetails
+from .design.design_pref_api import DesignPreference
+from .design.material_api import MaterialDetails
 from .design.design_pref_sync_api import DesignPreferenceSync
 from .design.design_pref_defaults_api import DesignPreferenceDefaults
 from .design.design_report_csv_view import CompanyLogoView, CreateDesignReport, GetPDF
@@ -43,4 +44,3 @@ __all__ = [
     # Modules
     'GetModules',
 ]
-

@@ -32,13 +32,13 @@ class OnCantileverService:
             # Validate inputs
             print("\n[1/3] Validating inputs...")
             validate_input(inputs)
-            print("✅ Input validation passed")
+            print("Input validation passed")
 
             # Generate formatted output
             print("\n[2/3] Generating output...")
             output, logs = generate_output(inputs)
-            print(f"✅ Output generated: {len(output)} output parameters")
-            print(f"✅ Logs retrieved: {len(logs) if logs else 0} log entries")
+            print(f"Output generated: {len(output)} output parameters")
+            print(f"Logs retrieved: {len(logs) if logs else 0} log entries")
 
             print("\n[3/3] Preparing response...")
             result = {
@@ -46,7 +46,7 @@ class OnCantileverService:
                 'logs': logs or [],
                 'success': True
             }
-            print("✅ Response prepared successfully")
+            print("Response prepared successfully")
             print("=" * 60)
 
             return result

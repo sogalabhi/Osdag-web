@@ -80,13 +80,12 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
         GET /api/modules/simple-connection/{slug}/options/
         Provides dropdown/options data for simple connections.
         """
-        email = request.query_params.get("email")
         slug = submodule_slug
 
         def material_list():
             mats = list(Material.objects.all().values())
-            if email:
-                mats += list(CustomMaterials.objects.filter(email=email).values())
+            if hasattr(request, "user") and request.user.is_authenticated:
+                mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 

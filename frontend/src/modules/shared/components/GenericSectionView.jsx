@@ -2,8 +2,9 @@ import React, { useContext, useState, useEffect } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
 import { STEEL_CONSTANTS, UNIT_LABELS } from "../constants/engineering";
-import CustomSectionModal from "./CustomSectionModal";
+import CustomMaterialModal from "./CustomMaterialModal";
 import SectionTabToolbar from "./SectionTabToolbar";
+import { notifyCustomSectionAdded } from "../hooks/useModuleData";
 
 const { Option } = Select;
 
@@ -32,11 +33,29 @@ const GenericSectionView = ({
   displayConfig,      // Configuration for fields and image
   onClearSection      // Callback to clear parent state if needed
 }) => {
-  const { manageDesignPreferences, [sectionType === 'supporting' ? 'supporting_material_details' : 'supported_material_details']: materialDetails } = useContext(ModuleContext);
+  const {
+    manageDesignPreferences,
+    beamList = [],
+    columnList = [],
+    angleList = [],
+    channelList = [],
+    sectionDesignation = [],
+    [sectionType === 'supporting' ? 'supporting_material_details' : 'supported_material_details']: materialDetails,
+  } = useContext(ModuleContext);
   const [showModal, setShowModal] = useState(false);
+  const [editableData, setEditableData] = useState({});
+  const [designationStr, setDesignationStr] = useState("");
 
   // Safety check for sectionData
   const safeSectionData = sectionData || {};
+
+  useEffect(() => {
+    setEditableData(safeSectionData);
+  }, [safeSectionData]);
+
+  useEffect(() => {
+    setDesignationStr(inputs?.[displayConfig.designationKey] || "");
+  }, [inputs, displayConfig.designationKey]);
 
   const materialKey = sectionType === 'supporting' ? 'supporting_material' : 'supported_material';
 
@@ -58,7 +77,7 @@ const GenericSectionView = ({
     }
     const material = materialList.find((item) => item.Grade === value);
     if (!material) return;
-    
+
     setDesignPrefInputs({
       ...designPrefInputs,
       [materialKey]: material.Grade,
@@ -82,31 +101,93 @@ const GenericSectionView = ({
     }));
   };
 
-  const renderField = (label, value, unit = "", options = null) => (
-    <div className="input-cont">
-      <h5>{label}{unit ? `, ${unit}` : ""}</h5>
-      {options ? (
-        <Select
-          disabled={isInputLocked}
-          style={{ width: "132px", height: "25px", fontSize: "12px" }}
-          value={value}
-          onSelect={options.onSelect}
-        >
-          {options.items.map((opt, idx) => (
-            <Option key={idx} value={opt}>{opt}</Option>
-          ))}
-        </Select>
-      ) : (
-        <Input
-          type="text"
-          className="input-design-pref"
-          value={value ?? 0}
-          disabled
-          style={readOnlyFontStyle}
-        />
-      )}
-    </div>
-  );
+  const handleAddSection = async () => {
+    if (!designationStr) {
+      alert("Please fill all the missing parameters!");
+      return;
+    }
+    const requiredKeys = [
+      ...(displayConfig.dimensions || []).map(f => f.key),
+      ...(displayConfig.properties?.middle || []).map(f => f.key),
+      ...(displayConfig.properties?.right || []).map(f => f.key)
+    ];
+
+    for (const key of requiredKeys) {
+      if (editableData[key] === undefined || editableData[key] === null || editableData[key] === "") {
+        alert("Please fill all the missing parameters!");
+        return;
+      }
+    }
+
+    const payload = { ...editableData, Designation: designationStr };
+    try {
+      const { addCustomSection } = await import("../../../datasources/sectionsDataSource");
+      await addCustomSection(sectionTableName, payload);
+      notifyCustomSectionAdded({ table: sectionTableName, designation: designationStr });
+      await onRefetchModuleOptions?.();
+      const listMap = {
+        Columns: [...columnList, ...sectionDesignation],
+        Beams: [...beamList, ...sectionDesignation],
+        Angles: angleList,
+        Channels: channelList,
+      };
+      const visible = (listMap[sectionTableName] || []).some(
+        (item) => String(item) === String(designationStr)
+      );
+      if (visible) {
+        alert("Data is added successfully to the database!");
+      } else {
+        alert("Section saved. Dropdown sync is in progress, please reopen the list.");
+      }
+    } catch (e) {
+      const msg = e?.message || "";
+      if (msg.includes("400") || msg.toLowerCase().includes("duplicate") || msg.toLowerCase().includes("unique")) {
+        alert("Designation already exists in the database!");
+      } else {
+        alert(msg || "Failed to add section.");
+      }
+    }
+  };
+
+  const renderField = (label, value, unit = "", options = null, dbKey = null) => {
+    const isAlwaysDisabled = dbKey === "Source";
+    const fieldDisabled = isAlwaysDisabled || isInputLocked;
+
+    return (
+      <div className="input-cont">
+        <h5>{label}{unit ? `, ${unit}` : ""}</h5>
+        {options ? (
+          <Select
+            disabled={fieldDisabled}
+            style={{ width: "132px", height: "25px", fontSize: "12px" }}
+            value={value}
+            onSelect={options.onSelect}
+          >
+            {options.items.map((opt, idx) => (
+              <Option key={idx} value={opt}>{opt}</Option>
+            ))}
+          </Select>
+        ) : (
+          <Input
+            type="text"
+            className="input-design-pref"
+            value={value ?? ""}
+            disabled={fieldDisabled}
+            style={fieldDisabled ? readOnlyFontStyle : { fontSize: "12px", color: "#000" }}
+            onChange={(e) => {
+              if (dbKey && !isAlwaysDisabled) {
+                setEditableData(prev => ({
+                  ...prev,
+                  [dbKey]: e.target.value,
+                  ...(dbKey !== 'Type' ? { Source: 'Custom' } : {})
+                }));
+              }
+            }}
+          />
+        )}
+      </div>
+    );
+  };
 
   const materialInfo = materialDetails?.[0] || {};
 
@@ -120,11 +201,13 @@ const GenericSectionView = ({
             <Input
               type="text"
               className="input-design-pref"
-              value={inputs?.[displayConfig.designationKey] || ""}
-              style={readOnlyFontStyle}
+              value={designationStr}
+              onChange={(e) => setDesignationStr(e.target.value)}
+              disabled={isInputLocked}
+              style={isInputLocked ? readOnlyFontStyle : { fontSize: "12px", color: "#000" }}
             />
           </div>
-          
+
           <div className="sub-container">
             <h4>Mechanical Properties</h4>
             <div className="input-cont">
@@ -147,13 +230,13 @@ const GenericSectionView = ({
             {renderField("Modulus of Rigidity", STEEL_CONSTANTS.G, UNIT_LABELS.G)}
             {renderField("Poisson's Ratio", STEEL_CONSTANTS.POISSON_RATIO)}
             {renderField(`Thermal Expansion Coefficient (x10^-6 / C)`, STEEL_CONSTANTS.THERMAL_EXPANSION)}
-            
-            {displayConfig.showType && renderField("Type", safeSectionData.Type || "Rolled", "", {
+
+            {displayConfig.showType && renderField("Type", editableData.Type || "Rolled", "", {
               items: ["Rolled", "Welded"],
-              onSelect: (val) => {} // Usually readonly in these modals but Select used for UI
+              onSelect: (val) => setEditableData(prev => ({ ...prev, Type: val }))
             })}
-            
-            {renderField("Source", safeSectionData.Source || "IS808 Rev")}
+
+            {renderField("Source", editableData.Source || "IS808 Rev", "", null, "Source")}
           </div>
         </div>
 
@@ -161,13 +244,13 @@ const GenericSectionView = ({
         <div className="col-middle">
           <div className="sub-container">
             <h4>Dimensions</h4>
-            {displayConfig.dimensions.map(field => 
-              renderField(field.label, safeSectionData[field.key], field.unit || UNIT_LABELS.DIMENSION)
+            {displayConfig.dimensions.map(field =>
+              renderField(field.label, editableData[field.key], field.unit || UNIT_LABELS.DIMENSION, null, field.key)
             )}
 
             <h4>Section Properties</h4>
-            {displayConfig.properties.middle.map(field => 
-              renderField(field.label, safeSectionData[field.key], field.unit)
+            {displayConfig.properties.middle.map(field =>
+              renderField(field.label, editableData[field.key], field.unit, null, field.key)
             )}
           </div>
         </div>
@@ -184,8 +267,8 @@ const GenericSectionView = ({
 
           <div className="sub-container" style={{ width: "310px" }}>
             <h4>Section Properties</h4>
-            {displayConfig.properties.right.map(field => 
-              renderField(field.label, safeSectionData[field.key], field.unit)
+            {displayConfig.properties.right.map(field =>
+              renderField(field.label, editableData[field.key], field.unit, null, field.key)
             )}
           </div>
         </div>
@@ -197,9 +280,10 @@ const GenericSectionView = ({
         isGuest={isGuest}
         onRefetchModuleOptions={onRefetchModuleOptions}
         onClearTab={handleClearSectionTab}
+        onAddSection={handleAddSection}
       />
 
-      <CustomSectionModal
+      <CustomMaterialModal
         showModal={showModal}
         setShowModal={setShowModal}
         setInputValues={setDesignPrefInputs}

@@ -15,6 +15,7 @@ from apps.core.utils.cad_helpers import generate_cad_models, get_default_section
 from apps.core.models import Columns, Beams, Bolt, Material, CustomMaterials, Angles
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from apps.sections.options_merge import merge_user_sections_into_options
+from apps.sections.models import UserCustomColumn
 
 
 SHEAR_REPORT_MODULE_ID_MAP = {
@@ -187,14 +188,13 @@ class ShearConnectionViewSet(viewsets.ViewSet):
         GET /api/modules/shear-connection/{submodule_slug}/options/
         Returns dropdown/options data for the sub-module.
         """
-        email = request.query_params.get("email")
         slug = submodule_slug
 
         # Common data helpers
         def material_list():
             mats = list(Material.objects.all().values())
-            if email:
-                mats += list(CustomMaterials.objects.filter(email=email).values())
+            if hasattr(request, "user") and request.user.is_authenticated:
+                mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 
@@ -211,6 +211,21 @@ class ShearConnectionViewSet(viewsets.ViewSet):
         connectivity_common = ['Column Flange-Beam-Web', 'Column Web-Beam-Web', 'Beam-Beam']
 
         try:
+            if hasattr(request, "user") and request.user.is_authenticated:
+                print(
+                    "[options-debug]",
+                    "auth=", True,
+                    "user_id=", getattr(request.user, "id", None),
+                    "email=", getattr(request.user, "email", None),
+                    "custom_cols=",
+                    UserCustomColumn.objects.filter(
+                        user_id=getattr(request.user, "id", None),
+                        is_active=True,
+                    ).count(),
+                )
+            else:
+                print("[options-debug]", "auth=", False, "user_id=", None, "email=", None, "custom_cols=", 0)
+
             if slug == 'fin-plate':
                 data = {
                     'connectivityList': connectivity_common,
@@ -221,8 +236,17 @@ class ShearConnectionViewSet(viewsets.ViewSet):
                     'propertyClassList': property_classes,
                     'thicknessList': thickness_list,
                 }
+                merged_data = merge_user_sections_into_options(request, data)
+                print(
+                    "[options-debug-list]",
+                    "has_HB154=", "HB 154" in merged_data.get("columnList", []),
+                    "has_HB151=", "HB 151" in merged_data.get("columnList", []),
+                    "has_HB351=", "HB 351" in merged_data.get("columnList", []),
+                    "has_HB451=", "HB 451" in merged_data.get("columnList", []),
+                    "column_len=", len(merged_data.get("columnList", [])),
+                )
                 return Response(
-                    merge_user_sections_into_options(request, data),
+                    merged_data,
                     status=status.HTTP_200_OK,
                 )
 
@@ -380,4 +404,3 @@ class ShearConnectionViewSet(viewsets.ViewSet):
                 {'error': str(e), 'status': 'error'},
                 status=500
             )
-

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
-import CustomSectionModal from "./CustomSectionModal";
+import CustomMaterialModal from "./CustomMaterialModal";
 
 const { Option } = Select;
 
@@ -269,7 +269,7 @@ const OptimizationSectionModal = ({
         </div>
     </div>
 
-      <CustomSectionModal
+      <CustomMaterialModal
         showModal={showModal}
         setShowModal={setShowModal}
         setInputValues={setDesignPrefInputs}

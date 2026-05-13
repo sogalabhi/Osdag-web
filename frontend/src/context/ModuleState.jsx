@@ -128,10 +128,8 @@ export const ModuleProvider = ({ children }) => {
       // Set current module
       dispatch({ type: "SET_CURRENT_MODULE_NAME", payload: moduleName });
 
-      const email = localStorage.getItem("email");
       const { success, data, error } = await dsFetchModuleOptions(moduleName, {
         connectivity: options.connectivity,
-        email,
       });
 
       if (!success) {
@@ -158,7 +156,7 @@ export const ModuleProvider = ({ children }) => {
   /**
    * Manage custom materials - add, update, remove, or sync with cache
    * Replaces: addCustomMaterialToDB, updateMaterialListFromCaches
-   * @param {string} action - 'add', 'update', 'remove', 'sync'
+   * @param {string} action - 'add', 'update'
    * @param {Object} data - Material data or parameters
    */
   const manageCustomMaterials = useCallback(async (action, data = {}) => {
@@ -177,14 +175,6 @@ export const ModuleProvider = ({ children }) => {
           }
 
           return { success: true, message: "Material added successfully", data: result };
-        }
-
-        case 'sync': {
-          const cachedMaterials = JSON.parse(localStorage.getItem("osdag-custom-materials") || "[]");
-          if (cachedMaterials.length > 0) {
-            dispatch({ type: "UPDATE_MATERIAL_FROM_CACHES", payload: cachedMaterials });
-          }
-          return { success: true, message: "Materials synced from cache" };
         }
 
         case 'update': {

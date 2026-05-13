@@ -124,10 +124,10 @@ The frontend keys are mapped to backend keys in `buildSubmissionParams()` functi
 - **3D Model**: Supports beam visualization
 
 ## Testing Status
-✅ **Build**: Successfully compiles without errors
-✅ **Routing**: Route added and configured
-✅ **Integration**: Uses shared components and patterns
-✅ **Constants**: All required constants added
+**Build**: Successfully compiles without errors
+**Routing**: Route added and configured
+**Integration**: Uses shared components and patterns
+**Constants**: All required constants added
 
 ## Next Steps
 

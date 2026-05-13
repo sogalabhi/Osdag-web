@@ -160,14 +160,13 @@ class MomentConnectionViewSet(viewsets.ViewSet):
         
         Returns dropdown/options data for the sub-module.
         """
-        email = request.query_params.get("email")
         slug = submodule_slug
 
         # Common data helpers
         def material_list():
             mats = list(Material.objects.all().values())
-            if email:
-                mats += list(CustomMaterials.objects.filter(email=email).values())
+            if hasattr(request, "user") and request.user.is_authenticated:
+                mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 
@@ -411,4 +410,3 @@ class MomentConnectionViewSet(viewsets.ViewSet):
                 {'error': str(e), 'status': 'error'},
                 status=500
             )
-

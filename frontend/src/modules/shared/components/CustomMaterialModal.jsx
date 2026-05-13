@@ -3,7 +3,7 @@ import { Modal, Input, Button } from "antd";
 import { ModuleContext } from "../../../context/ModuleState";
 import { isGuestUser } from "../../../utils/auth";
 
-const CustomSectionModal = ({
+const CustomMaterialModal = ({
   showModal,
   setShowModal,
   setInputValues,
@@ -36,7 +36,7 @@ const CustomSectionModal = ({
     setGrade(arr.join("_"));
   }, [inputs]);
 
-  const handleSubmit = (inCache = true) => {
+  const handleSubmit = async (inCache = true) => {
     if (!inputs.fy_20 || !inputs.fy_20_40 || !inputs.fy_40 || !inputs.fu) {
       alert("Please fill the missing parameters.");
       return;
@@ -96,9 +96,12 @@ const CustomSectionModal = ({
         materialType: type,
         materialData: customSectionData,
       });
-      manageCustomMaterials("sync");
+      onRefetchModuleOptions?.();
     } else {
-      handleCustomMat();
+      const saved = await handleCustomMat();
+      if (!saved) {
+        return;
+      }
     }
 
     setShowModal(false);
@@ -115,7 +118,6 @@ const CustomSectionModal = ({
     const result = await manageCustomMaterials("add", {
       grade,
       inputs,
-      connectivity: "Column-Flange-Beam-Web",
       type,
     });
     if (result?.success === true) {
@@ -130,9 +132,12 @@ const CustomSectionModal = ({
         materialType: type,
         materialData: result?.data?.data ?? result?.data ?? { Grade: grade, ...inputs },
       });
-      manageCustomMaterials("sync");
       onRefetchModuleOptions?.();
+      alert("Material added successfully.");
+      return true;
     }
+    alert(result?.error || "Failed to add custom material.");
+    return false;
   };
 
   const validateInput = (vals) => {
@@ -162,20 +167,11 @@ const CustomSectionModal = ({
     <Modal
       title="Custom Material"
       open={showModal}
-      onOk={() => handleSubmit(true)}
       onCancel={handleCancel}
-      okText="Save to cache"
-      cancelText="Cancel"
+      width={380}
       footer={[
         <Button key="cancel" onClick={handleCancel}>
           Cancel
-        </Button>,
-        <Button
-          key="cache"
-          type="primary"
-          onClick={() => handleSubmit(true)}
-        >
-          Save to cache
         </Button>,
         <Button
           key="db"
@@ -187,31 +183,50 @@ const CustomSectionModal = ({
         </Button>,
       ]}
     >
-      <div className="custom-section-modal">
-        <Input
-          placeholder="Yield Strength Fy (0-20mm)"
-          value={inputs.fy_20}
-          onChange={(e) => setInputs({ ...inputs, fy_20: e.target.value })}
-        />
-        <Input
-          placeholder="Yield Strength Fy (20-40mm)"
-          value={inputs.fy_20_40}
-          onChange={(e) => setInputs({ ...inputs, fy_20_40: e.target.value })}
-        />
-        <Input
-          placeholder="Yield Strength Fy (>40mm)"
-          value={inputs.fy_40}
-          onChange={(e) => setInputs({ ...inputs, fy_40: e.target.value })}
-        />
-        <Input
-          placeholder="Ultimate Tensile Stress Fu"
-          value={inputs.fu}
-          onChange={(e) => setInputs({ ...inputs, fu: e.target.value })}
-        />
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "8px 0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <label style={{ width: "120px", fontWeight: 500, fontSize: "13px" }}>Grade:</label>
+          <Input
+            value={grade}
+            disabled
+            style={{ flex: 1, backgroundColor: "#f5f5f5", color: "#333" }}
+          />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <label style={{ width: "120px", fontWeight: 500, fontSize: "13px" }}>Fy (&lt; 20mm):</label>
+          <Input
+            value={inputs.fy_20}
+            onChange={(e) => setInputs({ ...inputs, fy_20: e.target.value })}
+            style={{ flex: 1 }}
+          />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <label style={{ width: "120px", fontWeight: 500, fontSize: "13px" }}>Fy (20-40mm):</label>
+          <Input
+            value={inputs.fy_20_40}
+            onChange={(e) => setInputs({ ...inputs, fy_20_40: e.target.value })}
+            style={{ flex: 1 }}
+          />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <label style={{ width: "120px", fontWeight: 500, fontSize: "13px" }}>Fy (&gt; 40mm):</label>
+          <Input
+            value={inputs.fy_40}
+            onChange={(e) => setInputs({ ...inputs, fy_40: e.target.value })}
+            style={{ flex: 1 }}
+          />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <label style={{ width: "120px", fontWeight: 500, fontSize: "13px" }}>Fu:</label>
+          <Input
+            value={inputs.fu}
+            onChange={(e) => setInputs({ ...inputs, fu: e.target.value })}
+            style={{ flex: 1 }}
+          />
+        </div>
       </div>
     </Modal>
   );
 };
 
-export default CustomSectionModal;
-
+export default CustomMaterialModal;

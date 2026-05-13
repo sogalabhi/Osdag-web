@@ -52,13 +52,13 @@ def test_registry():
     slugs = list(ShearConnectionRegistry._registry.keys())
     module_ids = list(ShearConnectionRegistry._module_id_map.keys())
     
-    print(f"✅ Registered slugs: {slugs}")
-    print(f"✅ Registered MODULE_IDs: {module_ids}")
+    print(f"Registered slugs: {slugs}")
+    print(f"Registered MODULE_IDs: {module_ids}")
     
     # Test lookup
     service = ShearConnectionRegistry.get_service_by_slug('fin-plate')
     if service:
-        print(f"✅ Fin Plate Service found: {service.__name__}")
+        print(f"Fin Plate Service found: {service.__name__}")
     else:
         print("Fin Plate Service NOT found!")
         return False
@@ -85,11 +85,11 @@ def test_endpoint(submodule_slug, inputs):
         
         if response.status_code == 200:
             data = response.json()
-            print(f"✅ Success: {data.get('success', False)}")
+            print(f"Success: {data.get('success', False)}")
             if 'data' in data:
-                print(f"✅ Data keys: {list(data['data'].keys())[:5]}...")  # First 5 keys
+                print(f"Data keys: {list(data['data'].keys())[:5]}...")  # First 5 keys
             if 'logs' in data:
-                print(f"✅ Logs count: {len(data['logs'])}")
+                print(f"Logs count: {len(data['logs'])}")
             return True
         else:
             print(f"Error: {response.json()}")
@@ -126,7 +126,7 @@ def main():
     )
     print(f"Status Code: {response.status_code}")
     if response.status_code == 404:
-        print("✅ Correctly returns 404 for invalid slug")
+        print("Correctly returns 404 for invalid slug")
     else:
         print(f"Expected 404, got {response.status_code}")
     

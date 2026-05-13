@@ -13,7 +13,6 @@ export async function fetchModuleOptions(moduleKey, { connectivity, email } = {}
 
   const params = new URLSearchParams();
   if (connectivity) params.append("connectivity", connectivity);
-  if (email) params.append("email", email);
   const qs = params.toString();
   if (qs) url += `?${qs}`;
 
@@ -85,11 +84,9 @@ export async function exportCad(module_id, input_values, format, section = "Mode
  */
 export async function addCustomMaterial(materialData) {
   const { grade, inputs } = materialData;
-  const email = localStorage.getItem("email");
   const res = await apiClient(MATERIALS.customMaterial, {
     method: "POST",
     body: JSON.stringify({
-      email,
       materialName: grade,
       fy_20: parseInt(inputs.fy_20),
       fy_20_40: parseInt(inputs.fy_20_40),
@@ -184,4 +181,3 @@ export async function fetchDesignPreferences(params = {}) {
   const data = await res.json();
   return { success: true, data };
 }
-

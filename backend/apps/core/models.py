@@ -369,7 +369,11 @@ class Material(models.Model):
         db_table = "Material"
 
 class CustomMaterials(models.Model):
-    email = models.TextField()
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.CASCADE,
+        related_name='custom_materials',
+    )
     Grade = models.TextField()
     Yield_Stress_less_than_20 = models.IntegerField(db_column="Yield Stress (< 20)")
     Yield_Stress_between_20_and_neg40 = models.IntegerField(db_column="Yield Stress (20 -40)")
@@ -380,6 +384,12 @@ class CustomMaterials(models.Model):
     class Meta:
         app_label = 'core'
         db_table = "CustomMaterials"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'Grade'],
+                name='core_custommaterials_user_grade_uniq',
+            ),
+        ]
 
 
 class RHS(models.Model):

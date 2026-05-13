@@ -37,7 +37,9 @@ const DesignPrefSections = ({
   const designPrefConfig = getDesignPrefConfig(module);
   const tabs = getDesignPrefTabs(module);
   const ctx = useContext(ModuleContext);
-  const materialListForModals = moduleMaterialList ?? ctx.materialList ?? [];
+  const materialListForModals = (moduleMaterialList ?? ctx.materialList ?? []).filter(
+    (item) => item?.id !== -1 && item?.Grade !== "Custom"
+  );
   const [activeTab, setActiveTab] = useState(() => designPrefConfig.initialTabIndex);
   const {
     applyDesignPrefSyncBundle,
