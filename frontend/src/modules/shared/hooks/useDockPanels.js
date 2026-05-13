@@ -2,7 +2,7 @@ import { useReducer, useCallback, useEffect } from "react";
 
 const initialState = {
   input: true,
-  output: false,
+  output: true,
   cad: typeof window !== "undefined" ? window.innerWidth >= 768 : true,
   logs: false,
 };

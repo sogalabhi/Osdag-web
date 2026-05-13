@@ -61,6 +61,7 @@ import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
 import { getModuleConfig as getDesignPrefModuleConfig } from "../utils/moduleConfig";
 import { useShortcutLayer } from "../../../utils/shortcuts/ShortcutProvider";
 import { SHORTCUT_ACTION_BY_ID } from "../../../constants/shortcuts";
+import FloatingNavBar from "./FloatingNavBar";
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -1169,6 +1170,9 @@ export const EngineeringModule = ({
             </div>
           </div>
         )}
+
+        <FloatingNavBar />
+
         {/* EDGE BAR (always visible) */}
         <div
           className={`absolute top-0 h-screen w-[40px] z-[1000] ${docks.input ? "left-[400px]" : "left-[30px]"
@@ -1360,7 +1364,7 @@ export const EngineeringModule = ({
             className="
             fixed right-0 top-0 h-screen w-[40px]
             flex flex-col items-center justify-center
-            z-[1000]
+            z-[10] bg-white
           "
           >
             <div className="relative flex flex-col items-center w-[30px] py-[10px] gap-[14px]">
