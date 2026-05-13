@@ -1367,8 +1367,8 @@ export const EngineeringModule = ({
                 : 'h-[40%]'
               }
               ${isMobile && !docks.cad ? 'bg-white dark:bg-osdag-dark-color' : ''}
-              ${!isMobile && !docks.input ? 'md:pl-0' : 'md:pl-[30px]'}
-              ${!isMobile && !docks.output && output ? 'md:pr-0' : ''}
+              ${!isMobile ? (docks.input ? 'pl-0' : 'pl-[40px]') : ''}
+              ${!isMobile ? (docks.output ? 'pr-0' : 'pr-[40px]') : ''}
             `}>
               <Logs logs={logs} />
             </div>
