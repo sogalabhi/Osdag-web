@@ -117,6 +117,25 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
 
     setLoading(true);
     try {
+      // Upload company logo first if provided
+      let companyLogoPath = "";
+      if (designReportInputs.companyLogo instanceof File) {
+        try {
+          const formData = new FormData();
+          formData.append("file", designReportInputs.companyLogo);
+          const BASE_URL = (import.meta.env.VITE_BASE_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+          const logoRes = await fetch(`${BASE_URL}/api/company-logo/`, {
+            method: "POST",
+            body: formData,
+          });
+          const logoData = await logoRes.json();
+          if (logoRes.ok && logoData.logoFullPath) {
+            companyLogoPath = logoData.logoFullPath;
+          }
+        } catch (e) {
+          console.warn("[DesignReportModal] logo upload failed", e);
+        }
+      }
       // Transform input values using the same logic as design calculation
       const transformedInputValues = moduleConfig?.buildSubmissionParams ?
         moduleConfig.buildSubmissionParams(inputValues, allSelected, lists || {
@@ -168,7 +187,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
         metadata: {
           ProfileSummary: {
             CompanyName: designReportInputs.companyName,
-            CompanyLogo: designReportInputs.companyLogo ? designReportInputs.companyLogoName : "",
+            CompanyLogo: companyLogoPath || "",
             "Group/TeamName": designReportInputs.groupTeamName,
             Designer: designReportInputs.designer,
           },
