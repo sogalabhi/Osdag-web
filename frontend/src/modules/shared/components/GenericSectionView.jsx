@@ -279,6 +279,14 @@ const GenericSectionView = ({
         isInputLocked={isInputLocked}
         isGuest={isGuest}
         onRefetchModuleOptions={onRefetchModuleOptions}
+        dropdownLists={{
+          beamList,
+          columnList,
+          angleList,
+          topAngleList: angleList,
+          channelList,
+          sectionDesignation,
+        }}
         onClearTab={handleClearSectionTab}
         onAddSection={handleAddSection}
       />

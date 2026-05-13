@@ -6,6 +6,7 @@ import {
   downloadSectionTemplate,
   importSectionXlsx,
 } from "../../../datasources/sectionsDataSource";
+import { notifyCustomSectionAdded } from "../hooks/useModuleData";
 
 const toolbarRowStyle = {
   display: "flex",
@@ -24,6 +25,7 @@ export default function SectionTabToolbar({
   isInputLocked = false,
   isGuest: isGuestProp,
   onRefetchModuleOptions,
+  dropdownLists,
   onClearTab,
   onAddSection,
 }) {
@@ -64,12 +66,44 @@ export default function SectionTabToolbar({
     try {
       const { data } = await importSectionXlsx(sectionTable, file);
       const inserted = data?.inserted ?? 0;
+      const insertedDesignations = Array.isArray(data?.inserted_designations)
+        ? data.inserted_designations
+        : [];
+      insertedDesignations.forEach((designation) =>
+        notifyCustomSectionAdded({ table: sectionTable, designation })
+      );
       const ignored = data?.ignored?.length ?? 0;
       const rejected = data?.rejected?.length ?? 0;
-      message.success(
-        `Import finished: ${inserted} inserted, ${ignored} ignored, ${rejected} rejected.`
+      await onRefetchModuleOptions?.();
+
+      const listKeysByTable = {
+        Columns: ["columnList", "sectionDesignation"],
+        Beams: ["beamList", "sectionDesignation"],
+        Angles: ["angleList", "topAngleList"],
+        Channels: ["channelList"],
+      };
+      const verifyKeys = listKeysByTable[sectionTable] || [];
+      const visibleList = verifyKeys.flatMap((key) =>
+        Array.isArray(dropdownLists?.[key]) ? dropdownLists[key] : []
       );
-      onRefetchModuleOptions?.();
+      const isVisible = insertedDesignations.every((d) =>
+        visibleList.some((v) => String(v) === String(d))
+      );
+
+      const summary = `Import finished: ${inserted} inserted, ${ignored} ignored, ${rejected} rejected.`;
+      if (inserted > 0 && isVisible) {
+        message.success(summary);
+      } else if (inserted > 0 && !isVisible) {
+        message.warning(`${summary} Saved, but dropdown sync is pending.`);
+      } else if (inserted === 0 && (ignored > 0 || rejected > 0)) {
+        message.warning(
+          rejected > 0
+            ? `${summary} No new rows were added. Fix rejected rows in the template and re-import.`
+            : `${summary} No new rows were added.`
+        );
+      } else {
+        message.info(summary);
+      }
     } catch (err) {
       message.error(err?.message || "Import failed.");
     } finally {

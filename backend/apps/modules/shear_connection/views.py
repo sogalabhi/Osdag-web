@@ -15,7 +15,6 @@ from apps.core.utils.cad_helpers import generate_cad_models, get_default_section
 from apps.core.models import Columns, Beams, Bolt, Material, CustomMaterials, Angles
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from apps.sections.options_merge import merge_user_sections_into_options
-from apps.sections.models import UserCustomColumn
 
 
 SHEAR_REPORT_MODULE_ID_MAP = {
@@ -211,21 +210,6 @@ class ShearConnectionViewSet(viewsets.ViewSet):
         connectivity_common = ['Column Flange-Beam-Web', 'Column Web-Beam-Web', 'Beam-Beam']
 
         try:
-            if hasattr(request, "user") and request.user.is_authenticated:
-                print(
-                    "[options-debug]",
-                    "auth=", True,
-                    "user_id=", getattr(request.user, "id", None),
-                    "email=", getattr(request.user, "email", None),
-                    "custom_cols=",
-                    UserCustomColumn.objects.filter(
-                        user_id=getattr(request.user, "id", None),
-                        is_active=True,
-                    ).count(),
-                )
-            else:
-                print("[options-debug]", "auth=", False, "user_id=", None, "email=", None, "custom_cols=", 0)
-
             if slug == 'fin-plate':
                 data = {
                     'connectivityList': connectivity_common,
@@ -237,14 +221,6 @@ class ShearConnectionViewSet(viewsets.ViewSet):
                     'thicknessList': thickness_list,
                 }
                 merged_data = merge_user_sections_into_options(request, data)
-                print(
-                    "[options-debug-list]",
-                    "has_HB154=", "HB 154" in merged_data.get("columnList", []),
-                    "has_HB151=", "HB 151" in merged_data.get("columnList", []),
-                    "has_HB351=", "HB 351" in merged_data.get("columnList", []),
-                    "has_HB451=", "HB 451" in merged_data.get("columnList", []),
-                    "column_len=", len(merged_data.get("columnList", [])),
-                )
                 return Response(
                     merged_data,
                     status=status.HTTP_200_OK,

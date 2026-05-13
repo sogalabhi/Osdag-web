@@ -225,6 +225,7 @@ class SectionImportView(APIView):
             expected = get_db_header(table)
             Ser = get_user_section_serializer(table)
             inserted = 0
+            inserted_designations: List[str] = []
             ignored: List[str] = []
             rejected: List[Any] = []
 
@@ -278,7 +279,7 @@ class SectionImportView(APIView):
                         rejected.append(
                             {
                                 "row": row_idx,
-                                "designation": designation,
+                                "designation": des_str,
                                 "reason": code,
                             }
                         )
@@ -290,6 +291,7 @@ class SectionImportView(APIView):
                     ser.is_valid(raise_exception=True)
                     ser.save()
                     inserted += 1
+                    inserted_designations.append(des_str)
                 except ValidationError as exc:
                     rejected.append(
                         {
@@ -301,7 +303,12 @@ class SectionImportView(APIView):
                     )
 
             return Response(
-                {"inserted": inserted, "ignored": ignored, "rejected": rejected},
+                {
+                    "inserted": inserted,
+                    "inserted_designations": inserted_designations,
+                    "ignored": ignored,
+                    "rejected": rejected,
+                },
                 status=status.HTTP_200_OK,
             )
         finally:
