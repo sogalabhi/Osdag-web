@@ -505,24 +505,20 @@ class CompanyLogoView(APIView) :
         # obtain the file 
         file = request.data['file']
         
-        # generate a unique name for the file 
-        fileName = ''.join(str(uuid.uuid4()).split('-')) + ".png"
+        # generate a unique name preserving original extension
+        original_ext = os.path.splitext(file.name)[1].lower() or ".png"
+        fileName = ''.join(str(uuid.uuid4()).split('-')) + original_ext
         currentDirectory = os.getcwd()
+        logo_dir = os.path.join(currentDirectory, "file_storage", "company_logo")
+        os.makedirs(logo_dir, exist_ok=True)
         
-        # create the png file 
-        try :       
-            with open(currentDirectory+"/file_storage/company_logo/"+fileName , 'w') as fp : 
-                pass 
-        except : 
-            pass
-
         try : 
-            with default_storage.open(currentDirectory+"/file_storage/company_logo/"+fileName, 'wb+') as destination : 
-                for chunk in file.chunks() :                 
+            file_full_path = os.path.join(logo_dir, fileName)
+            with open(file_full_path, 'wb+') as destination:
+                for chunk in file.chunks():
                     destination.write(chunk)
 
-            # full path of the company logo w.r.t the Project 
-            logoFullPath = currentDirectory+"/file_storage/company_logo/"+fileName
+            logoFullPath = file_full_path.replace("\\", "/")
             return Response({'message' : 'successfully saved file' , 'logoFullPath' : logoFullPath} , status = status.HTTP_201_CREATED)
-        except : 
-            return Response({'message' : 'Error in saving the file'} , status = status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'message' : f'Error in saving the file: {str(e)}'} , status = status.HTTP_400_BAD_REQUEST)
