@@ -1211,7 +1211,7 @@ export const EngineeringModule = ({
             isOpen={docks.input}
           />
         ) : (
-          <div className="fixed left-0 top-[50%] -translate-y-1/2 h-[105vh] w-[40px] flex flex-col items-center justify-center font-bold z-[1000]">
+          <div className="fixed left-0 top-[52px] h-[calc(100vh-52px)] w-[40px] flex flex-col items-center justify-center font-bold z-[50] bg-white dark:bg-osdag-dark-color border-r border-gray-300 dark:border-gray-700">
             <div className="relative flex flex-col items-center w-[30px] py-[10px] gap-[14px]">
               <span className="inline-block rotate-[270deg]"><b>T</b></span>
               <span className="inline-block rotate-[270deg]"><b>U</b></span>
@@ -1226,7 +1226,7 @@ export const EngineeringModule = ({
 
         {/* EDGE BAR (always visible) */}
         <div
-          className={`absolute top-0 h-screen w-[40px] z-[1000] ${docks.input ? "left-[400px]" : "left-[30px]"
+          className={`absolute top-0 h-full w-[40px] z-[50] ${docks.input ? "left-[400px]" : "left-[30px]"
             }`}
         >
           {/* GREEN LINE */}
