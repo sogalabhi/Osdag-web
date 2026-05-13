@@ -130,59 +130,60 @@ const TabbedModulePage = () => {
     <div className="w-full p-4 sm:p-8 dark:text-gray-300" onKeyDown={handleWrapperKeyDown}>
       {/* Submodules Tabs */}
       <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2" role="tablist" aria-label="Submodules">
-        {submodules.map(({ key, label }, index) => (
-          <button
-            key={key}
-            onClick={() => setActiveSubmodule(key)}
-            onFocus={() => setActiveSubmodule(key)}
-            onKeyDown={(event) => handleSubmoduleKeyDown(event, index)}
-            ref={(element) => {
-              submoduleTabRefs.current[key] = element;
-            }}
-            role="tab"
-            aria-selected={activeSubmodule === key}
-            aria-controls={`submodule-panel-${toDomId(key)}`}
-            id={`submodule-tab-${toDomId(key)}`}
-            tabIndex={activeSubmodule === key ? 0 : -1}
-            className={`flex-shrink-0 flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border-2 rounded-xl transition-colors duration-150 ${activeSubmodule === key
-              ? "bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green"
-              : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300 dark:hover:text-osdag-green"
-              }`}
-          >
-            {label}
-          </button>
-        ))}
+        {submodules.map(({ key, label }, index) => {
+          const isDisabled = key === "Truss";
+
+          return (
+            <button
+              key={key}
+              onClick={() => !isDisabled && setActiveSubmodule(key)}
+              onFocus={() => !isDisabled && setActiveSubmodule(key)}
+              onKeyDown={(event) => handleSubmoduleKeyDown(event, index)}
+              ref={(element) => {
+                submoduleTabRefs.current[key] = element;
+              }}
+              role="tab"
+              aria-selected={activeSubmodule === key}
+              aria-controls={`submodule-panel-${toDomId(key)}`}
+              id={`submodule-tab-${toDomId(key)}`}
+              tabIndex={isDisabled ? -1 : activeSubmodule === key ? 0 : -1}
+              disabled={isDisabled}
+              className={`flex-shrink-0 flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border rounded-md transition-colors duration-150
+                ${
+                  isDisabled
+                    ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
+                    : activeSubmodule === key
+                    ? "bg-osdag-green text-white border-osdag-green"
+                    : "text-black border-gray-300 hover:bg-osdag-light-green/20"
+                }`}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Sub-SubModules Tabs */}
       {activeSubmodule === "Moment" && (
-        <div
-          className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2"
-          role="tablist"
-          aria-label="Moment connection options"
-        >
-          {content.map(({ label }, index) => (
+        <div className="flex flex-row mb-8 gap-3">
+          {content.map(({ label }) => (
             <button
               key={label}
-              onClick={() => setActiveSubSubmodule(label)}
-              onFocus={() => setActiveSubSubmodule(label)}
-              onKeyDown={(event) => handleSubSubmoduleKeyDown(event, index)}
-              ref={element => {
-                subSubmoduleTabRefs.current[label] = element;
-              }}
-              role="tab"
-              aria-selected={activeSubSubmodule === label}
-              id={`subsubmodule-tab-${toDomId(label)}`}
-              tabIndex={activeSubSubmodule === label ? 0 : -1}
-              className={`flex-shrink-0 flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border-2 rounded-xl transition-colors duration-150 ${activeSubSubmodule === label
-                  ? "bg-osdag-green text-white dark:bg-osdag-dark-green dark:border-osdag-dark-green"
-                  : "border-osdag-border hover:bg-osdag-light-green/10 hover:text-osdag-green dark:bg-osdag-dark-color dark:text-gray-300 dark:hover:text-osdag-green"
+              onClick={() => label !== "PEB" && setActiveSubSubmodule(label)}
+              disabled={label === "PEB"}
+              className={`flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border rounded-md transition-colors duration-150
+              ${
+                label === "PEB"
+                ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
+                : activeSubSubmodule === label
+                ? "bg-osdag-green text-white border-osdag-green"
+                : "text-black border-gray-300 hover:bg-osdag-light-green/20"
                 }`}
             >
               {label}
             </button>
           ))}
-        </div>
+          </div>
       )}
       {/* Section Cards */}
       <div
