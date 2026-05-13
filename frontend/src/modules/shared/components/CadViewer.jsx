@@ -23,7 +23,9 @@ export const CadViewer = React.memo(({
   moduleConfig,
   selectedCameraView,
   screenshotTrigger,
-  setScreenshotTrigger
+  setScreenshotTrigger,
+  showOutputDock,
+  hasOutput,
 }) => {
   const cameraRef = useRef();
 
@@ -46,6 +48,10 @@ export const CadViewer = React.memo(({
           className={`cadModel relative h-full w-full ${!customBgColor ? 'bg-gradient-to-b from-[#FFFFFF] to-[#D8D8D0] dark:from-[#535353] dark:to-[#000000]' : ''}`}
           style={customBgColor ? { backgroundColor: customBgColor } : {}}
         >
+          <div
+            className="absolute inset-0"
+            style={!isMobile && !showOutputDock && hasOutput ? { right: '40px' } : {}}
+          >
           <Canvas
             gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
             style={{ width: "100%", height: "100%", background: 'transparent' }}
@@ -119,7 +125,8 @@ export const CadViewer = React.memo(({
               </CadSceneProvider>
             </Suspense>
           </Canvas>
-          <div className="absolute right-[18px] top-[108px] z-10 flex flex-col gap-2">
+          </div>
+          <div className={`absolute top-[108px] z-10 flex flex-col gap-2 ${!isMobile && !showOutputDock && hasOutput ? 'right-[58px]' : 'right-[18px]'}`}>
             {[
               { label: "+", action: "zoom-in", title: "Zoom in" },
               { label: "-", action: "zoom-out", title: "Zoom out" },
