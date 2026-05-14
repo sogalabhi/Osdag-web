@@ -7,6 +7,7 @@ progress updates to a WebSocket channel via Django Channels.
 import time
 import logging
 import traceback
+from contextlib import contextmanager, redirect_stdout
 from typing import Any, Dict, List, Tuple
 
 from celery import shared_task
@@ -37,6 +38,13 @@ logger = logging.getLogger(__name__)
 SEND_INTERVAL = 0.08  # Stream particle batches at ~12 FPS for responsive UI updates.
 MAX_PARTICLES_PER_BATCH = 50  # One full 50-particle swarm per message at most.
 HEARTBEAT_INTERVAL = 2.0  # seconds
+
+
+@contextmanager
+def _suppress_core_stdout():
+    """Prevent verbose core PSO print() debug output from blocking realtime streaming."""
+    with open(os.devnull, "w") as devnull, redirect_stdout(devnull):
+        yield
 
 
 def _to_output_dict(raw_output: List[List[Any]]) -> Dict[str, Dict[str, Any]]:
@@ -188,7 +196,8 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
         from .adapter import apply_optimization_bounds
         apply_optimization_bounds(module, input_data)
         
-        module.set_input_values(design_dict)
+        with _suppress_core_stdout():
+            module.set_input_values(design_dict)
         
         # Log initial bounds (if available from module)
         if hasattr(module, 'bounds_map'):
@@ -254,14 +263,15 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
         logger.info(f"  Particles: 50 (hardcoded in optimized_method)")
         optimization_start = time.time()
         
-        print(f"DEBUG: Calling module.optimized_method...")
-        result = module.optimized_method(
-            design_dict,
-            is_thick_web=is_thick_web,
-            is_symmetric=is_symmetric,
-            viz_callback=viz_callback,
-        )
-        print(f"DEBUG: Optimization finished with result: {result is not None}")
+        logger.debug("Calling module.optimized_method...")
+        with _suppress_core_stdout():
+            result = module.optimized_method(
+                design_dict,
+                is_thick_web=is_thick_web,
+                is_symmetric=is_symmetric,
+                viz_callback=viz_callback,
+            )
+        logger.debug("Optimization finished with result: %s", result is not None)
 
         # Flush any particles that were still buffered when optimization ended.
         if particle_buffer:
@@ -281,7 +291,8 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
 
         # Prepare final output
         logger.info("📤 Preparing final output...")
-        raw_output = module.output_values(True)
+        with _suppress_core_stdout():
+            raw_output = module.output_values(True)
         output = _to_output_dict(raw_output)
         
         logger.info(f"  Output parameters: {len(output)}")

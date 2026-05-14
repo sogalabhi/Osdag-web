@@ -26,6 +26,7 @@ import { generateInitialReport as dsGenerateInitialReport, customizeReport as ds
 import { saveOsiFromInputs as dsSaveOsiFromInputs } from '../../../datasources/osiDataSource';
 import { apiClient } from '../../../utils/apiClient';
 import { getModuleSlug } from '../../../constants/apiRoutes';
+import { apiBase } from '../../../api';
 
 // ===================================================================
 // MAIN HOOK
@@ -342,16 +343,20 @@ export const useEngineeringService = () => {
   // ===================================================================
 
   const getRTUpdates = useCallback((ws_url, onOpen = () => { }, onMessage = () => { }, onError = () => { }, onClose = () => { }) => {
-    const backend_url = new URL(BASE_URL);
     try {
-      const socket = new WebSocket("ws://" + backend_url.host + "/" + ws_url);
+      const backendUrl = new URL(apiBase, window.location.origin);
+      const protocol = backendUrl.protocol === "https:" ? "wss:" : "ws:";
+      const path = ws_url.startsWith("/") ? ws_url : `/${ws_url}`;
+      const socket = new WebSocket(`${protocol}//${backendUrl.host}${path}`);
       socket.onopen = onOpen;
       socket.onmessage = onMessage;
       socket.onerror =  onError;
       socket.onclose = onClose;
+      return socket;
     }
     catch (error) {
       console.log(error);
+      onError(error);
     }
   }, [])
 
@@ -398,4 +403,3 @@ export const useEngineeringService = () => {
     getSlug: getModuleSlug,
   };
 };
-

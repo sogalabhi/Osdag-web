@@ -135,7 +135,7 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
         This method is called when a Celery task sends an update via Channel Layer.
         """
         data = event.get('data', {})
-        logger.info(f"PSO update received: iteration {data.get('iteration', 'unknown')}, particle {data.get('particle_index', 'unknown')}")
+        logger.debug(f"PSO update received: iteration {data.get('iteration', 'unknown')}, particle {data.get('particle_index', 'unknown')}")
         
         # Forward the update to the WebSocket client
         await self.send_json({
@@ -193,4 +193,3 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
             'type': 'pso_error',
             'data': data
         })
-

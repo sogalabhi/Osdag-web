@@ -202,7 +202,7 @@ export const EngineeringModule = ({
     globalBest: null
   });
   const applyPsoParticles = (particlesWithParent) => {
-    if (!particlesWithParent.length) return;
+    if (!Array.isArray(particlesWithParent) || !particlesWithParent.length) return;
     setOptimizationData((prev) => {
       let newHistory = [...(prev.history || [])];
       let currentSwarm = [...(prev.currentSwarm || [])];
@@ -213,9 +213,10 @@ export const EngineeringModule = ({
       let plotImage = prev.plotImage;
 
       particlesWithParent.forEach(({ particle: p, parentData }) => {
+        if (!p) return;
         const varsDict = {};
-        const names = p.variable_names || parentData.variable_names || [];
-        const values = p.variables || parentData.variables || [];
+        const names = p.variable_names || parentData?.variable_names || [];
+        const values = p.variables || parentData?.variables || [];
         (names || []).forEach((name, idx) => {
           varsDict[name] = (values || [])[idx];
         });
@@ -238,9 +239,9 @@ export const EngineeringModule = ({
           timestamp: Date.now()
         };
 
-        if (p.variable_names) variableNames = p.variable_names;
-        if (p.bounds) bounds = p.bounds;
-        if (p.plot_image) plotImage = p.plot_image;
+        if (p.variable_names || parentData?.variable_names) variableNames = p.variable_names || parentData.variable_names;
+        if (p.bounds || parentData?.bounds) bounds = p.bounds || parentData.bounds;
+        if (p.plot_image || parentData?.plot_image) plotImage = p.plot_image || parentData.plot_image;
 
         newHistory.push(particleData);
 
@@ -585,6 +586,25 @@ export const EngineeringModule = ({
     // Call the actual submit function
     try {
       if (extraState.optimizedInputs) {
+        let optimizationPayload = inputs;
+        try {
+          optimizationPayload = moduleConfig.buildSubmissionParams(
+            inputs,
+            allSelected,
+            contextData,
+            { ...extraState, optimizedInputs: true }
+          );
+          optimizationPayload["Total.Design_Type"] = "Optimized";
+        } catch (error) {
+          console.error("[PSO] Failed to prepare optimization payload:", error);
+          setStatus({
+            step: DESIGN_STATUS.ERROR,
+            message: 'Error preparing optimization parameters',
+            error
+          });
+          return;
+        }
+
         let sequence = -1; // to track and drop out-of-order messages.
         setShowOptimizationGraph(true);
         service.getRTUpdates("ws/optimize/plate-girder/",
@@ -593,7 +613,7 @@ export const EngineeringModule = ({
             const ws = ev.target
             ws.send(JSON.stringify({
               type: "start_optimization",
-              data: inputs
+              data: optimizationPayload
             }
             ));
 
@@ -608,92 +628,102 @@ export const EngineeringModule = ({
             setOptimizationDone(false);
           },
           (event) => {
-            const msg = JSON.parse(event.data);
-            const messageData = msg.data || {};
-            
-            // Fix: Guard against undefined sequences that break the comparison
-            const msgSequence = messageData.sequence !== undefined ? messageData.sequence : -2;
-            
-            if (msgSequence > sequence || msgSequence === -2) {
-              if (msgSequence !== -2) sequence = msgSequence;
-              
-              switch (msg.type) {
-                case "task_started":
-                  break;
-                case "pso_update":
-                  applyPsoParticles(
-                    (messageData.batch ? messageData.particles : [messageData]).map((particle) => ({
-                      particle,
-                      parentData: messageData
-                    }))
-                  );
-                  break;
-                case "pso_heartbeat":
-                  // update liveness indicator
-                  break;
-                case "pso_complete":
-                  setOptimizationDone(true);
-                  event.target.close(); // close the connection
+            try {
+              const msg = JSON.parse(event.data);
+              const messageData = msg.data || {};
 
-                  // Extract final design results from WebSocket message
-                  if (messageData.result) {
-                    const result = messageData.result;
+              // Fix: Guard against undefined sequences that break the comparison
+              const msgSequence = messageData.sequence !== undefined ? messageData.sequence : -2;
 
-                    // Update output with final design results
-                    // The result.design contains the formatted output from backend
-                    // Format it similar to regular API response
-                    if (result.design) {
-                      const formattedOutput = {};
-                      for (const [key, value] of Object.entries(result.design)) {
-                        const label = value?.label ?? key;
-                        const val = value?.val ?? value?.value ?? value;
-                        if (val !== undefined && val !== null) {
-                          formattedOutput[key] = { label, val };
-                        }
-                      }
+              if (msgSequence > sequence || msgSequence === -2) {
+                if (msgSequence !== -2) sequence = msgSequence;
 
-                      // Note: Output and logs will be set via the hook's internal state
-                      // For now, we'll trigger a re-fetch or use the data directly
-                      // The optimization graph will show the final result
+                switch (msg.type) {
+                  case "task_started":
+                    break;
+                  case "pso_update": {
+                    const rawParticles = messageData.batch && Array.isArray(messageData.particles)
+                      ? messageData.particles
+                      : [messageData];
+                    const particles = rawParticles.filter(Boolean);
 
-                      // Update status to complete
-                      setStatus({
-                        step: DESIGN_STATUS.COMPLETE,
-                        message: 'Optimization complete',
-                        error: null
-                      });
-
-                      // Store final result for later use (can be accessed via optimizationData)
-                      // CRITICAL: Preserve all existing data (history, currentSwarm, globalBest, etc.)
-                      setOptimizationData((prev) => {
-                        // Ensure we preserve all existing data
-                        const preserved = {
-                          current_iter: prev.current_iter || 0,
-                          variableNames: prev.variableNames || [],
-                          bounds: prev.bounds || { lb: [], ub: [] },
-                          history: prev.history || [],
-                          currentSwarm: prev.currentSwarm || [],
-                          globalBest: prev.globalBest || null,
-                          finalResult: result.design,
-                          finalLogs: result.raw || []
-                        };
-                        console.log('[PSO_COMPLETE] Preserving optimization data:', {
-                          historyCount: preserved.history.length,
-                          currentSwarmCount: preserved.currentSwarm.length,
-                          hasGlobalBest: !!preserved.globalBest,
-                          currentIter: preserved.current_iter
-                        });
-                        return preserved;
-                      });
-                    }
+                    applyPsoParticles(
+                      particles.map((particle) => ({
+                        particle,
+                        parentData: messageData
+                      }))
+                    );
+                    break;
                   }
-                  break;
-                case "pso_error":
-                  console.error("PSO optimization error:", messageData);
-                  event.target.close(); // close the connection
-                  // show error; stop loading
-                  break;
+                  case "pso_heartbeat":
+                    // update liveness indicator
+                    break;
+                  case "pso_complete":
+                    setOptimizationDone(true);
+                    event.target.close(); // close the connection
+
+                    // Extract final design results from WebSocket message
+                    if (messageData.result) {
+                      const result = messageData.result;
+
+                      // Update output with final design results
+                      // The result.design contains the formatted output from backend
+                      // Format it similar to regular API response
+                      if (result.design) {
+                        const formattedOutput = {};
+                        for (const [key, value] of Object.entries(result.design)) {
+                          const label = value?.label ?? key;
+                          const val = value?.val ?? value?.value ?? value;
+                          if (val !== undefined && val !== null) {
+                            formattedOutput[key] = { label, val };
+                          }
+                        }
+
+                        // Note: Output and logs will be set via the hook's internal state
+                        // For now, we'll trigger a re-fetch or use the data directly
+                        // The optimization graph will show the final result
+
+                        // Update status to complete
+                        setStatus({
+                          step: DESIGN_STATUS.COMPLETE,
+                          message: 'Optimization complete',
+                          error: null
+                        });
+
+                        // Store final result for later use (can be accessed via optimizationData)
+                        // CRITICAL: Preserve all existing data (history, currentSwarm, globalBest, etc.)
+                        setOptimizationData((prev) => {
+                          // Ensure we preserve all existing data
+                          const preserved = {
+                            current_iter: prev.current_iter || 0,
+                            variableNames: prev.variableNames || [],
+                            bounds: prev.bounds || { lb: [], ub: [] },
+                            history: prev.history || [],
+                            currentSwarm: prev.currentSwarm || [],
+                            globalBest: prev.globalBest || null,
+                            finalResult: result.design,
+                            finalLogs: result.raw || []
+                          };
+                          console.log('[PSO_COMPLETE] Preserving optimization data:', {
+                            historyCount: preserved.history.length,
+                            currentSwarmCount: preserved.currentSwarm.length,
+                            hasGlobalBest: !!preserved.globalBest,
+                            currentIter: preserved.current_iter
+                          });
+                          return preserved;
+                        });
+                      }
+                    }
+                    break;
+                  case "pso_error":
+                    console.error("PSO optimization error:", messageData);
+                    event.target.close(); // close the connection
+                    // show error; stop loading
+                    break;
+                }
               }
+            } catch (error) {
+              console.error("[PSO] WebSocket message handling failed:", error);
             }
           }
         )
