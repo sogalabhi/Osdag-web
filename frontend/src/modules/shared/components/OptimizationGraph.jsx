@@ -1,123 +1,328 @@
 import { useRef, useEffect } from 'react';
 import Plot from 'react-plotly.js';
-import Plotly from 'plotly.js-dist-min'
+import Plotly from 'plotly.js-dist-min';
 
-function OptimizationGraph({ data, onClose, optimizationDone }) {
-    const graphRef = useRef(null);
-    const savePlotRef = useRef(null);
-    useEffect(() => {
-        if (graphRef.current)
-            savePlotRef.current.onclick = () => { Plotly.downloadImage(graphRef.current.el, { format: 'png', width: 800, height: 600, filename: 'pso_visualization' }) }
-        console.log('Graph ref is set:', graphRef);
-    }, [graphRef]
+const IBeamSVG = ({ depth = 400, width = 300, tw = 8, tf = 12 }) => {
+    const maxH = 280;
+    const maxW = 200;
+    const currentDepth = depth || 400;
+    const currentWidth = width || 300;
+    const aspect = currentDepth / currentWidth;
+    
+    let drawH, drawW;
+    if (aspect > 1) {
+        drawH = maxH;
+        drawW = maxH / aspect;
+    } else {
+        drawW = maxW;
+        drawH = maxW * aspect;
+    }
+    
+    const scale = drawH / currentDepth;
+    const s_tw = Math.max(4, tw * scale);
+    const s_tf = Math.max(4, tf * scale);
+    
+    return (
+        <svg width="100%" height="350" viewBox="0 0 400 400" className="drop-shadow-md">
+            <g transform="translate(200, 200)">
+                {/* Axes Z-Z and Y-Y with Labels */}
+                <line x1="-180" y1="0" x2="180" y2="0" stroke="#f87171" strokeWidth="1.5" strokeDasharray="4 4" />
+                <text x="185" y="5" fill="#991b1b" fontSize="14" fontWeight="bold">Z</text>
+                <text x="-198" y="5" fill="#991b1b" fontSize="14" fontWeight="bold">Z</text>
+                
+                <line x1="0" y1="-180" x2="0" y2="180" stroke="#f87171" strokeWidth="1.5" strokeDasharray="4 4" />
+                <text x="-5" y="-185" fill="#991b1b" fontSize="14" fontWeight="bold">Y</text>
+                <text x="-5" y="195" fill="#991b1b" fontSize="14" fontWeight="bold">Y</text>
+
+                {/* I-Beam Shape */}
+                <rect x={-drawW/2} y={-drawH/2} width={drawW} height={s_tf} fill="#3b82f6" stroke="#1e3a8a" strokeWidth="2" />
+                <rect x={-s_tw/2} y={-drawH/2 + s_tf} width={s_tw} height={drawH - 2*s_tf} fill="#3b82f6" stroke="#1e3a8a" strokeWidth="2" />
+                <rect x={-drawW/2} y={drawH/2 - s_tf} width={drawW} height={s_tf} fill="#3b82f6" stroke="#1e3a8a" strokeWidth="2" />
+                
+                {/* Dimension Arrows */}
+                <g>
+                    <line x1={drawW/2 + 30} y1={-drawH/2} x2={drawW/2 + 30} y2={drawH/2} stroke="#4b5563" strokeWidth="1" markerEnd="url(#arrow)" markerStart="url(#arrow)" />
+                    <text x={drawW/2 + 40} y="5" fill="#000" fontSize="14" fontWeight="bold">D={currentDepth.toFixed(0)}</text>
+                    
+                    <line x1={-drawW/2} y1={drawH/2 + 30} x2={drawW/2} y2={drawH/2 + 30} stroke="#4b5563" strokeWidth="1" markerEnd="url(#arrow)" markerStart="url(#arrow)" />
+                    <text x="-25" y={drawH/2 + 55} fill="#000" fontSize="14" fontWeight="bold">B={currentWidth.toFixed(0)}</text>
+                </g>
+
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                        <path d="M0,0 L10,5 L0,10 Z" fill="#4b5563" />
+                    </marker>
+                </defs>
+            </g>
+        </svg>
     );
+};
 
-    return (<div className='flex flex-col w-full flex-1'>
-        <div className='flex flex-col w-full h-[95%]'>
-            <div className='flex flex-row h-fit p-4 font text-white' style={{ backgroundColor: "#6b7d20" }}>
-                <div className='flex-1 content-center font-black'>PSO OPTIMIZATION SPACE</div><div className='flex w-auto gap-5'>
-                    <div className='w-auto m-auto font-extrabold'>ITERATION: {data.current_iter}</div>
-                    <div className='w-auto m-auto font-black text-[#ffd708] '>BEST: {data.best.found ? data.best.y[0] : "---"}</div>
-                    <div className='w-auto m-auto '>Particle: {data.best.found ? `${data.best.particle} @ Iter ${data.best.iter}` : "---"}</div>
-                    <div className='w-auto flex items-center justify-center'>
-                        <button className="flex h-fit box-content justify-center px-4 py-2 items-center bg-osdag-green text-white font-semibold rounded-lg shadow-md hover:bg-opacity-90 transition-opacity" onClick={() => { onClose(); console.log("should close") }}>CLOSE</button>
+function OptimizationGraph({ data, onClose, optimizationDone, isWsConnected }) {
+    const graphRef = useRef(null);
+
+    useEffect(() => {
+        if (optimizationDone) {
+            const timer = setTimeout(() => {
+                onClose();
+            }, 2500); // Automatically close after 2.5 seconds
+            return () => clearTimeout(timer);
+        }
+    }, [optimizationDone, onClose]);
+
+    // Log the real-time particle data for debugging
+    useEffect(() => {
+        console.log("=== REAL-TIME PSO DATA UPDATE ===");
+        console.log("GREEN PARTICLES (Utilization <= 1):", {
+            historyCount: data.fease?.x?.length || 0,
+            liveCount: data.swarm_fease?.x?.length || 0,
+            historyData: data.fease,
+            liveData: data.swarm_fease
+        });
+        console.log("RED PARTICLES (Utilization > 1):", {
+            historyCount: data.non_fease?.x?.length || 0,
+            liveCount: data.swarm_non_fease?.x?.length || 0,
+            historyData: data.non_fease,
+            liveData: data.swarm_non_fease
+        });
+        console.log("=================================");
+    }, [data]);
+
+    const maxUR = Math.max(4, ...(data.fease.x || []), ...(data.non_fease.x || []));
+    const maxDepth = Math.max(2000, ...(data.fease.y || []), ...(data.non_fease.y || []));
+    const maxWeight = Math.max(8000, ...(data.fease.z || []), ...(data.non_fease.z || []));
+
+    return (
+        <div className='flex flex-col w-full h-full bg-white font-sans'>
+            {/* Header */}
+            <div className='flex flex-row h-12 px-6 items-center text-white bg-[#6b7d20] border-b border-[#556619] shadow-sm'>
+                <div className='flex-1 font-bold text-sm tracking-wide flex items-center gap-3 uppercase'>
+                    PSO Optimization Visualization
+                </div>
+                <div className='flex gap-12 items-center text-sm'>
+                    <div className='font-bold uppercase tracking-tight'>ITERATION: <span className="text-white ml-1">{data.current_iter + 1}</span></div>
+                    <div className='font-bold uppercase tracking-tight'>BEST: <span className="text-yellow-400 ml-1">{data.best.found ? `${data.best.val.toFixed(0)} kg` : "---"}</span></div>
+                    <div className='font-bold uppercase tracking-tight opacity-90'>
+                      PARTICLE: <span className="text-white ml-1">{data.best.found ? `${data.best.particle} @ Iter ${data.best.iter}` : "---"}</span>
+                    </div>
+                </div>
+                <button onClick={onClose} className="ml-8 text-white/80 hover:text-white transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            {/* Content Area */}
+            <div className='flex-1 flex flex-row overflow-hidden p-2 bg-[#f8f9fa]'>
+                <div className="flex-1 flex flex-row bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden">
+                    {/* Plot Area */}
+                    <div className="w-[65%] border-r border-gray-50 p-6 flex flex-col">
+                        <h3 className="text-base font-bold text-gray-800 mb-4">3D Scatter: Utilization Ratio vs Depth vs Weight</h3>
+                        
+                        <div className="flex-1 min-h-0 relative">
+                            <Plot
+                                ref={graphRef}
+                                data={[
+                                    // Vertical plane at UR = 1
+                                    {
+                                        type: 'mesh3d',
+                                        x: [1, 1, 1, 1],
+                                        y: [0, maxDepth, maxDepth, 0],
+                                        z: [0, 0, maxWeight, maxWeight],
+                                        i: [0, 0],
+                                        j: [1, 2],
+                                        k: [2, 3],
+                                        opacity: 0.1,
+                                        color: '#ef4444',
+                                        showlegend: false,
+                                        hoverinfo: 'skip'
+                                    },
+                                    // Infeasible points (History)
+                                    {
+                                        name: 'Utilization > 1',
+                                        x: data.non_fease.x.length > 0 ? data.non_fease.x : [null],
+                                        y: data.non_fease.y.length > 0 ? data.non_fease.y : [null],
+                                        z: data.non_fease.z.length > 0 ? data.non_fease.z : [null],
+                                        type: 'scatter3d',
+                                        mode: 'markers',
+                                        showlegend: true,
+                                        marker: {
+                                            size: 5,
+                                            symbol: 'circle-open',
+                                            color: '#f87171',
+                                            line: { color: '#f87171', width: 2 }
+                                        },
+                                    },
+                                    // Feasible points (History)
+                                    {
+                                        name: 'Utilization ≤ 1',
+                                        x: data.fease.x.length > 0 ? data.fease.x : [null],
+                                        y: data.fease.y.length > 0 ? data.fease.y : [null],
+                                        z: data.fease.z.length > 0 ? data.fease.z : [null],
+                                        type: 'scatter3d',
+                                        mode: 'markers',
+                                        showlegend: true,
+                                        marker: {
+                                            size: 5,
+                                            symbol: 'circle-open',
+                                            color: '#84cc16',
+                                            line: { color: '#84cc16', width: 2 }
+                                        },
+                                    },
+                                    // Current Live Swarm - Feasible
+                                    {
+                                        name: 'Live Feasible',
+                                        x: data.swarm_fease?.x || [],
+                                        y: data.swarm_fease?.y || [],
+                                        z: data.swarm_fease?.z || [],
+                                        type: 'scatter3d',
+                                        mode: 'markers',
+                                        marker: {
+                                            size: 7,
+                                            symbol: 'circle',
+                                            color: '#84cc16',
+                                            opacity: 0.9,
+                                            line: { color: 'white', width: 1 }
+                                        },
+                                        showlegend: false
+                                    },
+                                    // Current Live Swarm - Infeasible
+                                    {
+                                        name: 'Live Infeasible',
+                                        x: data.swarm_non_fease?.x || [],
+                                        y: data.swarm_non_fease?.y || [],
+                                        z: data.swarm_non_fease?.z || [],
+                                        type: 'scatter3d',
+                                        mode: 'markers',
+                                        marker: {
+                                            size: 7,
+                                            symbol: 'circle',
+                                            color: '#f87171',
+                                            opacity: 0.9,
+                                            line: { color: 'white', width: 1 }
+                                        },
+                                        showlegend: false
+                                    },
+                                    // Global Best
+                                    {
+                                        name: 'Global Best',
+                                        x: data.best.x,
+                                        y: data.best.y,
+                                        z: data.best.z,
+                                        type: 'scatter3d',
+                                        mode: 'markers',
+                                        marker: {
+                                            size: 16,
+                                            color: '#eab308',
+                                            symbol: 'star',
+                                            line: { color: '#854d0e', width: 2 }
+                                        },
+                                    }
+                                ]}
+                                layout={{
+                                    font: { family: 'Segoe UI, Arial, sans-serif', size: 11 },
+                                    legend: { 
+                                        x: 0.95, y: 0.95, 
+                                        xanchor: 'right',
+                                        bgcolor: 'rgba(255,255,255,0.8)',
+                                        bordercolor: '#eee',
+                                        borderwidth: 1
+                                    },
+                                    margin: { l: 0, r: 0, t: 0, b: 0 },
+                                    autosize: true,
+                                    scene: {
+                                        xaxis: { title: { text: "Utilization Ratio", font: { weight: 'bold' } }, gridcolor: '#f1f5f9', zerolinecolor: '#cbd5e1', range: [0, maxUR], dtick: 1 },
+                                        yaxis: { title: { text: "Depth (mm)", font: { weight: 'bold' } }, gridcolor: '#f1f5f9', zerolinecolor: '#cbd5e1', range: [maxDepth, 0], dtick: 250 },
+                                        zaxis: { title: { text: "Weight (kg)", font: { weight: 'bold' } }, gridcolor: '#f1f5f9', zerolinecolor: '#cbd5e1', range: [0, maxWeight], dtick: 1000 },
+                                        camera: { eye: { x: 1.8, y: 1.8, z: 1.2 } }
+                                    },
+                                    paper_bgcolor: 'white',
+                                    plot_bgcolor: 'white',
+                                }}
+                                config={{ displayModeBar: false, responsive: true }}
+                                className="w-full h-full"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Sidebar Area */}
+                    <div className="w-[35%] flex flex-col border-l border-gray-100 bg-[#fafafa]">
+                        <div className='p-6 flex flex-col items-center bg-white border-b border-gray-100'>
+                            <h4 className="font-bold text-base text-gray-700 mb-6 uppercase tracking-wider">Best Cross-Section (I-Beam)</h4>
+                            <div className="w-full flex items-center justify-center">
+                                {data.best.found ? (
+                                    <IBeamSVG 
+                                      depth={data.best.y[0]} 
+                                      width={data.best.vars?.bf || 300} 
+                                      tw={data.best.vars?.tw || 8} 
+                                      tf={data.best.vars?.tf || 8} 
+                                    />
+                                ) : (
+                                    <div className="h-64 flex flex-col items-center justify-center text-gray-400 gap-4">
+                                        <div className="w-10 h-10 border-4 border-gray-100 border-t-[#6b7d20] rounded-full animate-spin"></div>
+                                        <span className="text-xs font-bold uppercase tracking-widest">Searching...</span>
+                                    </div>
+                                )}
+                            </div>
+                            {data.best.found && (
+                                <div className="mt-6 w-full px-4">
+                                    <div className="grid grid-cols-4 border-y border-gray-200 text-[10px] font-mono bg-gray-50/50 text-center divide-x divide-gray-200">
+                                        <div className="py-2">tw={data.best.vars?.tw?.toFixed(1) || "8.0"}</div>
+                                        <div className="py-2">tf={data.best.vars?.tf?.toFixed(1) || "8.0"}</div>
+                                        <div className="py-2">R1=4.0</div>
+                                        <div className="py-2">R2=4.0</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-            <div className='flex flex-1 z-0 flex-row'>
-                <div className="flex items-center w-[65%] justify-center">
-                    <Plot
-                        ref={graphRef}
-                        data={[
-                            {
-                                name: 'Utilization > 1',
-                                x: data.non_fease.x,
-                                y: data.non_fease.y,
-                                z: data.non_fease.z,
-                                type: 'scatter3d',
-                                mode: 'markers',
-                                marker: {
-                                    size: 2,
-                                    color: "rgba(189, 0, 0, 0.83)",
-                                    opacity: 1
-                                },
-                            },
-                            {
-                                name: 'Utilization ≤ 1',
-                                x: data.fease.x,
-                                y: data.fease.y,
-                                z: data.fease.z,
-                                type: 'scatter3d',
-                                mode: 'markers',
-                                marker: {
-                                    size: 2,
-                                    color: 'rgba(34, 255, 0,1)',
-                                    opacity: 1
-                                },
-                            },
-                            {
-                                name: 'Gloabl Best',
-                                x: data.best.x,
-                                y: data.best.y,
-                                z: data.best.z,
-                                type: 'scatter3d',
-                                mode: 'markers',
-                                marker: {
-                                    size: 2,
-                                    color: 'rgba(255, 215, 0,1)',
-                                    opacity: 1
-                                },
-                            }
-                        ]}
-                        config={{ displayModeBar: false, responsive: true }}
-                        className="w-[80%] flex h-full pt-10 box-border"
-                        useResizeHandler={true}
-                        layout={{
-                            legend: { orientation: 'v', itemsizing: "constant", itemwidth: 30, y: 0.9, x: 0.6, font: { size: 10 }, bordercolor: "rgba(0,0,0,1)", borderwidth: 1 },
-                            margin: { l: 10, r: 10, t: 30, b: 60 },
-                            title: { text: "3D Scatter Plot: Utilization Ratio vs Depth vs Width", font: { weight: 800 } },
-                            autosize: true,
-                            scene: {
-                                zaxis: { showspikes: false, title: { text: "Weight (kg)" }, tickangle: 0 },
-                                yaxis: {
-                                    showspikes: false,
-                                    title: {
-                                        text: "Depth (mm)"
-                                    },
-                                    tickangle: 0
-                                },
-                                xaxis: {
-                                    showspikes: false,
-                                    title: {
 
-                                        text: "Utilization Ratio",
-                                    },
-                                    tickangle: 0
-                                },
-                                aspectmode: 'cube', dragmode: false, hovermode: false,
-                                camera: {
-                                    eye: { x: -2, y: -2, z: 1 },
-                                    up: { x: 0, y: 0, z: 1 }
-                                }
-                            },
-                            annotations: [{ align: "left", bgcolor: "rgba(255,255,227,1)", bordercolor: "rgba(0,0,0,1)", y: 0.8, x: 0.3, text: `<b>Global Best:</b><br>Iter: 10 | Particle: 13<br>Depth: ${data.best.y}<br>Weight: ${data.best.z}<br>UR: ${data.best.x}` }]
-                        }}
-                    />
-                </div>
-                <div className="w-[35%] flex flex-col justify-center text-5xl">
-                    <div className='h-fit font-black py-5 flex justify-center text-xl'>Best Cross-Section (I-Beam) </div>
-                    <div className='min-h-[50%] text-gray-500 items-center text-center flex justify-center font-medium'>No Feasible Solution Yet<br />(Searching...)</div>
+            {/* Footer Summary */}
+            <div className='bg-white px-6 py-3 border-t border-gray-200 flex flex-col gap-3'>
+                {data.best.found && (
+                    <div className="flex justify-center">
+                        <div className="flex items-center gap-1 border border-gray-300 rounded-md px-6 py-2 text-[12px] font-mono bg-gray-50 shadow-sm transition-all hover:border-[#6b7d20]">
+                            <span className="font-black text-[#6b7d20] uppercase mr-2">Global Best</span>
+                            <span className="text-gray-300 mx-2">|</span>
+                            <span className="text-gray-600">Iter: <span className="text-gray-950 font-bold">{data.best.iter}</span></span>
+                            <span className="text-gray-300 mx-2">|</span>
+                            <span className="text-gray-600">Particle: <span className="text-gray-950 font-bold">{data.best.particle}</span></span>
+                            <span className="text-gray-300 mx-2">|</span>
+                            <span className="text-gray-600">Weight: <span className="text-gray-950 font-bold">{data.best.val.toFixed(1)} kg</span></span>
+                            <span className="text-gray-300 mx-2">|</span>
+                            <span className="text-gray-600">D: <span className="text-gray-950 font-bold">{data.best.y[0].toFixed(0)} mm</span></span>
+                            <span className="text-gray-300 mx-2">|</span>
+                            <span className="text-gray-600">B: <span className="text-gray-950 font-bold">{(data.best.vars?.bf || 0).toFixed(0)} mm</span></span>
+                            <span className="text-gray-300 mx-2">|</span>
+                            <span className="text-gray-600">tw: <span className="text-gray-950 font-bold">{(data.best.vars?.tw || 0).toFixed(1)} mm</span></span>
+                            <span className="text-gray-300 mx-2">|</span>
+                            <span className="text-gray-600">tf: <span className="text-gray-950 font-bold">{(data.best.vars?.tf || 0).toFixed(1)} mm</span></span>
+                        </div>
+                    </div>
+                )}
+                <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-3'>
+                        <div className={`w-2 h-2 rounded-full ${optimizationDone ? 'bg-green-500' : 'bg-blue-500 animate-pulse'}`}></div>
+                        <span className='text-[10px] text-gray-500 font-black uppercase tracking-widest'>
+                            {optimizationDone ? "Optimization Complete" : "Real-time Swarm Tracking..."}
+                        </span>
+                    </div>
+                    <div className='flex gap-8 items-center text-[10px] font-bold text-gray-600'>
+                        <div className='flex items-center gap-2'><span className="text-[#eab308] text-sm">★</span> Best</div>
+                        <div className='flex items-center gap-2'><div className='w-3 h-3 rounded-full border-2 border-[#84cc16]'></div> Utilization ≤ 1</div>
+                        <div className='flex items-center gap-2'><div className='w-3 h-3 rounded-full border-2 border-[#f87171]'></div> Utilization &gt; 1</div>
+                        <button 
+                          onClick={() => Plotly.downloadImage(graphRef.current.el, { format: 'png', height: 800, width: 1200, filename: 'pso_plot' })}
+                          className="bg-[#334155] hover:bg-black text-white px-5 py-2 rounded shadow-sm flex items-center gap-2 transition-all uppercase"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                          Save Plot
+                        </button>
+                    </div>
                 </div>
             </div>
-
         </div>
-        <div className='flex justify-between box-border flex-row h-[5%] z-10 px-4 font w-full border-t-[1px] border-t-gray-700'>
-            <div className='content-center items-center flex'>{optimizationDone ? "Optimization Complete" : "Optimizing"}</div>
-            <div className='w-auto flex items-center justify-center'>
-                <button ref={savePlotRef} className="flex h-fit box-content justify-center px-4 py-1 items-center  bg-gray-200 text-black font-semibold rounded-lg shadow-md hover:bg-opacity-90 transition-opacity">Save Plot</button>
-            </div>
-        </div>
-    </div>
     );
 }
 

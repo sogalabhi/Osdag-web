@@ -13,6 +13,15 @@ from celery import shared_task
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import numpy as np
+import os
+import sys
+
+# Add project root to sys.path to access osdag_core
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../../"))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+from osdag_core.design_type.plate_girder.visualization.pso_visualizer import DataProcessor, get_pso_plot_base64
 
 # ---------------------------------------------------------------------------
 # Local imports
@@ -25,7 +34,7 @@ from apps.modules.flexure_member.submodules.plate_girder.adapter import (
 
 logger = logging.getLogger(__name__)
 
-SEND_INTERVAL = 0.10  # 10 FPS max for progress updates
+SEND_INTERVAL = 0.25  # 4 FPS max for image streaming (safe for web)
 HEARTBEAT_INTERVAL = 2.0  # seconds
 
 
@@ -89,9 +98,9 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
     logger.info("=" * 80)
     logger.info("🚀 PSO Optimization Task STARTED")
     logger.info("=" * 80)
-    logger.info(f"Task ID: {self.request.id}")
+    logger.info(f"Task ID: {getattr(self.request, 'id', 'local')}")
     logger.info(f"Channel: {channel_name}")
-    logger.info(f"Input keys: {list(input_data.keys())[:10]}...")  # Log first 10 keys
+    logger.info(f"Input keys: {list(input_data.keys())[:10]}...") 
     
     channel_layer = get_channel_layer()
     seq = 0
@@ -100,6 +109,9 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
     current_iteration = -1  # Track current iteration
     particles_in_batch = 0
     last_iteration_first_particle_sent = -1  # Track if we've sent first particle for this iteration
+    
+    # Initialize the real-time visualizer data processor
+    data_processor = DataProcessor()
 
     def send_update_event(payload: Dict[str, Any]):
         nonlocal seq, last_send, update_count, current_iteration, particles_in_batch
@@ -109,13 +121,20 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
         current_iteration = payload.get("iteration", current_iteration)
         particles_in_batch += 1
         
-        async_to_sync(channel_layer.send)(
-            channel_name,
-            {
-                "type": "pso_update",
-                "data": _sanitize_for_channels(payload),
-            },
-        )
+        try:
+            print(f"DEBUG: Attempting to send update to channel {channel_name}...")
+            async_to_sync(channel_layer.send)(
+                channel_name,
+                {
+                    "type": "pso_update",
+                    "data": _sanitize_for_channels(payload),
+                },
+            )
+            print(f"DEBUG: Update sent successfully!")
+        except Exception as e:
+            print(f"ERROR: Failed to send update to channel: {e}")
+            traceback.print_exc()
+
         last_send = time.time()
         
         # Log throttled send with iteration and particle info
@@ -180,53 +199,53 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
                     logger.info(f"  {var}: [{bounds[0]}, {bounds[1]}]" + 
                               (f" step={bounds[2]}" if len(bounds) > 2 else ""))
 
+        # Particle buffer for batch sending
+        particle_buffer = []
+
         # Progress callback from optimized_method
         def viz_callback(depth, ur, weight_kg, iteration, particle_idx, position, variable_list, lb, ub):
-            nonlocal last_send, throttled_count, current_iteration, particles_in_batch, last_iteration_first_particle_sent
+            nonlocal last_send, throttled_count, current_iteration
             now = time.time()
             
-            # Check if this is a new iteration
+            # Create particle data object
+            particle_data = {
+                "iteration": iteration,
+                "particle_index": particle_idx,
+                "depth": depth,
+                "ur": ur,
+                "weight_kg": weight_kg,
+                "variables": position,
+                "variable_names": variable_list,
+                "bounds": {"lb": lb, "ub": ub},
+                "plot_image": None,
+            }
+
+            # Update the data processor for server-side state (if needed)
+            data_processor.add_particle_data(
+                depth, ur, weight_kg, iteration, particle_idx, 
+                position=position, variables=variable_list, lb=lb, ub=ub
+            )
+
+            # Check if this is a new iteration or we've reached the send interval
             is_new_iteration = (iteration != current_iteration)
             
-            if is_new_iteration:
-                # New iteration: reset counters and mark that we haven't sent first particle yet
-                current_iteration = iteration
-                particles_in_batch = 0
-                last_iteration_first_particle_sent = -1
+            # Add to buffer
+            particle_buffer.append(particle_data)
+
+            if is_new_iteration or now - last_send >= SEND_INTERVAL or len(particle_buffer) >= 50:
+                # Send the entire buffer as a list of particles
+                if particle_buffer:
+                    send_update_event({
+                        "iteration": iteration,
+                        "batch": True,
+                        "particles": particle_buffer
+                    })
+                    particle_buffer.clear()
+                    last_send = now
+                
+                if is_new_iteration:
+                    current_iteration = iteration
             
-            # CRITICAL FIX: Always send at least the first particle of each iteration
-            # This ensures we have one frame per iteration for replay
-            is_first_particle = (particles_in_batch == 0)
-            should_send = False
-            
-            if is_first_particle:
-                # Always send first particle of each iteration (ensures frame cache has all iterations)
-                should_send = True
-                last_iteration_first_particle_sent = iteration
-                logger.debug(f"🎯 Sending first particle of iteration {iteration} (guaranteed)")
-            elif now - last_send >= SEND_INTERVAL:
-                # Throttle check: only send if enough time has passed
-                should_send = True
-            else:
-                # Throttled: skip this particle
-                throttled_count += 1
-                send_heartbeat_if_needed()
-                particles_in_batch += 1  # Still count it for tracking
-                return
-            
-            # Send the update
-            send_update_event(
-                {
-                    "iteration": iteration,
-                    "particle_index": particle_idx,
-                    "depth": depth,
-                    "ur": ur,
-                    "weight_kg": weight_kg,
-                    "variables": position,
-                    "variable_names": variable_list,
-                    "bounds": {"lb": lb, "ub": ub},
-                }
-            )
             send_heartbeat_if_needed()
 
         # Run optimization
@@ -236,12 +255,14 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
         logger.info(f"  Particles: 50 (hardcoded in optimized_method)")
         optimization_start = time.time()
         
+        print(f"DEBUG: Calling module.optimized_method...")
         result = module.optimized_method(
             design_dict,
             is_thick_web=is_thick_web,
             is_symmetric=is_symmetric,
             viz_callback=viz_callback,
         )
+        print(f"DEBUG: Optimization finished with result: {result is not None}")
         
         optimization_duration = time.time() - optimization_start
         logger.info(f"✅ PSO optimization completed in {optimization_duration:.2f} seconds")

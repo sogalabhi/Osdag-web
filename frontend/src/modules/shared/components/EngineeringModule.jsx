@@ -206,36 +206,25 @@ export const EngineeringModule = ({
   const colorPickerRef = useRef(null);
   const [customBgColor, setCustomBgColor] = useState(null);
 
-  useEffect(() => {
-    if (inputs?.graphicsOption) {
-      const opt = inputs.graphicsOption;
-      if (["Model", "Beam", "Column", "Seated Angle", "Cleat Angle"].includes(opt)) {
-        if (opt === "Model") {
-          setSelectedSection(["Model"]);
-
-          setSelectedCameraView("Model");
-        } else {
-          // If a non-Model option is selected, add it
-          const newSelection = selectedSection.filter(s => s !== "Model");
-          if (!newSelection.includes(opt)) {
-            newSelection.push(opt);
-          }
-          if (newSelection.length > 0) {
-            setSelectedSection(newSelection);
-
-            setSelectedCameraView(newSelection[0]);
-          }
-        }
-      } else if (opt === "Change Background") {
-        if (colorPickerRef.current) {
-          colorPickerRef.current.click();
-        }
-      } else if (opt === "Show front view") {
-        setSelectedCameraView("XY");
-      } else if (opt === "Show side view") {
-        setSelectedCameraView("YZ");
-      } else if (opt === "Show top view") {
-        setSelectedCameraView("ZX");
+  // Prepare data for Plotly OptimizationGraph
+  const plotlyData = useMemo(() => {
+    const fease = { x: [], y: [], z: [], text: [] };
+    const non_fease = { x: [], y: [], z: [], text: [] };
+    const swarm_fease = { x: [], y: [], z: [], text: [] };
+    const swarm_non_fease = { x: [], y: [], z: [], text: [] };
+    
+    // History points (all particles so far)
+    (optimizationData.history || []).forEach(p => {
+      if (p.ur <= 1.0) {
+        fease.x.push(p.ur);
+        fease.y.push(p.depth);
+        fease.z.push(p.weight_kg);
+        fease.text.push(`Iter: ${p.iter}, P: ${p.particle}`);
+      } else {
+        non_fease.x.push(p.ur);
+        non_fease.y.push(p.depth);
+        non_fease.z.push(p.weight_kg);
+        non_fease.text.push(`Iter: ${p.iter}, P: ${p.particle}`);
       }
       // Cleanup graphicOption to allow consecutive clicks of same option
       setInputs(prev => {
@@ -246,7 +235,51 @@ export const EngineeringModule = ({
     }
   }, [inputs?.graphicsOption, selectedSection]);
 
-  const prevPathsRef = useRef(null);
+    // Current Swarm (particles in the latest iteration)
+    (optimizationData.currentSwarm || []).forEach(p => {
+      if (p.ur <= 1.0) {
+        swarm_fease.x.push(p.ur);
+        swarm_fease.y.push(p.depth);
+        swarm_fease.z.push(p.weight_kg);
+        swarm_fease.text.push(`[LIVE] Iter: ${p.iter}, P: ${p.particle}`);
+      } else {
+        swarm_non_fease.x.push(p.ur);
+        swarm_non_fease.y.push(p.depth);
+        swarm_non_fease.z.push(p.weight_kg);
+        swarm_non_fease.text.push(`[LIVE] Iter: ${p.iter}, P: ${p.particle}`);
+      }
+    });
+
+    return {
+      current_iter: optimizationData.current_iter,
+      variableNames: optimizationData.variableNames,
+      bounds: optimizationData.bounds,
+      fease,
+      non_fease,
+      swarm_fease,
+      swarm_non_fease,
+      best: {
+        found: !!optimizationData.globalBest,
+        x: optimizationData.globalBest ? [optimizationData.globalBest.ur] : [],
+        y: optimizationData.globalBest ? [optimizationData.globalBest.depth] : [],
+        z: optimizationData.globalBest ? [optimizationData.globalBest.weight_kg] : [],
+        val: optimizationData.globalBest?.weight_kg || 0,
+        iter: (optimizationData.globalBest?.iter || 0) + 1,
+        particle: (optimizationData.globalBest?.particle || 0) + 1,
+        vars: optimizationData.globalBest?.vars || {}
+      }
+    };
+  }, [optimizationData]);
+
+  const { handleCreateProject, projectCreationModal } = useProjectCreation({
+    inputs,
+    extraState,
+    allSelected,
+    contextData,
+    moduleConfig,
+  });
+
+  // Normalize CAD path keys to handle case/spacing differences
   const normalizedCadModelPaths = useMemo(() => {
     const out = {};
     Object.entries(cadModelPaths || {}).forEach(([key, value]) => {
@@ -502,58 +535,61 @@ export const EngineeringModule = ({
                   break;
                 case "pso_update":
                   setOptimizationData((prev) => {
-                    const particleData = {
-                      ur: msg.data.ur,
-                      weight_kg: msg.data.weight_kg,
-                      depth: msg.data.depth,
-                      position: msg.data.variables || [],
-                      particle: msg.data.particle_index,
-                      iter: msg.data.iteration
-                    };
-
-                    // Update variable names and bounds if provided (usually in first message)
-                    const variableNames = msg.data.variable_names || prev.variableNames;
-                    const bounds = msg.data.bounds || prev.bounds;
-
-                    // Add to history (keep last 10000 entries)
-                    const newHistory = [...prev.history, particleData].slice(-10000);
-
-                    // Group current swarm by iteration (keep only current iteration)
-                    const currentIter = msg.data.iteration;
-                    let currentSwarm = prev.currentSwarm || [];
-                    if (currentIter !== prev.current_iter) {
-                      // New iteration, reset swarm
-                      currentSwarm = [particleData];
-                    } else {
-                      // Same iteration, add to swarm (limit to 50 particles to match PSO swarm size)
-                      currentSwarm = [...currentSwarm, particleData].slice(-50);
-                    }
-
-                    // Update global best if this is better
-                    // Priority: feasible (UR <= 1.0) > infeasible, then lower weight is better
+                    const particlesToProcess = msg.data.batch ? msg.data.particles : [msg.data];
+                    
+                    let newHistory = [...prev.history];
+                    let currentSwarm = [...prev.currentSwarm];
                     let globalBest = prev.globalBest;
-                    if (!globalBest) {
-                      globalBest = particleData;
-                    } else {
-                      const isFeasible = particleData.ur <= 1.0;
-                      const bestIsFeasible = globalBest.ur <= 1.0;
-                      
-                      if (isFeasible && !bestIsFeasible) {
-                        // New particle is feasible, old best is not
-                        globalBest = particleData;
-                      } else if (isFeasible && bestIsFeasible) {
-                        // Both feasible, prefer lower weight
-                        if (particleData.weight_kg < globalBest.weight_kg) {
-                          globalBest = particleData;
+                    let currentIter = prev.current_iter;
+                    let variableNames = prev.variableNames || [];
+                    let bounds = prev.bounds || { lb: [], ub: [] };
+                    let plotImage = prev.plotImage;
+
+                    particlesToProcess.forEach(p => {
+                        const varsDict = {};
+                        const names = p.variable_names || msg.data.variable_names || [];
+                        const values = p.variables || msg.data.variables || [];
+                        (names || []).forEach((name, idx) => {
+                          varsDict[name] = (values || [])[idx];
+                        });
+
+                        const particleData = {
+                          ur: p.ur,
+                          weight_kg: p.weight_kg,
+                          depth: varsDict['D'] || p.depth,
+                          tw: varsDict['tw'],
+                          tf: varsDict['tf'] || varsDict['tf_top'],
+                          bf: varsDict['bf'] || varsDict['bf_top'],
+                          vars: varsDict,
+                          particle: p.particle_index,
+                          iter: p.iteration,
+                          timestamp: Date.now()
+                        };
+
+                        if (p.variable_names) variableNames = p.variable_names;
+                        if (p.bounds) bounds = p.bounds;
+                        if (p.plot_image) plotImage = p.plot_image;
+
+                        newHistory.push(particleData);
+
+                        if (particleData.iter !== currentIter) {
+                          currentIter = particleData.iter;
+                          currentSwarm = [particleData];
+                        } else {
+                          currentSwarm.push(particleData);
+                          if (currentSwarm.length > 200) currentSwarm.shift();
                         }
-                      } else if (!isFeasible && !bestIsFeasible) {
-                        // Both infeasible, prefer lower UR (closer to feasible)
-                        if (particleData.ur < globalBest.ur) {
-                          globalBest = particleData;
+
+                        // Update global best
+                        const isFeasible = particleData.ur <= 1.0;
+                        if (!globalBest || (isFeasible && (globalBest.ur > 1.0 || particleData.weight_kg < globalBest.weight_kg))) {
+                           globalBest = particleData;
+                        } else if (!isFeasible && globalBest.ur > 1.0 && particleData.ur < globalBest.ur) {
+                           globalBest = particleData;
                         }
-                      }
-                      // If new is infeasible and best is feasible, keep best
-                    }
+                    });
+
+                    if (newHistory.length > 10000) newHistory = newHistory.slice(-10000);
 
                     return {
                       current_iter: currentIter,
