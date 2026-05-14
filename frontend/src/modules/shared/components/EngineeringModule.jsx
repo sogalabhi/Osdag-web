@@ -201,23 +201,8 @@ export const EngineeringModule = ({
     currentSwarm: [],
     globalBest: null
   });
-  const psoParticleQueueRef = useRef([]);
-  const psoFlushTimerRef = useRef(null);
-
-  const clearPsoFlushTimer = () => {
-    if (psoFlushTimerRef.current) {
-      window.clearTimeout(psoFlushTimerRef.current);
-      psoFlushTimerRef.current = null;
-    }
-  };
-
-  const flushPsoParticleQueue = () => {
-    clearPsoFlushTimer();
-
-    const queuedParticles = psoParticleQueueRef.current;
-    if (!queuedParticles.length) return;
-    psoParticleQueueRef.current = [];
-
+  const applyPsoParticles = (particlesWithParent) => {
+    if (!particlesWithParent.length) return;
     setOptimizationData((prev) => {
       let newHistory = [...(prev.history || [])];
       let currentSwarm = [...(prev.currentSwarm || [])];
@@ -227,7 +212,7 @@ export const EngineeringModule = ({
       let bounds = prev.bounds || { lb: [], ub: [] };
       let plotImage = prev.plotImage;
 
-      queuedParticles.forEach(({ particle: p, parentData }) => {
+      particlesWithParent.forEach(({ particle: p, parentData }) => {
         const varsDict = {};
         const names = p.variable_names || parentData.variable_names || [];
         const values = p.variables || parentData.variables || [];
@@ -290,19 +275,7 @@ export const EngineeringModule = ({
     });
   };
 
-  const schedulePsoParticleFlush = () => {
-    if (psoFlushTimerRef.current) return;
-    psoFlushTimerRef.current = window.setTimeout(flushPsoParticleQueue, 80);
-  };
-
-  useEffect(() => () => {
-    if (psoFlushTimerRef.current) {
-      window.clearTimeout(psoFlushTimerRef.current);
-      psoFlushTimerRef.current = null;
-    }
-  }, []);
-
-  // Hooking Graphics Options (Model / Selected Section & Bg Color)
+  const [customBgColor, setCustomBgColor] = useState(null);
   const colorPickerRef = useRef(null);
   const [customBgColor, setCustomBgColor] = useState(null);
 
@@ -617,8 +590,6 @@ export const EngineeringModule = ({
         service.getRTUpdates("ws/optimize/plate-girder/",
           (ev) => {
             setIsWsConnected(true);
-            psoParticleQueueRef.current = [];
-            clearPsoFlushTimer();
             const ws = ev.target
             ws.send(JSON.stringify({
               type: "start_optimization",
@@ -646,27 +617,28 @@ export const EngineeringModule = ({
             if (msgSequence > sequence || msgSequence === -2) {
               if (msgSequence !== -2) sequence = msgSequence;
               
-	              switch (msg.type) {
-		                case "task_started":
-		                  break;
-		                case "pso_update":
-		                  (messageData.batch ? messageData.particles : [messageData]).forEach((particle) => {
-		                    psoParticleQueueRef.current.push({ particle, parentData: messageData });
-		                  });
-		                  schedulePsoParticleFlush();
-		                  break;
-	                case "pso_heartbeat":
-	                  // update liveness indicator
-	                  break;
-	                case "pso_complete":
-	                  flushPsoParticleQueue();
-	                  setOptimizationDone(true);
+              switch (msg.type) {
+                case "task_started":
+                  break;
+                case "pso_update":
+                  applyPsoParticles(
+                    (messageData.batch ? messageData.particles : [messageData]).map((particle) => ({
+                      particle,
+                      parentData: messageData
+                    }))
+                  );
+                  break;
+                case "pso_heartbeat":
+                  // update liveness indicator
+                  break;
+                case "pso_complete":
+                  setOptimizationDone(true);
                   event.target.close(); // close the connection
-                  
+
                   // Extract final design results from WebSocket message
-	                  if (messageData.result) {
-	                    const result = messageData.result;
-                    
+                  if (messageData.result) {
+                    const result = messageData.result;
+
                     // Update output with final design results
                     // The result.design contains the formatted output from backend
                     // Format it similar to regular API response
@@ -679,18 +651,18 @@ export const EngineeringModule = ({
                           formattedOutput[key] = { label, val };
                         }
                       }
-                      
+
                       // Note: Output and logs will be set via the hook's internal state
                       // For now, we'll trigger a re-fetch or use the data directly
                       // The optimization graph will show the final result
-                      
+
                       // Update status to complete
-                      setStatus({ 
-                        step: DESIGN_STATUS.COMPLETE, 
-                        message: 'Optimization complete', 
-                        error: null 
+                      setStatus({
+                        step: DESIGN_STATUS.COMPLETE,
+                        message: 'Optimization complete',
+                        error: null
                       });
-                      
+
                       // Store final result for later use (can be accessed via optimizationData)
                       // CRITICAL: Preserve all existing data (history, currentSwarm, globalBest, etc.)
                       setOptimizationData((prev) => {
@@ -716,8 +688,8 @@ export const EngineeringModule = ({
                     }
                   }
                   break;
-	                case "pso_error":
-	                  console.error("PSO optimization error:", messageData);
+                case "pso_error":
+                  console.error("PSO optimization error:", messageData);
                   event.target.close(); // close the connection
                   // show error; stop loading
                   break;
