@@ -202,6 +202,13 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
         # Particle buffer for batch sending
         particle_buffer = []
 
+        def is_over_utilized(value: Any) -> bool:
+            """Return True when a particle has UR > 1 for visualization."""
+            try:
+                return float(value) > 1.0
+            except (TypeError, ValueError):
+                return False
+
         # Progress callback from optimized_method
         def viz_callback(depth, ur, weight_kg, iteration, particle_idx, position, variable_list, lb, ub):
             nonlocal last_send, throttled_count, current_iteration
@@ -232,7 +239,12 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
             # Add to buffer
             particle_buffer.append(particle_data)
 
-            if is_new_iteration or now - last_send >= SEND_INTERVAL or len(particle_buffer) >= 50:
+            if (
+                is_new_iteration
+                or is_over_utilized(ur)
+                or now - last_send >= SEND_INTERVAL
+                or len(particle_buffer) >= 50
+            ):
                 # Send the entire buffer as a list of particles
                 if particle_buffer:
                     send_update_event({
@@ -263,6 +275,15 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
             viz_callback=viz_callback,
         )
         print(f"DEBUG: Optimization finished with result: {result is not None}")
+
+        # Flush any particles that were still buffered when optimization ended.
+        if particle_buffer:
+            send_update_event({
+                "iteration": current_iteration,
+                "batch": True,
+                "particles": particle_buffer
+            })
+            particle_buffer.clear()
         
         optimization_duration = time.time() - optimization_start
         logger.info(f"✅ PSO optimization completed in {optimization_duration:.2f} seconds")
@@ -339,4 +360,3 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
             },
         )
         raise
-
