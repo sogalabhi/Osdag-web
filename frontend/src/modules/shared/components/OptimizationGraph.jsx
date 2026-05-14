@@ -2,58 +2,114 @@ import { useRef } from 'react';
 import Plot from 'react-plotly.js';
 import Plotly from 'plotly.js-dist-min';
 
-const IBeamSVG = ({ depth = 400, width = 300, tw = 8, tf = 12 }) => {
-    const maxH = 280;
-    const maxW = 200;
-    const currentDepth = depth || 400;
-    const currentWidth = width || 300;
-    const aspect = currentDepth / currentWidth;
-    
-    let drawH, drawW;
-    if (aspect > 1) {
-        drawH = maxH;
-        drawW = maxH / aspect;
-    } else {
-        drawW = maxW;
-        drawH = maxW * aspect;
-    }
-    
-    const scale = drawH / currentDepth;
-    const s_tw = Math.max(4, tw * scale);
-    const s_tf = Math.max(4, tf * scale);
-    
+const IBeamSVG = ({ depth = 400, bfTop = 300, bfBot = 300, tw = 8, tfTop = 12, tfBot = 12 }) => {
+    const toPositive = (value, fallback) => {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : fallback;
+    };
+
+    const D = toPositive(depth, 400);
+    const topWidth = toPositive(bfTop, 300);
+    const bottomWidth = toPositive(bfBot, topWidth);
+    const webThickness = toPositive(tw, 8);
+    const topThickness = toPositive(tfTop, 12);
+    const bottomThickness = toPositive(tfBot, topThickness);
+
+    const viewWidth = 560;
+    const viewHeight = 500;
+    const margin = { top: 34, right: 132, bottom: 92, left: 92 };
+    const drawAreaWidth = viewWidth - margin.left - margin.right;
+    const drawAreaHeight = viewHeight - margin.top - margin.bottom;
+    const maxWidth = Math.max(topWidth, bottomWidth, webThickness);
+    const scale = Math.min(drawAreaWidth / maxWidth, drawAreaHeight / D);
+
+    const drawD = D * scale;
+    const drawTopWidth = topWidth * scale;
+    const drawBottomWidth = bottomWidth * scale;
+    const drawWebThickness = Math.max(webThickness * scale, 5);
+    const drawTopThickness = Math.max(topThickness * scale, 5);
+    const drawBottomThickness = Math.max(bottomThickness * scale, 5);
+    const drawWebHeight = Math.max(drawD - drawTopThickness - drawBottomThickness, 8);
+
+    const centerX = margin.left + drawAreaWidth / 2;
+    const topY = margin.top + (drawAreaHeight - drawD) / 2;
+    const bottomY = topY + drawD - drawBottomThickness;
+    const webY = topY + drawTopThickness;
+    const sectionRight = centerX + Math.max(drawTopWidth, drawBottomWidth) / 2;
+    const sectionLeft = centerX - Math.max(drawTopWidth, drawBottomWidth) / 2;
+    const midY = topY + drawD / 2;
+    const depthDimX = sectionRight + 48;
+    const bottomDimY = topY + drawD + 38;
+    const widthLabel = topWidth === bottomWidth
+        ? `B=${bottomWidth.toFixed(0)}`
+        : `Bt=${topWidth.toFixed(0)}  Bb=${bottomWidth.toFixed(0)}`;
+
     return (
-        <svg width="100%" height="350" viewBox="0 0 400 400" className="drop-shadow-md">
-            <g transform="translate(200, 200)">
-                {/* Axes Z-Z and Y-Y with Labels */}
-                <line x1="-180" y1="0" x2="180" y2="0" stroke="#f87171" strokeWidth="1.5" strokeDasharray="4 4" />
-                <text x="185" y="5" fill="#991b1b" fontSize="14" fontWeight="bold">Z</text>
-                <text x="-198" y="5" fill="#991b1b" fontSize="14" fontWeight="bold">Z</text>
-                
-                <line x1="0" y1="-180" x2="0" y2="180" stroke="#f87171" strokeWidth="1.5" strokeDasharray="4 4" />
-                <text x="-5" y="-185" fill="#991b1b" fontSize="14" fontWeight="bold">Y</text>
-                <text x="-5" y="195" fill="#991b1b" fontSize="14" fontWeight="bold">Y</text>
+        <svg
+            width="100%"
+            height="100%"
+            viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+            preserveAspectRatio="xMidYMid meet"
+            className="drop-shadow-sm"
+            role="img"
+            aria-label={`Plate girder cross-section with depth ${D.toFixed(0)} millimetres and width ${bottomWidth.toFixed(0)} millimetres`}
+        >
+            <defs>
+                <marker id="section-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#4b5563" />
+                </marker>
+            </defs>
 
-                {/* I-Beam Shape */}
-                <rect x={-drawW/2} y={-drawH/2} width={drawW} height={s_tf} fill="#3b82f6" stroke="#1e3a8a" strokeWidth="2" />
-                <rect x={-s_tw/2} y={-drawH/2 + s_tf} width={s_tw} height={drawH - 2*s_tf} fill="#3b82f6" stroke="#1e3a8a" strokeWidth="2" />
-                <rect x={-drawW/2} y={drawH/2 - s_tf} width={drawW} height={s_tf} fill="#3b82f6" stroke="#1e3a8a" strokeWidth="2" />
-                
-                {/* Dimension Arrows */}
-                <g>
-                    <line x1={drawW/2 + 30} y1={-drawH/2} x2={drawW/2 + 30} y2={drawH/2} stroke="#4b5563" strokeWidth="1" markerEnd="url(#arrow)" markerStart="url(#arrow)" />
-                    <text x={drawW/2 + 40} y="5" fill="#000" fontSize="14" fontWeight="bold">D={currentDepth.toFixed(0)}</text>
-                    
-                    <line x1={-drawW/2} y1={drawH/2 + 30} x2={drawW/2} y2={drawH/2 + 30} stroke="#4b5563" strokeWidth="1" markerEnd="url(#arrow)" markerStart="url(#arrow)" />
-                    <text x="-25" y={drawH/2 + 55} fill="#000" fontSize="14" fontWeight="bold">B={currentWidth.toFixed(0)}</text>
-                </g>
+            {/* Axes */}
+            <line x1={centerX} y1={topY - 30} x2={centerX} y2={topY + drawD + 30} stroke="#ef4444" strokeWidth="1.3" strokeDasharray="5 5" opacity="0.75" />
+            <text x={centerX} y={topY - 36} textAnchor="middle" fill="#991b1b" fontSize="13" fontWeight="700">Y</text>
+            <text x={centerX} y={topY + drawD + 52} textAnchor="middle" fill="#991b1b" fontSize="13" fontWeight="700">Y</text>
 
-                <defs>
-                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
-                        <path d="M0,0 L10,5 L0,10 Z" fill="#4b5563" />
-                    </marker>
-                </defs>
+            <line x1={sectionLeft - 62} y1={midY} x2={sectionRight + 112} y2={midY} stroke="#ef4444" strokeWidth="1.3" strokeDasharray="5 5" opacity="0.75" />
+            <text x={sectionLeft - 74} y={midY - 10} textAnchor="middle" fill="#991b1b" fontSize="13" fontWeight="700">Z</text>
+            <text x={sectionRight + 124} y={midY - 10} textAnchor="middle" fill="#991b1b" fontSize="13" fontWeight="700">Z</text>
+
+            {/* I-section */}
+            <g>
+                <rect
+                    x={centerX - drawTopWidth / 2}
+                    y={topY}
+                    width={drawTopWidth}
+                    height={drawTopThickness}
+                    fill="#3b82f6"
+                    stroke="#1e3a8a"
+                    strokeWidth="2.4"
+                />
+                <rect
+                    x={centerX - drawWebThickness / 2}
+                    y={webY}
+                    width={drawWebThickness}
+                    height={drawWebHeight}
+                    fill="#60a5fa"
+                    stroke="#1e3a8a"
+                    strokeWidth="2.4"
+                />
+                <rect
+                    x={centerX - drawBottomWidth / 2}
+                    y={bottomY}
+                    width={drawBottomWidth}
+                    height={drawBottomThickness}
+                    fill="#3b82f6"
+                    stroke="#1e3a8a"
+                    strokeWidth="2.4"
+                />
             </g>
+
+            {/* Dimensions */}
+            <line x1={depthDimX} y1={topY} x2={depthDimX} y2={topY + drawD} stroke="#4b5563" strokeWidth="1.2" markerStart="url(#section-arrow)" markerEnd="url(#section-arrow)" />
+            <line x1={sectionRight + 12} y1={topY} x2={depthDimX + 10} y2={topY} stroke="#94a3b8" strokeWidth="1" />
+            <line x1={sectionRight + 12} y1={topY + drawD} x2={depthDimX + 10} y2={topY + drawD} stroke="#94a3b8" strokeWidth="1" />
+            <text x={depthDimX + 18} y={midY + 4} fill="#111827" fontSize="13" fontWeight="700">D={D.toFixed(0)}</text>
+
+            <line x1={centerX - drawBottomWidth / 2} y1={bottomDimY} x2={centerX + drawBottomWidth / 2} y2={bottomDimY} stroke="#4b5563" strokeWidth="1.2" markerStart="url(#section-arrow)" markerEnd="url(#section-arrow)" />
+            <line x1={centerX - drawBottomWidth / 2} y1={bottomY + drawBottomThickness + 8} x2={centerX - drawBottomWidth / 2} y2={bottomDimY + 8} stroke="#94a3b8" strokeWidth="1" />
+            <line x1={centerX + drawBottomWidth / 2} y1={bottomY + drawBottomThickness + 8} x2={centerX + drawBottomWidth / 2} y2={bottomDimY + 8} stroke="#94a3b8" strokeWidth="1" />
+            <text x={centerX} y={bottomDimY + 25} textAnchor="middle" fill="#111827" fontSize="13" fontWeight="700">{widthLabel}</text>
         </svg>
     );
 };
@@ -61,10 +117,26 @@ const IBeamSVG = ({ depth = 400, width = 300, tw = 8, tf = 12 }) => {
 function OptimizationGraph({ data, onClose, optimizationDone, isWsConnected }) {
     const graphRef = useRef(null);
 
+    const toPositiveNumber = (value, fallback = 0) => {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : fallback;
+    };
+
     const finiteValues = (...arrays) => arrays
         .flatMap((values) => Array.isArray(values) ? values : [])
         .map(Number)
         .filter(Number.isFinite);
+
+    const bestVars = data.best?.vars || {};
+    const bestDepth = toPositiveNumber(data.best?.y?.[0], 0);
+    const bestSection = {
+        depth: bestDepth,
+        bfTop: toPositiveNumber(bestVars.bf_top, toPositiveNumber(bestVars.bf, 300)),
+        bfBot: toPositiveNumber(bestVars.bf_bot, toPositiveNumber(bestVars.bf, toPositiveNumber(bestVars.bf_top, 300))),
+        tw: toPositiveNumber(bestVars.tw, 8),
+        tfTop: toPositiveNumber(bestVars.tf_top, toPositiveNumber(bestVars.tf, 8)),
+        tfBot: toPositiveNumber(bestVars.tf_bot, toPositiveNumber(bestVars.tf, toPositiveNumber(bestVars.tf_top, 8))),
+    };
 
     const xValues = finiteValues(data.fease?.x, data.non_fease?.x, data.swarm_fease?.x, data.swarm_non_fease?.x, data.best?.x);
     const yValues = finiteValues(data.fease?.y, data.non_fease?.y, data.swarm_fease?.y, data.swarm_non_fease?.y, data.best?.y);
@@ -231,16 +303,18 @@ function OptimizationGraph({ data, onClose, optimizationDone, isWsConnected }) {
                     </div>
 
                     {/* Sidebar Area */}
-                    <div className="w-[35%] flex flex-col border-l border-gray-100 bg-[#fafafa]">
-                        <div className='p-6 flex flex-col items-center bg-white border-b border-gray-100'>
-                            <h4 className="font-bold text-base text-gray-700 mb-6 uppercase tracking-wider">Best Cross-Section (I-Beam)</h4>
-                            <div className="w-full flex items-center justify-center">
+                    <div className="w-[35%] flex flex-col border-l border-gray-100 bg-white">
+                        <div className='flex-1 min-h-0 p-6 flex flex-col items-center bg-white'>
+                            <h4 className="font-bold text-base text-gray-700 mb-4 uppercase tracking-wider">Best Cross-Section (I-Beam)</h4>
+                            <div className="w-full flex-1 min-h-[360px] flex items-center justify-center">
                                 {data.best.found ? (
                                     <IBeamSVG 
-                                      depth={data.best.y[0]} 
-                                      width={data.best.vars?.bf || 300} 
-                                      tw={data.best.vars?.tw || 8} 
-                                      tf={data.best.vars?.tf || 8} 
+                                      depth={bestSection.depth}
+                                      bfTop={bestSection.bfTop}
+                                      bfBot={bestSection.bfBot}
+                                      tw={bestSection.tw}
+                                      tfTop={bestSection.tfTop}
+                                      tfBot={bestSection.tfBot}
                                     />
                                 ) : (
                                     <div className="h-64 flex flex-col items-center justify-center text-gray-400 gap-4">
@@ -250,10 +324,10 @@ function OptimizationGraph({ data, onClose, optimizationDone, isWsConnected }) {
                                 )}
                             </div>
                             {data.best.found && (
-                                <div className="mt-6 w-full px-4">
-                                    <div className="grid grid-cols-4 border-y border-gray-200 text-[10px] font-mono bg-gray-50/50 text-center divide-x divide-gray-200">
-                                        <div className="py-2">tw={data.best.vars?.tw?.toFixed(1) || "8.0"}</div>
-                                        <div className="py-2">tf={data.best.vars?.tf?.toFixed(1) || "8.0"}</div>
+                                <div className="mt-4 w-full px-4">
+                                    <div className="grid grid-cols-4 border-y border-gray-200 text-[11px] font-mono bg-gray-50/50 text-center divide-x divide-gray-200">
+                                        <div className="py-2">tw={bestSection.tw.toFixed(1)}</div>
+                                        <div className="py-2">tf={bestSection.tfTop.toFixed(1)}</div>
                                         <div className="py-2">R1=4.0</div>
                                         <div className="py-2">R2=4.0</div>
                                     </div>
@@ -277,13 +351,13 @@ function OptimizationGraph({ data, onClose, optimizationDone, isWsConnected }) {
                             <span className="text-gray-300 mx-2">|</span>
                             <span className="text-gray-600">Weight: <span className="text-gray-950 font-bold">{data.best.val.toFixed(1)} kg</span></span>
                             <span className="text-gray-300 mx-2">|</span>
-                            <span className="text-gray-600">D: <span className="text-gray-950 font-bold">{data.best.y[0].toFixed(0)} mm</span></span>
+                            <span className="text-gray-600">D: <span className="text-gray-950 font-bold">{bestSection.depth.toFixed(0)} mm</span></span>
                             <span className="text-gray-300 mx-2">|</span>
-                            <span className="text-gray-600">B: <span className="text-gray-950 font-bold">{(data.best.vars?.bf || 0).toFixed(0)} mm</span></span>
+                            <span className="text-gray-600">B: <span className="text-gray-950 font-bold">{bestSection.bfBot.toFixed(0)} mm</span></span>
                             <span className="text-gray-300 mx-2">|</span>
-                            <span className="text-gray-600">tw: <span className="text-gray-950 font-bold">{(data.best.vars?.tw || 0).toFixed(1)} mm</span></span>
+                            <span className="text-gray-600">tw: <span className="text-gray-950 font-bold">{bestSection.tw.toFixed(1)} mm</span></span>
                             <span className="text-gray-300 mx-2">|</span>
-                            <span className="text-gray-600">tf: <span className="text-gray-950 font-bold">{(data.best.vars?.tf || 0).toFixed(1)} mm</span></span>
+                            <span className="text-gray-600">tf: <span className="text-gray-950 font-bold">{bestSection.tfTop.toFixed(1)} mm</span></span>
                         </div>
                     </div>
                 )}
