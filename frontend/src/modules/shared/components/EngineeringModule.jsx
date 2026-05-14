@@ -201,6 +201,106 @@ export const EngineeringModule = ({
     currentSwarm: [],
     globalBest: null
   });
+  const psoParticleQueueRef = useRef([]);
+  const psoFlushTimerRef = useRef(null);
+
+  const clearPsoFlushTimer = () => {
+    if (psoFlushTimerRef.current) {
+      window.clearTimeout(psoFlushTimerRef.current);
+      psoFlushTimerRef.current = null;
+    }
+  };
+
+  const flushPsoParticleQueue = () => {
+    clearPsoFlushTimer();
+
+    const queuedParticles = psoParticleQueueRef.current;
+    if (!queuedParticles.length) return;
+    psoParticleQueueRef.current = [];
+
+    setOptimizationData((prev) => {
+      let newHistory = [...(prev.history || [])];
+      let currentSwarm = [...(prev.currentSwarm || [])];
+      let globalBest = prev.globalBest;
+      let currentIter = prev.current_iter;
+      let variableNames = prev.variableNames || [];
+      let bounds = prev.bounds || { lb: [], ub: [] };
+      let plotImage = prev.plotImage;
+
+      queuedParticles.forEach(({ particle: p, parentData }) => {
+        const varsDict = {};
+        const names = p.variable_names || parentData.variable_names || [];
+        const values = p.variables || parentData.variables || [];
+        (names || []).forEach((name, idx) => {
+          varsDict[name] = (values || [])[idx];
+        });
+
+        const ur = Number(p.ur);
+        const weightKg = Number(p.weight_kg);
+        const depth = Number(varsDict.D || p.depth);
+        if (!Number.isFinite(ur)) return;
+
+        const particleData = {
+          ur,
+          weight_kg: Number.isFinite(weightKg) ? weightKg : 0,
+          depth: Number.isFinite(depth) ? depth : 0,
+          tw: varsDict.tw,
+          tf: varsDict.tf || varsDict.tf_top,
+          bf: varsDict.bf || varsDict.bf_top,
+          vars: varsDict,
+          particle: p.particle_index,
+          iter: p.iteration,
+          timestamp: Date.now()
+        };
+
+        if (p.variable_names) variableNames = p.variable_names;
+        if (p.bounds) bounds = p.bounds;
+        if (p.plot_image) plotImage = p.plot_image;
+
+        newHistory.push(particleData);
+
+        if (particleData.iter !== currentIter) {
+          currentIter = particleData.iter;
+          currentSwarm = [particleData];
+        } else {
+          currentSwarm.push(particleData);
+          if (currentSwarm.length > 200) currentSwarm.shift();
+        }
+
+        const isFeasible = particleData.ur <= 1.0;
+        if (!globalBest || (isFeasible && (globalBest.ur > 1.0 || particleData.weight_kg < globalBest.weight_kg))) {
+          globalBest = particleData;
+        } else if (!isFeasible && globalBest.ur > 1.0 && particleData.ur < globalBest.ur) {
+          globalBest = particleData;
+        }
+      });
+
+      if (newHistory.length > 10000) newHistory = newHistory.slice(-10000);
+
+      return {
+        ...prev,
+        current_iter: currentIter,
+        variableNames,
+        bounds,
+        history: newHistory,
+        currentSwarm,
+        globalBest,
+        plotImage,
+      };
+    });
+  };
+
+  const schedulePsoParticleFlush = () => {
+    if (psoFlushTimerRef.current) return;
+    psoFlushTimerRef.current = window.setTimeout(flushPsoParticleQueue, 80);
+  };
+
+  useEffect(() => () => {
+    if (psoFlushTimerRef.current) {
+      window.clearTimeout(psoFlushTimerRef.current);
+      psoFlushTimerRef.current = null;
+    }
+  }, []);
 
   // Hooking Graphics Options (Model / Selected Section & Bg Color)
   const colorPickerRef = useRef(null);
@@ -516,6 +616,9 @@ export const EngineeringModule = ({
         setShowOptimizationGraph(true);
         service.getRTUpdates("ws/optimize/plate-girder/",
           (ev) => {
+            setIsWsConnected(true);
+            psoParticleQueueRef.current = [];
+            clearPsoFlushTimer();
             const ws = ev.target
             ws.send(JSON.stringify({
               type: "start_optimization",
@@ -535,93 +638,34 @@ export const EngineeringModule = ({
           },
           (event) => {
             const msg = JSON.parse(event.data);
-            if (msg.data.sequence > sequence) {
-              sequence = msg.data.sequence;
-              switch (msg.type) {
-                case "task_started":
-                  break;
-                case "pso_update":
-                  setOptimizationData((prev) => {
-                    const particlesToProcess = msg.data.batch ? msg.data.particles : [msg.data];
-                    
-                    let newHistory = [...prev.history];
-                    let currentSwarm = [...prev.currentSwarm];
-                    let globalBest = prev.globalBest;
-                    let currentIter = prev.current_iter;
-                    let variableNames = prev.variableNames || [];
-                    let bounds = prev.bounds || { lb: [], ub: [] };
-                    let plotImage = prev.plotImage;
-
-                    particlesToProcess.forEach(p => {
-                        const varsDict = {};
-                        const names = p.variable_names || msg.data.variable_names || [];
-                        const values = p.variables || msg.data.variables || [];
-                        (names || []).forEach((name, idx) => {
-                          varsDict[name] = (values || [])[idx];
-                        });
-
-                        const ur = Number(p.ur);
-                        const weightKg = Number(p.weight_kg);
-                        const depth = Number(varsDict['D'] || p.depth);
-                        if (!Number.isFinite(ur)) return;
-                        const particleData = {
-                          ur,
-                          weight_kg: Number.isFinite(weightKg) ? weightKg : 0,
-                          depth: Number.isFinite(depth) ? depth : 0,
-                          tw: varsDict['tw'],
-                          tf: varsDict['tf'] || varsDict['tf_top'],
-                          bf: varsDict['bf'] || varsDict['bf_top'],
-                          vars: varsDict,
-                          particle: p.particle_index,
-                          iter: p.iteration,
-                          timestamp: Date.now()
-                        };
-
-                        if (p.variable_names) variableNames = p.variable_names;
-                        if (p.bounds) bounds = p.bounds;
-                        if (p.plot_image) plotImage = p.plot_image;
-
-                        newHistory.push(particleData);
-
-                        if (particleData.iter !== currentIter) {
-                          currentIter = particleData.iter;
-                          currentSwarm = [particleData];
-                        } else {
-                          currentSwarm.push(particleData);
-                          if (currentSwarm.length > 200) currentSwarm.shift();
-                        }
-
-                        // Update global best
-                        const isFeasible = particleData.ur <= 1.0;
-                        if (!globalBest || (isFeasible && (globalBest.ur > 1.0 || particleData.weight_kg < globalBest.weight_kg))) {
-                           globalBest = particleData;
-                        } else if (!isFeasible && globalBest.ur > 1.0 && particleData.ur < globalBest.ur) {
-                           globalBest = particleData;
-                        }
-                    });
-
-                    if (newHistory.length > 10000) newHistory = newHistory.slice(-10000);
-
-                    return {
-                      current_iter: currentIter,
-                      variableNames,
-                      bounds,
-                      history: newHistory,
-                      currentSwarm,
-                      globalBest
-                    };
-                  });
-                  break;
-                case "pso_heartbeat":
-                  // update liveness indicator
-                  break;
-                case "pso_complete":
-                  setOptimizationDone(true);
+            const messageData = msg.data || {};
+            
+            // Fix: Guard against undefined sequences that break the comparison
+            const msgSequence = messageData.sequence !== undefined ? messageData.sequence : -2;
+            
+            if (msgSequence > sequence || msgSequence === -2) {
+              if (msgSequence !== -2) sequence = msgSequence;
+              
+	              switch (msg.type) {
+		                case "task_started":
+		                  break;
+		                case "pso_update":
+		                  (messageData.batch ? messageData.particles : [messageData]).forEach((particle) => {
+		                    psoParticleQueueRef.current.push({ particle, parentData: messageData });
+		                  });
+		                  schedulePsoParticleFlush();
+		                  break;
+	                case "pso_heartbeat":
+	                  // update liveness indicator
+	                  break;
+	                case "pso_complete":
+	                  flushPsoParticleQueue();
+	                  setOptimizationDone(true);
                   event.target.close(); // close the connection
                   
                   // Extract final design results from WebSocket message
-                  if (msg.data && msg.data.result) {
-                    const result = msg.data.result;
+	                  if (messageData.result) {
+	                    const result = messageData.result;
                     
                     // Update output with final design results
                     // The result.design contains the formatted output from backend
@@ -672,8 +716,8 @@ export const EngineeringModule = ({
                     }
                   }
                   break;
-                case "pso_error":
-                  console.error("PSO optimization error:", msg.data);
+	                case "pso_error":
+	                  console.error("PSO optimization error:", messageData);
                   event.target.close(); // close the connection
                   // show error; stop loading
                   break;

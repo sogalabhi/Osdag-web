@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import Plot from 'react-plotly.js';
 import Plotly from 'plotly.js-dist-min';
 
@@ -61,36 +61,22 @@ const IBeamSVG = ({ depth = 400, width = 300, tw = 8, tf = 12 }) => {
 function OptimizationGraph({ data, onClose, optimizationDone, isWsConnected }) {
     const graphRef = useRef(null);
 
-    useEffect(() => {
-        if (optimizationDone) {
-            const timer = setTimeout(() => {
-                onClose();
-            }, 2500); // Automatically close after 2.5 seconds
-            return () => clearTimeout(timer);
-        }
-    }, [optimizationDone, onClose]);
+    const finiteValues = (...arrays) => arrays
+        .flatMap((values) => Array.isArray(values) ? values : [])
+        .map(Number)
+        .filter(Number.isFinite);
 
-    // Log the real-time particle data for debugging
-    useEffect(() => {
-        console.log("=== REAL-TIME PSO DATA UPDATE ===");
-        console.log("GREEN PARTICLES (Utilization <= 1):", {
-            historyCount: data.fease?.x?.length || 0,
-            liveCount: data.swarm_fease?.x?.length || 0,
-            historyData: data.fease,
-            liveData: data.swarm_fease
-        });
-        console.log("RED PARTICLES (Utilization > 1):", {
-            historyCount: data.non_fease?.x?.length || 0,
-            liveCount: data.swarm_non_fease?.x?.length || 0,
-            historyData: data.non_fease,
-            liveData: data.swarm_non_fease
-        });
-        console.log("=================================");
-    }, [data]);
+    const xValues = finiteValues(data.fease?.x, data.non_fease?.x, data.swarm_fease?.x, data.swarm_non_fease?.x, data.best?.x);
+    const yValues = finiteValues(data.fease?.y, data.non_fease?.y, data.swarm_fease?.y, data.swarm_non_fease?.y, data.best?.y);
+    const zValues = finiteValues(data.fease?.z, data.non_fease?.z, data.swarm_fease?.z, data.swarm_non_fease?.z, data.best?.z);
 
-    const maxUR = Math.max(4, ...(data.fease.x || []), ...(data.non_fease.x || []));
-    const maxDepth = Math.max(2000, ...(data.fease.y || []), ...(data.non_fease.y || []));
-    const maxWeight = Math.max(8000, ...(data.fease.z || []), ...(data.non_fease.z || []));
+    const maxUR = xValues.length ? Math.max(1.2, Math.max(...xValues) * 1.08) : 4;
+    const minDepth = yValues.length ? Math.max(0, Math.min(...yValues) - 100) : 0;
+    const maxDepth = yValues.length ? Math.max(...yValues) + 100 : 2000;
+    const maxWeight = zValues.length ? Math.max(1, Math.max(...zValues) * 1.15) : 100;
+    const depthDtick = Math.max(100, Math.ceil(((maxDepth - minDepth) / 6) / 50) * 50);
+    const weightDtick = Math.max(1, Math.ceil((maxWeight / 5) * 10) / 10);
+    const urDtick = maxUR <= 2 ? 0.25 : 1;
 
     return (
         <div className='flex flex-col w-full h-full bg-white font-sans'>
@@ -126,7 +112,7 @@ function OptimizationGraph({ data, onClose, optimizationDone, isWsConnected }) {
                                     {
                                         type: 'mesh3d',
                                         x: [1, 1, 1, 1],
-                                        y: [0, maxDepth, maxDepth, 0],
+                                        y: [minDepth, maxDepth, maxDepth, minDepth],
                                         z: [0, 0, maxWeight, maxWeight],
                                         i: [0, 0],
                                         j: [1, 2],
@@ -230,9 +216,9 @@ function OptimizationGraph({ data, onClose, optimizationDone, isWsConnected }) {
                                     margin: { l: 0, r: 0, t: 0, b: 0 },
                                     autosize: true,
                                     scene: {
-                                        xaxis: { title: { text: "Utilization Ratio", font: { weight: 'bold' } }, gridcolor: '#f1f5f9', zerolinecolor: '#cbd5e1', range: [0, maxUR], dtick: 1 },
-                                        yaxis: { title: { text: "Depth (mm)", font: { weight: 'bold' } }, gridcolor: '#f1f5f9', zerolinecolor: '#cbd5e1', range: [maxDepth, 0], dtick: 250 },
-                                        zaxis: { title: { text: "Weight (kg)", font: { weight: 'bold' } }, gridcolor: '#f1f5f9', zerolinecolor: '#cbd5e1', range: [0, maxWeight], dtick: 1000 },
+                                        xaxis: { title: { text: "Utilization Ratio", font: { weight: 'bold' } }, gridcolor: '#f1f5f9', zerolinecolor: '#cbd5e1', range: [0, maxUR], dtick: urDtick },
+                                        yaxis: { title: { text: "Depth (mm)", font: { weight: 'bold' } }, gridcolor: '#f1f5f9', zerolinecolor: '#cbd5e1', range: [maxDepth, minDepth], dtick: depthDtick },
+                                        zaxis: { title: { text: "Weight (kg)", font: { weight: 'bold' } }, gridcolor: '#f1f5f9', zerolinecolor: '#cbd5e1', range: [0, maxWeight], dtick: weightDtick },
                                         camera: { eye: { x: 1.8, y: 1.8, z: 1.2 } }
                                     },
                                     paper_bgcolor: 'white',

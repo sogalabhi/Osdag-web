@@ -34,7 +34,8 @@ from apps.modules.flexure_member.submodules.plate_girder.adapter import (
 
 logger = logging.getLogger(__name__)
 
-SEND_INTERVAL = 0.25  # 4 FPS max for image streaming (safe for web)
+SEND_INTERVAL = 0.08  # Stream particle batches at ~12 FPS for responsive UI updates.
+MAX_PARTICLES_PER_BATCH = 50  # One full 50-particle swarm per message at most.
 HEARTBEAT_INTERVAL = 2.0  # seconds
 
 
@@ -119,10 +120,9 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
         payload["sequence"] = seq
         update_count += 1
         current_iteration = payload.get("iteration", current_iteration)
-        particles_in_batch += 1
+        particles_in_batch += len(payload.get("particles") or [payload])
         
         try:
-            print(f"DEBUG: Attempting to send update to channel {channel_name}...")
             async_to_sync(channel_layer.send)(
                 channel_name,
                 {
@@ -130,7 +130,6 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
                     "data": _sanitize_for_channels(payload),
                 },
             )
-            print(f"DEBUG: Update sent successfully!")
         except Exception as e:
             print(f"ERROR: Failed to send update to channel: {e}")
             traceback.print_exc()
@@ -202,13 +201,6 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
         # Particle buffer for batch sending
         particle_buffer = []
 
-        def is_over_utilized(value: Any) -> bool:
-            """Return True when a particle has UR > 1 for visualization."""
-            try:
-                return float(value) > 1.0
-            except (TypeError, ValueError):
-                return False
-
         # Progress callback from optimized_method
         def viz_callback(depth, ur, weight_kg, iteration, particle_idx, position, variable_list, lb, ub):
             nonlocal last_send, throttled_count, current_iteration
@@ -233,19 +225,16 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
                 position=position, variables=variable_list, lb=lb, ub=ub
             )
 
-            # Check if this is a new iteration or we've reached the send interval
-            is_new_iteration = (iteration != current_iteration)
-            
             # Add to buffer
             particle_buffer.append(particle_data)
 
             if (
-                is_new_iteration
-                or is_over_utilized(ur)
+                update_count == 0
                 or now - last_send >= SEND_INTERVAL
-                or len(particle_buffer) >= 50
+                or len(particle_buffer) >= MAX_PARTICLES_PER_BATCH
             ):
-                # Send the entire buffer as a list of particles
+                # Send every computed particle, but coalesce them into frame-sized
+                # batches so the browser is not asked to redraw once per particle.
                 if particle_buffer:
                     send_update_event({
                         "iteration": iteration,
@@ -254,8 +243,6 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
                     })
                     particle_buffer.clear()
                     last_send = now
-                
-                if is_new_iteration:
                     current_iteration = iteration
             
             send_heartbeat_if_needed()
