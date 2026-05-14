@@ -1160,7 +1160,7 @@ export const EngineeringModule = ({
             isOpen={docks.input}
           />
         ) : (
-          <div className="fixed left-0 top-0 h-[105vh] w-[40px] flex flex-col items-center justify-center font-bold z-[1000]">
+          <div className="fixed left-0 top-[50%] -translate-y-1/2 h-[105vh] w-[40px] flex flex-col items-center justify-center font-bold z-[1000]">
             <div className="relative flex flex-col items-center w-[30px] py-[10px] gap-[14px]">
               <span className="inline-block rotate-[270deg]"><b>T</b></span>
               <span className="inline-block rotate-[270deg]"><b>U</b></span>
@@ -1184,7 +1184,14 @@ export const EngineeringModule = ({
             {/* TOGGLE HANDLE */}
             <div
               onClick={toggleInputDock}
-              className="absolute right-0 top-[40%] w-[8px] h-[80px] bg-[#6a8f00] flex items-center justify-center cursor-pointer"
+              className="
+                absolute right-0 top-[44%]
+                -translate-y-1/2
+                w-[8px] h-[80px]
+                bg-[#6a8f00]
+                flex items-center justify-center
+                cursor-pointer
+              "
             >
               <span className="text-white text-[14px]">
                 {docks.input ? "❮" : "❯"}
@@ -1319,11 +1326,14 @@ export const EngineeringModule = ({
 
         {/* Right - Output Dock */}
         {docks.output && outputConfig && status.step !== DESIGN_STATUS.ERROR ? (
-          <div className={`
-         fixed inset-0 z-50 h-full pt-[80px] sm:relative sm:inset-auto sm:z-auto sm:h-auto sm:pt-0
-         w-full sm:w-[320px] md:w-[350px] lg:w-[400px]
-         flex flex-col bg-white dark:bg-osdag-dark-color
-        `}>
+          <div
+            className={`
+              fixed inset-0 z-50 h-full pt-[80px]
+              sm:relative sm:inset-auto sm:z-auto sm:h-auto sm:pt-0
+              w-full sm:w-[320px] md:w-[350px] lg:w-[400px]
+              flex flex-col bg-white dark:bg-osdag-dark-color
+            `}
+          >
             <BaseOutputDock
               output={output}
               outputConfig={outputConfig}
@@ -1340,21 +1350,28 @@ export const EngineeringModule = ({
               handleCreateDesignReport={handleCreateDesignReport}
               saveOutput={saveOutput}
             />
-            {/* GREEN STRIP (attached to dock edge) */}
-            <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
-              <div
-                onClick={() => toggleOutputDock(!!output)}
-                className="
-                absolute left-0 top-[40%]
-                w-[8px] h-[80px]
-                bg-[#6a8f00]
-                flex items-center justify-center
-                cursor-pointer
-              "
-              >
-                <span className="text-white text-sm">
-                  ❯
-                </span>
+
+            {/* RIGHT SIDE GREEN STRIP */}
+            <div className="absolute top-0 left-0 h-screen w-[40px] z-[1000]">
+              {/* GREEN LINE */}
+              <div className="absolute left-0 top-0 w-[8px] h-full bg-[#84bd00]">
+                
+                {/* TOGGLE HANDLE */}
+                <div
+                  onClick={() => toggleOutputDock(!!output)}
+                  className="
+                    absolute left-0 top-[44%]
+                    -translate-y-1/2
+                    w-[8px] h-[80px]
+                    bg-[#6a8f00]
+                    flex items-center justify-center
+                    cursor-pointer
+                  "
+                >
+                  <span className="text-white text-[14px]">
+                    ❯
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -1362,33 +1379,39 @@ export const EngineeringModule = ({
           /* COLLAPSED STRIP */
           <div
             className="
-            fixed right-0 top-0 h-screen w-[40px]
-            flex flex-col items-center justify-center
-            z-[10] bg-white
-          "
+              fixed right-0 top-0 h-screen w-[40px]
+              z-[1000]
+            "
           >
-            <div className="relative flex flex-col items-center w-[30px] py-[10px] gap-[14px]">
-              {"OUTPUT".split("").map((ch, i) => (
-                <span key={i} className="rotate-90 font-bold">{ch}</span>
-              ))}
-            </div>
-            {/* GREEN STRIP (collapsed state) */}
-            <div className="absolute left-0 top-0 h-full w-[8px] bg-[#84bd00]">
+            {/* GREEN LINE */}
+            <div className="absolute left-0 top-0 w-[8px] h-full bg-[#84bd00]">
+
+              {/* TOGGLE HANDLE */}
               <div
                 onClick={() => setDocks({ output: true })}
                 className="
-                absolute left-0 top-[40%]
-                w-[8px] h-[80px]
-                bg-[#6a8f00]
-                flex items-center justify-center
-                cursor-pointer
-              "
+                  absolute left-0 top-[44%]
+                  w-[8px] h-[80px]
+                  bg-[#6a8f00]
+                  flex items-center justify-center
+                  cursor-pointer
+                "
               >
-                <span className="text-white text-sm">❮</span>
+                <span className="text-white text-[14px]">
+                  ❮
+                </span>
               </div>
             </div>
-          </div>
 
+            {/* OUTPUT TEXT */}
+            <div className="absolute right-[10px] top-[50%] -translate-y-1/2 flex flex-col items-center gap-[14px]">
+              {"OUTPUT".split("").map((ch, i) => (
+                <span key={i} className="rotate-90 font-bold">
+                  {ch}
+                </span>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
