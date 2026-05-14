@@ -247,7 +247,7 @@ def create_module():
     """Create an instance of the PlateGirderWelded module design class and set it up for use"""
     from osdag_core.design_type.plate_girder.core.plate_girder import PlateGirderWelded
     module = PlateGirderWelded()
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, id="web")
     return module
 
 

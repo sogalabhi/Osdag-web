@@ -212,19 +212,30 @@ export const EngineeringModule = ({
     const non_fease = { x: [], y: [], z: [], text: [] };
     const swarm_fease = { x: [], y: [], z: [], text: [] };
     const swarm_non_fease = { x: [], y: [], z: [], text: [] };
+
+    const asFiniteNumber = (value, fallback = 0) => {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : fallback;
+    };
+
+    const pushParticlePoint = (target, p, prefix = "") => {
+      const ur = asFiniteNumber(p.ur);
+      const depth = asFiniteNumber(p.depth);
+      const weight = asFiniteNumber(p.weight_kg);
+      target.x.push(ur);
+      target.y.push(depth);
+      target.z.push(weight);
+      target.text.push(`${prefix}Iter: ${p.iter}, P: ${p.particle}`);
+    };
     
     // History points (all particles so far)
     (optimizationData.history || []).forEach(p => {
-      if (p.ur <= 1.0) {
-        fease.x.push(p.ur);
-        fease.y.push(p.depth);
-        fease.z.push(p.weight_kg);
-        fease.text.push(`Iter: ${p.iter}, P: ${p.particle}`);
+      const ur = Number(p.ur);
+      if (!Number.isFinite(ur)) return;
+      if (ur <= 1.0) {
+        pushParticlePoint(fease, p);
       } else {
-        non_fease.x.push(p.ur);
-        non_fease.y.push(p.depth);
-        non_fease.z.push(p.weight_kg);
-        non_fease.text.push(`Iter: ${p.iter}, P: ${p.particle}`);
+        pushParticlePoint(non_fease, p);
       }
       // Cleanup graphicOption to allow consecutive clicks of same option
       setInputs(prev => {
@@ -237,16 +248,12 @@ export const EngineeringModule = ({
 
     // Current Swarm (particles in the latest iteration)
     (optimizationData.currentSwarm || []).forEach(p => {
-      if (p.ur <= 1.0) {
-        swarm_fease.x.push(p.ur);
-        swarm_fease.y.push(p.depth);
-        swarm_fease.z.push(p.weight_kg);
-        swarm_fease.text.push(`[LIVE] Iter: ${p.iter}, P: ${p.particle}`);
+      const ur = Number(p.ur);
+      if (!Number.isFinite(ur)) return;
+      if (ur <= 1.0) {
+        pushParticlePoint(swarm_fease, p, "[LIVE] ");
       } else {
-        swarm_non_fease.x.push(p.ur);
-        swarm_non_fease.y.push(p.depth);
-        swarm_non_fease.z.push(p.weight_kg);
-        swarm_non_fease.text.push(`[LIVE] Iter: ${p.iter}, P: ${p.particle}`);
+        pushParticlePoint(swarm_non_fease, p, "[LIVE] ");
       }
     });
 
@@ -553,10 +560,14 @@ export const EngineeringModule = ({
                           varsDict[name] = (values || [])[idx];
                         });
 
+                        const ur = Number(p.ur);
+                        const weightKg = Number(p.weight_kg);
+                        const depth = Number(varsDict['D'] || p.depth);
+                        if (!Number.isFinite(ur)) return;
                         const particleData = {
-                          ur: p.ur,
-                          weight_kg: p.weight_kg,
-                          depth: varsDict['D'] || p.depth,
+                          ur,
+                          weight_kg: Number.isFinite(weightKg) ? weightKg : 0,
+                          depth: Number.isFinite(depth) ? depth : 0,
                           tw: varsDict['tw'],
                           tf: varsDict['tf'] || varsDict['tf_top'],
                           bf: varsDict['bf'] || varsDict['bf_top'],
