@@ -42,9 +42,14 @@ HEARTBEAT_INTERVAL = 2.0  # seconds
 
 @contextmanager
 def _suppress_core_stdout():
-    """Prevent verbose core PSO print() debug output from blocking realtime streaming."""
-    with open(os.devnull, "w") as devnull, redirect_stdout(devnull):
-        yield
+    """Prevent verbose core PSO print/log output from blocking realtime streaming."""
+    previous_disable_level = logging.root.manager.disable
+    logging.disable(logging.WARNING)
+    try:
+        with open(os.devnull, "w") as devnull, redirect_stdout(devnull):
+            yield
+    finally:
+        logging.disable(previous_disable_level)
 
 
 def _to_output_dict(raw_output: List[List[Any]]) -> Dict[str, Dict[str, Any]]:

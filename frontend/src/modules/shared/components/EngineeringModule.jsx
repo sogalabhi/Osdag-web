@@ -46,6 +46,9 @@ import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 import OptimizationGraph from "./OptimizationGraph";
 import PSODashboard from "../../flexuralMember/plateGirder/components/PSODashboard";
 
+const PSO_PLAYBACK_INTERVAL_MS = 80;
+const PSO_PARTICLES_PER_TICK = 50;
+
 export const EngineeringModule = ({
   moduleConfig,
   outputConfig,
@@ -201,6 +204,10 @@ export const EngineeringModule = ({
     currentSwarm: [],
     globalBest: null
   });
+  const psoParticleQueueRef = useRef([]);
+  const psoPlaybackTimerRef = useRef(null);
+  const psoPendingCompleteRef = useRef(null);
+
   const applyPsoParticles = (particlesWithParent) => {
     if (!Array.isArray(particlesWithParent) || !particlesWithParent.length) return;
     setOptimizationData((prev) => {
@@ -275,6 +282,100 @@ export const EngineeringModule = ({
       };
     });
   };
+
+  const completePsoOptimization = (messageData, socket) => {
+    setOptimizationDone(true);
+    if (socket?.readyState === WebSocket.OPEN || socket?.readyState === WebSocket.CONNECTING) {
+      socket.close();
+    }
+
+    if (messageData.result) {
+      const result = messageData.result;
+
+      if (result.design) {
+        const formattedOutput = {};
+        for (const [key, value] of Object.entries(result.design)) {
+          const label = value?.label ?? key;
+          const val = value?.val ?? value?.value ?? value;
+          if (val !== undefined && val !== null) {
+            formattedOutput[key] = { label, val };
+          }
+        }
+
+        setStatus({
+          step: DESIGN_STATUS.COMPLETE,
+          message: 'Optimization complete',
+          error: null
+        });
+
+        setOptimizationData((prev) => {
+          const preserved = {
+            current_iter: prev.current_iter || 0,
+            variableNames: prev.variableNames || [],
+            bounds: prev.bounds || { lb: [], ub: [] },
+            history: prev.history || [],
+            currentSwarm: prev.currentSwarm || [],
+            globalBest: prev.globalBest || null,
+            finalResult: result.design,
+            finalLogs: result.raw || []
+          };
+          console.log('[PSO_COMPLETE] Preserving optimization data:', {
+            historyCount: preserved.history.length,
+            currentSwarmCount: preserved.currentSwarm.length,
+            hasGlobalBest: !!preserved.globalBest,
+            currentIter: preserved.current_iter
+          });
+          return preserved;
+        });
+      }
+    }
+  };
+
+  const stopPsoPlayback = () => {
+    if (psoPlaybackTimerRef.current) {
+      clearInterval(psoPlaybackTimerRef.current);
+      psoPlaybackTimerRef.current = null;
+    }
+  };
+
+  const resetPsoPlayback = () => {
+    stopPsoPlayback();
+    psoParticleQueueRef.current = [];
+    psoPendingCompleteRef.current = null;
+  };
+
+  const drainPsoParticleQueue = () => {
+    const queue = psoParticleQueueRef.current;
+    if (!queue.length) {
+      stopPsoPlayback();
+      if (psoPendingCompleteRef.current) {
+        const { messageData, socket } = psoPendingCompleteRef.current;
+        psoPendingCompleteRef.current = null;
+        completePsoOptimization(messageData, socket);
+      }
+      return;
+    }
+
+    const nextParticles = queue.splice(0, PSO_PARTICLES_PER_TICK);
+    applyPsoParticles(nextParticles);
+  };
+
+  const startPsoPlayback = () => {
+    if (psoPlaybackTimerRef.current) return;
+    psoPlaybackTimerRef.current = setInterval(drainPsoParticleQueue, PSO_PLAYBACK_INTERVAL_MS);
+  };
+
+  const enqueuePsoParticles = (particlesWithParent) => {
+    if (!Array.isArray(particlesWithParent) || !particlesWithParent.length) return;
+    psoParticleQueueRef.current.push(...particlesWithParent);
+    startPsoPlayback();
+  };
+
+  useEffect(() => {
+    return () => {
+      stopPsoPlayback();
+    };
+  }, []);
 
   const [customBgColor, setCustomBgColor] = useState(null);
   const colorPickerRef = useRef(null);
@@ -610,6 +711,7 @@ export const EngineeringModule = ({
         service.getRTUpdates("ws/optimize/plate-girder/",
           (ev) => {
             setIsWsConnected(true);
+            resetPsoPlayback();
             const ws = ev.target
             ws.send(JSON.stringify({
               type: "start_optimization",
@@ -647,7 +749,7 @@ export const EngineeringModule = ({
                       : [messageData];
                     const particles = rawParticles.filter(Boolean);
 
-                    applyPsoParticles(
+                    enqueuePsoParticles(
                       particles.map((particle) => ({
                         particle,
                         parentData: messageData
@@ -659,64 +761,15 @@ export const EngineeringModule = ({
                     // update liveness indicator
                     break;
                   case "pso_complete":
-                    setOptimizationDone(true);
-                    event.target.close(); // close the connection
-
-                    // Extract final design results from WebSocket message
-                    if (messageData.result) {
-                      const result = messageData.result;
-
-                      // Update output with final design results
-                      // The result.design contains the formatted output from backend
-                      // Format it similar to regular API response
-                      if (result.design) {
-                        const formattedOutput = {};
-                        for (const [key, value] of Object.entries(result.design)) {
-                          const label = value?.label ?? key;
-                          const val = value?.val ?? value?.value ?? value;
-                          if (val !== undefined && val !== null) {
-                            formattedOutput[key] = { label, val };
-                          }
-                        }
-
-                        // Note: Output and logs will be set via the hook's internal state
-                        // For now, we'll trigger a re-fetch or use the data directly
-                        // The optimization graph will show the final result
-
-                        // Update status to complete
-                        setStatus({
-                          step: DESIGN_STATUS.COMPLETE,
-                          message: 'Optimization complete',
-                          error: null
-                        });
-
-                        // Store final result for later use (can be accessed via optimizationData)
-                        // CRITICAL: Preserve all existing data (history, currentSwarm, globalBest, etc.)
-                        setOptimizationData((prev) => {
-                          // Ensure we preserve all existing data
-                          const preserved = {
-                            current_iter: prev.current_iter || 0,
-                            variableNames: prev.variableNames || [],
-                            bounds: prev.bounds || { lb: [], ub: [] },
-                            history: prev.history || [],
-                            currentSwarm: prev.currentSwarm || [],
-                            globalBest: prev.globalBest || null,
-                            finalResult: result.design,
-                            finalLogs: result.raw || []
-                          };
-                          console.log('[PSO_COMPLETE] Preserving optimization data:', {
-                            historyCount: preserved.history.length,
-                            currentSwarmCount: preserved.currentSwarm.length,
-                            hasGlobalBest: !!preserved.globalBest,
-                            currentIter: preserved.current_iter
-                          });
-                          return preserved;
-                        });
-                      }
+                    if (psoParticleQueueRef.current.length) {
+                      psoPendingCompleteRef.current = { messageData, socket: event.target };
+                    } else {
+                      completePsoOptimization(messageData, event.target);
                     }
                     break;
                   case "pso_error":
                     console.error("PSO optimization error:", messageData);
+                    resetPsoPlayback();
                     event.target.close(); // close the connection
                     // show error; stop loading
                     break;
@@ -724,6 +777,17 @@ export const EngineeringModule = ({
               }
             } catch (error) {
               console.error("[PSO] WebSocket message handling failed:", error);
+            }
+          },
+          (error) => {
+            console.error("[PSO] WebSocket Error:", error);
+            setIsWsConnected(false);
+          },
+          () => {
+            console.log("[PSO] WebSocket Disconnected");
+            setIsWsConnected(false);
+            if (!psoParticleQueueRef.current.length && !psoPendingCompleteRef.current) {
+              setOptimizationDone(true);
             }
           }
         )
