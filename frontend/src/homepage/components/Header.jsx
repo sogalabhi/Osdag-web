@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
 import yaml from 'js-yaml';
 import { useNavigate } from 'react-router-dom';
-import { MODULE_ROUTES, MODULE_NAME_TO_KEY } from '../../constants/modules';
+import { MODULE_ROUTES, MODULE_NAME_TO_KEY, CONNECTIONS_TAB_CONTENT, GENERIC_SUBMODULE_CONTENT } from '../../constants/modules';
+import { apiClient } from '../../utils/apiClient';
 import { isGuestUser } from '../../utils/auth';
 import { useAuth } from '../../hooks/useAuth';
 import dayButton from '../../assets/homepage/day_button.svg';
@@ -61,55 +62,78 @@ const Header = ({ setshowSideBar, active }) => {
     navigate('/');
   };
 
-  // Mock data for search
-  const searchData = {
-    modules: [
-      // Connection modules
-      { name: 'Connection', type: 'Shear Connection - Endplate', date: '' },
-      { name: 'Connection', type: 'Shear Connection - Cleat Angle', date: '' },
-      { name: 'Connection', type: 'Shear Connection - Fin Plate', date: '' },
-      { name: 'Connection', type: 'Shear Connection - Single Plate', date: '' },
-      { name: 'Connection', type: 'Moment Connection - Endplate', date: '' },
-      { name: 'Connection', type: 'Moment Connection - Flange Plate', date: '' },
-      { name: 'Connection', type: 'Moment Connection - Haunched', date: '' },
-      { name: 'Connection', type: 'Base Plate Connection', date: '' },
+  const [projects, setProjects] = useState([]);
+  const [modulesList, setModulesList] = useState([]);
 
-      // Cleat Angle submodules
-      { name: 'Cleat Angle', type: 'Single Angle Cleat', date: '' },
-      { name: 'Cleat Angle', type: 'Double Angle Cleat', date: '' },
+  useEffect(() => {
+    const dynamicModules = [];
+    const extractModules = (contentObj, categoryName) => {
+      Object.entries(contentObj).forEach(([key, sections]) => {
+        sections.forEach(section => {
+          section.options.forEach(opt => {
+            dynamicModules.push({
+              name: section.label || categoryName,
+              type: opt.label,
+              routeKey: opt.key,
+              date: ''
+            });
+          });
+        });
+      });
+    };
+    extractModules(CONNECTIONS_TAB_CONTENT, 'Connection');
+    extractModules(GENERIC_SUBMODULE_CONTENT, 'Generic Member');
+    setModulesList(dynamicModules);
+  }, []);
 
-      // Tension Member submodules
-      { name: 'Tension Member', type: 'Bolted Tension Member', date: '' },
-      { name: 'Tension Member', type: 'Welded Tension Member', date: '' },
+  useEffect(() => {
+    if (isGuest || !searchQuery.trim()) {
+      setProjects([]);
+      return;
+    }
 
-      // Compression Member submodules
-      { name: 'Compression Member', type: 'Column Design', date: '' },
-      { name: 'Compression Member', type: 'Built-up Column', date: '' },
-    ],
-    projects: [
-      { name: 'Cleat Angle', type: 'ProjectA_R01_MB350-MB400_CleatAngle', date: '' },
-      { name: 'Connection Project', type: 'ProjectB_R01_MB300-MB350_Connection', date: '' },
-      { name: 'Steel Frame', type: 'ProjectC_R01_MB400-MB450_Frame', date: '' },
-    ]
-  };
+    const fetchProjects = async () => {
+      try {
+        const res = await apiClient(`api/projects/?q=${encodeURIComponent(searchQuery)}`, { method: 'GET' });
+        const data = await res.json();
+        if (data.success) {
+          const formatted = data.projects.map(p => {
+            const moduleName = p.submodule || p.module;
+            let routeKey = moduleName;
+            if (!MODULE_ROUTES[routeKey]) {
+              routeKey = MODULE_NAME_TO_KEY[moduleName] || moduleName;
+            }
+            return {
+              id: p.id,
+              name: p.name,
+              type: p.module || p.submodule || 'Project',
+              routeKey: routeKey,
+              date: new Date(p.updated_at).toLocaleDateString()
+            };
+          });
+          setProjects(formatted);
+        }
+      } catch (error) {
+        console.error("Failed to search projects:", error);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchProjects, 300);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, isGuest]);
 
   // Filter search results
   const getSearchResults = () => {
     if (!searchQuery.trim()) return { modules: [], projects: [] };
 
     const query = searchQuery.toLowerCase();
-    const filteredModules = searchData.modules.filter(item =>
+    const filteredModules = modulesList.filter(item =>
       item.name.toLowerCase().includes(query) ||
       item.type.toLowerCase().includes(query)
     );
 
-    // Don't show projects for guest users
-    const filteredProjects = isGuest ? [] : searchData.projects.filter(item =>
-      item.name.toLowerCase().includes(query) ||
-      item.type.toLowerCase().includes(query)
-    );
 
-    return { modules: filteredModules, projects: filteredProjects };
+    return { modules: filteredModules, projects: projects };
   };
 
   useShortcutLayer({
@@ -419,7 +443,7 @@ const Header = ({ setshowSideBar, active }) => {
                       alt="Info"
                       className="absolute inset-0 w-6 h-6 opacity-100 group-hover:opacity-0 transition-opacity duration-200"
                     />
-                  {/* Hover icon */}
+                    {/* Hover icon */}
                     <img
                       src={infoHover}
                       alt="Info Hover"
@@ -441,9 +465,9 @@ const Header = ({ setshowSideBar, active }) => {
                       }}
                       className="w-full px-4 py-2 hover:bg-osdag-green hover:text-white whitespace-nowrap text-left"
                     >
-                     About Osdag
+                      About Osdag
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         setShowAskQuestion(true);
                         setShowAboutDropdown(false); // close dropdown
@@ -461,7 +485,7 @@ const Header = ({ setshowSideBar, active }) => {
                 <AskQuestion onClose={() => setShowAskQuestion(false)} />
               )}
             </div>
-            
+
             {/* Resources Button with Dropdown */}
             <div className="relative resources-dropdown group ">
               <button
@@ -473,20 +497,20 @@ const Header = ({ setshowSideBar, active }) => {
               >
                 <div className="group flex items-center space-x-2">
                   <div className="relative w-6 h-6">
-                  {/* Default icon */}
-                  <img
-                    src={resourcesDefault}
-                    alt="Resources"
-                    className="w-6 h-6 block group-hover:hidden"
-                  />
+                    {/* Default icon */}
+                    <img
+                      src={resourcesDefault}
+                      alt="Resources"
+                      className="w-6 h-6 block group-hover:hidden"
+                    />
 
-                  {/* Hover icon */}
-                  <img
-                    src={resourcesHover}
-                    alt="Resources Hover"
-                    className="w-6 h-6 hidden group-hover:block"
-                  />
-                </div>
+                    {/* Hover icon */}
+                    <img
+                      src={resourcesHover}
+                      alt="Resources Hover"
+                      className="w-6 h-6 hidden group-hover:block"
+                    />
+                  </div>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
                     Resources
                   </span>
@@ -496,107 +520,107 @@ const Header = ({ setshowSideBar, active }) => {
                 <div className="absolute top-full bg-white dark:bg-black/70 border border-osdag-border dark:border-osdag-green shadow-lg z-20 min-w-64 animate-in fade-in slide-in-from-top-2 duration-200 whitespace-nowrap">
                   <div className="py-2">
                     <ul className="py-1 text-sm text-gray-800">
-                    
-                     <li className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left"
-                      onMouseEnter={() => setActiveSubmenu(null)}
-                     >
-                      Design Examples
-                     </li>
-                     <li className="relative"
-                         onMouseEnter={() => setActiveSubmenu("database")}
-                         onMouseLeave={() => setActiveSubmenu(null)}
-                     >
-                      <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
-                       Databases (IS 808:2021)
-                        <span className="ml-2 text-right">›</span>
-                      </div>
 
-                      {/* Submenu */}
-                      {activeSubmenu === "database" && (
-                       <div className="absolute left-full top-0 ml-1 w-24 bg-white border border-osdag-border shadow-md">
-                        {["Column", "Beam", "Channel", "Angle"].map(item => (
-                          <div
-                            key={item}
-                            onClick={() => handleDownload(item)}
-                            className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left"
-                          >
-                           {item}
-                          </div>
-                        ))}
-                      </div>
-                      )}
-                     </li>
-                     <li className="relative"
-                         onMouseEnter={() => setActiveSubmenu("is4923")}
-                         onMouseLeave={() => setActiveSubmenu(null)}
-                     >
-                      <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
-                       Databases (IS 4923:2017)
-                        <span className="ml-2">›</span>
-                      </div>
-
-                      {/* Submenu */}
-                      {activeSubmenu === "is4923" && (
-                       <div className="absolute left-full top-0 ml-1 w-20 bg-white border border-osdag-border shadow-md">
-                        {["SHS", "RHS"].map(item => (
-                          <div
-                            key={item}
-                            onClick={() => handleDownload(item)}
-                            className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
-                          >
-                           {item}
-                          </div>
-                        ))}
-                       </div>
-                       )}
-                     </li>
-                     <li className="relative"
-                         onMouseEnter={() => setActiveSubmenu("is1161")}
-                         onMouseLeave={() => setActiveSubmenu(null)}
-                     >
-                      <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
-                       Databases (IS 1161:2014)
-                        <span className="ml-2">›</span>
-                      </div>
-
-                      {/* Submenu */}
-                      {activeSubmenu === "is1161" && (
-                       <div className="absolute left-full top-0 ml-1 w-20 bg-white border border-osdag-border shadow-md">
-                        {["CHS"].map(item => (
-                          <div
-                            key={item}
-                            onClick={() => handleDownload(item)}
-                            className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
-                          >
-                           {item}
-                          </div>
-                        ))}
-                       </div>
-                       )}
-                     </li>
-                     <li className="relative"
-                         onMouseEnter={() => setActiveSubmenu("customdb")}
-                         onMouseLeave={() => setActiveSubmenu(null)}
-                     >
-                      <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
-                       Custom Database
-                        <span className="ml-2">›</span>
-                      </div>
-
-                      {/* Submenu */}
-                      {activeSubmenu === "customdb" && (
-                       <div className="absolute left-full top-0 ml-1 w-32 bg-white border border-osdag-border shadow-md">
-                        <div onClick={() => handleDownload("Download xlsx")} className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center">
-                         Download xlsx
+                      <li className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left"
+                        onMouseEnter={() => setActiveSubmenu(null)}
+                      >
+                        Design Examples
+                      </li>
+                      <li className="relative"
+                        onMouseEnter={() => setActiveSubmenu("database")}
+                        onMouseLeave={() => setActiveSubmenu(null)}
+                      >
+                        <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
+                          Databases (IS 808:2021)
+                          <span className="ml-2 text-right">›</span>
                         </div>
-                        <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
-                             onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                        >
-                         Import xlsx
+
+                        {/* Submenu */}
+                        {activeSubmenu === "database" && (
+                          <div className="absolute left-full top-0 ml-1 w-24 bg-white border border-osdag-border shadow-md">
+                            {["Column", "Beam", "Channel", "Angle"].map(item => (
+                              <div
+                                key={item}
+                                onClick={() => handleDownload(item)}
+                                className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left"
+                              >
+                                {item}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </li>
+                      <li className="relative"
+                        onMouseEnter={() => setActiveSubmenu("is4923")}
+                        onMouseLeave={() => setActiveSubmenu(null)}
+                      >
+                        <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
+                          Databases (IS 4923:2017)
+                          <span className="ml-2">›</span>
                         </div>
-                       </div>
-                       )}
-                     </li>
+
+                        {/* Submenu */}
+                        {activeSubmenu === "is4923" && (
+                          <div className="absolute left-full top-0 ml-1 w-20 bg-white border border-osdag-border shadow-md">
+                            {["SHS", "RHS"].map(item => (
+                              <div
+                                key={item}
+                                onClick={() => handleDownload(item)}
+                                className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
+                              >
+                                {item}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </li>
+                      <li className="relative"
+                        onMouseEnter={() => setActiveSubmenu("is1161")}
+                        onMouseLeave={() => setActiveSubmenu(null)}
+                      >
+                        <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
+                          Databases (IS 1161:2014)
+                          <span className="ml-2">›</span>
+                        </div>
+
+                        {/* Submenu */}
+                        {activeSubmenu === "is1161" && (
+                          <div className="absolute left-full top-0 ml-1 w-20 bg-white border border-osdag-border shadow-md">
+                            {["CHS"].map(item => (
+                              <div
+                                key={item}
+                                onClick={() => handleDownload(item)}
+                                className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
+                              >
+                                {item}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </li>
+                      <li className="relative"
+                        onMouseEnter={() => setActiveSubmenu("customdb")}
+                        onMouseLeave={() => setActiveSubmenu(null)}
+                      >
+                        <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-left">
+                          Custom Database
+                          <span className="ml-2">›</span>
+                        </div>
+
+                        {/* Submenu */}
+                        {activeSubmenu === "customdb" && (
+                          <div className="absolute left-full top-0 ml-1 w-32 bg-white border border-osdag-border shadow-md">
+                            <div onClick={() => handleDownload("Download xlsx")} className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center">
+                              Download xlsx
+                            </div>
+                            <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
+                              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                            >
+                              Import xlsx
+                            </div>
+                          </div>
+                        )}
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -607,34 +631,34 @@ const Header = ({ setshowSideBar, active }) => {
               <button className="p-3 text-black dark:text-white hover:text-white dark:hover:text-white bg-white border border-black transition-all duration-300 hover:bg-osdag-green group-hover:px-6">
                 <div className="flex items-center space-x-2">
                   <div className="relative w-6 h-6">
-                  {/* Default icon */}
-                  <img
-                    src={pluginDefault}
-                    alt="Plugin"
-                    className="w-6 h-6 block group-hover:hidden"
-                  />
+                    {/* Default icon */}
+                    <img
+                      src={pluginDefault}
+                      alt="Plugin"
+                      className="w-6 h-6 block group-hover:hidden"
+                    />
 
-                  {/* Hover icon */}
-                  <img
-                    src={pluginHover}
-                    alt="Plugin Hover"
-                    className="w-6 h-6 hidden group-hover:block"
-                  />
-                </div>
+                    {/* Hover icon */}
+                    <img
+                      src={pluginHover}
+                      alt="Plugin Hover"
+                      className="w-6 h-6 hidden group-hover:block"
+                    />
+                  </div>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
                     Plugins
                   </span>
                 </div>
               </button>
               <div
-               className="absolute left-1/2 -translate-x-1/2 top-full mt-2
+                className="absolute left-1/2 -translate-x-1/2 top-full mt-2
                opacity-0 group-hover:opacity-100
                transition-opacity duration-300
                bg-white text-black text-xs px-2 py-1
                border border-gray-300 shadow-sm
                whitespace-nowrap pointer-events-none"
               >
-               Under Development
+                Under Development
               </div>
             </div>
             {/* Documents Button */}
@@ -642,20 +666,20 @@ const Header = ({ setshowSideBar, active }) => {
               <button className="p-3 text-black dark:text-white hover:text-white bg-white border border-black transition-all duration-300 hover:bg-osdag-green group-hover:px-6" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
                 <div className="flex items-center space-x-2">
                   <div className="relative w-6 h-6">
-                  {/* Default icon */}
-                  <img
-                    src={loadDefault}
-                    alt="Load"
-                    className="w-6 h-6 block group-hover:hidden"
-                  />
+                    {/* Default icon */}
+                    <img
+                      src={loadDefault}
+                      alt="Load"
+                      className="w-6 h-6 block group-hover:hidden"
+                    />
 
-                  {/* Hover icon */}
-                  <img
-                    src={loadHover}
-                    alt="Load Hover"
-                    className="w-6 h-6 hidden group-hover:block"
-                  />
-                </div>
+                    {/* Hover icon */}
+                    <img
+                      src={loadHover}
+                      alt="Load Hover"
+                      className="w-6 h-6 hidden group-hover:block"
+                    />
+                  </div>
                   <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 w-0 group-hover:w-auto overflow-hidden whitespace-nowrap">
                     Import
                   </span>
@@ -685,15 +709,15 @@ const Header = ({ setshowSideBar, active }) => {
                   />
                 </div>
               </button>
-                <div
-               className="absolute left-1/2 -translate-x-1/2 top-full mt-2
+              <div
+                className="absolute left-1/2 -translate-x-1/2 top-full mt-2
                opacity-0 group-hover:opacity-100
                transition-opacity duration-300
                bg-white text-black text-xs px-2 py-1
                border border-gray-300 shadow-sm
                whitespace-nowrap pointer-events-none"
               >
-               Under Development
+                Under Development
               </div>
             </div>
           </div>
@@ -804,7 +828,16 @@ const Header = ({ setshowSideBar, active }) => {
                         <h3 className="text-sm font-semibold text-osdag-text-secondary dark:text-gray-400 mb-3">Modules</h3>
                         <div className="space-y-2">
                           {searchResults.modules.map((item, index) => (
-                            <div key={index} className="p-3 hover:bg-osdag-green/5 rounded-xl cursor-pointer transition-colors group">
+                            <div key={index}
+                              onClick={() => {
+                                const route = MODULE_ROUTES[item.routeKey];
+                                if (route) {
+                                  navigate(route);
+                                  setIsSearchFocused(false);
+                                  setSearchQuery('');
+                                }
+                              }}
+                              className="p-3 hover:bg-osdag-green/5 rounded-xl cursor-pointer transition-colors group">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
                                   <div className="w-8 h-8 bg-osdag-green/10 rounded-lg flex items-center justify-center">
@@ -833,7 +866,18 @@ const Header = ({ setshowSideBar, active }) => {
                         <h3 className="text-sm font-semibold text-osdag-text-secondary dark:text-gray-400 mb-3">Projects</h3>
                         <div className="space-y-2">
                           {searchResults.projects.map((item, index) => (
-                            <div key={index} className="p-3 hover:bg-osdag-green/5 rounded-xl cursor-pointer transition-colors group">
+                            <div key={index}
+                              onClick={() => {
+                                const route = MODULE_ROUTES[item.routeKey];
+                                if (route) {
+                                  navigate(`${route}/${item.id}`);
+                                } else {
+                                  navigate(`/home`);
+                                }
+                                setIsSearchFocused(false);
+                                setSearchQuery('');
+                              }}
+                              className="p-3 hover:bg-osdag-green/5 rounded-xl cursor-pointer transition-colors group">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
                                   <div className="w-8 h-8 bg-osdag-green/10 rounded-lg flex items-center justify-center">

@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from apps.core.models import Project
 from apps.core.permissions import IsEmailVerified
 import json
+from django.db.models import Q
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectAPI(APIView):
@@ -27,8 +28,22 @@ class ProjectAPI(APIView):
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
-            # Filter projects by user
-            projects = Project.objects.filter(user_email=user_email).order_by('-updated_at')[:10]
+                
+            search_query = request.GET.get('q', '').strip()
+            projects_query = Project.objects.filter(user_email=user_email)
+            
+            if search_query:
+                projects_query = projects_query.filter(
+                    Q(name__icontains=search_query) | 
+                    Q(module__icontains=search_query) |
+                    Q(submodule__icontains=search_query)
+                )
+                # If searching, we might want to return more than 10
+                projects = projects_query.order_by('-updated_at')[:20]
+            else:
+                # Default recent projects behavior
+                projects = projects_query.order_by('-updated_at')[:10]
+                
             print(f"Found {projects.count()} projects for user {user_email}")
             
             project_list = []
