@@ -158,9 +158,9 @@ export const MODULE_ROUTES = {
     [MODULE_KEY_BOLTED_TO_END_GUSSET]: "/design/tension-member/bolted_to_end_gusset",
     [MODULE_KEY_WELDED_TO_END_GUSSET]: "/design/tension-member/welded_to_end_gusset",
     [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: "/design/connections/column-beam/end_plate",
-    [MODULE_KEY_STRUTS_WELDED]: "/design/compression_member/compression_member/struts_welded_to_end_gusset",
+    [MODULE_KEY_STRUTS_WELDED]: "/design/compression-member/struts_welded_to_end_gusset",
     [MODULE_KEY_STRUTS_BOLTED]: "/design/compression-member/struts_bolted_to_end_gusset",
-    [MODULE_KEY_AXIALLY_LOADED_COLUMN]: "/design/compression_member/compression_member/axially_loaded_column",
+    [MODULE_KEY_AXIALLY_LOADED_COLUMN]: "/design/compression-member/axially_loaded_column",
     // Add other needed routes
 };
 

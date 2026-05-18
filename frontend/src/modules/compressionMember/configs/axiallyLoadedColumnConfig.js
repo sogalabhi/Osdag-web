@@ -5,7 +5,7 @@ import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
 
 export const axiallyLoadedColumnConfig = {
   sessionName: "Axially Loaded Column",
-  routePath: "/design/compression_member/compression_member/axially_loaded_column",
+  routePath: "/design/compression-member/axially_loaded_column",
   designType: MODULE_KEY_AXIALLY_LOADED_COLUMN,
   cameraKey: "AxiallyLoadedColumn",
   cadOptions: ["Model"],

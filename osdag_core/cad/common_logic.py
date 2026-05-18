@@ -2857,13 +2857,23 @@ class CommonDesignLogic(object):
 
         self.component = component
 
+        if self.display is None:
+            return
+
         # Use CleanupCoordinator for centralized cleanup
-        from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
-        coordinator = get_cleanup_coordinator()
-        coordinator.cleanup_for_new_design(self.cad_widget, self.display)
+        try:
+            from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+            coordinator = get_cleanup_coordinator()
+            coordinator.cleanup_for_new_design(self.cad_widget, self.display)
+        except (ImportError, ModuleNotFoundError):
+            pass
 
         # Show Cube
-        self.cad_widget.display_view_cube()
+        if hasattr(self, 'cad_widget') and self.cad_widget is not None:
+            try:
+                self.cad_widget.display_view_cube()
+            except Exception:
+                pass
 
         try:
             self.display.View_Iso()

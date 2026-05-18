@@ -46,6 +46,7 @@ SECTION_MAPPINGS = {
     },
     'compression-member': {
         'struts-bolted': ['Model', 'Member'],
+        'struts-welded': ['Model', 'Member', 'Plate', 'Endplate'],
         'axially-loaded-column': ['Model'],
     },
 }

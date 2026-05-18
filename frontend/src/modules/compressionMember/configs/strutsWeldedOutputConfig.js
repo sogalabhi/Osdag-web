@@ -1,0 +1,43 @@
+export const strutsWeldedOutputConfig = {
+    sections: {
+        "Section Details": [
+            { key: "Optimum.Designation", label: "Designation" },
+            { key: "Optimum.UR", label: "Utilization Ratio" },
+            { key: "Optimum.SectionClassification", label: "Section Classification" },
+            { key: "MajorEffSecArea", label: "Effective Sectional Area (mm²)" },
+            { key: "Major.Effective_Length", label: "Effective Length, KL (mm)" },
+            { key: "ESR", label: "Slenderness Ratio" },
+            { key: "ESRLambdavv", label: "Slenderness Ratio, λ_vv" },
+            { key: "ESRLambdapsi", label: "Slenderness Ratio, λ_psi" },
+            { key: "MajorBucklingStress", label: "Elastic Buckling Stress, f_cc (MPa)" },
+            { key: "BucklingCurve", label: "Buckling Curve Classification" },
+            { key: "ImperfectionFactor", label: "Imperfection Factor, α" },
+            { key: "StressReductionFactor", label: "Stress Reduction Factor, χ" },
+            { key: "NDESR", label: "Non-Dimensional Slenderness Ratio, λ" },
+        ],
+        "Design Compressive Strength": [
+            { key: "MinorDCS", label: "Design Compressive Stress, f_cd (MPa)" },
+            { key: "Design.Strength", label: "Design Compressive Strength, P_d (kN)" },
+        ],
+        "Weld Details": [
+            { key: "Weld.Type", label: "Weld Type" },
+            { key: "Weld.Size", label: "Weld Size (mm)" },
+            { key: "Weld.Strength", label: "Weld Strength (kN/mm)" },
+            { key: "bolt.long_joint", label: "Weld Efficiency Red. Factor" },
+            { key: "Weld.Strength_red", label: "Weld Capacity (kN/mm)" },
+            { key: "Weld.Stress", label: "Weld Stress (MPa)" },
+            { key: "Weld.EffLength", label: "Weld Effective Length (mm)" },
+        ],
+        "Gusset Plate Details": [
+            { key: "Plate.Thickness", label: "Thickness (mm)" },
+            { key: "Plate.Height", label: "Min. Height (mm)" },
+            { key: "Plate.Length", label: "Min. Plate Length (mm)" },
+            { key: "Plate.Yield", label: "Tension Yielding Capacity (kN)" },
+            { key: "Plate.BlockShear", label: "Block Shear Capacity (kN)" },
+            { key: "Plate.Capacity", label: "Plate Capacity (kN)" },
+        ],
+    },
+    modals: {},
+    modalTypes: {},
+    modalData: {},
+};

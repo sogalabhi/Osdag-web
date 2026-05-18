@@ -3,9 +3,9 @@
 
 export const compressionMemberConfig = {
   sessionName: "Compression Member Design",
-  // Must stay in sync with App route `/design/:designType/compression_member/struts_in_trusses/:projectId?`
+  // Must stay in sync with App route `/design/:designType/struts_in_trusses/:projectId?`
   // and MODULE_ROUTES.StrutsInTrusses
-  routePath: "/design/compression_member/compression_member/struts_in_trusses",
+  routePath: "/design/compression-member/struts_in_trusses",
   designType: "Compression-Member-Design",
   cameraKey: "CompressionMember", 
   cadOptions: ["Model", "Member"],

@@ -35,6 +35,7 @@ class CompressionMemberViewSet(viewsets.ViewSet):
         normalized = raw_slug.replace('_', '-').lower()
         module_id_map = {
             'struts-bolted-design': 'struts-bolted',
+            'struts-welded-design': 'struts-welded',
             'compression-member-design': 'struts-bolted',  # Legacy support for old compression-member
             'axially-loaded-column': 'axially-loaded-column',
             'axially_loaded_column': 'axially-loaded-column',
@@ -180,6 +181,26 @@ class CompressionMemberViewSet(viewsets.ViewSet):
                     status=status.HTTP_200_OK,
                 )
 
+            if slug == 'struts-welded':
+                data = {
+                    'materialList': material_list(),
+                    'connectorMaterialList': material_list(),
+                    'sectionProfileList': section_profiles,
+                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
+                    'channelList': list(Channels.objects.values_list('Designation', flat=True)),
+                    'thicknessList': thickness_list,
+                    'designMethodList': design_method_list,
+                    'edgeTypeList': edge_type_list,
+                    'corrosiveInfluencesList': corrosive_influences_list,
+                    'endConditionList': end_condition_list,
+                    'loadTypeList': load_type_list,
+                    'connLocationList': conn_location_list,
+                }
+                return Response(
+                    merge_user_sections_into_options(request, data),
+                    status=status.HTTP_200_OK,
+                )
+
             if slug == 'axially-loaded-column':
                 section_profile_list = [
                     "Beams and Columns",
@@ -276,8 +297,11 @@ class CompressionMemberViewSet(viewsets.ViewSet):
             # Import adapter to get create_from_input function for hover_dict
             create_from_input_func = None
             try:
-                if normalized_slug == 'struts_bolted':
+                if normalized_slug in ('struts-bolted', 'struts_bolted'):
                     from .submodules.struts_bolted.adapter import create_from_input
+                    create_from_input_func = create_from_input
+                elif normalized_slug in ('struts-welded', 'struts_welded'):
+                    from .submodules.struts_welded.adapter import create_from_input
                     create_from_input_func = create_from_input
                 elif normalized_slug == 'axially-loaded-column':
                     from .submodules.axially_loaded_column.adapter import create_from_input
@@ -285,7 +309,6 @@ class CompressionMemberViewSet(viewsets.ViewSet):
             except ImportError as e:
                 print(f"[CompressionMemberViewSet] Could not import create_from_input for {normalized_slug}: {e}")
             
-            # Generate CAD models
             result = generate_cad_models(
                 service_class=ServiceClass,
                 inputs=inputs,

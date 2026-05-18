@@ -10,7 +10,7 @@ import {
 import SectionCards from "./SectionCards";
 
 const TabbedModulePage = () => {
-  const moduleName = window.location.pathname.split("/")[1];
+  const moduleName = window.location.pathname.split("/")[1] || "";
   const navigate = useNavigate();
 
   const submodules = MODULE_SUBMODULES[moduleName] || [];

@@ -1,9 +1,9 @@
 """
-Struts Bolted to End Gusset - Design Adapter
-Implements the business logic for compression member bolted design
+Struts Welded to End Gusset - Design Adapter
+Implements the business logic for compression member welded design
 """
 # Module identifier for CommonDesignLogic (used for CAD generation)
-KEY_DISP_STRUT_BOLTED_END_GUSSET = "Struts Bolted to End Gusset"
+KEY_DISP_STRUT_WELDED_END_GUSSET = "Struts Welded to End Gusset"
 
 from apps.core.utils import (
     validate_arr, validate_num, validate_string,
@@ -18,7 +18,7 @@ from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
 from osdag_core.cad.common_logic import CommonDesignLogic
-from osdag_core.design_type.compression_member.compression_bolted import Compression_bolted
+from osdag_core.design_type.compression_member.compression_welded import Compression_welded
 import sys
 import os
 import typing
@@ -39,16 +39,8 @@ def get_required_keys() -> List[str]:
         "Material",                 # KEY_MATERIAL
         "Member.Material",          # KEY_SEC_MATERIAL
         "Connector.Plate.Thickness_List",  # KEY_PLATETHK
-        "Bolt.Diameter",            # KEY_D
-        "Bolt.Grade",               # KEY_GRD
-        "Bolt.Type",                # KEY_TYP
-        "Bolt.Bolt_Hole_Type",      # KEY_DP_BOLT_HOLE_TYPE
-        "Bolt.Slip_Factor",         # KEY_DP_BOLT_SLIP_FACTOR
         "Connector.Material",       # KEY_CONNECTOR_MATERIAL
         "Design.Design_Method",     # KEY_DP_DESIGN_METHOD
-        "Detailing.Corrosive_Influences",  # KEY_DP_DETAILING_CORROSIVE_INFLUENCES
-        "Detailing.Edge_type",      # KEY_DP_DETAILING_EDGE_TYPE
-        "Detailing.Gap",            # KEY_DP_DETAILING_GAP
         "Load.Axial",               # KEY_AXIAL
         "Member.Length",            # KEY_LENGTH
         "Conn_Location",            # KEY_LOCATION
@@ -65,34 +57,6 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     if missing_keys is not None:
         raise MissingKeyError(missing_keys[0])
 
-    # Validate Bolt.Bolt_Hole_Type
-    if not isinstance(input_values["Bolt.Bolt_Hole_Type"], str):
-        raise InvalidInputTypeError("Bolt.Bolt_Hole_Type", "str")
-
-    # Validate Bolt.Diameter
-    bolt_diameter = input_values["Bolt.Diameter"]
-    if (not isinstance(bolt_diameter, list)
-            or not validate_list_type(bolt_diameter, str)
-            or not custom_list_validation(bolt_diameter, int_able)):
-        raise InvalidInputTypeError("Bolt.Diameter", "non empty List[str] where all items can be converted to int")
-
-    # Validate Bolt.Grade
-    bolt_grade = input_values["Bolt.Grade"]
-    if (not isinstance(bolt_grade, list)
-            or not validate_list_type(bolt_grade, str)
-            or not custom_list_validation(bolt_grade, float_able)):
-        raise InvalidInputTypeError("Bolt.Grade", "non empty List[str] where all items can be converted to float")
-
-    # Validate Bolt.Slip_Factor
-    bolt_slipfactor = input_values["Bolt.Slip_Factor"]
-    if (not isinstance(bolt_slipfactor, str)
-            or not float_able(bolt_slipfactor)):
-        raise InvalidInputTypeError("Bolt.Slip_Factor", "str where str can be converted to float")
-
-    # Validate Bolt.Type
-    if not isinstance(input_values["Bolt.Type"], str):
-        raise InvalidInputTypeError("Bolt.Type", "str")
-
     # Validate Connector.Material
     if not isinstance(input_values["Connector.Material"], str):
         raise InvalidInputTypeError("Connector.Material", "str")
@@ -100,20 +64,6 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     # Validate Design.Design_Method
     if not isinstance(input_values["Design.Design_Method"], str):
         raise InvalidInputTypeError("Design.Design_Method", "str")
-
-    # Validate Detailing.Corrosive_Influences
-    if not is_yes_or_no(input_values["Detailing.Corrosive_Influences"]):
-        raise InvalidInputTypeError("Detailing.Corrosive_Influences", "'Yes' or 'No'")
-
-    # Validate Detailing.Edge_type
-    if not isinstance(input_values["Detailing.Edge_type"], str):
-        raise InvalidInputTypeError("Detailing.Edge_type", "str")
-
-    # Validate Detailing.Gap
-    detailing_gap = input_values["Detailing.Gap"]
-    if (not isinstance(detailing_gap, str)
-            or not int_able(detailing_gap)):
-        raise InvalidInputTypeError("Detailing.Gap", "str where str can be converted to int")
 
     # Validate Load.Axial
     load_axial = input_values["Load.Axial"]
@@ -129,7 +79,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     if not isinstance(input_values["Member.Profile"], str):
         raise InvalidInputTypeError("Member.Profile", "str")
 
-    # Validate Member.Designation — osdag_core expects KEY_SECSIZE as a list of section designations
+    # Validate Member.Designation
     member_designation = input_values.get("Member.Designation")
     if isinstance(member_designation, list):
         if not validate_list_type(member_designation, str):
@@ -173,21 +123,24 @@ def validate_input(input_values: Dict[str, Any]) -> None:
         raise InvalidInputTypeError("Connector.Plate.Thickness_List", "List[str] where all items can be converted to int")
 
 
-def create_module() -> Compression_bolted:
-    """Create an instance of the Compression_bolted module design class and set it up for use"""
-    module = Compression_bolted()
+def create_module() -> Compression_welded:
+    """Create an instance of the Compression_welded module design class and set it up for use"""
+    module = Compression_welded()
     module.set_osdaglogger(None, id="web")
     return module
 
 
-def create_from_input(input_values: Dict[str, Any]) -> Compression_bolted:
-    """Create an instance of the Compression_bolted module design class from input values."""
+def create_from_input(input_values: Dict[str, Any]) -> Compression_welded:
+    """Create an instance of the Compression_welded module design class from input values."""
     module = create_module()
-    # Plate.Thickness expects a list, take the first value if present, else ""
+    
+    # Map 'Connector.Plate.Thickness_List' list to a single float-able thickness for set_input_values
     if isinstance(input_values.get("Connector.Plate.Thickness_List", None), list) and input_values["Connector.Plate.Thickness_List"]:
-        input_values["Plate.Thickness"] = input_values["Connector.Plate.Thickness_List"][0]
+        input_values["Connector.Plate.Thickness_List"] = input_values["Connector.Plate.Thickness_List"][0]
+    elif isinstance(input_values.get("Connector.Plate.Thickness_List", None), str):
+        pass
     else:
-        input_values["Plate.Thickness"] = ""
+        input_values["Connector.Plate.Thickness_List"] = "8.0"
 
     # Core assigns self.sizelist = design_dictionary[KEY_SECSIZE]; must be a list of designation strings
     md = input_values.get("Member.Designation")
@@ -198,6 +151,32 @@ def create_from_input(input_values: Dict[str, Any]) -> Compression_bolted:
             str(x).strip() for x in md if x is not None and str(x).strip() != ""
         ]
     
+    # Map frontend/required keys to core expected keys (End_1 and End_2 are required by brackets)
+    input_values["End_1"] = input_values.get("Member.End_1", "Fixed")
+    input_values["End_2"] = input_values.get("Member.End_2", "Fixed")
+    
+    # Set default values for design preferences if they are not already set
+    if "Optimum.AllowUR" not in input_values:
+        input_values["Optimum.AllowUR"] = "1.0"
+    if "Effective.Area_Para" not in input_values:
+        input_values["Effective.Area_Para"] = "1.0"
+    if " Out_of_Plane" not in input_values:
+        input_values[" Out_of_Plane"] = "1.0"
+    if " In_Plane" not in input_values:
+        input_values[" In_Plane"] = "1.0"
+    if "Load.Type" not in input_values:
+        input_values["Load.Type"] = "Concentric Load"
+    if "Bolt.Number" not in input_values:
+        input_values["Bolt.Number"] = "1.0"
+    if "Design.Design_Method" not in input_values:
+        input_values["Design.Design_Method"] = "Limit State Design"
+    
+    # Weld fabrication/grade defaults
+    if "Weld.Fab" not in input_values:
+        input_values["Weld.Fab"] = "Shop Weld"
+    if "Weld.Material_Grade_OverWrite" not in input_values:
+        input_values["Weld.Material_Grade_OverWrite"] = ""
+
     module.set_input_values(input_values)
     return module
 
@@ -247,7 +226,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     
     # Object that will create the CAD model.
     try: 
-        cld = CommonDesignLogic(None, None, '', KEY_DISP_STRUT_BOLTED_END_GUSSET, module.mainmodule)
+        cld = CommonDesignLogic(None, None, '', KEY_DISP_STRUT_WELDED_END_GUSSET, module.mainmodule)
     except Exception as e: 
         print('error in cld e : ', e)
         raise

@@ -32,7 +32,7 @@ export const BaseOutputDock = React.memo(({
 
   // Shared dialog handler
   const handleDialog = (key) => {
-    const modalConfig = outputConfig.modals[key];
+    const modalConfig = outputConfig.modals?.[key];
     if (modalConfig) {
       openModal(modalConfig.type, key);
     }
@@ -167,7 +167,7 @@ export const BaseOutputDock = React.memo(({
 
   // Shared field renderer
   const renderField = (field, index) => {
-    const isModalTrigger = field.key in outputConfig.modals;
+    const isModalTrigger = outputConfig.modals && (field.key in outputConfig.modals);
     const fieldValue = getOutputValue(field.key, output);
 
     return (
@@ -240,7 +240,7 @@ export const BaseOutputDock = React.memo(({
       </div>
 
       {/* Dynamic Modal Rendering */}
-      {Object.entries(outputConfig.modalTypes).map(([modalType, config]) => (
+      {Object.entries(outputConfig.modalTypes || {}).map(([modalType, config]) => (
         <Modal
           key={modalType}
           open={activeModals[modalType]}

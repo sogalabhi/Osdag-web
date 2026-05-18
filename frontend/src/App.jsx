@@ -38,6 +38,7 @@ import WeldedToEnd from "./modules/TensionMembers/WeldedToEnd/WeldedToEnd";
 // Compression members modules
 import CompressionMember from "./modules/compressionMember/CompressionMember";
 import StrutsBolted from "./modules/compressionMember/StrutsBolted";
+import StrutsWelded from "./modules/compressionMember/StrutsWelded";
 import AxiallyLoadedColumn from "./modules/compressionMember/AxiallyLoadedColumn";
 
 // Beam modules
@@ -58,11 +59,13 @@ import "./App.css";
 import BeamToColumnEndPlate from "./modules/beamToColumnEndPlate/BeamToColumnEndPlate";
 import ShortcutHelpModal from "./components/ShortcutHelpModal";
 
+import ErrorPage from "./components/ErrorPage";
+
 function App() {
   let loggedIn = false;
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="/" element={<Root loggedIn={loggedIn} />}>
+      <Route path="/" element={<Root loggedIn={loggedIn} />} errorElement={<ErrorPage />}>
         {/* Root and home routes */}
         <Route path="/" element={<LoginPage />} />
         <Route path="/home" element={<Homepage />} />
@@ -89,10 +92,18 @@ function App() {
         <Route path="/design/:designType/purlin/:projectId?" element={<Purlin />} />
         <Route path="/design/:designType/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
         <Route path="/design/:designType/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
+        <Route path="/design/:designType/tension-member/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
+        <Route path="/design/:designType/tension-member/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
+        <Route path="/design/:designType/tension_member/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
+        <Route path="/design/:designType/tension_member/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
+
         <Route path="/design/:designType/column-beam/:projectId?" element={<BeamToColumnEndPlate />} />
-        <Route path="/design/:designType/compression_member/struts_in_trusses/:projectId?" element={<CompressionMember />} />
+
+        {/* Compression Members */}
+        <Route path="/design/:designType/struts_in_trusses/:projectId?" element={<CompressionMember />} />
         <Route path="/design/:designType/struts_bolted_to_end_gusset/:projectId?" element={<StrutsBolted />} />
-        <Route path="/design/:designType/compression_member/axially_loaded_column/:projectId?" element={<AxiallyLoadedColumn />} />
+        <Route path="/design/:designType/struts_welded_to_end_gusset/:projectId?" element={<StrutsWelded />} />
+        <Route path="/design/:designType/axially_loaded_column/:projectId?" element={<AxiallyLoadedColumn />} />
       </Route>
     )
   );
