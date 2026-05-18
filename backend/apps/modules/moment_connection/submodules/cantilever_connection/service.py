@@ -2,7 +2,7 @@
 Fin Plate Service - Business logic layer
 Bridges between API and osdag_core
 """
-from osdag_core.design_type.connection.cantilever_connection import CantileverConnection
+from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Cantilever as CantileverConnection
 from .adapter import validate_input, generate_output, create_cad_model
 import traceback
 

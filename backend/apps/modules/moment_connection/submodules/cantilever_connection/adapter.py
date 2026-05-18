@@ -40,7 +40,7 @@ from OCC.Core.IGESControl import IGESControl_Writer
 # from OCC.Core.TopoDS import TopoDS_Solid, TopoDS_Shell
 from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
-from osdag_core.design_type.connection.cantilever_connection import CantileverConnection
+from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Cantilever as CantileverConnection
 from osdag_core.Common import KEY_DISP_Cantilever, KEY_CONN
 from osdag_core.custom_logger import CustomLogger
 import sys
