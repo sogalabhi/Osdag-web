@@ -237,10 +237,8 @@ export const useModuleForm = (moduleConfig, moduleData) => {
   };
 
   const resetFormState = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const hasProjectId = urlParams.get('projectId') != null || window.location.pathname.match(/\/\d+$/);
-    const resolvedInputs = hasProjectId ? {} : moduleConfig.defaultInputs;
-    console.log(`[useModuleForm] resetFormState: hasProjectId=${hasProjectId}, setting inputs to`, resolvedInputs);
+    const resolvedInputs = moduleConfig.defaultInputs || {};
+    console.log('[useModuleForm] resetFormState: setting inputs to config defaults', resolvedInputs);
     setInputs(resolvedInputs);
     setExtraState(resolveInitialExtraState());
     setSelectionStates(

@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import MainContent from "../components/MainContent";
 import { EmailVerificationBanner } from '../components/EmailVerificationBanner';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext';
 import mosLogo from '../../assets/homepage/mos_logo.png';
 import constructSteelLogo from '../../assets/homepage/constructsteel_logo.png';
 import moeLogo from '../../assets/homepage/moe_logo.png';

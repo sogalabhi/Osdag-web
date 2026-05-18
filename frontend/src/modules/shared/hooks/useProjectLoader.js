@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { message } from "antd";
-import { isGuestUser } from "../../../utils/auth";
+import { useAuth } from "../../../context/AuthContext";
 
 export const useProjectLoader = ({
   projectIdFromUrl,
@@ -18,19 +18,28 @@ export const useProjectLoader = ({
   setShowOptionsContainer,
   setIsInputLocked,
   designCompletedRef,
+  resetFormState,
 }) => {
   const lastLoadedProjectIdRef = useRef(null);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (isGuestUser()) {
-      console.info('[EngineeringModule] Guest mode detected: skipping project loading');
+    // 1. Wait until Firebase Auth state is fully initialized.
+    if (loading) return;
+
+    const projectId = projectIdFromUrl;
+    
+    // 2. If there is no project ID in the URL, reset the form for BOTH guests and authenticated users.
+    if (!projectId || Number.isNaN(projectId)) {
+      console.info('[EngineeringModule] No project ID in URL: resetting form to defaults');
+      resetFormState();
+      lastLoadedProjectIdRef.current = null;
       return;
     }
 
-    const projectId = projectIdFromUrl;
-    if (!projectId || Number.isNaN(projectId)) {
-      console.info('[EngineeringModule] No project ID in URL: user can work without project');
-      lastLoadedProjectIdRef.current = null;
+    // 3. If there is a project ID in the URL but no authenticated user, skip loading (the Route Guard will redirect).
+    if (!user) {
+      console.info('[EngineeringModule] Guest mode detected with project ID: skipping project loading');
       return;
     }
 
@@ -69,10 +78,18 @@ export const useProjectLoader = ({
               typeof savedInputs === "object" &&
               Object.prototype.hasOwnProperty.call(savedInputs, "dock")
             ) {
-              setInputs(savedInputs.dock || {});
+              setInputs((prev) => ({
+                ...(moduleConfig?.defaultInputs || {}),
+                ...(prev || {}),
+                ...(savedInputs.dock || {}),
+              }));
               setDesignPrefOverrides(savedInputs.pref || {});
             } else {
-              setInputs(savedInputs || {});
+              setInputs((prev) => ({
+                ...(moduleConfig?.defaultInputs || {}),
+                ...(prev || {}),
+                ...(savedInputs || {}),
+              }));
               setDesignPrefOverrides({});
             }
           } catch (err) {
@@ -112,5 +129,5 @@ export const useProjectLoader = ({
     return () => {
       abortController.abort();
     };
-  }, [projectIdFromUrl, service, moduleConfig, navigate, location.pathname, location.search, setInputs, setDesignPrefOverrides, loadSavedOutputs, resetModuleState, clearDesignResults, resetDocks, setIsDesignComplete, setShowOptionsContainer, setIsInputLocked, designCompletedRef]);
+  }, [projectIdFromUrl, service, moduleConfig, navigate, location.pathname, location.search, setInputs, setDesignPrefOverrides, loadSavedOutputs, resetModuleState, clearDesignResults, resetDocks, setIsDesignComplete, setShowOptionsContainer, setIsInputLocked, designCompletedRef, resetFormState, user, loading]);
 };

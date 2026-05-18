@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import icon from '../assets/logo-osdag.png';
 import { Modal, Button, Alert, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { clearAuthStorage } from "../utils/auth";
 import { apiBase } from '../api';
 import {
     signupWithFirebase,
@@ -12,7 +11,7 @@ import {
     getFirebaseErrorMessage,
 } from '../utils/firebaseAuth';
 import { EmailVerificationStatus } from './EmailVerificationStatus';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -185,10 +184,6 @@ const LoginPage = () => {
         setGeneralError('');
 
         try {
-            clearAuthStorage();
-            // Guest mode is purely frontend - no backend call needed
-            localStorage.setItem("userType", "guest");
-            localStorage.setItem("username", "Guest");
             navigate('/home');
         } catch (error) {
             setGeneralError("Error entering guest mode. Please try again.");

@@ -1,18 +1,21 @@
 import { apiBase } from "../api";
-import { getAccessToken } from "../utils/auth";
+import { auth } from "../Auth/firebase";
+import { signOut } from "firebase/auth";
 
-/**
- * Shared fetch-based API client with Firebase token injection.
- *
- * Usage:
- *   import { apiClient } from "../utils/apiClient";
- *   const res = await apiClient("api/projects/", { method: "GET" });
- *   const data = await res.json();
- */
+const getAccessToken = async (forceRefresh = false) => {
+  const user = auth.currentUser;
+  if (!user) return null;
+  try {
+    return await user.getIdToken(forceRefresh);
+  } catch (error) {
+    console.error('Error getting Firebase token:', error);
+    return null;
+  }
+};
+
 const createApiClient = (baseUrl) => {
-  return async (url, options = {}) => {
+  return async (url, options = {}, isRetry = false) => {
     const token = await getAccessToken();
-
     const headers = {
       "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
@@ -30,6 +33,33 @@ const createApiClient = (baseUrl) => {
       credentials: "include",
       mode: "cors",
     });
+
+    if (response.status === 401 && !isRetry) {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          console.warn("401 hit. Force-refreshing token and retrying...");
+          const freshToken = await getAccessToken(true);
+          
+          const retryHeaders = {
+            ...headers,
+            Authorization: `Bearer ${freshToken}`,
+          };
+          return await fetch(`${baseUrl}${url}`, {
+            ...options,
+            headers: retryHeaders,
+            credentials: "include",
+            mode: "cors",
+          });
+        } catch (refreshError) {
+          await signOut(auth);
+          window.location.href = '/';
+          throw refreshError;
+        }
+      } else {
+        window.location.href = '/';
+      }
+    }
 
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}`;
@@ -52,4 +82,3 @@ const createApiClient = (baseUrl) => {
 };
 
 export const apiClient = createApiClient(apiBase);
-
