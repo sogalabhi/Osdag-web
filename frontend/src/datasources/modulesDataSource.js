@@ -5,7 +5,7 @@ import { getModuleSlug } from "../constants/apiRoutes";
 /**
  * Fetch module options / lists for a given module key.
  */
-export async function fetchModuleOptions(moduleKey, { connectivity, email } = {}) {
+export async function fetchModuleOptions(moduleKey, { connectivity } = {}) {
   if (!moduleKey) return { success: false, error: "Module name is required" };
 
   const slug = getModuleSlug(moduleKey);

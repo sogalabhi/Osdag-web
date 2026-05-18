@@ -14,7 +14,7 @@ const getAccessToken = async (forceRefresh = false) => {
 };
 
 const createApiClient = (baseUrl) => {
-  return async (url, options = {}, isRetry = false) => {
+  const client = async (url, options = {}, isRetry = false) => {
     const token = await getAccessToken();
     const headers = {
       "Content-Type": "application/json",
@@ -41,16 +41,19 @@ const createApiClient = (baseUrl) => {
           console.warn("401 hit. Force-refreshing token and retrying...");
           const freshToken = await getAccessToken(true);
           
+          if (!freshToken) {
+            throw new Error("Unable to obtain a fresh session token.");
+          }
+
           const retryHeaders = {
             ...headers,
             Authorization: `Bearer ${freshToken}`,
           };
-          return await fetch(`${baseUrl}${url}`, {
+          // Recursive call with isRetry=true to preserve error checking and exceptions
+          return await client(url, {
             ...options,
             headers: retryHeaders,
-            credentials: "include",
-            mode: "cors",
-          });
+          }, true);
         } catch (refreshError) {
           await signOut(auth);
           window.location.href = '/';
@@ -79,6 +82,8 @@ const createApiClient = (baseUrl) => {
 
     return response;
   };
+
+  return client;
 };
 
 export const apiClient = createApiClient(apiBase);

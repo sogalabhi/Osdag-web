@@ -20,52 +20,91 @@ export const useProjectLoader = ({
   designCompletedRef,
   resetFormState,
 }) => {
-  const lastLoadedProjectIdRef = useRef(null);
+  // Use 'undefined' so it doesn't falsely match a 'null' base route on first mount
+  const lastLoadedProjectIdRef = useRef(undefined);
   const { user, loading } = useAuth();
 
+  const callbacksRef = useRef({
+    setInputs,
+    setDesignPrefOverrides,
+    loadSavedOutputs,
+    resetModuleState,
+    clearDesignResults,
+    resetDocks,
+    setIsDesignComplete,
+    setShowOptionsContainer,
+    setIsInputLocked,
+    resetFormState,
+    service,
+    moduleConfig,
+    navigate,
+    location
+  });
+
   useEffect(() => {
-    // 1. Wait until Firebase Auth state is fully initialized.
+    callbacksRef.current = {
+      setInputs,
+      setDesignPrefOverrides,
+      loadSavedOutputs,
+      resetModuleState,
+      clearDesignResults,
+      resetDocks,
+      setIsDesignComplete,
+      setShowOptionsContainer,
+      setIsInputLocked,
+      resetFormState,
+      service,
+      moduleConfig,
+      navigate,
+      location
+    };
+  });
+
+  useEffect(() => {
+    return () => {
+      lastLoadedProjectIdRef.current = undefined;
+    };
+  }, []);
+
+  useEffect(() => {
     if (loading) return;
 
-    const projectId = projectIdFromUrl;
-    
-    // 2. If there is no project ID in the URL, reset the form for BOTH guests and authenticated users.
-    if (!projectId || Number.isNaN(projectId)) {
-      console.info('[EngineeringModule] No project ID in URL: resetting form to defaults');
-      resetFormState();
-      lastLoadedProjectIdRef.current = null;
+    const projectId = projectIdFromUrl || null;
+
+    if (lastLoadedProjectIdRef.current === projectId) {
       return;
     }
 
-    // 3. If there is a project ID in the URL but no authenticated user, skip loading (the Route Guard will redirect).
+    lastLoadedProjectIdRef.current = projectId;
+
+    if (!projectId) {
+      console.info('[EngineeringModule] No project ID in URL: resetting form to defaults');
+      callbacksRef.current.resetFormState();
+      return;
+    }
+
     if (!user) {
       console.info('[EngineeringModule] Guest mode detected with project ID: skipping project loading');
       return;
     }
 
-    if (lastLoadedProjectIdRef.current === projectId) {
-      return;
-    }
-    lastLoadedProjectIdRef.current = projectId;
-
     const abortController = new AbortController();
 
     const loadProject = async () => {
       try {
-        resetModuleState();
-        clearDesignResults();
-        setIsDesignComplete(false);
-        resetDocks("RESET");
-        setShowOptionsContainer(false);
-        setIsInputLocked(false);
+        callbacksRef.current.resetModuleState();
+        callbacksRef.current.clearDesignResults();
+        callbacksRef.current.setIsDesignComplete(false);
+        callbacksRef.current.resetDocks("RESET");
+        callbacksRef.current.setShowOptionsContainer(false);
+        callbacksRef.current.setIsInputLocked(false);
         designCompletedRef.current = false;
 
-        const result = await service.getProject(projectId, { signal: abortController.signal });
+        const result = await callbacksRef.current.service.getProject(projectId, { signal: abortController.signal });
         if (abortController.signal.aborted) return;
         
-        console.log('[EngineeringModule] Project loaded:', result);
         if (!result.success || !result.project) {
-          lastLoadedProjectIdRef.current = null;
+          lastLoadedProjectIdRef.current = undefined;
           message.warning('Project not found.');
           return;
         }
@@ -78,19 +117,17 @@ export const useProjectLoader = ({
               typeof savedInputs === "object" &&
               Object.prototype.hasOwnProperty.call(savedInputs, "dock")
             ) {
-              setInputs((prev) => ({
-                ...(moduleConfig?.defaultInputs || {}),
-                ...(prev || {}),
+              callbacksRef.current.setInputs({
+                ...(callbacksRef.current.moduleConfig?.defaultInputs || {}),
                 ...(savedInputs.dock || {}),
-              }));
-              setDesignPrefOverrides(savedInputs.pref || {});
+              });
+              callbacksRef.current.setDesignPrefOverrides(savedInputs.pref || {});
             } else {
-              setInputs((prev) => ({
-                ...(moduleConfig?.defaultInputs || {}),
-                ...(prev || {}),
+              callbacksRef.current.setInputs({
+                ...(callbacksRef.current.moduleConfig?.defaultInputs || {}),
                 ...(savedInputs || {}),
-              }));
-              setDesignPrefOverrides({});
+              });
+              callbacksRef.current.setDesignPrefOverrides({});
             }
           } catch (err) {
             console.error('[EngineeringModule] Error parsing inputs_json:', err);
@@ -99,28 +136,28 @@ export const useProjectLoader = ({
         }
         if (result.project.outputs_json) {
           try {
-            loadSavedOutputs(result.project.outputs_json);
+            callbacksRef.current.loadSavedOutputs(result.project.outputs_json);
           } catch (err) {
             console.error('[EngineeringModule] Error loading saved outputs:', err);
             message.error('Failed to load saved project outputs.');
           }
         }
 
-        const pathname = location.pathname;
-        const pathEndsWithId = pathname.endsWith(`/${projectId}`);
-        const hasQueryProjectId = new URLSearchParams(location.search).get('projectId') != null;
-        if (!pathEndsWithId && hasQueryProjectId && moduleConfig.routePath) {
-          const basePath = moduleConfig.routePath.replace(/\/$/, '');
-          navigate(`${basePath}/${projectId}`, { replace: true });
+        const currentPathname = callbacksRef.current.location.pathname;
+        const pathEndsWithId = currentPathname.endsWith(`/${projectId}`);
+        const hasQueryProjectId = new URLSearchParams(callbacksRef.current.location.search).get('projectId') != null;
+        if (!pathEndsWithId && hasQueryProjectId && callbacksRef.current.moduleConfig.routePath) {
+          const basePath = callbacksRef.current.moduleConfig.routePath.replace(/\/$/, '');
+          callbacksRef.current.navigate(`${basePath}/${projectId}`, { replace: true });
         }
       } catch (_e) {
         if (abortController.signal.aborted) return;
-        lastLoadedProjectIdRef.current = null;
+        lastLoadedProjectIdRef.current = undefined;
         console.error('[EngineeringModule] Error loading project:', _e);
         message.warning('Cannot load project. Redirecting to module base.');
 
-        const basePath = moduleConfig.routePath || '/home';
-        navigate(basePath, { replace: true });
+        const basePath = callbacksRef.current.moduleConfig.routePath || '/home';
+        callbacksRef.current.navigate(basePath, { replace: true });
       }
     };
 
@@ -129,5 +166,6 @@ export const useProjectLoader = ({
     return () => {
       abortController.abort();
     };
-  }, [projectIdFromUrl, service, moduleConfig, navigate, location.pathname, location.search, setInputs, setDesignPrefOverrides, loadSavedOutputs, resetModuleState, clearDesignResults, resetDocks, setIsDesignComplete, setShowOptionsContainer, setIsInputLocked, designCompletedRef, resetFormState, user, loading]);
+
+  }, [projectIdFromUrl, user, loading]);
 };

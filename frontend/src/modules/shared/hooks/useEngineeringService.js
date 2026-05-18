@@ -47,10 +47,8 @@ export const useEngineeringService = () => {
    */
   const getModuleData = useCallback(async (moduleKey, options = {}) => {
     try {
-      const email = localStorage.getItem('email');
       return await fetchModuleOptions(moduleKey, {
         connectivity: options.connectivity,
-        email,
       });
     } catch (error) {
       return { success: false, error: error.message };

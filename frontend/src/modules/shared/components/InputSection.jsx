@@ -123,7 +123,9 @@ export const InputSection = ({
     if (extraState.selectedOption) {
       const conn = safeInputs.connectivity;
       const epType = extraState.selectedOption;
-      console.log(conn + "  " + epType);
+      if (conn && epType) {
+        console.log(conn + "  " + epType);
+      }
       const imageMap = {
         "Column-Flange-Beam-Web": {
           "Flushed - Reversible Moment": BC_CF_BW_FLUSH,
@@ -139,7 +141,7 @@ export const InputSection = ({
         "Column Flange-Beam-Web": CFBW, "Column Web-Beam-Web": CWBW, "Beam-Beam": BB,
       };
 
-      const selectedImage = imageMap[conn]?.[epType] || imageMap[extraState.selectedOption] || ErrorImg;
+      const selectedImage = (conn ? imageMap[conn]?.[epType] : null) || imageMap[extraState.selectedOption] || ErrorImg;
       setImageSource(selectedImage);
     }
   }, [extraState.selectedOption, safeInputs.connectivity]);

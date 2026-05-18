@@ -270,9 +270,7 @@ export const EngineeringModule = ({
   useEffect(() => {
     if (normalizedCadModelPaths) {
       const keys = Object.keys(normalizedCadModelPaths || {});
-      console.log("[EngineeringModule] cadModelPaths keys:", keys);
-      console.log("[EngineeringModule] selectedSection:", selectedSection);
-    }
+      }
   }, [normalizedCadModelPaths, selectedSection]);
 
 
@@ -737,11 +735,7 @@ export const EngineeringModule = ({
       ...staticFallbacks,
       ...(ctxHoverDict || {}),
     };
-
-    if (ctxHoverDict && Object.keys(ctxHoverDict).length > 0) {
-      console.log('[EngineeringModule] hoverDict from backend:', final);
-    }
-
+    
     return final;
   }, [ctxHoverDict]);
 
