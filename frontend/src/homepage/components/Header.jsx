@@ -143,7 +143,7 @@ const Header = ({ setshowSideBar, active }) => {
     bindings: [
       {
         combos: SHORTCUT_ACTION_BY_ID['global.search.focus']?.shortcuts,
-        when: () => !active && !isGuest,
+        when: () => !active,
         handler: () => {
           const searchInput = document.getElementById('search-input');
           if (!searchInput) return;
@@ -779,8 +779,8 @@ const Header = ({ setshowSideBar, active }) => {
 
         </div>
       </div>
-      {/* Search Section - Hidden for guest users */}
-      {!active && !isGuest && <div className="px-12 pb-8 dark:bg-osdag-dark-color">
+      {/* Search Section */}
+      {!active && <div className="px-12 pb-8 dark:bg-osdag-dark-color">
         <div className="flex items-center justify-center">
           <div className="relative w-search search-container">
             <div className="absolute inset-y-0 left-5 flex items-center space-x-3">

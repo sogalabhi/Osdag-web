@@ -47,7 +47,8 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
-    'http://192.168.1.9:5173' # your local network ip
+    'http://192.168.1.9:5173',
+    'http://10.104.135.9:5173'
 ]
 CORS_ALLOW_CREDENTIALS = True
 
