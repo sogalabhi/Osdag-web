@@ -409,6 +409,9 @@ export const useEngineeringModule = (moduleConfig) => {
     // Explicitly expose reset functions for targeted clears that don't destroy `inputs`
     resetDesignState,
 
+    // Expose resetFormState for external/loader reset
+    resetFormState,
+
     // Expose resetModuleState for external use (e.g., module change detection)
     resetModuleState,
   };

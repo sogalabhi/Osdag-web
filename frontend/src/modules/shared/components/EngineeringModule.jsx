@@ -180,6 +180,7 @@ export const EngineeringModule = ({
     service,
 
     // Direct access to module context reset
+    resetFormState,
     resetModuleState,
     contextData,
     refetchModuleOptions,
@@ -388,6 +389,7 @@ export const EngineeringModule = ({
     setShowOptionsContainer,
     setIsInputLocked,
     designCompletedRef,
+    resetFormState,
   });
 
   // Only change dock visibility after design is complete

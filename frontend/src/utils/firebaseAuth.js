@@ -45,12 +45,6 @@ export const syncUserToBackend = async (firebaseUser) => {
         const data = await firebaseLoginWithToken(idToken);
         console.log("Backend sync response payload:", data);
         
-        // Store user info for convenience
-        localStorage.setItem("userType", "user");
-        localStorage.setItem("email", firebaseUser.email || "");
-        const displayName = firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "User";
-        localStorage.setItem("username", displayName);
-        
         return data;
     } catch (error) {
         console.error("Error syncing user to backend:", error);

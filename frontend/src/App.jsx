@@ -60,50 +60,51 @@ import BeamToColumnEndPlate from "./modules/beamToColumnEndPlate/BeamToColumnEnd
 import ShortcutHelpModal from "./components/ShortcutHelpModal";
 
 import ErrorPage from "./components/ErrorPage";
+import ProjectAuthGuard from "./components/ProjectAuthGuard";
 
 function App() {
   let loggedIn = false;
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<Root loggedIn={loggedIn} />} errorElement={<ErrorPage />}>
-        {/* Root and home routes */}
         <Route path="/" element={<LoginPage />} />
         <Route path="/home" element={<Homepage />} />
         <Route path="/:moduleName" element={<SelectModulePage />} />
 
-        {/* Design routes grouped with dynamic designType */}
-        <Route path="/design/:designType/shear/fin_plate/:projectId?" element={<FinPlate />} />
-        <Route path="/design/:designType/shear/end_plate/:projectId?" element={<EndPlate />} />
-        <Route path="/design/:designType/shear/seatAngle/:projectId?" element={<SeatedAngle />} />
-        <Route path="/design/:designType/shear/cleat_angle/:projectId?" element={<CleatAngle />} />
-        <Route path="/design/:designType/column-to-column-splice/cover_plate_bolted/:projectId?" element={<ColumnColumnCoverPlateBolted />} />
-        <Route path="/design/:designType/column-to-column-splice/cover_plate_welded/:projectId?" element={<ColumnColumnCoverPlateWelded />} />
-        <Route path="/design/:designType/column-to-column-splice/end_plate/:projectId?" element={<ColumnColumnEndPlate />} />
-        <Route path="/design/:designType/beam-to-beam-splice/cover_plate_bolted/:projectId?" element={<CoverPlateBolted />} />
-        <Route path="/design/:designType/beam-to-beam-splice/cover_plate_welded/:projectId?" element={<CoverPlateWelded />} />
-        <Route path="/design/:designType/beam-to-beam-splice/end_plate/:projectId?" element={<BeamBeamEndPlate />} />
-        <Route path="/design/:designType/base_plate/:projectId?" element={<BasePlate />} />
-        <Route path="/design/:designType/simple/butt_joint_welded/:projectId?" element={<ButtJointWelded />} />
-        <Route path="/design/:designType/simple/butt_joint_bolted/:projectId?" element={<ButtJointBolted />} />
-        <Route path="/design/:designType/simple/lap_joint_welded/:projectId?" element={<LapJointWelded />} />
-        <Route path="/design/:designType/simple/lap_joint_bolted/:projectId?" element={<LapJointBolted />} />
-        <Route path="/design/:designType/simply_supported_beam/:projectId?" element={<SimplySupportedBeam />} />
-        <Route path="/design/:designType/on_cantilever/:projectId?" element={<OnCantilever />} />
-        <Route path="/design/:designType/purlin/:projectId?" element={<Purlin />} />
-        <Route path="/design/:designType/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
-        <Route path="/design/:designType/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
-        <Route path="/design/:designType/tension-member/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
-        <Route path="/design/:designType/tension-member/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
-        <Route path="/design/:designType/tension_member/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
-        <Route path="/design/:designType/tension_member/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
+        <Route element={<ProjectAuthGuard />}>
+          <Route path="/design/:designType/shear/fin_plate/:projectId?" element={<FinPlate />} />
+          <Route path="/design/:designType/shear/end_plate/:projectId?" element={<EndPlate />} />
+          <Route path="/design/:designType/shear/seatAngle/:projectId?" element={<SeatedAngle />} />
+          <Route path="/design/:designType/shear/cleat_angle/:projectId?" element={<CleatAngle />} />
+          <Route path="/design/:designType/column-to-column-splice/cover_plate_bolted/:projectId?" element={<ColumnColumnCoverPlateBolted />} />
+          <Route path="/design/:designType/column-to-column-splice/cover_plate_welded/:projectId?" element={<ColumnColumnCoverPlateWelded />} />
+          <Route path="/design/:designType/column-to-column-splice/end_plate/:projectId?" element={<ColumnColumnEndPlate />} />
+          <Route path="/design/:designType/beam-to-beam-splice/cover_plate_bolted/:projectId?" element={<CoverPlateBolted />} />
+          <Route path="/design/:designType/beam-to-beam-splice/cover_plate_welded/:projectId?" element={<CoverPlateWelded />} />
+          <Route path="/design/:designType/beam-to-beam-splice/end_plate/:projectId?" element={<BeamBeamEndPlate />} />
+          <Route path="/design/:designType/base_plate/:projectId?" element={<BasePlate />} />
+          <Route path="/design/:designType/simple/butt_joint_welded/:projectId?" element={<ButtJointWelded />} />
+          <Route path="/design/:designType/simple/butt_joint_bolted/:projectId?" element={<ButtJointBolted />} />
+          <Route path="/design/:designType/simple/lap_joint_welded/:projectId?" element={<LapJointWelded />} />
+          <Route path="/design/:designType/simple/lap_joint_bolted/:projectId?" element={<LapJointBolted />} />
+          <Route path="/design/:designType/simply_supported_beam/:projectId?" element={<SimplySupportedBeam />} />
+          <Route path="/design/:designType/on_cantilever/:projectId?" element={<OnCantilever />} />
+          <Route path="/design/:designType/purlin/:projectId?" element={<Purlin />} />
+          <Route path="/design/:designType/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
+          <Route path="/design/:designType/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
+          <Route path="/design/:designType/tension-member/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
+          <Route path="/design/:designType/tension-member/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
+          <Route path="/design/:designType/tension_member/bolted_to_end_gusset/:projectId?" element={<BoltedToEnd />} />
+          <Route path="/design/:designType/tension_member/welded_to_end_gusset/:projectId?" element={<WeldedToEnd />} />
 
-        <Route path="/design/:designType/column-beam/:projectId?" element={<BeamToColumnEndPlate />} />
+          <Route path="/design/:designType/column-beam/:projectId?" element={<BeamToColumnEndPlate />} />
 
-        {/* Compression Members */}
-        <Route path="/design/:designType/struts_in_trusses/:projectId?" element={<CompressionMember />} />
-        <Route path="/design/:designType/struts_bolted_to_end_gusset/:projectId?" element={<StrutsBolted />} />
-        <Route path="/design/:designType/struts_welded_to_end_gusset/:projectId?" element={<StrutsWelded />} />
-        <Route path="/design/:designType/axially_loaded_column/:projectId?" element={<AxiallyLoadedColumn />} />
+          {/* Compression Members */}
+          <Route path="/design/:designType/struts_in_trusses/:projectId?" element={<CompressionMember />} />
+          <Route path="/design/:designType/struts_bolted_to_end_gusset/:projectId?" element={<StrutsBolted />} />
+          <Route path="/design/:designType/struts_welded_to_end_gusset/:projectId?" element={<StrutsWelded />} />
+          <Route path="/design/:designType/axially_loaded_column/:projectId?" element={<AxiallyLoadedColumn />} />
+        </Route>
       </Route>
     )
   );

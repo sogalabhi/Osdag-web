@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { MODULE_ROUTES, MODULE_NAME_TO_KEY, CONNECTIONS_TAB_CONTENT, GENERIC_SUBMODULE_CONTENT } from '../../constants/modules';
 import { apiClient } from '../../utils/apiClient';
 import { isGuestUser } from '../../utils/auth';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext';
 import dayButton from '../../assets/homepage/day_button.svg';
 import infoDefault from '../../assets/homepage/info_default.svg';
 import infoHover from '../../assets/homepage/info_hover.svg';
@@ -38,10 +38,8 @@ const Header = ({ setshowSideBar, active }) => {
   const isGuest = isGuestUser();
 
   // Get user display name and email
-  // Priority: Firebase displayName -> localStorage username -> email prefix
-  const storedUsername = !isGuest ? localStorage.getItem('username') : '';
-  const userDisplayName = firebaseUser?.displayName || storedUsername || firebaseUser?.email?.split('@')[0] || '';
-  const userEmail = firebaseUser?.email || (!isGuest ? localStorage.getItem('email') : '') || '';
+  const userDisplayName = firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || '';
+  const userEmail = firebaseUser?.email || '';
   // Get initial: from displayName, or email first letter, or 'G' for guest
   const userInitial = userDisplayName
     ? userDisplayName[0].toUpperCase()
