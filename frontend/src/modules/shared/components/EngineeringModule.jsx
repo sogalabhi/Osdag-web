@@ -1870,21 +1870,23 @@ export const EngineeringModule = ({
       </Modal>
 
       {/* Design Status Modal */}
-      <DesignStatusModal
-        status={status}
-        isMobile={isMobile}
-        onRetry={() => {
-          // Retry logic - could trigger handleSubmitEnhanced again
-          setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
-        }}
-        onClose={() => {
-          console.log('[DesignStatusModal] onClose called, status:', status.step);
-          if (status.step === DESIGN_STATUS.ERROR || status.step === DESIGN_STATUS.COMPLETE) {
+      {!(moduleConfig?.designType?.includes('plate') && status.step === DESIGN_STATUS.COMPLETE) && (
+        <DesignStatusModal
+          status={status}
+          isMobile={isMobile}
+          onRetry={() => {
+            // Retry logic - could trigger handleSubmitEnhanced again
             setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
-            console.log('[DesignStatusModal] Status reset to IDLE');
-          }
-        }}
-      />
+          }}
+          onClose={() => {
+            console.log('[DesignStatusModal] onClose called, status:', status.step);
+            if (status.step === DESIGN_STATUS.ERROR || status.step === DESIGN_STATUS.COMPLETE) {
+              setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
+              console.log('[DesignStatusModal] Status reset to IDLE');
+            }
+          }}
+        />
+      )}
 
       {/* Hover tooltip overlay */}
       {hoverText && (

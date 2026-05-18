@@ -1242,7 +1242,7 @@ class PlateGirderWelded(Member):
             # Thick web - no stiffeners needed for shear buckling
             # Use maximum spacing (essentially single panel)
             c = 3 * d
-            self.logger.info(f"Thick web (d/tw = {web_slenderness:.2f} ≤ {67 * self.epsilon:.2f}ε), c = 3d = {c:.2f} mm")
+            self.logger.info(f"Thick web (d/tw = {web_slenderness:.2f} <= {67 * self.epsilon:.2f}e), c = 3d = {c:.2f} mm")
         elif shear_force <= 0.6 * V_p:
             # Low shear - larger spacing acceptable
             c = min(1.5 * d, 3 * d)
@@ -1410,9 +1410,9 @@ class PlateGirderWelded(Member):
                         if self.debug:
                             print(f"\n========== SHEAR CAPACITY CHECK ==========")
                             print(f"  Design Shear Capacity (V_d): {self.V_d:.2f} N")
-                            print(f"  Low Shear Limit (0.6 × V_d): {low_shear_limit:.2f} N")
+                            print(f"  Low Shear Limit (0.6 x V_d): {low_shear_limit:.2f} N")
                             print(f"  Applied Shear Force: {self.load.shear_force:.2f} N")
-                            print(f"  >>> LOW SHEAR CONDITION (V ≤ 0.6 × V_d) <<<")
+                            print(f"  >>> LOW SHEAR CONDITION (V <= 0.6 x V_d) <<<")
                             print(f"============================================\n")
                     else:
                         self.shear_type = 'High'

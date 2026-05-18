@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import Plot from 'react-plotly.js';
 import Plotly from 'plotly.js-dist-min';
 
@@ -137,6 +137,15 @@ function OptimizationGraph({ data, onClose, optimizationDone, isWsConnected }) {
         tfTop: toPositiveNumber(bestVars.tf_top, toPositiveNumber(bestVars.tf, 8)),
         tfBot: toPositiveNumber(bestVars.tf_bot, toPositiveNumber(bestVars.tf, toPositiveNumber(bestVars.tf_top, 8))),
     };
+
+    useEffect(() => {
+        if (optimizationDone) {
+            const timer = setTimeout(() => {
+                if (onClose) onClose();
+            }, 2500);
+            return () => clearTimeout(timer);
+        }
+    }, [optimizationDone, onClose]);
 
     const xValues = finiteValues(data.fease?.x, data.non_fease?.x, data.swarm_fease?.x, data.swarm_non_fease?.x, data.best?.x);
     const yValues = finiteValues(data.fease?.y, data.non_fease?.y, data.swarm_fease?.y, data.swarm_non_fease?.y, data.best?.y);
