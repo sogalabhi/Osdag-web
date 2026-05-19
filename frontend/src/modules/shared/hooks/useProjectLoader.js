@@ -75,6 +75,13 @@ export const useProjectLoader = ({
       return;
     }
 
+    if (callbacksRef.current.location.state?.justSaved) {
+      console.info('[EngineeringModule] Just saved project, preserving current UI state.');
+      lastLoadedProjectIdRef.current = projectId;
+      window.history.replaceState({}, document.title); 
+      return;
+    }
+
     lastLoadedProjectIdRef.current = projectId;
 
     if (!projectId) {

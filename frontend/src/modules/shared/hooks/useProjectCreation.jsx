@@ -50,9 +50,8 @@ export const useProjectCreation = ({
       const result = await createProject(payload);
       if (result.success && result.project_id) {
         message.success(`Project "${safeProjectName}" created successfully`);
-        // Navigate to current path + project ID
         const currentPath = location.pathname;
-        navigate(`${currentPath}/${result.project_id}`, { replace: true });
+        navigate(`${currentPath}/${result.project_id}`, { replace: true, state: { justSaved: true } },);
       } else {
         message.error(result.error || 'Failed to create project');
       }
