@@ -226,6 +226,10 @@ const Header = ({ setshowSideBar, active }) => {
             const text = await file.text();
             const uiObj = yaml.load(text) || {};
             const moduleField = uiObj.Module || uiObj["Module"] || uiObj.module || uiObj["module"] || uiObj.inputs?.module || uiObj.inputs?.Module || uiObj.module_id;
+            console.log("Parsed YAML:", uiObj);
+            console.log("Detected Module Field:", moduleField);
+            console.log("MODULE_NAME_TO_KEY matches:", MODULE_NAME_TO_KEY[moduleField.trim()]);
+
             if (!moduleField || typeof moduleField !== 'string') {
               alert('Unsupported or invalid OSI file: Module not found.');
               e.target.value = '';

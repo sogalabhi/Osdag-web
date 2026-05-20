@@ -20,7 +20,6 @@ export const useProjectLoader = ({
   designCompletedRef,
   resetFormState,
 }) => {
-  // Use 'undefined' so it doesn't falsely match a 'null' base route on first mount
   const lastLoadedProjectIdRef = useRef(undefined);
   const { user, loading } = useAuth();
 
@@ -85,6 +84,15 @@ export const useProjectLoader = ({
     lastLoadedProjectIdRef.current = projectId;
 
     if (!projectId) {
+      const activeConfig = callbacksRef.current.moduleConfig || {};
+      const moduleKey = activeConfig.cameraKey || activeConfig.moduleKey || activeConfig.designType;
+      const hasPrefill = moduleKey && sessionStorage.getItem(`prefill:${moduleKey}`);
+      
+      if (hasPrefill) {
+        console.info('[EngineeringModule] OSI prefill detected: skipping default reset');
+        return;
+      }
+
       console.info('[EngineeringModule] No project ID in URL: resetting form to defaults');
       callbacksRef.current.resetFormState();
       return;

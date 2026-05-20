@@ -167,19 +167,77 @@ export const MODULE_ROUTES = {
 // Mapping from .osi Module names (desktop) → web module keys used above
 // Extend as more modules are supported
 export const MODULE_NAME_TO_KEY = {
+    // Shear Connections
     "Shear Connection - Fin Plate": MODULE_KEY_FIN_PLATE,
+    "Fin Plate Connection": MODULE_KEY_FIN_PLATE,
+    "FinPlateConnection": MODULE_KEY_FIN_PLATE,
     "Shear Connection - End Plate": MODULE_KEY_END_PLATE,
+    "End Plate Connection": MODULE_KEY_END_PLATE,
     "Shear Connection - Cleat Angle": MODULE_KEY_CLEAT_ANGLE,
+    "Cleat Angle Connection": MODULE_KEY_CLEAT_ANGLE,
     "Shear Connection - Seated Angle": MODULE_KEY_SEAT_ANGLE,
-    // Tension Members
-    "Tension Member Bolted Design": MODULE_KEY_BOLTED_TO_END_GUSSET,
-    // Moment Connection
-    "Beam-to-Column End Plate Connection": MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
-    "Beam-to-Beam-Cover-Plate-Bolted-Connection": MODULE_KEY_COVER_PLATE_BOLTED,
-    "Beam-to-Beam-Cover-Plate-Welded-Connection": MODULE_KEY_COVER_PLATE_WELDED,
-    "Beam-Beam-End-Plate-Connection": MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
-    "Column-to-Column-Cover-Plate-Welded-Connection": MODULE_KEY_CC_COVER_PLATE_WELDED,
-    "Column-to-Column-Cover-Plate-Bolted-Connection": MODULE_KEY_CC_COVER_PLATE_BOLTED,
-    "Column-to-Column-End-Plate-Connection": MODULE_KEY_CC_END_PLATE,
+    "Seated Angle Connection": MODULE_KEY_SEAT_ANGLE,
+
+    // Plated Connections (Simple Connections)
+    "Lap Joint Bolted Connection": MODULE_KEY_LAP_JOINT_BOLTED,
+    "Lap Joint - Bolted": MODULE_KEY_LAP_JOINT_BOLTED,
+    "Lap Joint Bolted": MODULE_KEY_LAP_JOINT_BOLTED,
+    "Lap Joint Welded Connection": MODULE_KEY_LAP_JOINT_WELDED,
+    "Lap Joint - Welded": MODULE_KEY_LAP_JOINT_WELDED,
+    "Lap Joint Welded": MODULE_KEY_LAP_JOINT_WELDED,
+    "Butt Joint Bolted Connection": MODULE_KEY_BUTT_JOINT_BOLTED,
+    "Butt Joint - Bolted": MODULE_KEY_BUTT_JOINT_BOLTED,
+    "Butt Joint Bolted": MODULE_KEY_BUTT_JOINT_BOLTED,
+    "Butt Joint Welded Connection": MODULE_KEY_BUTT_JOINT_WELDED,
+    "Butt Joint - Welded": MODULE_KEY_BUTT_JOINT_WELDED,
+    "Butt Joint Welded": MODULE_KEY_BUTT_JOINT_WELDED,
+
+    // Base Plate
+    "Base Plate Connection": "BasePlateConnection",
     "Base-Plate": "BasePlateConnection",
+    "Base Plate": "BasePlateConnection",
+
+    // Tension Members
+    "Tension Member Design - Bolted to End Gusset": MODULE_KEY_BOLTED_TO_END_GUSSET,
+    "Tension Member Bolted Design": MODULE_KEY_BOLTED_TO_END_GUSSET,
+    "Tension Bolted": MODULE_KEY_BOLTED_TO_END_GUSSET,
+    "Tension Member Design - Welded to End Gusset": MODULE_KEY_WELDED_TO_END_GUSSET,
+    "Tension Member Welded Design": MODULE_KEY_WELDED_TO_END_GUSSET,
+    "Tension Welded": MODULE_KEY_WELDED_TO_END_GUSSET,
+
+    // Compression Members
+    "Compression Member Design - Strut Design": MODULE_KEY_STRUTS_BOLTED,
+    "Struts Bolted to End Gusset": MODULE_KEY_STRUTS_BOLTED,
+    "Struts Welded to End Gusset": MODULE_KEY_STRUTS_WELDED,
+    "Columns with known support conditions": MODULE_KEY_AXIALLY_LOADED_COLUMN,
+    "Axially Loaded Column": MODULE_KEY_AXIALLY_LOADED_COLUMN,
+
+    // Flexure Members
+    "Flexural Members - Simply Supported": MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
+    "Simply Supported Beam": MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
+    "Flexural Members - Cantilever": "OnCantilever",
+    "Cantilever Beam": "OnCantilever",
+    "Flexural Members - Purlins": "Purlin",
+    "Purlin": "Purlin",
+
+    // PEB / Member Splices / Moment Connections
+    // Beam to Column
+    "Beam-to-Column End Plate Connection": MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
+    "Beam to Column End Plate Connection": MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
+    
+    // Beam to Beam
+    "Beam-to-Beam End Plate Connection": MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
+    "Beam-Beam-End-Plate-Connection": MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
+    "Beam-to-Beam Cover Plate Bolted Connection": MODULE_KEY_COVER_PLATE_BOLTED,
+    "Beam-to-Beam-Cover-Plate-Bolted-Connection": MODULE_KEY_COVER_PLATE_BOLTED,
+    "Beam-to-Beam Cover Plate Welded Connection": MODULE_KEY_COVER_PLATE_WELDED,
+    "Beam-to-Beam-Cover-Plate-Welded-Connection": MODULE_KEY_COVER_PLATE_WELDED,
+
+    // Column to Column
+    "Column-to-Column Cover Plate Bolted Connection": MODULE_KEY_CC_COVER_PLATE_BOLTED,
+    "Column-to-Column-Cover-Plate-Bolted-Connection": MODULE_KEY_CC_COVER_PLATE_BOLTED,
+    "Column-to-Column Cover Plate Welded Connection": MODULE_KEY_CC_COVER_PLATE_WELDED,
+    "Column-to-Column-Cover-Plate-Welded-Connection": MODULE_KEY_CC_COVER_PLATE_WELDED,
+    "Column-to-Column End Plate Connection": MODULE_KEY_CC_END_PLATE,
+    "Column-to-Column-End-Plate-Connection": MODULE_KEY_CC_END_PLATE,
 };
