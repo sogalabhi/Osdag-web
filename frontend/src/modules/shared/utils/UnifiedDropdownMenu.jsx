@@ -330,6 +330,10 @@ function UnifiedDropdownMenu({
       case "Save Cad Image":
         triggerScreenshotCapture();
         break;
+      case "Quit":
+        // Navigate to home page
+        window.location.href = '/home';
+        break;
       case "Design Preferences": {
         const mod = getModuleConfig();
         const guard = canOpenAdditionalInputs(
