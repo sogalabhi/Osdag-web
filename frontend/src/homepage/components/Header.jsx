@@ -191,26 +191,50 @@ const Header = ({ setshowSideBar, active }) => {
   const searchResults = getSearchResults();
 
   const fileMap = {
-    Column: "Columns_Details.xlsx",
-    Beam: "Beams_Details.xlsx",
-    Channel: "Channels_Details.xlsx",
-    Angle: "Angles_Details.xlsx",
-    SHS: "SHS_Details.xlsx",
-    RHS: "RHS_Details.xlsx",
-    CHS: "CHS_Details.xlsx",
-    "Download xlsx": "Beams_Details.xlsx"
+    Column: "Columns",
+    Beam: "Beams",
+    Channel: "Channels",
+    Angle: "Angles",
+    SHS: "SHS",
+    RHS: "RHS",
+    CHS: "CHS",
+    "Download xlsx": "Beams" // Default template
   };
 
-  const handleDownload = (item) => {
-    const fileName = fileMap[item];
+  const handleDownload = async (item) => {
+    const tableName = fileMap[item];
+    if (!tableName) {
+      console.error('Unknown table:', item);
+      return;
+    }
 
-    const link = document.createElement("a");
-    link.href = `${window.location.origin}/downloads/${fileName}`;
-    link.download = fileName;
-    link.setAttribute("download", fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // Call the backend API to get the catalog export
+      const response = await apiClient(
+        `api/sections/catalog-export/?table=${tableName}`,
+        { method: 'GET' }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to download file');
+      }
+
+      // Get the blob from response
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${tableName}_Catalog.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download file. Please try again.');
+    }
   };
 
   return (
