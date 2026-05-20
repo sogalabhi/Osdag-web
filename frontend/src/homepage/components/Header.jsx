@@ -29,6 +29,7 @@ const Header = ({ setshowSideBar, active }) => {
   const [showAboutDropdown, setShowAboutDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const fileInputRef = useRef(null);
+  const xlsxInputRef = useRef(null);
   const navigate = useNavigate();
   const { logout, user: firebaseUser } = useAuth();
   const [activeSubmenu, setActiveSubmenu] = useState(null);
@@ -237,6 +238,32 @@ const Header = ({ setshowSideBar, active }) => {
     }
   };
 
+  const handleXlsxImport = async (file, tableName) => {
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('table', tableName);
+
+      const response = await apiClient('api/sections/import/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(`Import successful!\nInserted: ${result.inserted}\nIgnored: ${result.ignored?.length || 0}\nRejected: ${result.rejected?.length || 0}`);
+      } else {
+        alert(`Import failed: ${result.detail || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      alert('Failed to import file. Please try again.');
+    }
+  };
+
   return (
     <div className="border-osdag-border dark:border-gray-700">
       {/* Hidden file input for OSI import */}
@@ -289,6 +316,21 @@ const Header = ({ setshowSideBar, active }) => {
           } finally {
             if (e?.target) e.target.value = '';
           }
+        }}
+      />
+      {/* Hidden file input for XLSX import */}
+      <input
+        ref={xlsxInputRef}
+        type="file"
+        accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        className="hidden"
+        onChange={async (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            // For now, default to Beams table. In future, could show a dialog to select table
+            await handleXlsxImport(file, 'Beams');
+          }
+          if (e?.target) e.target.value = '';
         }}
       />
       {/* Main Header */}
