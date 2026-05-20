@@ -97,15 +97,38 @@ class FirebaseAuthView(APIView):
             
             # Sync UserAccount if it doesn't exist
             from apps.core.models import UserAccount
-            user_account, account_created = UserAccount.objects.get_or_create(
-                username=uid,
-                defaults={
-                    'user': user,
-                    'email': email or '',
-                    'allInputValueFiles': []
-                }
-            )
-            logger.info(f"FirebaseAuthView: UserAccount {'created' if account_created else 'retrieved'}")
+            
+            # Try to find existing UserAccount by username (Firebase UID) or email
+            user_account = None
+            account_created = False
+            
+            try:
+                # First try to get by username (Firebase UID)
+                user_account = UserAccount.objects.get(username=uid)
+                logger.info(f"FirebaseAuthView: UserAccount found by username (UID)")
+            except UserAccount.DoesNotExist:
+                # If not found by UID, try to find by email
+                if email:
+                    try:
+                        user_account = UserAccount.objects.get(email=email)
+                        logger.info(f"FirebaseAuthView: UserAccount found by email, updating username to UID")
+                        # Update the username to the Firebase UID
+                        user_account.username = uid
+                        user_account.user = user
+                        user_account.save()
+                    except UserAccount.DoesNotExist:
+                        pass
+            
+            # If still not found, create new UserAccount
+            if not user_account:
+                user_account = UserAccount.objects.create(
+                    username=uid,
+                    user=user,
+                    email=email or '',
+                    allInputValueFiles=[]
+                )
+                account_created = True
+                logger.info(f"FirebaseAuthView: UserAccount created")
             
             # Update UserAccount if user link is missing or email changed
             needs_save = False
