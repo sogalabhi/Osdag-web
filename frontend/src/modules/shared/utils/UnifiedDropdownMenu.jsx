@@ -353,15 +353,42 @@ function UnifiedDropdownMenu({
       }
       case "Zoom In":
         document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'zoom-in' }));
+        setIsOpen(false);
         break;
       case "Zoom Out":
         document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'zoom-out' }));
+        setIsOpen(false);
         break;
       case "Pan":
         document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'pan-left' }));
+        setIsOpen(false);
         break;
       case "Rotate 3D Model":
         document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'auto-rotate' }));
+        setIsOpen(false);
+        break;
+      case "Show front view":
+        document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'front-view' }));
+        setIsOpen(false);
+        break;
+      case "Show top view":
+        document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'top-view' }));
+        setIsOpen(false);
+        break;
+      case "Show side view":
+        document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'side-view' }));
+        setIsOpen(false);
+        break;
+      case "Model":
+      case "Beam":
+      case "Column":
+      case "Seated Angle":
+      case "Change Background":
+        // These options change the view/section displayed
+        if (onMenuClick) {
+          onMenuClick(option.name);
+        }
+        setIsOpen(false);
         break;
       default:
         if (onMenuClick) {
