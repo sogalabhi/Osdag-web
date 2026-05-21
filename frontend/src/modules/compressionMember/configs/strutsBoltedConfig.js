@@ -17,7 +17,7 @@ export const strutsBoltedConfig = {
   routePath: "/design/compression-member/struts_bolted_to_end_gusset",
   designType: "Struts-Bolted-Design",
   cameraKey: "CompressionMember",
-  cadOptions: ["Model", "Member", "Plate", "Endplate"],
+  cadOptions: ["Model", "Member", "Plate"],
 
   defaultInputs: {
     bolt_diameter: [],
