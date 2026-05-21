@@ -17,7 +17,7 @@ export const strutsBoltedOutputConfig = {
             { key: "bolt.large_grip", label: "Large Grip Red.Factor" },
             { key: "Bolt.Capacity", label: "Capacity (kN)" },
             { key: "Bolt.Force (kN)", label: "Bolt Force (kN)" },
-            { key: "SpacingModal", label: "Spacing" },
+            // { key: "SpacingModal", label: "Spacing" },  // Removed: not present in desktop version
         ],
         "Gusset Plate Details": [
             { key: "Plate.Thickness", label: "Thickness (mm)" },
@@ -26,7 +26,7 @@ export const strutsBoltedOutputConfig = {
             { key: "Plate.Yield", label: "Tension Yielding Capacity (kN)" },
             { key: "Plate.Rupture", label: "Tension Rupture Capacity (kN)" },
             { key: "Plate.BlockShear", label: "Block Shear Capacity (kN)" },
-            { key: "PatternModal", label: "Pattern" },
+            // { key: "PatternModal", label: "Pattern" },  // Removed: not present in desktop version
         ],
         "Connection Details": [
             { key: "Intermittent.Connection", label: "Connection (nos)" },

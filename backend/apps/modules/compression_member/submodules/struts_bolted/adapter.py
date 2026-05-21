@@ -199,6 +199,8 @@ def create_from_input(input_values: Dict[str, Any]) -> Compression_bolted:
         ]
     
     module.set_input_values(input_values)
+    # Restore the display name for reports (set_input_values overrides self.module with the raw KEY_MODULE value)
+    module.module = KEY_DISP_STRUT_BOLTED_END_GUSSET
     return module
 
 
@@ -240,8 +242,8 @@ def setup_for_cad(cld, module):
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Member", "Plate", "Endplate"):
-        raise InvalidInputTypeError("section", "'Model', 'Member', 'Plate', 'Endplate'")
+    if section not in ("Model", "Member", "Plate"):
+        raise InvalidInputTypeError("section", "'Model', 'Member', or 'Plate'")
     
     module = create_from_input(input_values)
     
@@ -264,7 +266,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     cld.component = section
 
     # When section == "Model", also ensure per-part shapes exist and prepare a compound
-    part_names = ["Member", "Plate", "Endplate"]
+    part_names = ["Member", "Plate"]
     part_files = {}
     compound_model = None
 
