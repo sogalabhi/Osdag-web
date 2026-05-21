@@ -907,11 +907,33 @@ export const EngineeringModule = ({
       setShowAboutOsdagModal(true);
       return;
     }
+    if (name === "Model" || name === "Beam" || name === "Column" || name === "Seated Angle") {
+      setSelectedSection([name]);
+      setSelectedCameraView(name);
+      return;
+    }
+    if (name === "Change Background") {
+      message.info("Background change feature coming soon");
+      return;
+    }
     if (name === "Reset") {
       return handleResetEnhanced();
     }
     if (name === "Quit") {
       handleQuitClick();
+      return;
+    }
+
+    if (name === "Show front view") {
+      setSelectedCameraView("XY");
+      return;
+    }
+    if (name === "Show top view") {
+      setSelectedCameraView("ZX");
+      return;
+    }
+    if (name === "Show side view") {
+      setSelectedCameraView("YZ");
       return;
     }
 
@@ -1236,7 +1258,7 @@ export const EngineeringModule = ({
             <div
               onClick={toggleInputDock}
               className="
-                absolute right-0 top-[44%]
+                absolute right-0 top-[50%]
                 -translate-y-1/2
                 w-[8px] h-[80px]
                 bg-[#6a8f00]
@@ -1405,7 +1427,7 @@ export const EngineeringModule = ({
             />
 
             {/* RIGHT SIDE GREEN STRIP */}
-            <div className="absolute top-0 left-0 h-screen w-[40px] z-[1000]">
+            <div className="absolute top-0 left-0 h-full w-[40px] z-[50]">
               {/* GREEN LINE */}
               <div className="absolute left-0 top-0 w-[8px] h-full bg-[#84bd00]">
                 
@@ -1413,7 +1435,7 @@ export const EngineeringModule = ({
                 <div
                   onClick={() => toggleOutputDock(!!output)}
                   className="
-                    absolute left-0 top-[44%]
+                    absolute left-0 top-[50%]
                     -translate-y-1/2
                     w-[8px] h-[80px]
                     bg-[#6a8f00]
@@ -1432,8 +1454,8 @@ export const EngineeringModule = ({
           /* COLLAPSED STRIP */
           <div
             className="
-              fixed right-0 top-0 h-screen w-[40px]
-              z-10 bg-white
+              fixed right-0 top-[52px] h-[calc(100vh-52px)] w-[40px]
+              z-[50]
             "
           >
             {/* GREEN LINE */}
@@ -1443,7 +1465,8 @@ export const EngineeringModule = ({
               <div
                 onClick={() => setDocks({ output: true })}
                 className="
-                  absolute left-0 top-[44%]
+                  absolute left-0 top-[50%]
+                  -translate-y-1/2
                   w-[8px] h-[80px]
                   bg-[#6a8f00]
                   flex items-center justify-center
