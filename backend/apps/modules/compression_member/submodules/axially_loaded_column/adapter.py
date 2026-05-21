@@ -218,13 +218,9 @@ def create_from_input(input_values: Dict[str, Any]) -> ColumnDesign:
     }
 
     module = create_module()
-    try:
-        module.set_input_values(design_dict)
-    except Exception as e:
-        traceback.print_exc()
-        print(f"[AxiallyLoadedColumn] Error in set_input_values: {e}")
-        raise
-
+    module.set_input_values(mapped)
+    # Restore the display name for reports (set_input_values overrides self.module with the raw KEY_MODULE value)
+    module.module = "Columns with known support conditions"
     return module
 
 

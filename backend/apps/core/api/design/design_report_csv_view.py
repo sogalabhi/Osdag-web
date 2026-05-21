@@ -29,6 +29,7 @@ from apps.modules.flexure_member.submodules.simply_supported_beam.adapter import
 from apps.modules.flexure_member.submodules.purlin.adapter import create_from_input as purlin_create_from_input
 from apps.modules.compression_member.submodules.struts_bolted.adapter import create_from_input as struts_bolted_create_from_input
 from apps.modules.compression_member.submodules.struts_welded.adapter import create_from_input as struts_welded_create_from_input
+from apps.modules.compression_member.submodules.axially_loaded_column.adapter import create_from_input as axially_loaded_column_create_from_input
 
 # importing models
 from apps.core.models import Design
@@ -152,6 +153,7 @@ class CreateDesignReport(APIView):
             'Purlin': purlin_create_from_input,
             'Struts-Bolted-Design': struts_bolted_create_from_input,
             'Struts-Welded-Design': struts_welded_create_from_input,
+            'Axially-Loaded-Column': axially_loaded_column_create_from_input,
         }
         
         if not module_id or module_id not in module_function_map:
