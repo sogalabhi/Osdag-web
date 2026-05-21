@@ -178,6 +178,8 @@ def create_from_input(input_values: Dict[str, Any]) -> Compression_welded:
         input_values["Weld.Material_Grade_OverWrite"] = ""
 
     module.set_input_values(input_values)
+    # Restore the display name for reports (set_input_values overrides self.module with the raw KEY_MODULE value)
+    module.module = KEY_DISP_STRUT_WELDED_END_GUSSET
     return module
 
 
