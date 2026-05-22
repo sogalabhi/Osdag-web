@@ -4,7 +4,11 @@
 // Fallback: current origin if env is not set.
 const rawBase = import.meta.env.VITE_BASE_URL;
 console.log(rawBase);
-let apiBase = `${window.location.protocol}//${window.location.hostname}/`;
+let apiBase = `${window.location.origin}/`;
+
+if (window.location.port === "5173") {
+  apiBase = `${window.location.protocol}//${window.location.hostname}:8000/`;
+}
 
 if (typeof rawBase === "string" && rawBase && rawBase !== "undefined") {
   apiBase = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;

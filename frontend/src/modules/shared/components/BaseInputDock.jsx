@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { message } from "antd";
 import { InputSection } from "./InputSection";
-import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
+import { OptimizedBoundsModal } from "./OptimizedBoundsModal";
 
 export const BaseInputDock = React.memo(({
   moduleConfig,
@@ -35,19 +35,38 @@ export const BaseInputDock = React.memo(({
   const internalLockBtnRef = useRef(null);
   const lockBtnRef = externalLockBtnRef || internalLockBtnRef;
 
-  const openAdditionalInputs = () => {
-    const guard = canOpenAdditionalInputs(
-      moduleConfig,
-      inputs,
-      extraState,
-      contextData,
-      selectionStates
-    );
-    if (!guard.ok) {
-      message.warning(guard.message);
+  // This contains all the data regarding the optimized modal, like if its open,
+  // which key it bounds and also the values for setting the inputs
+  const [optimizedModal, setOptimizedModal] = useState({ state: false, key: '' });
+  const [modalValues, setModalValues] = useState({ lb: '', ub: '', inc: '' });
+
+  const resolveOptimizedFieldLabel = (fieldKey) => {
+    if (!fieldKey || !moduleConfig?.inputSections) return "";
+    for (const section of moduleConfig.inputSections) {
+      const match = section?.fields?.find((field) => field.key === fieldKey);
+      if (match) return match.label || "";
+    }
+    return "";
+  };
+
+  const handleOptimizedModalCancel = () => {
+    setOptimizedModal({ state: false, key: "" });
+    setModalValues({ lb: "", ub: "", inc: "" });
+  };
+
+  const handleOptimizedModalSave = () => {
+    const { key } = optimizedModal;
+    if (!key) {
+      handleOptimizedModalCancel();
       return;
     }
-    setDesignPrefModalStatus(true);
+    setInputs({
+      ...inputs,
+      [`${key}_lb`]: modalValues.lb ?? "",
+      [`${key}_ub`]: modalValues.ub ?? "",
+      [`${key}_inc`]: modalValues.inc ?? "",
+    });
+    handleOptimizedModalCancel();
   };
 
   return (
@@ -143,6 +162,15 @@ export const BaseInputDock = React.memo(({
               </div>
             </div>
           )}
+
+          <OptimizedBoundsModal
+            isOpen={optimizedModal.state}
+            fieldLabel={resolveOptimizedFieldLabel(optimizedModal.key)}
+            values={modalValues}
+            onChange={(nextValues) => setModalValues(nextValues)}
+            onCancel={handleOptimizedModalCancel}
+            onSave={handleOptimizedModalSave}
+          />
         </div>
       </div>
 
@@ -204,7 +232,9 @@ export const BaseInputDock = React.memo(({
               setExtraState={setExtraState}
               updateSelectedItems={updateSelectedItems}
               setModalDynamicSrc={setModalDynamicSrc}
-              onRefetchModuleOptions={onRefetchModuleOptions}
+              isOptimized={moduleConfig.isOptimized}
+              setOptimizedModal={setOptimizedModal}
+              setModalValues={setModalValues}
             />
           ))}
         </div>

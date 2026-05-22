@@ -30,6 +30,7 @@ function UnifiedDropdownMenu({
   triggerScreenshotCapture,
   selectedOption = null,
   setSelectedOption = () => { },
+  openOptiGraph,
   boltDiameterList = [],
   propertyClassList = [],
   thicknessList = [],
@@ -345,6 +346,11 @@ function UnifiedDropdownMenu({
         break;
       case "Rotate 3D Model":
         document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'auto-rotate' }));
+        break;
+      case "Open Optimization Graph":
+        if (openOptiGraph) {
+          openOptiGraph();
+        }
         break;
       default:
         if (onMenuClick) {

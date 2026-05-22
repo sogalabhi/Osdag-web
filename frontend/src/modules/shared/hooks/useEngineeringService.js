@@ -26,6 +26,10 @@ import { generateInitialReport as dsGenerateInitialReport, customizeReport as ds
 import { saveOsiFromInputs as dsSaveOsiFromInputs } from '../../../datasources/osiDataSource';
 import { apiClient } from '../../../utils/apiClient';
 import { getModuleSlug } from '../../../constants/apiRoutes';
+import { apiBase } from '../../../api';
+import { URLS } from '../../../constants/Urls';
+
+const BASE_URL = URLS.BASE_URL;
 
 // ===================================================================
 // MAIN HOOK
@@ -338,6 +342,37 @@ export const useEngineeringService = () => {
   }, [apiCall]);
 
   // ===================================================================
+  // 8. WEBSOCKET - Websocket Connection for real-time updates
+  // ===================================================================
+
+  const getRTUpdates = useCallback((ws_url, onOpen = () => { }, onMessage = () => { }, onError = () => { }, onClose = () => { }) => {
+    try {
+      // Use the actual backend host and port from URLS
+      const backend_url = new URL(BASE_URL);
+      const protocol = backend_url.protocol === 'https:' ? 'wss:' : 'ws:';
+      
+      // Construct the absolute WebSocket URL
+      // Ensure ws_url doesn't have a leading slash if we add one, or vice versa
+      const path = ws_url.startsWith('/') ? ws_url.substring(1) : ws_url;
+      const full_ws_url = `${protocol}//${backend_url.host}/${path}`;
+      
+      console.log("[PSO] Connecting to WebSocket:", full_ws_url);
+      
+      const socket = new WebSocket(full_ws_url);
+      socket.onopen = onOpen;
+      socket.onmessage = onMessage;
+      socket.onerror =  onError;
+      socket.onclose = onClose;
+      
+      return socket; // Return socket to allow potential manual closing
+    }
+    catch (error) {
+      console.error("[PSO] WebSocket initialization error:", error);
+      onError(error);
+    }
+  }, [])
+
+  // ===================================================================
   // RETURN API
   // ===================================================================
 
@@ -370,6 +405,9 @@ export const useEngineeringService = () => {
     getDesignPreferences,
     uploadCompanyLogo,
 
+    // WebSocket
+    getRTUpdates: getRTUpdates,
+
     // CSV
     exportToCSV: exportToCSVUtil,
 
@@ -377,4 +415,3 @@ export const useEngineeringService = () => {
     getSlug: getModuleSlug,
   };
 };
-

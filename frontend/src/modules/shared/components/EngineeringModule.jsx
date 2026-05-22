@@ -23,6 +23,7 @@ import {
 import { BaseInputDock } from "./BaseInputDock";
 import { BaseOutputDock } from "./BaseOutputDock";
 import { CustomizationModal } from "../components/CustomizationModal";
+import { ThicknessSelectionModal } from "../../flexuralMember/plateGirder/components/ThicknessSelectionModal";
 import { DesignReportModal } from "../components/DesignReportModal";
 import { DesignStatusModal } from "./DesignStatusModal";
 import { DESIGN_STATUS } from "../hooks/useDesignSubmission";
@@ -42,26 +43,11 @@ import { menuItems } from "../utils/moduleUtils";
 import { UI_STRINGS } from "../../../constants/UIStrings";
 import { isGuestUser, canCreateProjects } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
-import {
-  downloadGroupedInputsCsv,
-  downloadGroupedOutputsCsv,
-} from "../utils/groupedCsvExport";
-import ProjectNameModal from "../../../homepage/components/ProjectNameModal";
-import { useProjectCreation } from '../hooks/useProjectCreation';
-import { deleteAllCustomSections } from "../../../datasources/sectionsDataSource";
-import HelpLinkModal from "./help/HelpLinkModal";
-import AboutOsdagModal from "./help/AboutOsdagModal";
-import { ASK_QUESTION_LINK, DESIGN_EXAMPLES_URL } from "./help/helpContent";
-import { openOsiFile } from "../../../datasources/osiDataSource";
-import {
-  downloadCachedModelByFormat,
-  downloadExportCadResponse,
-} from "../utils/cadExport";
-import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
-import { getModuleConfig as getDesignPrefModuleConfig } from "../utils/moduleConfig";
-import { useShortcutLayer } from "../../../utils/shortcuts/ShortcutProvider";
-import { SHORTCUT_ACTION_BY_ID } from "../../../constants/shortcuts";
-import FloatingNavBar from "./FloatingNavBar";
+import OptimizationGraph from "./OptimizationGraph";
+import PSODashboard from "../../flexuralMember/plateGirder/components/PSODashboard";
+
+const PSO_PLAYBACK_INTERVAL_MS = 80;
+const PSO_PARTICLES_PER_TICK = 50;
 
 export const EngineeringModule = ({
   moduleConfig,
@@ -205,41 +191,226 @@ export const EngineeringModule = ({
   const [selectedCameraView, setSelectedCameraView] = useState("Model");
   const [lockZoom, setLockZoom] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [showCad, setShowCad] = useState(window.innerWidth >= 768); // Default: true on desktop, false on mobile
+  const [showOptimizationGraph, setShowOptimizationGraph] = useState(false);
+  const [optimizationDone, setOptimizationDone] = useState(false);
+  const [optimizationData, setOptimizationData] = useState({
+    current_iter: 0,
+    variableNames: [],
+    bounds: { lb: [], ub: [] },
+    history: [],
+    currentSwarm: [],
+    globalBest: null
+  });
+  const psoParticleQueueRef = useRef([]);
+  const psoPlaybackTimerRef = useRef(null);
+  const psoPendingCompleteRef = useRef(null);
 
-  // Hooking Graphics Options (Model / Selected Section & Bg Color)
+  const applyPsoParticles = (particlesWithParent) => {
+    if (!Array.isArray(particlesWithParent) || !particlesWithParent.length) return;
+    setOptimizationData((prev) => {
+      let newHistory = [...(prev.history || [])];
+      let currentSwarm = [...(prev.currentSwarm || [])];
+      let globalBest = prev.globalBest;
+      let currentIter = prev.current_iter;
+      let variableNames = prev.variableNames || [];
+      let bounds = prev.bounds || { lb: [], ub: [] };
+      let plotImage = prev.plotImage;
+
+      particlesWithParent.forEach(({ particle: p, parentData }) => {
+        if (!p) return;
+        const varsDict = {};
+        const names = p.variable_names || parentData?.variable_names || [];
+        const values = p.variables || parentData?.variables || [];
+        (names || []).forEach((name, idx) => {
+          varsDict[name] = (values || [])[idx];
+        });
+
+        const ur = Number(p.ur);
+        const weightKg = Number(p.weight_kg);
+        const depth = Number(varsDict.D || p.depth);
+        if (!Number.isFinite(ur)) return;
+
+        const particleData = {
+          ur,
+          weight_kg: Number.isFinite(weightKg) ? weightKg : 0,
+          depth: Number.isFinite(depth) ? depth : 0,
+          tw: varsDict.tw,
+          tf: varsDict.tf || varsDict.tf_top,
+          bf: varsDict.bf || varsDict.bf_top,
+          vars: varsDict,
+          particle: p.particle_index,
+          iter: p.iteration,
+          timestamp: Date.now()
+        };
+
+        if (p.variable_names || parentData?.variable_names) variableNames = p.variable_names || parentData.variable_names;
+        if (p.bounds || parentData?.bounds) bounds = p.bounds || parentData.bounds;
+        if (p.plot_image || parentData?.plot_image) plotImage = p.plot_image || parentData.plot_image;
+
+        newHistory.push(particleData);
+
+        if (particleData.iter !== currentIter) {
+          currentIter = particleData.iter;
+          currentSwarm = [particleData];
+        } else {
+          currentSwarm.push(particleData);
+          if (currentSwarm.length > 200) currentSwarm.shift();
+        }
+
+        const isFeasible = particleData.ur <= 1.0;
+        if (!globalBest || (isFeasible && (globalBest.ur > 1.0 || particleData.weight_kg < globalBest.weight_kg))) {
+          globalBest = particleData;
+        } else if (!isFeasible && globalBest.ur > 1.0 && particleData.ur < globalBest.ur) {
+          globalBest = particleData;
+        }
+      });
+
+      if (newHistory.length > 10000) newHistory = newHistory.slice(-10000);
+
+      return {
+        ...prev,
+        current_iter: currentIter,
+        variableNames,
+        bounds,
+        history: newHistory,
+        currentSwarm,
+        globalBest,
+        plotImage,
+      };
+    });
+  };
+
+  const completePsoOptimization = (messageData, socket) => {
+    setOptimizationDone(true);
+    if (socket?.readyState === WebSocket.OPEN || socket?.readyState === WebSocket.CONNECTING) {
+      socket.close();
+    }
+
+    if (messageData.result) {
+      const result = messageData.result;
+
+      if (result.design) {
+        const formattedOutput = {};
+        for (const [key, value] of Object.entries(result.design)) {
+          const label = value?.label ?? key;
+          const val = value?.val ?? value?.value ?? value;
+          if (val !== undefined && val !== null) {
+            formattedOutput[key] = { label, val };
+          }
+        }
+
+        setStatus({
+          step: DESIGN_STATUS.COMPLETE,
+          message: 'Optimization complete',
+          error: null
+        });
+
+        setOptimizationData((prev) => {
+          const preserved = {
+            current_iter: prev.current_iter || 0,
+            variableNames: prev.variableNames || [],
+            bounds: prev.bounds || { lb: [], ub: [] },
+            history: prev.history || [],
+            currentSwarm: prev.currentSwarm || [],
+            globalBest: prev.globalBest || null,
+            finalResult: result.design,
+            finalLogs: result.raw || []
+          };
+          console.log('[PSO_COMPLETE] Preserving optimization data:', {
+            historyCount: preserved.history.length,
+            currentSwarmCount: preserved.currentSwarm.length,
+            hasGlobalBest: !!preserved.globalBest,
+            currentIter: preserved.current_iter
+          });
+          return preserved;
+        });
+      }
+    }
+  };
+
+  const stopPsoPlayback = () => {
+    if (psoPlaybackTimerRef.current) {
+      clearInterval(psoPlaybackTimerRef.current);
+      psoPlaybackTimerRef.current = null;
+    }
+  };
+
+  const resetPsoPlayback = () => {
+    stopPsoPlayback();
+    psoParticleQueueRef.current = [];
+    psoPendingCompleteRef.current = null;
+  };
+
+  const drainPsoParticleQueue = () => {
+    const queue = psoParticleQueueRef.current;
+    if (!queue.length) {
+      stopPsoPlayback();
+      if (psoPendingCompleteRef.current) {
+        const { messageData, socket } = psoPendingCompleteRef.current;
+        psoPendingCompleteRef.current = null;
+        completePsoOptimization(messageData, socket);
+      }
+      return;
+    }
+
+    const nextParticles = queue.splice(0, PSO_PARTICLES_PER_TICK);
+    applyPsoParticles(nextParticles);
+  };
+
+  const startPsoPlayback = () => {
+    if (psoPlaybackTimerRef.current) return;
+    psoPlaybackTimerRef.current = setInterval(drainPsoParticleQueue, PSO_PLAYBACK_INTERVAL_MS);
+  };
+
+  const enqueuePsoParticles = (particlesWithParent) => {
+    if (!Array.isArray(particlesWithParent) || !particlesWithParent.length) return;
+    psoParticleQueueRef.current.push(...particlesWithParent);
+    startPsoPlayback();
+  };
+
+  useEffect(() => {
+    return () => {
+      stopPsoPlayback();
+    };
+  }, []);
+
+  const [customBgColor, setCustomBgColor] = useState(null);
   const colorPickerRef = useRef(null);
   const [customBgColor, setCustomBgColor] = useState(null);
 
-  useEffect(() => {
-    if (inputs?.graphicsOption) {
-      const opt = inputs.graphicsOption;
-      if (["Model", "Beam", "Column", "Seated Angle", "Cleat Angle"].includes(opt)) {
-        if (opt === "Model") {
-          setSelectedSection(["Model"]);
+  // Prepare data for Plotly OptimizationGraph
+  const plotlyData = useMemo(() => {
+    const fease = { x: [], y: [], z: [], text: [] };
+    const non_fease = { x: [], y: [], z: [], text: [] };
+    const swarm_fease = { x: [], y: [], z: [], text: [] };
+    const swarm_non_fease = { x: [], y: [], z: [], text: [] };
 
-          setSelectedCameraView("Model");
-        } else {
-          // If a non-Model option is selected, add it
-          const newSelection = selectedSection.filter(s => s !== "Model");
-          if (!newSelection.includes(opt)) {
-            newSelection.push(opt);
-          }
-          if (newSelection.length > 0) {
-            setSelectedSection(newSelection);
+    const asFiniteNumber = (value, fallback = 0) => {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : fallback;
+    };
 
-            setSelectedCameraView(newSelection[0]);
-          }
-        }
-      } else if (opt === "Change Background") {
-        if (colorPickerRef.current) {
-          colorPickerRef.current.click();
-        }
-      } else if (opt === "Show front view") {
-        setSelectedCameraView("XY");
-      } else if (opt === "Show side view") {
-        setSelectedCameraView("YZ");
-      } else if (opt === "Show top view") {
-        setSelectedCameraView("ZX");
+    const pushParticlePoint = (target, p, prefix = "") => {
+      const ur = asFiniteNumber(p.ur);
+      const depth = asFiniteNumber(p.depth);
+      const weight = asFiniteNumber(p.weight_kg);
+      target.x.push(ur);
+      target.y.push(depth);
+      target.z.push(weight);
+      target.text.push(`${prefix}Iter: ${p.iter}, P: ${p.particle}`);
+    };
+    
+    // History points (all particles so far)
+    (optimizationData.history || []).forEach(p => {
+      const ur = Number(p.ur);
+      if (!Number.isFinite(ur)) return;
+      if (ur <= 1.0) {
+        pushParticlePoint(fease, p);
+      } else {
+        pushParticlePoint(non_fease, p);
       }
       // Cleanup graphicOption to allow consecutive clicks of same option
       setInputs(prev => {
@@ -250,7 +421,47 @@ export const EngineeringModule = ({
     }
   }, [inputs?.graphicsOption, selectedSection]);
 
-  const prevPathsRef = useRef(null);
+    // Current Swarm (particles in the latest iteration)
+    (optimizationData.currentSwarm || []).forEach(p => {
+      const ur = Number(p.ur);
+      if (!Number.isFinite(ur)) return;
+      if (ur <= 1.0) {
+        pushParticlePoint(swarm_fease, p, "[LIVE] ");
+      } else {
+        pushParticlePoint(swarm_non_fease, p, "[LIVE] ");
+      }
+    });
+
+    return {
+      current_iter: optimizationData.current_iter,
+      variableNames: optimizationData.variableNames,
+      bounds: optimizationData.bounds,
+      fease,
+      non_fease,
+      swarm_fease,
+      swarm_non_fease,
+      best: {
+        found: !!optimizationData.globalBest,
+        x: optimizationData.globalBest ? [optimizationData.globalBest.ur] : [],
+        y: optimizationData.globalBest ? [optimizationData.globalBest.depth] : [],
+        z: optimizationData.globalBest ? [optimizationData.globalBest.weight_kg] : [],
+        val: optimizationData.globalBest?.weight_kg || 0,
+        iter: (optimizationData.globalBest?.iter || 0) + 1,
+        particle: (optimizationData.globalBest?.particle || 0) + 1,
+        vars: optimizationData.globalBest?.vars || {}
+      }
+    };
+  }, [optimizationData]);
+
+  const { handleCreateProject, projectCreationModal } = useProjectCreation({
+    inputs,
+    extraState,
+    allSelected,
+    contextData,
+    moduleConfig,
+  });
+
+  // Normalize CAD path keys to handle case/spacing differences
   const normalizedCadModelPaths = useMemo(() => {
     const out = {};
     Object.entries(cadModelPaths || {}).forEach(([key, value]) => {
@@ -475,7 +686,117 @@ export const EngineeringModule = ({
 
     // Call the actual submit function
     try {
-      await handleSubmit();
+      if (extraState.optimizedInputs) {
+        let optimizationPayload = inputs;
+        try {
+          optimizationPayload = moduleConfig.buildSubmissionParams(
+            inputs,
+            allSelected,
+            contextData,
+            { ...extraState, optimizedInputs: true }
+          );
+          optimizationPayload["Total.Design_Type"] = "Optimized";
+        } catch (error) {
+          console.error("[PSO] Failed to prepare optimization payload:", error);
+          setStatus({
+            step: DESIGN_STATUS.ERROR,
+            message: 'Error preparing optimization parameters',
+            error
+          });
+          return;
+        }
+
+        let sequence = -1; // to track and drop out-of-order messages.
+        setShowOptimizationGraph(true);
+        service.getRTUpdates("ws/optimize/plate-girder/",
+          (ev) => {
+            setIsWsConnected(true);
+            resetPsoPlayback();
+            const ws = ev.target
+            ws.send(JSON.stringify({
+              type: "start_optimization",
+              data: optimizationPayload
+            }
+            ));
+
+            setOptimizationData({
+              current_iter: 0,
+              variableNames: [],
+              bounds: { lb: [], ub: [] },
+              history: [],
+              currentSwarm: [],
+              globalBest: null
+            });
+            setOptimizationDone(false);
+          },
+          (event) => {
+            try {
+              const msg = JSON.parse(event.data);
+              const messageData = msg.data || {};
+
+              // Fix: Guard against undefined sequences that break the comparison
+              const msgSequence = messageData.sequence !== undefined ? messageData.sequence : -2;
+
+              if (msgSequence > sequence || msgSequence === -2) {
+                if (msgSequence !== -2) sequence = msgSequence;
+
+                switch (msg.type) {
+                  case "task_started":
+                    break;
+                  case "pso_update": {
+                    const rawParticles = messageData.batch && Array.isArray(messageData.particles)
+                      ? messageData.particles
+                      : [messageData];
+                    const particles = rawParticles.filter(Boolean);
+
+                    enqueuePsoParticles(
+                      particles.map((particle) => ({
+                        particle,
+                        parentData: messageData
+                      }))
+                    );
+                    break;
+                  }
+                  case "pso_heartbeat":
+                    // update liveness indicator
+                    break;
+                  case "pso_complete":
+                    if (psoParticleQueueRef.current.length) {
+                      psoPendingCompleteRef.current = { messageData, socket: event.target };
+                    } else {
+                      completePsoOptimization(messageData, event.target);
+                    }
+                    break;
+                  case "pso_error":
+                    console.error("PSO optimization error:", messageData);
+                    resetPsoPlayback();
+                    event.target.close(); // close the connection
+                    // show error; stop loading
+                    break;
+                }
+              }
+            } catch (error) {
+              console.error("[PSO] WebSocket message handling failed:", error);
+            }
+          },
+          (error) => {
+            console.error("[PSO] WebSocket Error:", error);
+            setIsWsConnected(false);
+          },
+          () => {
+            console.log("[PSO] WebSocket Disconnected");
+            setIsWsConnected(false);
+            if (!psoParticleQueueRef.current.length && !psoPendingCompleteRef.current) {
+              setOptimizationDone(true);
+            }
+          }
+        )
+        // For optimized designs, don't call handleSubmit() - WebSocket handles it
+        // The optimization will run via WebSocket and show real-time updates
+      } else {
+        // For non-optimized (Customized) designs, use regular API
+        await handleSubmit();
+      }
       setShowResetButton(true);
     } catch (error) {
     } finally {
@@ -923,6 +1244,7 @@ export const EngineeringModule = ({
               setCreateDesignReportBool={setCreateDesignReportBool}
               triggerScreenshotCapture={triggerScreenshotCapture}
               selectedOption={extraState.selectedOption}
+              openOptiGraph={openOptiGraph}
               setSelectedOption={(value) =>
                 setExtraState({ ...extraState, selectedOption: value })
               }
@@ -1102,7 +1424,7 @@ export const EngineeringModule = ({
         }, [])}
       </div>
 
-      <div className="relative flex flex-row flex-1 overflow-hidden w-full">
+      <div className="relative flex flex-row h-full w-full" style={{ minHeight: 'calc(100vh - 80px)', maxHeight: 'calc(100vh - 48px)' }}> {/* Adjust for nav height */}
         {/* Input Dock Toggle Button - Fixed to left, shows when dock is closed (Desktop only) */}
         {!docks.input && !isMobile && (
           <button
@@ -1434,21 +1756,35 @@ export const EngineeringModule = ({
       />
 
       {/* Customization Modals */}
-      {
-        moduleConfig.modalConfig.map((modal) => (
-          <CustomizationModal
+      {moduleConfig.modalConfig.map((modal) => {
+        const ModalComponent = modal.type === "thickness"
+          ? ThicknessSelectionModal
+          : CustomizationModal;
+        return (
+          <ModalComponent
             key={modal.key}
             isOpen={modalStates[modal.key]}
-            onClose={() => updateModalState(modal.key, false)}
-            title="Customized"
+            onClose={() => {
+              // Save selectedItems to inputs when modal closes
+              if (selectedItems[modal.inputKey]) {
+                setInputs({
+                  ...inputs,
+                  [modal.inputKey]: Array.isArray(selectedItems[modal.inputKey])
+                    ? selectedItems[modal.inputKey]
+                    : []
+                });
+              }
+              updateModalState(modal.key, false);
+            }}
+            title={modal.title || "Customized"}
             dataSource={contextData[modal.dataSource] || (modalDynamicSrc[modal.inputKey] || [])} // FIXED: This now includes angleList
             selectedItems={selectedItems[modal.inputKey]}
             onTransferChange={(nextTargetKeys) =>
               updateSelectedItems(modal.inputKey, nextTargetKeys)
             }
           />
-        ))
-      }
+        );
+      })}
 
       {/* Design Preferences Modal (Additional Inputs) */}
       {
@@ -1534,19 +1870,23 @@ export const EngineeringModule = ({
       </Modal>
 
       {/* Design Status Modal */}
-      <DesignStatusModal
-        status={status}
-        isMobile={isMobile}
-        onRetry={() => {
-          // Retry logic - could trigger handleSubmitEnhanced again
-          setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
-        }}
-        onClose={() => {
-          if (status.step === DESIGN_STATUS.ERROR) {
+      {!(moduleConfig?.designType?.includes('plate') && status.step === DESIGN_STATUS.COMPLETE) && (
+        <DesignStatusModal
+          status={status}
+          isMobile={isMobile}
+          onRetry={() => {
+            // Retry logic - could trigger handleSubmitEnhanced again
             setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
-          }
-        }}
-      />
+          }}
+          onClose={() => {
+            console.log('[DesignStatusModal] onClose called, status:', status.step);
+            if (status.step === DESIGN_STATUS.ERROR || status.step === DESIGN_STATUS.COMPLETE) {
+              setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
+              console.log('[DesignStatusModal] Status reset to IDLE');
+            }
+          }}
+        />
+      )}
 
       {/* Hover tooltip overlay */}
       {hoverText && (
