@@ -61,6 +61,8 @@ import ShortcutHelpModal from "./components/ShortcutHelpModal";
 
 import ErrorPage from "./components/ErrorPage";
 import ProjectAuthGuard from "./components/ProjectAuthGuard";
+import PrivacyTab from "./homepage/components/tabs/PrivacyTab";
+import CaveatsTab from "./homepage/components/tabs/CaveatsTab";
 
 function App() {
   let loggedIn = false;
@@ -69,6 +71,10 @@ function App() {
       <Route path="/" element={<Root loggedIn={loggedIn} />} errorElement={<ErrorPage />}>
         <Route path="/" element={<LoginPage />} />
         <Route path="/home" element={<Homepage />} />
+
+        {/* Privacy Policy */}
+        <Route path="/privacy-policy" element={<PrivacyTab />} />
+        <Route path="/caveats" element={<CaveatsTab />} />
         <Route path="/:moduleName" element={<SelectModulePage />} />
 
         <Route element={<ProjectAuthGuard />}>

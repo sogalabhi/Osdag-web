@@ -12,6 +12,8 @@ import {
 } from '../utils/firebaseAuth';
 import { EmailVerificationStatus } from './EmailVerificationStatus';
 import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
+import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -35,6 +37,8 @@ const LoginPage = () => {
     // Modal states
     const [fPasswordModalVisible, setFPasswordModalVisible] = useState(false);
     const [fPasswordEmail, setFPasswordEmail] = useState('');
+
+    const [acceptPolicy, setAcceptPolicy] = useState(false);
 
     // Firebase user state (from shared auth hook)
     const { user: currentUser } = useAuth();
@@ -76,6 +80,10 @@ const LoginPage = () => {
             }
         }
 
+        if (isSignup && !acceptPolicy) {
+            newErrors.acceptPolicy = 'You must accept the Privacy Policy and Caveats';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -85,6 +93,7 @@ const LoginPage = () => {
         setEmail('');
         setPassword('');
         setConfirmPassword('');
+        setAcceptPolicy(false);
     };
 
     // Handle Forgot password
@@ -426,6 +435,47 @@ const LoginPage = () => {
                                 </div>
                             )}
 
+                            {isSignup && (
+                                <div className="mt-2">
+                                    <label className="flex items-start gap-2 text-sm text-gray-600">
+                                        <input
+                                            type="checkbox"
+                                            checked={acceptPolicy}
+                                            onChange={(e) => setAcceptPolicy(e.target.checked)}
+                                            className="mt-1 accent-osdag-green"
+                                        />
+
+                            <span>
+                                I agree to the{" "}
+
+                                <Link
+                                    to="/privacy-policy"
+                                    target="_blank"
+                                    className="text-osdag-green hover:underline"
+                                >
+                                    Privacy Policy
+                                </Link>
+
+                                {" "}and{" "}
+
+                                <Link
+                                    to="/caveats"
+                                    target="_blank"
+                                    className="text-osdag-green hover:underline"
+                                >
+                                    Caveats
+                                </Link>.
+                            </span>
+                                    </label>
+
+                                    {errors.acceptPolicy && (
+                                        <span className="text-red-500 text-xs mt-1 block">
+                                            {errors.acceptPolicy}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+
                             {!isSignup && (
                                 <p
                                     className="text-osdag-green text-sm cursor-pointer hover:underline mt-1"
@@ -456,6 +506,28 @@ const LoginPage = () => {
                             >
                                 {isSignup ? "Log in" : "Sign up"}
                             </button>
+                        </p>
+
+                        <p className="text-xs text-gray-500 text-center mt-4 leading-5">
+                            By continuing, you agree to our{" "}
+
+                            <Link
+                                to="/caveats"
+                                target="_blank"
+                                className="text-osdag-green hover:underline"
+                            >
+                                Caveats
+                            </Link>
+
+                            {" "}and{" "}
+
+                            <Link
+                                to="/privacy-policy"
+                                target="_blank"
+                                className="text-osdag-green hover:underline"
+                            >
+                                Privacy Policy
+                            </Link>.
                         </p>
                     </div>
 

@@ -205,8 +205,9 @@ const Header = ({ setshowSideBar, active }) => {
     const fileName = fileMap[item];
 
     const link = document.createElement("a");
-    link.href = `/downloads/${fileName}`; // <-- path where XLSX is served
+    link.href = `${window.location.origin}/downloads/${fileName}`;
     link.download = fileName;
+    link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
