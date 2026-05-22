@@ -92,7 +92,8 @@ function SpacingDiagramLayout({ config, fields, diagram, output, getOutputValue,
         <div className="flex w-full flex-col gap-3 px-4 md:w-1/2">
           {fields.map(({ key, label }, idx) => (
             <div key={idx} className="flex items-center justify-between gap-3 text-sm">
-              <h4 className="font-medium text-gray-700">{label}</h4>
+              <h4 className="font-medium text-gray-700" dangerouslySetInnerHTML={{ __html: label }} />
+
               <div className="min-w-[40%]">
                 <ValueBox value={getOutputValue(key, output)} />
               </div>
