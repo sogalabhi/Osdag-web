@@ -66,6 +66,7 @@ function UnifiedDropdownMenu({
 
   const loadInput = () => {
     let element = document.createElement("input");
+
     element.setAttribute("type", "file");
     element.accept = ".osi,application/json";
     element.style.display = "none";
@@ -87,10 +88,12 @@ function UnifiedDropdownMenu({
       try {
         const formData = new FormData();
         formData.append('file', file);
+
         const data = await openOsiFile(formData);
         if (data.ok && data.success) {
           // data.inputs follows the backend schema — pass through
           setInputs(data.inputs || {});
+
           // reset flags conservatively
           setAllSelected({});
           message.success('Input loaded from OSI');
@@ -427,7 +430,7 @@ function UnifiedDropdownMenu({
         {label}
       </div>
       {isOpen && (
-        <div className="absolute top-full left-0 bg-white border border-[#ccc] border-t-0 min-w-[350px] z-[1]">
+        <div className="absolute top-full left-0 bg-white border border-[#ccc] border-t-0 min-w-52 z-[1]">
           {dropdown.map((option, index) => {
             const isDisabled =
               (option.name === "Create Project" && isExistingProject) ||
@@ -464,7 +467,7 @@ function UnifiedDropdownMenu({
                   </span>
                 </div>
                 {hasSubmenu && isSubmenuOpen && (
-                  <div className="absolute top-0 left-full ml-[1px] bg-white border border-[#ccc] min-w-[220px] z-[2]">
+                  <div className="absolute top-0 left-full ml-[1px] bg-white border border-[#ccc] min-w-26 z-[2]">
                     {option.options.map((subOption) => (
                       <div
                         key={`${option.name}-${subOption}`}

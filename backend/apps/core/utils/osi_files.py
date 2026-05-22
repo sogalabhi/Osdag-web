@@ -169,6 +169,7 @@ def parse_osi(text: str) -> Tuple[str, str, Dict[str, Any]]:
         # Fallback to legacy flat YAML
         legacy = _parse_legacy_yaml(text)
         module_id = legacy.get("Module") or legacy.get("module") or ""
+
         if not module_id:
             raise ValueError("Module missing in OSI")
 
@@ -176,7 +177,9 @@ def parse_osi(text: str) -> Tuple[str, str, Dict[str, Any]]:
             return legacy.get(key, default)
 
         inputs: Dict[str, Any] = {}
-        if module_id == "FinPlateConnection":
+        normalized_module = module_id.replace(" ", "").lower()
+
+        if normalized_module == "finplateconnection":
             # Reverse mapping for FinPlateConnection
             inputs.update({
                 "bolt_hole_type": g("Bolt.Bolt_Hole_Type"),

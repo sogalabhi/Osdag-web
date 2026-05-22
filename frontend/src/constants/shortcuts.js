@@ -348,6 +348,7 @@ export const MENU_ACTION_TO_SHORTCUT_ID = {
   'Show top view': 'eng.cad.view.top',
   'Show side view': 'eng.cad.view.side',
   'Reset': 'eng.design.reset',
+  'Show optimization graph': '',
 };
 
 export const getShortcutDisplayLabel = (

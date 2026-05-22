@@ -41,22 +41,18 @@ export const menuItems = [
       { name: "Zoom Out", shortcut: getMenuShortcutLabel("Zoom Out") },
       { name: "Pan" },
       { name: "Rotate 3D Model" },
-      { name: "Show front view", shortcut: getMenuShortcutLabel("Show front view") },
-      { name: "Show top view", shortcut: getMenuShortcutLabel("Show top view") },
-      { name: "Show side view", shortcut: getMenuShortcutLabel("Show side view") },
-      { name: "Model" },
-      { name: "Beam" },
-      { name: "Column" },
-      { name: "Seated Angle" },
-      { name: "Change Background" },
+      { name: "Show Front View", shortcut: getMenuShortcutLabel("Show front view") },
+      { name: "Show Top View", shortcut: getMenuShortcutLabel("Show top view") },
+      { name: "Show Side View", shortcut: getMenuShortcutLabel("Show side view") },
+      { name: "Show Optimization Graph", shortcut: getMenuShortcutLabel("Show optimization graph") },
     ],
   },
   {
     label: "Database",
     dropdown: [
-      { name: "Download Inputs CSV" },
-      { name: "Download Outputs CSV" },
-      { name: "Download Inputs OSI" },
+      { name: "Save Inputs (.csv)" },
+      { name: "Save Outputs (.csv)" },
+      { name: "Save Inputs (.osi)" },
       { name: "Download Database", options: ["Column", "Beam", "Angle", "Channel"] },
       { name: "Reset", shortcut: getMenuShortcutLabel("Reset") },
     ],
@@ -64,7 +60,6 @@ export const menuItems = [
   {
     label: "Help",
     dropdown: [
-      { name: "Video Tutorials" },
       { name: "Design Examples" },
       { name: "Ask us a question" },
       { name: "About Osdag" }
