@@ -11,7 +11,8 @@ function TwoColumnLayout({ config, fields, output, getOutputValue, ValueBox, get
         <div className="spacing-left-body">
           {fields.map(({ key, label }, idx) => (
             <div key={idx} className="spacing-left-body-align">
-              <h4>{label}</h4>
+              <h4 dangerouslySetInnerHTML={{ __html: label }} />
+
               <ValueBox value={getOutputValue(key, output)} />
             </div>
           ))}
