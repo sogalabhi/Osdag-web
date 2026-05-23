@@ -5,6 +5,11 @@ import { MODULE_ROUTES, MODULE_NAME_TO_KEY, CONNECTIONS_TAB_CONTENT, GENERIC_SUB
 import { apiClient } from '../../utils/apiClient';
 import { isGuestUser } from '../../utils/auth';
 import { useAuth } from '../../context/AuthContext';
+import { Button, message } from 'antd';
+import { FileTextOutlined } from '@ant-design/icons';
+import { getProjectById } from "../../datasources/projectsDataSource";
+import { saveOsiFromInputs } from "../../datasources/osiDataSource";
+import { getModuleRoute } from "../../constants/moduleRoutes";
 import dayButton from '../../assets/homepage/day_button.svg';
 import infoDefault from '../../assets/homepage/info_default.svg';
 import infoHover from '../../assets/homepage/info_hover.svg';
@@ -942,17 +947,7 @@ const Header = ({ setshowSideBar, active }) => {
                         <div className="space-y-2">
                           {searchResults.projects.map((item, index) => (
                             <div key={index}
-                              onClick={() => {
-                                const route = MODULE_ROUTES[item.routeKey];
-                                if (route) {
-                                  navigate(`${route}/${item.id}`);
-                                } else {
-                                  navigate(`/home`);
-                                }
-                                setIsSearchFocused(false);
-                                setSearchQuery('');
-                              }}
-                              className="p-3 hover:bg-osdag-green/5 rounded-xl cursor-pointer transition-colors group">
+                              className="p-3 hover:bg-osdag-green/5 rounded-xl transition-colors group">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
                                   <div className="w-8 h-8 bg-osdag-green/10 rounded-lg flex items-center justify-center">
@@ -968,6 +963,62 @@ const Header = ({ setshowSideBar, active }) => {
                                   </div>
                                 </div>
                                 <span className="text-osdag-text-muted text-xs">{item.date}</span>
+                              </div>
+                              <div className="flex flex-wrap gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-all duration-300 max-h-0 group-hover:max-h-20 overflow-hidden pl-11">
+                                <Button type="default" size="small" className="px-3 py-1.5 text-xs font-medium" onClick={(e) => {
+                                  e.stopPropagation();
+                                  const route = MODULE_ROUTES[item.routeKey] || getModuleRoute(item.module_id);
+                                  if (route) {
+                                    navigate(`${route}/${item.id}`);
+                                    setIsSearchFocused(false);
+                                    setSearchQuery('');
+                                  } else {
+                                    message.error('Module route not found');
+                                  }
+                                }}>Open Project</Button>
+                                <Button type="default" size="small" className="px-3 py-1.5 text-xs font-medium" icon={<FileTextOutlined />} onClick={(e) => {
+                                  e.stopPropagation();
+                                  const route = MODULE_ROUTES[item.routeKey] || getModuleRoute(item.module_id);
+                                  if (route) {
+                                    navigate(`${route}/${item.id}?action=report`);
+                                    setIsSearchFocused(false);
+                                    setSearchQuery('');
+                                  } else {
+                                    message.error('Module route not found');
+                                  }
+                                }}>Generate Report</Button>
+                                <Button type="default" size="small" className="px-3 py-1.5 text-xs font-medium" onClick={async (e) => {
+                                  e.stopPropagation();
+                                  try {
+                                    const detailRes = await getProjectById(item.id);
+                                    if (!detailRes.success) {
+                                      message.error('Failed to load project');
+                                      return;
+                                    }
+                                    const projectDetail = detailRes.project;
+                                    const inputs = projectDetail?.inputs_json || {};
+                                    const module_id = projectDetail?.submodule || projectDetail?.module || item.module_id;
+                                    const data = await saveOsiFromInputs({ name: item.name, moduleId: module_id, inputs, inline: true });
+                                    if (!data.success || !data.content_base64) {
+                                      message.error(data.error || 'Failed to prepare OSI');
+                                      return;
+                                    }
+                                    const binaryString = atob(data.content_base64);
+                                    const bytes = new Uint8Array(binaryString.length);
+                                    for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+                                    const blob = new Blob([bytes], { type: 'text/plain' });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = data.filename || `${item.name}.osi`;
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                    URL.revokeObjectURL(url);
+                                  } catch (_e) {
+                                    message.error('Failed to download OSI');
+                                  }
+                                }}>Download OSI</Button>
                               </div>
                             </div>
                           ))}
