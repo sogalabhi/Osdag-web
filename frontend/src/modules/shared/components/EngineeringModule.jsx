@@ -428,9 +428,14 @@ export const EngineeringModule = ({
 
       // Lock inputs after successful design
       setIsInputLocked(true);
-    } else if (status.step === DESIGN_STATUS.ERROR) {
-      console.log(`[DESIGN_ERROR] Design failed. Setting logs=true`);
-      setDocks({ logs: true });
+
+      // Auto-trigger report generation if ?action=report is in the URL
+      const searchParams = new URLSearchParams(location.search);
+      if (searchParams.get('action') === 'report') {
+        setTimeout(() => {
+          if (handleCreateDesignReport) handleCreateDesignReport();
+        }, 1000);
+      }
     } else if (isRedesigning || status.step === DESIGN_STATUS.CALCULATING || status.step === DESIGN_STATUS.CAD_GENERATING) {
       // Reset the completion flag when redesigning or during design process
       if (isRedesigning) {
