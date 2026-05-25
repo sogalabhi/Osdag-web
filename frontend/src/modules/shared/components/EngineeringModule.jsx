@@ -276,7 +276,7 @@ export const EngineeringModule = ({
   useEffect(() => {
     if (normalizedCadModelPaths) {
       const keys = Object.keys(normalizedCadModelPaths || {});
-      }
+    }
   }, [normalizedCadModelPaths, selectedSection]);
 
 
@@ -602,7 +602,7 @@ export const EngineeringModule = ({
 
     try {
       const inputsForSave = expandAllSelectedInputs(inputs, allSelected, contextData);
-      
+
       let flatInputs = {};
       if (moduleConfig && typeof moduleConfig.buildSubmissionParams === "function") {
         try {
@@ -783,7 +783,7 @@ export const EngineeringModule = ({
       ...staticFallbacks,
       ...(ctxHoverDict || {}),
     };
-    
+
     return final;
   }, [ctxHoverDict]);
 
@@ -921,6 +921,14 @@ export const EngineeringModule = ({
     if (name === "Reset") {
       return handleResetEnhanced();
     }
+
+    if (name === "Quit") {
+      handleQuitClick();
+      return;
+    }
+
+    // Reset/Downloads are handled elsewhere (existing handlers or upcoming reset work).
+
     return undefined;
   };
 
@@ -1413,7 +1421,7 @@ export const EngineeringModule = ({
             <div className="absolute top-0 left-0 h-full w-[40px] z-[50]">
               {/* GREEN LINE */}
               <div className="absolute left-0 top-0 w-[8px] h-full bg-[#84bd00]">
-                
+
                 {/* TOGGLE HANDLE */}
                 <div
                   onClick={() => toggleOutputDock(!!output)}
