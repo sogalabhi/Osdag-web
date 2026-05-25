@@ -134,11 +134,13 @@ def get_db_header(table: str) -> List[str]:
 
 
 def headers_match_table(header_row: List[str], table: str) -> bool:
-    """True if the first row of an import sheet matches `get_db_header(table)`."""
-    expected = get_db_header(table)
-    got = [str(h).strip() if h is not None else "" for h in header_row]
-    exp = [str(h).strip() for h in expected]
-    return got == exp
+    """True if the first row contains all expected headers for `table`.
+
+    Extra columns (e.g. `Id` from a catalog export) are allowed and ignored.
+    """
+    expected = set(get_db_header(table))
+    got = {str(h).strip() for h in header_row if h is not None and str(h).strip()}
+    return expected.issubset(got)
 
 
 def import_db_validation(table: str, key: str, value: Any) -> bool:

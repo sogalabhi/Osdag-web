@@ -67,8 +67,8 @@ export const ANGLE_DISPLAY_CONFIG = {
       { label: "Radius of Gyration, ry", key: "ry", unit: UNIT_LABELS.RADIUS_OF_GYRATION },
     ],
     right: [
-      { label: "Radius of Gyration, ru", key: "ru", unit: UNIT_LABELS.RADIUS_OF_GYRATION },
-      { label: "Radius of Gyration, rv", key: "rv", unit: UNIT_LABELS.RADIUS_OF_GYRATION },
+      { label: "Radius of Gyration, ru", key: "rumax", unit: UNIT_LABELS.RADIUS_OF_GYRATION },
+      { label: "Radius of Gyration, rv", key: "rvmin", unit: UNIT_LABELS.RADIUS_OF_GYRATION },
       { label: "Elastic Modulus, Zz", key: "Zz", unit: UNIT_LABELS.ELASTIC_MODULUS },
       { label: "Elastic Modulus, Zy", key: "Zy", unit: UNIT_LABELS.ELASTIC_MODULUS },
       { label: "Plastic Modulus, Zpz", key: "Zpz", unit: UNIT_LABELS.PLASTIC_MODULUS },

@@ -19,6 +19,7 @@ import AboutOsdag from "./AboutOsdag";
 import AskQuestion from "./AskQuestion";
 import { useShortcutLayer } from '../../utils/shortcuts/ShortcutProvider';
 import { SHORTCUT_ACTION_BY_ID } from '../../constants/shortcuts';
+import XlsxImportTrigger from '../../modules/shared/components/XlsxImportTrigger';
 
 const Header = ({ setshowSideBar, active }) => {
   const [isDark, setIsDark] = useState(false);
@@ -615,11 +616,16 @@ const Header = ({ setshowSideBar, active }) => {
                             <div onClick={() => handleDownload("Download xlsx")} className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center">
                               Download xlsx
                             </div>
-                            <div className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
-                              onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                            >
-                              Import xlsx
-                            </div>
+                            <XlsxImportTrigger>
+                              {({ trigger }) => (
+                                <div
+                                  className="px-4 py-2 hover:bg-osdag-green hover:text-white cursor-pointer whitespace-nowrap text-center flex items-center justify-center"
+                                  onClick={trigger}
+                                >
+                                  Import xlsx
+                                </div>
+                              )}
+                            </XlsxImportTrigger>
                           </div>
                         )}
                       </li>

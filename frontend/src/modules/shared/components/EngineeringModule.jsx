@@ -1376,7 +1376,7 @@ export const EngineeringModule = ({
           <div
             className="
               fixed right-0 top-0 h-screen w-[40px]
-              z-[1000]
+              z-10 bg-white
             "
           >
             {/* GREEN LINE */}

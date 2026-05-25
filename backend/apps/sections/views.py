@@ -154,10 +154,18 @@ class SectionImportView(APIView):
     throttle_scope = "sections_import"
 
     def post(self, request):
+        import logging
         from openpyxl import load_workbook
 
+        logger = logging.getLogger("sections.import")
+        user = getattr(request.user, "email", None) or getattr(request.user, "username", None) or str(request.user)
+        logger.info("[SectionImport] POST from user=%s | POST keys=%s | FILES keys=%s",
+                    user, list(request.POST.keys()), list(request.FILES.keys()))
+
         table = request.POST.get("table") or request.data.get("table")
+        logger.info("[SectionImport] resolved table=%r", table)
         if not table:
+            logger.warning("[SectionImport] 400 — table field missing")
             return Response(
                 {"detail": "Form field `table` is required."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -165,10 +173,14 @@ class SectionImportView(APIView):
         try:
             assert_allowed_table(table)
         except ValueError as exc:
+            logger.warning("[SectionImport] 400 — table not allowed: %s", exc)
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
         upload = request.FILES.get("file")
+        logger.info("[SectionImport] upload file=%r (size=%s)",
+                    getattr(upload, "name", None), getattr(upload, "size", None))
         if not upload:
+            logger.warning("[SectionImport] 400 — file field missing")
             return Response(
                 {"detail": "Form file field `file` is required."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -177,15 +189,24 @@ class SectionImportView(APIView):
         try:
             wb = load_workbook(upload, data_only=True)
         except Exception as exc:  # noqa: BLE001
+            logger.warning("[SectionImport] 400 — could not read workbook: %s", exc)
             return Response(
                 {"detail": f"Could not read Excel file: {exc}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
+            logger.info("[SectionImport] workbook sheet names=%s", wb.sheetnames)
             if table not in wb.sheetnames:
+                logger.warning("[SectionImport] 400 — sheet %r not found in %s", table, wb.sheetnames)
                 return Response(
-                    {"detail": f"Worksheet named {table!r} not found in workbook."},
+                    {
+                        "detail": (
+                            f"Worksheet named {table!r} not found in workbook "
+                            f"(available sheets: {wb.sheetnames}). "
+                            "The sheet tab must be named Columns, Beams, Angles, or Channels."
+                        )
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -212,7 +233,10 @@ class SectionImportView(APIView):
                 if first_row
                 else []
             )
+            logger.info("[SectionImport] header_row=%s | expected=%s", header_row, get_db_header(table))
             if not headers_match_table(header_row, table):
+                logger.warning("[SectionImport] 400 — header mismatch for table=%r | got=%s | expected=%s",
+                               table, header_row, get_db_header(table))
                 return Response(
                     {
                         "detail": "Header row does not match expected headers for this table.",
@@ -221,6 +245,14 @@ class SectionImportView(APIView):
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            # Build a name → column-index map from the actual header row.
+            # This tolerates extra columns (e.g. Id from the catalog export) at any position.
+            col_map = {
+                str(h).strip(): i
+                for i, h in enumerate(header_row)
+                if h is not None and str(h).strip()
+            }
 
             expected = get_db_header(table)
             Ser = get_user_section_serializer(table)
@@ -233,7 +265,6 @@ class SectionImportView(APIView):
                 sheet.iter_rows(
                     min_row=2,
                     max_row=max_r,
-                    max_col=len(expected),
                     values_only=True,
                 ),
                 start=2,
@@ -245,7 +276,10 @@ class SectionImportView(APIView):
                 ):
                     continue
 
-                raw = {expected[i]: values[i] for i in range(len(expected))}
+                raw = {
+                    key: (values[col_map[key]] if col_map.get(key) is not None and col_map[key] < len(values) else None)
+                    for key in expected
+                }
                 des_str = _normalize_designation(raw.get("Designation"))
                 if not des_str:
                     rejected.append(
@@ -302,6 +336,8 @@ class SectionImportView(APIView):
                         }
                     )
 
+            logger.info("[SectionImport] done — inserted=%d ignored=%d rejected=%d",
+                        inserted, len(ignored), len(rejected))
             return Response(
                 {
                     "inserted": inserted,

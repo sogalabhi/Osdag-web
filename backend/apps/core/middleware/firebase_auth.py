@@ -15,6 +15,13 @@ class FirebaseAuthentication(BaseAuthentication):
     Verifies Firebase ID tokens and syncs users to Django User model.
     """
     
+    def authenticate_header(self, request):
+        """
+        Return Bearer to trigger 401 Unauthorized instead of 403 Forbidden
+        when authentication fails.
+        """
+        return 'Bearer'
+        
     def authenticate(self, request):
         """
         Authenticate request using Firebase token.
