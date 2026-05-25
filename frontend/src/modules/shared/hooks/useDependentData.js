@@ -10,23 +10,46 @@ export const useDependentData = (getDesignPreferences, moduleConfig, inputs, ext
   // Supported section preferences for other modules
   useEffect(() => {
     const loadSupportedData = async () => {
+      const designationVal = inputs.section_designation || inputs.member_designation;
       if (
-        inputs.member_designation &&
+        designationVal &&
         moduleConfig.cameraKey !== MODULE_KEY_FIN_PLATE &&
         moduleConfig.cameraKey !== MODULE_KEY_CLEAT_ANGLE
       ) {
-        try {
-          await getDesignPreferences({
-            supported_section: inputs.member_designation,
-          });
-        } catch (error) {
-          console.error("Failed to load supported data:", error);
+        let resolvedDesignation = designationVal;
+        if (Array.isArray(designationVal)) {
+          resolvedDesignation = designationVal.find(item => item !== "All") || designationVal[0];
+        }
+
+        if (resolvedDesignation && resolvedDesignation !== "All" && resolvedDesignation !== "Select Section") {
+          const getSectionType = (profile, cameraKey) => {
+            const prof = String(profile || "").toLowerCase();
+            if (prof.includes("angle")) return "angles";
+            if (prof.includes("channel")) return "channels";
+            if (prof.includes("column")) return "columns";
+            if (prof.includes("beam")) return "beams";
+            
+            const cam = String(cameraKey || "").toLowerCase();
+            if (cam.includes("compression") || cam.includes("tension") || cam.includes("strut")) {
+              return "angles";
+            }
+            return "beams";
+          };
+
+          try {
+            await getDesignPreferences({
+              supported_section: resolvedDesignation,
+              section_type: getSectionType(inputs.section_profile, moduleConfig.cameraKey),
+            });
+          } catch (error) {
+            console.error("Failed to load supported data:", error);
+          }
         }
       }
     };
 
     loadSupportedData();
-  }, [inputs.member_designation, moduleConfig.cameraKey, getDesignPreferences]);
+  }, [inputs.section_designation, inputs.member_designation, inputs.section_profile, moduleConfig.cameraKey, getDesignPreferences]);
 
   // Design preferences for FinPlate / CleatAngle modules
   useEffect(() => {

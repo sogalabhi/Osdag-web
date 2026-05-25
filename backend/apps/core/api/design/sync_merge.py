@@ -24,19 +24,24 @@ _SECTION_KEY_MAP: Dict[str, Tuple[Optional[str], Optional[str], Optional[str], O
     "FinPlateConnection": ("column_section", "columns", "beam_section", "beams", None, None),
     "EndPlateConnection": ("column_section", "columns", "beam_section", "beams", None, None),
     "CleatAngleConnection": ("column_section", "columns", "beam_section", "beams", "cleat_section", "angles"),
-    "SeatedAngleConnection": ("column_section", "columns", "beam_section", "beams", None, None),
+    "SeatedAngleConnection": ("column_section", "columns", "beam_section", "beams", "seated_section", "angles"),
     "Beam to Column End Plate Connection": ("column_section", "columns", "beam_section", "beams", None, None),
-    "Beam Beam End Plate Connection": ("beam_section", "beams", "beam_section", "beams", None, None),
+    "Beam Beam End Plate Connection": ("primary_beam", "beams", "secondary_beam", "beams", None, None),
     "Column Cover Plate Bolted Connection": ("member_designation", "columns", None, None, None, None),
     "Beam Cover Plate Bolted Connection": (None, None, "member_designation", "beams", None, None),
     "Column Cover Plate Welded Connection": ("member_designation", "columns", None, None, None, None),
     "Beam Cover Plate Welded Connection": (None, None, "member_designation", "beams", None, None),
     "Column Column End Plate Connection": ("member_designation", "columns", None, None, None, None),
     "Base Plate": ("member_designation", "columns", None, None, None, None),
-    "Simply Supported Beam Design": (None, None, "member_designation", "beams", None, None),
-    "On Cantilever Beam Design": (None, None, "member_designation", "beams", None, None),
-    "Compression Member Design": (None, None, "member_designation", "beams", None, None),
-    "Axially Loaded Column": ("member_designation", "columns", None, None, None, None),
+    "Simply Supported Beam Design": (None, None, "section_designation", "beams", None, None),
+    "On Cantilever Beam Design": (None, None, "section_designation", "beams", None, None),
+    "Purlin Design": (None, None, "section_designation", "beams", None, None),
+    "Compression Member Design": (None, None, "section_designation", "angles", None, None),
+    "Axially Loaded Column": ("section_designation", "columns", None, None, None, None),
+    "Struts Bolted to End Gusset": (None, None, "section_designation", "angles_channels", None, None),
+    "Struts Welded to End Gusset": (None, None, "section_designation", "angles_channels", None, None),
+    "Tension Member Bolted Design": (None, None, "section_designation", "angles_channels", None, None),
+    "Tension Member Welded Design": (None, None, "section_designation", "angles_channels", None, None),
 }
 
 
@@ -53,6 +58,7 @@ def _resolve_section_details(
     beams_model=None,
     columns_model=None,
     angles_model=None,
+    channels_model=None,
 ) -> Dict[str, Dict[str, Any]]:
     details: Dict[str, Dict[str, Any]] = {"supporting": {}, "supported": {}, "connector": {}}
     mapping = _SECTION_KEY_MAP.get(module_session_name)
@@ -60,28 +66,78 @@ def _resolve_section_details(
         return details
 
     support_key, support_source, supported_key, supported_source, connector_key, connector_source = mapping
+
+    def get_model(source_str):
+        if source_str == "columns":
+            return columns_model
+        elif source_str == "beams":
+            return beams_model
+        elif source_str == "angles":
+            return angles_model
+        elif source_str == "channels":
+            return channels_model
+        elif source_str == "angles_channels":
+            profile = str(inputs.get("section_profile") or "").lower()
+            if "channel" in profile:
+                return channels_model
+            else:
+                return angles_model
+        return None
+
     if support_key and support_source:
-        support_designation = str(inputs.get(support_key) or "")
-        support_model = columns_model if support_source == "columns" else beams_model
-        details["supporting"] = _section_row_for_designation(support_model, support_designation)
+        support_val = inputs.get(support_key)
+        support_designation = ""
+        if isinstance(support_val, list) and len(support_val) > 0:
+            support_designation = str(support_val[0])
+        elif support_val:
+            support_designation = str(support_val)
+
+        support_model = get_model(support_source)
+        if support_model:
+            details["supporting"] = _section_row_for_designation(support_model, support_designation)
 
     if supported_key and supported_source:
-        supported_designation = str(inputs.get(supported_key) or "")
-        supported_model = columns_model if supported_source == "columns" else beams_model
-        details["supported"] = _section_row_for_designation(supported_model, supported_designation)
+        supported_val = inputs.get(supported_key)
+        supported_designation = ""
+        if isinstance(supported_val, list) and len(supported_val) > 0:
+            supported_designation = str(supported_val[0])
+        elif supported_val:
+            supported_designation = str(supported_val)
+
+        supported_model = get_model(supported_source)
+        if supported_model:
+            # Normalize designation if it is an angle
+            is_angle = (supported_source == "angles") or (
+                supported_source == "angles_channels"
+                and "channel" not in str(inputs.get("section_profile") or "").lower()
+            )
+            if is_angle:
+                parts = supported_designation.replace("ISA ", "").replace("X", "x").split("x")
+                norm_desig = " x ".join([p.strip() for p in parts])
+                details["supported"] = _section_row_for_designation(supported_model, norm_desig)
+            else:
+                details["supported"] = _section_row_for_designation(supported_model, supported_designation)
 
     if connector_key and connector_source:
         connector_val = inputs.get(connector_key)
-        # connector_val can be a list or a string. If list, use the first element.
         connector_designation = ""
         if isinstance(connector_val, list) and len(connector_val) > 0:
             connector_designation = str(connector_val[0])
         elif connector_val:
             connector_designation = str(connector_val)
             
-        if connector_source == "angles":
-            norm_desig = connector_designation.replace("ISA ", "").replace("X", " x ").replace("  ", " ").strip()
-            details["connector"] = _section_row_for_designation(angles_model, norm_desig)
+        connector_model = get_model(connector_source)
+        if connector_model:
+            is_angle = (connector_source == "angles") or (
+                connector_source == "angles_channels"
+                and "channel" not in str(inputs.get("section_profile") or "").lower()
+            )
+            if is_angle:
+                parts = connector_designation.replace("ISA ", "").replace("X", "x").split("x")
+                norm_desig = " x ".join([p.strip() for p in parts])
+                details["connector"] = _section_row_for_designation(connector_model, norm_desig)
+            else:
+                details["connector"] = _section_row_for_designation(connector_model, connector_designation)
 
     return details
 
@@ -176,8 +232,15 @@ def _resolve_driver_and_targets(module_session_name: str, inputs: Dict[str, Any]
         if val:
             return driver, list(targets), str(val)
     m = inputs.get("material")
-    if m and "material" in rules:
-        return "material", list(rules["material"]), str(m)
+    if m:
+        if "material" in rules:
+            return "material", list(rules["material"]), str(m)
+        else:
+            first_targets = list(rules.values())[0] if rules else ["supporting_material", "supported_material", "connector_material"]
+            extended_targets = list(first_targets)
+            if "connector_material" not in extended_targets:
+                extended_targets.append("connector_material")
+            return "material", extended_targets, str(m)
     return None, [], ""
 
 
@@ -201,6 +264,7 @@ def merge_design_pref_sync(
     beams_model=None,
     columns_model=None,
     angles_model=None,
+    channels_model=None,
 ) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, List[Dict[str, Any]]], Dict[str, Dict[str, Any]]]:
     """
     Returns (resolved_inputs, metadata, material_details_by_role, section_details_by_role).
@@ -223,7 +287,15 @@ def merge_design_pref_sync(
     elif operation == "open":
         # Preserve saved pref overrides — do NOT force-sync targets from driver.
         # Only resolve driver so material_details are populated correctly.
-        _, _, grade = _resolve_driver_and_targets(module_session_name, out)
+        _driver_key, linked_targets, grade = _resolve_driver_and_targets(module_session_name, out)
+        if grade and linked_targets:
+            copied_targets = []
+            for t in linked_targets:
+                if t not in out:
+                    out[t] = grade
+                    copied_targets.append(t)
+            if copied_targets and _driver_key:
+                copied[_driver_key] = copied_targets
         if design_pref_draft:
             out.update(design_pref_draft)
     else:
@@ -244,6 +316,7 @@ def merge_design_pref_sync(
         beams_model=beams_model,
         columns_model=columns_model,
         angles_model=angles_model,
+        channels_model=channels_model,
     )
 
     metadata = {
@@ -264,6 +337,8 @@ def build_design_pref_defaults(
     material_model=None,
     beams_model=None,
     columns_model=None,
+    angles_model=None,
+    channels_model=None,
 ) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, List[Dict[str, Any]]], Dict[str, Dict[str, Any]]]:
     """
     Returns defaults for Additional Inputs using current dock driver values.
@@ -277,7 +352,8 @@ def build_design_pref_defaults(
         material_model=material_model,
         beams_model=beams_model,
         columns_model=columns_model,
-        angles_model=None,
+        angles_model=angles_model,
+        channels_model=channels_model,
     )
 
 

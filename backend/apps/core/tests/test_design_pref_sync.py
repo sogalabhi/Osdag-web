@@ -13,7 +13,7 @@ class DesignPrefSyncMergeTests(TestCase):
             "material": "E 250 (Fe 410 W)A",
             "bolt_diameter": "12",
         }
-        resolved, meta, _md = merge_design_pref_sync(
+        resolved, meta, _md, _sd = merge_design_pref_sync(
             "FinPlateConnection",
             inputs,
             "open",
@@ -33,7 +33,7 @@ class DesignPrefSyncMergeTests(TestCase):
             "connector_material": "E 250 (Fe 410 W)A",
         }
         draft = {"connector_material": "E 350 (Fe 490)"}
-        resolved, _meta, _md = merge_design_pref_sync(
+        resolved, _meta, _md, _sd = merge_design_pref_sync(
             "FinPlateConnection",
             inputs,
             "save",
@@ -44,7 +44,7 @@ class DesignPrefSyncMergeTests(TestCase):
 
     def test_reset_applies_driver_sync(self):
         inputs = {"material": "E 165 (Fe 290)"}
-        resolved, _meta, _md = merge_design_pref_sync(
+        resolved, _meta, _md, _sd = merge_design_pref_sync(
             "FinPlateConnection",
             inputs,
             "reset",

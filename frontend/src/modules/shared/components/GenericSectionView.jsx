@@ -31,7 +31,9 @@ const GenericSectionView = ({
   sectionType,        // 'supporting' or 'supported'
   sectionTableName,   // 'Beams', 'Columns', 'Angles', etc.
   displayConfig,      // Configuration for fields and image
-  onClearSection      // Callback to clear parent state if needed
+  onClearSection,     // Callback to clear parent state if needed
+  onDesignationChange,// Callback when designation changes
+  hideDropdown        // If true, suppress dropdown (e.g. for primary members)
 }) => {
   const {
     manageDesignPreferences,
@@ -46,6 +48,49 @@ const GenericSectionView = ({
   const [editableData, setEditableData] = useState({});
   const [designationStr, setDesignationStr] = useState("");
 
+  const getDropdownOptions = () => {
+    const fullList =
+      sectionTableName === "Beams"
+        ? beamList
+        : sectionTableName === "Columns"
+        ? columnList
+        : sectionTableName === "Angles"
+        ? angleList
+        : sectionTableName === "Channels"
+        ? channelList
+        : [];
+
+    let dockSelections = [];
+    if (sectionTableName === "Beams") {
+      dockSelections = inputs?.section_designation || inputs?.beam_section || inputs?.primary_beam || inputs?.secondary_beam;
+    } else if (sectionTableName === "Columns") {
+      dockSelections = inputs?.section_designation || inputs?.column_section || inputs?.member_designation;
+    } else if (sectionTableName === "Angles") {
+      dockSelections = inputs?.section_designation || inputs?.cleat_section || inputs?.seated_section || inputs?.Designation;
+    } else if (sectionTableName === "Channels") {
+      dockSelections = inputs?.section_designation || inputs?.section_designation;
+    }
+
+    let selectionsArr = [];
+    if (Array.isArray(dockSelections)) {
+      selectionsArr = dockSelections;
+    } else if (dockSelections) {
+      selectionsArr = [dockSelections];
+    }
+
+    const filteredSelections = selectionsArr.filter(
+      (item) => item && item !== "All" && item !== "Select Section"
+    );
+
+    const finalOptionsList = filteredSelections.length > 0 ? filteredSelections : fullList;
+
+    return finalOptionsList.map((item) =>
+      typeof item === "object"
+        ? item.Designation || item.value || item.Grade || String(item)
+        : String(item)
+    );
+  };
+
   // Safety check for sectionData
   const safeSectionData = sectionData || {};
 
@@ -54,8 +99,31 @@ const GenericSectionView = ({
   }, [safeSectionData]);
 
   useEffect(() => {
-    setDesignationStr(inputs?.[displayConfig.designationKey] || "");
-  }, [inputs, displayConfig.designationKey]);
+    const resolved =
+      inputs?.section_designation ||
+      inputs?.member_designation ||
+      inputs?.cleat_section ||
+      inputs?.seated_section ||
+      inputs?.[displayConfig.designationKey] ||
+      "";
+
+    let desigStr = "";
+    if (Array.isArray(resolved)) {
+      desigStr = resolved.find((item) => item !== "All") || resolved[0] || "";
+    } else {
+      desigStr = String(resolved || "");
+    }
+
+    if (!desigStr && !hideDropdown) {
+      const opts = getDropdownOptions();
+      if (opts.length > 0) {
+        desigStr = opts[0];
+        onDesignationChange?.(desigStr);
+      }
+    }
+
+    setDesignationStr(desigStr);
+  }, [inputs, displayConfig.designationKey, beamList, columnList, angleList, channelList, hideDropdown]);
 
   const materialKey = sectionType === 'supporting' ? 'supporting_material' : 'supported_material';
 
@@ -198,14 +266,49 @@ const GenericSectionView = ({
         <div className="col-left">
           <div className="input-cont">
             <h5>Designation</h5>
-            <Input
-              type="text"
-              className="input-design-pref"
-              value={designationStr}
-              onChange={(e) => setDesignationStr(e.target.value)}
-              disabled={isInputLocked}
-              style={isInputLocked ? readOnlyFontStyle : { fontSize: "12px", color: "#000" }}
-            />
+            {isInputLocked ? (
+              <Input
+                type="text"
+                className="input-design-pref text-[#808080] bg-[#f5f5f5]"
+                value={designationStr}
+                disabled={true}
+              />
+            ) : hideDropdown ? (
+              <Input
+                type="text"
+                value={designationStr}
+                onChange={(e) => {
+                  setDesignationStr(e.target.value);
+                  onDesignationChange?.(e.target.value);
+                }}
+                className="input-design-pref text-black"
+              />
+            ) : (
+              <div className="flex flex-col gap-[5px]">
+                <Select
+                  value={designationStr}
+                  onChange={(val) => {
+                    setDesignationStr(val);
+                    onDesignationChange?.(val);
+                  }}
+                  className="input-design-pref"
+                  dropdownMatchSelectWidth={false}
+                >
+                  {getDropdownOptions().map((opt) => (
+                    <Option key={opt} value={opt}>
+                      {opt}
+                    </Option>
+                  ))}
+                </Select>
+                <Input
+                  type="text"
+                  placeholder="Custom name..."
+                  value={designationStr}
+                  onChange={(e) => setDesignationStr(e.target.value)}
+                  className="input-design-pref text-black"
+                />
+              </div>
+            )}
           </div>
 
           <div className="sub-container">

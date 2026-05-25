@@ -160,6 +160,31 @@ const DesignPrefSections = ({
     },
     [applySyncResponse, module, rollBackSync, buildMergedInputsForSync]
   );
+  const handleDesignationChange = useCallback(async (tabIndex, newDesignation) => {
+    let keyToUpdate = null;
+    if (tabIndex === 0) {
+      keyToUpdate = inputsRef.current.column_section ? "column_section" : (inputsRef.current.section_designation ? "section_designation" : "member_designation");
+    } else if (tabIndex === 1) {
+      keyToUpdate = inputsRef.current.beam_section ? "beam_section" : (inputsRef.current.section_designation ? "section_designation" : "member_designation");
+    } else if (tabIndex === 2) {
+      keyToUpdate = inputsRef.current.section_designation ? "section_designation" : "member_designation";
+    } else if (tabIndex === 4) {
+      keyToUpdate = "cleat_section";
+    } else if (tabIndex === 5) {
+      keyToUpdate = "seated_section";
+    }
+
+    if (keyToUpdate) {
+      const updatedValue = Array.isArray(inputsRef.current[keyToUpdate]) ? [newDesignation] : newDesignation;
+      
+      setDesignPrefOverrides?.((prev) => ({
+        ...prev,
+        [keyToUpdate]: updatedValue
+      }));
+      
+      await runSync("open", { [keyToUpdate]: updatedValue });
+    }
+  }, [runSync, setDesignPrefOverrides]);
 
   const runDefaults = useCallback(async () => {
     syncAbortRef.current?.abort();
@@ -273,6 +298,18 @@ const DesignPrefSections = ({
   // Safety fallback
   const safeSectionDetails = sectionDetails || { supporting: {}, supported: {} };
 
+  const getDynamicSectionTableName = (defaultTable) => {
+    if (inputs?.section_profile) {
+      if (inputs.section_profile.includes("Channel")) return "Channels";
+      if (inputs.section_profile.includes("Angle")) return "Angles";
+      if (inputs.section_profile.includes("Beam")) return "Beams";
+      if (inputs.section_profile.includes("Column")) return "Columns";
+    }
+    return defaultTable;
+  };
+
+  const isConnectionModule = !module.includes("Design") && module !== "Axially Loaded Column";
+
   return (
     <div>
       <Spin spinning={syncLoading} tip="Syncing preferences…">
@@ -302,7 +339,7 @@ const DesignPrefSections = ({
           {activeTab === 0 && (
             <GenericSectionView
               sectionType="supporting"
-              sectionTableName="Columns"
+              sectionTableName={getDynamicSectionTableName("Columns")}
               displayConfig={COLUMN_DISPLAY_CONFIG}
               module={module}
               inputs={inputs}
@@ -319,13 +356,15 @@ const DesignPrefSections = ({
                   supporting: {},
                 }))
               }
+              onDesignationChange={(val) => handleDesignationChange(0, val)}
+              hideDropdown={isConnectionModule}
               {...modalCommon}
             />
           )}
           {activeTab === 1 && (
             <GenericSectionView
               sectionType="supported"
-              sectionTableName="Beams"
+              sectionTableName={getDynamicSectionTableName("Beams")}
               displayConfig={BEAM_DISPLAY_CONFIG}
               module={module}
               inputs={inputs}
@@ -342,13 +381,15 @@ const DesignPrefSections = ({
                   supported: {},
                 }))
               }
+              onDesignationChange={(val) => handleDesignationChange(1, val)}
+              hideDropdown={isConnectionModule}
               {...modalCommon}
             />
           )}
           {activeTab === 2 && (
             <GenericSectionView
               sectionType="supporting"
-              sectionTableName="Angles"
+              sectionTableName={getDynamicSectionTableName("Angles")}
               displayConfig={ANGLE_DISPLAY_CONFIG}
               module={module}
               inputs={inputs}
@@ -365,6 +406,7 @@ const DesignPrefSections = ({
                   supporting: {},
                 }))
               }
+              onDesignationChange={(val) => handleDesignationChange(2, val)}
               {...modalCommon}
             />
           )}
@@ -400,6 +442,7 @@ const DesignPrefSections = ({
               materialList={materialListForModals}
               isGuest={isGuest}
               onRefetchModuleOptions={onRefetchModuleOptions}
+              onDesignationChange={(val) => handleDesignationChange(4, val)}
               {...modalCommon}
             />
           )}
@@ -424,6 +467,7 @@ const DesignPrefSections = ({
                   supported: {},
                 }))
               }
+              onDesignationChange={(val) => handleDesignationChange(5, val)}
               {...modalCommon}
             />
           )}

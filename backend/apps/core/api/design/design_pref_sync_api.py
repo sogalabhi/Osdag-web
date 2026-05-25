@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from apps.core.models import Material, Beams, Columns, Angles
+from apps.core.models import Material, Beams, Columns, Angles, Channels
 from apps.core.api.design.sync_merge import merge_design_pref_sync, VALID_OPERATIONS
 
 
@@ -42,6 +42,7 @@ class DesignPreferenceSync(APIView):
                 beams_model=Beams.objects,
                 columns_model=Columns.objects,
                 angles_model=Angles.objects,
+                channels_model=Channels.objects,
             )
         except Exception as e:
             return Response(
