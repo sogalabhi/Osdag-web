@@ -168,6 +168,7 @@ export const EngineeringModule = ({
     handleSubmit,
     handleReset,
     handleHomeClick,
+    handleQuitClick,
     performReset,
 
     // Report
@@ -867,6 +868,10 @@ export const EngineeringModule = ({
     }
     if (name === "Reset") {
       return handleResetEnhanced();
+    }
+    if (name === "Quit") {
+      handleQuitClick();
+      return;
     }
 
     // Reset/Downloads are handled elsewhere (existing handlers or upcoming reset work).
