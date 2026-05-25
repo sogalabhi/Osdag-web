@@ -87,6 +87,7 @@ INSTALLED_APPS = [
 
     # DRF
     'rest_framework',
+    'silk',
 ]
 
 # Middleware order is CRITICAL - CorsMiddleware MUST be first
@@ -227,3 +228,46 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'file_storage/')
 
 SECRET_ROOT = os.path.join(BASE_DIR , 'secret/')
 
+# Add this to the bottom of settings.py
+
+import os
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(parents=True, exist_ok=True) # Creates the logs folder if it doesn't exist
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOGS_DIR / 'django.log',
+            'maxBytes': 1024 * 1024 * 5, # 5 MB
+            'backupCount': 3,
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
