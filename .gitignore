@@ -81,3 +81,7 @@ backend/file_storage/cad_models/*.aux
 
 backend/firebase-service-account.json
 file_storage
+
+# Ignore local database folder
+pgdata/
+

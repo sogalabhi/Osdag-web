@@ -206,7 +206,7 @@ export const useEngineeringModule = (moduleConfig) => {
     setConfirmationType,
     confirmNavigation,
     performNavigation,
-  } = useNavigationGuard(hasUnsavedWork, moduleConfig.routePath);
+  } = useNavigationGuard(hasUnsavedWork(), moduleConfig.routePath);
 
   // Design report
   const report = useDesignReport(
@@ -259,6 +259,14 @@ export const useEngineeringModule = (moduleConfig) => {
       confirmNavigation("navigation", "home");
     } else {
       navigate("/home");
+    }
+  };
+
+  const handleQuitClick = () => {
+    if (hasUnsavedWork()) {
+      confirmNavigation("navigation", "back");
+    } else {
+      navigate(-1);
     }
   };
 
@@ -392,6 +400,7 @@ export const useEngineeringModule = (moduleConfig) => {
     handleSubmit,
     handleReset,
     handleHomeClick,
+    handleQuitClick,
     performReset,
     saveOutput,
 

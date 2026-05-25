@@ -16,10 +16,12 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
   const [allowNavigation, setAllowNavigation] = useState(false);
   const [navigationSource, setNavigationSource] = useState(null); // 'home' | 'back'
 
+  const hasUnsaved = typeof hasUnsavedWork === "function" ? hasUnsavedWork() : !!hasUnsavedWork;
+
   // Browser Guard (Refresh / Close Tab) and Back Button Guard
   useEffect(() => {
     const handleBeforeUnload = (event) => {
-      if (hasUnsavedWork) {
+      if (hasUnsaved) {
         const message = "You have unsaved design progress. Are you sure you want to leave?";
         event.preventDefault();
         event.returnValue = message;
@@ -28,7 +30,7 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
     };
 
     const handlePopState = () => {
-      if (hasUnsavedWork && !allowNavigation) {
+      if (hasUnsaved && !allowNavigation) {
         try {
           // Preserve the full current path (including projectId) so we don't
           // lose the project context when trapping the back button.
@@ -51,11 +53,11 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [allowNavigation, hasUnsavedWork, routePath]);
+  }, [allowNavigation, hasUnsaved, routePath]);
 
   // Ensure there's a history entry to trap back navigation when work is unsaved
   useEffect(() => {
-    if (!hasUnsavedWork) return;
+    if (!hasUnsaved) return;
     try {
       const path = window.location.pathname;
       if (path && window.location.origin) {
@@ -65,7 +67,7 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
       // pushState can throw "The operation is insecure" (e.g. post-login, iframe, or restricted context)
       if (e?.name !== "SecurityError") throw e;
     }
-  }, [hasUnsavedWork]);
+  }, [hasUnsaved]);
 
   const confirmNavigation = (type, source) => {
     setConfirmationType(type);
