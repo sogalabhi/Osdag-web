@@ -4414,9 +4414,29 @@ class CommonDesignLogic(object):
             return None
 
         # Fuse ONCE, regardless of module or component
-        result = shapes[0]
-        for shp in shapes[1:]:
-            result = BRepAlgoAPI_Fuse(result, shp).Shape()
+        if len(shapes) > 1:
+            try:
+                from OCC.Core.BOPAlgo import BOPAlgo_Builder
+                from OCC.Core.TopTools import TopTools_ListOfShape
+                
+                builder = BOPAlgo_Builder()
+                shape_list = TopTools_ListOfShape()
+                for shp in shapes:
+                    shape_list.Append(shp)
+                builder.SetArguments(shape_list)
+                builder.Perform()
+                if not builder.HasErrors():
+                    result = builder.Shape()
+                else:
+                    result = shapes[0]
+                    for shp in shapes[1:]:
+                        result = BRepAlgoAPI_Fuse(result, shp).Shape()
+            except Exception as e:
+                result = shapes[0]
+                for shp in shapes[1:]:
+                    result = BRepAlgoAPI_Fuse(result, shp).Shape()
+        else:
+            result = shapes[0]
 
         # Register the fused result shape with memory manager to prevent premature GC
         self._register_shapes(result)
