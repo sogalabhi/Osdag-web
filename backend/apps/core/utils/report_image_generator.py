@@ -15,6 +15,12 @@ from typing import Dict, Optional, Tuple, Any
 
 logger = logging.getLogger(__name__)
 
+try:
+    from osdag_core.Common import _get_resource_path
+except ImportError:
+    _get_resource_path = None
+
+
 
 def verify_vtk_available() -> bool:
     """Verify VTK is installed and can be used for rendering.

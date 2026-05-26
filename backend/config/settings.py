@@ -140,13 +140,14 @@ DATABASES = {
 }
 
 # Redis/Celery settings
-REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/0')
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', REDIS_URL)
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', REDIS_URL)
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = os.getenv('CELERY_TIMEZONE', 'UTC')
+CELERY_TASK_ALWAYS_EAGER = 'test' in sys.argv or any('pytest' in arg for arg in sys.argv)
 
 # Optional Redis cache backend (toggle with USE_REDIS_CACHE=true)
 USE_REDIS_CACHE = os.getenv('USE_REDIS_CACHE', 'false').lower() == 'true'

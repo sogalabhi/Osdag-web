@@ -30,9 +30,10 @@ class TestVerifyOpen3DAvailable:
     
     def test_open3d_available(self):
         """Test when Open3D is available"""
-        with patch('apps.core.utils.report_image_generator.open3d') as mock_o3d:
-            mock_renderer = MagicMock()
-            mock_o3d.visualization.rendering.OffscreenRenderer.return_value = mock_renderer
+        mock_o3d = MagicMock()
+        mock_renderer = MagicMock()
+        mock_o3d.visualization.rendering.OffscreenRenderer.return_value = mock_renderer
+        with patch.dict('sys.modules', {'open3d': mock_o3d}):
             result = verify_open3d_available()
             assert result is True
     

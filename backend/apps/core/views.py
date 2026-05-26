@@ -206,3 +206,27 @@ def get_base_plate(request):
 def get_tension_member(request):
     return JsonResponse({'result': tension_member}, safe=False)
 
+
+from celery.result import AsyncResult
+
+class TaskStatusAPIView(APIView):
+    """
+    ViewSet/APIView to query the status of a Celery calculation/CAD task.
+    """
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    
+    def get(self, request, task_id):
+        task_result = AsyncResult(task_id)
+        response_data = {
+            "task_id": task_id,
+            "status": task_result.status,
+        }
+        if task_result.ready():
+            if task_result.successful():
+                response_data["result"] = task_result.result
+            else:
+                response_data["error"] = str(task_result.result)
+        return Response(response_data, status=status.HTTP_200_OK)
+
+

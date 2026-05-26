@@ -38,9 +38,9 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-changeme}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
-      REDIS_URL: redis://redis:6379/0
-      CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      REDIS_URL: redis://127.0.0.1:6379/0
+      CELERY_BROKER_URL: redis://127.0.0.1:6379/0
+      CELERY_RESULT_BACKEND: redis://127.0.0.1:6379/0
       USE_REDIS_CACHE: ${USE_REDIS_CACHE:-true}
     volumes:
       - ./file_storage:/app/file_storage
@@ -72,9 +72,9 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-changeme}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
-      REDIS_URL: redis://redis:6379/0
-      CELERY_BROKER_URL: redis://redis:6379/0
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      REDIS_URL: redis://127.0.0.1:6379/0
+      CELERY_BROKER_URL: redis://127.0.0.1:6379/0
+      CELERY_RESULT_BACKEND: redis://127.0.0.1:6379/0
       USE_REDIS_CACHE: ${USE_REDIS_CACHE:-true}
     depends_on:
       db:

@@ -1,4 +1,4 @@
-import { apiClient } from "../utils/apiClient";
+import { apiClient, pollTask } from "../utils/apiClient";
 import { MODULES, CAD, MATERIALS, DESIGN_PREFERENCES } from "./endpoints";
 import { getModuleSlug } from "../constants/apiRoutes";
 
@@ -31,6 +31,24 @@ export async function createDesign(moduleKey, inputs) {
     method: "POST",
     body: JSON.stringify({ inputs }),
   });
+  
+  if (res.status === 202) {
+    const acceptedBody = await res.json();
+    const taskId = acceptedBody.task_id;
+    try {
+      const taskResult = await pollTask(taskId);
+      const finalBody = {
+        ...taskResult,
+        project_saved: acceptedBody.project_saved,
+        project_id: acceptedBody.project_id,
+        project_error: acceptedBody.project_error
+      };
+      return { status: 200, body: finalBody };
+    } catch (err) {
+      return { status: 400, body: { success: false, error: err.message } };
+    }
+  }
+
   const body = await res.json();
   return { status: res.status, body };
 }
@@ -45,6 +63,26 @@ export async function createCad(moduleKey, inputs) {
     method: "POST",
     body: JSON.stringify({ inputs }),
   });
+  
+  if (res.status === 202) {
+    const acceptedBody = await res.json();
+    const taskId = acceptedBody.task_id;
+    try {
+      const taskResult = await pollTask(taskId);
+      const isComingSoon = !taskResult.files || Object.keys(taskResult.files).length === 0;
+      const finalData = {
+        status: isComingSoon ? 'coming_soon' : 'success',
+        files: taskResult.files || {},
+        hover_dict: taskResult.hover_dict || {},
+        warnings: taskResult.warnings || [],
+        message: isComingSoon ? '3D model generation is coming soon' : 'CAD models generated successfully'
+      };
+      return { status: isComingSoon ? 200 : 201, data: finalData };
+    } catch (err) {
+      return { status: 500, data: { status: 'error', message: err.message } };
+    }
+  }
+
   const data = await res.json();
   return { status: res.status, data };
 }

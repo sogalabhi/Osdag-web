@@ -147,3 +147,128 @@ def handle_design_request(
     
     return context
 
+
+from rest_framework.response import Response
+from rest_framework import status
+from apps.core.tasks import run_design_calculation_task, run_cad_generation_task, run_report_generation_task
+from apps.core.utils.cad_helpers import get_default_sections
+
+def trigger_async_design(module_name: str, submodule_slug: str, ServiceClass, request) -> Response:
+    """
+    Triggers asynchronous design calculations using Celery.
+    """
+    if not ServiceClass:
+        return Response({'error': f'Sub-module {submodule_slug} not found'}, status=404)
+        
+    inputs = request.data.get('inputs', request.data)
+    project_id = request.data.get('project_id')
+    
+    context = handle_design_request(
+        request=request,
+        inputs=inputs,
+        project_id=project_id,
+        submodule_slug=submodule_slug,
+        module_name=module_name
+    )
+    
+    task = run_design_calculation_task.delay(
+        module_name=module_name,
+        submodule_slug=submodule_slug,
+        inputs=inputs,
+        project_id=project_id if not context.get('is_guest') else None,
+        user_email=context.get('user_email')
+    )
+    
+    response_data = {
+        "success": True,
+        "task_id": task.id,
+        "status": "PENDING"
+    }
+    
+    if context.get('project_result'):
+        response_data['project_saved'] = context['project_result'].get('saved')
+        if context['project_result'].get('project_id'):
+            response_data['project_id'] = context['project_result']['project_id']
+        if context['project_result'].get('error'):
+            response_data['project_error'] = context['project_result']['error']
+            
+    return Response(response_data, status=status.HTTP_202_ACCEPTED)
+
+
+def trigger_async_cad(module_name: str, submodule_slug: str, ServiceClass, request) -> Response:
+    """
+    Triggers asynchronous CAD model generation using Celery.
+    """
+    if not ServiceClass:
+        return Response({'error': f'Sub-module {submodule_slug} not found'}, status=404)
+        
+    inputs = request.data.get('inputs', request.data)
+    if not inputs:
+        return Response({'error': 'inputs are required'}, status=400)
+        
+    sections = request.data.get('sections')
+    if not sections:
+        sections = get_default_sections(module_name, submodule_slug)
+        
+    if not sections:
+        return Response({'error': f'No sections defined for {submodule_slug}'}, status=400)
+        
+    task = run_cad_generation_task.delay(
+        module_name=module_name,
+        submodule_slug=submodule_slug,
+        inputs=inputs,
+        sections=sections
+    )
+    
+    return Response({
+        "success": True,
+        "task_id": task.id,
+        "status": "PENDING"
+    }, status=status.HTTP_202_ACCEPTED)
+
+
+def trigger_async_report(module_name: str, submodule_slug: str, module_id_map: dict, request) -> Response:
+    """
+    Triggers asynchronous LaTeX report generation using Celery.
+    """
+    module_id = module_id_map.get(submodule_slug) if module_id_map else submodule_slug
+    if not module_id:
+        return Response(
+            {
+                "success": False,
+                "error": f"Report generation is not supported for {module_name} sub-module '{submodule_slug}'",
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    input_values = request.data.get("input_values") or request.data.get("inputs")
+    if not input_values:
+        return Response(
+            {"success": False, "error": "input_values are required"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    mapped_data = {
+        "module_id": module_id,
+        "input_values": input_values,
+        "metadata": request.data.get("metadata"),
+        "design_status": request.data.get("design_status", True),
+        "logs": request.data.get("logs", []),
+    }
+
+    if "sections" in request.data:
+        mapped_data["sections"] = request.data.get("sections")
+    if "customization" in request.data:
+        mapped_data["customization"] = request.data.get("customization")
+    if "images" in request.data:
+        mapped_data["images"] = request.data.get("images")
+
+    task = run_report_generation_task.delay(mapped_data)
+    
+    return Response({
+        "success": True,
+        "task_id": task.id,
+        "status": "PENDING"
+    }, status=status.HTTP_202_ACCEPTED)
+
+

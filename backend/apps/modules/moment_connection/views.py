@@ -9,7 +9,12 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from .registry import MomentConnectionRegistry
-from apps.core.utils.module_helpers import handle_design_request
+from apps.core.utils.module_helpers import (
+    handle_design_request,
+    trigger_async_design,
+    trigger_async_cad,
+    trigger_async_report
+)
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from apps.core.models import Columns, Beams, Bolt, Material, CustomMaterials
 from apps.core.api.design.report_customization_api import generate_initial_report_core
@@ -39,119 +44,18 @@ class MomentConnectionViewSet(viewsets.ViewSet):
     def design(self, request, submodule_slug=None):
         """
         POST /api/modules/moment-connection/{submodule_slug}/design/
-        
-        Request body:
-        {
-            "inputs": {...},  # Design input parameters
-            "project_id": 123  # Optional: Save results to project if user is authenticated
-        }
-        
-        Example: POST /api/modules/moment-connection/cover-plate-bolted/design/
-        
-        Guest Mode:
-        - Can calculate designs
-        - Cannot save to projects (project_id is ignored)
-        
-        Authenticated Users:
-        - Can calculate designs
-        - Can save to projects if project_id is provided
+        Asynchronously runs calculation task.
         """
-        # Use URL slug to find service (not POST body)
         ServiceClass = MomentConnectionRegistry.get_service_by_slug(submodule_slug)
-        
-        if not ServiceClass:
-            return Response(
-                {'error': f'Sub-module {submodule_slug} not found'}, 
-                status=404
-            )
-        
-        # Extract inputs and optional project_id
-        inputs = request.data.get('inputs', request.data)  # Support both formats
-        project_id = request.data.get('project_id')
-        
-        # Handle authentication and project saving (shared logic)
-        context = handle_design_request(
-            request=request,
-            inputs=inputs,
-            project_id=project_id,
-            submodule_slug=submodule_slug,
-            module_name='moment-connection'
-        )
-        
-        try:
-            # Call the service with request context
-            result = ServiceClass.calculate(
-                inputs=inputs,
-                request=request,
-                project_id=project_id if not context['is_guest'] else None,
-                user_email=context['user_email']
-            )
-            
-            # Add project saving result to response
-            if context['project_result']:
-                result['project_saved'] = context['project_result']['saved']
-                if context['project_result'].get('project_id'):
-                    result['project_id'] = context['project_result']['project_id']
-                if context['project_result'].get('error'):
-                    result['project_error'] = context['project_result']['error']
-            
-            return Response(result, status=200)
-        except Exception as e:
-            return Response(
-                {'error': str(e), 'success': False}, 
-                status=400
-            )
+        return trigger_async_design('moment-connection', submodule_slug, ServiceClass, request)
 
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
     def report_generate_initial(self, request, submodule_slug=None):
         """
         POST /api/modules/moment-connection/{submodule_slug}/report/generate-initial/
-
-        Request body:
-        {
-            "metadata": {...},
-            "input_values": {...},      # Or "inputs": {...}
-            "design_status": boolean,
-            "logs": [...],
-            "sections": [...],          # Optional
-            "customization": {...},    # Optional
-            "images": {...}               # Optional CAD captures (iso/front/side/top)
-        }
+        Asynchronously runs LaTeX report generation task.
         """
-        module_id = MOMENT_REPORT_MODULE_ID_MAP.get(submodule_slug)
-        if not module_id:
-            return Response(
-                {
-                    "success": False,
-                    "error": f"Report generation is not supported for moment-connection sub-module '{submodule_slug}'",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        input_values = request.data.get("input_values") or request.data.get("inputs")
-        if not input_values:
-            return Response(
-                {"success": False, "error": "input_values are required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        mapped_data = {
-            "module_id": module_id,
-            "input_values": input_values,
-            "metadata": request.data.get("metadata"),
-            "design_status": request.data.get("design_status", True),
-            "logs": request.data.get("logs", []),
-        }
-
-        if "sections" in request.data:
-            mapped_data["sections"] = request.data.get("sections")
-        if "customization" in request.data:
-            mapped_data["customization"] = request.data.get("customization")
-        if "images" in request.data:
-            mapped_data["images"] = request.data.get("images")
-
-        payload, status_code = generate_initial_report_core(mapped_data)
-        return Response(payload, status=status_code)
+        return trigger_async_report('moment-connection', submodule_slug, MOMENT_REPORT_MODULE_ID_MAP, request)
     
     @action(detail=False, methods=['get'], url_path='(?P<submodule_slug>[^/.]+)/options')
     def options(self, request, submodule_slug=None):
@@ -304,109 +208,7 @@ class MomentConnectionViewSet(viewsets.ViewSet):
     def cad(self, request, submodule_slug=None):
         """
         POST /api/modules/moment-connection/{submodule_slug}/cad/
-        
-        Request body:
-        {
-            "inputs": {...},  # Design input parameters
-            "sections": ["Model", "Beam", ...]  # Optional: specific sections to generate
-        }
-        
-        Returns:
-        {
-            "status": "success",
-            "files": {section: base64_data, ...},
-            "hover_dict": {...},
-            "warnings": [...]
-        }
+        Asynchronously runs CAD generation task.
         """
-        # Get service from registry
         ServiceClass = MomentConnectionRegistry.get_service_by_slug(submodule_slug)
-        
-        if not ServiceClass:
-            return Response(
-                {'error': f'Sub-module {submodule_slug} not found'},
-                status=404
-            )
-        
-        # Extract inputs
-        inputs = request.data.get('inputs', request.data)
-        
-        if not inputs:
-            return Response(
-                {'error': 'inputs are required'},
-                status=400
-            )
-        
-        # Get sections from request or use defaults
-        sections = request.data.get('sections')
-        if not sections:
-            sections = get_default_sections('moment-connection', submodule_slug)
-        
-        if not sections:
-            return Response(
-                {'error': f'No sections defined for {submodule_slug}'},
-                status=400
-            )
-        
-        try:
-            # Import adapter to get create_from_input function for hover_dict
-            create_from_input_func = None
-            try:
-                if submodule_slug == 'beam-beam-cover-plate-bolted':
-                    from .submodules.beam_beam_cover_plate_bolted.adapter import create_from_input
-                    create_from_input_func = create_from_input
-                elif submodule_slug == 'beam-beam-cover-plate-welded':
-                    from .submodules.beam_beam_cover_plate_welded.adapter import create_from_input
-                    create_from_input_func = create_from_input
-                elif submodule_slug == 'beam-beam-end-plate':
-                    from .submodules.beam_beam_end_plate.adapter import create_from_input
-                    create_from_input_func = create_from_input
-                elif submodule_slug == 'beam-column-end-plate':
-                    from .submodules.beam_column_end_plate.adapter import create_from_input
-                    create_from_input_func = create_from_input
-                elif submodule_slug == 'column-column-cover-plate-bolted':
-                    from .submodules.column_column_cover_plate_bolted.adapter import create_from_input
-                    create_from_input_func = create_from_input
-                elif submodule_slug == 'column-column-cover-plate-welded':
-                    from .submodules.column_column_cover_plate_welded.adapter import create_from_input
-                    create_from_input_func = create_from_input
-                elif submodule_slug == 'column-column-end-plate':
-                    from .submodules.column_column_end_plate.adapter import create_from_input
-                    create_from_input_func = create_from_input
-            except ImportError as e:
-                print(f"[MomentConnectionViewSet] Could not import create_from_input for {submodule_slug}: {e}")
-            
-            # Generate CAD models
-            result = generate_cad_models(
-                service_class=ServiceClass,
-                inputs=inputs,
-                sections=sections,
-                create_from_input_func=create_from_input_func
-            )
-            
-            if not result['files']:
-                return Response(
-                    {
-                        'status': 'error',
-                        'message': 'No CAD models were generated',
-                        'errors': result['warnings']
-                    },
-                    status=422
-                )
-            
-            return Response({
-                'status': 'success',
-                'files': result['files'],
-                'hover_dict': result['hover_dict'],
-                'message': 'CAD models generated successfully',
-                'warnings': result['warnings']
-            }, status=201)
-            
-        except Exception as e:
-            print(f"[MomentConnectionViewSet] Error generating CAD: {e}")
-            import traceback
-            traceback.print_exc()
-            return Response(
-                {'error': str(e), 'status': 'error'},
-                status=500
-            )
+        return trigger_async_cad('moment-connection', submodule_slug, ServiceClass, request)

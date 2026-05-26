@@ -1,4 +1,4 @@
-import { apiClient } from "../utils/apiClient";
+import { apiClient, pollTask } from "../utils/apiClient";
 import { REPORTS, MODULES } from "./endpoints";
 import { getModuleSlug } from "../constants/apiRoutes";
 
@@ -22,6 +22,27 @@ export async function generateInitialReport(moduleKey, reportData) {
     method: "POST",
     body: JSON.stringify(reportData),
   });
+
+  if (res.status === 202) {
+    const acceptedBody = await res.json();
+    const taskId = acceptedBody.task_id;
+    try {
+      const taskResult = await pollTask(taskId);
+      const payload = taskResult.payload || {};
+      const statusCode = taskResult.status_code || 200;
+      
+      if (statusCode >= 200 && statusCode < 300 && payload.success) {
+        return {
+          success: true,
+          report_id: payload.report_id,
+          sections: payload.sections,
+        };
+      }
+      return { success: false, error: payload.error || "Failed to generate report" };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }
 
   const result = await res.json();
   if (res.ok && result.success) {

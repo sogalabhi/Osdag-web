@@ -72,4 +72,5 @@ urlpatterns = [
     path('osdag-web/connections/moment-connection/column-to-column-splice', views.get_c2c_splice, name='column-to-column-splice'),
     path('osdag-web/connections/base-plate', views.get_base_plate, name='base-plate'),
     path('osdag-web/tension-member', views.get_tension_member, name='tension-member'),
+    path('api/tasks/<str:task_id>/', views.TaskStatusAPIView.as_view(), name='task-status'),
 ]

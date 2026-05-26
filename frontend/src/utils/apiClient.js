@@ -87,3 +87,19 @@ const createApiClient = (baseUrl) => {
 };
 
 export const apiClient = createApiClient(apiBase);
+
+export async function pollTask(taskId, delayMs = 500, maxRetries = 120) {
+  for (let i = 0; i < maxRetries; i++) {
+    const res = await apiClient(`api/tasks/${taskId}/`, { method: "GET" });
+    const data = await res.json();
+    if (data.status === "SUCCESS") {
+      return data.result;
+    }
+    if (data.status === "FAILURE") {
+      throw new Error(data.error || "Async task execution failed");
+    }
+    // Wait before polling again
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+  throw new Error("Task polling timed out");
+}

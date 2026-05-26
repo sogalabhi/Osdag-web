@@ -9,7 +9,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.core.models import Material, CustomMaterials, Bolt
-from apps.core.utils.module_helpers import handle_design_request
+from apps.core.utils.module_helpers import (
+    handle_design_request,
+    trigger_async_design,
+    trigger_async_cad,
+    trigger_async_report
+)
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from apps.core.utils.errors import format_error_response, get_error_status_code
 from apps.core.api.design.report_customization_api import generate_initial_report_core
@@ -34,45 +39,10 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
     def design(self, request, submodule_slug=None):
         """
         POST /api/modules/simple-connection/{slug}/design/
-        Request body supports {inputs: {...}} or raw dict for backward compatibility.
+        Asynchronously runs calculation task.
         """
         ServiceClass = SimpleConnectionRegistry.get_service_by_slug(submodule_slug)
-        if not ServiceClass:
-            return Response({'error': f'Sub-module {submodule_slug} not found'}, status=404)
-
-        inputs = request.data.get('inputs', request.data)
-        project_id = request.data.get('project_id')
-
-        context = handle_design_request(
-            request=request,
-            inputs=inputs,
-            project_id=project_id,
-            submodule_slug=submodule_slug,
-            module_name='simple-connection'
-        )
-
-        try:
-            result = ServiceClass.calculate(
-                inputs=inputs,
-                request=request,
-                project_id=project_id if not context['is_guest'] else None,
-                user_email=context['user_email']
-            )
-
-            if context['project_result']:
-                result['project_saved'] = context['project_result']['saved']
-                if context['project_result'].get('project_id'):
-                    result['project_id'] = context['project_result']['project_id']
-                if context['project_result'].get('error'):
-                    result['project_error'] = context['project_result']['error']
-
-            status_code = 200 if result.get('success', True) else 400
-            return Response(result, status=status_code)
-        except Exception as exc:
-            logger.error(f"Error in simple connection design for {submodule_slug}: {exc}", exc_info=True)
-            error_response = format_error_response(exc)
-            status_code = get_error_status_code(exc)
-            return Response(error_response, status=status_code)
+        return trigger_async_design('simple-connection', submodule_slug, ServiceClass, request)
 
     @action(detail=False, methods=['get'], url_path='(?P<submodule_slug>[^/.]+)/options')
     def options(self, request, submodule_slug=None):
@@ -168,162 +138,15 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
     def cad(self, request, submodule_slug=None):
         """
         POST /api/modules/simple-connection/{submodule_slug}/cad/
-        
-        Request body:
-        {
-            "inputs": {...},  # Design input parameters
-            "sections": ["Model", "Column", ...]  # Optional: specific sections to generate
-        }
-        
-        Returns:
-        {
-            "status": "success",
-            "files": {section: base64_data, ...},
-            "hover_dict": {...},
-            "warnings": [...]
-        }
+        Asynchronously runs CAD generation task.
         """
-        # Get service from registry
         ServiceClass = SimpleConnectionRegistry.get_service_by_slug(submodule_slug)
-        
-        if not ServiceClass:
-            return Response(
-                {'error': f'Sub-module {submodule_slug} not found'},
-                status=404
-            )
-        
-        # Extract inputs
-        inputs = request.data.get('inputs', request.data)
-        
-        if not inputs:
-            return Response(
-                {'error': 'inputs are required'},
-                status=400
-            )
-        
-        # Get sections from request or use defaults
-        sections = request.data.get('sections')
-        if not sections:
-            sections = get_default_sections('simple-connection', submodule_slug)
-        
-        if not sections:
-            return Response(
-                {'error': f'No sections defined for {submodule_slug}'},
-                status=400
-            )
-        
-        try:
-            # Import adapter to get create_from_input function for hover_dict
-            create_from_input_func = None
-            try:
-                if submodule_slug == 'butt-joint-bolted':
-                    from .submodules.butt_joint_bolted.adapter import create_from_input
-                    create_from_input_func = create_from_input
-                elif submodule_slug == 'butt-joint-welded':
-                    from .submodules.butt_joint_welded.adapter import create_from_input
-                    create_from_input_func = create_from_input
-                elif submodule_slug == 'lap-joint-bolted':
-                    from .submodules.lap_joint_bolted.adapter import create_from_input
-                    create_from_input_func = create_from_input
-                elif submodule_slug == 'lap-joint-welded':
-                    from .submodules.lap_joint_welded.adapter import create_from_input
-                    create_from_input_func = create_from_input
-            except ImportError as e:
-                print(f"[SimpleConnectionViewSet] Could not import create_from_input for {submodule_slug}: {e}")
-            
-            # Generate CAD models
-            result = generate_cad_models(
-                service_class=ServiceClass,
-                inputs=inputs,
-                sections=sections,
-                create_from_input_func=create_from_input_func
-            )
-            
-            if not result['files']:
-                # Check if this is a known limitation (no CAD support yet)
-                # Return "coming soon" message instead of error
-                return Response(
-                    {
-                        'status': 'coming_soon',
-                        'message': '3D model generation is coming soon for this module',
-                        'files': {},
-                        'hover_dict': {}
-                    },
-                    status=200
-                )
-            
-            return Response({
-                'status': 'success',
-                'files': result['files'],
-                'hover_dict': result['hover_dict'],
-                'message': 'CAD models generated successfully',
-                'warnings': result['warnings']
-            }, status=201)
-            
-        except Exception as e:
-            print(f"[SimpleConnectionViewSet] Error generating CAD: {e}")
-            import traceback
-            traceback.print_exc()
-            # For modules without CAD support, return "coming soon" instead of error
-            # Check if it's a CAD-related error (ValueError, AttributeError, etc.)
-            if isinstance(e, (ValueError, AttributeError, ImportError)):
-                return Response(
-                    {
-                        'status': 'coming_soon',
-                        'message': '3D model generation is coming soon for this module',
-                        'files': {},
-                        'hover_dict': {}
-                    },
-                    status=200
-                )
-            # For other errors, return error response
-            return Response(
-                {'error': str(e), 'status': 'error'},
-                status=500
-            )
+        return trigger_async_cad('simple-connection', submodule_slug, ServiceClass, request)
 
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
     def report_generate_initial(self, request, submodule_slug=None):
         """
         POST /api/modules/simple-connection/{submodule_slug}/report/generate-initial/
-
-        Optional body fields: sections, customization, images (CAD view captures).
+        Asynchronously runs LaTeX report generation task.
         """
-        module_id = SIMPLE_CONNECTION_REPORT_MODULE_ID_MAP.get(submodule_slug)
-        if not module_id:
-            return Response(
-                {
-                    "success": False,
-                    "error": (
-                        f"Report generation is not yet implemented for simple-connection "
-                        f"sub-module '{submodule_slug}'."
-                    ),
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        input_values = request.data.get("input_values") or request.data.get("inputs")
-        if not input_values:
-            return Response(
-                {"success": False, "error": "input_values are required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        mapped_data = {
-            "module_id": module_id,
-            "input_values": input_values,
-            "metadata": request.data.get("metadata"),
-            "design_status": request.data.get("design_status", True),
-            "logs": request.data.get("logs", []),
-        }
-
-        if "sections" in request.data:
-            mapped_data["sections"] = request.data.get("sections")
-        if "customization" in request.data:
-            mapped_data["customization"] = request.data.get("customization")
-        # CAD view captures from the browser (same as shear_connection)
-        if "images" in request.data:
-            mapped_data["images"] = request.data.get("images")
-
-        payload, status_code = generate_initial_report_core(mapped_data)
-        return Response(payload, status=status_code)
+        return trigger_async_report('simple-connection', submodule_slug, SIMPLE_CONNECTION_REPORT_MODULE_ID_MAP, request)

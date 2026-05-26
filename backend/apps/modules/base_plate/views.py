@@ -8,7 +8,12 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.core.models import Material, CustomMaterials, Columns, Beams
-from apps.core.utils.module_helpers import handle_design_request
+from apps.core.utils.module_helpers import (
+    handle_design_request,
+    trigger_async_design,
+    trigger_async_cad,
+    trigger_async_report
+)
 from apps.core.utils.errors import format_error_response, get_error_status_code
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 
@@ -36,41 +41,9 @@ class BasePlateViewSet(viewsets.ViewSet):
     def design(self, request):
         """
         POST /api/modules/base-plate/design/
-        Request body: { "inputs": {...} } or raw dict.
+        Asynchronously runs calculation task.
         """
-        inputs = request.data.get('inputs', request.data)
-        project_id = request.data.get('project_id')
-
-        context = handle_design_request(
-            request=request,
-            inputs=inputs,
-            project_id=project_id,
-            submodule_slug='base-plate',
-            module_name='base-plate',
-        )
-
-        try:
-            result = BasePlateService.calculate(
-                inputs=inputs,
-                request=request,
-                project_id=project_id if not context.get('is_guest') else None,
-                user_email=context.get('user_email'),
-            )
-
-            if context.get('project_result'):
-                result['project_saved'] = context['project_result'].get('saved')
-                if context['project_result'].get('project_id'):
-                    result['project_id'] = context['project_result']['project_id']
-                if context['project_result'].get('error'):
-                    result['project_error'] = context['project_result']['error']
-
-            status_code = 200 if result.get('success', True) else 400
-            return Response(result, status=status_code)
-        except Exception as exc:
-            logger.error(f"Error in base plate design: {exc}", exc_info=True)
-            error_response = format_error_response(exc)
-            status_code = get_error_status_code(exc)
-            return Response(error_response, status=status_code)
+        return trigger_async_design('base-plate', 'base-plate', BasePlateService, request)
 
     @action(detail=False, methods=['get'], url_path='options')
     def options(self, request):
@@ -117,55 +90,6 @@ class BasePlateViewSet(viewsets.ViewSet):
     def cad(self, request):
         """
         POST /api/modules/base-plate/cad/
-        Request body: { "inputs": {...}, "sections": ["Model", "Plate", ...] } (sections optional).
-        Returns: { "status": "success"|"coming_soon", "files": {...}, "hover_dict": {...}, "warnings": [...] }
+        Asynchronously runs CAD generation task.
         """
-        inputs = request.data.get('inputs', request.data)
-        if not inputs:
-            return Response({'error': 'inputs are required'}, status=status.HTTP_400_BAD_REQUEST)
-        sections = request.data.get('sections')
-        if not sections:
-            sections = get_default_sections('base-plate', 'base-plate')
-        if not sections:
-            return Response(
-                {'error': 'No sections defined for base-plate'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        try:
-            result = generate_cad_models(
-                service_class=BasePlateService,
-                inputs=inputs,
-                sections=sections,
-                create_from_input_func=create_from_input,
-            )
-            if not result['files']:
-                return Response(
-                    {
-                        'status': 'coming_soon',
-                        'message': '3D model generation is coming soon for this module',
-                        'files': {},
-                        'hover_dict': result.get('hover_dict', {}),
-                    },
-                    status=status.HTTP_200_OK,
-                )
-            return Response(
-                {
-                    'status': 'success',
-                    'files': result['files'],
-                    'hover_dict': result['hover_dict'],
-                    'message': 'CAD models generated successfully',
-                    'warnings': result.get('warnings', []),
-                },
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as exc:
-            logger.exception("Base plate CAD failed: %s", exc)
-            return Response(
-                {
-                    'status': 'coming_soon',
-                    'message': '3D model generation is coming soon for this module',
-                    'files': {},
-                    'hover_dict': {},
-                },
-                status=status.HTTP_200_OK,
-            )
+        return trigger_async_cad('base-plate', 'base-plate', BasePlateService, request)
