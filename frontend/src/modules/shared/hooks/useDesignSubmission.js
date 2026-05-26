@@ -91,7 +91,6 @@ export const useDesignSubmission = (service, moduleConfig) => {
         message: validationResult.message || 'Validation failed',
         error: new Error(validationResult.message)
       });
-      alert(validationResult.message);
       return;
     }
 

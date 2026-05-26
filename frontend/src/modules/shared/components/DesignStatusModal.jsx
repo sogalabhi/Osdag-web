@@ -154,14 +154,6 @@ export const DesignStatusModal = ({ status, isMobile, onRetry, onClose }) => {
           <div style={{ fontSize: '14px', color: '#666', marginBottom: content.showRetry ? '20px' : '0' }}>
             {content.subMessage}
           </div>
-          {content.showRetry && onRetry && (
-            <button
-              onClick={onRetry}
-              className="mt-4 px-6 py-2 bg-osdag-green text-white rounded-lg hover:bg-opacity-90 transition-opacity font-semibold"
-            >
-              Retry
-            </button>
-          )}
         </div>
       </Modal>
 
