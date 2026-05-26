@@ -63,7 +63,7 @@ export default function AboutOsdag({ onClose }) {
         </div>
 
         {/* Content */}
-        <div className="p-4 overflow-y-auto max-h-[60vh]">
+        <div className="p-4 overflow-y-auto h-[60vh]">
           {renderTab()}
         </div>
 
