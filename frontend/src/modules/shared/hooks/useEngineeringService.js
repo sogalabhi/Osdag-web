@@ -363,7 +363,6 @@ export const useEngineeringService = () => {
       socket.onmessage = onMessage;
       socket.onerror =  onError;
       socket.onclose = onClose;
-      
       return socket; // Return socket to allow potential manual closing
     }
     catch (error) {

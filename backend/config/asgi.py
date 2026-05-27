@@ -26,9 +26,17 @@ application = ProtocolTypeRouter({
     # Django's ASGI application to handle traditional HTTP requests
     "http": django_asgi_app,
     
+<<<<<<< HEAD
     # WebSocket handler (no origin validation in dev - frontend is on different port)
     "websocket": AuthMiddlewareStack(
         URLRouter(websocket_urlpatterns)
+=======
+    # WebSocket handler with authentication and origin validation
+    "websocket": AllowedHostsOriginValidator(
+        AuthMiddlewareStack(
+            URLRouter(websocket_urlpatterns)
+        )
+>>>>>>> pr-3
     ),
 })
 

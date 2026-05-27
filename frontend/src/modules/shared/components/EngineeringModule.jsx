@@ -44,6 +44,9 @@ import { UI_STRINGS } from "../../../constants/UIStrings";
 import { isGuestUser, canCreateProjects } from "../../../utils/auth";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 import OptimizationGraph from "./OptimizationGraph";
+import ProjectNameModal from "../../../homepage/components/ProjectNameModal";
+import { useProjectCreation } from '../hooks/useProjectCreation';
+import { ThicknessSelectionModal } from "../../flexuralMember/plateGirder/components/ThicknessSelectionModal";
 import PSODashboard from "../../flexuralMember/plateGirder/components/PSODashboard";
 
 const PSO_PLAYBACK_INTERVAL_MS = 80;
@@ -170,6 +173,12 @@ export const EngineeringModule = ({
     resetModuleState,
     contextData,
     refetchModuleOptions,
+    
+    // PSO optimization
+    optimizationData,
+    optimizationDone,
+    showOptimizationGraph,
+    setShowOptimizationGraph,
   } = useEngineeringModule(moduleConfig);
 
   const { handleCreateProject, projectCreationModal } = useProjectCreation({
@@ -452,6 +461,9 @@ export const EngineeringModule = ({
       }
     };
   }, [optimizationData]);
+
+  // Opens the PSO real-time graph overlay
+  const openOptiGraph = () => setShowOptimizationGraph(true);
 
   const { handleCreateProject, projectCreationModal } = useProjectCreation({
     inputs,
@@ -1755,6 +1767,7 @@ export const EngineeringModule = ({
         setSelectedSection={setSelectedSection}
       />
 
+<<<<<<< HEAD
       {/* Customization Modals */}
       {moduleConfig.modalConfig.map((modal) => {
         const ModalComponent = modal.type === "thickness"
@@ -1785,6 +1798,32 @@ export const EngineeringModule = ({
           />
         );
       })}
+=======
+      {/* Customization Modals (includes ThicknessSelectionModal for plate girder) */}
+      {
+        moduleConfig.modalConfig.map((modal) => {
+          const ModalComponent = modal.type === "thickness"
+            ? ThicknessSelectionModal
+            : CustomizationModal;
+          return (
+            <ModalComponent
+              key={modal.key}
+              isOpen={modalStates[modal.key]}
+              onClose={() => updateModalState(modal.key, false)}
+              title="Customized"
+              dataSource={contextData[modal.dataSource] || (modalDynamicSrc[modal.inputKey] || [])}
+              selectedItems={selectedItems[modal.inputKey]}
+              onTransferChange={(nextTargetKeys) =>
+                updateSelectedItems(modal.inputKey, nextTargetKeys)
+              }
+              thicknessList={thicknessList}
+              inputs={inputs}
+              setInputs={setInputs}
+            />
+          );
+        })
+      }
+>>>>>>> pr-3
 
       {/* Design Preferences Modal (Additional Inputs) */}
       {
@@ -1869,8 +1908,13 @@ export const EngineeringModule = ({
         </div>
       </Modal>
 
+<<<<<<< HEAD
       {/* Design Status Modal */}
       {!(moduleConfig?.designType?.includes('plate') && status.step === DESIGN_STATUS.COMPLETE) && (
+=======
+      {/* Design Status Modal - Hide when PSO Dashboard is open */}
+      {!showOptimizationGraph && (
+>>>>>>> pr-3
         <DesignStatusModal
           status={status}
           isMobile={isMobile}
@@ -1879,10 +1923,15 @@ export const EngineeringModule = ({
             setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
           }}
           onClose={() => {
+<<<<<<< HEAD
             console.log('[DesignStatusModal] onClose called, status:', status.step);
             if (status.step === DESIGN_STATUS.ERROR || status.step === DESIGN_STATUS.COMPLETE) {
               setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
               console.log('[DesignStatusModal] Status reset to IDLE');
+=======
+            if (status.step === DESIGN_STATUS.ERROR) {
+              setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
+>>>>>>> pr-3
             }
           }}
         />
@@ -1910,6 +1959,7 @@ export const EngineeringModule = ({
         />
       )}
       {projectCreationModal}
+<<<<<<< HEAD
       <HelpLinkModal
         open={showAskQuestionModal}
         onClose={() => setShowAskQuestionModal(false)}
@@ -1949,6 +1999,17 @@ export const EngineeringModule = ({
           </Radio.Group>
         </div>
       </Modal>
+=======
+
+      {/* Plate Girder: PSO real-time dashboard */}
+      {showOptimizationGraph && (
+        <PSODashboard
+          data={optimizationData}
+          optimizationDone={optimizationDone}
+          onClose={() => setShowOptimizationGraph(false)}
+        />
+      )}
+>>>>>>> pr-3
     </div>
   );
 };

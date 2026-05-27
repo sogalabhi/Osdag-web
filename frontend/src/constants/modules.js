@@ -25,6 +25,7 @@ import {
     MODULE_KEY_STRUTS_BOLTED,
     MODULE_KEY_AXIALLY_LOADED_COLUMN,
     MODULE_KEY_STRUTS_WELDED,
+    MODULE_KEY_PLATE_GIRDER,
 } from "./DesignKeys";
 import { UI_STRINGS } from "./UIStrings";
 
@@ -156,6 +157,8 @@ export const MODULE_ROUTES = {
     [MODULE_KEY_PLATE_GIRDER]: "/design/flexure/plate_girder",
     OnCantilever: "/design/flexure/on_cantilever",
     Purlin: "/design/flexure/purlin",
+    [MODULE_KEY_PLATE_GIRDER]: "/design/flexure/plate_girder",
+    PlateGirder: "/design/flexure/plate_girder",
     [MODULE_KEY_TENSION_BOLTED]: "/design/tension-member/bolted_to_end_gusset",
     [MODULE_KEY_TENSION_WELDED]: "/design/tension-member/welded_to_end_gusset",
     [MODULE_KEY_BOLTED_TO_END_GUSSET]: "/design/tension-member/bolted_to_end_gusset",

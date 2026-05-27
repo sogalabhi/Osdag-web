@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import { useWebSocketOptimization } from "./useWebSocketOptimization";
 
 /**
  * Status state machine types
@@ -53,6 +54,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
     error: null
   });
 
+<<<<<<< HEAD
   const submitDesign = async ({
     inputs,
     dockInputs = null,
@@ -62,6 +64,156 @@ export const useDesignSubmission = (service, moduleConfig) => {
     moduleData,
     extraState,
   }) => {
+=======
+  // PSO optimization state
+  const [optimizationData, setOptimizationData] = useState({
+    current_iter: 0,
+    variableNames: [],
+    bounds: { lb: [], ub: [] },
+    history: [],
+    currentSwarm: [],
+    globalBest: null,
+  });
+  const [optimizationDone, setOptimizationDone] = useState(false);
+  const [showOptimizationGraph, setShowOptimizationGraph] = useState(false);
+
+  // WebSocket optimization callbacks
+  const handleOptimizationUpdate = useCallback((data) => {
+    console.log('[PSO] Raw update received:', data);
+    
+    // Backend sends: iteration, particle_index, depth, ur, weight_kg, variables, variable_names, bounds
+    // We need to build: history, currentSwarm, globalBest, variableNames, bounds
+    
+    setOptimizationData(prevData => {
+      const newParticle = {
+        iter: data.iteration,
+        particle: data.particle_index,
+        depth: data.depth,
+        ur: data.ur,
+        weight_kg: data.weight_kg,
+        position: data.variables || [],
+      };
+      
+      // Add to history
+      const newHistory = [...(prevData.history || []), newParticle];
+      
+      // Update current swarm (particles from current iteration)
+      let newCurrentSwarm = prevData.currentSwarm || [];
+      if (data.iteration !== prevData.current_iter) {
+        // New iteration started - reset current swarm
+        newCurrentSwarm = [newParticle];
+      } else {
+        // Same iteration - add to current swarm
+        newCurrentSwarm = [...newCurrentSwarm, newParticle];
+      }
+      
+      // Update global best (feasible priority, then lowest weight)
+      let newGlobalBest = prevData.globalBest;
+      if (!newGlobalBest) {
+        newGlobalBest = newParticle;
+      } else {
+        const isFeasible = newParticle.ur <= 1.0;
+        const bestIsFeasible = newGlobalBest.ur <= 1.0;
+        
+        if (isFeasible && !bestIsFeasible) {
+          newGlobalBest = newParticle;
+        } else if (isFeasible && bestIsFeasible && newParticle.weight_kg < newGlobalBest.weight_kg) {
+          newGlobalBest = newParticle;
+        } else if (!isFeasible && !bestIsFeasible && newParticle.ur < newGlobalBest.ur) {
+          newGlobalBest = newParticle;
+        }
+      }
+      
+      const newData = {
+        current_iter: data.iteration,
+        variableNames: data.variable_names || prevData.variableNames || [],
+        bounds: data.bounds || prevData.bounds || { lb: [], ub: [] },
+        history: newHistory,
+        currentSwarm: newCurrentSwarm,
+        globalBest: newGlobalBest,
+      };
+      
+      console.log('[PSO] Updated state:', {
+        iteration: newData.current_iter,
+        historyLength: newData.history.length,
+        swarmSize: newData.currentSwarm.length,
+        globalBest: newData.globalBest?.weight_kg,
+      });
+      
+      return newData;
+    });
+  }, []);
+
+  const handleOptimizationComplete = useCallback((data) => {
+    console.log('[PSO] Optimization complete:', data);
+    setOptimizationDone(true);
+    setOptimizationData(prevData => ({
+      ...prevData,
+      ...data,
+    }));
+
+    // Set output from optimization result
+    // Backend sends: { result: { design: {...}, raw: [...], pso_result: ... } }
+    const outputData = data.result?.design || data.output || data.design;
+    
+    if (outputData) {
+      const formattedOutput = {};
+      for (const [key, value] of Object.entries(outputData)) {
+        const label = value?.label ?? key;
+        const val = value?.val ?? value?.value ?? value;
+        formattedOutput[key] = { label, val: val !== undefined && val !== null ? val : "" };
+      }
+      setOutput(formattedOutput);
+      setDisplayOutput(true);
+      console.log('[PSO] Output set:', formattedOutput);
+    } else {
+      console.warn('[PSO] No output data found in completion message:', data);
+    }
+
+    // Complete status
+    setStatus({
+      step: DESIGN_STATUS.COMPLETE,
+      message: 'Optimization complete!',
+      error: null
+    });
+    setLoading(false);
+
+    // Auto-dismiss after 1 second
+    setTimeout(() => {
+      setStatus({
+        step: DESIGN_STATUS.IDLE,
+        message: '',
+        error: null
+      });
+    }, 1000);
+  }, []);
+
+  const handleOptimizationError = useCallback((errorMessage) => {
+    console.error('[PSO] Optimization error:', errorMessage);
+    setStatus({
+      step: DESIGN_STATUS.ERROR,
+      message: errorMessage,
+      error: new Error(errorMessage)
+    });
+    setLoading(false);
+    setOptimizationDone(false);
+  }, []);
+
+  // WebSocket hook
+  const {
+    connect: connectWebSocket,
+    disconnect: disconnectWebSocket,
+    startOptimization: startWebSocketOptimization,
+    isConnected: isWebSocketConnected,
+    isOptimizing: isWebSocketOptimizing,
+  } = useWebSocketOptimization(
+    handleOptimizationUpdate,
+    handleOptimizationComplete,
+    handleOptimizationError
+  );
+
+  const submitDesign = async ({ inputs, selectionStates, allSelected, moduleData, extraState }) => {
+>>>>>>> pr-3
     console.log("[useDesignSubmission] submitDesign start", {
       designType: moduleConfig.designType,
       inputs,
@@ -112,6 +264,50 @@ export const useDesignSubmission = (service, moduleConfig) => {
       });
       alert("Error preparing submission parameters. See console for details.");
       console.error("buildSubmissionParams threw:", err);
+      return;
+    }
+
+    // Check if this is an Optimized design (WebSocket flow)
+    const isOptimizedDesign = inputs.design_type === 'Optimized' || param['Total.Design_Type'] === 'Optimized';
+    
+    if (isOptimizedDesign) {
+      console.log('[useDesignSubmission] Optimized design detected - using WebSocket');
+      
+      // Reset optimization state
+      setOptimizationDone(false);
+      const initialData = {
+        current_iter: 0,
+        variableNames: [],
+        bounds: { lb: [], ub: [] },
+        history: [],
+        currentSwarm: [],
+        globalBest: null,
+      };
+      console.log('[PSO] Resetting optimization data to initial state');
+      setOptimizationData(initialData);
+      
+      // Show optimization graph
+      setShowOptimizationGraph(true);
+      
+      // Set status to calculating
+      setStatus({
+        step: DESIGN_STATUS.CALCULATING,
+        message: 'Running PSO optimization...',
+        error: null
+      });
+      setLoading(true);
+      
+      // Connect to WebSocket if not connected
+      if (!isWebSocketConnected) {
+        connectWebSocket();
+        // Wait a bit for connection
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      // Start optimization via WebSocket
+      startWebSocketOptimization(param);
+      
+      // Note: Completion is handled by WebSocket callbacks
       return;
     }
 
@@ -355,7 +551,20 @@ export const useDesignSubmission = (service, moduleConfig) => {
     resetDesignState,
     clearDesignResults,
     loadSavedOutputs,
+<<<<<<< HEAD
     loadOutputs,
+=======
+    // PSO optimization state
+    optimizationData,
+    optimizationDone,
+    showOptimizationGraph,
+    setShowOptimizationGraph,
+    // WebSocket control
+    connectWebSocket,
+    disconnectWebSocket,
+    isWebSocketConnected,
+    isWebSocketOptimizing,
+>>>>>>> pr-3
   };
 };
 

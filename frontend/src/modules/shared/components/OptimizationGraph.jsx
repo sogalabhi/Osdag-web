@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import Plot from 'react-plotly.js';
+
 import Plotly from 'plotly.js-dist-min';
 
 const IBeamSVG = ({ depth = 400, bfTop = 300, bfBot = 300, tw = 8, tfTop = 12, tfBot = 12 }) => {
@@ -396,3 +397,4 @@ function OptimizationGraph({ data, onClose, optimizationDone, isWsConnected }) {
 }
 
 export default OptimizationGraph;
+

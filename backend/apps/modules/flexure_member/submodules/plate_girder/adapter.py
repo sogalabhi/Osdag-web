@@ -260,7 +260,19 @@ def create_from_input(input_values: Dict[str, Any]):
         print('Error in create_module:', e)
         raise
     
-    # Map input_values to exact keys expected by PlateGirderWelded.set_input_values
+    # For Customized design: osdag_core calls float() on thickness keys → must be a scalar string.
+    # For Optimized design: osdag_core expects a list → PSO picks from list of available thicknesses.
+    design_type = input_values.get('Total.Design_Type', 'Customized')
+
+    def _thickness_val(key, default='6'):
+        val = input_values.get(key, [default])
+        if design_type == 'Customized':
+            # Return first element as string (osdag_core does float(val))
+            return str(val[0]) if isinstance(val, list) and val else str(val)
+        else:
+            # Return full list for PSO optimization
+            return val if isinstance(val, list) else [str(val)]
+
     design_dict = {
         KEY_MODULE: input_values.get('Module', 'Plate Girder'),
         KEY_MATERIAL: input_values.get('Material', 'E 250 (Fe 410 W)A'),
@@ -268,10 +280,10 @@ def create_from_input(input_values: Dict[str, Any]):
         KEY_LOAD: input_values.get('Loading.Condition', ''),
         KEY_SHEAR: input_values.get('Load.Shear', '0'),
         KEY_MOMENT: input_values.get('Load.Moment', '0'),
-        KEY_OVERALL_DEPTH_PG_TYPE: input_values.get('Total.Design_Type', 'Customized'),
-        KEY_WEB_THICKNESS_PG: input_values.get('Web.Thickness', ['6']),
-        KEY_TOP_FLANGE_THICKNESS_PG: input_values.get('TopFlange.Thickness', ['6']),
-        KEY_BOTTOM_FLANGE_THICKNESS_PG: input_values.get('BottomFlange.Thickness', ['6']),
+        KEY_OVERALL_DEPTH_PG_TYPE: design_type,
+        KEY_WEB_THICKNESS_PG: _thickness_val('Web.Thickness'),
+        KEY_TOP_FLANGE_THICKNESS_PG: _thickness_val('TopFlange.Thickness'),
+        KEY_BOTTOM_FLANGE_THICKNESS_PG: _thickness_val('BottomFlange.Thickness'),
         KEY_DESIGN_TYPE_FLEXURE: input_values.get('Design.Design_Type_Flexure', 'Major Laterally Supported'),
         KEY_BENDING_MOMENT_SHAPE: input_values.get('Loading.Bending_Moment_Shape', ''),
         KEY_TORSIONAL_RES: input_values.get('Design.Torsional_Restraint', 'No'),

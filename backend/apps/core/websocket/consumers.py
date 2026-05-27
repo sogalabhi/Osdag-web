@@ -34,14 +34,22 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
     
     async def connect(self):
         """Handle WebSocket connection."""
+<<<<<<< HEAD
         logger.info(f"WebSocket connecting: {self.channel_name}")
+=======
+        logger.info(f"🔌 WebSocket connecting: {self.channel_name}")
+>>>>>>> pr-3
         
         # Accept the connection
         await self.accept()
         
         # Add to a group for this optimization session
         # For now, we'll use a simple approach - can be enhanced later
+<<<<<<< HEAD
         logger.info(f"WebSocket connected: {self.channel_name}")
+=======
+        logger.info(f"✅ WebSocket connected: {self.channel_name}")
+>>>>>>> pr-3
     
     async def disconnect(self, close_code):
         """
@@ -51,6 +59,7 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
         This prevents "zombie" tasks from consuming CPU after the user closes the tab.
         Without this, users refreshing/closing tabs can DOS the worker nodes.
         """
+<<<<<<< HEAD
         logger.info(f"WebSocket disconnected: {self.channel_name}, code: {close_code}")
         
         # CRITICAL: Since we are using threads, task revocation is a bit trickier, but acceptable.
@@ -60,6 +69,28 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
                 pass
             except Exception as e:
                 logger.error(f"Error during disconnect cleanup: {e}")
+=======
+        logger.info(f"🔌 WebSocket disconnected: {self.channel_name}, code: {close_code}")
+        
+        # CRITICAL: Revoke the running task if it exists
+        if self.task_id:
+            logger.warning(f"⚠️ Disconnect detected. Revoking task {self.task_id} to prevent zombie task")
+            try:
+                # Import Celery app for task revocation
+                from config.celery import app
+                
+                # Revoke the task with terminate=True to kill CPU-bound processes
+                # terminate=True sends SIGTERM, which is sufficient for most cases
+                # For more aggressive termination, we can use terminate=True with signal='SIGKILL'
+                # Use sync_to_async since app.control.revoke is a sync operation
+                def revoke_task():
+                    app.control.revoke(self.task_id, terminate=True)
+                
+                await sync_to_async(revoke_task)()
+                logger.info(f"✅ Task {self.task_id} revoked successfully")
+            except Exception as e:
+                logger.error(f"❌ Error revoking task {self.task_id}: {e}")
+>>>>>>> pr-3
         
         # Clean up channel layer group if needed
         # (Currently not using groups, but good practice for future)
@@ -69,11 +100,16 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
         message_type = content.get('type')
         
         if message_type == 'start_optimization':
+<<<<<<< HEAD
             logger.info(f"Received start_optimization message on channel: {self.channel_name}")
+=======
+            logger.info(f"📤 Received start_optimization message on channel: {self.channel_name}")
+>>>>>>> pr-3
             
             # Extract input data
             input_data = content.get('data', {})
             
+<<<<<<< HEAD
             # Use direct function call in a local thread to bypass Celery/Redis
             # This is essential for local Windows development without Redis.
             from apps.modules.flexure_member.submodules.plate_girder.tasks import run_pso_optimization
@@ -108,17 +144,44 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
                 t.start()
                 
                 logger.info(f"Local thread task triggered: {self.task_id}")
+=======
+            # Import here to avoid circular imports
+            from apps.modules.flexure_member.submodules.plate_girder.tasks import run_pso_optimization
+            
+            # Trigger Celery task asynchronously
+            # The task will send updates via Channel Layer
+            try:
+                # Use sync_to_async to call the Celery task
+                task_result = run_pso_optimization.delay(
+                    self.channel_name,
+                    input_data
+                )
+                
+                # CRITICAL: Store task_id for revocation on disconnect
+                self.task_id = task_result.id
+                
+                logger.info(f"✅ Celery task triggered: {self.task_id}")
+>>>>>>> pr-3
                 
                 # Send acknowledgment to client
                 await self.send_json({
                     'type': 'task_started',
+<<<<<<< HEAD
                     'task_id': self.task_id,
                     'data': {
+=======
+                    'data': {
+                        'task_id': self.task_id,
+>>>>>>> pr-3
                         'channel_name': self.channel_name
                     }
                 })
             except Exception as e:
+<<<<<<< HEAD
                 logger.error(f"Error triggering thread task: {e}")
+=======
+                logger.error(f"❌ Error triggering Celery task: {e}")
+>>>>>>> pr-3
                 await self.send_json({
                     'type': 'error',
                     'data': {
@@ -126,7 +189,11 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
                     }
                 })
         else:
+<<<<<<< HEAD
             logger.warning(f"Unknown message type: {message_type}")
+=======
+            logger.warning(f"⚠️ Unknown message type: {message_type}")
+>>>>>>> pr-3
     
     async def pso_update(self, event):
         """
@@ -135,7 +202,11 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
         This method is called when a Celery task sends an update via Channel Layer.
         """
         data = event.get('data', {})
+<<<<<<< HEAD
         logger.debug(f"PSO update received: iteration {data.get('iteration', 'unknown')}, particle {data.get('particle_index', 'unknown')}")
+=======
+        logger.info(f"📊 PSO update received: iteration {data.get('iteration', 'unknown')}, particle {data.get('particle_index', 'unknown')}")
+>>>>>>> pr-3
         
         # Forward the update to the WebSocket client
         await self.send_json({
@@ -150,7 +221,11 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
         This method is called when a Celery task completes.
         """
         data = event.get('data', {})
+<<<<<<< HEAD
         logger.info(f"PSO optimization complete: {data.get('total_iterations', 'unknown')} iterations")
+=======
+        logger.info(f"✅ PSO optimization complete: {data.get('total_iterations', 'unknown')} iterations")
+>>>>>>> pr-3
         
         # Clear task_id since task is complete (no need to revoke)
         self.task_id = None
@@ -168,7 +243,11 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
         This method is called periodically to keep the connection alive.
         """
         data = event.get('data', {})
+<<<<<<< HEAD
         logger.debug(f"PSO heartbeat: {data.get('timestamp', 'unknown')}")
+=======
+        logger.debug(f"💓 PSO heartbeat: {data.get('timestamp', 'unknown')}")
+>>>>>>> pr-3
         
         # Forward the heartbeat to the WebSocket client
         await self.send_json({
@@ -183,7 +262,11 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
         This method is called when a Celery task encounters an error.
         """
         data = event.get('data', {})
+<<<<<<< HEAD
         logger.error(f"PSO error: {data.get('message', 'Unknown error')}")
+=======
+        logger.error(f"❌ PSO error: {data.get('message', 'Unknown error')}")
+>>>>>>> pr-3
         
         # Clear task_id since task has errored (no need to revoke)
         self.task_id = None
@@ -193,3 +276,7 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
             'type': 'pso_error',
             'data': data
         })
+<<<<<<< HEAD
+=======
+
+>>>>>>> pr-3

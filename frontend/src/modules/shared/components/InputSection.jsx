@@ -210,15 +210,30 @@ export const InputSection = ({
     }
   }, [safeContextData, section.fields]);
 
-  const handleCustomizableSelect = (field, value) => {
-    const getAllValuesForInputKey = (inputKey) => {
-      if (field?.getDynamicDataSource) {
-        const options = field.getDynamicDataSource(inputs, contextData);
-        setModalDynamicSrc((modalDynSrc) => ({ ...modalDynSrc, [field.key]: options }));
-        return options;
+  // Helper to normalize value lists to array of strings
+  const normalizeValueList = (list) => {
+    if (!list || !Array.isArray(list)) return [];
+    return list.map(item => {
+      if (typeof item === 'string') return item;
+      if (typeof item === 'object' && item !== null) {
+        return item.value ?? item.label ?? item.Grade ?? item.Designation ?? String(item);
       }
-      return getListForInputKey(inputKey, safeContextData, field.dataSource);
-    };
+      return String(item);
+    });
+  };
+
+  // Helper to get all values for an input key
+  const getAllValuesForInputKey = (inputKey, field) => {
+    if (field?.getDynamicDataSource) {
+      const options = field.getDynamicDataSource(inputs, contextData);
+      setModalDynamicSrc((modalDynSrc) => ({ ...modalDynSrc, [field.key]: options }));
+      return options;
+    }
+    return getListForInputKey(inputKey, safeContextData, field.dataSource);
+  };
+
+  const handleCustomizableSelect = (field, value) => {
+
 
 
     if (value === "Customized") {
@@ -267,7 +282,10 @@ export const InputSection = ({
   const renderField = (field) => {
     if (field.conditionalDisplay && !field.conditionalDisplay(extraState, safeInputs)) return null;
 
-    switch (field.type) {
+    // Handle conditional field type (e.g., customizable vs select based on design_type)
+    const fieldType = field.conditionalType ? field.conditionalType(safeInputs) : field.type;
+
+    switch (fieldType) {
       case 'select': {
         const isCustomizable = Boolean(field.selectionKey) && !(field.key.includes("plate1") || field.key.includes("plate2"));
         const rawList = getOptionsForField(field, safeContextData, safeInputs);
