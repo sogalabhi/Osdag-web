@@ -25,7 +25,7 @@ sys.stdout = open(os.devnull, "w")  # redirect stdout
 sys.stdout = old_stdout  # Reset log
 
 # Core expects these key names (from osdag_core.Common / base_plate_connection.set_input_values)
-KEY_CONN = 'Connectivity *'
+KEY_CONN = 'Connectivity'
 KEY_END_CONDITION = 'End Condition'
 KEY_SECSIZE = 'Member.Designation'
 KEY_MATERIAL = 'Material'
@@ -235,11 +235,21 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
     if not designation_icf and anchor_dia_icf:
         designation_icf = f"{anchor_dia_icf[0]}X{length_icf} IS5624 GALV"
 
+    weld_fu_overwrite = float(input_values.get("Weld.Material_Grade_OverWrite", 0) or 0)
+    if weld_fu_overwrite <= 0:
+        from osdag_core.utils.common.material import Material
+        try:
+            weld_fu_overwrite = float(Material(member_material).fu)
+        except Exception:
+            weld_fu_overwrite = 410.0
+
     # Parent MomentConnection.set_input_values() -> Load() requires numeric strings; use "0" when "Disabled"
     shear_for_load = "0" if shear_major == "Disabled" else str(shear_major)
     moment_for_load = "0" if moment_major == "Disabled" else str(moment_major)
     design_dict = {
         KEY_CONN: connectivity,
+        'Connectivity': connectivity,      # web Common.py KEY_CONN value
+        'Connectivity *': connectivity,    # desktop Common.py KEY_CONN value (Celery worker may resolve this)
         KEY_END_CONDITION: "Pinned",
         KEY_SECSIZE: section_str,
         KEY_MATERIAL: material,
@@ -276,7 +286,7 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
         KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF: float(input_values.get("DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite", 0) or 0),
         KEY_DP_ANCHOR_BOLT_FRICTION: input_values.get("DesignPreferences.Anchor_Bolt.Friction_coefficient", "0.30"),
         KEY_DP_WELD_FAB: input_values.get("Weld.Fab", "Shop Weld"),
-        KEY_DP_WELD_MATERIAL_G_O: float(input_values.get("Weld.Material_Grade_OverWrite", 0) or 0),
+        KEY_DP_WELD_MATERIAL_G_O: weld_fu_overwrite,
         KEY_DP_WELD_TYPE: weld_type,
         KEY_DP_DETAILING_EDGE_TYPE: input_values.get("Detailing.Edge_type", "b - Machine flame cut"),
         KEY_DP_DETAILING_CORROSIVE_INFLUENCES: input_values.get("Detailing.Corrosive_Influences", "No"),
@@ -347,17 +357,17 @@ def generate_output(input_values: Dict[str, Any]):
     return output, logs
 
 
-BASE_PLATE_CAD_SECTIONS = ("Model", "Column", "Plate")
+BASE_PLATE_CAD_SECTIONS = ("Model", "Column", "Plate", "Welds", "Bolts", "Concrete", "Grout")
 
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate CAD model from input values as BREP/STL. Returns file path or empty string.
-    Desktop options: Model, Column, Base Plate (Plate).
+    Desktop options: Model, Column, Base Plate (Plate), Welds, Bolts, Concrete, Grout.
     """
     if section not in BASE_PLATE_CAD_SECTIONS:
         raise InvalidInputTypeError(
             "section",
-            "'Model', 'Column', 'Plate'",
+            "'Model', 'Column', 'Plate', 'Welds', 'Bolts', 'Concrete', 'Grout'",
         )
 
     try:
@@ -378,11 +388,14 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
         print(f"[BasePlate CAD] createBasePlateCAD failed: {e}")
         return ""
 
-    # Section -> getter on base_plate (desktop: Model, Column, Base Plate only)
     section_getters = {
         "Model": lambda: base_plate.get_models(),
         "Column": lambda: base_plate.get_column_model(),
         "Plate": lambda: base_plate.get_plate_connector_models(),
+        "Welds": lambda: base_plate.get_welded_models(),
+        "Bolts": lambda: base_plate.get_nut_bolt_array_models(),
+        "Concrete": lambda: base_plate.get_concrete_models(),
+        "Grout": lambda: base_plate.get_grout_models(),
     }
     get_shape = section_getters.get(section)
     if not get_shape:

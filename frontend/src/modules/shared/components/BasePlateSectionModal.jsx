@@ -1,8 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
-import { Input, Select, Button } from "antd";
+import { Input, Select } from "antd";
 import CustomMaterialModal from "./CustomMaterialModal";
-import Slope_Beam from "../../../assets/Slope_Beam.png";
 
 const { Option } = Select;
 
@@ -40,24 +39,15 @@ const BasePlateSectionModal = ({
     }
   }, [suppressInitialMaterialDispatch]);
 
-  const handleDownload = () => {
-    const fileName = "Columns_Details.xlsx";
-  
-    const link = document.createElement("a");
-    link.href = `/downloads/${fileName}`;
-    link.setAttribute("download", fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const selectedMaterialGrade = designPrefInputs["Base_Plate.Material"] || designPrefInputs.supporting_material || "";
+  const selectedMaterialDetails = materials.find((item) => item.Grade === selectedMaterialGrade) || (supporting_material_details && supporting_material_details[0]);
 
   return (
     <>
-  
       <div className="col-beam-cont">
         {/* Left Section */}
         <div className="col-left">
-        <h4>Inputs</h4>
+          <h4>Inputs</h4>
           <div className="sub-container">
             <div className="input-cont">
               <h5>Material</h5>
@@ -65,7 +55,7 @@ const BasePlateSectionModal = ({
                 <Select
                   disabled={isInputLocked}
                   style={{ width: "132px", height: "25px", fontSize: "12px" }}
-                  value={designPrefInputs.supporting_material}
+                  value={selectedMaterialGrade}
                   onSelect={(value) => {
                     if (isInputLocked) return;
                     if (value === -1) {
@@ -76,15 +66,7 @@ const BasePlateSectionModal = ({
                     if (!material) return;
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      supporting_material: material.Grade,
-                    });
-                    manageDesignPreferences("section_update", {
-                      id: 1,
-                      materialValue: material.Grade,
-                    });
-                    manageDesignPreferences("material_update", {
-                      materialType: "supporting",
-                      materialData: material,
+                      "Base_Plate.Material": material.Grade,
                     });
                   }}
                 >
@@ -102,13 +84,8 @@ const BasePlateSectionModal = ({
               <h5>Ultimate Strength, Fu (MPa)</h5>
               <Input
                 type="text"
-                name="ultimate-strength"
                 className="input-design-pref"
-                value={
-                  supporting_material_details[0]
-                    ? supporting_material_details[0].Ultimate_Tensile_Stress
-                    : 0
-                }
+                value={selectedMaterialDetails ? selectedMaterialDetails.Ultimate_Tensile_Stress : 0}
                 disabled
                 style={readOnlyFontStyle}
               />
@@ -117,28 +94,18 @@ const BasePlateSectionModal = ({
               <h5>Yield Strength, Fy (MPa) (0-20mm)</h5>
               <Input
                 type="text"
-                name="yield-strength"
                 className="input-design-pref"
-                value={
-                  supporting_material_details[0]
-                    ? supporting_material_details[0].Yield_Stress_greater_than_40
-                    : 0
-                }
+                value={selectedMaterialDetails ? selectedMaterialDetails.Yield_Stress_less_than_20 : 0}
                 disabled
                 style={readOnlyFontStyle}
               />
             </div>
             <div className="input-cont">
-              <h5>Yield Strength, Fy (MPa) (0-40mm)</h5>
+              <h5>Yield Strength, Fy (MPa) (20-40mm)</h5>
               <Input
                 type="text"
-                name="yield-strength"
                 className="input-design-pref"
-                value={
-                  supporting_material_details[0]
-                    ? supporting_material_details[0].Yield_Stress_greater_than_40
-                    : 0
-                }
+                value={selectedMaterialDetails ? selectedMaterialDetails.Yield_Stress_between_20_and_neg40 : 0}
                 disabled
                 style={readOnlyFontStyle}
               />
@@ -147,36 +114,42 @@ const BasePlateSectionModal = ({
               <h5>Yield Strength, Fy (MPa) (&gt;40mm)</h5>
               <Input
                 type="text"
-                name="yield-strength"
                 className="input-design-pref"
-                value={
-                  supporting_material_details[0]
-                    ? supporting_material_details[0].Yield_Stress_greater_than_40
-                    : 0
-                }
+                value={selectedMaterialDetails ? selectedMaterialDetails.Yield_Stress_greater_than_40 : 0}
                 disabled
                 style={readOnlyFontStyle}
               />
             </div>
-            
           </div>
-
         </div>
-              </div>
+      </div>
       
       <CustomMaterialModal
         showModal={showModal}
         setShowModal={setShowModal}
-        setInputValues={setDesignPrefInputs}
+        setInputValues={(newValues) => {
+          if (typeof newValues === 'function') {
+            setDesignPrefInputs((prev) => {
+              const updated = newValues(prev);
+              return {
+                ...updated,
+                "Base_Plate.Material": updated.supporting_material,
+              };
+            });
+          } else {
+            setDesignPrefInputs({
+              ...designPrefInputs,
+              ...newValues,
+              "Base_Plate.Material": newValues.supporting_material,
+            });
+          }
+        }}
         inputValues={designPrefInputs}
         type="supporting"
         materialList={materials}
       />
-
-      
     </>
   );
 };
 
 export default BasePlateSectionModal;
-

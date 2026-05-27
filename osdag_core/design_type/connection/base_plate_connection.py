@@ -2581,7 +2581,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # the following list of anchor diameters are neglected due its practical non acceptance/unavailability - 'M8', 'M10', 'M12', 'M16'
 
         # 1.1: Anchor outside flange
-        self.anchor_dia_list_out = [int(a[-2:]) for a in self.anchor_dia_out]  # list of anchor dia provided as input, (int) [20, 24, 30, ...]
+        self.anchor_dia_list_out = [int(a.lstrip('M')) for a in self.anchor_dia_out]  # list of anchor dia provided as input, (int) [8, 20, 24, 30, ...]
 
         sort_bolt = filter(lambda x: 'M20' <= x <= self.anchor_dia_out[-1], self.anchor_dia_out)
 
@@ -2595,7 +2595,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.anchor_area_outside_flange = self.bolt_area(self.anchor_dia_provided_outside_flange)  # list of areas [shank area, thread area] mm^2
 
         # 1.2: Anchor inside flange
-        self.anchor_dia_list_in = [int(a[-2:]) for a in self.anchor_dia_in]  # list of anchor dia provided as input, (int) [20, 24, 30, ...]
+        self.anchor_dia_list_in = [int(a.lstrip('M')) for a in self.anchor_dia_in]  # list of anchor dia provided as input, (int) [8, 20, 24, 30, ...]
 
         sort_bolt = filter(lambda x: 'M20' <= x <= self.anchor_dia_in[-1], self.anchor_dia_in)
 

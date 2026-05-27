@@ -23,6 +23,7 @@ export const DEFAULT_VIEW_MAPPINGS = {
   "Bolts": ["Bolts"],
   "Welds": ["Welds"],
   // Base Plate
+  "Concrete": ["Concrete"],
   "Conc": ["Conc", "Concrete"],
   "Grout": ["Grout"],
   "Stiffeners": ["Stiffeners", "Stiffener"],

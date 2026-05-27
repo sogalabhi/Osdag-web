@@ -213,6 +213,9 @@ def connectdb(table_name, call_type="dropdown"):
     elif table_name == "CHS":
         cursor = conn.execute("SELECT Designation FROM CHS")
 
+    elif table_name == "Beams and Columns":
+        cursor = conn.execute("SELECT Designation FROM Beams UNION SELECT Designation FROM Columns")
+
     else:
         cursor = conn.execute("SELECT Designation FROM Columns")
     rows = cursor.fetchall()
@@ -409,6 +412,7 @@ TYPE_TABLE_GUS = 'Gusset_Table'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
+TYPE_HEADING = 'Heading'
 TYPE_IMAGE = 'Image'
 TYPE_IMAGE_BIGGER = 'Image_Bigger'
 TYPE_IMAGE_COMPRESSION = 'Image_compression'
@@ -691,6 +695,7 @@ KEY_SemiCompact = "Semi-Compact"
 KEY_Flexure_Member_MAIN_MODULE = 'Flexure Member'
 KEY_DISP_FLEXURE = 'Flexural Members - Simply Supported'
 KEY_DISP_FLEXURE2 = 'Flexural Members - Cantilever'
+KEY_DISP_Cantilever = KEY_DISP_FLEXURE2
 KEY_DISP_FLEXURE3 = 'Flexural Members'
 KEY_DISP_FLEXURE4 = 'Flexural Members - Purlins'
 
@@ -1137,6 +1142,7 @@ try:
     VALUES_MATERIAL = connectdb("Material")
     VALUES_PRIBM = connectdb("Beams")
     VALUES_DIAM = connectdb("Bolt")
+    VALUE_BEAM_COL = connectdb("Beams and Columns")
 except Exception as e:
     print(f"Warning: Could not load bolt diameters from database: {e}")
     VALUES_DIAM = []
@@ -1145,6 +1151,7 @@ except Exception as e:
     VALUES_COLSEC = []
     VALUES_MATERIAL = []
     VALUES_PRIBM = []
+    VALUE_BEAM_COL = []
 
 VALUES_MATERIAL_SELECTED = "E 250 (Fe 410 W)A"
 # VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']

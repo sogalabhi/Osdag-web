@@ -232,23 +232,88 @@ const DESIGN_PREF_CONFIG = {
     }),
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
-  "Base Plate":{
+  "Base Plate": {
     tabIds: [0, 7, 8, 9, 10, 11, 13],
     initialTabIndex: 0,
     getInitialPrefs: (inputs) => ({
-      supported_material: inputs.supported_material,
-      connector_material: inputs.connector_material,
-      bolt_tension_type: inputs.bolt_tension_type,
-      bolt_hole_type: inputs.bolt_hole_type,
-      bolt_slip_factor: inputs.bolt_slip_factor,
-      weld_fab: inputs.weld_fab,
-      weld_material_grade: inputs.weld_material_grade,
-      detailing_edge_type: inputs.detailing_edge_type,
-      detailing_gap: inputs.detailing_gap,
-      detailing_corr_status: inputs.detailing_corr_status,
-      design_method: inputs.design_method,
+      supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      connector_material: inputs.connector_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
+      bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
+      bolt_slip_factor: inputs.bolt_slip_factor ?? "0.3",
+      weld_fab: inputs["Weld.Fab"] ?? inputs.weld_fab ?? "Shop Weld",
+      weld_material_grade: inputs["Weld.Material_Grade_OverWrite"] ?? inputs.weld_material_grade ?? "0",
+      detailing_edge_type: inputs["Detailing.Edge_type"] ?? inputs.detailing_edge_type ?? "Sheared or hand flame cut",
+      detailing_gap: inputs.detailing_gap ?? "10",
+      detailing_corr_status: inputs["Detailing.Corrosive_Influences"] ?? inputs.detailing_corr_status ?? "No",
+      design_method: inputs["Design.Design_Method"] ?? inputs.design_method ?? "Limit State Design",
+
+      // Anchor Bolt OCF
+      "DesignPreferences.Anchor_Bolt.OCF.Designation": inputs["DesignPreferences.Anchor_Bolt.OCF.Designation"] ?? "",
+      "DesignPreferences.Anchor_Bolt.OCF.Type": inputs["DesignPreferences.Anchor_Bolt.OCF.Type"] ?? "End Plate Type",
+      "DesignPreferences.Anchor_Bolt.OCF.Galvanized": inputs["DesignPreferences.Anchor_Bolt.OCF.Galvanized"] ?? "Yes",
+      "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type": inputs["DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type"] ?? "Over-sized",
+      "DesignPreferences.Anchor_Bolt.OCF.Length": inputs["DesignPreferences.Anchor_Bolt.OCF.Length"] ?? "300",
+      "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": inputs["DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite"] ?? "0",
+
+      // Anchor Bolt ICF
+      "DesignPreferences.Anchor_Bolt.ICF.Designation": inputs["DesignPreferences.Anchor_Bolt.ICF.Designation"] ?? "",
+      "DesignPreferences.Anchor_Bolt.ICF.Type": inputs["DesignPreferences.Anchor_Bolt.ICF.Type"] ?? "End Plate Type",
+      "DesignPreferences.Anchor_Bolt.ICF.Galvanized": inputs["DesignPreferences.Anchor_Bolt.ICF.Galvanized"] ?? "Yes",
+      "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": inputs["DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type"] ?? "Over-sized",
+      "DesignPreferences.Anchor_Bolt.ICF.Length": inputs["DesignPreferences.Anchor_Bolt.ICF.Length"] ?? "300",
+      "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": inputs["DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite"] ?? "0",
+
+      // Anchor General
+      "DesignPreferences.Anchor_Bolt.Friction_coefficient": inputs["DesignPreferences.Anchor_Bolt.Friction_coefficient"] ?? "0.30",
+
+      // Base Plate & Stiffener materials
+      "Base_Plate.Material": inputs["Base_Plate.Material"] ?? inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      "Stiffener_Key.Material": inputs["Stiffener_Key.Material"] ?? inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+
+      // Other design keys
+      "DesignPreferences.Design.Base_Plate": inputs["DesignPreferences.Design.Base_Plate"] ?? "Effective Area Method",
     }),
-    getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
+    getDefaultPrefs: (inputs) => ({
+      supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      connector_material: inputs.connector_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      bolt_tension_type: "Pre-tensioned",
+      bolt_hole_type: "Standard",
+      bolt_slip_factor: "0.3",
+      weld_fab: "Shop Weld",
+      weld_material_grade: "0",
+      detailing_edge_type: "Sheared or hand flame cut",
+      detailing_gap: "10",
+      detailing_corr_status: "No",
+      design_method: "Limit State Design",
+
+      "Weld.Fab": "Shop Weld",
+      "Weld.Material_Grade_OverWrite": "0",
+      "Detailing.Edge_type": "Sheared or hand flame cut",
+      "Detailing.Corrosive_Influences": "No",
+      "Design.Design_Method": "Limit State Design",
+
+      "DesignPreferences.Anchor_Bolt.OCF.Designation": "",
+      "DesignPreferences.Anchor_Bolt.OCF.Type": "End Plate Type",
+      "DesignPreferences.Anchor_Bolt.OCF.Galvanized": "Yes",
+      "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type": "Over-sized",
+      "DesignPreferences.Anchor_Bolt.OCF.Length": "300",
+      "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": "0",
+
+      "DesignPreferences.Anchor_Bolt.ICF.Designation": "",
+      "DesignPreferences.Anchor_Bolt.ICF.Type": "End Plate Type",
+      "DesignPreferences.Anchor_Bolt.ICF.Galvanized": "Yes",
+      "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "Over-sized",
+      "DesignPreferences.Anchor_Bolt.ICF.Length": "300",
+      "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": "0",
+
+      "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.30",
+
+      "Base_Plate.Material": inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      "Stiffener_Key.Material": inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+
+      "DesignPreferences.Design.Base_Plate": "Effective Area Method",
+    }),
   },
   "CleatAngleConnection":{
     tabIds: [0, 1, 4, 6, 11, 13],

@@ -34,6 +34,10 @@ export const DEFAULT_PART_COLORS = {
 
   // Fallback
   Model: "#999999",
+
+  // Base Plate
+  Concrete: "#e0e0e0",
+  Grout: "#9e9e9e",
 };
 
 // Render order categories (z-index priority)
@@ -82,6 +86,8 @@ export const VALID_PART_KEYS = new Set([
   "Cover Plate",
   "CoverPlate",
   "Model",
+  "Concrete",
+  "Grout",
 ]);
 
 /**

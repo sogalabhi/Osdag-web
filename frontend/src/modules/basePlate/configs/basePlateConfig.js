@@ -5,12 +5,12 @@ export const basePlateConfig = {
   routePath: "/design/connections/base_plate",
   designType: "BasePlateConnection",
   cameraKey: "BasePlateConnection",
-  cadOptions: ["Model", "Column", "Plate"],
+  cadOptions: ["Model", "Column", "Plate", "Welds", "Bolts", "Concrete", "Grout"],
 
   defaultInputs: {
     module: "BasePlateConnection",
     member_designation: "",
-    material: "E 165 (Fe 290)",
+    material: "E 250 (Fe 410 W)A",
     connectivity: "Welded Column Base",
     end_condition: "Pinned",
     load_axial: "",
@@ -74,7 +74,7 @@ export const basePlateConfig = {
     return {
       Module: "BasePlateConnection",
       "Member.Designation": memberDesignation,
-      Material: inputs.material || "E 165 (Fe 290)",
+      Material: inputs.material || "E 250 (Fe 410 W)A",
       Connectivity: inputs.connectivity || "Welded Column Base",
       "End Condition": inputs.end_condition || "Pinned",
       "Load.Axial": inputs.load_axial ?? "",

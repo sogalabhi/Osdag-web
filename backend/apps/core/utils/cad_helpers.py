@@ -42,7 +42,7 @@ SECTION_MAPPINGS = {
         'purlin': ['Model'],
     },
     'base-plate': {
-        'base-plate': ['Model', 'Column', 'Plate'],
+        'base-plate': ['Model', 'Column', 'Plate', 'Welds', 'Bolts', 'Concrete', 'Grout'],
     },
     'compression-member': {
         'struts-bolted': ['Model', 'Member'],
