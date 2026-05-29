@@ -81,28 +81,32 @@ export const CustomizationModal = ({
           Submit
         </Button>
       ]}
-      width={680}
+      width={620}
       className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
     >
-      <div className="popUp">
-        <h3 className="py-2 text-lg font-bold text-osdag-text-primary dark:text-white">{title}</h3>
-        <div className="flex gap-2 mb-3">
-          <Button size="middle" className="hover:border-osdag-green hover:text-osdag-green" onClick={handleSelectAll}>
-            Select All (≫)
-          </Button>
-          <Button size="middle" className="hover:border-osdag-green hover:text-osdag-green" onClick={handleClearAll}>
-            Clear All (≪)
-          </Button>
+      <div className="popUp flex flex-col items-center w-full">
+        <div className="w-full max-w-[560px]">
+          <h3 className="py-2 text-lg font-bold text-osdag-text-primary dark:text-white text-left">{title}</h3>
+          <div className="flex gap-2 mb-3 justify-start">
+            <Button size="middle" className="hover:border-osdag-green hover:text-osdag-green" onClick={handleSelectAll}>
+              Select All (≫)
+            </Button>
+            <Button size="middle" className="hover:border-osdag-green hover:text-osdag-green" onClick={handleClearAll}>
+              Clear All (≪)
+            </Button>
+          </div>
+          <div className="flex justify-center w-full">
+            <Transfer
+              dataSource={transferData}
+              targetKeys={tempKeys}
+              onChange={(nextTargetKeys) => setTempKeys(nextTargetKeys)}
+              render={(item) => <h5>{item.label}</h5>}
+              titles={["Available", "Selected"]}
+              showSearch
+              listStyle={{ height: 350, width: 240 }}
+            />
+          </div>
         </div>
-        <Transfer
-          dataSource={transferData}
-          targetKeys={tempKeys}
-          onChange={(nextTargetKeys) => setTempKeys(nextTargetKeys)}
-          render={(item) => <h5>{item.label}</h5>}
-          titles={["Available", "Selected"]}
-          showSearch
-          listStyle={{ height: 350, width: 260 }}
-        />
       </div>
     </Modal>
   );
