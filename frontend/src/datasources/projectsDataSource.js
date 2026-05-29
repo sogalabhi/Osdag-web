@@ -30,6 +30,16 @@ export async function getProjectById(projectId) {
 }
 
 /**
+ * Search projects by query string.
+ * @param {string} query - Search term
+ * @returns {Promise<{ success: boolean, projects?: Array }>}
+ */
+export async function searchProjects(query) {
+  const res = await apiClient(`${PROJECTS.list}?q=${encodeURIComponent(query)}`, { method: "GET" });
+  return res.json();
+}
+
+/**
  * Delete a project by ID.
  */
 export async function deleteProject(projectId) {

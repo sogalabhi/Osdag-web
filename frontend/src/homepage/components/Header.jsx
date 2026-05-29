@@ -2,9 +2,10 @@ import { useRef, useState, useEffect } from 'react';
 import yaml from 'js-yaml';
 import { useNavigate } from 'react-router-dom';
 import { MODULE_ROUTES, MODULE_NAME_TO_KEY, CONNECTIONS_TAB_CONTENT, GENERIC_SUBMODULE_CONTENT } from '../../constants/modules';
-import { apiClient } from '../../utils/apiClient';
 import { isGuestUser } from '../../utils/auth';
 import { useAuth } from '../../context/AuthContext';
+import { searchProjects } from '../../datasources/projectsDataSource';
+import { downloadSectionCatalog, importSectionXlsx } from '../../datasources/sectionsDataSource';
 import ProjectActionButtons from './ProjectActionButtons';
 import dayButton from '../../assets/homepage/day_button.svg';
 import infoDefault from '../../assets/homepage/info_default.svg';
@@ -95,8 +96,7 @@ const Header = ({ setshowSideBar, active }) => {
 
     const fetchProjects = async () => {
       try {
-        const res = await apiClient(`api/projects/?q=${encodeURIComponent(searchQuery)}`, { method: 'GET' });
-        const data = await res.json();
+        const data = await searchProjects(searchQuery);
         if (data.success) {
           const formatted = data.projects.map(p => {
             const moduleName = p.submodule || p.module;
@@ -108,6 +108,7 @@ const Header = ({ setshowSideBar, active }) => {
               id: p.id,
               name: p.name,
               type: p.module || p.submodule || 'Project',
+              module_id: p.submodule || p.module,
               routeKey: routeKey,
               date: new Date(p.updated_at).toLocaleDateString()
             };
@@ -211,28 +212,7 @@ const Header = ({ setshowSideBar, active }) => {
     }
 
     try {
-      // Call the backend API to get the catalog export
-      const response = await apiClient(
-        `api/sections/catalog-export/?table=${tableName}`,
-        { method: 'GET' }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to download file');
-      }
-
-      // Get the blob from response
-      const blob = await response.blob();
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${tableName}_Catalog.xlsx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      await downloadSectionCatalog(tableName);
     } catch (error) {
       console.error('Download error:', error);
       alert('Failed to download file. Please try again.');
@@ -243,21 +223,12 @@ const Header = ({ setshowSideBar, active }) => {
     if (!file) return;
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('table', tableName);
+      const result = await importSectionXlsx(tableName, file);
 
-      const response = await apiClient('api/sections/import/', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(`Import successful!\nInserted: ${result.inserted}\nIgnored: ${result.ignored?.length || 0}\nRejected: ${result.rejected?.length || 0}`);
+      if (result.success) {
+        alert(`Import successful!\nInserted: ${result.data?.inserted || 0}\nIgnored: ${result.data?.ignored?.length || 0}\nRejected: ${result.data?.rejected?.length || 0}`);
       } else {
-        alert(`Import failed: ${result.detail || 'Unknown error'}`);
+        alert(`Import failed: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Import error:', error);
