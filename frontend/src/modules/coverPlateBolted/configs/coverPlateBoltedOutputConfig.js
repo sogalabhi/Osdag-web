@@ -17,14 +17,12 @@ export const coverPlateBoltedOutputConfig = {
       { key: "Web_Plate.Width", label: "Width (mm)" },
       { key: "Web_Plate.Thickness", label: "Thickness (mm)*" },
       { key: "WebSpacingDetailsModal", label: "Spacing (mm)" },
-      { key: "WebCapacityModal", label: "Capacity" },
     ],
     "Flange Splice Plate Outer Plate": [
       { key: "Flange_Plate.Width (mm)", label: "Width (mm)" },
       { key: "flange_plate.Length", label: "Length (mm)" },
       { key: "Connector.Flange_Plate.Thickness_list", label: "Thickness (mm)" },
       { key: "FlangeSpacingDetailsModal", label: "Spacing (mm)" },
-      { key: "FlangeCapacityModal", label: "Capacity" },
     ],
     "Inner Plate": [
       { key: "Flange_Plate.InnerWidth", label: "Width (mm)" },
@@ -40,8 +38,6 @@ export const coverPlateBoltedOutputConfig = {
       type: "spacing",
       buttonText: "Flange Spacing",
     },
-    WebCapacityModal: { type: "capacity", buttonText: "Web Capacity" },
-    FlangeCapacityModal: { type: "capacity", buttonText: "Flange Capacity" },
     BoltWebCapacityModal: { type: "details", buttonText: "Web Bolt Capacity" },
     BoltFlangeCapacityModal: {
       type: "details",
@@ -64,13 +60,6 @@ export const coverPlateBoltedOutputConfig = {
       width: "35%",
       layout: "single-column", // ← Configuration instead of JSX
       hasImage: false,
-    },
-
-    capacity: {
-      title: "Plate Capacity Details",
-      width: "68%",
-      layout: "two-column", // ← Configuration instead of JSX
-      hasImage: true,
     },
   },
 
@@ -111,37 +100,6 @@ export const coverPlateBoltedOutputConfig = {
         {
           key: "Flange_plate.edge_dist_provided_flange_spacing",
           label: "Edge Distance (mm)",
-        },
-      ],
-    },
-
-    capacity: {
-      WebCapacityModal: [
-        {
-          key: "section.Tension_capacity_web_web_capacity",
-          label: "Web Tension Capacity (kN)",
-        },
-        {
-          key: "Web_plate.capacity_web_capacity",
-          label: "Web Plate Tension Capacity (kN)",
-        },
-        {
-          key: "web_plate.shear_capacity_web_plate_web_capacity",
-          label: "Web Plate Shear Capacity (kN)",
-        },
-        {
-          key: "Web_Plate.MomDemand_web_capacity",
-          label: "Web Moment Demand (kNm)",
-        },
-      ],
-      FlangeCapacityModal: [
-        {
-          key: "Section.flange_capacity_flange_capacity",
-          label: "Flange Tension Capacity (kN)",
-        },
-        {
-          key: "flange_plate.tension_capacity_flange_plate_flange_capacity",
-          label: "Flange Plate Tension Capacity (kN)",
         },
       ],
     },

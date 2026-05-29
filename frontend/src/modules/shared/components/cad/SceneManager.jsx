@@ -46,10 +46,17 @@ export const SceneManager = forwardRef(({
         const parsedData = {};
         const partsGroup = new THREE.Group();
 
+        const allKeys = Object.keys(modelPaths);
+        const uniqueKeys = allKeys.filter(
+          (key, idx) => allKeys.findIndex(k => k.toLowerCase() === key.toLowerCase()) === idx
+        );
+
         Object.entries(modelPaths).forEach(([key, dataUrl]) => {
           if (!dataUrl) return;
           
-          if (key === 'Model' && Object.keys(modelPaths).length > 1) return;
+          if (!uniqueKeys.includes(key)) return;
+
+          if (key === 'Model' && uniqueKeys.length > 1) return;
 
           try {
             // STL Handling

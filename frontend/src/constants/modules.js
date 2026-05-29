@@ -240,4 +240,13 @@ export const MODULE_NAME_TO_KEY = {
     "Column-to-Column-Cover-Plate-Welded-Connection": MODULE_KEY_CC_COVER_PLATE_WELDED,
     "Column-to-Column End Plate Connection": MODULE_KEY_CC_END_PLATE,
     "Column-to-Column-End-Plate-Connection": MODULE_KEY_CC_END_PLATE,
+
+    "fp": MODULE_KEY_FIN_PLATE,
+    "ca": MODULE_KEY_CLEAT_ANGLE,
+    "ep": MODULE_KEY_END_PLATE,
+    "sa": MODULE_KEY_SEAT_ANGLE,
+    "cpb": MODULE_KEY_COVER_PLATE_BOLTED,
+    "cpw": MODULE_KEY_COVER_PLATE_WELDED,
+    "boltedtoendplate": MODULE_KEY_BOLTED_TO_END_GUSSET,
+    "ssb": MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
 };

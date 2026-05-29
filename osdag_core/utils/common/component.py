@@ -1314,6 +1314,12 @@ class ISection(Material):
             cur = conn.cursor()
             cur.execute(db_query, (designation,))
         row = cur.fetchone()
+        if row is None:
+            conn.close()
+            raise ValueError(
+                f"Section '{designation}' not found in "
+                f"{'Beams/Columns' if tables_combined else table} table of the database."
+            )
         self.mass = row[2]
         self.area = row[3] * 100
         self.depth = row[4]
@@ -1368,6 +1374,11 @@ class ISection(Material):
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
         row = cur.fetchone()
+        if row is None:
+            conn.close()
+            raise ValueError(
+                f"Section '{designation}' not found in '{table}' table of the database."
+            )
         self.mass = row[2]
         self.area = row[3] * 100
         self.depth = row[4]

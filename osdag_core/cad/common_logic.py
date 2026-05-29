@@ -4245,9 +4245,9 @@ class CommonDesignLogic(object):
                         pg.get('stiffener_welds')
                     ]
 
-        # elif self.mainmodule == 'Columns with known support conditions':
-        #     # Column - only has one component (the column section)
-        #     final_model = self.ColObj
+        elif self.mainmodule == 'Columns with known support conditions':
+            # createColumnInFrameCAD() returns the TopoDS_Shape (sec) directly
+            final_model = self.ColObj
 
         elif self.mainmodule in (
             'Struts in Trusses',

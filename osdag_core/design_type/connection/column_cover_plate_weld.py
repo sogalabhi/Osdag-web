@@ -488,7 +488,7 @@ class ColumnCoverPlateWeld(MomentConnection):
         web_weld_details.append(t15)  # in N/mm
         t5 = (
             KEY_REDUCTION_LONG_JOINT, KEY_DISP_REDUCTION, TYPE_TEXTBOX, round(
-                self.Reduction_factor_web, 2) if flag else '',
+                getattr(self, 'Reduction_factor_web', 1), 2) if flag else '',
             True)
         web_weld_details.append(t5)
 

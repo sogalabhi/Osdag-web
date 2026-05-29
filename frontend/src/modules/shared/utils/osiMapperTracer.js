@@ -1,3 +1,5 @@
+import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
+
 /**
  * Utility to extract bidirectional key mappings dynamically for any engineering module config
  * by dry-running buildSubmissionParams with sentinel values.
@@ -35,13 +37,18 @@ export function getModuleKeyMap(moduleConfig) {
 
     const mockLists = new Proxy({}, {
       get(target, prop) {
-        const possibleKey = prop.replace(/List$/, "").replace(/Select$/, "");
-        const match = standardInputs.find(k => {
-          const normK = k.toLowerCase().replace(/_/g, "");
-          const normP = possibleKey.toLowerCase().replace(/_/g, "");
-          return normK.includes(normP) || normP.includes(normK);
-        });
-        return [`__TRACER_VAL__:${match || possibleKey}`];
+        let match = Object.keys(INPUT_KEY_TO_LIST).find(
+          (k) => INPUT_KEY_TO_LIST[k] === prop
+        );
+        if (!match) {
+          const possibleKey = prop.replace(/List$/, "").replace(/Select$/, "");
+          match = standardInputs.find(k => {
+            const normK = k.toLowerCase().replace(/_/g, "");
+            const normP = possibleKey.toLowerCase().replace(/_/g, "");
+            return normK.includes(normP) || normP.includes(normK);
+          }) || possibleKey;
+        }
+        return [`__TRACER_VAL__:${match}`];
       }
     });
 

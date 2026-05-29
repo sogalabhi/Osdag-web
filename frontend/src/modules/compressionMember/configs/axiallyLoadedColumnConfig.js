@@ -1,7 +1,14 @@
 import { MODULE_KEY_AXIALLY_LOADED_COLUMN } from "../../../constants/DesignKeys";
-import FIXED_FIXED from "../../../assets/CompressionMember/RRRRstrut.png";
-import FIXED_HINGED from "../../../assets/CompressionMember/RFRFstrut.png";
-import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
+import img_1_RRFF from "../../../assets/CompressionMember/1.RRFF.PNG";
+import img_1_RRFF_rotated from "../../../assets/CompressionMember/1.RRFF_rotated.PNG";
+import img_2_FRFR from "../../../assets/CompressionMember/2.FRFR.PNG";
+import img_2_FRFR_rotated from "../../../assets/CompressionMember/2.FRFR_rotated.PNG";
+import img_3_RFRF from "../../../assets/CompressionMember/3.RFRF.PNG";
+import img_4_RRFR from "../../../assets/CompressionMember/4.RRFR.PNG";
+import img_4_RRFR_rotated from "../../../assets/CompressionMember/4.RRFR_rotated.PNG";
+import img_5_RRRF from "../../../assets/CompressionMember/5.RRRF.PNG";
+import img_5_RRRF_rotated from "../../../assets/CompressionMember/5.RRRF_rotated.PNG";
+import img_6_RRRR from "../../../assets/CompressionMember/6.RRRR.PNG";
 
 export const axiallyLoadedColumnConfig = {
   sessionName: "Axially Loaded Column",
@@ -62,16 +69,22 @@ export const axiallyLoadedColumnConfig = {
   },
 
   getEndConditionImageZZ: (end1, end2) => {
-    if (end1 === "Fixed" && end2 === "Fixed") {
-      return FIXED_FIXED;
+    if (end1 === "Fixed") {
+      if (end2 === "Fixed") return img_6_RRRR;
+      if (end2 === "Free") return img_1_RRFF_rotated;
+      if (end2 === "Hinged") return img_5_RRRF_rotated;
+      if (end2 === "Roller") return img_4_RRFR_rotated;
+    } else if (end1 === "Free") {
+      return img_1_RRFF;
+    } else if (end1 === "Hinged") {
+      if (end2 === "Fixed") return img_5_RRRF;
+      if (end2 === "Hinged") return img_3_RFRF;
+      if (end2 === "Roller") return img_2_FRFR_rotated;
+    } else if (end1 === "Roller") {
+      if (end2 === "Fixed") return img_4_RRFR;
+      if (end2 === "Hinged") return img_2_FRFR;
     }
-    if (end1 === "Fixed" && end2 === "Hinged") {
-      return FIXED_HINGED;
-    }
-    if (end1 === "Hinged" && end2 === "Fixed") {
-      return HINGED_FIXED;
-    }
-    return FIXED_FIXED;
+    return img_6_RRRR;
   },
 
   getEndConditionImageYY: (end1, end2) => {

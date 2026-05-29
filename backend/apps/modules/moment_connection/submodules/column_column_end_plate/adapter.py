@@ -268,48 +268,46 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     output = {}
     logs = []  # Initialize logs
 
-    try:
-        module = create_from_input(input_values)
-        raw_output_text = module.output_values(True)
-        raw_output_flange = module.flange_bolt_spacing(True)
-        raw_output_web = module.web_bolt_spacing(True)
+    module = create_from_input(input_values)
 
-        if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
-            logs = module.logger.get_logs() or []
-            print(f'Retrieved {len(logs)} logs from custom logger')
-        else:
-            print('Logger is not CustomLogger instance or logger not found')
-            print(f'Logger type: {type(module.logger) if hasattr(module, "logger") else "No logger"}')
-            logs = getattr(module, "logs", []) or []
+    # Only call output methods with flag=True if design succeeded
+    design_ok = getattr(module, 'design_status', False)
 
-        raw_output = (
-            raw_output_text +
-            raw_output_flange + raw_output_web
-        )
+    raw_output_text = module.output_values(design_ok)
+    raw_output_flange = module.flange_bolt_spacing(design_ok)
+    raw_output_web = module.web_bolt_spacing(design_ok)
 
-        # Format output
-        for param in raw_output:
-            if len(param) >= 4 and param[2] == "TextBox":
-                key = param[0]
-                label = param[1] 
-                value = param[3]
-                
-                # Handle numpy types
-                if hasattr(value, 'item'):
-                    value = value.item()
-                
-                output[key] = {
-                    "key": key,
-                    "label": label,
-                    "val": value
-                }
-        
-        logger.info(f"Output generation completed. Generated {len(output)} output fields and {len(logs)} log messages")
-        
-    except Exception as e:
-        logger.error(f"Error in generate_output: {str(e)}")
-        logger.error(traceback.format_exc())
-        # Return what we have so far
+    if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
+        logs = module.logger.get_logs() or []
+        print(f'Retrieved {len(logs)} logs from custom logger')
+    else:
+        print('Logger is not CustomLogger instance or logger not found')
+        print(f'Logger type: {type(module.logger) if hasattr(module, "logger") else "No logger"}')
+        logs = getattr(module, "logs", []) or []
+
+    raw_output = (
+        raw_output_text +
+        raw_output_flange + raw_output_web
+    )
+
+    # Format output
+    for param in raw_output:
+        if len(param) >= 4 and param[2] == "TextBox":
+            key = param[0]
+            label = param[1]
+            value = param[3]
+
+            # Handle numpy types
+            if hasattr(value, 'item'):
+                value = value.item()
+
+            output[key] = {
+                "key": key,
+                "label": label,
+                "val": value
+            }
+
+    logger.info(f"Output generation completed. Generated {len(output)} output fields and {len(logs)} log messages")
     logger.debug(f"Final logs being returned: {logs}")
     return output, logs
 

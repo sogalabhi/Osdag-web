@@ -763,22 +763,30 @@ class ColumnDesign(Member):
             trial_section = section.strip("'")
 
             # fetching the section properties
-            if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams and columns
-                try:
-                    result = Beam(designation=trial_section, material_grade=self.material)
-                except:
-                    result = Column(designation=trial_section, material_grade=self.material)
-                section_property = result
-            elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # RHS and SHS
-                try:
-                    result = RHS(designation=trial_section, material_grade=self.material)
-                except:
-                    result = SHS(designation=trial_section, material_grade=self.material)
-                section_property = result
-            elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # CHS
-                section_property = CHS(designation=trial_section, material_grade=self.material)
-            else:
-                section_property = Column(designation=trial_section, material_grade=self.material)
+            # Each lookup is wrapped so that a single unrecognised designation
+            # (e.g. a WPB/NPB/UB that doesn't exist in the local Beam or Column
+            # table) is skipped gracefully instead of crashing the whole loop.
+            try:
+                if self.sec_profile == VALUES_SEC_PROFILE[0]:  # Beams and columns
+                    try:
+                        result = Beam(designation=trial_section, material_grade=self.material)
+                    except Exception:
+                        result = Column(designation=trial_section, material_grade=self.material)
+                    section_property = result
+                elif self.sec_profile == VALUES_SEC_PROFILE[1]:  # RHS and SHS
+                    try:
+                        result = RHS(designation=trial_section, material_grade=self.material)
+                    except Exception:
+                        result = SHS(designation=trial_section, material_grade=self.material)
+                    section_property = result
+                elif self.sec_profile == VALUES_SEC_PROFILE[2]:  # CHS
+                    section_property = CHS(designation=trial_section, material_grade=self.material)
+                else:
+                    section_property = Column(designation=trial_section, material_grade=self.material)
+            except Exception as _sec_err:
+                # Section not found in database — skip it silently.
+                print(f"[ColumnDesign] Skipping unrecognised section '{trial_section}': {_sec_err}")
+                continue
 
             # updating the material property based on thickness of the thickest element
             self.material_property.connect_to_database_to_get_fy_fu(self.material,

@@ -1065,7 +1065,7 @@ export const EngineeringModule = ({
           <button
             onClick={toggleCad}
             className={`md:hidden p-2 min-w-[44px] min-h-[44px] rounded-md transition-colors ${docks.cad
-              ? 'bg-osdag-green text-white dark:bg-osdag-dark-green'
+              ? 'text-white'
               : 'hover:bg-black/10 dark:hover:bg-black/40'
               }`}
             title={`${docks.cad ? 'Hide' : 'Show'} CAD`}

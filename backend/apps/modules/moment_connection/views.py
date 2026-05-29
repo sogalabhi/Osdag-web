@@ -23,11 +23,11 @@ from apps.sections.options_merge import merge_user_sections_into_options
 
 # Mapping from moment-connection submodule slug to legacy report module_id
 MOMENT_REPORT_MODULE_ID_MAP = {
-    "beam-beam-cover-plate-bolted": "Cover-Plate-Bolted-Connection",
-    "beam-beam-cover-plate-welded": "Cover-Plate-Welded-Connection",
+    "beam-beam-cover-plate-bolted": "Beam-to-Beam-Cover-Plate-Bolted-Connection",
+    "beam-beam-cover-plate-welded": "Beam-to-Beam-Cover-Plate-Welded-Connection",
     "beam-beam-end-plate": "Beam-Beam-End-Plate-Connection",
     "beam-column-end-plate": "Beam-to-Column-End-Plate-Connection",
-    "column-column-cover-plate-bolted": "ColumnCoverPlateBolted",
+    "column-column-cover-plate-bolted": "Column-to-Column-Cover-Plate-Bolted-Connection",
     "column-column-cover-plate-welded": "Column-to-Column-Cover-Plate-Welded-Connection",
     "column-column-end-plate": "Column-to-Column-End-Plate-Connection",
 }
