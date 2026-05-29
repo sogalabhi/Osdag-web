@@ -15,6 +15,7 @@ export const useProjectCreation = ({
   allSelected,
   contextData,
   moduleConfig,
+  designPrefOverrides,
 }) => {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const navigate = useNavigate();
@@ -44,7 +45,15 @@ export const useProjectCreation = ({
         name: safeProjectName,
         module: parent_module,
         submodule: module_id,
-        inputs_json: inputsForSave || {},
+        inputs_json: {
+          version: "1.0",
+          name: safeProjectName,
+          module_id: module_id,
+          inputs: {
+            dock: inputsForSave || {},
+            pref: designPrefOverrides || {},
+          }
+        },
       };
 
       const result = await createProject(payload);

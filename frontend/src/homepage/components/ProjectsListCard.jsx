@@ -11,6 +11,10 @@ import { beamBeamEndPlateConfig } from '../../modules/beamBeamEndPlate/configs/b
 import { beamToColumnEndPlateConfig } from '../../modules/beamToColumnEndPlate/configs/beamToColumnEndPlateConfig';
 import { boltedToEndConfig } from '../../modules/TensionMembers/BoltedToEnd/configs/boltedToEndConfig';
 import { simplySupportedBeamConfig } from '../../modules/flexuralMember/simplySupportedBeam/configs/simplySupportedBeamConfig';
+import { lapJointWeldedConfig } from '../../modules/SimpleConnection/LapJointWelded/config/lapJointWeldedConfig';
+import { lapJointBoltedConfig } from '../../modules/SimpleConnection/LapJointBolted/config/lapJointBoltedConfig';
+import { buttJointWeldedConfig } from '../../modules/SimpleConnection/ButtJointWelded/config/buttJointWeldedConfig';
+import { buttJointBoltedConfig } from '../../modules/SimpleConnection/ButtJointBolted/config/buttJointBoltedConfig';
 import { ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { isGuestUser, getCurrentUserEmail } from '../../utils/auth';
@@ -28,6 +32,10 @@ import {
   MODULE_KEY_TENSION_BOLTED,
   MODULE_KEY_TENSION_WELDED,
   MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
+  MODULE_KEY_LAP_JOINT_WELDED,
+  MODULE_KEY_LAP_JOINT_BOLTED,
+  MODULE_KEY_BUTT_JOINT_WELDED,
+  MODULE_KEY_BUTT_JOINT_BOLTED,
 } from '../../constants/DesignKeys';
 import { getProjectById } from "../../datasources/projectsDataSource";
 import { saveOsiFromInputs } from "../../datasources/osiDataSource";
@@ -103,6 +111,10 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
         [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: beamToColumnEndPlateConfig,
         [MODULE_KEY_TENSION_BOLTED]: boltedToEndConfig,
         [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: simplySupportedBeamConfig,
+        [MODULE_KEY_LAP_JOINT_WELDED]: lapJointWeldedConfig,
+        [MODULE_KEY_LAP_JOINT_BOLTED]: lapJointBoltedConfig,
+        [MODULE_KEY_BUTT_JOINT_WELDED]: buttJointWeldedConfig,
+        [MODULE_KEY_BUTT_JOINT_BOLTED]: buttJointBoltedConfig,
       };
       const cfg = resolver[modId] || null;
       setReportModuleConfig(cfg);
@@ -158,10 +170,48 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
       const inputs = projectDetail?.inputs_json || {};
       const module_id = projectDetail?.submodule || projectDetail?.module || MODULE_KEY_FIN_PLATE;
 
+      const resolver = {
+        [MODULE_KEY_FIN_PLATE]: finPlateConfig,
+        [MODULE_KEY_END_PLATE]: endPlateConfig,
+        [MODULE_KEY_CLEAT_ANGLE]: cleatAngleConfig,
+        [MODULE_KEY_SEAT_ANGLE]: seatedAngleConfig,
+        [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED]: coverPlateBoltedConfig,
+        [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED]: coverPlateWeldedConfig,
+        [MODULE_KEY_BEAM_BEAM_END_PLATE_ALT]: beamBeamEndPlateConfig,
+        [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: beamToColumnEndPlateConfig,
+        [MODULE_KEY_TENSION_BOLTED]: boltedToEndConfig,
+        [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: simplySupportedBeamConfig,
+      };
+      const cfg = resolver[module_id] || null;
+
+      const isNested = (inputs.dock || inputs.pref) || (inputs.inputs && (inputs.inputs.dock || inputs.inputs.pref));
+      const dock = isNested ? (inputs.dock || inputs.inputs?.dock || {}) : inputs;
+      const pref = isNested ? (inputs.pref || inputs.inputs?.pref || {}) : {};
+
+      let flatInputs = {};
+      if (cfg && typeof cfg.buildSubmissionParams === "function") {
+        try {
+          flatInputs = cfg.buildSubmissionParams(
+            dock,
+            {},
+            {},
+            { selectedOption: dock.connectivity }
+          ) || {};
+        } catch (e) {
+          flatInputs = { ...dock };
+        }
+      } else {
+        flatInputs = { ...dock };
+      }
+
+      Object.entries(pref).forEach(([key, val]) => {
+        flatInputs[`Pref.${key}`] = val;
+      });
+
       const data = await saveOsiFromInputs({
         name: project.name,
         moduleId: module_id,
-        inputs,
+        inputs: flatInputs,
         inline: true,
       });
       if (!data.success || !data.content_base64) {

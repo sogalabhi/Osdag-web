@@ -53,6 +53,7 @@ import HelpLinkModal from "./help/HelpLinkModal";
 import AboutOsdagModal from "./help/AboutOsdagModal";
 import { ASK_QUESTION_LINK, DESIGN_EXAMPLES_URL } from "./help/helpContent";
 import { openOsiFile } from "../../../datasources/osiDataSource";
+import { loadStateFromOsi } from "../utils/osiLoader";
 import {
   downloadCachedModelByFormat,
   downloadExportCadResponse,
@@ -130,8 +131,11 @@ export const EngineeringModule = ({
     modelKey,
     modalStates,
     selectionStates,
+    setSelectionStates,
     allSelected,
+    setAllSelected,
     selectedItems,
+    setSelectedItems,
     saveOutput,
     createDesignReportBool,
     setCreateDesignReportBool,
@@ -193,6 +197,7 @@ export const EngineeringModule = ({
     allSelected,
     contextData,
     moduleConfig,
+    designPrefOverrides,
   });
 
   const [showResetButton, setShowResetButton] = useState(false);
@@ -389,6 +394,11 @@ export const EngineeringModule = ({
     setIsInputLocked,
     designCompletedRef,
     resetFormState,
+    setExtraState,
+    setSelectionStates,
+    setAllSelected,
+    setSelectedItems,
+    moduleData: contextData,
   });
 
   // Only change dock visibility after design is complete
@@ -587,8 +597,31 @@ export const EngineeringModule = ({
 
     try {
       const inputsForSave = expandAllSelectedInputs(inputs, allSelected, contextData);
+      
+      let flatInputs = {};
+      if (moduleConfig && typeof moduleConfig.buildSubmissionParams === "function") {
+        try {
+          flatInputs = moduleConfig.buildSubmissionParams(
+            inputsForSave,
+            allSelected,
+            contextData,
+            extraState
+          ) || {};
+        } catch (e) {
+          console.warn("Failed to dynamically build flat parameters, falling back to raw inputs:", e);
+          flatInputs = { ...inputsForSave };
+        }
+      } else {
+        flatInputs = { ...inputsForSave };
+      }
+
+      // Prefix design pref overrides
+      Object.entries(designPrefOverrides || {}).forEach(([key, val]) => {
+        flatInputs[`Pref.${key}`] = val;
+      });
+
       // Always download-only (no backend persistence). Force inline/base64 response.
-      const result = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, true);
+      const result = await service.saveOSIFromInputs(projectName, module_id, flatInputs, true);
       if (result.success && result.content_base64) {
         try {
           const binaryString = atob(result.content_base64);
@@ -687,7 +720,16 @@ export const EngineeringModule = ({
         formData.append("file", file);
         const data = await openOsiFile(formData);
         if (data.ok && data.success) {
-          setInputs(data.inputs || {});
+          loadStateFromOsi(data.inputs || {}, {
+            setInputs,
+            setDesignPrefOverrides,
+            setExtraState,
+            setSelectionStates,
+            setAllSelected,
+            setSelectedItems,
+            moduleConfig,
+            safeModuleData: contextData || {},
+          });
           message.success("Input loaded from OSI");
         } else {
           message.error(data.error || "Failed to open OSI file");
@@ -924,6 +966,11 @@ export const EngineeringModule = ({
               inputs={inputs}
               setInputs={setInputs}
               allSelected={allSelected}
+              setAllSelected={setAllSelected}
+              setDesignPrefOverrides={setDesignPrefOverrides}
+              setExtraState={setExtraState}
+              setSelectionStates={setSelectionStates}
+              setSelectedItems={setSelectedItems}
               logs={logs}
               setCreateDesignReportBool={setCreateDesignReportBool}
               triggerScreenshotCapture={triggerScreenshotCapture}

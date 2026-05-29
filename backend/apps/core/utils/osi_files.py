@@ -34,62 +34,37 @@ def build_osi_payload(name: str, module_id: str, inputs: Dict[str, Any]) -> Dict
     }
 
 
-def _to_legacy_yaml(module_id: str, name: str, inputs: Dict[str, Any]) -> str:
-    """Render inputs into legacy flat YAML with dotted, title-cased keys.
-
-    This function implements the FinPlateConnection mapping now; for other modules
-    it will fall back to a generic block under JSON if no mapping is present.
-    """
+def _to_flat_yaml(module_id: str, name: str, inputs: Dict[str, Any]) -> str:
+    """Render a flat dictionary of inputs into OSI flat YAML with dotted keys."""
     def qt(s: Any) -> str:
-        # quote list items as strings in YAML as per legacy files
+        # quote list items as strings in YAML as per standard flat files
         return f"'{str(s)}'"
 
-    legacy: Dict[str, Any] = {}
+    flat_inputs = {**inputs}
+    
+    # Guarantee Module and Version are set
+    if "Module" not in flat_inputs and "module" not in flat_inputs:
+        flat_inputs["Module"] = module_id
+    if "OsdagWeb.Version" not in flat_inputs:
+        flat_inputs["OsdagWeb.Version"] = "1.0"
 
-    # Common top-level entries
-    legacy["Module"] = inputs.get("module") or module_id
-
-    # FinPlateConnection mapping (expand as needed)
-    if module_id == "FinPlateConnection":
-        legacy.update({
-            "Bolt.Bolt_Hole_Type": inputs.get("bolt_hole_type"),
-            "Bolt.Diameter": inputs.get("bolt_diameter") or [],
-            "Bolt.Grade": inputs.get("bolt_grade") or [],
-            "Bolt.Slip_Factor": inputs.get("bolt_slip_factor"),
-            "Bolt.TensionType": inputs.get("bolt_tension_type"),
-            "Bolt.Type": (inputs.get("bolt_type") or "").replace("_", " ").title().replace("Bearing Bolt", "Bearing Bolt"),
-            "Connectivity": inputs.get("connectivity") or inputs.get("Connectivity"),
-            "Connector.Material": inputs.get("connector_material"),
-            "Design.Design_Method": inputs.get("design_method"),
-            "Detailing.Corrosive_Influences": inputs.get("detailing_corr_status"),
-            "Detailing.Edge_type": inputs.get("detailing_edge_type"),
-            "Detailing.Gap": inputs.get("detailing_gap"),
-            "Load.Axial": inputs.get("load_axial"),
-            "Load.Shear": inputs.get("load_shear"),
-            "Material": inputs.get("material"),
-            "Member.Supported_Section.Designation": inputs.get("beam_section") or inputs.get("supported_designation"),
-            "Member.Supported_Section.Material": inputs.get("supported_material"),
-            "Member.Supporting_Section.Designation": inputs.get("column_section") or inputs.get("supporting_designation") or inputs.get("primary_beam") or inputs.get("secondary_beam"),
-            "Member.Supporting_Section.Material": inputs.get("supporting_material"),
-            "Weld.Fab": inputs.get("weld_fab"),
-            "Weld.Material_Grade_OverWrite": inputs.get("weld_material_grade"),
-            "Connector.Plate.Thickness_List": inputs.get("plate_thickness") or [],
-        })
-
-    # Build YAML string manually to avoid new dependencies
+    # Build YAML string manually
     lines: list[str] = []
-    for key, value in legacy.items():
+    
+    # Sort keys for deterministic output
+    for key in sorted(flat_inputs.keys()):
+        if key in ["name", "project_name"]:
+            continue
+        value = flat_inputs[key]
         if value is None:
             continue
         if isinstance(value, list):
             if len(value) == 0:
-                # skip empty lists to avoid saving default/blank arrays
                 continue
             lines.append(f"{key}:")
             for item in value:
                 lines.append(f"- {qt(item)}")
         else:
-            # skip empty strings
             if isinstance(value, str) and value.strip() == "":
                 continue
             lines.append(f"{key}: {value}")
@@ -102,16 +77,16 @@ def serialize_osi(payload: Dict[str, Any]) -> str:
     name = payload.get("name") or "project"
     inputs = payload.get("inputs") or {}
 
-    # Use legacy YAML for known modules; else JSON for safety
-    if module_id in {"FinPlateConnection"}:
-        return _to_legacy_yaml(module_id, name, inputs)
+    # If payload inputs are already nested, fallback to JSON
+    if "dock" in inputs or "pref" in inputs:
+        return json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
 
-    # default JSON
-    return json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+    # Otherwise, serialize as generic flat YAML
+    return _to_flat_yaml(module_id, name, inputs)
 
 
-def _parse_legacy_yaml(text: str) -> Dict[str, Any]:
-    """Very small YAML reader for the flat legacy format we emit.
+def _parse_flat_yaml(text: str) -> Dict[str, Any]:
+    """Very small YAML reader for the flat format we emit.
 
     Supports lines like:
       Key: value\n
@@ -119,7 +94,7 @@ def _parse_legacy_yaml(text: str) -> Dict[str, Any]:
       - 'item'\n
     Returns a dict of key -> value (str or list[str]).
     """
-    legacy: Dict[str, Any] = {}
+    flat_inputs: Dict[str, Any] = {}
     lines = [ln.rstrip() for ln in text.splitlines() if ln.strip() != ""]
     i = 0
     while i < len(lines):
@@ -139,7 +114,7 @@ def _parse_legacy_yaml(text: str) -> Dict[str, Any]:
                         item = item[1:-1]
                     items.append(item)
                     i += 1
-                legacy[key] = items
+                flat_inputs[key] = items
                 continue  # already advanced i
             else:
                 # scalar
@@ -147,9 +122,9 @@ def _parse_legacy_yaml(text: str) -> Dict[str, Any]:
                 # strip quotes
                 if (val.startswith("'") and val.endswith("'")) or (val.startswith('"') and val.endswith('"')):
                     val = val[1:-1]
-                legacy[key] = val
+                flat_inputs[key] = val
         i += 1
-    return legacy
+    return flat_inputs
 
 
 def parse_osi(text: str) -> Tuple[str, str, Dict[str, Any]]:
@@ -166,49 +141,16 @@ def parse_osi(text: str) -> Tuple[str, str, Dict[str, Any]]:
             raise ValueError("Malformed OSI payload")
         return module_id, name, inputs
     except Exception:
-        # Fallback to legacy flat YAML
-        legacy = _parse_legacy_yaml(text)
-        module_id = legacy.get("Module") or legacy.get("module") or ""
+        # Fallback to flat YAML
+        flat_inputs = _parse_flat_yaml(text)
+        module_id = flat_inputs.get("Module") or flat_inputs.get("module") or ""
 
         if not module_id:
             raise ValueError("Module missing in OSI")
 
-        def g(key: str, default: Any = None) -> Any:
-            return legacy.get(key, default)
-
-        inputs: Dict[str, Any] = {}
-        normalized_module = module_id.replace(" ", "").lower()
-
-        if normalized_module == "finplateconnection":
-            # Reverse mapping for FinPlateConnection
-            inputs.update({
-                "bolt_hole_type": g("Bolt.Bolt_Hole_Type"),
-                "bolt_diameter": g("Bolt.Diameter", []),
-                "bolt_grade": g("Bolt.Grade", []),
-                "bolt_slip_factor": g("Bolt.Slip_Factor"),
-                "bolt_tension_type": g("Bolt.TensionType"),
-                "bolt_type": (g("Bolt.Type") or "").replace(" ", "_"),
-                "connectivity": g("Connectivity"),
-                "connector_material": g("Connector.Material"),
-                "design_method": g("Design.Design_Method"),
-                "detailing_corr_status": g("Detailing.Corrosive_Influences"),
-                "detailing_edge_type": g("Detailing.Edge_type"),
-                "detailing_gap": g("Detailing.Gap"),
-                "load_axial": g("Load.Axial"),
-                "load_shear": g("Load.Shear"),
-                "material": g("Material"),
-                "beam_section": g("Member.Supported_Section.Designation"),
-                "supported_material": g("Member.Supported_Section.Material"),
-                "column_section": g("Member.Supporting_Section.Designation"),
-                "supporting_material": g("Member.Supporting_Section.Material"),
-                "weld_fab": g("Weld.Fab"),
-                "weld_material_grade": g("Weld.Material_Grade_OverWrite"),
-                "plate_thickness": g("Connector.Plate.Thickness_List", []),
-                "module": module_id,
-            })
-
-        name = legacy.get("name") or module_id
-        return module_id, name, inputs
+        # Simply return the parsed flat dictionary as inputs!
+        name = flat_inputs.get("name") or module_id
+        return module_id, name, flat_inputs
 
 
 def make_osifile_contentfile(payload: Dict[str, Any]) -> ContentFile:

@@ -182,6 +182,15 @@ class ProjectOsiDownload(APIView):
             if inputs is None:
                 inputs = {}
 
+            # Handle nested structure
+            if "dock" in inputs or "pref" in inputs or (isinstance(inputs, dict) and "inputs" in inputs):
+                dock = inputs.get("dock") or inputs.get("inputs", {}).get("dock", {})
+                pref = inputs.get("pref") or inputs.get("inputs", {}).get("pref", {})
+                combined = {**dock}
+                for k, v in pref.items():
+                    combined[f"Pref.{k}"] = v
+                inputs = combined
+
             # Choose module identifier for OSI payload (prefer submodule, fallback to module)
             module_id = getattr(project, 'submodule', None) or getattr(project, 'module', None) or 'FinPlateConnection'
 

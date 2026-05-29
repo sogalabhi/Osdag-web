@@ -188,7 +188,11 @@ export const InputSection = ({
 
         const current = nextInputs[field.key];
         const opts = toSelectOptions(rawList);
-        const currentExistsInOptions = opts.some(opt => opt.value === current || String(opt.value) === String(current));
+        const currentExistsInOptions = opts.some(opt => {
+          const s1 = String(opt.value).trim().toLowerCase().replace(/\s+/g, '');
+          const s2 = String(current).trim().toLowerCase().replace(/\s+/g, '');
+          return s1 === s2;
+        });
 
         if (current === undefined || current === null || current === '' || !currentExistsInOptions) {
           nextInputs[field.key] = firstValue;
@@ -338,7 +342,7 @@ export const InputSection = ({
 
         const isMaterialField = field.key?.includes('material');
 
-        const value = options.find(opt => opt.value === safeInputs[field.key]);
+        const value = options.find(opt => String(opt.value) === String(safeInputs[field.key]));
 
         return (
           <Select
@@ -369,7 +373,7 @@ export const InputSection = ({
           "Flushed - Reversible Moment": "", "Extended One Way - Irreversible Moment": "", "Extended Both Ways - Reversible Moment": ""
         });
         const options = toSelectOptions(list);
-        const value = options.find(opt => opt.value === extraState.selectedOption);
+        const value = options.find(opt => String(opt.value) === String(extraState.selectedOption));
         return (
           <Select
             options={options}
@@ -391,7 +395,7 @@ export const InputSection = ({
         const rawOptions = getOptionsForField(field, safeContextData, safeInputs);
         const options = toSelectOptions(rawOptions);
         const currentValue = safeInputs[field.key] || field.defaultValue;
-        const value = options.find(opt => opt.value === currentValue);
+        const value = options.find(opt => String(opt.value) === String(currentValue));
         return (
           <Select
             options={options}
@@ -415,7 +419,7 @@ export const InputSection = ({
 
       case 'customizable': {
         const options = [{ value: "All", label: "All" }, { value: "Customized", label: "Customized" }];
-        const value = options.find(opt => opt.value === (selectionStates?.[field.selectionKey] || "All"));
+        const value = options.find(opt => String(opt.value) === String(selectionStates?.[field.selectionKey] || "All"));
         return (
           <Select
             options={options}
@@ -436,7 +440,7 @@ export const InputSection = ({
       case 'sectionProfileList': {
         const rawSectionList = getOptionsForField(field, safeContextData, safeInputs);
         const options = (rawSectionList || []).map((elem) => ({ value: elem, label: elem }));
-        const value = options.find(opt => opt.value === inputs.section_profile);
+        const value = options.find(opt => String(opt.value) === String(inputs.section_profile));
         return (
           <Select
             options={options}
@@ -451,7 +455,7 @@ export const InputSection = ({
       }
       case 'dynamicSelect': {
         const options = getOptionsForField(field, safeContextData, safeInputs);
-        const value = options.find(opt => opt.value === inputs[field.key]);
+        const value = options.find(opt => String(opt.value) === String(inputs[field.key]));
         return (
           <Select
             options={options}

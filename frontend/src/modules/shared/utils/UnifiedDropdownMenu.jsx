@@ -5,6 +5,7 @@ import { MODULE_KEY_FIN_PLATE } from '../../../constants/DesignKeys';
 import { message } from 'antd';
 import { apiBase } from "../../../api";
 import { openOsiFile } from "../../../datasources/osiDataSource";
+import { loadStateFromOsi } from "./osiLoader";
 import { downloadSectionCatalog } from "../../../datasources/sectionsDataSource";
 import { getModuleConfig } from "./moduleConfig";
 import { expandAllSelectedInputs, buildOsiContent } from "./osiInputSerializer";
@@ -24,6 +25,10 @@ function UnifiedDropdownMenu({
   allSelected,
   setInputs,
   setAllSelected = () => { },
+  setDesignPrefOverrides = () => {},
+  setExtraState = () => {},
+  setSelectionStates = () => {},
+  setSelectedItems = () => {},
   logs,
   setCreateDesignReportBool,
   setSaveInputFileName,
@@ -91,11 +96,16 @@ function UnifiedDropdownMenu({
 
         const data = await openOsiFile(formData);
         if (data.ok && data.success) {
-          // data.inputs follows the backend schema — pass through
-          setInputs(data.inputs || {});
-
-          // reset flags conservatively
-          setAllSelected({});
+          loadStateFromOsi(data.inputs || {}, {
+            setInputs,
+            setDesignPrefOverrides,
+            setExtraState,
+            setSelectionStates,
+            setAllSelected,
+            setSelectedItems,
+            moduleConfig,
+            safeModuleData: contextData || {},
+          });
           message.success('Input loaded from OSI');
         } else {
           message.error(data.error || 'Failed to open OSI file');

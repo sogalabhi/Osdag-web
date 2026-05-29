@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { message } from "antd";
 import { useAuth } from "../../../context/AuthContext";
+import { loadStateFromOsi } from "../utils/osiLoader";
 
 export const useProjectLoader = ({
   projectIdFromUrl,
@@ -19,6 +20,11 @@ export const useProjectLoader = ({
   setIsInputLocked,
   designCompletedRef,
   resetFormState,
+  setExtraState,
+  setSelectionStates,
+  setAllSelected,
+  setSelectedItems,
+  moduleData,
 }) => {
   const lastLoadedProjectIdRef = useRef(undefined);
   const { user, loading } = useAuth();
@@ -37,7 +43,12 @@ export const useProjectLoader = ({
     service,
     moduleConfig,
     navigate,
-    location
+    location,
+    setExtraState,
+    setSelectionStates,
+    setAllSelected,
+    setSelectedItems,
+    moduleData,
   });
 
   useEffect(() => {
@@ -55,7 +66,12 @@ export const useProjectLoader = ({
       service,
       moduleConfig,
       navigate,
-      location
+      location,
+      setExtraState,
+      setSelectionStates,
+      setAllSelected,
+      setSelectedItems,
+      moduleData,
     };
   });
 
@@ -85,7 +101,7 @@ export const useProjectLoader = ({
 
     if (!projectId) {
       const activeConfig = callbacksRef.current.moduleConfig || {};
-      const moduleKey = activeConfig.cameraKey || activeConfig.moduleKey || activeConfig.designType;
+      const moduleKey = activeConfig.designType || activeConfig.moduleKey || activeConfig.cameraKey;
       const hasPrefill = moduleKey && sessionStorage.getItem(`prefill:${moduleKey}`);
       
       if (hasPrefill) {
@@ -127,23 +143,16 @@ export const useProjectLoader = ({
         if (result.project.inputs_json) {
           try {
             const savedInputs = result.project.inputs_json;
-            if (
-              savedInputs &&
-              typeof savedInputs === "object" &&
-              Object.prototype.hasOwnProperty.call(savedInputs, "dock")
-            ) {
-              callbacksRef.current.setInputs({
-                ...(callbacksRef.current.moduleConfig?.defaultInputs || {}),
-                ...(savedInputs.dock || {}),
-              });
-              callbacksRef.current.setDesignPrefOverrides(savedInputs.pref || {});
-            } else {
-              callbacksRef.current.setInputs({
-                ...(callbacksRef.current.moduleConfig?.defaultInputs || {}),
-                ...(savedInputs || {}),
-              });
-              callbacksRef.current.setDesignPrefOverrides({});
-            }
+            loadStateFromOsi(savedInputs, {
+              setInputs: callbacksRef.current.setInputs,
+              setDesignPrefOverrides: callbacksRef.current.setDesignPrefOverrides,
+              setExtraState: callbacksRef.current.setExtraState,
+              setSelectionStates: callbacksRef.current.setSelectionStates,
+              setAllSelected: callbacksRef.current.setAllSelected,
+              setSelectedItems: callbacksRef.current.setSelectedItems,
+              moduleConfig: callbacksRef.current.moduleConfig,
+              safeModuleData: callbacksRef.current.moduleData || {},
+            });
           } catch (err) {
             console.error('[EngineeringModule] Error parsing inputs_json:', err);
             message.error('Failed to parse saved project inputs.');
