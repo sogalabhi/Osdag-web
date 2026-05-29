@@ -220,7 +220,7 @@ export const useEngineeringModule = (moduleConfig) => {
     inputs,
     allSelected,
     extraState,
-    { boltDiameterList, propertyClassList, thicknessList, angleList }
+    moduleData
   );
 
   // Dependent data side-effects
@@ -294,12 +294,7 @@ export const useEngineeringModule = (moduleConfig) => {
     const data = moduleConfig.buildSubmissionParams(
       inputs,
       allSelected,
-      {
-        boltDiameterList,
-        propertyClassList,
-        thicknessList,
-        angleList,
-      },
+      moduleData,
       extraState
     );
 

@@ -23,6 +23,7 @@ export const DesignReportModal = ({
   extraState = {},
   selectedSection,
   setSelectedSection,
+  lists,
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -118,7 +119,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
     try {
       // Transform input values using the same logic as design calculation
       const transformedInputValues = moduleConfig?.buildSubmissionParams ?
-        moduleConfig.buildSubmissionParams(inputValues, allSelected, {
+        moduleConfig.buildSubmissionParams(inputValues, allSelected, lists || {
           boltDiameterList,
           propertyClassList,
           thicknessList,

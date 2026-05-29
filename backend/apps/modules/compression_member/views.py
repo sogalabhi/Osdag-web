@@ -19,6 +19,14 @@ from apps.core.models import Material, CustomMaterials, Bolt, Angles, Channels, 
 from apps.sections.options_merge import merge_user_sections_into_options
 
 
+# Mapping from compression-member submodule slug to legacy report module_id
+COMPRESSION_REPORT_MODULE_ID_MAP = {
+    "axially-loaded-column": "AxiallyLoadedColumn",
+    "struts-bolted": "Struts-Bolted-Design",
+    "struts-welded": "Struts-Welded-Design",
+}
+
+
 class CompressionMemberViewSet(viewsets.ViewSet):
     """
     Generic ViewSet that routes to specific sub-module services based on URL slug.
@@ -57,6 +65,16 @@ class CompressionMemberViewSet(viewsets.ViewSet):
         normalized_slug = self._normalize_slug(submodule_slug)
         ServiceClass = CompressionMemberRegistry.get_service_by_slug(normalized_slug)
         return trigger_async_design('compression-member', normalized_slug, ServiceClass, request)
+
+    @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
+    def report_generate_initial(self, request, submodule_slug=None):
+        """
+        POST /api/modules/compression-member/{submodule_slug}/report/generate-initial/
+        Asynchronously runs LaTeX report generation task.
+        """
+        normalized_slug = self._normalize_slug(submodule_slug)
+        return trigger_async_report('compression-member', normalized_slug, COMPRESSION_REPORT_MODULE_ID_MAP, request)
+
     
     @action(detail=False, methods=['get'], url_path='(?P<submodule_slug>[^/.]+)/options')
     def options(self, request, submodule_slug=None):

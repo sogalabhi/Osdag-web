@@ -1483,6 +1483,7 @@ export const EngineeringModule = ({
         extraState={extraState}
         selectedSection={selectedSection}
         setSelectedSection={setSelectedSection}
+        lists={contextData}
       />
 
       {/* Customization Modals */}
