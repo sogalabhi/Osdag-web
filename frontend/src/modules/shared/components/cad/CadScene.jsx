@@ -120,12 +120,9 @@ function CadScene({
 
   return (
     <group name="scene">
-      <ambientLight intensity={2.0} />
-      <directionalLight position={[5, 5, 5]} intensity={2.0} />
-      <directionalLight position={[-5, -5, -5]} intensity={1.5} />
-      <pointLight position={[10, 10, 10]} intensity={1.5} />
-      <pointLight position={[-10, -10, -10]} intensity={1.5} />
-      <spotLight position={[0, 10, 0]} angle={0.3} penumbra={1} intensity={1.0} />
+      <ambientLight intensity={1.0} />
+      <directionalLight position={[10, 10, 10]} intensity={1.0} />
+      <directionalLight position={[-10, 10, -10]} intensity={0.4} />
 
       <ViewCube controlsRef={controlsRef} focusRef={modelRef} placement="top-right" showPan={false} showRotate={false} showZoom={false} showViewCube={false}/>
 

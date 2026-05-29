@@ -12,10 +12,10 @@ from typing import Dict, List, Any, Optional
 # Sections mapping for each module/submodule
 SECTION_MAPPINGS = {
     'shear-connection': {
-        'fin-plate': ['Beam', 'Column', 'Plate'],
-        'cleat-angle': ['Model', 'Beam', 'Column', 'cleatAngle'],
-        'end-plate': ['Model', 'Beam', 'Column', 'Plate'],
-        'seated-angle': ['Model', 'Beam', 'Column', 'SeatedAngle'],
+        'fin-plate': ['Model', 'Beam', 'Column', 'Plate', 'Bolt', 'Weld'],
+        'cleat-angle': ['Model', 'Beam', 'Column', 'cleatAngle', 'Bolt', 'Weld'],
+        'end-plate': ['Model', 'Beam', 'Column', 'Plate', 'Bolt', 'Weld'],
+        'seated-angle': ['Model', 'Beam', 'Column', 'SeatedAngle', 'Bolt', 'Weld'],
     },
     'moment-connection': {
         'beam-beam-cover-plate-bolted': ['Model', 'Beam', 'CoverPlate'],

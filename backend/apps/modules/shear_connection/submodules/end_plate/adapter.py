@@ -403,9 +403,9 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     from OCC.Core.TopoDS import TopoDS_Compound
     from OCC.Core.Message import Message_ProgressRange
 
-    if section not in ("Model", "Beam", "Column", "Plate"):  # Error checking: If section is valid.
+    if section not in ("Model", "Beam", "Column", "Plate", "Bolt", "Weld"):  # Error checking: If section is valid.
         raise InvalidInputTypeError(
-            "section", "'Model', 'Beam', 'Column' or 'Plate'")
+            "section", "'Model', 'Beam', 'Column', 'Plate', 'Bolt' or 'Weld'")
     module = create_from_input(input_values)  # Create module from input.
     # Object that will create the CAD model.
     try :

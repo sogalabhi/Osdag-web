@@ -6,25 +6,25 @@
 // Default part colors (hex values)
 export const DEFAULT_PART_COLORS = {
   // Structural members
-  Beam: "#868664",
-  Column: "#484836",
-  Member: "#808080",
+  Beam: "#C8C89E",
+  Column: "#909078",
+  Member: "#909078",
 
   // Plates and connectors
-  Plate: "#2f2f23",
-  "Plate 1": "#2f2f23",
-  "Plate 2": "#4a4a3a",
-  Endplate: "#2f2f23",
-  EndPlate: "#2f2f23",
-  cleatAngle: "#2f2f23",
-  SeatedAngle: "#2f2f23",
-  Connector: "#868664",
-  CoverPlate: "#2f2f23",
-  "Cover Plate": "#2f2f23",
+  Plate: "#8A8A6A",
+  "Plate 1": "#8A8A6A",
+  "Plate 2": "#8A8A6A",
+  Endplate: "#8A8A6A",
+  EndPlate: "#8A8A6A",
+  cleatAngle: "#8A8A6A",
+  SeatedAngle: "#8A8A6A",
+  Connector: "#8A8A6A",
+  CoverPlate: "#8A8A6A",
+  "Cover Plate": "#8A8A6A",
 
   // Fasteners
-  Bolt: "#996633",
-  Bolts: "#996633",
+  Bolt: "#E63030",
+  Bolts: "#E63030",
 
   // Welds
   Weld: "#ff0000",

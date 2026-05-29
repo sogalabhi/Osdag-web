@@ -93,13 +93,13 @@ class CADGeneration(View):
     
         # Determine sections based on the session type and what each backend module expects
         if session_type == "FinPlateConnection":
-            sections = ["Model", "Beam", "Column", "Plate"]
+            sections = ["Model", "Beam", "Column", "Plate", "Bolt", "Weld"]
         elif session_type == "CleatAngle":
-            sections = ["Model", "Beam", "Column", "cleatAngle"]
+            sections = ["Model", "Beam", "Column", "cleatAngle", "Bolt", "Weld"]
         elif session_type == "EndPlate":
-            sections = ["Model", "Beam", "Column", "Plate"]
+            sections = ["Model", "Beam", "Column", "Plate", "Bolt", "Weld"]
         elif session_type == "SeatedAngleConnection":
-            sections = ["Model", "Beam", "Column", "SeatedAngle"]
+            sections = ["Model", "Beam", "Column", "SeatedAngle", "Bolt", "Weld"]
         elif session_type == "CoverPlateBolted":
             sections = ["Model", "Beam", "CoverPlate"]
         elif session_type == "BeamBeamEndPlate":

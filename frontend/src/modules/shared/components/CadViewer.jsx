@@ -43,7 +43,7 @@ export const CadViewer = React.memo(({
         </div>
       ) : renderBoolean ? (
         <div 
-          className={`cadModel relative h-full w-full ${!customBgColor ? 'bg-gradient-to-b from-[#FFFFFF] to-[#7E7E7E] dark:from-[#535353] dark:to-[#000000]' : ''}`}
+          className={`cadModel relative h-full w-full ${!customBgColor ? 'bg-gradient-to-b from-[#FFFFFF] to-[#D8D8D0] dark:from-[#535353] dark:to-[#000000]' : ''}`}
           style={customBgColor ? { backgroundColor: customBgColor } : {}}
         >
           <Canvas

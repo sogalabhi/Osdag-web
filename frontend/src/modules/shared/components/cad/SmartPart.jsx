@@ -139,20 +139,18 @@ export const SmartPart = ({
 
   // 4. MATERIAL MEMOIZATION
   // Prevents material recompilation on every frame
-  const displayColor = isHovered || localHovered ? "#8cc480" : color;
+  const isBolt = name?.toLowerCase().includes('bolt');
+  const displayColor = (isHovered || localHovered) && !isBolt ? "#8cc480" : color;
 
   const meshMaterial = useMemo(() => (
-    <meshPhysicalMaterial
+    <meshPhongMaterial
       color={displayColor}
-      metalness={materialProps.metalness ?? 0.3}
-      roughness={materialProps.roughness ?? 0.4}
+      shininess={15}
+      specular="#222222"
       opacity={materialProps.opacity ?? 1.0}
       transparent={materialProps.transparent ?? false}
-      clearcoat={materialProps.clearcoat ?? 0.8}
-      clearcoatRoughness={materialProps.clearcoatRoughness ?? 0.2}
-      transmission={materialProps.transmission}
-      emissive={isHovered || localHovered ? "#8cc480" : undefined}
-      emissiveIntensity={isHovered || localHovered ? 0.2 : 0}
+      emissive={isHovered || localHovered ? "#00e5e5" : undefined}
+      emissiveIntensity={isHovered || localHovered ? 0.15 : 0}
       depthWrite={!(isHovered || localHovered)}
       map={materialProps.map || null} // Support texture if passed
     />
@@ -190,8 +188,8 @@ export const SmartPart = ({
           {/* Declarative material allows color updates without rebuilding geometry */}
           <lineBasicMaterial
             attach="material"
-            color={localHovered || isHovered ? "#9fda90" : "black"}
-            linewidth={localHovered || isHovered ? 2 : 1}
+            color={localHovered || isHovered ? "#00e5e5" : "#333333"}
+            linewidth={localHovered || isHovered ? 3 : 1}
           />
         </lineSegments>
       )}

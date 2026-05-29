@@ -4068,14 +4068,15 @@ class CommonDesignLogic(object):
             elif self.component == "Column":
                 final_model = self.connectivityObj.get_columnModel()
             elif self.component == "Plate":
-                cadlist = [self.connectivityObj.weldModelLeft, self.connectivityObj.weldModelRight,
-                        self.connectivityObj.plateModel] + self.connectivityObj.nut_bolt_array.get_models()
+                final_model = self.connectivityObj.plateModel
             elif self.component == "cleatAngle":
-                cadlist = [self.connectivityObj.angleModel, self.connectivityObj.angleLeftModel] + \
-                        self.connectivityObj.nut_bolt_array.get_models()
+                cadlist = [self.connectivityObj.angleModel, self.connectivityObj.angleLeftModel]
             elif self.component == "SeatAngle":
-                cadlist = [self.connectivityObj.topclipangleModel, self.connectivityObj.angleModel] + \
-                        self.connectivityObj.nut_bolt_array.get_models()
+                cadlist = [self.connectivityObj.topclipangleModel, self.connectivityObj.angleModel]
+            elif self.component in ("Bolt", "Bolts", "Connector"):
+                cadlist = self.connectivityObj.nut_bolt_array.get_models()
+            elif self.component in ("Weld", "Welds"):
+                cadlist = [self.connectivityObj.weldModelLeft, self.connectivityObj.weldModelRight]
             else:
                 cadlist = self.connectivityObj.get_models()
 
@@ -4415,26 +4416,36 @@ class CommonDesignLogic(object):
 
         # Fuse ONCE, regardless of module or component
         if len(shapes) > 1:
-            try:
-                from OCC.Core.BOPAlgo import BOPAlgo_Builder
-                from OCC.Core.TopTools import TopTools_ListOfShape
-                
-                builder = BOPAlgo_Builder()
-                shape_list = TopTools_ListOfShape()
+            if self.component in ("Bolt", "Bolts", "Weld", "Welds", "Connector", "cleatAngle", "SeatedAngle"):
+                from OCC.Core.BRep import BRep_Builder
+                from OCC.Core.TopoDS import TopoDS_Compound
+                builder = BRep_Builder()
+                compound = TopoDS_Compound()
+                builder.MakeCompound(compound)
                 for shp in shapes:
-                    shape_list.Append(shp)
-                builder.SetArguments(shape_list)
-                builder.Perform()
-                if not builder.HasErrors():
-                    result = builder.Shape()
-                else:
+                    builder.Add(compound, shp)
+                result = compound
+            else:
+                try:
+                    from OCC.Core.BOPAlgo import BOPAlgo_Builder
+                    from OCC.Core.TopTools import TopTools_ListOfShape
+                    
+                    builder = BOPAlgo_Builder()
+                    shape_list = TopTools_ListOfShape()
+                    for shp in shapes:
+                        shape_list.Append(shp)
+                    builder.SetArguments(shape_list)
+                    builder.Perform()
+                    if not builder.HasErrors():
+                        result = builder.Shape()
+                    else:
+                        result = shapes[0]
+                        for shp in shapes[1:]:
+                            result = BRepAlgoAPI_Fuse(result, shp).Shape()
+                except Exception as e:
                     result = shapes[0]
                     for shp in shapes[1:]:
                         result = BRepAlgoAPI_Fuse(result, shp).Shape()
-            except Exception as e:
-                result = shapes[0]
-                for shp in shapes[1:]:
-                    result = BRepAlgoAPI_Fuse(result, shp).Shape()
         else:
             result = shapes[0]
 
