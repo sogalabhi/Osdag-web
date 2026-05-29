@@ -40,6 +40,7 @@ import {
 import { getProjectById } from "../../datasources/projectsDataSource";
 import { saveOsiFromInputs } from "../../datasources/osiDataSource";
 import { getModuleRoute } from "../../constants/moduleRoutes";
+import ProjectActionButtons from './ProjectActionButtons';
 
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
   const [projects, setProjects] = React.useState(projectsProp);
@@ -288,9 +289,10 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
                   Last modified: {formatDate(project.updated_at)} · Created: {formatDate(project.created_at)}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-all duration-300 max-h-0 group-hover:max-h-20 overflow-hidden">
-                  <Button type="default" size="small" className="px-3 py-1.5 text-xs font-medium" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleOpenProject(project); }}>Open Project</Button>
-                  <Button type="default" size="small" className="px-3 py-1.5 text-xs font-medium" icon={<FileTextOutlined />} onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleGenerateReportClick(project); }}>Download Report</Button>
-                  <Button type="default" size="small" className="px-3 py-1.5 text-xs font-medium" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadOsi(project); }}>Download OSI</Button>
+                  <ProjectActionButtons
+                    project={project}
+                    onGenerateReport={handleGenerateReportClick}
+                  />
                   <Popconfirm title="Are you sure you want to delete this project?" onConfirm={() => handleDeleteProject(project.id)} okText="Yes" cancelText="No">
                     <Button type="text" danger>Delete</Button>
                   </Popconfirm>
