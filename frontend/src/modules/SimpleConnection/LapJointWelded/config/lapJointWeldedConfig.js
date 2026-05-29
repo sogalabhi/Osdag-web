@@ -25,7 +25,7 @@ export const lapJointWeldedConfig = {
         material: "E 250 (Fe 410 W)A",
         detailing_edge_type: "Sheared or hand flame cut",
         weld_fab: "Shop weld",
-        weld_material_grade: "",
+        weld_material_grade: "290",
         design_for: "Tension",
     },
 

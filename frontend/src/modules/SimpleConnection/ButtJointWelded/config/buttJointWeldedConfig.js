@@ -27,7 +27,7 @@ export const buttJointWeldedConfig = {
         detailing_packing_plate: "No",
         cover_plate: "Single-Cover",
         weld_fab: "Shop weld",
-        weld_material_grade: "",
+        weld_material_grade: "290",
         design_for: "Tension",
     },
 

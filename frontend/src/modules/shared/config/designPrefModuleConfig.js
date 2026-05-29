@@ -29,7 +29,7 @@ const DEFAULT_INITIAL_PREFS = (inputs) => ({
   bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
   bolt_slip_factor: inputs.bolt_slip_factor ?? "0.2",
   weld_fab: inputs.weld_fab ?? "Shop weld",
-  weld_material_grade: inputs.weld_material_grade ?? "0",
+  weld_material_grade: inputs.weld_material_grade || "290",
   detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
   detailing_packing_plate: inputs.detailing_packing_plate ?? "Yes",
   detailing_gap: inputs.detailing_gap ?? "0",
@@ -80,7 +80,7 @@ const DESIGN_PREF_CONFIG = {
     initialTabIndex: 10,
     getInitialPrefs: (inputs) => ({
       weld_fab: inputs.weld_fab ?? "Shop weld",
-      weld_material_grade: inputs.weld_material_grade ?? "0",
+      weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_packing_plate: inputs.detailing_packing_plate ?? "Yes",
       design_for: inputs.design_for ?? "Tension",
@@ -88,7 +88,7 @@ const DESIGN_PREF_CONFIG = {
     getDefaultPrefs: (inputs) => {
       const defs = {
         weld_fab: "Shop weld",
-        weld_material_grade: inputs.weld_material_grade ?? "0",
+        weld_material_grade: inputs.weld_material_grade || "290",
         detailing_edge_type: "Sheared or hand flame cut",
         design_for: "Tension",
       };
@@ -101,7 +101,7 @@ const DESIGN_PREF_CONFIG = {
     initialTabIndex: 10,
     getInitialPrefs: (inputs) => ({
       weld_fab: inputs.weld_fab ?? "Shop weld",
-      weld_material_grade: inputs.weld_material_grade ?? "0",
+      weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_packing_plate: inputs.detailing_packing_plate,
       design_for: inputs.design_for ?? "Tension",
@@ -109,7 +109,7 @@ const DESIGN_PREF_CONFIG = {
     getDefaultPrefs: (inputs) => {
       const defs = {
         weld_fab: "Shop weld",
-        weld_material_grade: inputs.weld_material_grade ?? "0",
+        weld_material_grade: inputs.weld_material_grade || "290",
         detailing_edge_type: "Sheared or hand flame cut",
         design_for: "Tension",
       };
@@ -206,7 +206,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_hole_type: inputs.bolt_hole_type,
       bolt_slip_factor: inputs.bolt_slip_factor,
       weld_fab: inputs.weld_fab,
-      weld_material_grade: inputs.weld_material_grade,
+      weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: inputs.detailing_edge_type,
       detailing_gap: inputs.detailing_gap,
       detailing_corr_status: inputs.detailing_corr_status,
@@ -224,7 +224,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_hole_type: inputs.bolt_hole_type,
       bolt_slip_factor: inputs.bolt_slip_factor,
       weld_fab: inputs.weld_fab,
-      weld_material_grade: inputs.weld_material_grade,
+      weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: inputs.detailing_edge_type,
       detailing_gap: inputs.detailing_gap,
       detailing_corr_status: inputs.detailing_corr_status,
@@ -242,7 +242,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
       bolt_slip_factor: inputs.bolt_slip_factor ?? "0.3",
       weld_fab: inputs["Weld.Fab"] ?? inputs.weld_fab ?? "Shop Weld",
-      weld_material_grade: inputs["Weld.Material_Grade_OverWrite"] ?? inputs.weld_material_grade ?? "0",
+      weld_material_grade: inputs["Weld.Material_Grade_OverWrite"] || inputs.weld_material_grade || "290",
       detailing_edge_type: inputs["Detailing.Edge_type"] ?? inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_gap: inputs.detailing_gap ?? "10",
       detailing_corr_status: inputs["Detailing.Corrosive_Influences"] ?? inputs.detailing_corr_status ?? "No",
@@ -281,14 +281,14 @@ const DESIGN_PREF_CONFIG = {
       bolt_hole_type: "Standard",
       bolt_slip_factor: "0.3",
       weld_fab: "Shop Weld",
-      weld_material_grade: "0",
+      weld_material_grade: "290",
       detailing_edge_type: "Sheared or hand flame cut",
       detailing_gap: "10",
       detailing_corr_status: "No",
       design_method: "Limit State Design",
 
       "Weld.Fab": "Shop Weld",
-      "Weld.Material_Grade_OverWrite": "0",
+      "Weld.Material_Grade_OverWrite": "290",
       "Detailing.Edge_type": "Sheared or hand flame cut",
       "Detailing.Corrosive_Influences": "No",
       "Design.Design_Method": "Limit State Design",
@@ -326,7 +326,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
       bolt_slip_factor: inputs.bolt_slip_factor ?? "0.2",
       weld_fab: inputs.weld_fab ?? "Shop weld",
-      weld_material_grade: inputs.weld_material_grade ?? "0",
+      weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_gap: inputs.detailing_gap ?? "10",
       detailing_corr_status: inputs.detailing_corr_status ?? "No",
@@ -342,7 +342,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_hole_type: "Standard",
       bolt_slip_factor: "0.2",
       weld_fab: "Shop weld",
-      weld_material_grade: inputs.weld_material_grade ?? "0",
+      weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: "Sheared or hand flame cut",
       detailing_gap: "0",
       detailing_corr_status: "No",
@@ -493,7 +493,7 @@ const DESIGN_PREF_CONFIG = {
   
       // Existing fields
       weld_fab: inputs.weld_fab ?? "Shop weld",
-      weld_material_grade: inputs.weld_material_grade ?? "0",
+      weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type:
         inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_packing_plate: inputs.detailing_packing_plate,
@@ -521,7 +521,7 @@ const DESIGN_PREF_CONFIG = {
       toe_radius: 0,
   
       weld_fab: "Shop weld",
-      weld_material_grade: inputs.weld_material_grade ?? "0",
+      weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: "Sheared or hand flame cut",
       design_for: "Tension",
     }),
