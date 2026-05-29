@@ -16,15 +16,9 @@ from apps.core.utils.module_helpers import (
 )
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from apps.core.api.design.report_customization_api import generate_initial_report_core
+from apps.core.constants import get_report_module_id
 from apps.core.models import Material, CustomMaterials, Bolt, Angles, Channels, Beams, Columns, RHS, SHS, CHS
 from apps.sections.options_merge import merge_user_sections_into_options
-
-# Mapping from compression-member slug to legacy report module_id
-COMPRESSION_REPORT_MODULE_ID_MAP = {
-    "struts-bolted": "Struts-Bolted-Design",
-    "struts-welded": "Struts-Welded-Design",
-    "axially-loaded-column": "Axially-Loaded-Column",
-}
 
 
 # Mapping from compression-member submodule slug to legacy report module_id
@@ -311,7 +305,7 @@ class CompressionMemberViewSet(viewsets.ViewSet):
         }
         """
         normalized_slug = self._normalize_slug(submodule_slug)
-        module_id = COMPRESSION_REPORT_MODULE_ID_MAP.get(normalized_slug)
+        module_id = get_report_module_id(normalized_slug)
         if not module_id:
             return Response(
                 {
