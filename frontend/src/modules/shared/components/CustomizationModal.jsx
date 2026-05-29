@@ -1,38 +1,107 @@
-import React from 'react';
-import { Modal, Transfer } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Modal, Transfer, Button, message } from 'antd';
 
 export const CustomizationModal = ({
   isOpen,
   onClose,
   title,
-  dataSource,
-  selectedItems,
-  onTransferChange
+  dataSource = [],
+  selectedItems = [],
+  onTransferChange,
+  disabledValues = []
 }) => {
+  const [tempKeys, setTempKeys] = useState([]);
+
+  // Sync temp keys when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setTempKeys(selectedItems || []);
+    }
+  }, [isOpen, selectedItems]);
+
+  const handleSelectAll = () => {
+    const allKeys = dataSource
+      .map(item => {
+        if (typeof item === 'object' && item !== null) {
+          return item.value || item.Grade || item.toString();
+        }
+        return item.toString();
+      })
+      .filter(key => !disabledValues.includes(key));
+    setTempKeys(allKeys);
+  };
+
+  const handleClearAll = () => {
+    setTempKeys([]);
+  };
+
+  const handleSubmit = () => {
+    if (tempKeys.length === 0) {
+      message.error("Please select at least one value.");
+      return;
+    }
+    onTransferChange(tempKeys);
+    onClose();
+  };
+
+  const handleCancel = () => {
+    onClose();
+  };
+
+  const sortedDataSource = [...dataSource].sort((a, b) => {
+    const valA = typeof a === 'object' && a !== null ? (a.value || a.Grade || a.toString()) : a.toString();
+    const valB = typeof b === 'object' && b !== null ? (b.value || b.Grade || b.toString()) : b.toString();
+    return valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' });
+  });
+
+  const transferData = sortedDataSource.map((item) => {
+    const key = typeof item === 'object' && item !== null ? (item.value || item.Grade || item.toString()) : item.toString();
+    const disabled = disabledValues && disabledValues.includes(key);
+    return {
+      key: key,
+      label: key,
+      disabled: disabled
+    };
+  });
+
   return (
     <Modal
       open={isOpen}
-      onCancel={onClose}
-      footer={null}
-      width={500}
-      height={500}
+      onCancel={handleCancel}
+      footer={[
+        <Button key="cancel" onClick={handleCancel}>
+          Cancel
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          className="bg-osdag-green hover:bg-osdag-dark-green border-none"
+          onClick={handleSubmit}
+        >
+          Submit
+        </Button>
+      ]}
+      width={680}
       className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
     >
-      <div className="popUp ">
-        <h3 className="py-2">{title}</h3>
+      <div className="popUp">
+        <h3 className="py-2 text-lg font-bold text-osdag-text-primary dark:text-white">{title}</h3>
+        <div className="flex gap-2 mb-3">
+          <Button size="middle" className="hover:border-osdag-green hover:text-osdag-green" onClick={handleSelectAll}>
+            Select All (≫)
+          </Button>
+          <Button size="middle" className="hover:border-osdag-green hover:text-osdag-green" onClick={handleClearAll}>
+            Clear All (≪)
+          </Button>
+        </div>
         <Transfer
-          dataSource={dataSource
-            .sort((a, b) => Number(a) - Number(b))
-            .map((label) => ({
-              key: label,
-              label: <h5>{label}</h5>,
-            }))}
-          targetKeys={selectedItems}
-          onChange={onTransferChange}
-          render={(item) => item.label}
+          dataSource={transferData}
+          targetKeys={tempKeys}
+          onChange={(nextTargetKeys) => setTempKeys(nextTargetKeys)}
+          render={(item) => <h5>{item.label}</h5>}
           titles={["Available", "Selected"]}
           showSearch
-          listStyle={{ height: 400, width: 300 }}
+          listStyle={{ height: 350, width: 260 }}
         />
       </div>
     </Modal>

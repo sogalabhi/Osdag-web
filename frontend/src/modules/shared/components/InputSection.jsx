@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 import { getOptionsForField, getListForInputKey } from '../utils/fieldOptionUtils';
 import { ModuleContext } from "../../../context/ModuleState";
 import CustomMaterialModal from "./CustomMaterialModal";
@@ -19,6 +19,26 @@ import ANGLE_SECTION from "../../../assets/TensionMember/com1_1.png";
 import BACK_TO_BACK_ANGLES_SAME_SIDE from "../../../assets/TensionMember/com1_2.png";
 import BACK_TO_BACK_ANGLES_OPPOSITE_SIDE from "../../../assets/TensionMember/com1_3.png";
 import ErrorImg from "../../../assets/notSelected.png";
+
+const CustomOption = (props) => {
+  return (
+    <components.Option {...props}>
+      <div
+        onClick={(e) => {
+          if (props.innerProps.onClick) {
+            props.innerProps.onClick(e);
+          }
+          if (props.data.value === 'Customized') {
+            props.selectProps.onCustomizedClick(props.selectProps.field);
+          }
+        }}
+        className="w-full h-full"
+      >
+        {props.children}
+      </div>
+    </components.Option>
+  );
+};
 
 export const InputSection = ({
   section,
@@ -230,10 +250,13 @@ export const InputSection = ({
         return val.toString();
       });
 
-      // Set all items as selected (moved to right side) - this populates the Transfer component
-      updateSelectedItems(field.key, allKeys);
-      // Also update inputs with all values
-      setInputs({ ...safeInputs, [field.key]: allKeys });
+      const isCurrentlyCustomized = selectionStates?.[field.selectionKey] === "Customized";
+      if (!isCurrentlyCustomized) {
+        // Set all items as selected (moved to right side) - this populates the Transfer component
+        updateSelectedItems(field.key, allKeys);
+        // Also update inputs with all values
+        setInputs({ ...safeInputs, [field.key]: allKeys });
+      }
       updateSelectionState(field.selectionKey, "Customized");
       updateModalState(field.modalKey, true);
       toggleAllSelected(field.key, false);
@@ -403,6 +426,9 @@ export const InputSection = ({
             styles={customSelectStyles}
             classNamePrefix="react-select"
             className="w-[60%]"
+            components={{ Option: CustomOption }}
+            onCustomizedClick={(f) => updateModalState(f.modalKey, true)}
+            field={field}
           />
         );
       }
