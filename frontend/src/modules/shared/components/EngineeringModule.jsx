@@ -924,25 +924,6 @@ export const EngineeringModule = ({
     if (name === "Reset") {
       return handleResetEnhanced();
     }
-    if (name === "Quit") {
-      handleQuitClick();
-      return;
-    }
-
-    if (name === "Show front view") {
-      setSelectedCameraView("XY");
-      return;
-    }
-    if (name === "Show top view") {
-      setSelectedCameraView("ZX");
-      return;
-    }
-    if (name === "Show side view") {
-      setSelectedCameraView("YZ");
-      return;
-    }
-
-    // Reset/Downloads are handled elsewhere (existing handlers or upcoming reset work).
     return undefined;
   };
 
