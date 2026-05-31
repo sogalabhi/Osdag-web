@@ -222,33 +222,25 @@ export const EngineeringModule = ({
       if (["Model", "Beam", "Column", "Seated Angle", "Cleat Angle"].includes(opt)) {
         if (opt === "Model") {
           setSelectedSection(["Model"]);
-
           setSelectedCameraView("Model");
         } else {
-          // If a non-Model option is selected, add it
-          const newSelection = selectedSection.filter(s => s !== "Model");
-          if (!newSelection.includes(opt)) {
-            newSelection.push(opt);
-          }
-          if (newSelection.length > 0) {
-            setSelectedSection(newSelection);
-
-            setSelectedCameraView(newSelection[0]);
-          }
-        }
-      } else if (opt === "Change Background") {
-        if (colorPickerRef.current) {
-          colorPickerRef.current.click();
+          const partKey =
+            opt === "Seated Angle"
+              ? "SeatedAngle"
+              : opt === "Cleat Angle"
+                ? "CleatAngle"
+                : opt;
+          setSelectedSection([partKey]);
+          setSelectedCameraView(partKey);
         }
       } else if (opt === "Show front view") {
-        setSelectedCameraView("XY");
+        setSelectedCameraView("ZX");
       } else if (opt === "Show side view") {
         setSelectedCameraView("YZ");
       } else if (opt === "Show top view") {
-        setSelectedCameraView("ZX");
+        setSelectedCameraView("XY");
       }
-      // Cleanup graphicOption to allow consecutive clicks of same option
-      setInputs(prev => {
+      setInputs((prev) => {
         const next = { ...prev };
         delete next.graphicsOption;
         return next;
@@ -276,7 +268,7 @@ export const EngineeringModule = ({
   useEffect(() => {
     if (normalizedCadModelPaths) {
       const keys = Object.keys(normalizedCadModelPaths || {});
-      }
+    }
   }, [normalizedCadModelPaths, selectedSection]);
 
 
@@ -670,7 +662,6 @@ export const EngineeringModule = ({
     modelScale,
   } = cameraSettings;
 
-  // Determine view options based on module config
   const getViewOptions = () => {
     if (moduleConfig.cadOptions) {
       return moduleConfig.cadOptions || ["Model", "Beam", "Connector"];
@@ -699,6 +690,10 @@ export const EngineeringModule = ({
 
   const triggerScreenshotCapture = () => {
     setScreenshotTrigger(true);
+  };
+
+  const triggerBackgroundColorPicker = () => {
+    colorPickerRef.current?.click();
   };
 
   const handleLoadInputFromShortcut = async () => {
@@ -778,7 +773,7 @@ export const EngineeringModule = ({
       ...staticFallbacks,
       ...(ctxHoverDict || {}),
     };
-    
+
     return final;
   }, [ctxHoverDict]);
 
@@ -908,7 +903,7 @@ export const EngineeringModule = ({
       return handleResetEnhanced();
     }
     if (name === "Quit") {
-      handleQuitClick();
+      navigate("/home");
       return;
     }
 
@@ -954,6 +949,13 @@ export const EngineeringModule = ({
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden">
+      <input
+        ref={colorPickerRef}
+        type="color"
+        onChange={(e) => setCustomBgColor(e.target.value)}
+        className="sr-only"
+        aria-label="CAD view background color"
+      />
       {/* Navigation */}
       <div className="sticky top-0 z-[60] h-[52px] flex flex-row justify-between items-center bg-[#d2d4d2] w-full text-sm flex-shrink-0 px-4">
         <div className="flex flex-row items-center gap-x-4">
@@ -974,6 +976,7 @@ export const EngineeringModule = ({
               logs={logs}
               setCreateDesignReportBool={setCreateDesignReportBool}
               triggerScreenshotCapture={triggerScreenshotCapture}
+              triggerBackgroundColorPicker={triggerBackgroundColorPicker}
               selectedOption={extraState.selectedOption}
               setSelectedOption={(value) =>
                 setExtraState({ ...extraState, selectedOption: value })
@@ -1297,15 +1300,9 @@ export const EngineeringModule = ({
                             else {
                               // If a non-Model option is selected
                               if (event.target.checked) {
-                                // Remove Model from selection and add this option
-                                const newSelection = selectedSection.filter(s => s !== "Model");
-                                if (!newSelection.includes(option)) {
-                                  newSelection.push(option);
-                                }
-                                setSelectedSection(newSelection);
-                                // Use first selected for camera/view if needed
-
-                                setSelectedCameraView(newSelection[0]);
+                                // Exactly one CAD part/view at a time (Column replaces Beam, etc.).
+                                setSelectedSection([option]);
+                                setSelectedCameraView(option);
                               } else {
                                 // Uncheck: remove this option
                                 const newSelection = selectedSection.filter(s => s !== option);
@@ -1378,8 +1375,8 @@ export const EngineeringModule = ({
             className={`
               fixed inset-0 z-50 h-full pt-[80px]
               sm:relative sm:inset-auto sm:z-auto sm:h-auto sm:pt-0
-              w-full sm:w-[320px] md:w-[350px] lg:w-[400px]
-              flex flex-col bg-white dark:bg-osdag-dark-color
+         w-full sm:w-[320px] md:w-[350px] lg:w-[400px]
+         flex flex-col bg-white dark:bg-osdag-dark-color
             `}
           >
             <BaseOutputDock
@@ -1405,20 +1402,20 @@ export const EngineeringModule = ({
               <div className="absolute left-0 top-0 w-[8px] h-full bg-[#84bd00]">
                 
                 {/* TOGGLE HANDLE */}
-                <div
-                  onClick={() => toggleOutputDock(!!output)}
-                  className="
+              <div
+                onClick={() => toggleOutputDock(!!output)}
+                className="
                     absolute left-0 top-[44%]
                     -translate-y-1/2
-                    w-[8px] h-[80px]
-                    bg-[#6a8f00]
-                    flex items-center justify-center
-                    cursor-pointer
-                  "
-                >
+                w-[8px] h-[80px]
+                bg-[#6a8f00]
+                flex items-center justify-center
+                cursor-pointer
+              "
+              >
                   <span className="text-white text-[14px]">
-                    ❯
-                  </span>
+                  ❯
+                </span>
                 </div>
               </div>
             </div>
@@ -1427,9 +1424,9 @@ export const EngineeringModule = ({
           /* COLLAPSED STRIP */
           <div
             className="
-              fixed right-0 top-0 h-screen w-[40px]
+            fixed right-0 top-0 h-screen w-[40px]
               z-10 bg-white
-            "
+          "
           >
             {/* GREEN LINE */}
             <div className="absolute left-0 top-0 w-[8px] h-full bg-[#84bd00]">
@@ -1439,11 +1436,11 @@ export const EngineeringModule = ({
                 onClick={() => setDocks({ output: true })}
                 className="
                   absolute left-0 top-[44%]
-                  w-[8px] h-[80px]
-                  bg-[#6a8f00]
-                  flex items-center justify-center
-                  cursor-pointer
-                "
+                w-[8px] h-[80px]
+                bg-[#6a8f00]
+                flex items-center justify-center
+                cursor-pointer
+              "
               >
                 <span className="text-white text-[14px]">
                   ❮
@@ -1458,7 +1455,7 @@ export const EngineeringModule = ({
                   {ch}
                 </span>
               ))}
-            </div>
+          </div>
           </div>
         )}
       </div>

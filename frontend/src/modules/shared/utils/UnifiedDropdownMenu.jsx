@@ -33,6 +33,7 @@ function UnifiedDropdownMenu({
   setCreateDesignReportBool,
   setSaveInputFileName,
   triggerScreenshotCapture,
+  triggerBackgroundColorPicker,
   selectedOption = null,
   setSelectedOption = () => { },
   boltDiameterList = [],
@@ -165,9 +166,9 @@ function UnifiedDropdownMenu({
     }
     const inputsForSave = expandAllSelectedInputs(inputs, allSelected, getContextData());
 
-    // Determine module_id and projectName with defaults
-    const module_id = inputs?.module || MODULE_KEY_FIN_PLATE;
-    const projectName = inputs?.project_name || inputs?.name || 'project';
+    // Backend validate_module_id() allows only alphanumeric, dash, underscore — not display names like "Tension Member Bolted Design".
+    const module_id = moduleConfig?.designType || inputs?.module || MODULE_KEY_FIN_PLATE;
+    const projectName = inputs?.project_name || inputs?.name || moduleConfig?.sessionName || 'project';
 
     try {
       const result = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, true);
@@ -252,9 +253,9 @@ function UnifiedDropdownMenu({
       case "Save Log Messages":
         saveLogMessages();
         break;
-      // case "Create Design Report":
-      //   setCreateDesignReportBool(true);
-      //   break;
+      case "Create Design Report":
+        setCreateDesignReportBool(true);
+        break;
       case "Save 3D Model":
         (async () => {
           await downloadCadSectionsAsStl(cadModelPaths, message);
@@ -359,17 +360,47 @@ function UnifiedDropdownMenu({
       case "Rotate 3D Model":
         document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'auto-rotate' }));
         break;
-      default:
+      case "Change Background":
+        if (typeof triggerBackgroundColorPicker === "function") {
+          triggerBackgroundColorPicker();
+        }
+        break;
+      case "Quit":
+        if (typeof onMenuClick === "function") {
+          onMenuClick(option.name);
+        }
+        setIsOpen(false);
+        break;
+      default: {
+        // View / part visibility are driven via inputs.graphicsOption in EngineeringModule.
+        // Background uses triggerBackgroundColorPicker (same synchronous pattern as screenshots).
+        const graphicsOptionNames = new Set([
+          "Show front view",
+          "Show top view",
+          "Show side view",
+          "Model",
+          "Beam",
+          "Column",
+          "Seated Angle",
+          "Cleat Angle",
+        ]);
+        if (graphicsOptionNames.has(option.name)) {
+          setInputs({
+            ...(inputs || {}),
+            graphicsOption: option.name,
+          });
+          break;
+        }
         if (onMenuClick) {
           onMenuClick(option.name);
         } else {
-          // Default value - ensure inputs is an object before spreading
           setInputs({
             ...(inputs || {}),
             graphicsOption: option.name,
           });
         }
         break;
+      }
     }
   };
 

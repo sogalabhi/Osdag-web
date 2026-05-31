@@ -97,14 +97,14 @@ export const useEngineeringShortcuts = ({
         combos: SHORTCUT_ACTION_BY_ID["eng.cad.view.front"]?.shortcuts,
         when: () => !!showCad,
         handler: () => {
-          setSelectedCameraView("XY");
+          setSelectedCameraView("ZX");
         },
       },
       {
         combos: SHORTCUT_ACTION_BY_ID["eng.cad.view.top"]?.shortcuts,
         when: () => !!showCad,
         handler: () => {
-          setSelectedCameraView("ZX");
+          setSelectedCameraView("XY");
         },
       },
       {

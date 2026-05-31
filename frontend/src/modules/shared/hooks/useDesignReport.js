@@ -99,6 +99,7 @@ export const useDesignReport = (
 
   return {
     createDesignReportBool,
+    setCreateDesignReportBool,
     designReportInputs,
     setDesignReportInputs,
     open,
