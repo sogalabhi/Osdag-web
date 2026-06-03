@@ -25,7 +25,8 @@ from apps.sections.options_merge import merge_user_sections_into_options
 SHEAR_REPORT_MODULE_ID_MAP = {
     "fin-plate": "FinPlateConnection",
     "cleat-angle": "CleatAngleConnection",
-    "end-plate": "EndPlateConnection",
+    # "end-plate": "EndPlateConnection",
+    "header-plate": "HeaderPlateConnection",
     "seated-angle": "Seated-Angle-Connection",
 }
 
@@ -114,7 +115,8 @@ class ShearConnectionViewSet(viewsets.ViewSet):
                     status=status.HTTP_200_OK,
                 )
 
-            if slug == 'end-plate':
+            # if slug == 'end-plate':
+            if slug == 'header-plate':
                 data = {
                     'connectivityList': connectivity_common,
                     'boltTypeList': ['Bearing Bolt', 'Friction Grip Bolt'],

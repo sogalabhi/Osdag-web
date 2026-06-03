@@ -8,7 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 from apps.modules.shear_connection.submodules.fin_plate.adapter import create_from_input as fin_plate_create_from_input
-from apps.modules.shear_connection.submodules.end_plate.adapter import create_from_input as end_plate_create_from_input
+# from apps.modules.shear_connection.submodules.end_plate.adapter import create_from_input as end_plate_create_from_input
+from apps.modules.shear_connection.submodules.header_plate.adapter import create_from_input as header_plate_create_from_input
 from apps.modules.shear_connection.submodules.cleat_angle.adapter import create_from_input as cleat_angle_create_from_input
 from apps.modules.shear_connection.submodules.seated_angle.adapter import create_from_input as seated_angle_create_from_input
 from apps.modules.moment_connection.submodules.beam_beam_cover_plate_bolted.adapter import create_from_input as cover_plate_bolted_create_from_input
@@ -132,12 +133,13 @@ class CreateDesignReport(APIView):
         # Map module IDs to their respective create_from_input functions
         module_function_map = {
             'FinPlateConnection': fin_plate_create_from_input,
-            'EndPlateConnection': end_plate_create_from_input,
+            # 'EndPlateConnection': end_plate_create_from_input,
+            'HeaderPlateConnection': header_plate_create_from_input,
             'CleatAngleConnection': cleat_angle_create_from_input,
             'Seated-Angle-Connection': seated_angle_create_from_input,
             'Beam-to-Beam-Cover-Plate-Bolted-Connection': cover_plate_bolted_create_from_input,
             'Beam-Beam-End-Plate-Connection': beam_beam_end_plate_create_from_input,
-            'Beam-to-Beam-Cover-Plate-Welded-Connection': cover_plate_welded_create_from_input,
+            'Cover-Plate-Welded-Connection': cover_plate_welded_create_from_input,
             'Beam-to-Column-End-Plate-Connection': beam_to_column_end_plate_create_from_input,
             'Column-to-Column-Cover-Plate-Bolted-Connection': column_cover_plate_bolted_create_from_input,
             'Column-to-Column-Cover-Plate-Welded-Connection': column_cover_plate_welded_create_from_input,
@@ -279,15 +281,15 @@ class CreateDesignReport(APIView):
             # log and continue with original metadata.
             pass
 
-        from osdag_core.Common import KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE
+        from osdag_core.Common import KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE # KEY_DISP_ENDPLATE
         
         # Fix module.module if it doesn't match KEY_DISP_FINPLATE or KEY_DISP_ENDPLATE
         # This is needed for parent save_design() to set report_input
         if hasattr(module, 'module'):
             if module.module == 'FinPlateConnection' and module_id == 'FinPlateConnection':
                 module.module = KEY_DISP_FINPLATE
-            elif module.module == 'EndPlateConnection' and module_id == 'EndPlateConnection':
-                module.module = KEY_DISP_ENDPLATE
+            elif module.module == 'HeaderPlateConnection' and module_id == 'HeaderPlateConnection':
+                module.module = KEY_DISP_HEADERPLATE
         
         # Check if design has been run - output_values() typically triggers design
         # But for report generation, we need to ensure design is complete
@@ -396,7 +398,6 @@ class CreateDesignReport(APIView):
             # Treat this as non-fatal if the expected LaTeX file was created.
             import traceback
             traceback.print_exc()
-            
             tex_path = f'{file_path}.tex'
             if os.path.exists(tex_path):
                 resultBoolean = True

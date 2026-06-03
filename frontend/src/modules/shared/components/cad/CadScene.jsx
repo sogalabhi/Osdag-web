@@ -65,57 +65,97 @@ function CadScene({
     const handleAction = (e) => {
       const controls = controlsRef.current;
       if (!controls) return;
-
-      const { camera } = controls.object;
-
-      if (e.detail === 'zoom-in') {
-        controls.dollyOut(1.2);
-        controls.update();
-      } else if (e.detail === 'zoom-out') {
-        controls.dollyIn(1.2);
-        controls.update();
-      } else if (e.detail === 'pan-up') {
-        // Actually, panning via OrbitControls needs mouse events, but we can shift the target slightly.
-        controls.target.y += 0.05;
-        camera.position.y += 0.05;
-        controls.update();
-      } else if (e.detail === 'pan-down') {
-        controls.target.y -= 0.05;
-        camera.position.y -= 0.05;
-        controls.update();
-      } else if (e.detail === 'pan-left') {
-        controls.target.x -= 0.05;
-        camera.position.x -= 0.05;
-        controls.update();
-      } else if (e.detail === 'pan-right') {
-        controls.target.x += 0.05;
-        camera.position.x += 0.05;
-        controls.update();
-      } else if (e.detail === 'auto-rotate') {
-        setIsAutoRotate(prev => !prev);
-      } else if (e.detail === 'front-view') {
-        const dist = camera.position.distanceTo(controls.target);
-        camera.position.set(controls.target.x, controls.target.y, controls.target.z + dist);
-        camera.lookAt(controls.target);
-        camera.updateProjectionMatrix();
-        controls.update();
-      } else if (e.detail === 'top-view') {
-        const dist = camera.position.distanceTo(controls.target);
-        camera.position.set(controls.target.x, controls.target.y + dist, controls.target.z + 0.001);
-        camera.lookAt(controls.target);
-        camera.updateProjectionMatrix();
-        controls.update();
-      } else if (e.detail === 'side-view') {
-        const dist = camera.position.distanceTo(controls.target);
-        camera.position.set(controls.target.x + dist, controls.target.y, controls.target.z);
-        camera.lookAt(controls.target);
-        camera.updateProjectionMatrix();
-        controls.update();
+  
+      const camera = controls.object; // Correct
+      const target = controls.target.clone();
+  
+      const distance = camera.position.distanceTo(target);
+  
+      switch (e.detail) {
+        case "zoom-in":
+          controls.dollyOut(1.2);
+          controls.update();
+          break;
+  
+        case "zoom-out":
+          controls.dollyIn(1.2);
+          controls.update();
+          break;
+  
+        case "pan-up":
+          controls.target.y += 0.05;
+          camera.position.y += 0.05;
+          controls.update();
+          break;
+  
+        case "pan-down":
+          controls.target.y -= 0.05;
+          camera.position.y -= 0.05;
+          controls.update();
+          break;
+  
+        case "pan-left":
+          controls.target.x -= 0.05;
+          camera.position.x -= 0.05;
+          controls.update();
+          break;
+  
+        case "pan-right":
+          controls.target.x += 0.05;
+          camera.position.x += 0.05;
+          controls.update();
+          break;
+  
+        case "auto-rotate":
+          setIsAutoRotate((prev) => !prev);
+          break;
+  
+        // FRONT VIEW
+        case "front-view":
+          camera.position.set(
+            target.x,
+            target.y,
+            target.z + distance
+          );
+          camera.up.set(0, 1, 0);
+          camera.lookAt(target);
+          controls.update();
+          break;
+  
+        // TOP VIEW
+        case "top-view":
+          camera.position.set(
+            target.x,
+            target.y + distance,
+            target.z
+          );
+          camera.up.set(0, 0, -1);
+          camera.lookAt(target);
+          controls.update();
+          break;
+  
+        // SIDE VIEW
+        case "side-view":
+          camera.position.set(
+            target.x + distance,
+            target.y,
+            target.z
+          );
+          camera.up.set(0, 1, 0);
+          camera.lookAt(target);
+          controls.update();
+          break;
+  
+        default:
+          break;
       }
     };
-
-    document.addEventListener('cad-camera-action', handleAction);
-    return () => document.removeEventListener('cad-camera-action', handleAction);
+  
+    document.addEventListener("cad-camera-action", handleAction);
+  
+    return () => {
+      document.removeEventListener("cad-camera-action", handleAction);
+    };
   }, []);
 
   return (
