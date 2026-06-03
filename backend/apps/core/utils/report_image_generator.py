@@ -726,7 +726,8 @@ def generate_cad_files_for_report(module: Any, input_values: dict,
     # Map module_id to adapter function
     module_adapter_map = {
         'FinPlateConnection': 'apps.modules.shear_connection.submodules.fin_plate.adapter',
-        'EndPlateConnection': 'apps.modules.shear_connection.submodules.end_plate.adapter',
+        # 'EndPlateConnection': 'apps.modules.shear_connection.submodules.end_plate.adapter',
+        'HeaderPlateConnection': 'apps.modules.shear_connection.submodules.header_plate.adapter',
         'CleatAngleConnection': 'apps.modules.shear_connection.submodules.cleat_angle.adapter',
         'Seated-Angle-Connection': 'apps.modules.shear_connection.submodules.seated_angle.adapter',
         'Cover-Plate-Bolted-Connection': 'apps.modules.moment_connection.submodules.beam_beam_cover_plate_bolted.adapter',
