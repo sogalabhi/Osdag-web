@@ -64,9 +64,9 @@ const MainContent = () => {
   }));
 
   return (
-    <div className=" flex-1 px-12 pb-6">
+    <div className="flex-1 px-4 sm:px-8 lg:px-12 pb-2 lg:pb-3">
       <div className="max-w-7xl mx-auto h-full">
-        <div className={`flex flex-row gap-8 h-full`}>
+        <div className="flex flex-col lg:flex-row gap-8 h-full">
           {/* Recent Projects */}
           <div className="flex-1">
             <DashboardSectionCard title="Recent Projects">
@@ -75,11 +75,12 @@ const MainContent = () => {
           </div>
 
           {/* Recently used Modules */}
-          {isGuest ? null : (<div className="flex-1">
-            <DashboardSectionCard title="Recently used Modules">
-              <ModulesListCard items={recentModules} />
-            </DashboardSectionCard>
-          </div>
+          {isGuest ? null : (
+            <div className="flex-1">
+              <DashboardSectionCard title="Recently used Modules">
+                <ModulesListCard items={recentModules} />
+              </DashboardSectionCard>
+            </div>
           )}
         </div>
       </div>

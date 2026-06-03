@@ -21,16 +21,14 @@ const Homepage = () => {
         {/* Sidebar */}
         {showSideBar && (
           <div className="fixed inset-0 z-40 flex">
-            <div className="flex-shrink-0 w-sidebar h-screen border-r border-osdag-border dark:border-gray-700">
+            {/* Overlay to close sidebar */}
+            <div
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30 cursor-pointer"
+              onClick={() => setshowSideBar(false)}
+            />
+            <div className="relative flex-shrink-0 w-sidebar h-screen border-r border-osdag-border dark:border-gray-700 z-40">
               <Sidebar setshowSideBar={setshowSideBar} />
             </div>
-            {/* Overlay to close sidebar */}
-            {/* 
-            <div
-              className="fixed inset-0 bg-black bg-opacity-30"
-              onClick={() => setshowSideBar(false)}
-            /> 
-            */}
           </div>
         )}
 
@@ -47,11 +45,8 @@ const Homepage = () => {
             <div className="absolute inset-0 bg-[url('/images/background_dark.svg')] bg-cover bg-center hidden dark:block"></div>
           </div>
 
-          {/* Dark/Light overlay
-          <div className="absolute inset-0 bg-white/70 dark:bg-black/40"></div> */}
-
           {/* Foreground content */}
-          <div className="relative flex-1 flex flex-col min-w-0">
+          <div className="relative flex-1 flex flex-col min-w-0 min-h-0">
             {/* Header */}
             <Header setshowSideBar={setshowSideBar} />
 
@@ -69,27 +64,28 @@ const Homepage = () => {
             )}
 
             {/* Main Content */}
-            <div className="flex-1 lg:overflow-y-auto">
-              <MainContent />
-            </div>            
-            <div className="pointer-events-none absolute bottom-6">
-             <div className="px-6 py-3 rounded-md shadow-sm">
-              <div className="mb-2"> 
-               <span className="text-lg font-semibold whitespace-nowrap">
-                 Supported by:
-               </span>
+            <div className="flex-1 overflow-y-auto flex flex-col justify-between">
+              <div className="flex-1">
+                <MainContent />
               </div>
-              <div className="flex flex-wrap items-center gap-6">
-                <img src={moeLogo} alt="MOE Logo" className="h-[4.2rem] pointer-events-auto dark:invert" />
-                <img src={mosLogo} alt="MOS Logo" className="h-[4.2rem] pointer-events-auto dark:invert" /> 
-                <img src={constructSteelLogo} alt="Construct Steel Logo" className="h-[1.44rem] pointer-events-auto" />
-                <img src={InsdagLogo} alt="Insdag Logo" className="h-[4.2rem] pointer-events-auto" />
-              {/* <img src={fosseeLogo} alt="FOSSEE Logo" className="h-10 pointer-events-auto" /> */}
-              </div>           
-             </div>
-            </div>
-           </div>
-       </div>
+              
+              {/* Footer / Supported by logos */}
+              <div className="px-4 sm:px-8 lg:px-12 py-3">
+                <div className="mb-2"> 
+                  <span className="text-lg font-semibold whitespace-nowrap dark:text-white">
+                    Supported by:
+                  </span>
+                </div>
+                <div className="flex flex-wrap items-center gap-6">
+                  <img src={moeLogo} alt="MOE Logo" className="h-[3rem] md:h-[4.2rem] dark:invert" />
+                  <img src={mosLogo} alt="MOS Logo" className="h-[3rem] md:h-[4.2rem] dark:invert" /> 
+                  <img src={constructSteelLogo} alt="Construct Steel Logo" className="h-[1rem] md:h-[1.44rem]" />
+                  <img src={InsdagLogo} alt="Insdag Logo" className="h-[3rem] md:h-[4.2rem]" />
+                </div>           
+              </div>
+            </div>            
+          </div>
+        </div>
       </div>
     </div>
   );
