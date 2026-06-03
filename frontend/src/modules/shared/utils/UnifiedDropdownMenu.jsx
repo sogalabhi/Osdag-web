@@ -359,6 +359,15 @@ function UnifiedDropdownMenu({
       case "Rotate 3D Model":
         document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'auto-rotate' }));
         break;
+      case "Show Front View":
+        document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'front-view' }));
+        break;
+      case "Show Top View":
+        document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'top-view' }));
+        break;
+      case "Show Side View":
+        document.dispatchEvent(new CustomEvent('cad-camera-action', { detail: 'side-view' }));
+        break;
       default:
         if (onMenuClick) {
           onMenuClick(option.name);

@@ -38,7 +38,8 @@ export const MODULE_SLUGS = {
   // Shear
   [MODULE_KEY_FIN_PLATE]: 'shear-connection/fin-plate',
   [MODULE_KEY_CLEAT_ANGLE]: 'shear-connection/cleat-angle',
-  [MODULE_KEY_END_PLATE]: 'shear-connection/end-plate',
+  // [MODULE_KEY_END_PLATE]: 'shear-connection/end-plate',
+  [MODULE_KEY_END_PLATE]: 'shear-connection/header-plate',
   [MODULE_KEY_SEAT_ANGLE]: 'shear-connection/seated-angle',
   // Moment
   [MODULE_KEY_COVER_PLATE_BOLTED]: 'moment-connection/beam-beam-cover-plate-bolted',

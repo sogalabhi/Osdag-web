@@ -51,10 +51,12 @@ from importlib.resources import files
 from ...custom_logger import CustomLogger
 
 
-class EndPlateConnection(ShearConnection):
+# class EndPlateConnection(ShearConnection):
+class HeaderPlateConnection(ShearConnection):
 
     def __init__(self):
-        super(EndPlateConnection, self).__init__()
+        # super(EndPlateConnection, self).__init__()
+        super(HeaderPlateConnection, self).__init__()
         # self.plate = Plate(thickness=self.plate.thickness_provided, height=plate_height, width=plate_width, material=self.material)
         # self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL], fabrication=design_dictionary[KEY_DP_WELD_TYPE])
         self.weld_size_list = []
@@ -250,7 +252,7 @@ class EndPlateConnection(ShearConnection):
 
     @staticmethod
     def module_name():
-        return KEY_DISP_ENDPLATE
+        return KEY_DISP_HEADERPLATE # KEY_DISP_ENDPLATE
 
     def input_values(self):
 
@@ -259,10 +261,10 @@ class EndPlateConnection(ShearConnection):
         """
 
         # @author: Amir, Umair
-        self.module = KEY_DISP_ENDPLATE
+        self.module = KEY_DISP_HEADERPLATE # KEY_DISP_ENDPLATE
         options_list = []
 
-        t16 = (KEY_MODULE, KEY_DISP_ENDPLATE, TYPE_MODULE, None, True, 'No Validator')
+        t16 = (KEY_MODULE, KEY_DISP_HEADERPLATE, TYPE_MODULE, None, True, 'No Validator') # KEY_DISP_ENDPLATE
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')
@@ -326,7 +328,8 @@ class EndPlateConnection(ShearConnection):
                 " : You are using a section (in red color) that is not available in latest version of IS 808")
 
     def set_input_values(self, design_dictionary):
-        super(EndPlateConnection,self).set_input_values(design_dictionary)
+        # super(EndPlateConnection,self).set_input_values(design_dictionary)
+        super(HeaderPlateConnection,self).set_input_values(design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.plate = Plate(thickness=design_dictionary.get(KEY_PLATETHK, None),
                            material_grade=design_dictionary[KEY_CONNECTOR_MATERIAL], gap=design_dictionary[KEY_DP_DETAILING_GAP])
@@ -336,7 +339,8 @@ class EndPlateConnection(ShearConnection):
         self.member_capacity()
 
     def member_capacity(self):
-        super(EndPlateConnection, self).member_capacity()
+        # super(EndPlateConnection, self).member_capacity()
+        super(HeaderPlateConnection, self).member_capacity()
         if self.connectivity == VALUES_CONN_2[0]:
             if self.supported_section.shear_yielding_capacity / 1000 > self.load.shear_force and \
                     self.supported_section.tension_yielding_capacity / 1000 > self.load.axial_force:
@@ -1470,7 +1474,8 @@ class EndPlateConnection(ShearConnection):
     # Function to create design report (LateX/PDF)
     ######################################
     def save_design(self, popup_summary):
-        super(EndPlateConnection, self).save_design()
+        # super(EndPlateConnection, self).save_design()
+        super(HeaderPlateConnection, self).save_design()
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 

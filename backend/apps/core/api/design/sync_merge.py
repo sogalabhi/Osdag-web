@@ -22,7 +22,8 @@ def _material_row_for_grade(material_models, grade: str) -> List[Dict[str, Any]]
 # source is one of: "columns", "beams", "angles"
 _SECTION_KEY_MAP: Dict[str, Tuple[Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Optional[str]]] = {
     "FinPlateConnection": ("column_section", "columns", "beam_section", "beams", None, None),
-    "EndPlateConnection": ("column_section", "columns", "beam_section", "beams", None, None),
+    # "EndPlateConnection": ("column_section", "columns", "beam_section", "beams", None, None),
+    "HeaderPlateConnection": ("column_section", "columns", "beam_section", "beams", None, None),
     "CleatAngleConnection": ("column_section", "columns", "beam_section", "beams", "cleat_section", "angles"),
     "SeatedAngleConnection": ("column_section", "columns", "beam_section", "beams", "seated_section", "angles"),
     "Beam to Column End Plate Connection": ("column_section", "columns", "beam_section", "beams", None, None),
@@ -146,7 +147,8 @@ def _resolve_section_details(
 # Aligns with osdag_core input_dictionary_without_design_pref "Input Dock" rows where applicable.
 _MATERIAL_SYNC_RULES: Dict[str, Dict[str, List[str]]] = {
     "FinPlateConnection": {"connector_material": ["supporting_material", "supported_material"]},
-    "EndPlateConnection": {"connector_material": ["supporting_material", "supported_material"]},
+    # "EndPlateConnection": {"connector_material": ["supporting_material", "supported_material"]},
+    "HeaderPlateConnection": {"connector_material": ["supporting_material", "supported_material"]},
     "CleatAngleConnection": {"connector_material": ["supporting_material", "supported_material"]},
     "SeatedAngleConnection": {"connector_material": ["supporting_material", "supported_material"]},
     "Beam to Column End Plate Connection": {
