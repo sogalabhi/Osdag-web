@@ -22,7 +22,7 @@ const ModulesListCard = ({ items }) => {
   return (
     <>
       {items.map((item, index) => (
-        <div key={index} className="p-4 rounded-xl border transition-all duration-300 group bg-gray-50/50 dark:bg-gray-800/20 border-osdag-border dark:border-gray-700 hover:bg-osdag-green/20 hover:border-osdag-green/20 dark:hover:bg-osdag-green/20 hover:shadow-sm">
+        <div key={index} className="p-4 rounded-xl border transition-all duration-300 group bg-gray-50/50 dark:bg-gray-800/20 border-osdag-border dark:border-gray-700 hover:bg-osdag-green/20 hover:border-osdag-green/20 dark:hover:bg-osdag-green/20 hover:shadow-sm pb-8 md:pb-4 md:hover:pb-8">
           <div className="flex items-start justify-between">
             <div className="flex items-start space-x-3 flex-1">
               {getIcon()}
@@ -33,7 +33,7 @@ const ModulesListCard = ({ items }) => {
                 {item.subtitle && (
                   <p className="text-subtitle text-osdag-text-secondary dark:text-gray-400 mb-2">{item.subtitle}</p>
                 )}
-                <div className="flex flex-wrap gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-all duration-300 max-h-0 group-hover:max-h-20 overflow-hidden">
+                <div className="flex flex-wrap gap-2 mt-3 opacity-100 max-h-40 md:opacity-0 md:group-hover:opacity-100 md:max-h-0 md:group-hover:max-h-20 transition-all duration-300 overflow-hidden">
                   <button className="px-3 py-1.5 text-xs font-medium bg-osdag-green/10 text-osdag-green rounded-lg hover:bg-osdag-green/20 transition-colors" onClick={(e) => { e.stopPropagation(); handleModuleClick(item); }}>
                     Open
                   </button>
