@@ -48,12 +48,41 @@ Field weld takes a material safety factor of 1.5
           type="text"
           className="input-design-pref"
           value={designPrefInputs.weld_material_grade}
-          onChange={(e) =>
+          onChange={(e) => {
+            let val = e.target.value.replace(/[^0-9.-]/g, '');
+            const decimalCount = (val.match(/\./g) || []).length;
+            if (decimalCount > 1) {
+              const firstDecimalIdx = val.indexOf('.');
+              val = val.slice(0, firstDecimalIdx + 1) + val.slice(firstDecimalIdx + 1).replace(/\./g, '');
+            }
+            if (val.includes('-')) {
+              const isNegative = val.startsWith('-');
+              val = val.replace(/-/g, '');
+              if (isNegative) {
+                val = '-' + val;
+              }
+            }
             setDesignPrefInputs({
               ...designPrefInputs,
-              weld_material_grade: e.target.value,
-            })
-          }
+              weld_material_grade: val,
+            });
+          }}
+          onKeyDown={(e) => {
+            const allowedKeys = [
+              'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+              'Home', 'End', 'ArrowLeft', 'ArrowRight', '.', '-'
+            ];
+            const isShortcut = (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase());
+
+            if (e.key === ' ') {
+              e.preventDefault();
+              return;
+            }
+
+            if (!allowedKeys.includes(e.key) && !isShortcut && isNaN(Number(e.key))) {
+              e.preventDefault();
+            }
+          }}
         />
       </div>
     </GenericConfigView>

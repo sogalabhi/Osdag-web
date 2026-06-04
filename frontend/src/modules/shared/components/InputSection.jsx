@@ -381,7 +381,11 @@ export const InputSection = ({
             isSearchable={false}
             onChange={(selected) => {
               setExtraState({ ...extraState, selectedOption: selected.value });
-              setInputs({ ...safeInputs, output: null });
+              if (field.onChange) {
+                field.onChange(selected.value, safeInputs, setInputs, safeContextData, extraState, setExtraState);
+              } else {
+                setInputs({ ...safeInputs, [field.key]: selected.value, output: null });
+              }
             }}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
@@ -483,9 +487,46 @@ export const InputSection = ({
         return (
           <div className="w-[60%]">
             <input
-              type={field.type === 'number' ? 'number' : 'text'}
+              type="text"
+              inputMode={field.type === 'number' ? 'decimal' : 'text'}
               value={safeInputs[field.key] ?? ""}
-              onChange={(e) => setInputs({ ...safeInputs, [field.key]: e.target.value })}
+              onChange={(e) => {
+                let val = e.target.value;
+                if (field.type === 'number') {
+                  val = val.replace(/[^0-9.-]/g, '');
+                  const decimalCount = (val.match(/\./g) || []).length;
+                  if (decimalCount > 1) {
+                    const firstDecimalIdx = val.indexOf('.');
+                    val = val.slice(0, firstDecimalIdx + 1) + val.slice(firstDecimalIdx + 1).replace(/\./g, '');
+                  }
+                  if (val.includes('-')) {
+                    const isNegative = val.startsWith('-');
+                    val = val.replace(/-/g, '');
+                    if (isNegative) {
+                      val = '-' + val;
+                    }
+                  }
+                }
+                setInputs({ ...safeInputs, [field.key]: val });
+              }}
+              onKeyDown={(e) => {
+                if (field.type === 'number') {
+                  const allowedKeys = [
+                    'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+                    'Home', 'End', 'ArrowLeft', 'ArrowRight', '.', '-'
+                  ];
+                  const isShortcut = (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase());
+
+                  if (e.key === ' ') {
+                    e.preventDefault();
+                    return;
+                  }
+
+                  if (!allowedKeys.includes(e.key) && !isShortcut && isNaN(Number(e.key))) {
+                    e.preventDefault();
+                  }
+                }
+              }}
               placeholder={field.placeholder || `ex. ${field.label}`}
               disabled={field.disabled}
               className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70"
