@@ -159,6 +159,17 @@ export const useDesignSubmission = (service, moduleConfig) => {
       setOutput(formattedOutput);
       setDisplayOutput(true);
 
+      if (designBody?.design_status === false) {
+        const failMessage = "Design is unsafe / failed. Please inspect calculation logs for details.";
+        setStatus({
+          step: DESIGN_STATUS.ERROR,
+          message: failMessage,
+          error: new Error(failMessage)
+        });
+        setLoading(false);
+        return;
+      }
+
       // Save outputs to project if projectId exists
       if (projectId && service.updateProject) {
         try {

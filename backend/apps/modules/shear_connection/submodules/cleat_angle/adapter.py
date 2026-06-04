@@ -354,7 +354,13 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         if missing_attrs:
             print(f'CleatAngle - Module missing required attributes: {missing_attrs}')
             print('CleatAngle - This indicates set_input_values failed. Module not properly initialized.')
-            return {}, []
+            if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
+                logs = module.logger.get_logs()
+            else:
+                logs = getattr(module, 'logs', []) or []
+            if not logs:
+                logs = ["No logs generated"]
+            return {}, logs
             
         # Generate output values in unformatted form.
         raw_output_text = module.output_values(True)

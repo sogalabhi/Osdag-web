@@ -428,6 +428,9 @@ export const EngineeringModule = ({
 
       // Lock inputs after successful design
       setIsInputLocked(true);
+    } else if (status.step === DESIGN_STATUS.ERROR) {
+      console.log(`[DESIGN_ERROR] Design failed. Setting logs=true`);
+      setDocks({ logs: true });
     } else if (isRedesigning || status.step === DESIGN_STATUS.CALCULATING || status.step === DESIGN_STATUS.CAD_GENERATING) {
       // Reset the completion flag when redesigning or during design process
       if (isRedesigning) {
@@ -1019,9 +1022,9 @@ export const EngineeringModule = ({
           {/* Logs Button */}
           <button
             onClick={toggleLogs}
-            disabled={!output}
+            disabled={!output && (!logs || logs.length === 0)}
             className={`w-9 h-9 flex items-center justify-center transition`}
-            title={output ? `${docks.logs ? 'Hide' : 'Show'} logs` : 'Run a design to view logs'}
+            title={(output || (logs && logs.length > 0)) ? `${docks.logs ? 'Hide' : 'Show'} logs` : 'Run a design to view logs'}
             type="button"
           >
             <svg
@@ -1357,7 +1360,7 @@ export const EngineeringModule = ({
           />
 
           {/* Logs Dock */}
-          {docks.logs && output && (
+          {docks.logs && (output || (logs && logs.length > 0)) && (
             <div className={`
               ${isMobile
                 ? (docks.cad ? 'h-[30%]' : 'fixed inset-0 z-50 h-full pt-[80px]')
