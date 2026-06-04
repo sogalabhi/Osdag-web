@@ -130,12 +130,37 @@ const AnchorBoltSectionModal = ({
                   value={designPrefInputs["DesignPreferences.Anchor_Bolt.OCF.Length"] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^0-9.-]/g, '');
+                    const decimalCount = (val.match(/\./g) || []).length;
+                    if (decimalCount > 1) {
+                      const firstDecimalIdx = val.indexOf('.');
+                      val = val.slice(0, firstDecimalIdx + 1) + val.slice(firstDecimalIdx + 1).replace(/\./g, '');
+                    }
+                    if (val.includes('-')) {
+                      const isNegative = val.startsWith('-');
+                      val = val.replace(/-/g, '');
+                      if (isNegative) val = '-' + val;
+                    }
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.OCF.Length": e.target.value,
-                    })
-                  }
+                      "DesignPreferences.Anchor_Bolt.OCF.Length": val,
+                    });
+                  }}
+                  onKeyDown={(e) => {
+                    const allowedKeys = [
+                      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+                      'Home', 'End', 'ArrowLeft', 'ArrowRight', '.', '-'
+                    ];
+                    const isShortcut = (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase());
+                    if (e.key === ' ') {
+                      e.preventDefault();
+                      return;
+                    }
+                    if (!allowedKeys.includes(e.key) && !isShortcut && isNaN(Number(e.key))) {
+                      e.preventDefault();
+                    }
+                  }}
                 />
               </div>
 
@@ -147,12 +172,37 @@ const AnchorBoltSectionModal = ({
                   value={designPrefInputs["DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite"] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^0-9.-]/g, '');
+                    const decimalCount = (val.match(/\./g) || []).length;
+                    if (decimalCount > 1) {
+                      const firstDecimalIdx = val.indexOf('.');
+                      val = val.slice(0, firstDecimalIdx + 1) + val.slice(firstDecimalIdx + 1).replace(/\./g, '');
+                    }
+                    if (val.includes('-')) {
+                      const isNegative = val.startsWith('-');
+                      val = val.replace(/-/g, '');
+                      if (isNegative) val = '-' + val;
+                    }
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": e.target.value,
-                    })
-                  }
+                      "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": val,
+                    });
+                  }}
+                  onKeyDown={(e) => {
+                    const allowedKeys = [
+                      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+                      'Home', 'End', 'ArrowLeft', 'ArrowRight', '.', '-'
+                    ];
+                    const isShortcut = (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase());
+                    if (e.key === ' ') {
+                      e.preventDefault();
+                      return;
+                    }
+                    if (!allowedKeys.includes(e.key) && !isShortcut && isNaN(Number(e.key))) {
+                      e.preventDefault();
+                    }
+                  }}
                 />
               </div>
             </div>
@@ -241,12 +291,37 @@ const AnchorBoltSectionModal = ({
                   value={designPrefInputs["DesignPreferences.Anchor_Bolt.ICF.Length"] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^0-9.-]/g, '');
+                    const decimalCount = (val.match(/\./g) || []).length;
+                    if (decimalCount > 1) {
+                      const firstDecimalIdx = val.indexOf('.');
+                      val = val.slice(0, firstDecimalIdx + 1) + val.slice(firstDecimalIdx + 1).replace(/\./g, '');
+                    }
+                    if (val.includes('-')) {
+                      const isNegative = val.startsWith('-');
+                      val = val.replace(/-/g, '');
+                      if (isNegative) val = '-' + val;
+                    }
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.ICF.Length": e.target.value,
-                    })
-                  }
+                      "DesignPreferences.Anchor_Bolt.ICF.Length": val,
+                    });
+                  }}
+                  onKeyDown={(e) => {
+                    const allowedKeys = [
+                      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+                      'Home', 'End', 'ArrowLeft', 'ArrowRight', '.', '-'
+                    ];
+                    const isShortcut = (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase());
+                    if (e.key === ' ') {
+                      e.preventDefault();
+                      return;
+                    }
+                    if (!allowedKeys.includes(e.key) && !isShortcut && isNaN(Number(e.key))) {
+                      e.preventDefault();
+                    }
+                  }}
                 />
               </div>
 
@@ -258,12 +333,37 @@ const AnchorBoltSectionModal = ({
                   value={designPrefInputs["DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite"] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^0-9.-]/g, '');
+                    const decimalCount = (val.match(/\./g) || []).length;
+                    if (decimalCount > 1) {
+                      const firstDecimalIdx = val.indexOf('.');
+                      val = val.slice(0, firstDecimalIdx + 1) + val.slice(firstDecimalIdx + 1).replace(/\./g, '');
+                    }
+                    if (val.includes('-')) {
+                      const isNegative = val.startsWith('-');
+                      val = val.replace(/-/g, '');
+                      if (isNegative) val = '-' + val;
+                    }
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": e.target.value,
-                    })
-                  }
+                      "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": val,
+                    });
+                  }}
+                  onKeyDown={(e) => {
+                    const allowedKeys = [
+                      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+                      'Home', 'End', 'ArrowLeft', 'ArrowRight', '.', '-'
+                    ];
+                    const isShortcut = (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase());
+                    if (e.key === ' ') {
+                      e.preventDefault();
+                      return;
+                    }
+                    if (!allowedKeys.includes(e.key) && !isShortcut && isNaN(Number(e.key))) {
+                      e.preventDefault();
+                    }
+                  }}
                 />
               </div>
             </div>
@@ -283,12 +383,37 @@ const AnchorBoltSectionModal = ({
                 value={designPrefInputs["DesignPreferences.Anchor_Bolt.Friction_coefficient"] || ""}
                 disabled={isInputLocked}
                 style={readOnlyFontStyle}
-                onChange={(e) =>
+                onChange={(e) => {
+                  let val = e.target.value.replace(/[^0-9.-]/g, '');
+                  const decimalCount = (val.match(/\./g) || []).length;
+                  if (decimalCount > 1) {
+                    const firstDecimalIdx = val.indexOf('.');
+                    val = val.slice(0, firstDecimalIdx + 1) + val.slice(firstDecimalIdx + 1).replace(/\./g, '');
+                  }
+                  if (val.includes('-')) {
+                    const isNegative = val.startsWith('-');
+                    val = val.replace(/-/g, '');
+                    if (isNegative) val = '-' + val;
+                  }
                   setDesignPrefInputs({
                     ...designPrefInputs,
-                    "DesignPreferences.Anchor_Bolt.Friction_coefficient": e.target.value,
-                  })
-                }
+                    "DesignPreferences.Anchor_Bolt.Friction_coefficient": val,
+                  });
+                }}
+                onKeyDown={(e) => {
+                  const allowedKeys = [
+                    'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+                    'Home', 'End', 'ArrowLeft', 'ArrowRight', '.', '-'
+                  ];
+                  const isShortcut = (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase());
+                  if (e.key === ' ') {
+                    e.preventDefault();
+                    return;
+                  }
+                  if (!allowedKeys.includes(e.key) && !isShortcut && isNaN(Number(e.key))) {
+                    e.preventDefault();
+                  }
+                }}
               />
             </div>
           </div>

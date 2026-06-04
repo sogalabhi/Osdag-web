@@ -276,6 +276,25 @@ const DesignPrefSections = ({
       draft["Detailing.Corrosive_Influences"] = draft.detailing_corr_status;
       draft["Design.Design_Method"] = draft.design_method;
     }
+
+    for (const [key, value] of Object.entries(draft)) {
+      if (key.includes("Designation") || key.includes("Type")) {
+        continue;
+      }
+      if (
+        value === undefined ||
+        value === null ||
+        (typeof value === "string" && value.trim() === "")
+      ) {
+        const displayName = key
+          .replace(/^(DesignPreferences\.)?Anchor_Bolt\./, "")
+          .replace(/_/g, " ")
+          .replace(/\./g, " ");
+        message.warning(`Please fill in the additional input: ${displayName}`);
+        return;
+      }
+    }
+
     const r = await runSync("save", draft);
     if (!r?.success) {
       return;

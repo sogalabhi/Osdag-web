@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { message } from "antd";
 
 /**
  * Status state machine types
@@ -78,6 +79,54 @@ export const useDesignSubmission = (service, moduleConfig) => {
       error: null
     });
 
+    if (moduleConfig.inputSections) {
+      for (const section of moduleConfig.inputSections) {
+        for (const field of section.fields || []) {
+          if (field.conditionalDisplay && !field.conditionalDisplay(extraState, inputs)) {
+            continue;
+          }
+
+          let value = inputs[field.key];
+          if (field.type === 'connectivitySelect' || field.type === 'endPlateSelect') {
+            value = extraState?.selectedOption || value;
+          }
+          const isCustomizable = field.type === 'customizable';
+
+          if (isCustomizable) {
+            const selectionKey = field.selectionKey;
+            const isCustomized = selectionStates?.[selectionKey] === 'Customized';
+            if (isCustomized && (!Array.isArray(value) || value.length === 0)) {
+              const errMsg = `Please select at least one value for ${field.label}.`;
+              setStatus({
+                step: DESIGN_STATUS.ERROR,
+                message: errMsg,
+                error: new Error(errMsg)
+              });
+              message.error(errMsg);
+              return;
+            }
+          } else {
+            if (
+              value === undefined ||
+              value === null ||
+              (typeof value === 'string' && value.trim() === '') ||
+              value === 'Select Section' ||
+              (Array.isArray(value) && value.length === 0)
+            ) {
+              const errMsg = `Please fill in the ${field.label} field.`;
+              setStatus({
+                step: DESIGN_STATUS.ERROR,
+                message: errMsg,
+                error: new Error(errMsg)
+              });
+              message.error(errMsg);
+              return;
+            }
+          }
+        }
+      }
+    }
+
     const validationResult = moduleConfig.validateInputs(
       inputs,
       extraState,
@@ -91,6 +140,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
         message: validationResult.message || 'Validation failed',
         error: new Error(validationResult.message)
       });
+      message.error(validationResult.message || 'Validation failed');
       return;
     }
 

@@ -82,12 +82,41 @@ Specifying whether the members are exposed to corrosive influences, here, only a
                       name="source"
                       className="input-design-pref"
                       value={designPrefInputs.detailing_gap}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        let val = e.target.value.replace(/[^0-9.-]/g, '');
+                        const decimalCount = (val.match(/\./g) || []).length;
+                        if (decimalCount > 1) {
+                          const firstDecimalIdx = val.indexOf('.');
+                          val = val.slice(0, firstDecimalIdx + 1) + val.slice(firstDecimalIdx + 1).replace(/\./g, '');
+                        }
+                        if (val.includes('-')) {
+                          const isNegative = val.startsWith('-');
+                          val = val.replace(/-/g, '');
+                          if (isNegative) {
+                            val = '-' + val;
+                          }
+                        }
                         setDesignPrefInputs({
                           ...designPrefInputs,
-                          detailing_gap: e.target.value,
-                        })
-                      }
+                          detailing_gap: val,
+                        });
+                      }}
+                      onKeyDown={(e) => {
+                        const allowedKeys = [
+                          'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+                          'Home', 'End', 'ArrowLeft', 'ArrowRight', '.', '-'
+                        ];
+                        const isShortcut = (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase());
+
+                        if (e.key === ' ') {
+                          e.preventDefault();
+                          return;
+                        }
+
+                        if (!allowedKeys.includes(e.key) && !isShortcut && isNaN(Number(e.key))) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   </div>
                 </div>
