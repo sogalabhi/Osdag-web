@@ -86,12 +86,61 @@ def run_design_calculation_task(self, module_name: str, submodule_slug: str, inp
     if not ServiceClass:
         raise ValueError(f"Service class for {module_name}/{submodule_slug} not found")
         
-    result = ServiceClass.calculate(
-        inputs=inputs,
-        request=None,
-        project_id=project_id,
-        user_email=user_email
-    )
+    from apps.core.main_registry import WebMainRegistry
+    WebMainRegistry.start_recording()
+    try:
+        result = ServiceClass.calculate(
+            inputs=inputs,
+            request=None,
+            project_id=project_id,
+            user_email=user_email
+        )
+    finally:
+        instances = WebMainRegistry.stop_recording()
+        
+    design_status = True
+    if result and isinstance(result, dict):
+        for inst in reversed(instances):
+            if hasattr(inst, 'design_status'):
+                design_status = bool(inst.design_status)
+                break
+        result['design_status'] = design_status
+        logger.info(f"Calculation task design_status resolved to: {design_status}")
+
+        # Extract logs from recorded instances if result logs is empty/falsy
+        if not result.get('logs'):
+            extracted_logs = []
+            from osdag_core.custom_logger import CustomLogger
+            for inst in reversed(instances):
+                if hasattr(inst, 'logger') and isinstance(inst.logger, CustomLogger):
+                    inst_logs = inst.logger.get_logs()
+                    if inst_logs:
+                        extracted_logs.extend(inst_logs)
+                elif hasattr(inst, 'logs') and inst.logs:
+                    extracted_logs.extend(inst.logs)
+            if extracted_logs:
+                result['logs'] = extracted_logs
+    else:
+        # Fallback if result is None or not a dict
+        for inst in reversed(instances):
+            if hasattr(inst, 'design_status'):
+                design_status = bool(inst.design_status)
+                break
+        extracted_logs = []
+        from osdag_core.custom_logger import CustomLogger
+        for inst in reversed(instances):
+            if hasattr(inst, 'logger') and isinstance(inst.logger, CustomLogger):
+                inst_logs = inst.logger.get_logs()
+                if inst_logs:
+                    extracted_logs.extend(inst_logs)
+            elif hasattr(inst, 'logs') and inst.logs:
+                extracted_logs.extend(inst.logs)
+        result = {
+            'success': False,
+            'data': {},
+            'logs': extracted_logs,
+            'design_status': design_status
+        }
     
     return result
 
