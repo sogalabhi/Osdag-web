@@ -332,8 +332,8 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     """
     if section == "Plate":
         section = "CoverPlate"
-    if section not in ("Model", "Column", "CoverPlate"):
-        raise InvalidInputTypeError("section", "'Model', 'Column' or 'CoverPlate'")
+    if section not in ("Model", "Column", "CoverPlate", "Bolt", "Weld"):
+        raise InvalidInputTypeError("section", "'Model', 'Column', 'CoverPlate', 'Bolt' or 'Weld'")
 
     module = create_from_input(input_values)
     from osdag_core.Common import KEY_DISP_COLUMNCOVERPLATE
@@ -350,17 +350,63 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     setup_for_cad(cld, module)
 
     # Map external section names to internal component names expected by CommonDesignLogic.
-    # For column cover plate, the core CAD logic expects component name "Cover Plate"
-    # (with a space) for the plate + bolts assembly. Using "Connector" here falls
-    # through to CPObj.get_models(), which can later be treated like a list and
-    # cause TypeErrors such as "object of type 'TopoDS_Compound' has no len()".
     internal_section = section
     if section == "CoverPlate":
         internal_section = "Cover Plate"
 
     cld.component = internal_section
     print(f"[cadissue] CC cover plate bolted: cld.component set to {internal_section} for section={section}")
-    model = cld.create2Dcad()
+
+    part_names = ["Column", "CoverPlate", "Bolt"]
+    part_files = {}
+    compound_model = None
+
+    try:
+        if section == "Model":
+            from OCC.Core.TopoDS import TopoDS_Compound
+            from OCC.Core.BRep import BRep_Builder
+            import json
+
+            builder = BRep_Builder()
+            compound = TopoDS_Compound()
+            builder.MakeCompound(compound)
+
+            for part in part_names:
+                try:
+                    cld.component = "Cover Plate" if part == "CoverPlate" else part
+                    part_shape = cld.create2Dcad()
+                    if part_shape is None:
+                        continue
+
+                    # Add to compound
+                    builder.Add(compound, part_shape)
+
+                    # Ensure per-part BREP file exists
+                    part_file_name = f"{session}_{part}.brep"
+                    part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
+                    BRepTools.breptools.Write(part_shape, part_file_path_rel, Message_ProgressRange())
+                    part_files[part] = part_file_path_rel
+
+                    # Write STL for this part
+                    try:
+                        part_stl_rel = part_file_path_rel.replace(".brep", ".stl")
+                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_rel))
+                    except Exception as stle:
+                        print(f"Failed to write STL for part {part} (CC cover plate bolted): {stle}")
+                except Exception as e:
+                    print(f"Failed to build/write part {part} in CC cover plate bolted: {e}")
+
+            cld.component = section
+            compound_model = compound
+
+        if compound_model is not None:
+            model = compound_model
+        else:
+            model = cld.create2Dcad()
+    except Exception as e:
+        print('Error in cld.create2Dcad() e : ', e)
+        traceback.print_exc()
+        raise
 
     # check if the cad_models folder exists or not 
     # if no, then create one 
@@ -388,6 +434,26 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
             print(f"Warning: Failed to save STL at {file_path}: {stle}")
 
         if section == "Model":
+            try:
+                import json
+                manifest = {
+                    "session": session,
+                    "mergedBrep": file_path,
+                    "parts": [
+                        {"name": name, "brepPath": part_files.get(name)} for name in part_names if part_files.get(name)
+                    ]
+                }
+                for entry in manifest["parts"]:
+                    if entry.get("brepPath"):
+                        entry["stlPath"] = entry["brepPath"].replace(".brep", ".stl")
+                manifest_path = file_path.replace(".brep", ".parts.json")
+                full_manifest_path = os.path.join(os.getcwd(), manifest_path)
+                with open(full_manifest_path, "w", encoding="utf-8") as mf:
+                    json.dump(manifest, mf)
+                print(f"Parts manifest saved at {full_manifest_path}")
+            except Exception as me:
+                print(f"Warning: Failed to write manifest: {me}")
+
             export_formats_lc = {f.lower() for f in export_formats} if export_formats else set()
 
             # Optional on-demand STEP/IGES exports

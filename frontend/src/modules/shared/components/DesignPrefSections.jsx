@@ -290,10 +290,21 @@ const DesignPrefSections = ({
   const resetInputs = async () => {
     const r = await runDefaults();
     if (!r?.success) return;
-    if (r.data?.resolved_inputs) setDesignPrefOverrides?.(toStoredPrefOverrides(r.data.resolved_inputs));
+    const backendDefaults = r.data?.resolved_inputs || {};
+    const frontendDefaults = typeof designPrefConfig.getDefaultPrefs === "function"
+      ? designPrefConfig.getDefaultPrefs({ ...inputsRef.current, ...backendDefaults }, module, backendDefaults)
+      : {};
+    const mergedDefaults = {
+      ...backendDefaults,
+      ...frontendDefaults,
+    };
+    setDesignPrefInputs(designPrefConfig.getInitialPrefs(mergedDefaults, module));
+    if (setDesignPrefOverrides) {
+      setDesignPrefOverrides(toStoredPrefOverrides(mergedDefaults));
+    }
     invalidateDesignOutputs();
     setConfirmationModal(false);
-    setDesignPrefModalStatus(false);
+    message.success("Preferences reset to defaults.");
   };
 
   const handleDiscard = () => {

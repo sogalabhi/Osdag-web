@@ -11,6 +11,119 @@ from typing import Any, Dict, List, Optional, Tuple
 VALID_OPERATIONS = frozenset({"open", "refresh", "save", "reset"})
 
 
+import importlib
+
+_CORE_CLASS_MAP = {
+    "FinPlateConnection": ("osdag_core.design_type.connection.fin_plate_connection", "FinPlateConnection"),
+    "EndPlateConnection": ("osdag_core.design_type.connection.end_plate_connection", "EndPlateConnection"),
+    "CleatAngleConnection": ("osdag_core.design_type.connection.cleat_angle_connection", "CleatAngleConnection"),
+    "SeatedAngleConnection": ("osdag_core.design_type.connection.seated_angle_connection", "SeatedAngleConnection"),
+    "Beam to Column End Plate Connection": ("osdag_core.design_type.connection.beam_column_end_plate", "BeamColumnEndPlate"),
+    "Beam Beam End Plate Connection": ("osdag_core.design_type.connection.beam_beam_end_plate_splice", "BeamBeamEndPlateSplice"),
+    "Column Cover Plate Bolted Connection": ("osdag_core.design_type.connection.column_cover_plate", "ColumnCoverPlate"),
+    "Beam Cover Plate Bolted Connection": ("osdag_core.design_type.connection.beam_cover_plate", "BeamCoverPlate"),
+    "Column Cover Plate Welded Connection": ("osdag_core.design_type.connection.column_cover_plate_weld", "ColumnCoverPlateWeld"),
+    "Beam Cover Plate Welded Connection": ("osdag_core.design_type.connection.beam_cover_plate_weld", "BeamCoverPlateWeld"),
+    "Column Column End Plate Connection": ("osdag_core.design_type.connection.column_end_plate", "ColumnEndPlate"),
+    "Base Plate": ("osdag_core.design_type.connection.base_plate_connection", "BasePlateConnection"),
+    "Simply Supported Beam Design": ("osdag_core.design_type.flexural_member.flexure", "Flexure"),
+    "On Cantilever Beam Design": ("osdag_core.design_type.flexural_member.flexure_cantilever", "Flexure_Cantilever"),
+    "Purlin Design": ("osdag_core.design_type.flexural_member.flexure_purlin", "Flexure_Purlin"),
+    "Compression Member Design": ("osdag_core.design_type.compression_member.compression_welded", "Compression_welded"),
+    "Axially Loaded Column": ("osdag_core.design_type.compression_member.compression_column", "ColumnDesign"),
+    "Struts Bolted to End Gusset": ("osdag_core.design_type.compression_member.compression_bolted", "Compression_bolted"),
+    "Struts Welded to End Gusset": ("osdag_core.design_type.compression_member.compression_welded", "Compression_welded"),
+    "Tension Member Bolted Design": ("osdag_core.design_type.tension_member.tension_bolted", "Tension_bolted"),
+    "Tension Member Welded Design": ("osdag_core.design_type.tension_member.tension_welded", "Tension_welded"),
+    "Butt Joint Bolted": ("osdag_core.design_type.connection.butt_joint_bolted", "ButtJointBolted"),
+    "Lap Joint Bolted": ("osdag_core.design_type.connection.lap_joint_bolted", "LapJointBolted"),
+    "Butt Joint Welded": ("osdag_core.design_type.connection.butt_joint_welded", "ButtJointWelded"),
+    "Lap Joint Welded": ("osdag_core.design_type.connection.lap_joint_welded", "LapJointWelded"),
+}
+
+_FRONTEND_TO_CORE_KEY_MAP = {
+    "bolt_tension_type": "Bolt.TensionType",
+    "bolt_hole_type": "Bolt.Bolt_Hole_Type",
+    "bolt_slip_factor": "Bolt.Slip_Factor",
+    "weld_fab": "Weld.Fab",
+    "weld_material_grade": "Weld.Material_Grade_OverWrite",
+    "detailing_edge_type": "Detailing.Edge_type",
+    "detailing_gap": "Detailing.Gap",
+    "detailing_corr_status": "Detailing.Corrosive_Influences",
+    "detailing_packing_plate": "Detailing.Packing_Plate",
+    "design_method": "Design.Design_Method",
+    "design_for": "Design.Design_For",
+    
+    # Base Plate specific:
+    "DesignPreferences.Anchor_Bolt.OCF.Designation": "DesignPreferences.Anchor_Bolt.OCF.Designation",
+    "DesignPreferences.Anchor_Bolt.OCF.Type": "DesignPreferences.Anchor_Bolt.OCF.Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Galvanized": "DesignPreferences.Anchor_Bolt.OCF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type": "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Length": "DesignPreferences.Anchor_Bolt.OCF.Length",
+    "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.ICF.Designation": "DesignPreferences.Anchor_Bolt.ICF.Designation",
+    "DesignPreferences.Anchor_Bolt.ICF.Type": "DesignPreferences.Anchor_Bolt.ICF.Type",
+    "DesignPreferences.Anchor_Bolt.ICF.Galvanized": "DesignPreferences.Anchor_Bolt.ICF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.ICF.Length": "DesignPreferences.Anchor_Bolt.ICF.Length",
+    "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.Friction_coefficient": "DesignPreferences.Anchor_Bolt.Friction_coefficient",
+    "DesignPreferences.Design.Base_Plate": "DesignPreferences.Design.Base_Plate",
+}
+
+def _get_core_defaults(module_session_name: str, inputs: Dict[str, Any], grade: str) -> Dict[str, Any]:
+    defaults = {}
+    if module_session_name not in _CORE_CLASS_MAP:
+        return defaults
+
+    try:
+        material_grade = grade or inputs.get("connector_material") or inputs.get("material") or inputs.get("member_material") or "E 250 (Fe 410 W)A"
+        if not material_grade or material_grade == "Select Material":
+            material_grade = "E 250 (Fe 410 W)A"
+            
+        core_inputs = {
+            "Material": material_grade,
+            "Stiffener_Key.Material": material_grade,
+            "Anchor Bolt.OCF.Diameter": [20],
+            "Anchor Bolt.ICF.Diameter": [20],
+            "Base_Plate.Material_St_Sk": material_grade,
+            "Material_St_Sk": material_grade,
+        }
+        for k, v in inputs.items():
+            if k in _FRONTEND_TO_CORE_KEY_MAP:
+                core_inputs[_FRONTEND_TO_CORE_KEY_MAP[k]] = v
+            else:
+                core_inputs[k] = v
+
+        module_path, class_name = _CORE_CLASS_MAP[module_session_name]
+        mod = importlib.import_module(module_path)
+        cls = getattr(mod, class_name)
+        instance = cls()
+        if hasattr(instance, "set_osdaglogger"):
+            instance.set_osdaglogger(None, id="web")
+        
+        # Set missing attributes to prevent AttributeError in get_values_for_design_pref
+        if not hasattr(instance, "design_status"):
+            instance.design_status = False
+        if not hasattr(instance, "load_axial_tension"):
+            instance.load_axial_tension = 0.0
+        if not hasattr(instance, "load_moment_minor"):
+            instance.load_moment_minor = 0.0
+
+        for frontend_key, core_key in _FRONTEND_TO_CORE_KEY_MAP.items():
+            try:
+                val = instance.get_values_for_design_pref(core_key, core_inputs)
+                if val is not None:
+                    if isinstance(val, str):
+                        val = val.strip()
+                    defaults[frontend_key] = val
+            except Exception:
+                pass
+    except Exception as e:
+        pass
+    return defaults
+
+
 def _material_row_for_grade(material_models, grade: str) -> List[Dict[str, Any]]:
     if not grade:
         return []
@@ -298,8 +411,24 @@ def merge_design_pref_sync(
                 copied[_driver_key] = copied_targets
         if design_pref_draft:
             out.update(design_pref_draft)
+        
+        # Populate defaults for missing keys
+        core_defaults = _get_core_defaults(module_session_name, out, grade)
+        for k, v in core_defaults.items():
+            if k not in out:
+                out[k] = v
+                if k not in defaulted_keys:
+                    defaulted_keys.append(k)
+    elif operation == "reset":
+        # reset: dock driver wins, targets are updated, and design prefs are reset to defaults
+        copied, grade = _apply_material_sync(out, module_session_name)
+        core_defaults = _get_core_defaults(module_session_name, out, grade)
+        for k, v in core_defaults.items():
+            out[k] = v
+            if k not in defaulted_keys:
+                defaulted_keys.append(k)
     else:
-        # refresh / reset: dock driver wins and propagates to all targets.
+        # refresh: dock driver wins and propagates to all targets.
         copied, grade = _apply_material_sync(out, module_session_name)
 
     material_details = {"connector": [], "supported": [], "supporting": []}

@@ -10,12 +10,12 @@ export const DEFAULT_VIEW_MAPPINGS = {
   "Column": ["Column"],
   // Plate view should show both Plate and Bolt/Bolts (for Fin Plate connections)
   "Plate": ["Plate", "Bolt", "Bolts", "Connector"],
-  "Connector": ["Connector", "cleatAngle", "SeatedAngle", "EndPlate"],
+  "Connector": ["Connector", "cleatAngle", "SeatedAngle", "EndPlate", "Bolt", "Bolts", "Weld", "Welds"],
   "CleatAngle": ["cleatAngle"],
   "SeatedAngle": ["SeatedAngle"],
-  "EndPlate": ["EndPlate", "Connector"],
+  "EndPlate": ["EndPlate", "Connector", "Bolt", "Bolts", "Weld", "Welds"],
   "Member": ["Member"],
-  "CoverPlate": ["CoverPlate", "Cover Plate", "Connector"],
+  "CoverPlate": ["CoverPlate", "Cover Plate", "Connector", "Bolt", "Bolts", "Weld", "Welds"],
   // Simple connections (desktop parity): Plate 1, Plate 2, Cover Plate, Bolts, Welds
   "Plate 1": ["Plate 1"],
   "Plate 2": ["Plate 2"],

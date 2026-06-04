@@ -388,13 +388,13 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP/STL file.
 
-    External API uses section names: "Model", "Beam", "CoverPlate".
-    Internally, the legacy CAD logic for beam cover plate uses component name "Connector"
+    External API uses section names: "Model", "Beam", "CoverPlate", "Bolt", "Weld".
+    Internally, the legacy CAD logic uses component name "Connector"
     for the cover plate + bolts assembly. Map CoverPlate -> Connector for CAD routing,
     but keep the external section name for file naming and response keys.
     """
-    if section not in ("Model", "Beam", "CoverPlate"):
-        raise InvalidInputTypeError("section", "'Model', 'Beam' or 'CoverPlate'")
+    if section not in ("Model", "Beam", "CoverPlate", "Bolt", "Weld"):
+        raise InvalidInputTypeError("section", "'Model', 'Beam', 'CoverPlate', 'Bolt' or 'Weld'")
 
     module = create_from_input(input_values)
 
@@ -420,7 +420,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     cld.component = internal_section
     print(f"[cadissue] BB cover plate bolted: cld.component set to {internal_section} for section={section}")
 
-    part_names = ["Beam", "Connector"]
+    part_names = ["Beam", "Connector", "Bolt", "Weld"]
     part_files = {}
     compound_model = None
 

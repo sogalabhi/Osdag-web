@@ -101,19 +101,19 @@ class CADGeneration(View):
         elif session_type == "SeatedAngleConnection":
             sections = ["Model", "Beam", "Column", "SeatedAngle", "Bolt", "Weld"]
         elif session_type == "CoverPlateBolted":
-            sections = ["Model", "Beam", "CoverPlate"]
+            sections = ["Model", "Beam", "CoverPlate", "Bolt"]
         elif session_type == "BeamBeamEndPlate":
-            sections = ["Model", "Beam", "Connector"]
+            sections = ["Model", "Beam", "Connector", "Bolt", "Weld"]
         elif session_type == "CoverPlateWelded":
-            sections = ["Model", "Beam", "Connector"]
+            sections = ["Model", "Beam", "Connector", "Weld"]
         elif session_type == "BeamToColumnEndPlate":
-            sections = ["Model", "Beam", "Column", "Connector"]
+            sections = ["Model", "Beam", "Column", "Connector", "Bolt", "Weld"]
         elif session_type == "ColumnCoverPlateBolted":
-            sections = ["Model", "Column", "CoverPlate"]
+            sections = ["Model", "Column", "CoverPlate", "Bolt"]
         elif session_type == "ColumnCoverPlateWelded":
-            sections = ["Model", "Column", "CoverPlate"]
+            sections = ["Model", "Column", "CoverPlate", "Weld"]
         elif session_type == "ColumnEndPlate":
-            sections = ["Model", "Column", "Connector"]
+            sections = ["Model", "Column", "Connector", "Bolt", "Weld"]
         elif session_type == "TensionMember":
             sections = ["Model", "Member", "Plate", "Endplate"]
         elif session_type in ("ButtJointWelded", "ButtJointBolted", "LapJointWelded", "LapJointBolted"):
