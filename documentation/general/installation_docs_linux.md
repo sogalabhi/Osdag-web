@@ -1,128 +1,300 @@
-# now give the entire steps. all 20+ steps to install in linux(ubuntu) cleary. i am making documentation. also mention the errors we might find how to fix them at last
+# Osdag-Web Installation Guide — Ubuntu / Linux
 
-Here is a **comprehensive, step-by-step guide to installing and configuring Osdag-web on Ubuntu/Linux**, covering all the steps from your Windows script (including database setup, dependency installation, code fixes, and configuration changes). At the end, you'll find a troubleshooting section listing common errors and their solutions.
+This guide covers two ways to run **Osdag-Web** on Ubuntu/Linux:
+
+- **[Option A — Docker Compose (Recommended)](#option-a-docker-compose-recommended)** — spins up all services (Postgres, Redis, Django, Celery, React) in containers with a single command.
+- **[Option B — Native Local Development (No Docker)](#option-b-native-local-development-no-docker)** — run services directly on your machine using Conda, pip, and Node.js.
 
 ---
 
-## **Osdag-web Installation Steps on Ubuntu/Linux**
+## Architecture Overview
 
-### **1. Update System Packages**
+| Service | Role |
+|---|---|
+| **Vite + React (frontend)** | UI, initiates design tasks, polls async task status |
+| **Django (backend)** | REST API, input validation, task dispatch |
+| **Celery worker** | Background processing (CAD, PDF, design calculations) |
+| **Redis** | Message broker + Celery result backend |
+| **PostgreSQL** | Persistent database |
+
+---
+
+## Option A: Docker Compose (Recommended)
+
+> This is the fastest path. All services are managed by Docker; you do **not** need to install Postgres, Redis, or Conda manually.
+
+### A.1 — System Requirements
+
+- **Ubuntu 20.04 LTS / 22.04 LTS** (or any modern Linux distro)
+- **Docker Engine 24.x+** and **Docker Compose v2**
+- At least **8 GB RAM** and **20 GB free disk** (backend image is large)
+
+### A.2 — Install Docker Engine
+
+```bash
+# Remove old Docker versions if present
+sudo apt remove -y docker docker-engine docker.io containerd runc
+
+# Install dependencies
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg lsb-release
+
+# Add Docker's official GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the Docker repository
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker Engine and Compose plugin
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+Verify the installation:
+
+```bash
+docker --version
+docker compose version
+```
+
+Add your user to the `docker` group so you can run Docker without `sudo`:
+
+```bash
+sudo usermod -aG docker $USER
+# Log out and log back in for this to take effect
+```
+
+### A.3 — Install Git
 
 ```bash
 sudo apt update
-sudo apt upgrade
-```
-
-
----
-
-### **2. Install System Build Tools**
-
-```bash
-sudo apt install -y build-essential cmake
-```
-
-*These are required for compiling dependencies.*
-
----
-
-### **3. Install Git (if not already installed)**
-
-```bash
 sudo apt install -y git
 ```
 
-
----
-
-### **4. Install Miniconda (if not already installed)**
-
-```bash
-# Download Miniconda installer
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-
-# Run the installer
-bash Miniconda3-latest-Linux-x86_64.sh
-
-# Follow prompts, say 'yes' to initialize Miniconda
-```
-
-*Restart your terminal after installation.*
-
----
-
-### **5. Clone the Osdag-web Repository**
+### A.4 — Clone the Repository
 
 ```bash
 git clone https://github.com/osdag-admin/Osdag-web.git
 cd Osdag-web
 ```
 
-*Or download and extract the zip, then `cd` into the folder.*
+### A.5 — Create the `.env` File
 
----
-
-### **6. Create and Activate a Conda Environment**
+Create a `.env` file in the project root (one-time setup):
 
 ```bash
-conda create -n osdag-env python=3.9
-conda activate osdag-env
+cat > .env << 'EOF'
+DEBUG=True
+SECRET_KEY=dev-secret-key
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+DATABASE_NAME=postgres_Intg_osdag
+DATABASE_USER=osdagdeveloper
+DATABASE_PASSWORD=password
+DATABASE_HOST=db
+DATABASE_PORT=5432
+
+REDIS_URL=redis://redis:6379/0
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+USE_REDIS_CACHE=false
+
+VITE_API_URL=http://localhost:8000
+EOF
 ```
 
+> **Note:** The `.env` file at the root is for Docker Compose services (backend, Celery, frontend). A separate `.env` inside `frontend/` controls the Vite dev server (`VITE_BASE_URL`).
+
+### A.6 — Build and Start All Services
+
+```bash
+docker compose up --build
+```
+
+This single command:
+1. Builds the backend image (Ubuntu 22.04 + Miniconda + Python 3.11 + pip packages)
+2. Builds the frontend image (Node 20 Alpine)
+3. Starts Postgres 14, Redis 7, Django backend, Celery worker, and Vite dev server
+4. Runs `python manage.py migrate` on first start
+
+> **First build** can take **15–30 minutes** due to the large backend dependency layer (TeX Live, VTK, etc.). Subsequent builds use Docker's layer cache and are much faster.
+
+### A.7 — Access the Application
+
+| Service | URL |
+|---|---|
+| Frontend (React) | http://localhost:5173 |
+| Backend (Django API) | http://localhost:8000 |
+
+### A.8 — Populate the Database (First Time Only)
+
+After the services are running, populate the structural section database:
+
+```bash
+docker compose exec backend bash -c "source /opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && python populate_database.py"
+```
+
+### A.9 — Useful Docker Commands
+
+```bash
+# Follow logs for all services
+docker compose logs -f
+
+# Follow logs for specific services
+docker compose logs -f backend celery_worker
+
+# Check container status
+docker compose ps
+
+# Stop containers (keeps volumes/data)
+docker compose stop
+
+# Start again
+docker compose up -d
+
+# Full reset — deletes all volumes and data
+docker compose down -v
+
+# Rebuild only specific services
+docker compose build backend celery_worker frontend
+
+# Open a shell in the backend container
+docker compose exec backend bash
+```
+
+### A.10 — Verify Celery Is Working
+
+```bash
+docker compose exec backend bash -c \
+  "source /opt/miniconda/etc/profile.d/conda.sh && \
+   conda activate myenv && \
+   python -c \"from apps.core.tasks import healthcheck_task; print(healthcheck_task.delay().id)\""
+
+# Then check the worker picked it up
+docker compose logs --tail=50 celery_worker
+```
+
+### A.11 — Production Deployment
+
+For production, use the production compose file which enables `DEBUG=False`, `collectstatic`, persistent named volumes, and the Nginx frontend:
+
+```bash
+# Create a production .env with strong secrets
+cp .env .env.prod
+# Edit .env.prod: set strong SECRET_KEY, DATABASE_PASSWORD, DEBUG=False, ALLOWED_HOSTS
+
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+> **Security notes:**
+> - Never commit secrets or production `.env` files to Git.
+> - Use a strong random `SECRET_KEY` in production (e.g. `python -c "import secrets; print(secrets.token_hex(50))"`)
+> - Set `ALLOWED_HOSTS` to your actual domain, not `*`.
+> - Set a strong `DATABASE_PASSWORD`.
 
 ---
 
-### **7. Install Python Dependencies from requirements.txt**
+## Option B: Native Local Development (No Docker)
+
+Use this if you prefer to run services directly on your machine or cannot use Docker.
+
+### B.1 — System Requirements
+
+- Ubuntu 20.04 LTS / 22.04 LTS
+- At least **8 GB RAM**, **20 GB free disk**
+- sudo / admin privileges
+
+### B.2 — Install System Build Tools
 
 ```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y \
+  build-essential cmake curl wget git \
+  libpq-dev libssl-dev libgl1-mesa-glx libglu1-mesa \
+  software-properties-common
+```
+
+### B.3 — Install wkhtmltopdf (required for PDF reports)
+
+```bash
+sudo apt install -y wkhtmltopdf
+```
+
+### B.4 — Install TeX Live (required for LaTeX report generation)
+
+```bash
+sudo apt install -y texlive-full
+```
+
+> `texlive-full` is large (~4 GB). If disk space is a concern, use `texlive-latex-extra` as a lighter alternative, though some report templates may not render correctly.
+
+### B.5 — Install Miniconda
+
+```bash
+# Download Miniconda installer (Python 3.x)
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
+
+# Run the installer (non-interactive)
+bash ~/miniconda.sh -b -p ~/miniconda3
+
+# Initialize conda for bash
+~/miniconda3/bin/conda init bash
+
+# Reload shell
+source ~/.bashrc
+```
+
+Verify:
+
+```bash
+conda --version
+```
+
+### B.7 — Create and Activate a Conda Environment
+
+The application uses **Python 3.11** (matching the Dockerfile):
+
+```bash
+conda create -n osdag-web python=3.11 -y
+conda activate osdag-web
+```
+
+> **Important:** Keep this environment activated for all subsequent steps and every time you run the application.
+
+### B.8 — Clone the Repository
+
+```bash
+git clone https://github.com/osdag-admin/Osdag-web.git
+cd Osdag-web
+```
+
+### B.9 — Install Python Dependencies
+
+```bash
+pip install --upgrade pip pyopenssl
 pip install -r requirements.txt
 ```
 
-*If any package fails, try installing it manually with pip or conda.*
+> If any package fails to build, ensure `build-essential`, `libpq-dev`, and `libssl-dev` are installed (Step B.2).
 
----
-
-### **8. Install Additional Conda and Pip Packages**
+### B.10 — Install PostgreSQL
 
 ```bash
-conda install -c conda-forge pythonocc-core pylatex
-pip install psycopg2-binary django numpy pandas matplotlib
-```
-
-
----
-
-### **9. Install TeX Live (for PDF/LaTeX features)**
-
-```bash
-sudo apt install -y texlive-latex-extra
-```
-
-
----
-
-### **10. Install FreeCAD (if required by Osdag)**
-
-```bash
-sudo apt install -y snapd
-sudo snap install freecad
-```
-
-
----
-
-### **11. Install PostgreSQL**
-
-```bash
-sudo apt install -y postgresql postgresql-contrib
+# Add official PostgreSQL repository (for Postgres 14+)
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt update
+sudo apt install -y postgresql-14 postgresql-contrib
 sudo systemctl start postgresql
 sudo systemctl enable postgresql
 ```
 
-
----
-
-### **12. Create PostgreSQL User and Database**
+### B.11 — Create PostgreSQL Role and Database
 
 ```bash
 sudo -u postgres psql
@@ -136,91 +308,73 @@ CREATE DATABASE "postgres_Intg_osdag" WITH OWNER osdagdeveloper;
 \q
 ```
 
-
----
-
-### **13. Update Django Database Settings**
-
-Edit `osdag_api/settings.py` (or wherever your Django DB config is):
-
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres_Intg_osdag',
-        'USER': 'osdagdeveloper',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
-
-
----
-
-### **14. Update Database Credentials in Python Scripts**
-
-Edit any scripts that connect directly to the database (like `populate_database.py`, `update_sequences.py`):
-
-```python
-conn = psycopg2.connect(
-    dbname='postgres_Intg_osdag',
-    user='osdagdeveloper',
-    password='password',
-    host='localhost',
-    port=5432
-)
-```
-
-*Search for `psycopg2.connect` and update the parameters accordingly.*
-
----
-
-### **15. Fix Typing Import in module_finder.py**
-
-Open `osdag_api/module_finder.py` and ensure the top imports look like:
-
-```python
-from typing import Dict, Any, List
-from typing_extensions import Protocol as _Protocol
-```
-
-*Remove `_Protocol` from any `from typing import ...` line.*
-
----
-
-### **16. Switch to the winter24 Branch**
+### B.12 — Install Redis
 
 ```bash
-git checkout winter24
+sudo apt install -y redis-server
+sudo systemctl start redis-server
+sudo systemctl enable redis-server
 ```
 
-*If you need the latest development features.*
+Verify:
 
----
+```bash
+redis-cli ping
+# Expected output: PONG
+```
 
-### **17. Run Database Setup and Migrations**
+### B.13 — Configure Django Settings
+
+The backend reads settings from environment variables (defined in `backend/config/settings.py`). For local development, you can export them or create a `.env` file at the project root.
+
+The default values already match the Postgres role created in Step B.11:
+
+```
+DATABASE_NAME=postgres_Intg_osdag
+DATABASE_USER=osdagdeveloper
+DATABASE_PASSWORD=password
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+SECRET_KEY=dev-secret-key
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+REDIS_URL=redis://127.0.0.1:6379/0
+CELERY_BROKER_URL=redis://127.0.0.1:6379/0
+CELERY_RESULT_BACKEND=redis://127.0.0.1:6379/0
+USE_REDIS_CACHE=false
+```
+
+If you changed the Postgres password, update `DATABASE_PASSWORD` accordingly.
+
+### B.14 — Run Django Migrations
+
+```bash
+cd backend
+python manage.py migrate
+cd ..
+```
+
+### B.15 — Populate the Structural Database (First Time Only)
 
 ```bash
 python populate_database.py
-python update_sequences.py
-python manage.py migrate
 ```
 
+> This script reads `osdag_core/data/ResourceFiles/Database/postgres_Intg_osdag.sql` and populates the section tables.
 
----
+### B.16 — Install Node.js and NPM (for the Frontend)
 
-### **18. Install Node.js and NPM (for frontend)**
+Use NVM (Node Version Manager) to install the correct Node.js version. The frontend requires **Node 20**:
 
 ```bash
-sudo apt install -y nodejs npm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc
+nvm install 20
+nvm use 20
+node --version   # Should show v20.x.x
 ```
 
-
----
-
-### **19. Install Frontend Dependencies**
+### B.17 — Install Frontend Dependencies
 
 ```bash
 cd frontend
@@ -228,82 +382,154 @@ npm install
 cd ..
 ```
 
+### B.18 — Configure Frontend Environment
 
----
-
-### **20. Run the Django Server**
+The frontend reads `VITE_BASE_URL` from `frontend/.env`:
 
 ```bash
+# frontend/.env already exists; verify it points to your backend
+cat frontend/.env
+# Should show: VITE_BASE_URL=http://127.0.0.1:8000/
+```
+
+### B.19 — Start All Services
+
+You need **three separate terminal sessions**, all with the conda environment activated.
+
+**Terminal 1 — Django Backend:**
+
+```bash
+conda activate osdag-web
+cd Osdag-web/backend
 python manage.py runserver 8000
 ```
 
-*Visit `http://localhost:8000` in your browser.*
-
----
-
-### **21. Install and Launch pgAdmin**
+**Terminal 2 — Celery Worker:**
 
 ```bash
-sudo apt install -y pgadmin4
-pgadmin4
+conda activate osdag-web
+cd Osdag-web/backend
+celery -A config worker --loglevel=info
 ```
 
-*Use pgAdmin for graphical database management.*
+> Celery must be running for design calculations, CAD generation, and PDF report creation to work. Without it, requests will hang indefinitely.
+
+**Terminal 3 — Vite Frontend Dev Server:**
+
+```bash
+cd Osdag-web/frontend
+npm run dev
+```
+
+### B.20 — Access the Application
+
+Navigate to **http://localhost:5173** in your browser.
+
+The frontend (port 5173) talks to the Django API (port 8000). Celery picks up tasks from Redis (port 6379).
 
 ---
 
-### **22. Install Any Other Required Tools**
+### 💡 Tip: Create a `run-osdag.sh` Launcher Script
 
-*Refer to Osdag-web documentation for any project-specific requirements.*
+Instead of opening three terminals manually every time, you can create a single shell script that starts all services at once in separate terminal tabs/windows using `gnome-terminal` (default on Ubuntu).
+
+Create the file anywhere you like, e.g. your home directory:
+
+```bash
+nano ~/run-osdag.sh
+```
+
+Paste the following — **replace `/path/to/Osdag-web` with the actual path to your cloned project folder**:
+
+```bash
+#!/bin/bash
+
+# -----------------------------------------------
+# run-osdag.sh — Start all Osdag-Web services
+# Update PROJECT_DIR to your actual project path
+# -----------------------------------------------
+
+PROJECT_DIR="/path/to/Osdag-web"   # <--- CHANGE THIS
+CONDA_ENV="osdag-web"
+
+ACTIVATE="source \$(conda info --base)/etc/profile.d/conda.sh && conda activate $CONDA_ENV"
+
+gnome-terminal \
+  --tab --title="Django Backend" -- bash -c \
+    "$ACTIVATE && cd $PROJECT_DIR/backend && python manage.py runserver 8000; exec bash" \
+  --tab --title="Celery Worker" -- bash -c \
+    "$ACTIVATE && cd $PROJECT_DIR/backend && celery -A config worker --loglevel=info; exec bash" \
+  --tab --title="Vite Frontend" -- bash -c \
+    "cd $PROJECT_DIR/frontend && npm run dev; exec bash"
+```
+
+Make it executable and run it:
+
+```bash
+chmod +x ~/run-osdag.sh
+~/run-osdag.sh
+```
+
+> **Note:** This uses `gnome-terminal`, which is the default terminal on Ubuntu with GNOME. If you use a different terminal (e.g. `xterm`, `konsole`, `xfce4-terminal`), replace `gnome-terminal --tab` with the equivalent flag for your terminal emulator.
 
 ---
 
-## **Troubleshooting \& Common Errors**
+## Troubleshooting & Common Errors
 
-| Error Message | Likely Cause | Solution |
-| :-- | :-- | :-- |
-| `psycopg2.OperationalError: FATAL: password authentication failed` | Wrong DB username/password | Double-check credentials in `settings.py` and scripts |
-| `ModuleNotFoundError: No module named ...` | Missing Python package | Run `pip install <package>` or `conda install <package>` |
-| `ERROR: Could not build wheels for ...` | Missing build tools | Ensure `build-essential` and `cmake` are installed |
-| `django.db.utils.OperationalError: FATAL: database ... does not exist` | Wrong DB name or not created | Check DB name in `settings.py` and that DB exists in PostgreSQL |
-| `Permission denied` when running scripts | Lack of executable permissions | Run `chmod +x script.sh` or use `sudo` if needed |
-| `pip: command not found` | pip not installed in conda env | Run `conda install pip` |
-| `ImportError: cannot import name '_Protocol'` | Typing import issue | Fix imports in `module_finder.py` as described above |
-| `pgAdmin4 fails to launch` | Missing dependencies | Try running `sudo apt --fix-broken install` and reinstall pgAdmin4 |
-| `npm: command not found` | Node.js/NPM not installed | Run `sudo apt install nodejs npm` |
-
+| Error | Likely Cause | Solution |
+|---|---|---|
+| `psycopg2.OperationalError: FATAL: password authentication failed` | Wrong DB credentials | Verify `DATABASE_USER`/`DATABASE_PASSWORD` match what you created in PostgreSQL |
+| `psycopg2.OperationalError: could not connect to server` | PostgreSQL not running | Run `sudo systemctl start postgresql` |
+| `django.db.utils.OperationalError: database "postgres_Intg_osdag" does not exist` | DB not created | Run the `CREATE DATABASE` SQL in Step B.11 |
+| `ModuleNotFoundError: No module named '...'` | Missing Python package | Run `pip install -r requirements.txt` in the active conda env |
+| `ERROR: Could not build wheels for ...` | Missing build tools | Run Step B.2 to install `build-essential`, `cmake`, `libpq-dev` |
+| `ConnectionRefusedError: [Errno 111] Connection refused` (Redis) | Redis not running | Run `sudo systemctl start redis-server` or `redis-cli ping` to check |
+| `celery.exceptions.NotRegistered` | Celery worker not running | Start the Celery worker in Terminal 2 (Step B.19) |
+| Frontend shows blank page / API errors | Wrong `VITE_BASE_URL` | Check `frontend/.env` has `VITE_BASE_URL=http://127.0.0.1:8000/` |
+| `npm: command not found` | Node.js not installed | Install via NVM (Step B.16) |
+| `Permission denied` when running scripts | Missing executable permission | Run `chmod +x <script>` or prefix with `sudo` |
+| Docker build takes very long | Large dependencies (VTK, TeX Live, etc.) | Expected on first build; subsequent builds use Docker cache |
+| `docker compose: command not found` | Old Docker Compose v1 installed | Install Docker Compose v2 plugin (Step A.2); use `docker compose` not `docker-compose` |
+| `LD_PRELOAD` errors in Docker container | libstdc++ path | Already set in Dockerfile: `ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6` |
+| `populate_database.py` fails | Wrong DB connection | Verify Postgres is running and credentials in Step B.11 match the script defaults |
 
 ---
 
-## **Summary Table: Key Steps**
+## Summary: Key Steps
+
+### Docker Path (Recommended)
 
 | Step | Task |
-| :-- | :-- |
-| 1 | Update system packages |
-| 2 | Install build tools |
-| 3 | Install git |
-| 4 | Install Miniconda |
-| 5 | Clone Osdag-web repo |
-| 6 | Create/activate conda env |
-| 7 | Install Python dependencies |
-| 8 | Install extra conda/pip packages |
-| 9 | Install TeX Live |
-| 10 | Install FreeCAD |
-| 11 | Install PostgreSQL |
-| 12 | Create DB/user in PostgreSQL |
-| 13 | Update Django settings.py |
-| 14 | Update DB creds in scripts |
-| 15 | Fix typing import in module_finder.py |
-| 16 | Checkout develop branch |
-| 17 | Run DB setup/migrations |
-| 18 | Install Node.js/NPM |
-| 19 | Install frontend deps |
-| 20 | Run Django server |
-| 21 | Install/launch pgAdmin |
-| 22 | Install extra tools |
+|---|---|
+| A.1 | Confirm system requirements |
+| A.2 | Install Docker Engine + Compose v2 |
+| A.3 | Install Git |
+| A.4 | Clone repository |
+| A.5 | Create `.env` file |
+| A.6 | `docker compose up --build` |
+| A.7 | Open http://localhost:5173 |
+| A.8 | Populate DB (first time only) |
 
+### Native Path
 
----
-
-**This guide covers all steps found in your Windows script, adapted for Ubuntu/Linux, including all code and configuration changes required for a successful setup.**
-If you encounter any issues, refer to the troubleshooting section above for solutions.
+| Step | Task |
+|---|---|
+| B.1 | Confirm system requirements |
+| B.2 | Install system build tools |
+| B.3 | Install wkhtmltopdf |
+| B.4 | Install TeX Live |
+| B.5 | Install Miniconda |
+| B.6 | Create conda env (Python 3.11) |
+| B.7 | Clone repository |
+| B.8 | Install Python deps (`pip install -r requirements.txt`) |
+| B.9 | Install PostgreSQL 14 |
+| B.10 | Create Postgres role + database |
+| B.11 | Install Redis |
+| B.12 | Configure Django environment variables |
+| B.13 | Run `python manage.py migrate` |
+| B.14 | Run `python populate_database.py` |
+| B.15 | Install Node.js 20 via NVM |
+| B.16 | Install frontend deps (`npm install`) |
+| B.17 | Configure frontend `.env` |
+| B.18 | Start Django, Celery, and Vite (3 terminals) |
+| B.19 | Open http://localhost:5173 |
