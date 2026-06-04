@@ -4087,21 +4087,28 @@ class CommonDesignLogic(object):
                         final_model = self.CPObj.get_only_beams_Models()
                     else:
                         final_model = self.CPObj.get_beam_models()
-                elif self.component == "Connector":
+                elif self.component in ("Plate", "CoverPlate", "Cover Plate", "Connector"):
+                    cadlist = [self.CPObj.get_flangewebplatesModel()]
+                    if self.B.preference != 'Outside':
+                        cadlist.insert(1, self.CPObj.get_innetplatesModels())
+                elif self.component in ("Bolt", "Bolts"):
                     if self.connection == KEY_DISP_BEAMCOVERPLATE:
-                        cadlist = [self.CPObj.get_flangewebplatesModel(), self.CPObj.get_nut_bolt_arrayModels()]
-                        if self.B.preference != 'Outside':
-                            cadlist.insert(1, self.CPObj.get_innetplatesModels())
-                    else:
-                        cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_welded_modules()]
+                        cadlist = [self.CPObj.get_nut_bolt_arrayModels()]
+                elif self.component in ("Weld", "Welds"):
+                    if self.connection == KEY_DISP_BEAMCOVERPLATEWELD:
+                        cadlist = [self.CPObj.get_welded_modules()]
                 else:
                     cadlist = self.CPObj.get_models()
 
             elif self.connection == KEY_DISP_BB_EP_SPLICE:
                 if self.component == "Beam":
                     final_model = self.CPObj.get_beam_models()
-                elif self.component == "Connector":
-                    final_model = self.CPObj.get_connector_models()
+                elif self.component in ("Plate", "CoverPlate", "Cover Plate", "Connector"):
+                    final_model = self.CPObj.get_plate_connector_models()
+                elif self.component in ("Bolt", "Bolts"):
+                    final_model = self.CPObj.get_nut_bolt_array_models()
+                elif self.component in ("Weld", "Welds"):
+                    final_model = self.CPObj.get_welded_models()
                 else:
                     final_model = self.CPObj.get_models()
 
@@ -4110,8 +4117,12 @@ class CommonDesignLogic(object):
                     final_model = self.CPObj.get_column_models()
                 elif self.component == "Beam":
                     final_model = self.CPObj.get_beam_models()
-                elif self.component == "Connector":
-                    final_model = self.CPObj.get_connector_models()
+                elif self.component in ("Plate", "CoverPlate", "Cover Plate", "Connector"):
+                    final_model = self.CPObj.get_plate_connector_models()
+                elif self.component in ("Bolt", "Bolts"):
+                    final_model = self.CPObj.get_nut_bolt_array_models()
+                elif self.component in ("Weld", "Welds"):
+                    final_model = self.CPObj.get_welded_models()
                 else:
                     final_model = self.CPObj.get_models()
 
@@ -4121,33 +4132,44 @@ class CommonDesignLogic(object):
                         final_model = self.CPObj.get_only_column_models()
                     else:
                         final_model = self.CPObj.get_column_models()
-                elif self.component == "Cover Plate":
+                elif self.component in ("Plate", "CoverPlate", "Cover Plate", "Connector"):
+                    cadlist = [self.CPObj.get_plate_models()]
+                elif self.component in ("Bolt", "Bolts"):
                     if self.connection == KEY_DISP_COLUMNCOVERPLATE:
-                        cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_nut_bolt_models()]
-                    else:
-                        cadlist = [self.CPObj.get_plate_models(), self.CPObj.get_welded_modules()]
+                        cadlist = [self.CPObj.get_nut_bolt_models()]
+                elif self.component in ("Weld", "Welds"):
+                    if self.connection == KEY_DISP_COLUMNCOVERPLATEWELD:
+                        cadlist = [self.CPObj.get_welded_modules()]
                 else:
                     cadlist = self.CPObj.get_models()
 
             elif self.connection == KEY_DISP_COLUMNENDPLATE:
                 if self.component == "Column":
                     final_model = self.CEPObj.get_column_models()
-                elif self.component == "Connector":
+                elif self.component in ("Plate", "CoverPlate", "Cover Plate", "Connector"):
                     plates = self.CEPObj.get_plate_models()
-                    welds = self.CEPObj.get_weld_models()
+                    cadlist = [plates]
+                elif self.component in ("Bolt", "Bolts"):
                     nutBolts = self.CEPObj.get_nut_bolt_models()
-                    cadlist = [plates, welds, nutBolts]
+                    cadlist = [nutBolts]
+                elif self.component in ("Weld", "Welds"):
+                    welds = self.CEPObj.get_weld_models()
+                    cadlist = [welds]
                 else:
                     final_model = self.CEPObj.get_models()
 
             elif self.connection == KEY_DISP_BASE_PLATE:
                 if self.component == "Column":
                     final_model = self.BPObj.get_column_model()
-                elif self.component == "Connector":
+                elif self.component in ("Plate", "CoverPlate", "Cover Plate", "Connector"):
                     plate = self.BPObj.get_plate_connector_models()
+                    cadlist = [plate]
+                elif self.component in ("Weld", "Welds"):
                     weld = self.BPObj.get_welded_models()
+                    cadlist = [weld]
+                elif self.component in ("Bolt", "Bolts"):
                     nut_bolt = self.BPObj.get_nut_bolt_array_models()
-                    cadlist = [plate, weld, nut_bolt]
+                    cadlist = [nut_bolt]
                 else:
                     final_model = self.BPObj.get_models()
 

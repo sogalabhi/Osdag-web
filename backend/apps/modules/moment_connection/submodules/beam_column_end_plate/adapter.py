@@ -516,8 +516,8 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     """Generate the CAD model from input values as a BREP file. Return file path."""
     if section == "Plate":
         section = "Connector"
-    if section not in ("Model", "Beam", "Column", "Connector"):
-        raise InvalidInputTypeError("section", "'Model', 'Beam', 'Column' or 'Connector'")
+    if section not in ("Model", "Beam", "Column", "Connector", "Bolt", "Weld"):
+        raise InvalidInputTypeError("section", "'Model', 'Beam', 'Column', 'Connector', 'Bolt' or 'Weld'")
 
     module = create_from_input(input_values)
     from osdag_core.Common import KEY_DISP_BCENDPLATE
@@ -538,7 +538,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
 
     # When section == "Model", also ensure per-part shapes exist and prepare a compound
     # Try to include additional subparts like Welds and Bolts if available
-    part_names = ["Beam", "Column", "Connector"]
+    part_names = ["Beam", "Column", "Connector", "Bolt", "Weld"]
     part_files = {}
     compound_model = None
 
