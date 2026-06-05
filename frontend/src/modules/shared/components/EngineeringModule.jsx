@@ -205,7 +205,6 @@ export const EngineeringModule = ({
   const [isInputLocked, setIsInputLocked] = useState(false);
   const [showUnlockWarning, setShowUnlockWarning] = useState(false);
   const [showOptionsContainer, setShowOptionsContainer] = useState(false); // New state for options container
-  const [isGridActive, setIsGridActive] = useState(false);
   const [isRedesigning, setIsRedesigning] = useState(false); // New state for re-design operations
   const [selectedSection, setSelectedSection] = useState(["Model"]);
   const [selectedCameraView, setSelectedCameraView] = useState("Model");
@@ -459,9 +458,6 @@ export const EngineeringModule = ({
     }
   }, [status.step, output, isRedesigning, isMobile]);
 
-  const handleGridToggle = () => {
-    setIsGridActive(!isGridActive);
-  };
 
   const handleSubmitEnhanced = useCallback(async () => {
     setIsInputLocked(false);
