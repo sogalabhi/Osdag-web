@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 
 export const useViewport = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1280);
   const [isLandscape, setIsLandscape] = useState(
-    window.innerWidth > window.innerHeight && window.innerWidth < 768
+    window.innerWidth > window.innerHeight && window.innerWidth < 1280
   );
 
   const checkViewportRef = useRef(() => {
     const width = window.innerWidth;
     const height = window.innerHeight;
-    const mobile = width < 768;
+    const mobile = width < 1280;
     setIsMobile(mobile);
     setIsLandscape(width > height && mobile);
   });

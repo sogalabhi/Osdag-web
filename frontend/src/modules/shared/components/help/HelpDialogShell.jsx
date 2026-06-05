@@ -9,7 +9,7 @@ export const HelpDialogShell = ({
   children,
   footer,
 }) => {
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 1280;
 
   return (
     <Modal

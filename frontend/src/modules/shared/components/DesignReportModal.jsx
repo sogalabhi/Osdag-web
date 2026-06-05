@@ -314,13 +314,13 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
       onCancel={onCancel}
       footer={null}
       className={`designModal [&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4 ${
-        window.innerWidth < 768 
+        window.innerWidth < 1280 
           ? '[&_.ant-modal]:!w-screen [&_.ant-modal]:!h-screen [&_.ant-modal]:!top-0 [&_.ant-modal]:!max-w-full [&_.ant-modal]:!m-0 [&_.ant-modal]:!left-0 [&_.ant-modal-body]:!p-4 [&_.ant-modal-body]:!h-[calc(100vh-55px)] [&_.ant-modal-body]:!overflow-y-auto' 
           : ''
       }`}
       title="Design Report Summary"
-      width={window.innerWidth < 768 ? '100vw' : 1400}
-      style={window.innerWidth < 768 ? { 
+      width={window.innerWidth < 1280 ? '100vw' : 1400}
+      style={window.innerWidth < 1280 ? { 
         maxWidth: '100vw',
         top: 0,
         paddingBottom: 0

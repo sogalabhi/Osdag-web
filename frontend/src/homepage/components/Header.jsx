@@ -37,6 +37,7 @@ const Header = ({ setshowSideBar, active }) => {
   const [showAbout, setShowAbout] = useState(false);
   const [showAskQuestion, setShowAskQuestion] = useState(false);
   const [showPluginsTooltip, setShowPluginsTooltip] = useState(false);
+  const [showThemeTooltip, setShowThemeTooltip] = useState(false);
 
   // Check if user is a guest
   const isGuest = isGuestUser();
@@ -554,28 +555,33 @@ const Header = ({ setshowSideBar, active }) => {
                 </button>
               </div>
               {/* Theme Toggle Button - Mobile */}
-              <div className="relative group">
+              <div
+                className="relative group cursor-not-allowed"
+                onClick={() => {
+                  setShowThemeTooltip(true);
+                  setTimeout(() => setShowThemeTooltip(false), 2000);
+                }}
+              >
                 <button
-                  onClick={toggleTheme}
-                  className="p-2 sm:p-3 text-osdag-text-muted hover:text-white dark:text-gray-400 dark:hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl"
+                  disabled
+                  className="p-2 sm:p-3 text-osdag-text-muted dark:text-gray-400 opacity-40 pointer-events-none"
                 >
-                  {isDark ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      height="24px"
-                      viewBox="0 -960 960 960"
-                      width="24px"
-                      fill="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
-                    </svg>
-                  ) : (
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M21.64 13.64a1 1 0 00-1.05-.24 8 8 0 01-10-10 1 1 0 00-.24-1.05A1 1 0 008.73 2 10 10 0 1022 15.27a1 1 0 00-.36-1.63z" />
-                    </svg>
-                  )}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path d="M480-360q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0 80q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
+                  </svg>
                 </button>
+                {showThemeTooltip && (
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-white dark:bg-gray-800 text-black dark:text-white text-xs px-2 py-1 border border-gray-300 dark:border-gray-700 shadow-md rounded whitespace-nowrap z-30">
+                    Under Development
+                  </div>
+                )}
               </div>
               {/* Profile Icon - Mobile */}
               <div className="relative profile-dropdown group">
