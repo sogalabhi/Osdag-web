@@ -25,6 +25,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='osifile',
             name='file',
-            field=models.FileField(storage=django.core.files.storage.FileSystemStorage(base_url='/osifiles/', location=pathlib.PurePosixPath('/home/abhijith/coding/osdag/Osdag-web/osifiles')), upload_to=''),
+            field=models.FileField(storage=django.core.files.storage.FileSystemStorage(base_url='/osifiles/', location=pathlib.PurePosixPath('/Users/varnikumarpatel/Study/Osdag-web/osifiles')), upload_to=''),
         ),
     ]
