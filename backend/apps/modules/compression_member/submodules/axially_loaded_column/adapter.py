@@ -218,7 +218,7 @@ def create_from_input(input_values: Dict[str, Any]) -> ColumnDesign:
     }
 
     module = create_module()
-    module.set_input_values(mapped)
+    module.set_input_values(design_dict)
     # Restore the display name for reports (set_input_values overrides self.module with the raw KEY_MODULE value)
     module.module = "Columns with known support conditions"
     return module

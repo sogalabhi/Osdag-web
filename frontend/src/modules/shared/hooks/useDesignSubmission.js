@@ -86,6 +86,10 @@ export const useDesignSubmission = (service, moduleConfig) => {
             continue;
           }
 
+          if (field.type === 'image') {
+            continue;
+          }
+
           let value = inputs[field.key];
           if (field.type === 'connectivitySelect' || field.type === 'endPlateSelect') {
             value = extraState?.selectedOption || value;

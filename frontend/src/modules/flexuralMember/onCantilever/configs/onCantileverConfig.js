@@ -42,8 +42,14 @@ export const onCantileverConfig = {
 
   // Helper: get list of sections based on profile (mirrors simply-supported beam)
   getDynamicSectionList: (profile, beamList, columnList) => {
-    // Cantilever beam uses column list (like simply-supported beam)
-    return columnList || [];
+    if (profile === "Beams") {
+      return beamList || [];
+    } else if (profile === "Columns") {
+      return columnList || [];
+    } else if (profile === "Beams and Columns") {
+      return [...(beamList || []), ...(columnList || [])];
+    }
+    return [];
   },
 
   validateInputs: (inputs) => {
