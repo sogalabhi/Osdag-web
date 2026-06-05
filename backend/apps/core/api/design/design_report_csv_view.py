@@ -26,6 +26,8 @@ from apps.modules.simple_connection.submodules.lap_joint_bolted.adapter import c
 from apps.modules.simple_connection.submodules.lap_joint_welded.adapter import create_from_input as lap_joint_welded_create_from_input
 from apps.modules.flexure_member.submodules.simply_supported_beam.adapter import create_from_input as simply_supported_beam_create_from_input
 from apps.modules.flexure_member.submodules.purlin.adapter import create_from_input as purlin_create_from_input
+from apps.modules.flexure_member.submodules.on_cantilever.adapter import create_from_input as on_cantilever_beam_create_from_input
+from apps.modules.compression_member.submodules.axially_loaded_column.adapter import create_from_input as axially_loaded_column_create_from_input
 from apps.modules.compression_member.submodules.struts_bolted.adapter import create_from_input as struts_bolted_create_from_input
 from apps.modules.compression_member.submodules.struts_welded.adapter import create_from_input as struts_welded_create_from_input
 from apps.modules.compression_member.submodules.axially_loaded_column.adapter import create_from_input as axially_loaded_column_create_from_input
@@ -149,6 +151,11 @@ class CreateDesignReport(APIView):
             'LapJointWelded': lap_joint_welded_create_from_input,
             'Simply-Supported-Beam': simply_supported_beam_create_from_input,
             'Purlin': purlin_create_from_input,
+            'On-Cantilever-Beam': on_cantilever_beam_create_from_input,
+            'Cover-Plate-Welded-Connection': cover_plate_welded_create_from_input,
+            'Cover-Plate-Bolted-Connection': cover_plate_bolted_create_from_input,
+            'ColumnCoverPlateBolted': column_cover_plate_bolted_create_from_input,
+            'AxiallyLoadedColumn': axially_loaded_column_create_from_input,
             'Struts-Bolted-Design': struts_bolted_create_from_input,
             'Struts-Welded-Design': struts_welded_create_from_input,
             'Axially-Loaded-Column': axially_loaded_column_create_from_input,
