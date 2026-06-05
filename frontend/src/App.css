@@ -587,29 +587,6 @@
   @apply border-none rounded;
 }
 
-.canvas-control-bar-overlay-right {
-  @apply absolute top-[15px] right-[15px] z-10;
-}
-
-.grid-3x3 {
-  @apply grid grid-cols-3 grid-rows-3 gap-[3px] w-[60px] h-[60px];
-}
-
-.grid-button {
-  @apply w-full h-full border-none bg-transparent cursor-pointer transition-transform duration-200 ease-linear flex items-center justify-center p-0 outline-none;
-}
-
-.grid-button:hover {
-  @apply scale-110;
-}
-
-.grid-button.active .grid-icon {
-  @apply brightness-0;
-}
-
-.grid-icon {
-  @apply w-full h-full transition-[filter] duration-200 ease-linear;
-}
 
 .modelLoading {
   @apply w-full h-full flex justify-center items-center text-xl font-bold bg-[#333333] text-white mb-0 transition-none;
