@@ -11,6 +11,8 @@ import { beamBeamEndPlateConfig } from '../../modules/beamBeamEndPlate/configs/b
 import { beamToColumnEndPlateConfig } from '../../modules/beamToColumnEndPlate/configs/beamToColumnEndPlateConfig';
 import { boltedToEndConfig } from '../../modules/TensionMembers/BoltedToEnd/configs/boltedToEndConfig';
 import { simplySupportedBeamConfig } from '../../modules/flexuralMember/simplySupportedBeam/configs/simplySupportedBeamConfig';
+import { purlinConfig } from '../../modules/flexuralMember/purlin/configs/purlinConfig';
+import { onCantileverConfig } from '../../modules/flexuralMember/onCantilever/configs/onCantileverConfig';
 import { lapJointWeldedConfig } from '../../modules/SimpleConnection/LapJointWelded/config/lapJointWeldedConfig';
 import { lapJointBoltedConfig } from '../../modules/SimpleConnection/LapJointBolted/config/lapJointBoltedConfig';
 import { buttJointWeldedConfig } from '../../modules/SimpleConnection/ButtJointWelded/config/buttJointWeldedConfig';
@@ -32,6 +34,8 @@ import {
   MODULE_KEY_TENSION_BOLTED,
   MODULE_KEY_TENSION_WELDED,
   MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
+  MODULE_KEY_PURLIN,
+  MODULE_KEY_ON_CANTILEVER_BEAM,
   MODULE_KEY_LAP_JOINT_WELDED,
   MODULE_KEY_LAP_JOINT_BOLTED,
   MODULE_KEY_BUTT_JOINT_WELDED,
@@ -41,6 +45,30 @@ import { getProjectById } from "../../datasources/projectsDataSource";
 import { saveOsiFromInputs } from "../../datasources/osiDataSource";
 import { getModuleRoute } from "../../constants/moduleRoutes";
 import ProjectActionButtons from './ProjectActionButtons';
+
+const normalizeModuleId = (id) => {
+  if (!id) return id;
+  const normalized = id.toLowerCase().replace(/_/g, '-');
+  const mapping = {
+    'fin-plate': MODULE_KEY_FIN_PLATE,
+    'end-plate': MODULE_KEY_END_PLATE,
+    'cleat-angle': MODULE_KEY_CLEAT_ANGLE,
+    'seated-angle': MODULE_KEY_SEAT_ANGLE,
+    'beam-beam-cover-plate-bolted': MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED,
+    'beam-beam-cover-plate-welded': MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED,
+    'beam-beam-end-plate': MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
+    'beam-column-end-plate': MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
+    'bolted': MODULE_KEY_TENSION_BOLTED,
+    'simply-supported-beam': MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
+    'on-cantilever': MODULE_KEY_ON_CANTILEVER_BEAM,
+    'purlin': MODULE_KEY_PURLIN,
+    'lap-joint-welded': MODULE_KEY_LAP_JOINT_WELDED,
+    'lap-joint-bolted': MODULE_KEY_LAP_JOINT_BOLTED,
+    'butt-joint-welded': MODULE_KEY_BUTT_JOINT_WELDED,
+    'butt-joint-bolted': MODULE_KEY_BUTT_JOINT_BOLTED,
+  };
+  return mapping[normalized] || id;
+};
 
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
   const [projects, setProjects] = React.useState(projectsProp);
@@ -98,7 +126,8 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
       const detail = await fetchProjectDetail(project.id);
       setReportProject(project);
       setReportInputValues(detail?.inputs_json || {});
-      const modId = detail?.submodule || detail?.module || MODULE_KEY_FIN_PLATE;
+      const rawModId = detail?.submodule || detail?.module || MODULE_KEY_FIN_PLATE;
+      const modId = normalizeModuleId(rawModId);
       setReportModuleId(modId);
       // Resolve moduleConfig to reuse DesignReportModal logic
       const resolver = {
@@ -112,6 +141,8 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
         [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: beamToColumnEndPlateConfig,
         [MODULE_KEY_TENSION_BOLTED]: boltedToEndConfig,
         [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: simplySupportedBeamConfig,
+        [MODULE_KEY_PURLIN]: purlinConfig,
+        [MODULE_KEY_ON_CANTILEVER_BEAM]: onCantileverConfig,
         [MODULE_KEY_LAP_JOINT_WELDED]: lapJointWeldedConfig,
         [MODULE_KEY_LAP_JOINT_BOLTED]: lapJointBoltedConfig,
         [MODULE_KEY_BUTT_JOINT_WELDED]: buttJointWeldedConfig,
@@ -169,7 +200,8 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
       }
       const projectDetail = detailRes.project;
       const inputs = projectDetail?.inputs_json || {};
-      const module_id = projectDetail?.submodule || projectDetail?.module || MODULE_KEY_FIN_PLATE;
+      const rawModuleId = projectDetail?.submodule || projectDetail?.module || MODULE_KEY_FIN_PLATE;
+      const module_id = normalizeModuleId(rawModuleId);
 
       const resolver = {
         [MODULE_KEY_FIN_PLATE]: finPlateConfig,
@@ -182,6 +214,12 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
         [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: beamToColumnEndPlateConfig,
         [MODULE_KEY_TENSION_BOLTED]: boltedToEndConfig,
         [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: simplySupportedBeamConfig,
+        [MODULE_KEY_PURLIN]: purlinConfig,
+        [MODULE_KEY_ON_CANTILEVER_BEAM]: onCantileverConfig,
+        [MODULE_KEY_LAP_JOINT_WELDED]: lapJointWeldedConfig,
+        [MODULE_KEY_LAP_JOINT_BOLTED]: lapJointBoltedConfig,
+        [MODULE_KEY_BUTT_JOINT_WELDED]: buttJointWeldedConfig,
+        [MODULE_KEY_BUTT_JOINT_BOLTED]: buttJointBoltedConfig,
       };
       const cfg = resolver[module_id] || null;
 

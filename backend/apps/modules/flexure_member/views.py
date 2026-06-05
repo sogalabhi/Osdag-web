@@ -20,6 +20,14 @@ from apps.core.models import Columns, Beams, Material, CustomMaterials
 from apps.sections.options_merge import merge_user_sections_into_options
 
 
+# Mapping from flexure-member submodule slug to legacy report module_id
+FLEXURE_REPORT_MODULE_ID_MAP = {
+    "simply-supported-beam": "Simply-Supported-Beam",
+    "purlin": "Purlin",
+    "on-cantilever": "On-Cantilever-Beam",
+}
+
+
 class FlexureMemberViewSet(viewsets.ViewSet):
     """
     Generic ViewSet that routes to specific sub-module services based on URL slug.
@@ -169,3 +177,11 @@ class FlexureMemberViewSet(viewsets.ViewSet):
         """
         ServiceClass = FlexureMemberRegistry.get_service_by_slug(submodule_slug)
         return trigger_async_cad('flexure-member', submodule_slug, ServiceClass, request)
+
+    @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
+    def report_generate_initial(self, request, submodule_slug=None):
+        """
+        POST /api/modules/flexure-member/{submodule_slug}/report/generate-initial/
+        Asynchronously runs LaTeX report generation task.
+        """
+        return trigger_async_report('flexure-member', submodule_slug, FLEXURE_REPORT_MODULE_ID_MAP, request)

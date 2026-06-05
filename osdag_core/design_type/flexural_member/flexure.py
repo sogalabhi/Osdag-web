@@ -1616,6 +1616,12 @@ class Flexure(Member):
             print( 'self.allow_class', self.allow_class)
             if self.section_property.plast_sec_mod_z >= self.Zp_req:
                 print( 'self.section_property.plast_sec_mod_z More than Requires')
+            else:
+                self.logger.warning(
+                    f"{trial_section}: Plastic section modulus (Zp = {round(self.section_property.plast_sec_mod_z * 1e-3, 1)} cm³) "
+                    f"is less than required Zp = {round(self.Zp_req * 1e-3, 1)} cm³ for the given moment. Section ignored."
+                )
+                continue
 
                 if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
                     self.It = self.section_property.It
@@ -1695,6 +1701,12 @@ class Flexure(Member):
             self.logger.info("After checking Non-dimensional slendƒerness ratio for given sections, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ")
         if len(self.input_section_list) == 0:
             local_flag = False
+            self.logger.error(
+                f"None of the provided sections have sufficient plastic section modulus for the applied moment of "
+                f"{round(self.load.moment * 1e-6, 1)} kNm. "
+                f"Required Zp ≥ {round(self.Zp_req * 1e-3, 1)} cm³. "
+                f"Please select larger sections or reduce the applied loads."
+            )
         else:
             local_flag = True
         return local_flag
