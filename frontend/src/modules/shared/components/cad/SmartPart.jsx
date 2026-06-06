@@ -57,7 +57,9 @@ export const SmartPart = ({
     // what the Python modules call "Plate" in hover_dict. This mapping bridges
     // that naming gap so hover details always display correctly.
     const PART_ALIASES = {
-      'connector': 'Plate',
+      'connector': hoverDict && ('Bolt' in hoverDict || 'Bolts' in hoverDict || 'bolt' in hoverDict || 'bolts' in hoverDict)
+        ? 'Bolt'
+        : (hoverDict && ('Weld' in hoverDict || 'Welds' in hoverDict || 'weld' in hoverDict || 'welds' in hoverDict) ? 'Weld' : 'Plate'),
       'endplate': 'Plate',
       'end plate': 'Plate',
       'end-plate': 'Plate',
@@ -139,7 +141,7 @@ export const SmartPart = ({
 
   // 4. MATERIAL MEMOIZATION
   // Prevents material recompilation on every frame
-  const isBolt = name?.toLowerCase().includes('bolt');
+  const isBolt = name?.toLowerCase().includes('bolt') || name?.toLowerCase().includes('connector') || name?.toLowerCase().includes('weld');
   const displayColor = (isHovered || localHovered) && !isBolt ? "#8cc480" : color;
 
   const meshMaterial = useMemo(() => (

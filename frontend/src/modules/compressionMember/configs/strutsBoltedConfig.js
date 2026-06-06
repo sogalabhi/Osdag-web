@@ -47,14 +47,14 @@ export const strutsBoltedConfig = {
   modalConfig: [
     { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
     { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    // { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
+    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
     { key: "sectionDesignation", inputKey: "section_designation", dataSource: null },
   ],
 
   selectionConfig: [
     { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
     { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    // { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
+    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
     { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
   ],
 
@@ -379,18 +379,18 @@ export const strutsBoltedConfig = {
         }
       ]
     },
-    // {
-    //   title: "Plate",
-    //   fields: [
-    //     {
-    //       key: "plate_thickness",
-    //       label: "Thickness (mm) *",
-    //       type: "customizable",
-    //       selectionKey: "thicknessSelect",
-    //       modalKey: "plateThickness",
-    //       dataSource: "thicknessList"
-    //     }
-    //   ]
-    // }
+    {
+      title: "Plate",
+      fields: [
+        {
+          key: "plate_thickness",
+          label: "Thickness (mm) *",
+          type: "customizable",
+          selectionKey: "thicknessSelect",
+          modalKey: "plateThickness",
+          dataSource: "thicknessList"
+        }
+      ]
+    }
   ]
 };

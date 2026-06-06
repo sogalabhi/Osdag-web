@@ -176,8 +176,8 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Member", "Plate", "Endplate"):
-        raise InvalidInputTypeError("section", "'Model', 'Member', 'Plate', 'Endplate'")
+    if section not in ("Model", "Member", "Plate", "Connector"):
+        raise InvalidInputTypeError("section", "'Model', 'Member', 'Plate', or 'Connector'")
     
     module = create_from_input(input_values)
     
@@ -200,11 +200,47 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     cld.component = section
 
     # When section == "Model", also ensure per-part shapes exist and prepare a compound
-    part_names = ["Member", "Plate", "Endplate"]
+    part_names = ["Member", "Plate", "Connector"]
     part_files = {}
     compound_model = None
 
     try:
+        from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+        
+        def get_part_shape(part_name, cld):
+            t_obj = cld.TObj
+            if part_name == "Member":
+                return t_obj.get_members_models()
+            elif part_name == "Plate":
+                shapes = []
+                if hasattr(t_obj, "get_plates_models"):
+                    p = t_obj.get_plates_models()
+                    if p is not None:
+                        shapes.append(p)
+                if hasattr(t_obj, "get_end_plates_models"):
+                    ep = t_obj.get_end_plates_models()
+                    if ep is not None:
+                        shapes.append(ep)
+                if not shapes:
+                    return None
+                res = shapes[0]
+                for item in shapes[1:]:
+                    res = BRepAlgoAPI_Fuse(res, item).Shape()
+                return res
+            elif part_name == "Connector":
+                shapes = []
+                if hasattr(t_obj, "get_welded_models"):
+                    w = t_obj.get_welded_models()
+                    if w is not None:
+                        shapes.append(w)
+                if not shapes:
+                    return None
+                res = shapes[0]
+                for item in shapes[1:]:
+                    res = BRepAlgoAPI_Fuse(res, item).Shape()
+                return res
+            return None
+
         if section == "Model":
             # Build compound by adding each part shape without fusing
             builder = BRep_Builder()
@@ -214,8 +250,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
             for part in part_names:
                 try:
                     # Generate shape for this part
-                    cld.component = part
-                    part_shape = cld.create2Dcad()
+                    part_shape = get_part_shape(part, cld)
                     if part_shape is None:
                         continue
 
@@ -236,14 +271,12 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
                 except Exception as e:
                     print(f"Failed to build/write part {part}: {e}")
 
-            # Reset component to Model and set compound as the model to write
-            cld.component = section
             compound_model = compound
         # Generate model for non-Model sections (or fallback)
         if compound_model is not None:
             model = compound_model
         else:
-            model = cld.create2Dcad()
+            model = get_part_shape(section, cld)
     except Exception as e :
         print("Error in cld.create2Dcad() e : " , e)
         raise

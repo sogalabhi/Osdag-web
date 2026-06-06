@@ -88,7 +88,7 @@ const createApiClient = (baseUrl) => {
 
 export const apiClient = createApiClient(apiBase);
 
-export async function pollTask(taskId, delayMs = 500, maxRetries = 120) {
+export async function pollTask(taskId, delayMs = 1000, maxRetries = 300) {
   for (let i = 0; i < maxRetries; i++) {
     const res = await apiClient(`api/tasks/${taskId}/`, { method: "GET" });
     const data = await res.json();

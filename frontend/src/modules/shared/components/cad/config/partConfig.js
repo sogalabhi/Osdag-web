@@ -18,13 +18,13 @@ export const DEFAULT_PART_COLORS = {
   EndPlate: "#8A8A6A",
   cleatAngle: "#8A8A6A",
   SeatedAngle: "#8A8A6A",
-  Connector: "#8A8A6A",
+  Connector: "#8B4513",
   CoverPlate: "#8A8A6A",
   "Cover Plate": "#8A8A6A",
 
   // Fasteners
-  Bolt: "#E63030",
-  Bolts: "#E63030",
+  Bolt: "#8B4513",
+  Bolts: "#8B4513",
 
   // Welds
   Weld: "#ff0000",

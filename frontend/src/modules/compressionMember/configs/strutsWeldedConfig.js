@@ -304,18 +304,18 @@ export const strutsWeldedConfig = {
         { key: "axial_force", label: "Axial Force (kN)*", type: "number" }
       ]
     },
-    // {
-    //   title: "Plate",
-    //   fields: [
-    //     {
-    //       key: "plate_thickness",
-    //       label: "Thickness (mm) *",
-    //       type: "customizable",
-    //       selectionKey: "thicknessSelect",
-    //       modalKey: "plateThickness",
-    //       dataSource: "thicknessList"
-    //     }
-    //   ]
-    // }
+    {
+      title: "Plate",
+      fields: [
+        {
+          key: "plate_thickness",
+          label: "Thickness (mm) *",
+          type: "customizable",
+          selectionKey: "thicknessSelect",
+          modalKey: "plateThickness",
+          dataSource: "thicknessList"
+        }
+      ]
+    }
   ]
 };
