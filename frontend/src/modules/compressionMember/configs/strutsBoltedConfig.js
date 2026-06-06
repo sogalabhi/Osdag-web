@@ -1,11 +1,11 @@
 // Config for Struts Bolted to End Gusset (Compression Member with Bolted Connection)
 // Keys must match backend API (see compression_bolted.py input_values)
 // Section profile images
-import ANGLES from "../../../assets/CompressionMember/angles_CB (1).png";
-import BACK_TO_BACK_ANGLES from "../../../assets/CompressionMember/backtobackangles_CB (5).png";
-import STAR_ANGLES from "../../../assets/CompressionMember/starangles_CB (4).png";
-import CHANNELS from "../../../assets/CompressionMember/channels_CB (3).png";
-import BACK_TO_BACK_CHANNELS from "../../../assets/CompressionMember/backtobackchannels_CB (2).png";
+import ANGLES from "../../../assets/CompressionMember/bA.png";
+import BACK_TO_BACK_ANGLES from "../../../assets/CompressionMember/bBBA.png";
+import STAR_ANGLES from "../../../assets/CompressionMember/bSA.png";
+import CHANNELS from "../../../assets/CompressionMember/bC.png";
+import BACK_TO_BACK_CHANNELS from "../../../assets/CompressionMember/bBBC.png";
 import ErrorImg from "../../../assets/notSelected.png";
 // End condition images
 import FIXED_FIXED from "../../../assets/CompressionMember/RRRRstrut.png";
