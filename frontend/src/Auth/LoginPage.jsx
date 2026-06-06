@@ -41,7 +41,13 @@ const LoginPage = () => {
     const [acceptPolicy, setAcceptPolicy] = useState(false);
 
     // Firebase user state (from shared auth hook)
-    const { user: currentUser } = useAuth();
+    const { user: currentUser, loading: authLoading } = useAuth();
+
+    useEffect(() => {
+        if (!authLoading && currentUser) {
+            navigate('/home');
+        }
+    }, [currentUser, authLoading, navigate]);
 
     // Clear errors when switching between login/signup
     useEffect(() => {
@@ -253,6 +259,14 @@ const LoginPage = () => {
             setIsLoading(false);
         }
     };
+
+    if (authLoading) {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100%' }}>
+                <Spin size="large" tip="Verifying session..." />
+            </div>
+        );
+    }
 
     return (
         <>

@@ -242,8 +242,8 @@ def setup_for_cad(cld, module):
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Member", "Plate"):
-        raise InvalidInputTypeError("section", "'Model', 'Member', or 'Plate'")
+    if section not in ("Model", "Member", "Plate", "Connector"):
+        raise InvalidInputTypeError("section", "'Model', 'Member', 'Plate', or 'Connector'")
     
     module = create_from_input(input_values)
     
@@ -264,9 +264,9 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
  
     # The section of the module that will be generated.
     cld.component = section
-
+ 
     # When section == "Model", also ensure per-part shapes exist and prepare a compound
-    part_names = ["Member", "Plate"]
+    part_names = ["Member", "Plate", "Connector"]
     part_files = {}
     compound_model = None
 
