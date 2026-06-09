@@ -675,25 +675,25 @@ const SpacingDiagram = ({
       <defs>
         <marker
           id="arrow-start"
-          markerWidth="8"
-          markerHeight="8"
-          refX="8"
-          refY="4"
+          markerWidth="12"
+          markerHeight="12"
+          refX="12"
+          refY="6"
           orient="auto-start-reverse"
-          markerUnits="strokeWidth"
+          markerUnits="userSpaceOnUse"
         >
-          <path d="M 8 4 L 0 0 L 0 8 Z" fill="#000" />
+          <path d="M 12 6 L 0 0 L 0 12 Z" fill="#000" />
         </marker>
         <marker
           id="arrow-end"
-          markerWidth="8"
-          markerHeight="8"
-          refX="0"
-          refY="4"
+          markerWidth="12"
+          markerHeight="12"
+          refX="12"
+          refY="6"
           orient="auto"
-          markerUnits="strokeWidth"
+          markerUnits="userSpaceOnUse"
         >
-          <path d="M 8 4 L 0 0 L 0 8 Z" fill="#000" />
+          <path d="M 12 6 L 0 0 L 0 12 Z" fill="#000" />
         </marker>
       </defs>
       
