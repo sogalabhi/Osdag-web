@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Transfer, Button, message } from 'antd';
+import { useViewport } from '../hooks/useViewport';
 
 export const CustomizationModal = ({
   isOpen,
@@ -11,6 +12,7 @@ export const CustomizationModal = ({
   disabledValues = []
 }) => {
   const [tempKeys, setTempKeys] = useState([]);
+  const { isMobile } = useViewport();
 
   // Sync temp keys when modal opens
   useEffect(() => {
@@ -95,15 +97,20 @@ export const CustomizationModal = ({
               Clear All (≪)
             </Button>
           </div>
-          <div className="flex justify-center w-full">
+          <div className="flex justify-center w-full overflow-hidden">
             <Transfer
+              className="w-full flex justify-center items-center"
               dataSource={transferData}
               targetKeys={tempKeys}
               onChange={(nextTargetKeys) => setTempKeys(nextTargetKeys)}
-              render={(item) => <h5>{item.label}</h5>}
+              render={(item) => <span className="text-sm truncate block" title={item.label}>{item.label}</span>}
               titles={["Available", "Selected"]}
               showSearch
-              listStyle={{ height: 350, width: 240 }}
+              listStyle={{ 
+                height: 350, 
+                width: isMobile ? 140 : 240,
+                minWidth: isMobile ? 130 : 240
+              }}
             />
           </div>
         </div>

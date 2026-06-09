@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Input, Modal } from 'antd';
 import { getOutputImage } from "../config/outputImageMap";
 import { OUTPUT_LAYOUTS } from "./outputDock/OutputModalLayouts";
+import { useViewport } from "../hooks/useViewport";
 
 export const BaseOutputDock = React.memo(({
   output,
@@ -12,6 +13,7 @@ export const BaseOutputDock = React.memo(({
   saveOutput,
 }) => {
   const normalizedOutput = output && output.data ? output.data : output;
+  const { isMobile } = useViewport();
 
   // Shared state management
   const [activeModals, setActiveModals] = useState({});
@@ -246,7 +248,7 @@ export const BaseOutputDock = React.memo(({
           open={activeModals[modalType]}
           onCancel={() => closeModal(modalType)}
           footer={null}
-          width={config.width || "50%"}
+          width={isMobile ? "95%" : (config.width || "50%")}
           title={config.title}
           className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
         >

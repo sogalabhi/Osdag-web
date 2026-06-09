@@ -99,6 +99,7 @@ export const useDockPanels = (isMobile) => {
   const [docks, dispatch] = useReducer(dockReducer, {
     ...initialState,
     cad: !isMobile,
+    output: !isMobile,
   });
 
   useEffect(() => {
