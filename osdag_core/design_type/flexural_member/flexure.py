@@ -40,7 +40,6 @@ from ...custom_logger import CustomLogger
 class Flexure(Member):
 
     def __init__(self):
-        # print(f"Here10")
         super(Flexure, self).__init__()
         self.hover_dict = {}
 
@@ -78,8 +77,12 @@ class Flexure(Member):
     def tab_value_changed(self):
         change_tab = []
 
-        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
+        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL, KEY_SECSIZE], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
         change_tab.append(t1)
+
+        t3 = (KEY_DISP_COLSEC, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+              ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'], TYPE_TEXTBOX, self.get_I_sec_properties_from_designation)
+        change_tab.append(t3)
 
         t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
@@ -151,8 +154,8 @@ class Flexure(Member):
 
         add_buttons = []
 
-        t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
-        add_buttons.append(t2)
+        # t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
+        # add_buttons.append(t2)
 
         return add_buttons
 
@@ -628,7 +631,6 @@ class Flexure(Member):
 
         # Populate hover dict
         self.hover_dict["Flexure Member"] = (
-            f"<b>Flexure Member</b><br>"
             f"{self.result_designation if flag else ''}"
         )
 
@@ -1616,12 +1618,6 @@ class Flexure(Member):
             print( 'self.allow_class', self.allow_class)
             if self.section_property.plast_sec_mod_z >= self.Zp_req:
                 print( 'self.section_property.plast_sec_mod_z More than Requires')
-            else:
-                self.logger.warning(
-                    f"{trial_section}: Plastic section modulus (Zp = {round(self.section_property.plast_sec_mod_z * 1e-3, 1)} cm³) "
-                    f"is less than required Zp = {round(self.Zp_req * 1e-3, 1)} cm³ for the given moment. Section ignored."
-                )
-                continue
 
                 if self.design_type == KEY_DISP_DESIGN_TYPE2_FLEXURE:
                     self.It = self.section_property.It
@@ -1701,12 +1697,6 @@ class Flexure(Member):
             self.logger.info("After checking Non-dimensional slendƒerness ratio for given sections, some sections maybe be ignored by Osdag.[Ref IS 8.2.2] ")
         if len(self.input_section_list) == 0:
             local_flag = False
-            self.logger.error(
-                f"None of the provided sections have sufficient plastic section modulus for the applied moment of "
-                f"{round(self.load.moment * 1e-6, 1)} kNm. "
-                f"Required Zp ≥ {round(self.Zp_req * 1e-3, 1)} cm³. "
-                f"Please select larger sections or reduce the applied loads."
-            )
         else:
             local_flag = True
         return local_flag
@@ -3136,4 +3126,4 @@ class Flexure(Member):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module) #
-        return True
+
