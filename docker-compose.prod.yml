@@ -1,21 +1,22 @@
 services:
   db:
     image: postgres:14-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${DATABASE_USER:-osdagdeveloper}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-changeme}
-      POSTGRES_DB: ${DATABASE_NAME:-postgres_Intg_osdag}
+      POSTGRES_DB: ${DATABASE_NAME:-osdagdeveloper}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-osdagdeveloper}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-osdagdeveloper} -d ${DATABASE_NAME:-osdagdeveloper}"]
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     volumes:
       - redis_data:/data
     healthcheck:
@@ -23,80 +24,145 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
 
   backend:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: unless-stopped
     environment:
+      PYTHONPATH: /app
       DEBUG: "False"
       SECRET_KEY: ${SECRET_KEY:-changeme}
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
-      DATABASE_NAME: ${DATABASE_NAME:-postgres_Intg_osdag}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,frontend}
+      DATABASE_NAME: ${DATABASE_NAME:-osdagdeveloper}
       DATABASE_USER: ${DATABASE_USER:-osdagdeveloper}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-changeme}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
-      REDIS_URL: redis://127.0.0.1:6379/0
-      CELERY_BROKER_URL: redis://127.0.0.1:6379/0
-      CELERY_RESULT_BACKEND: redis://127.0.0.1:6379/0
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
       USE_REDIS_CACHE: ${USE_REDIS_CACHE:-true}
     volumes:
-      - ./file_storage:/app/file_storage
-      - ./osifiles:/app/osifiles
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+      - osifiles_volume:/app/osifiles
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
     command: >
-      bash -c "source /opt/miniconda/etc/profile.d/conda.sh &&
-      conda activate myenv &&
-      python manage.py migrate &&
-      python manage.py collectstatic --noinput &&
-      python manage.py runserver 0.0.0.0:8000"
+      bash -c "/opt/conda/envs/osdag_env/bin/python manage.py migrate &&
+      /opt/conda/envs/osdag_env/bin/python manage.py collectstatic --noinput &&
+      /opt/conda/envs/osdag_env/bin/python populate_database.py &&
+      /opt/conda/envs/osdag_env/bin/gunicorn config.asgi:application 
+      --bind 0.0.0.0:8000 
+      --workers 4 
+      --worker-class uvicorn.workers.UvicornWorker 
+      --timeout 60"
     expose:
       - "8000"
-    restart: unless-stopped
 
-  celery_worker:
+  celery_worker_calc:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: unless-stopped
     environment:
+      PYTHONPATH: /app
       DEBUG: "False"
       SECRET_KEY: ${SECRET_KEY:-changeme}
-      DATABASE_NAME: ${DATABASE_NAME:-postgres_Intg_osdag}
+      DATABASE_NAME: ${DATABASE_NAME:-osdagdeveloper}
       DATABASE_USER: ${DATABASE_USER:-osdagdeveloper}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-changeme}
       DATABASE_HOST: db
       DATABASE_PORT: 5432
-      REDIS_URL: redis://127.0.0.1:6379/0
-      CELERY_BROKER_URL: redis://127.0.0.1:6379/0
-      CELERY_RESULT_BACKEND: redis://127.0.0.1:6379/0
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
       USE_REDIS_CACHE: ${USE_REDIS_CACHE:-true}
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: >
-      bash -c "source /opt/miniconda/etc/profile.d/conda.sh &&
-      conda activate myenv &&
-      celery -A config worker --loglevel=info"
+    command: bash -c "/opt/conda/envs/osdag_env/bin/celery -A config worker --workdir=/app -Q calculations --loglevel=info --concurrency=32"
+
+  celery_worker_cad:
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
+    environment:
+      PYTHONPATH: /app
+      DEBUG: "False"
+      SECRET_KEY: ${SECRET_KEY:-changeme}
+      DATABASE_NAME: ${DATABASE_NAME:-osdagdeveloper}
+      DATABASE_USER: ${DATABASE_USER:-osdagdeveloper}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-changeme}
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      USE_REDIS_CACHE: ${USE_REDIS_CACHE:-true}
+    volumes:
+      - media_volume:/app/media
+      - osifiles_volume:/app/osifiles
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: bash -c "/opt/conda/envs/osdag_env/bin/celery -A config worker --workdir=/app -Q cad --loglevel=info --concurrency=16 --max-tasks-per-child=10"
+
+  celery_worker_reports:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      PYTHONPATH: /app
+      DEBUG: "False"
+      SECRET_KEY: ${SECRET_KEY:-changeme}
+      DATABASE_NAME: ${DATABASE_NAME:-osdagdeveloper}
+      DATABASE_USER: ${DATABASE_USER:-osdagdeveloper}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-changeme}
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      USE_REDIS_CACHE: ${USE_REDIS_CACHE:-true}
+    volumes:
+      - media_volume:/app/media
+      - osifiles_volume:/app/osifiles
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: bash -c "/opt/conda/envs/osdag_env/bin/celery -A config worker --workdir=/app -Q reports --loglevel=info --concurrency=8"
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
+    restart: unless-stopped
     ports:
       - "80:80"
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+      - osifiles_volume:/app/osifiles
     depends_on:
       - backend
-    restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
+  static_volume:
+  media_volume:
+  osifiles_volume:

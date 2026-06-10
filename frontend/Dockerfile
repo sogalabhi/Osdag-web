@@ -1,11 +1,12 @@
-FROM node:20-alpine
+FROM node:20.11.1-alpine3.19
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY package*.json /app/
 
-COPY . .
+RUN npm install && npm cache clean --force
+
+COPY . /app
 
 EXPOSE 5173
 

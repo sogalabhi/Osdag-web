@@ -149,6 +149,20 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = os.getenv('CELERY_TIMEZONE', 'UTC')
 CELERY_TASK_ALWAYS_EAGER = 'test' in sys.argv or any('pytest' in arg for arg in sys.argv)
 
+CELERY_DEFAULT_QUEUE = 'calculations'
+
+CELERY_TASK_ROUTES = {
+    'apps.core.tasks.run_design_calculation_task': {
+        'queue': 'calculations',
+    },
+    'apps.core.tasks.run_cad_generation_task': {
+        'queue': 'cad',
+    },
+    'apps.core.tasks.run_report_generation_task': {
+        'queue': 'reports',
+    },
+}
+
 # Optional Redis cache backend (toggle with USE_REDIS_CACHE=true)
 USE_REDIS_CACHE = os.getenv('USE_REDIS_CACHE', 'false').lower() == 'true'
 if USE_REDIS_CACHE:
@@ -215,6 +229,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 _static_dir = BASE_DIR / "static"
 STATICFILES_DIRS = [_static_dir] if _static_dir.exists() else []
 
@@ -226,7 +241,8 @@ OSIFILES_ROOT = BASE_DIR / 'osifiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'file_storage/')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 SECRET_ROOT = os.path.join(BASE_DIR , 'secret/')
 
