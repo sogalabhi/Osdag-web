@@ -693,7 +693,6 @@ class Flexure_Purlin(Member):
         t2 = ()
 
         self.hover_dict["Flexural Members"] = (
-            f"<b>Flexural Members</b><br>"
             f"{self.result_designation if flag else ''}"
         )
 
@@ -3402,5 +3401,5 @@ class Flexure_Purlin(Member):
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, [], '', module=self.module)  #
 
-        return True
+
 
