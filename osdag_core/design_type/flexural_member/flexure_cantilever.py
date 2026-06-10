@@ -78,8 +78,12 @@ class Flexure_Cantilever(Member):
     def tab_value_changed(self):
         change_tab = []
 
-        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
+        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL, KEY_SECSIZE], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
         change_tab.append(t1)
+
+        t3 = (KEY_DISP_COLSEC, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+              ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'], TYPE_TEXTBOX, self.get_I_sec_properties_from_designation)
+        change_tab.append(t3)
 
         t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
@@ -151,8 +155,8 @@ class Flexure_Cantilever(Member):
 
         add_buttons = []
 
-        t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
-        add_buttons.append(t2)
+        # t2 = (KEY_DISP_COLSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Columns")
+        # add_buttons.append(t2)
 
         return add_buttons
 
@@ -602,7 +606,6 @@ class Flexure_Cantilever(Member):
         # Populate hover dict
 
         self.hover_dict["Flexure Member"] = (
-            f"<b>Flexure Member</b><br>"
             f"{self.result_designation if flag else ''}"
         )
 
@@ -2969,4 +2972,3 @@ class Flexure_Cantilever(Member):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                               rel_path, Disp_2d_image, Disp_3D_image, module=self.module) #
-        return True
