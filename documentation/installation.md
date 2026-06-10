@@ -193,10 +193,21 @@ The Osdag-Web application uses 'Conda' environment which contains all the depend
      ```
      git checkout develop
      ```
+   * Install conda-forge dependencies (Important for CAD and Graphics)
+
+     ```
+     conda install -c conda-forge pythonocc-core cairo -y
+     ```
    * Install requirements.txt packages
 
      ```
      pip install -r requirements.txt
+     ```
+   * Add Firebase Service Account Key JSON (Required for authentication)
+
+     Obtain your service account private key JSON file from the Firebase Console (Project Settings -> Service Accounts -> Generate new private key), save it as `firebase-service-account.json` and place it inside the `backend/` directory of the repository:
+     ```
+     backend/firebase-service-account.json
      ```
    * Configure the Postgres database
 

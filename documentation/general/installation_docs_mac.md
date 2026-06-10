@@ -97,6 +97,17 @@ VITE_API_URL=http://localhost:8000
 EOF
 ```
 
+### A.5.1 — Add Firebase Service Account Key JSON
+
+This application uses Firebase for user authentication. You must add the Firebase service account private key JSON file in the backend configuration before running Docker Compose:
+
+1. Obtain your service account key JSON file from the Firebase Console (Project Settings -> Service Accounts -> Generate new private key).
+2. Save this file as `firebase-service-account.json` and place it in the `backend/` directory of the repository:
+   ```bash
+   # Path relative to project root:
+   backend/firebase-service-account.json
+   ```
+
 > **Note:** The `.env` file at the root is for Docker Compose services (backend, Celery, frontend). A separate `.env` inside `frontend/` controls the Vite dev server (`VITE_BASE_URL`).
 
 ### A.6 — Build and Start All Services
@@ -304,7 +315,7 @@ Verify:
 conda --version
 ```
 
-### B.9 — Create and Activate a Conda Environment
+### B.8 — Create and Activate a Conda Environment
 
 The application uses **Python 3.11** (matching the Dockerfile):
 
@@ -321,6 +332,14 @@ conda activate osdag-web
 > ```
 
 > **Important:** Keep this environment activated for all subsequent steps and every time you run the application.
+
+### B.9 — Install Conda-Forge Dependencies (Important for CAD/Graphics)
+
+Certain heavy binary packages like `pythonocc-core` (used for 3D CAD modeling and generation) and `cairo` (used for 2D graphic exports) are not in `requirements.txt` because they cannot be compiled/installed reliably via pip. They must be installed through conda-forge:
+
+```bash
+conda install -c conda-forge pythonocc-core cairo -y
+```
 
 ### B.10 — Clone the Repository
 
@@ -418,6 +437,13 @@ CELERY_BROKER_URL=redis://127.0.0.1:6379/0
 CELERY_RESULT_BACKEND=redis://127.0.0.1:6379/0
 USE_REDIS_CACHE=false
 ```
+
+#### Firebase Admin Credentials Setup
+
+Because the project uses Firebase for user authentication, you must configure the backend to use your Firebase service account key:
+1. Obtain the service account key JSON file from the Firebase Console (Project Settings -> Service Accounts -> Generate new private key).
+2. Save this file as `firebase-service-account.json` and place it inside the `backend/` directory (i.e., `Osdag-web/backend/firebase-service-account.json`).
+3. If this file is missing, the backend will print a warning on startup and authenticated endpoints will fail token validation.
 
 ### B.16 — Run Django Migrations
 
@@ -602,16 +628,17 @@ chmod +x ~/run-osdag.sh
 | B.6 | Install MacTeX |
 | B.7 | Install Miniconda |
 | B.8 | Create conda env (Python 3.11) |
-| B.9 | Clone repository |
-| B.10 | Install Python deps (`pip install -r requirements.txt`) |
-| B.11 | Install PostgreSQL 14 via Homebrew |
-| B.12 | Create Postgres role + database |
-| B.13 | Install Redis via Homebrew |
-| B.14 | Configure Django environment variables |
-| B.15 | Run `python manage.py migrate` |
-| B.16 | Run `python populate_database.py` |
-| B.17 | Install Node.js 20 via NVM |
-| B.18 | Install frontend deps (`npm install`) |
-| B.19 | Configure frontend `.env` |
-| B.20 | Start Django, Celery, and Vite (3 terminals) |
-| B.21 | Open http://localhost:5173 |
+| B.9 | Install Conda-Forge deps (`pythonocc-core`, `cairo`) |
+| B.10 | Clone repository |
+| B.11 | Install Python deps (`pip install -r requirements.txt`) |
+| B.12 | Install PostgreSQL 14 via Homebrew |
+| B.13 | Create Postgres role + database |
+| B.14 | Install Redis via Homebrew |
+| B.15 | Configure Django environment variables |
+| B.16 | Run `python manage.py migrate` |
+| B.17 | Run `python populate_database.py` |
+| B.18 | Install Node.js 20 via NVM |
+| B.19 | Install frontend deps (`npm install`) |
+| B.20 | Configure frontend `.env` |
+| B.21 | Start Django, Celery, and Vite (3 terminals) |
+| B.22 | Open http://localhost:5173 |

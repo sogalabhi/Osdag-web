@@ -19,6 +19,16 @@ Under the hood, Osdag-Web uses an asynchronous architecture powered by **Django*
 
 You can run the Osdag-Web application either using **Docker Compose** (recommended, as it automatically sets up Redis and databases) or **Native Local Development**.
 
+### Firebase Configuration (Prerequisite)
+
+Before running the application via either Docker or Native setups, you must add the Firebase service account credentials JSON file for authentication:
+
+1. Obtain your service account key JSON file from the Firebase Console (Project Settings -> Service Accounts -> Generate new private key).
+2. Save this file as `firebase-service-account.json` and place it inside the `backend/` directory of this repository:
+   ```
+   backend/firebase-service-account.json
+   ```
+
 ### Option A: Using Docker Compose (Recommended)
 
 To run the entire stack (Postgres, Redis, Django, Celery Worker, React frontend) in containers:
@@ -43,26 +53,23 @@ To run the entire stack (Postgres, Redis, Django, Celery Worker, React frontend)
 
 #### Step-by-Step Setup
 
-1. **Activate the Conda Environment**:
-   ```bash
-   conda activate osdag-web
-   ```
-
-2. **Start the Celery Worker**:
-   Open a new terminal session, activate the conda environment, navigate to the `backend` folder, and start the Celery worker:
+1. **Start the Celery Worker**:
+   Open a new terminal session, navigate to the `backend` folder, activate the conda environment, and start the Celery worker:
    ```bash
    cd backend
+   conda activate osdag-web
    celery -A config worker --loglevel=info
    ```
 
-3. **Start the Django Backend**:
-   Open a new terminal session, activate the conda environment, navigate to the `backend` folder, and start the development server:
+2. **Start the Django Backend**:
+   Open another terminal session, navigate to the `backend` folder, activate the conda environment, and start the development server:
    ```bash
    cd backend
+   conda activate osdag-web
    python manage.py runserver 8000
    ```
 
-4. **Start the Vite Frontend**:
+3. **Start the Vite Frontend**:
    Open a new terminal session, navigate to the `frontend` folder, and start the React dev server:
    ```bash
    cd frontend
@@ -70,8 +77,25 @@ To run the entire stack (Postgres, Redis, Django, Celery Worker, React frontend)
    npm run dev
    ```
 
-5. **Access the Application**:
+4. **Access the Application**:
    Navigate to `http://localhost:5173/` in your browser.
+
+---
+
+### Option C: Using the Launcher Script (Linux / macOS)
+
+If you are on Linux or macOS, you can launch all three services (Celery worker, Django backend, and Vite frontend) automatically using the provided `osdagweb.sh` script:
+
+1. Ensure the script is executable:
+   ```bash
+   chmod +x osdagweb.sh
+   ```
+2. Run the script:
+   ```bash
+   ./osdagweb.sh
+   ```
+   This will start all background processes and output their logs into the `logs/` directory. Press `Ctrl-C` at any time to shut down all processes cleanly.
+
 
 ---
 
