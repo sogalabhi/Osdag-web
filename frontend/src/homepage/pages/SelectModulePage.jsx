@@ -39,8 +39,8 @@ const SelectModulePage = () => {
         <div className="relative flex-1 min-h-[100vh] flex flex-col min-w-0 overflow-hidden">
           {/* Background image */}
           <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-[url('/images/background_light.svg')] bg-cover bg-center dark:hidden"></div>
-            <div className="absolute inset-0 bg-[url('/images/background_dark.svg')] bg-cover bg-center hidden dark:block"></div>
+            <div className="absolute inset-0 bg-[url('/images/background_light.svg')] bg-contain bg-right-bottom bg-no-repeat lg:bg-cover lg:bg-center dark:hidden"></div>
+            <div className="absolute inset-0 bg-[url('/images/background_dark.svg')] bg-contain bg-right-bottom bg-no-repeat lg:bg-cover lg:bg-center hidden dark:block"></div>
           </div>
 
           {/* Foreground content */}
