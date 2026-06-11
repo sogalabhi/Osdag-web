@@ -321,10 +321,11 @@ const Header = ({ setshowSideBar, active }) => {
         }}
       />
       {/* Main Header */}
-      <div className="px-4 sm:px-8 md:px-12 pb-8 md:pb-2">
-        <div className="flex items-center justify-between py-4 md:py-0">
+      <div className="px-4 sm:px-8 md:px-12 pb-8 md:pb-2 relative z-30">
+        <div className="flex items-center justify-between py-4 md:py-0 min-h-[80px]">
           {/* Hamburger Menu Icon (Mobile/Tablet Only) */}
-          <button
+          <div className="w-11 lg:hidden flex-shrink-0 z-10">
+            <button
             className="block lg:hidden p-2 rounded-lg text-osdag-text-muted hover:text-osdag-text-primary focus:outline-none focus:ring-2 focus:ring-osdag-green"
             aria-label="Open menu"
             onClick={() => {
@@ -335,9 +336,10 @@ const Header = ({ setshowSideBar, active }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
+          </div>
 
           {/* Logo and Branding */}
-          <div className="flex-1 flex flex-col items-center lg:items-start md:flex-row md:items-end md:space-x-8">
+          <div className="flex-1 flex flex-col items-center lg:items-start md:flex-row md:items-end md:space-x-8 z-0">
             <div className="flex flex-col items-center lg:items-start">
               {/* Osdag Label - Light mode */}
               <img src="/images/Osdag_label.svg" alt="Osdag Logo" className="h-14 md:h-16 mt-2 dark:hidden" />
@@ -636,7 +638,7 @@ const Header = ({ setshowSideBar, active }) => {
           </div>
 
           {/* Desktop Icons */}
-          <div className="hidden md:flex items-center space-x-1 mb-6 md:mb-1 border-black p-2 dark:bg-osdag-dark-color justify-center" >
+          <div className="hidden md:flex items-center space-x-1 mb-6 md:mb-1 border-black p-2 dark:bg-osdag-dark-color justify-center z-10" >
             <div className="relative about-dropdown group ">
               <button
                 onClick={() => setShowAboutDropdown(!showAboutDropdown)}
@@ -985,7 +987,8 @@ const Header = ({ setshowSideBar, active }) => {
             )}
           </div>
 
-
+          {/* Dummy Spacer for Mobile Centering */}
+          <div className="w-11 block md:hidden flex-shrink-0" aria-hidden="true" />
         </div>
       </div>
       {/* Search Section */}

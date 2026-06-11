@@ -218,15 +218,23 @@
 
 .bloc-tabs {
   width: 100%;
-  height: 10%;
   display: flex;
-  justify-content: center;
-  border-bottom:1px solid black;
+  justify-content: flex-start;
+  overflow-x: auto;
+  white-space: nowrap;
+  border-bottom: 1px solid black;
   margin-top: 0.5rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.bloc-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .bloc-tabs button{
-  width: 15%;
+  width: auto;
+  flex-shrink: 0;
 }
 
 .tabs {
@@ -241,9 +249,10 @@
 }
 
 .tabs-design-pref {
-  padding: 0 5px;
+  padding: 10px 15px;
   text-align: center;
-  width: 120%;
+  width: auto;
+  flex-shrink: 0;
   background: rgba(128, 128, 128, 0.075);
   cursor: pointer;
   border-bottom: 1px solid rgba(0, 0, 0, 0.274);
@@ -513,13 +522,13 @@
 .ant-modal .ant-btn {
   background-color: #91b014 !important;
   border-color: #91b014 !important;
-  color: #000 !important;
+  color: #fff !important;
 }
 
 .ant-modal .ant-btn:hover {
   background-color: #7a9612 !important;
   border-color: #7a9612 !important;
-  color: #000 !important;
+  color: #fff !important;
 }
 
 .superMainBody_mid {
@@ -1526,4 +1535,18 @@
 
 .desc-table td {
   background: #f9f9f9;
+}
+
+/* Mobile and Tablet Scroll Prevention when Popup is Open */
+@media screen and (max-width: 1024px) {
+  body.ant-scrolling-effect .superMainBody,
+  body.ant-scrolling-effect .scroll-data,
+  body.ant-scrolling-effect .subMainBody,
+  body.ant-scrolling-effect .InputDock,
+  body.ant-scrolling-effect .OutputDock,
+  body.ant-scrolling-effect .design-pref-cont,
+  body.ant-scrolling-effect .app {
+    overflow: hidden !important;
+    touch-action: none !important;
+  }
 }
