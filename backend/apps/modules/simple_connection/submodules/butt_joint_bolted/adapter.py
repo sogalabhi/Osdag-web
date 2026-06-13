@@ -299,6 +299,22 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     except Exception as stle:
         print(f"[ButtJointBolted CAD] Warning: Failed to save STL for {section}: {stle}")
 
+    # Optional on-demand STEP/IGES exports (only when frontend requests them)
+    export_formats_lc = {f.lower() for f in export_formats} if export_formats else set()
+    if export_formats_lc:
+        try:
+            from apps.core.utils.cad_export import export_step, export_iges
+            if "step" in export_formats_lc:
+                step_rel = file_path.replace(".brep", ".step")
+                export_step(model, os.path.join(os.getcwd(), step_rel))
+                print(f"[ButtJointBolted CAD] STEP file saved: {step_rel}")
+            if "iges" in export_formats_lc:
+                iges_rel = file_path.replace(".brep", ".iges")
+                export_iges(model, os.path.join(os.getcwd(), iges_rel))
+                print(f"[ButtJointBolted CAD] IGES file saved: {iges_rel}")
+        except Exception as e:
+            print(f"[ButtJointBolted CAD] Warning: Optional STEP/IGES export failed: {e}")
+
     print(f"[ButtJointBolted CAD] CAD generation completed successfully. Returning path: {file_path}")
     return file_path
 
