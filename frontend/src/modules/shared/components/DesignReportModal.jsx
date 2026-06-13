@@ -137,13 +137,20 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
         }
       }
       // Transform input values using the same logic as design calculation
-      const transformedInputValues = moduleConfig?.buildSubmissionParams ?
-        moduleConfig.buildSubmissionParams(inputValues, allSelected, lists || {
-          boltDiameterList,
-          propertyClassList,
-          thicknessList,
-          angleList,
-        }, extraState) : inputValues;
+      let transformedInputValues = inputValues;
+      if (moduleConfig?.buildSubmissionParams) {
+        try {
+          transformedInputValues = moduleConfig.buildSubmissionParams(inputValues, allSelected, lists || {
+            boltDiameterList,
+            propertyClassList,
+            thicknessList,
+            angleList,
+          }, extraState);
+        } catch (transformErr) {
+          console.warn("[DesignReportModal] buildSubmissionParams failed, using raw inputs:", transformErr.message);
+          transformedInputValues = inputValues;
+        }
+      }
 
       // Optionally capture CAD views for report images (frontend-driven).
       // Force Model view so report shows full assembly, not the current per-part view.
