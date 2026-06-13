@@ -59,7 +59,7 @@ services:
     command: >
       bash -c "/opt/conda/envs/osdag_env/bin/python manage.py migrate &&
       /opt/conda/envs/osdag_env/bin/python populate_database.py &&
-      /opt/conda/envs/osdag_env/bin/gunicorn config.asgi:application 
+      exec /opt/conda/envs/osdag_env/bin/gunicorn config.asgi:application 
       --bind 0.0.0.0:8000 
       --workers 2 
       --worker-class uvicorn.workers.UvicornWorker 
@@ -93,7 +93,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: bash -c "cd /app && PYTHONPATH=/app:/app/backend /opt/conda/envs/osdag_env/bin/celery -A config worker -Q calculations,cad,reports,celery --loglevel=info --concurrency=4"
+    command: bash -c "cd /app && exec PYTHONPATH=/app:/app/backend /opt/conda/envs/osdag_env/bin/celery -A config worker -Q calculations,cad,reports,celery --loglevel=info --concurrency=4"
 
   frontend:
     build:

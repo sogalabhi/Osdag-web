@@ -13,7 +13,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libglu1-mesa \
     wkhtmltopdf \
     texlive-latex-base \
+    texlive-latex-recommended \
+    texlive-latex-extra \
     texlive-fonts-recommended \
+    lmodern \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/requirements.txt

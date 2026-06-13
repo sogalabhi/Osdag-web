@@ -72,7 +72,7 @@ run_in_conda() {
         source '$CONDA_SH'
         conda activate '$CONDA_ENV'
         cd '$workdir'
-        $*
+        exec \$*
     " >>"$logfile" 2>&1 &
 
   echo $! # return PID
@@ -120,7 +120,7 @@ sleep 1
 FRONTEND_LOG="$REPO_ROOT/logs/osdagweb_frontend.log"
 mkdir -p "$REPO_ROOT/logs"
 log "Starting ${BOLD}frontend${RESET} → log: logs/osdagweb_frontend.log"
-bash -c "cd '$FRONTEND_DIR' && npm run dev" \
+bash -c "cd '$FRONTEND_DIR' && exec npm run dev" \
   >>"$FRONTEND_LOG" 2>&1 &
 FRONTEND_PID=$!
 PIDS+=("$FRONTEND_PID")
