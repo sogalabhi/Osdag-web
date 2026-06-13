@@ -39,6 +39,18 @@ const Header = ({ setshowSideBar, active }) => {
   const [showPluginsTooltip, setShowPluginsTooltip] = useState(false);
   const [showThemeTooltip, setShowThemeTooltip] = useState(false);
 
+  useEffect(() => {
+    if (!showPluginsTooltip) return;
+    const id = window.setTimeout(() => setShowPluginsTooltip(false), 2000);
+    return () => window.clearTimeout(id);
+  }, [showPluginsTooltip]);
+
+  useEffect(() => {
+    if (!showThemeTooltip) return;
+    const id = window.setTimeout(() => setShowThemeTooltip(false), 2000);
+    return () => window.clearTimeout(id);
+  }, [showThemeTooltip]);
+
   // Check if user is a guest
   const isGuest = isGuestUser();
 
@@ -394,7 +406,6 @@ const Header = ({ setshowSideBar, active }) => {
                 <button
                   onClick={() => {
                     setShowPluginsTooltip(true);
-                    setTimeout(() => setShowPluginsTooltip(false), 2000);
                   }}
                   className="p-2 sm:p-3 text-osdag-text-muted hover:text-white dark:text-gray-400 dark:hover:text-white transition-all duration-300 hover:bg-osdag-green rounded-xl"
                 >
@@ -561,7 +572,6 @@ const Header = ({ setshowSideBar, active }) => {
                 className="relative group cursor-not-allowed"
                 onClick={() => {
                   setShowThemeTooltip(true);
-                  setTimeout(() => setShowThemeTooltip(false), 2000);
                 }}
               >
                 <button

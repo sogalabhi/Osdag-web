@@ -22,7 +22,9 @@ const Homepage = () => {
         {showSideBar && (
           <div className="fixed inset-0 z-40 flex">
             {/* Overlay to close sidebar */}
-            <div
+            <button
+              type="button"
+              aria-label="Close sidebar"
               className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30 cursor-pointer"
               onClick={() => setshowSideBar(false)}
             />

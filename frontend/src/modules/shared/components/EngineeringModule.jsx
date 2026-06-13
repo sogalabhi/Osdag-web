@@ -272,12 +272,7 @@ export const EngineeringModule = ({
     return out;
   }, [cadModelPaths]);
 
-  // Debug: log CAD paths when they change
-  useEffect(() => {
-    if (normalizedCadModelPaths) {
-      const keys = Object.keys(normalizedCadModelPaths || {});
-    }
-  }, [normalizedCadModelPaths, selectedSection]);
+
 
 
 
@@ -431,11 +426,15 @@ export const EngineeringModule = ({
 
       // Auto-trigger report generation if ?action=report is in the URL
       const searchParams = new URLSearchParams(location.search);
+      let timerId;
       if (searchParams.get('action') === 'report') {
-        setTimeout(() => {
+        timerId = setTimeout(() => {
           if (handleCreateDesignReport) handleCreateDesignReport();
         }, 1000);
       }
+      return () => {
+        if (timerId) clearTimeout(timerId);
+      };
     } else if (isRedesigning || status.step === DESIGN_STATUS.CALCULATING || status.step === DESIGN_STATUS.CAD_GENERATING) {
       // Reset the completion flag when redesigning or during design process
       if (isRedesigning) {
