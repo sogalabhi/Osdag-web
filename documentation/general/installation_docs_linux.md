@@ -31,6 +31,10 @@ This guide covers two ways to run **Osdag-Web** on Ubuntu/Linux:
 
 ### A.2 — Install Docker Engine
 
+Choose the installation instructions for your distribution:
+
+#### Ubuntu / Debian
+
 ```bash
 # Remove old Docker versions if present
 sudo apt remove -y docker docker-engine docker.io containerd runc
@@ -55,6 +59,19 @@ sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
+#### Arch Linux
+
+```bash
+# Install Docker and Docker Compose
+sudo pacman -Syu docker docker-compose
+
+# Start and enable the Docker service
+sudo systemctl start docker.service
+sudo systemctl enable docker.service
+```
+
+#### Post-Installation Steps (All Distributions)
+
 Verify the installation:
 
 ```bash
@@ -66,15 +83,26 @@ Add your user to the `docker` group so you can run Docker without `sudo`:
 
 ```bash
 sudo usermod -aG docker $USER
-# Log out and log back in for this to take effect
+# Log out and log back in (or run 'newgrp docker') for this to take effect
 ```
 
 ### A.3 — Install Git
+
+Choose the installation instructions for your distribution:
+
+#### Ubuntu / Debian
 
 ```bash
 sudo apt update
 sudo apt install -y git
 ```
+
+#### Arch Linux
+
+```bash
+sudo pacman -S git
+```
+
 
 ### A.4 — Clone the Repository
 

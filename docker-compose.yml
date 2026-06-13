@@ -29,6 +29,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host
     restart: unless-stopped
     user: "1000:1000"
     ports:
@@ -68,6 +69,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host
     restart: unless-stopped
     user: "1000:1000" # Fixed mapping profile matching your laptop workspace properties
     volumes:
@@ -97,6 +99,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      network: host
     restart: unless-stopped
     ports:
       - "5173:5173"

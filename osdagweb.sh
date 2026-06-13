@@ -23,30 +23,35 @@ FRONTEND_DIR="$REPO_ROOT/frontend"
 CONDA_ENV="osdag-web"
 
 # ---------- colour helpers ----------
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
-CYAN='\033[0;36m'; BOLD='\033[1m'; RESET='\033[0m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+RESET='\033[0m'
 
-log()  { echo -e "${CYAN}[osdagweb]${RESET} $*"; }
-ok()   { echo -e "${GREEN}[osdagweb]${RESET} $*"; }
+log() { echo -e "${CYAN}[osdagweb]${RESET} $*"; }
+ok() { echo -e "${GREEN}[osdagweb]${RESET} $*"; }
 warn() { echo -e "${YELLOW}[osdagweb]${RESET} $*"; }
-err()  { echo -e "${RED}[osdagweb]${RESET} $*" >&2; }
+err() { echo -e "${RED}[osdagweb]${RESET} $*" >&2; }
 
 # ---------- locate conda ----------
 CONDA_SH=""
 for candidate in \
-    "$HOME/miniconda3/etc/profile.d/conda.sh" \
-    "$HOME/anaconda3/etc/profile.d/conda.sh" \
-    "/opt/conda/etc/profile.d/conda.sh" \
-    "/usr/local/anaconda3/etc/profile.d/conda.sh"; do
-    if [[ -f "$candidate" ]]; then
-        CONDA_SH="$candidate"
-        break
-    fi
+  "$HOME/miniconda3/etc/profile.d/conda.sh" \
+  "$HOME/anaconda3/etc/profile.d/conda.sh" \
+  "/opt/conda/etc/profile.d/conda.sh" \
+  "/opt/miniconda3/etc/profile.d/conda.sh" \
+  "/usr/local/anaconda3/etc/profile.d/conda.sh"; do
+  if [[ -f "$candidate" ]]; then
+    CONDA_SH="$candidate"
+    break
+  fi
 done
 
 if [[ -z "$CONDA_SH" ]]; then
-    err "Could not find conda.sh. Set CONDA_SH manually in this script."
-    exit 1
+  err "Could not find conda.sh. Set CONDA_SH manually in this script."
+  exit 1
 fi
 
 log "Using conda init script: $CONDA_SH"
@@ -54,36 +59,38 @@ log "Using conda init script: $CONDA_SH"
 # ---------- helper: run a command inside the conda env ----------
 # Usage: run_in_conda <label> <working_dir> <cmd…>
 run_in_conda() {
-    local label="$1"; shift
-    local workdir="$1"; shift
-    local logfile="$REPO_ROOT/logs/osdagweb_${label}.log"
-    mkdir -p "$REPO_ROOT/logs"
+  local label="$1"
+  shift
+  local workdir="$1"
+  shift
+  local logfile="$REPO_ROOT/logs/osdagweb_${label}.log"
+  mkdir -p "$REPO_ROOT/logs"
 
-    log "Starting ${BOLD}${label}${RESET} → log: logs/osdagweb_${label}.log"
+  log "Starting ${BOLD}${label}${RESET} → log: logs/osdagweb_${label}.log"
 
-    bash -c "
+  bash -c "
         source '$CONDA_SH'
         conda activate '$CONDA_ENV'
         cd '$workdir'
         $*
-    " >> "$logfile" 2>&1 &
+    " >>"$logfile" 2>&1 &
 
-    echo $!  # return PID
+  echo $! # return PID
 }
 
 # ---------- track child PIDs for clean shutdown ----------
 PIDS=()
 
 cleanup() {
-    echo ""
-    warn "Shutting down all services…"
-    for pid in "${PIDS[@]}"; do
-        if kill -0 "$pid" 2>/dev/null; then
-            kill "$pid" 2>/dev/null && ok "Stopped PID $pid"
-        fi
-    done
-    ok "All services stopped."
-    exit 0
+  echo ""
+  warn "Shutting down all services…"
+  for pid in "${PIDS[@]}"; do
+    if kill -0 "$pid" 2>/dev/null; then
+      kill "$pid" 2>/dev/null && ok "Stopped PID $pid"
+    fi
+  done
+  ok "All services stopped."
+  exit 0
 }
 trap cleanup SIGINT SIGTERM
 
@@ -91,17 +98,17 @@ trap cleanup SIGINT SIGTERM
 # 1. Celery worker
 # ============================================================
 CELERY_PID=$(run_in_conda "celery" "$BACKEND_DIR" \
-    "celery -A config worker --loglevel=info")
+  "celery -A config worker --loglevel=info")
 PIDS+=("$CELERY_PID")
 ok "Celery worker started (PID $CELERY_PID)"
 
-sleep 1   # let celery init before Django
+sleep 1 # let celery init before Django
 
 # ============================================================
 # 2. Django backend
 # ============================================================
 DJANGO_PID=$(run_in_conda "django" "$BACKEND_DIR" \
-    "python manage.py runserver 8000")
+  "python manage.py runserver 8000")
 PIDS+=("$DJANGO_PID")
 ok "Django backend started (PID $DJANGO_PID)"
 
@@ -113,8 +120,8 @@ sleep 1
 FRONTEND_LOG="$REPO_ROOT/logs/osdagweb_frontend.log"
 mkdir -p "$REPO_ROOT/logs"
 log "Starting ${BOLD}frontend${RESET} → log: logs/osdagweb_frontend.log"
-bash -c "cd '$FRONTEND_DIR' && npm install --silent && npm run dev" \
-    >> "$FRONTEND_LOG" 2>&1 &
+bash -c "cd '$FRONTEND_DIR' && npm run dev" \
+  >>"$FRONTEND_LOG" 2>&1 &
 FRONTEND_PID=$!
 PIDS+=("$FRONTEND_PID")
 ok "Vite frontend started (PID $FRONTEND_PID)"
