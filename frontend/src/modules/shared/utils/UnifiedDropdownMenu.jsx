@@ -8,7 +8,7 @@ import { openOsiFile } from "../../../datasources/osiDataSource";
 import { loadStateFromOsi } from "./osiLoader";
 import { downloadSectionCatalog } from "../../../datasources/sectionsDataSource";
 import { getModuleConfig } from "./moduleConfig";
-import { expandAllSelectedInputs, buildOsiContent } from "./osiInputSerializer";
+import { expandAllSelectedInputs } from "./osiInputSerializer";
 import { buildLogFileContent } from "./logExport";
 import {
   downloadCadSectionsAsStl,
@@ -25,10 +25,10 @@ function UnifiedDropdownMenu({
   allSelected,
   setInputs,
   setAllSelected = () => { },
-  setDesignPrefOverrides = () => {},
-  setExtraState = () => {},
-  setSelectionStates = () => {},
-  setSelectedItems = () => {},
+  setDesignPrefOverrides = () => { },
+  setExtraState = () => { },
+  setSelectionStates = () => { },
+  setSelectedItems = () => { },
   logs,
   setCreateDesignReportBool,
   setSaveInputFileName,
@@ -122,32 +122,7 @@ function UnifiedDropdownMenu({
     });
   };
 
-  const buildContentString = () => {
-    return buildOsiContent({
-      inputs,
-      allSelected,
-      boltDiameterList,
-      propertyClassList,
-      thicknessList,
-      angleList,
-      topAngleList,
-      selectedOption,
-    });
-  };
 
-  const downloadInput = () => {
-    const content = buildContentString();
-    let element = document.createElement("a");
-    element.setAttribute(
-      "href",
-      "data:application/json;charset=utf-8," + encodeURIComponent(content)
-    );
-    element.setAttribute("download", "input_osdag.osi");
-    element.style.display = "none";
-    parentRef.current.appendChild(element);
-    element.click();
-    parentRef.current.removeChild(element);
-  };
 
   const getContextData = () =>
     contextData || {
@@ -238,9 +213,7 @@ function UnifiedDropdownMenu({
       case "Load Input":
         loadInput();
         break;
-      // case "Download Input":
-      //   downloadInput();
-      //   break;
+
       case "Download Osi":
       case "Download Inputs OSI":
         saveInput();
@@ -395,31 +368,6 @@ function UnifiedDropdownMenu({
     }
   };
 
-  // UTILITY FUNCTIONS
-  const formatArrayForText = (arr) => {
-    if (!arr || arr.length === 0) return "";
-    let text = "";
-    for (let i = 0; i < arr.length; i++) {
-      if (i !== arr.length - 1) text += `- '${arr[i]}'\n`;
-      else text += `- '${arr[i]}'`;
-    }
-    return text;
-  };
-
-  const getFormatedArrayFields = (arr, index) => {
-    let res = [];
-    for (let i = index + 1; i < arr.length; i++) {
-      const line = arr[i].trim();
-      if (!line.startsWith("-")) break;
-
-      const match = line.match(/'([^']+)'/);
-      if (match) {
-        res.push(match[1]);
-      }
-    }
-    return res;
-  };
-
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (parentRef.current && !parentRef.current.contains(event.target)) {
@@ -459,8 +407,8 @@ function UnifiedDropdownMenu({
               >
                 <div
                   className={`flex w-full justify-between text-sm p-1 ${isDisabled
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-black hover:text-white hover:bg-osdag-green cursor-pointer"
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-black hover:text-white hover:bg-osdag-green cursor-pointer"
                     }`}
                   onClick={() => {
                     if (isDisabled) return;
