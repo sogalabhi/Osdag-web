@@ -88,7 +88,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery -A config worker --workdir=/app -Q calculations --loglevel=info --concurrency=32"
+    command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery -A config worker --workdir=/app -Q calculations --loglevel=info --concurrency=18"
 
   celery_worker_cad:
     build:
@@ -116,7 +116,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery -A config worker --workdir=/app -Q cad --loglevel=info --concurrency=16 --max-tasks-per-child=10"
+    command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery -A config worker --workdir=/app -Q cad --loglevel=info --concurrency=8 --max-tasks-per-child=10"
 
   celery_worker_reports:
     build:
@@ -144,7 +144,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery -A config worker --workdir=/app -Q reports --loglevel=info --concurrency=8"
+    command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery -A config worker --workdir=/app -Q reports --loglevel=info --concurrency=4"
 
   frontend:
     build:
