@@ -24,63 +24,23 @@ class SaveOsiFromInputs(APIView):
             name = request.data.get('name')
             module_id = request.data.get('module_id')
             inputs = request.data.get('inputs')
-            inline = False
-            try:
-                # allow caller to force inline/base64 response even for authenticated users
-                inline = bool(request.data.get('inline')) or bool(request.GET.get('inline'))
-            except Exception:
-                inline = False
 
             payload = build_osi_payload(name=name, module_id=module_id, inputs=inputs or {})
             
-            # Check if user is guest (guests don't send authentication tokens)
-            is_guest = not (hasattr(request, 'user') and request.user.is_authenticated)
-
-            # For guests OR when inline flag is set: return OSI content for download (no DB save)
-            if is_guest or inline:
-                import base64
-                content_file = make_osifile_contentfile(payload)
-                content_bytes = content_file.read()
-                content_base64 = base64.b64encode(content_bytes).decode('ascii')
-                safe_name = (name or 'project').replace(' ', '_')[:50]
-                filename = f"{safe_name}_{module_id}.osi"
-                
-                return JsonResponse({
-                    'success': True,
-                    'is_guest': True,
-                    'filename': filename,
-                    'content_base64': content_base64,
-                    'message': 'OSI file generated. Download available.'
-                }, safe=False, status=200)
-
-            # For authenticated users: save to database
+            import base64
             content_file = make_osifile_contentfile(payload)
-
-            # Determine owner email from JWT or user
-            owner_email = getattr(request.user, 'email', None)
-            if not owner_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
-                owner_email = request.auth.get('email')
-
-            osifile = OsiFile.objects.create(owner_email=owner_email, original_name=f"{name}.osi")
-            # generate a safe filename
+            content_bytes = content_file.read()
+            content_base64 = base64.b64encode(content_bytes).decode('ascii')
             safe_name = (name or 'project').replace(' ', '_')[:50]
             filename = f"{safe_name}_{module_id}.osi"
-            osifile.file.save(filename, content_file, save=True)
-            try:
-                osifile.size_bytes = osifile.file.size
-            except Exception:
-                pass
-            osifile.content_type = 'text/plain'
-            osifile.save()
-
-            serializer = OsiFileSerializer(osifile)
-            # Do not create a Project here. Frontend will update existing project with this URL.
+            
             return JsonResponse({
                 'success': True,
-                'is_guest': False,
-                'data': serializer.data,
-                'url': osifile.file.url
-            }, safe=False, status=201)
+                'is_guest': True,
+                'filename': filename,
+                'content_base64': content_base64,
+                'message': 'OSI file generated. Download available.'
+            }, safe=False, status=200)
         except Exception as e:
             print('Error in SaveOsiFromInputs:', e)
             return JsonResponse({'success': False, 'error': str(e)}, safe=False, status=400)
@@ -172,19 +132,6 @@ class ProjectOsiDownload(APIView):
             project = Project.objects.get(id=project_id, user_email=requester_email)
 
             inputs = getattr(project, 'inputs_json', None) or {}
-            if inputs is None:
-                inputs = {}
-
-            # Handle nested structure
-            if "dock" in inputs or "pref" in inputs or (isinstance(inputs, dict) and "inputs" in inputs):
-                dock = inputs.get("dock") or inputs.get("inputs", {}).get("dock", {})
-                pref = inputs.get("pref") or inputs.get("inputs", {}).get("pref", {})
-                combined = {**dock}
-                for k, v in pref.items():
-                    combined[f"Pref.{k}"] = v
-                inputs = combined
-
-            # Choose module identifier for OSI payload (prefer submodule, fallback to module)
             module_id = getattr(project, 'submodule', None) or getattr(project, 'module', None) or 'FinPlateConnection'
 
             payload = build_osi_payload(name=project.name or 'project', module_id=module_id, inputs=inputs)

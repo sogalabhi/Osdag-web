@@ -88,5 +88,5 @@ class EmailVerificationTests(TestCase):
             "inputs": {"material": "E 250 (Fe 410 W)A"}
         }
         r = self.client.post("/api/save-osi-from-inputs/", data=osi_data, content_type="application/json", **headers)
-        self.assertEqual(r.status_code, 201)
+        self.assertEqual(r.status_code, 200)
         self.assertTrue(r.json().get("success"))

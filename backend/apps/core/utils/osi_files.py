@@ -16,6 +16,153 @@ def validate_module_id(module_id: str) -> bool:
     return bool(re.fullmatch(r"[A-Za-z0-9_-]{2,64}", module_id))
 
 
+def flatten_and_translate_keys(inputs: Dict[str, Any]) -> Dict[str, Any]:
+    if not isinstance(inputs, dict):
+        return {}
+
+    dock = inputs.get("dock") or {}
+    pref = inputs.get("pref") or {}
+
+    # If it is not nested under dock/pref, assume it is already flat
+    if not dock and not pref:
+        inner_inputs = inputs.get("inputs")
+        if isinstance(inner_inputs, dict) and ("dock" in inner_inputs or "pref" in inner_inputs):
+            dock = inner_inputs.get("dock") or {}
+            pref = inner_inputs.get("pref") or {}
+        else:
+            return inputs
+
+    combined = {}
+
+    baseline_aliases = {
+        "Bolt.Bolt_Hole_Type": "bolt_hole_type",
+        "Bolt.Diameter": "bolt_diameter",
+        "Bolt.Grade": "bolt_grade",
+        "Bolt.Slip_Factor": "bolt_slip_factor",
+        "Bolt.TensionType": "bolt_tension_type",
+        "Bolt.Type": "bolt_type",
+        "Connector.Material": "connector_material",
+        "Design.Design_Method": "design_method",
+        "Detailing.Corrosive_Influences": "detailing_corr_status",
+        "Detailing.Edge_type": "detailing_edge_type",
+        "Detailing.Gap": "detailing_gap",
+        "Load.Axial": "load_axial",
+        "Load.Axial.Force": "axial_force",
+        "Load.Shear.Force": "shear_force",
+        "Load.Shear": "load_shear",
+        "Material": "material",
+        "Plate1Thickness": "plate1_thickness",
+        "Plate2Thickness": "plate2_thickness",
+        "PlateWidth": "plate_width",
+        "Weld.Fab": "weld_fab",
+        "Weld.Material_Grade_OverWrite": "weld_material_grade",
+        "Weld.Size": "weld_size",
+        "Weld.Type": "weld_type"
+    }
+
+    # Reverse aliases mapping: snake_case -> PascalCase
+    reverse_aliases = {v: k for k, v in baseline_aliases.items()}
+
+    # 1. Translate and flatten dock keys
+    for k, v in dock.items():
+        if k in reverse_aliases:
+            combined[reverse_aliases[k]] = v
+        else:
+            # Fallback: convert snake_case to PascalCase (best effort)
+            pascal_key = ''.join(word.capitalize() for word in k.split('_'))
+            combined[pascal_key] = v
+
+    # 2. Translate and flatten pref keys (prefix with Pref.)
+    for k, v in pref.items():
+        pascal_key = ''.join(word.capitalize() for word in k.split('_'))
+        combined[f"Pref.{pascal_key}"] = v
+
+    return combined
+
+
+def normalize_osi_keys(flat_inputs: Dict[str, Any]) -> Dict[str, Any]:
+    if not isinstance(flat_inputs, dict):
+        return {"dock": {}, "pref": {}}
+
+    # If already nested under dock/pref, return as-is
+    if "dock" in flat_inputs or "pref" in flat_inputs:
+        return {
+            "dock": flat_inputs.get("dock") or {},
+            "pref": flat_inputs.get("pref") or {}
+        }
+    if "inputs" in flat_inputs and isinstance(flat_inputs["inputs"], dict) and ("dock" in flat_inputs["inputs"] or "pref" in flat_inputs["inputs"]):
+        inputs = flat_inputs["inputs"]
+        return {
+            "dock": inputs.get("dock") or {},
+            "pref": inputs.get("pref") or {}
+        }
+
+    dock = {}
+    pref = {}
+
+    baseline_aliases = {
+        "Bolt.Bolt_Hole_Type": "bolt_hole_type",
+        "Bolt.Diameter": "bolt_diameter",
+        "Bolt.Grade": "bolt_grade",
+        "Bolt.Slip_Factor": "bolt_slip_factor",
+        "Bolt.TensionType": "bolt_tension_type",
+        "Bolt.Type": "bolt_type",
+        "Connector.Material": "connector_material",
+        "Design.Design_Method": "design_method",
+        "Detailing.Corrosive_Influences": "detailing_corr_status",
+        "Detailing.Edge_type": "detailing_edge_type",
+        "Detailing.Gap": "detailing_gap",
+        "Load.Axial": "load_axial",
+        "Load.Axial.Force": "axial_force",
+        "Load.Shear.Force": "shear_force",
+        "Load.Shear": "load_shear",
+        "Material": "material",
+        "Plate1Thickness": "plate1_thickness",
+        "Plate2Thickness": "plate2_thickness",
+        "PlateWidth": "plate_width",
+        "Weld.Fab": "weld_fab",
+        "Weld.Material_Grade_OverWrite": "weld_material_grade",
+        "Weld.Size": "weld_size",
+        "Weld.Type": "weld_type"
+    }
+
+    for key, value in flat_inputs.items():
+        if key.startswith("Pref."):
+            pref_key = key[5:]
+            clean_pref_key = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', pref_key).replace('.', '_').lower()
+            pref[clean_pref_key] = value
+        elif key in baseline_aliases:
+            dock[baseline_aliases[key]] = value
+        else:
+            clean_key = re.sub(r'^(Bolt|Connector|Design|Detailing|Load|Member|Weld)\.', '', key)
+            clean_key = clean_key.replace('.', '_')
+            clean_key = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', clean_key).lower()
+            dock[clean_key] = value
+
+    connectivity = flat_inputs.get("Connectivity *") or flat_inputs.get("Connectivity")
+    if connectivity:
+        dock["connectivity"] = str(connectivity).strip()
+
+    supporting_desc = flat_inputs.get("Member.Supporting_Section.Designation") or flat_inputs.get("Supporting_Section.Designation")
+    if supporting_desc:
+        dock["supporting_designation"] = supporting_desc
+        dock["column_section"] = supporting_desc
+        dock["member_designation"] = supporting_desc
+
+    supported_desc = flat_inputs.get("Member.Supported_Section.Designation") or flat_inputs.get("Supported_Section.Designation")
+    if supported_desc:
+        dock["supported_designation"] = supported_desc
+        dock["beam_section"] = supported_desc
+        if "member_designation" not in dock:
+            dock["member_designation"] = supported_desc
+
+    direct_desc = flat_inputs.get("Member.Designation") or flat_inputs.get("Designation")
+    if direct_desc:
+        dock["member_designation"] = direct_desc
+
+    return {"dock": dock, "pref": pref}
+
+
 def build_osi_payload(name: str, module_id: str, inputs: Dict[str, Any]) -> Dict[str, Any]:
     if not name or not isinstance(name, str):
         raise ValueError("Invalid project name")
@@ -27,7 +174,7 @@ def build_osi_payload(name: str, module_id: str, inputs: Dict[str, Any]) -> Dict
         "version": OSI_SCHEMA_VERSION,
         "name": name,
         "module_id": module_id,
-        "inputs": inputs,
+        "inputs": flatten_and_translate_keys(inputs),
         "meta": {
             "saved_at": datetime.utcnow().isoformat() + "Z",
         },
@@ -139,7 +286,7 @@ def parse_osi(text: str) -> Tuple[str, str, Dict[str, Any]]:
         inputs = data.get("inputs")
         if not name or not validate_module_id(module_id) or not isinstance(inputs, dict):
             raise ValueError("Malformed OSI payload")
-        return module_id, name, inputs
+        return module_id, name, normalize_osi_keys(inputs)
     except Exception:
         # Fallback to flat YAML
         flat_inputs = _parse_flat_yaml(text)
@@ -148,9 +295,8 @@ def parse_osi(text: str) -> Tuple[str, str, Dict[str, Any]]:
         if not module_id:
             raise ValueError("Module missing in OSI")
 
-        # Simply return the parsed flat dictionary as inputs!
         name = flat_inputs.get("name") or module_id
-        return module_id, name, flat_inputs
+        return module_id, name, normalize_osi_keys(flat_inputs)
 
 
 def make_osifile_contentfile(payload: Dict[str, Any]) -> ContentFile:

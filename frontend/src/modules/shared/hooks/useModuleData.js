@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { MODULE_DATA_LIST_KEYS, API_KEY_MAP } from "../constants/moduleDataKeys";
 
 const CUSTOM_SECTION_EVENT = "osdag:custom-section-added";
@@ -37,7 +37,7 @@ const mergeLocalCustomSections = (data, localCustomSections) => {
  */
 export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) => {
   const initialState = MODULE_DATA_LIST_KEYS.reduce((acc, k) => ({ ...acc, [k]: [] }), {});
-  const [moduleData, setModuleData] = useState(initialState);
+  const [baseModuleData, setBaseModuleData] = useState(initialState);
   const [localCustomSections, setLocalCustomSections] = useState({});
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) 
             acc[camel] = pick(camel, API_KEY_MAP[camel]);
             return acc;
           }, {});
-          setModuleData(mergeLocalCustomSections(next, localCustomSections));
+          setBaseModuleData(next);
         }
       } catch (error) {
         console.error("Failed to load module data:", error);
@@ -74,9 +74,13 @@ export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) 
     };
 
     loadModuleData();
-  }, [designType, getModuleData, optionsRefetchKey, localCustomSections]);
+  }, [designType, getModuleData, optionsRefetchKey]);
 
-  return moduleData;
+  const mergedOptions = useMemo(() => {
+    return mergeLocalCustomSections(baseModuleData, localCustomSections);
+  }, [baseModuleData, localCustomSections]);
+
+  return mergedOptions;
 };
 
 export const notifyCustomSectionAdded = ({ table, designation }) => {

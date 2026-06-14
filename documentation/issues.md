@@ -1,6 +1,6 @@
-# Fixed & Resolved Issues (Chapters 1 to 4)
+# Fixed & Resolved Issues (Chapters 1 to 6)
 
-This document tracks all the architecture, storage, performance, and security issues resolved across Chapters 1 through 4 of the Osdag-Web codebase.
+This document tracks all the architecture, storage, performance, and security issues resolved across Chapters 1 through 6 of the Osdag-Web codebase.
 
 | # | Chapter / Issue Title | Target Component | Description (1-2 lines) | Resolution Summary |
 |---|------------------------|------------------|--------------------------|--------------------|
@@ -15,4 +15,13 @@ This document tracks all the architecture, storage, performance, and security is
 | **9** | **Chapter 4: High DB Write Volume on Auto-save** | Design Submission / DB | Saving the full project payload on every successful calculation created heavy PostgreSQL write traffic. | Implemented a 5-second debounced save on calculation success, with immediate flush on unmount to prevent data loss. |
 | **10** | **Chapter 4: Project Creation Before Calculation Run** | Project Creation Flow | Projects could be registered with inputs configured but outputs left as `null`, bypasses design verify logic. | Disabled the "Create Project" button and blocked keyboard shortcut actions if calculations have not run (`hasOutput` is false). |
 | **11** | **Chapter 4: Legacy & Unimplemented Database Schema Fields** | Backend Models / DB Schema | Legacy `Design` model, `Project.osi_file_path`, and `UserAccount.allInputValueFiles` fields/views were dead, relational schema leftovers. | Removed unused database columns, cleaned views/middleware referencing them, deleted `ObtainInputFileView`, and updated database schema. |
+| **12** | **Chapter 5: Download OSI in Module Page (DB & Storage Accumulation)** | OSI Export API | Authenticated exports generated physical files on disk and wrote a database entry in `OsiFile`, causing disk bloat. | Streamlined `SaveOsiFromInputs` to always return base64 inline content, avoiding physical file storage and DB write overhead entirely. |
+| **13** | **Chapter 5: Download OSI in Project / Dashboard List Page (Key Flattening Drift)** | OSI Export / Flattening | Flattener logic was duplicated and handled manually, leading to key normalization/translation drift. | Integrated dynamic key translation and flattening in `build_osi_payload` on the backend via a unified mappings dict. |
+| **14** | **Chapter 5: Import OSI from Homepage / Dashboard (Inconsistent Parsing Engine)** | OSI Homepage Import | Homepage OSI imports used client-side JavaScript (`yaml-js`) which was error-prone and inconsistent with the backend Python parser. | Refactored homepage file loader to route uploaded OSI files through the stateless backend `/api/open-osi/` parser endpoint. |
+| **15** | **Chapter 5: Import OSI in Module Page (Key Mapping & Translation Drift)** | OSI Parse / Normalization | Dotted PascalCase keys from flat files had to be mapped and translated entirely on the client-side. | Integrated the translation mappings directly into `parse_osi` on the backend, returning web-ready `{ dock, pref }` inputs. |
+| **16** | **Chapter 6: Keyboard Navigation Lock Bypass** | Form Engine / Input Controls | Keyboard-navigating users could press the `Tab` key to focus and edit locked inputs, bypassing the lock interceptor. | Bound text `<input>` and React `<Select>` elements' `disabled`/`isDisabled` props to the `isInputLocked` state. |
+| **17** | **Chapter 6: Redundant Network Re-fetches on Custom Section Events** | `useModuleData.js` / Options Fetch | Adding a custom section dispatched `osdag:custom-section-added`, which changed `localCustomSections` state. Because `localCustomSections` was included in the options-fetching `useEffect` dependency array, every custom section registration triggered a full API re-fetch to `/api/options/<module_id>/` even though the server data had not changed. This caused unnecessary HTTP load, re-render cycles, and a complete overwrite of dropdown options on every custom section addition. | Separated the API fetch lifecycle from the client-side merge logic. Removed `localCustomSections` from the `useEffect` dependency array so that the network call fires only on `designType`, `getModuleData`, or `optionsRefetchKey` changes. Introduced a `useMemo` block that re-computes the merged options object on the client whenever either `baseModuleData` (raw API response) or `localCustomSections` changes — without making any network request. |
+
+
+
 

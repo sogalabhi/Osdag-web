@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from 'react';
-import yaml from 'js-yaml';
 import { useNavigate } from 'react-router-dom';
 import { MODULE_ROUTES, MODULE_NAME_TO_KEY, CONNECTIONS_TAB_CONTENT, GENERIC_SUBMODULE_CONTENT } from '../../constants/modules';
 import { isGuestUser } from '../../utils/auth';
@@ -249,12 +248,25 @@ const Header = ({ setshowSideBar, active }) => {
           try {
             const file = e.target.files && e.target.files[0];
             if (!file) return;
-            const text = await file.text();
-            const uiObj = yaml.load(text) || {};
-            const moduleField = uiObj.Module || uiObj["Module"] || uiObj.module || uiObj["module"] || uiObj.inputs?.module || uiObj.inputs?.Module || uiObj.module_id;
-            console.log("Parsed YAML:", uiObj);
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const res = await fetch("/api/open-osi/", {
+              method: "POST",
+              body: formData,
+            });
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+              alert(data.error || "Failed to import OSI file.");
+              e.target.value = '';
+              return;
+            }
+
+            const moduleField = data.module_id || data.submodule;
+            console.log("Parsed backend response:", data);
             console.log("Detected Module Field:", moduleField);
-            console.log("MODULE_NAME_TO_KEY matches:", MODULE_NAME_TO_KEY[moduleField.trim()]);
 
             if (!moduleField || typeof moduleField !== 'string') {
               alert('Unsupported or invalid OSI file: Module not found.');
@@ -276,10 +288,10 @@ const Header = ({ setshowSideBar, active }) => {
               e.target.value = '';
               return;
             }
-            // Store raw uiObj for Phase 2 prefill
+            // Store raw inputs for Phase 2 prefill
             try {
               if (moduleKey) {
-                sessionStorage.setItem(`prefill:${moduleKey}`, JSON.stringify(uiObj));
+                sessionStorage.setItem(`prefill:${moduleKey}`, JSON.stringify(data.inputs));
               }
             } catch (_) { }
             navigate(route);

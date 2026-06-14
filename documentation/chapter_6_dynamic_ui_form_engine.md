@@ -168,10 +168,9 @@ To keep visual layouts consistent across all modules, helper files map section p
 
 During the code review of the Form Engine components, two critical implementation vulnerabilities were identified:
 
-### 1. Keyboard Navigation Lock Bypass (Security & Usability Bug)
-* **The Problem:** When a calculation completes successfully, Osdag-Web marks the input dock as locked (`isInputLocked = true`). This applies a transparent click-interceptor overlay and the Tailwind class `pointer-events-none` to block mouse input. However, the form controls (inputs and select boxes) inside `InputSection.jsx` **do not** receive `disabled={isInputLocked}` or `readOnly={isInputLocked}` flags.
-* **The Risk:** Keyboard-navigating users can press the `Tab` key to focus on text fields or dropdown menus. They can type or make selections, changing input values while the dock is locked. This bypasses the lock overlay without triggering the re-design warning confirmation modal, leaving the browser form state out of sync with the rendered 3D CAD graphics.
-* **Proposed Fix:** Bind the `disabled` prop on text `<input>` controls and the `isDisabled` prop on React `<Select>` elements to the `isInputLocked` state passed from the orchestrator.
+### 1. Keyboard Navigation Lock Bypass (Security & Usability Bug) (Resolved)
+* **The Problem:** When a calculation completes successfully, Osdag-Web marks the input dock as locked (`isInputLocked = true`). This applies a transparent click-interceptor overlay and the Tailwind class `pointer-events-none` to block mouse input. However, the form controls (inputs and select boxes) inside `InputSection.jsx` **did not** receive `disabled={isInputLocked}` or `readOnly={isInputLocked}` flags, allowing keyboard users to bypass the lock using the Tab key.
+* **Resolution:** Bound the `disabled` property on text `<input>` controls and the `isDisabled` property on React `<Select>` dropdown elements to the `isInputLocked` state passed from the orchestrator. All controls are now properly disabled when the input dock is locked, fully blocking keyboard navigation bypasses.
 
 ### 2. Redundant Network Re-fetches on Custom Section Events (Performance Issue)
 * **The Problem:** In the hook [useModuleData.js](../frontend/src/modules/shared/hooks/useModuleData.js), `localCustomSections` is included in the dependency array of the options-fetching `useEffect` block.

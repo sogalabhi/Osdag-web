@@ -44,6 +44,7 @@ export const InputSection = ({
   section,
   inputs,
   setInputs,
+  isInputLocked,
   selectionStates,
   updateSelectionState,
   updateModalState,
@@ -314,6 +315,7 @@ export const InputSection = ({
               isMulti
               options={options}
               value={currentValue}
+              isDisabled={isInputLocked}
               isSearchable={false}
               onChange={(selectedOptions) => {
                 const newValues = selectedOptions.map(opt => opt.value);
@@ -348,6 +350,7 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isDisabled={isInputLocked}
             isSearchable={false}
             onChange={(selected) => {
               if (isMaterialField && selected.value === 'Custom') {
@@ -378,6 +381,7 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isDisabled={isInputLocked}
             isSearchable={false}
             onChange={(selected) => {
               setExtraState({ ...extraState, selectedOption: selected.value });
@@ -404,6 +408,7 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isDisabled={isInputLocked}
             isSearchable={false}
             onChange={(selected) => {
               setExtraState({ ...extraState, selectedProfile: selected.value });
@@ -428,6 +433,7 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isDisabled={isInputLocked}
             isSearchable={false}
             onChange={(selected) => handleCustomizableSelect(field, selected.value)}
             menuPortalTarget={document.body}
@@ -449,6 +455,7 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isDisabled={isInputLocked}
             onChange={(selected) => field.onChange(selected.value, inputs, setInputs, contextData, extraState, setExtraState)}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
@@ -464,6 +471,7 @@ export const InputSection = ({
           <Select
             options={options}
             value={value}
+            isDisabled={isInputLocked}
             onChange={(selected) => setInputs({ ...inputs, [field.key]: selected.value })}
             menuPortalTarget={document.body}
             styles={customSelectStyles}
@@ -528,7 +536,7 @@ export const InputSection = ({
                 }
               }}
               placeholder={field.placeholder || `ex. ${field.label}`}
-              disabled={field.disabled}
+              disabled={field.disabled || isInputLocked}
               className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70"
             />
           </div>

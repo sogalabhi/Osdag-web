@@ -138,3 +138,23 @@ Osdag-Web ensures full bidirectional compatibility for three main round-trip exc
 
 Since the serialization and parsing logic is centralized in the Python backend, we guarantee that the same formatting rules and engineering dictionary mappings apply across both Desktop and Web, eliminating validation drift.
 
+---
+
+## 5.8 Architecture Assessment & Scopes of Improvement
+
+### 1. Download OSI in Module Page (DB & Storage Accumulation) (Resolved)
+* **The Problem:** When an authenticated user downloaded/exported an OSI file from a module page, the backend endpoint `SaveOsiFromInputs` generated a physical file on disk (`/osifiles/`) and registered an `OsiFile` record in the database, causing storage accumulation and DB write bloat.
+* **Resolution:** Refactored `SaveOsiFromInputs` to always stream the generated OSI file directly inline in the HTTP response using Base64 encoding. This completely bypasses saving files to disk or database records for simple exports.
+
+### 2. Download OSI in Project / Dashboard List Page (Key Flattening Drift) (Resolved)
+* **The Problem:** When downloading an existing project as an `.osi` file from the dashboard, the backend endpoint `ProjectOsiDownload` reads the stored nested JSON, flattens it by prefixing overrides with `Pref.`, and streams the flat text file. This flattening logic was duplicated separately in Python, leading to a sync drift risk.
+* **Resolution:** Centralized the key translation mappings (`baseline_aliases` and their reverse mapping) in `osi_files.py`. Refactored `build_osi_payload` to automatically flatten and translate the input keys on the backend before serialization, ensuring that any download from `ProjectOsiDownload` or `SaveOsiFromInputs` outputs consistent, Osdag-desktop-compatible flat files.
+
+### 3. Import OSI from Homepage / Dashboard (Inconsistent Parsing Engine) (Resolved)
+* **The Problem:** The homepage import flow (in `Header.jsx`) parsed the `.osi` file using client-side JavaScript (`yaml-js`), which could fail or diverge from Python's parsing behaviors on complex YAML flat structures.
+* **Resolution:** Updated the onChange handler in `Header.jsx` to upload files directly to the stateless backend endpoint `/api/open-osi/`. The homepage now routes the file to the same python-based parser used on the module pages, guaranteeing parser parity, and stores the parsed inputs in `sessionStorage` for routing prefill.
+
+### 4. Import OSI in Module Page (Key Mapping & Translation Drift) (Resolved)
+* **The Problem:** The module-level import uploaded the file to the stateless parser and received raw dotted PascalCase engineering keys, leaving the translation mapping logic to be hardcoded client-side in the frontend normalizers.
+* **Resolution:** Moved key normalization and translation mapping dictionary to the backend engine inside `osi_files.py`. The `parse_osi` utility now returns a fully translated `{ dock, pref }` dictionary directly inside `inputs`, reducing frontend translation configuration and maintenance overhead.
+

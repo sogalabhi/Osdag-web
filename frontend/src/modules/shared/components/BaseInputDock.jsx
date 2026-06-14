@@ -195,6 +195,7 @@ export const BaseInputDock = React.memo(({
               section={section}
               inputs={inputs}
               setInputs={setInputs}
+              isInputLocked={isInputLocked}
               selectionStates={selectionStates}
               updateSelectionState={updateSelectionState}
               updateModalState={updateModalState}
