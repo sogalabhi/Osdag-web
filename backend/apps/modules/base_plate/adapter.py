@@ -20,10 +20,6 @@ from typing import Dict, Any, List
 import traceback
 import json
 
-old_stdout = sys.stdout  # Backup log
-sys.stdout = open(os.devnull, "w")  # redirect stdout
-sys.stdout = old_stdout  # Reset log
-
 # Core expects these key names (from osdag_core.Common / base_plate_connection.set_input_values)
 KEY_CONN = 'Connectivity'
 KEY_END_CONDITION = 'End Condition'

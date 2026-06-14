@@ -11,7 +11,7 @@ This guide covers two ways to run **Osdag-Web** on Ubuntu/Linux:
 
 | Service | Role |
 |---|---|
-| **Vite + React (frontend)** | UI, initiates design tasks, polls async task status |
+| **Vite + React (frontend)** | UI, initiates design tasks, listens to real-time WebSocket status updates |
 | **Django (backend)** | REST API, input validation, task dispatch |
 | **Celery worker** | Background processing (CAD, PDF, design calculations) |
 | **Redis** | Message broker + Celery result backend |
@@ -244,12 +244,15 @@ Use this if you prefer to run services directly on your machine or cannot use Do
 
 ### B.1 — System Requirements
 
-- Ubuntu 20.04 LTS / 22.04 LTS
+- Ubuntu 20.04 LTS / 22.04 LTS or Arch Linux
 - At least **8 GB RAM**, **20 GB free disk**
 - sudo / admin privileges
 
 ### B.2 — Install System Build Tools
 
+Choose the installation instructions for your distribution:
+
+#### Ubuntu / Debian
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y \
@@ -258,19 +261,39 @@ sudo apt install -y \
   software-properties-common
 ```
 
+#### Arch Linux
+```bash
+sudo pacman -Syu
+sudo pacman -S --needed base-devel cmake curl wget git postgresql-libs openssl mesa glu
+```
+
 ### B.3 — Install wkhtmltopdf (required for PDF reports)
 
+#### Ubuntu / Debian
 ```bash
 sudo apt install -y wkhtmltopdf
 ```
 
+#### Arch Linux
+```bash
+sudo pacman -S wkhtmltopdf
+```
+
 ### B.4 — Install TeX Live (required for LaTeX report generation)
 
+#### Ubuntu / Debian
 ```bash
 sudo apt install -y texlive-full
 ```
 
-> `texlive-full` is large (~4 GB). If disk space is a concern, use `texlive-latex-extra` as a lighter alternative, though some report templates may not render correctly.
+#### Arch Linux
+```bash
+sudo pacman -S texlive-basic texlive-latexextra texlive-fontsrecommended
+# Or the full suite:
+# sudo pacman -S texlive
+```
+
+> `texlive-full` (or `texlive` on Arch Linux) is large (~4 GB). If disk space is a concern, use `texlive-latex-extra` on Ubuntu or install only necessary texlive packages on Arch.
 
 ### B.5 — Install Miniconda
 
@@ -331,12 +354,21 @@ pip install -r requirements.txt
 
 ### B.10 — Install PostgreSQL
 
+#### Ubuntu / Debian
 ```bash
 # Add official PostgreSQL repository (for Postgres 14+)
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo apt update
 sudo apt install -y postgresql-14 postgresql-contrib
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
+
+#### Arch Linux
+```bash
+sudo pacman -S postgresql
+sudo -u postgres initdb -D /var/lib/postgres/data
 sudo systemctl start postgresql
 sudo systemctl enable postgresql
 ```
@@ -357,10 +389,18 @@ CREATE DATABASE "postgres_Intg_osdag" WITH OWNER osdagdeveloper;
 
 ### B.12 — Install Redis
 
+#### Ubuntu / Debian
 ```bash
 sudo apt install -y redis-server
 sudo systemctl start redis-server
 sudo systemctl enable redis-server
+```
+
+#### Arch Linux
+```bash
+sudo pacman -S redis
+sudo systemctl start redis
+sudo systemctl enable redis
 ```
 
 Verify:
@@ -463,7 +503,7 @@ python manage.py runserver 8000
 ```bash
 conda activate osdag-web
 cd Osdag-web/backend
-celery -A config worker --loglevel=info
+celery -A config worker -Q calculations,cad,reports,celery --loglevel=info
 ```
 
 > Celery must be running for design calculations, CAD generation, and PDF report creation to work. Without it, requests will hang indefinitely.
@@ -512,7 +552,7 @@ gnome-terminal \
   --tab --title="Django Backend" -- bash -c \
     "$ACTIVATE && cd $PROJECT_DIR/backend && python manage.py runserver 8000; exec bash" \
   --tab --title="Celery Worker" -- bash -c \
-    "$ACTIVATE && cd $PROJECT_DIR/backend && celery -A config worker --loglevel=info; exec bash" \
+    "$ACTIVATE && cd $PROJECT_DIR/backend && celery -A config worker -Q calculations,cad,reports,celery --loglevel=info; exec bash" \
   --tab --title="Vite Frontend" -- bash -c \
     "cd $PROJECT_DIR/frontend && npm run dev; exec bash"
 ```

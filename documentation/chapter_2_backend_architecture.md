@@ -66,6 +66,12 @@ def run_design_calculation_task(self, module_name, submodule_slug, inputs, proje
     }
 ```
 
+### 3. Django Channels & WebSocket Event Broadcast
+To support real-time status updates without polling overhead, the backend integrates **Django Channels** for WebSocket routing:
+- **Protocol Router (`asgi.py`)**: Configured to wrap standard Django HTTP application with `ProtocolTypeRouter`, forwarding WebSocket connection requests (`ws/tasks/<task_id>/`) to channels consumers.
+- **WebSocket Consumer (`consumers.py`)**: Implements `TaskStatusConsumer` which subscribes the user's connection to a Redis channel group `task_{task_id}`. On socket connection, it queries `AsyncResult` immediately to push results if the task is already finished, mitigating race conditions.
+- **Signals Broadcast (`signals.py`)**: Subscribes to Celery's `task_postrun` signal. When any Celery task completes, this handler automatically fetches the channel layer and broadcasts the state and results to the respective `task_{task_id}` channel group, immediately pushing the update to the client.
+
 ---
 
 ## 2.3 The Adapter Pattern for Osdag Desktop Modules

@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  frontend-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Lint
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Build
+        working-directory: ./frontend
+        run: npm run build
+
+  backend-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create dummy Firebase config
+        run: |
+          mkdir -p backend
+          echo '{}' > backend/firebase-service-account.json
+
+      - name: Start DB and Redis
+        run: docker compose up -d db redis
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: osdag_env
+          python-version: "3.11"
+          channels: conda-forge
+          channel-priority: strict
+
+      - name: Install dependencies
+        shell: bash -l {0}
+        run: |
+          conda install pythonocc-core cairo -y
+          pip install -r requirements.txt pytest pytest-django
+
+      - name: Run tests
+        shell: bash -l {0}
+        env:
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5433
+          DATABASE_NAME: postgres_Intg_osdag
+          DATABASE_USER: osdagdeveloper
+          DATABASE_PASSWORD: password
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          cd backend
+          pytest --ds=config.settings
+
+      - name: Teardown
+        if: always()
+        run: docker compose down

@@ -8,6 +8,8 @@ app = Celery("osdag_web")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
+import apps.core.signals  # noqa
+
 
 @app.task(bind=True)
 def debug_task(self):

@@ -17,11 +17,6 @@ import os
 from typing import Dict, Any, List
 import traceback
 
-old_stdout = sys.stdout  # Backup log
-sys.stdout = open(os.devnull, "w")  # redirect stdout
-sys.stdout = old_stdout  # Reset log
-
-
 def get_required_keys() -> List[str]:
     return [
         "Bolt.Bolt_Hole_Type",

@@ -146,6 +146,33 @@ services:
         condition: service_healthy
     command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery -A config worker --workdir=/app -Q reports --loglevel=info --concurrency=4"
 
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      PYTHONPATH: /app
+      DEBUG: "False"
+      SECRET_KEY: ${SECRET_KEY:-changeme}
+      DATABASE_NAME: ${DATABASE_NAME:-osdagdeveloper}
+      DATABASE_USER: ${DATABASE_USER:-osdagdeveloper}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-changeme}
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery -A config beat --loglevel=info"
+    volumes:
+      - media_volume:/app/media
+      - osifiles_volume:/app/osifiles
+
   frontend:
     build:
       context: ./frontend

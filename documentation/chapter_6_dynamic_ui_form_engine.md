@@ -133,7 +133,7 @@ The component [EngineeringModule.jsx](../frontend/src/modules/shared/components/
 1. **State Orchestration:** Connects to `useEngineeringModule` to manage state hooks for `inputs`, `outputs`, `logs`, `status` (calculating/rendering), and `designPrefOverrides`.
 2. **Form Interactivity Lock:** When calculations complete successfully, the component sets `isInputLocked = true` to freeze editing.
 3. **Re-Design Confirmation Loop:** If a user modifies inputs while locked, a confirmation modal warning is shown. Confirming the unlock clears calculation outputs, resets CAD states, and restores edit permissions.
-4. **Calculations Lifecycle Hooking:** Launches asynchronous task polling on submit and guides the docks from input to calculating to output visualization.
+4. **Calculations Lifecycle Hooking:** Initiates WebSocket status subscriptions on submit and guides the docks from input to calculating to output visualization.
 5. **Layout Responsiveness:** Manages view panels based on device sizing (e.g., mobile layout toggles between CAD view and form tabs, while desktop splits views into multi-column layouts).
 
 ---

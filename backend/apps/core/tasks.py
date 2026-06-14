@@ -184,3 +184,49 @@ def run_report_generation_task(self, mapped_data: dict):
         "payload": payload,
         "status_code": status_code
     }
+
+
+@shared_task
+def clean_temporary_files(max_age_hours=24):
+    """
+    Safety net cleanup - removes CAD files and leftover report folders
+    older than max_age_hours. Runs daily via Celery Beat.
+    Reports should already be gone (deleted in-memory on serve),
+    but this catches any failures.
+    """
+    import os
+    import time
+    import shutil
+    from django.conf import settings
+
+    now = time.time()
+    max_age_sec = max_age_hours * 3600
+    file_storage_root = settings.FILE_STORAGE_ROOT
+
+    targets = {
+        'cad_models': 'file',
+        'design_report': 'dir',
+    }
+
+    for folder_name, item_type in targets.items():
+        target_dir = os.path.join(file_storage_root, folder_name)
+        if not os.path.exists(target_dir):
+            continue
+
+        for item in os.listdir(target_dir):
+            item_path = os.path.join(target_dir, item)
+            try:
+                age = now - os.path.getmtime(item_path)
+                if age < max_age_sec:
+                    continue
+
+                if item_type == 'file' and os.path.isfile(item_path):
+                    os.remove(item_path)
+                    logger.info(f"[cleanup] Deleted CAD file: {item_path}")
+                elif item_type == 'dir' and os.path.isdir(item_path):
+                    shutil.rmtree(item_path)
+                    logger.info(f"[cleanup] Deleted report folder: {item_path}")
+
+            except Exception as e:
+                logger.warning(f"[cleanup] Failed to delete {item_path}: {e}")
+

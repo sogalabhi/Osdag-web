@@ -1,4 +1,4 @@
-import { apiClient, pollTask } from "../utils/apiClient";
+import { apiClient, subscribeToTask } from "../utils/apiClient";
 import { MODULES, CAD, MATERIALS, DESIGN_PREFERENCES } from "./endpoints";
 import { getModuleSlug } from "../constants/apiRoutes";
 
@@ -36,7 +36,7 @@ export async function createDesign(moduleKey, inputs) {
     const acceptedBody = await res.json();
     const taskId = acceptedBody.task_id;
     try {
-      const taskResult = await pollTask(taskId);
+      const taskResult = await subscribeToTask(taskId);
       const finalBody = {
         ...taskResult,
         project_saved: acceptedBody.project_saved,
@@ -68,7 +68,7 @@ export async function createCad(moduleKey, inputs) {
     const acceptedBody = await res.json();
     const taskId = acceptedBody.task_id;
     try {
-      const taskResult = await pollTask(taskId);
+      const taskResult = await subscribeToTask(taskId);
       const isComingSoon = !taskResult.files || Object.keys(taskResult.files).length === 0;
       const finalData = {
         status: isComingSoon ? 'coming_soon' : 'success',

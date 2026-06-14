@@ -333,9 +333,17 @@ class CustomizeReport(APIView):
                 # if result.returncode == 0 and os.path.exists(pdf_path):
                 if os.path.exists(pdf_path):
                     print('[report_customization_api] CustomizeReport:pdflatex:success', { 'report_id': report_id, 'pdf_path': pdf_path })
-                    # Return PDF file
+                    # Read into memory then delete temp dir — zero disk accumulation
+                    from io import BytesIO
+                    with open(pdf_path, 'rb') as f:
+                        pdf_bytes = f.read()
+                    try:
+                        shutil.rmtree(safe_temp_dir, ignore_errors=True)
+                        print('[report_customization_api] CustomizeReport:temp dir cleaned up')
+                    except Exception as e:
+                        print(f'[report_customization_api] CustomizeReport:cleanup warning: {e}')
                     response = FileResponse(
-                        open(pdf_path, 'rb'),
+                        BytesIO(pdf_bytes),
                         content_type='application/pdf',
                         filename=f'osdag_custom_report_{report_id}.pdf'
                     )

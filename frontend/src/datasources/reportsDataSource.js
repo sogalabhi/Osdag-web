@@ -1,4 +1,4 @@
-import { apiClient, pollTask } from "../utils/apiClient";
+import { apiClient, subscribeToTask } from "../utils/apiClient";
 import { REPORTS, MODULES } from "./endpoints";
 import { getModuleSlug } from "../constants/apiRoutes";
 
@@ -27,7 +27,7 @@ export async function generateInitialReport(moduleKey, reportData) {
     const acceptedBody = await res.json();
     const taskId = acceptedBody.task_id;
     try {
-      const taskResult = await pollTask(taskId);
+      const taskResult = await subscribeToTask(taskId);
       const payload = taskResult.payload || {};
       const statusCode = taskResult.status_code || 200;
       

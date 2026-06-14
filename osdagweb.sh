@@ -66,13 +66,13 @@ run_in_conda() {
   local logfile="$REPO_ROOT/logs/osdagweb_${label}.log"
   mkdir -p "$REPO_ROOT/logs"
 
-  log "Starting ${BOLD}${label}${RESET} → log: logs/osdagweb_${label}.log"
+  log "Starting ${BOLD}${label}${RESET} → log: logs/osdagweb_${label}.log" >&2
 
   bash -c "
         source '$CONDA_SH'
         conda activate '$CONDA_ENV'
         cd '$workdir'
-        exec \$*
+        exec $*
     " >>"$logfile" 2>&1 &
 
   echo $! # return PID
@@ -98,7 +98,7 @@ trap cleanup SIGINT SIGTERM
 # 1. Celery worker
 # ============================================================
 CELERY_PID=$(run_in_conda "celery" "$BACKEND_DIR" \
-  "celery -A config worker --loglevel=info")
+  "celery -A config worker -Q calculations,cad,reports,celery --loglevel=info")
 PIDS+=("$CELERY_PID")
 ok "Celery worker started (PID $CELERY_PID)"
 

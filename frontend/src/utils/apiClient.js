@@ -103,3 +103,65 @@ export async function pollTask(taskId, delayMs = 1000, maxRetries = 300) {
   }
   throw new Error("Task polling timed out");
 }
+
+export function subscribeToTask(taskId) {
+  return new Promise((resolve, reject) => {
+    let retries = 0;
+    const maxRetries = 3;
+    let socket = null;
+
+    function connect() {
+      const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      let host = window.location.host;
+      if (apiBase && (apiBase.startsWith("http://") || apiBase.startsWith("https://"))) {
+        try {
+          const urlObj = new URL(apiBase);
+          host = urlObj.host;
+        } catch (e) {
+          // ignore parsing error
+        }
+      }
+      
+      const wsUrl = `${wsProtocol}//${host}/ws/tasks/${taskId}/`;
+      console.log(`Connecting to task WebSocket: ${wsUrl}`);
+      socket = new WebSocket(wsUrl);
+
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.status === "SUCCESS") {
+            resolve(data.result);
+            socket.close();
+          } else if (data.status === "FAILURE" || data.status === "REVOKED") {
+            reject(new Error(data.error || "Async task execution failed"));
+            socket.close();
+          }
+        } catch (err) {
+          console.error("Error parsing WebSocket message:", err);
+        }
+      };
+
+      socket.onerror = (error) => {
+        console.error(`WebSocket error on task ${taskId}:`, error);
+      };
+
+      socket.onclose = (event) => {
+        if (event.wasClean) {
+          console.log(`WebSocket closed cleanly for task ${taskId}`);
+        } else {
+          console.warn(`WebSocket closed unexpectedly for task ${taskId}. Code: ${event.code}`);
+          if (retries < maxRetries) {
+            retries++;
+            const delay = 1000 * retries;
+            console.log(`Retrying WebSocket connection in ${delay}ms (Attempt ${retries}/${maxRetries})`);
+            setTimeout(connect, delay);
+          } else {
+            reject(new Error("WebSocket connection failed after multiple retries."));
+          }
+        }
+      };
+    }
+
+    connect();
+  });
+}

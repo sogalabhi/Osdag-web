@@ -8,7 +8,7 @@ Under the hood, Osdag-Web uses an asynchronous architecture powered by **Django*
 
 ## Architecture Overview
 
-1. **Vite + React Frontend**: Initiates calculations, CAD modeling, and report requests. When the backend triggers an asynchronous task, the frontend receives a `202 Accepted` status with a `task_id` and polls the status endpoint until completion.
+1. **Vite + React Frontend**: Initiates calculations, CAD modeling, and report requests. When the backend triggers an asynchronous task, the frontend receives a `202 Accepted` status with a `task_id` and establishes a WebSocket connection to receive real-time status transitions and results.
 2. **Django Backend**: Exposes the REST API, validates input files, and submits background tasks to the Celery queue.
 3. **Redis**: Serves as the message broker and result backend for Celery.
 4. **Celery Worker**: Consumes calculation, CAD generation, and PDF report compilation tasks in background worker threads, freeing up Django to serve web requests.
@@ -64,7 +64,7 @@ To run the entire stack (Postgres, Redis, Django, Celery Worker, React frontend)
    ```bash
    cd backend
    conda activate osdag-web
-   celery -A config worker --loglevel=info
+   celery -A config worker -Q calculations,cad,reports,celery --loglevel=info
    ```
 
 2. **Start the Django Backend**:

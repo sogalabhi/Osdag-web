@@ -47,6 +47,10 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5174',
+    'http://localhost:5175',
+    'http://127.0.0.1:5175',
     'http://192.168.1.9:5173',
     'http://10.104.135.9:5173'
 ]
@@ -70,12 +74,14 @@ CORS_ALLOW_HEADERS = ["accept",
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'apps.core.apps.OsdagConfig', 
     'apps.sections.apps.SectionsConfig',  # User-owned custom section catalog (UserCustom*)
     'apps.modules.shear_connection',  # Shear connection parent module
@@ -123,6 +129,18 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
+
+REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/0')
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [REDIS_URL],
+        },
+    },
+}
 
 
 # Database
@@ -139,8 +157,6 @@ DATABASES = {
     }
 }
 
-# Redis/Celery settings
-REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/0')
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', REDIS_URL)
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', REDIS_URL)
 CELERY_ACCEPT_CONTENT = ['json']
@@ -148,6 +164,17 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = os.getenv('CELERY_TIMEZONE', 'UTC')
 CELERY_TASK_ALWAYS_EAGER = 'test' in sys.argv or any('pytest' in arg for arg in sys.argv)
+CELERY_RESULT_EXPIRES = 1800
+
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'cleanup-temp-files-daily': {
+        'task': 'apps.core.tasks.clean_temporary_files',
+        'schedule': crontab(hour=0, minute=0),
+        'args': (24,),
+    },
+}
+
 
 CELERY_DEFAULT_QUEUE = 'calculations'
 
@@ -245,6 +272,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 SECRET_ROOT = os.path.join(BASE_DIR , 'secret/')
+FILE_STORAGE_ROOT = BASE_DIR / 'file_storage'
+
 
 # Add this to the bottom of settings.py
 

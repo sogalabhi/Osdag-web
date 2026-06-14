@@ -13,11 +13,11 @@ Structural engineering tasks—such as design calculations, 3D CAD model geometr
 3. This would lead to request timeouts, high latency, and complete unresponsiveness of the web app.
 
 ### The Asynchronous Solution
-To decouple HTTP request handling from background calculation, Osdag-Web implements the **Asynchronous Calculation Design Pattern**:
+To decouple HTTP request handling from background calculation, Osdag-Web implements the **Asynchronous Calculation Design Pattern** using WebSockets:
 
-1. **Immediate Acceptance:** When a user clicks **Design**, **CAD**, or **Generate Report**, the frontend submits the request payload. The Django backend instantly generates a background job, submits it to a Celery task queue, and returns an `HTTP 202 Accepted` response with a unique `task_id` (taking <50ms).
-2. **Client-Side Polling:** The frontend intercepts the `task_id` and starts a non-blocking polling loop, querying the status endpoint every 1000ms.
-3. **Execution & Return:** The Celery worker processes the computation out-of-process. When finished, it persists the result. The next polling query from the frontend receives a `SUCCESS` status with the computed outputs, terminating the polling loop and updating the UI state.
+1. **Immediate Acceptance:** When a user clicks **Design**, **CAD**, or **Generate Report**, the frontend submits the request payload via HTTP POST. The Django backend instantly generates a background job, submits it to a Celery task queue, and returns an `HTTP 202 Accepted` response with a unique `task_id` (taking <50ms).
+2. **WebSocket Subscription:** The frontend intercepts the `task_id` and establishes a WebSocket connection to `/ws/tasks/{task_id}/`. Django Channels registers this WebSocket channel into a Redis channel group unique to the task (`task_{task_id}`).
+3. **Execution & Push:** The Celery worker processes the computation out-of-process. When finished, a `task_postrun` signal handler broadcasts the final task state and results to the corresponding Redis channel group. Django Channels receives the event and immediately pushes the payload to the active WebSocket client, avoiding repetitive HTTP polling requests. The client updates the UI state and closes the connection.
 
 ---
 
@@ -40,26 +40,27 @@ The Osdag-Web stack comprises five key components:
 ```mermaid
 graph TD
     Client[React Frontend - Vite]
-    Django[Django ASGI Backend - Gunicorn/Uvicorn]
+    Django[Django Channels ASGI Backend]
     Postgres[(PostgreSQL DB)]
-    Redis[(Redis Message Broker & Cache)]
+    Redis[(Redis Message Broker & Channels Layer)]
     Celery[Celery Background Workers]
 
     Client -- 1. Submit Design (HTTP POST) --> Django
     Django -- 2. Accept (HTTP 202 + Task ID) --> Client
-    Django -- 3. Push Task Payload --> Redis
-    Redis -- 4. Consume Task --> Celery
-    Celery -- 5. Write Task Status & Result --> Redis
-    Client -- 6. Poll Task Status (HTTP GET) --> Django
-    Django -- 7. Check Task State --> Redis
-    Django -- 8. Read/Write Project Metadata --> Postgres
+    Client -- 3. Connect WebSocket (ws/tasks/task_id/) --> Django
+    Django -- 4. Push Task Payload --> Redis
+    Redis -- 5. Consume Task --> Celery
+    Celery -- 6. Write Result & Broadcast (task_postrun) --> Redis
+    Redis -- 7. Route Broadcast Event --> Django
+    Django -- 8. Push Status & Results (WebSocket) --> Client
+    Django -- 9. Read/Write Project Metadata --> Postgres
 ```
 
 ### 1. React Frontend (Vite)
 * Renders the dynamic input/output docks, forms, and custom preferences.
 * Manages local UI states via React Context (`ModuleState`, `GlobalState`).
 * Integrates React Three Fiber (R3F) and Three.js to render interactive 3D CAD scenes.
-* Runs the client-side task polling loops and handles local file downloads (`.osi`, `.pdf`, `.dxf`, `.stp`).
+* Manages client-side WebSocket connections to monitor task lifecycle and handles local file downloads (`.osi`, `.pdf`, `.dxf`, `.stp`).
 
 ### 2. Django ASGI Backend (Gunicorn + Uvicorn)
 * Exposes the REST API endpoints for user authentication, project CRUD, option listings, and task triggers.
@@ -89,53 +90,39 @@ sequenceDiagram
     autonumber
     actor User
     participant FE as React Frontend
-    participant BE as Django Backend
-    participant DB as PostgreSQL
-    participant Broker as Redis Queue
+    participant BE as Django Channels (ASGI)
+    participant Redis as Redis (Broker/Layer)
     participant Worker as Celery Worker
 
     User->>FE: Clicks "Design"
     Note over FE: Frontend validates inputs locally
-    FE->>BE: POST /api/modules/shear-connection/fin-plate/design/
-    BE->>DB: Save/update project input details
-    BE->>Broker: Submit "run_design_calculation_task" payload
-    BE-->>FE: HTTP 202 Accepted (Returns task_id & project_saved=true)
-    
-    loop Every 1000ms
-        FE->>BE: GET /api/tasks/{task_id}/
-        BE->>Broker: Fetch AsyncResult({task_id})
-        BE-->>FE: HTTP 200 OK (Status: PENDING)
-    end
-
-    Broker->>Worker: Consume calculation task
-    Note over Worker: Runs Osdag-core engineering solver
-    Worker->>Broker: Update task status to SUCCESS & write output payload
-    
-    FE->>BE: GET /api/tasks/{task_id}/
-    BE->>Broker: Fetch AsyncResult({task_id})
-    BE-->>FE: HTTP 200 OK (Status: SUCCESS + calculation results)
-    
-    Note over FE: Update state context & render Output Dock
-    
-    FE->>BE: POST /api/modules/shear-connection/fin-plate/cad/ (Trigger CAD)
-    BE->>Broker: Submit "run_cad_generation_task" payload
+    FE->>BE: HTTP POST /api/modules/.../design/
+    BE->>Redis: Submit "run_design_calculation_task"
     BE-->>FE: HTTP 202 Accepted (Returns task_id)
+    FE->>BE: Establish WebSocket (ws/tasks/{task_id}/)
+    BE->>Redis: Join group "task_{task_id}"
     
-    loop Every 1000ms
-        FE->>BE: GET /api/tasks/{task_id}/
-        BE->>Broker: Fetch AsyncResult({task_id})
-        BE-->>FE: HTTP 200 OK (Status: PENDING)
-    end
-    
-    Broker->>Worker: Consume CAD task
-    Note over Worker: Generates STL/OBJ geometry buffers via PythonOCC
-    Worker->>Broker: Update status to SUCCESS & write mesh paths
-    
-    FE->>BE: GET /api/tasks/{task_id}/
-    BE->>Broker: Fetch AsyncResult({task_id})
-    BE-->>FE: HTTP 200 OK (Status: SUCCESS + mesh URLs & hover_dict)
-    
+    Redis->>Worker: Consume calculation task
+    Note over Worker: Runs Osdag-core solver
+    Worker->>Redis: Broadcast SUCCESS/FAILURE state via task_postrun signal
+    Redis->>BE: Route group broadcast event
+    BE->>FE: Push status/results via WebSocket
+    Note over FE: Render Output Dock
+    FE->>BE: Close WebSocket
+
+    FE->>BE: HTTP POST /api/modules/.../cad/
+    BE->>Redis: Submit "run_cad_generation_task"
+    BE-->>FE: HTTP 202 Accepted (Returns task_id)
+    FE->>BE: Establish WebSocket (ws/tasks/{task_id}/)
+    BE->>Redis: Join group "task_{task_id}"
+
+    Redis->>Worker: Consume CAD task
+    Note over Worker: Generates STL/OBJ via PythonOCC
+    Worker->>Redis: Broadcast SUCCESS/FAILURE state via task_postrun signal
+    Redis->>BE: Route group broadcast event
+    BE->>FE: Push status/mesh URLs via WebSocket
     Note over FE: Renders 3D components in R3F Canvas
+    FE->>BE: Close WebSocket
 ```
 
 ---
@@ -146,8 +133,6 @@ sequenceDiagram
 * **Anonymous Task Status Access:** The `TaskStatusAPIView` endpoint (`/api/tasks/<task_id>/`) is configured with `permission_classes = [AllowAny]`. While task IDs are generated as UUID4 (practically unguessable), this is an security-through-obscurity pattern. If a task ID is leaked or intercepted, an unauthenticated third-party can fetch the entire engineering inputs and outputs payload.
   * *Recommendation:* Update the backend status checker to require authentication and verify that the logged-in user owns the project associated with that task (if the task was triggered inside an authenticated session).
 
-### 2. Network & Performance Overhead
-* **Resource Waste from HTTP Polling:** Polling at 1s intervals generates significant HTTP overhead. If 100 users are active, Gunicorn/Uvicorn is flooded with up to 100 requests per second just querying task states.
-  * *Recommendation:* Transition the task status loop from HTTP polling to **WebSockets** (using Django Channels). Celery can push status transitions to a Redis channel, which is then broadcast directly to the specific user's WebSocket.
-* **Celery Result Bloat in Redis:** Task results are stored in Redis as the Celery backend. If expiration is not configured, the Redis memory footprint will grow indefinitely over time.
-  * *Recommendation:* Ensure `CELERY_RESULT_EXPIRES` is set in the Django settings (e.g., to 1800 seconds / 30 minutes) to automatically purge completed task payloads from memory.
+### 2. Network & Performance Overhead (Resolved)
+* **Resource Waste from HTTP Polling [RESOLVED]:** Polling at 1s intervals generated significant HTTP overhead. This has been resolved by transitioning to a **WebSocket-based push model** using Django Channels and a Redis channel layer. Celery worker completion events (`task_postrun` signal) are dynamically broadcast to the active connection.
+* **Celery Result Bloat in Redis [RESOLVED]:** Celery result storage was configured with `CELERY_RESULT_EXPIRES = 1800` in the settings, ensuring that finished task payloads are automatically purged after 30 minutes to manage the memory footprint.

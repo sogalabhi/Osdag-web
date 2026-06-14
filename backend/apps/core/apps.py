@@ -6,6 +6,9 @@ class OsdagConfig(AppConfig):
     name = 'apps.core'
 
     def ready(self):
+        # Register signals
+        import apps.core.signals  # noqa
+
         try:
             from osdag_core.design_type.main import Main
             from apps.core.main_registry import WebMainRegistry

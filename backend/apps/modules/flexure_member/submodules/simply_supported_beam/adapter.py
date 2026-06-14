@@ -25,11 +25,6 @@ import json
 import traceback
 from apps.core.utils import write_stl
 
-old_stdout = sys.stdout  # Backup log
-sys.stdout = open(os.devnull, "w")  # redirect stdout
-sys.stdout = old_stdout  # Reset log
-
-
 def get_required_keys() -> List[str]:
     """Return all required input parameters for the module."""
     return [

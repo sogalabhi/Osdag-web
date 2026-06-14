@@ -13,7 +13,7 @@ This guide covers two ways to run **Osdag-Web** on macOS:
 
 | Service | Role |
 |---|---|
-| **Vite + React (frontend)** | UI, initiates design tasks, polls async task status |
+| **Vite + React (frontend)** | UI, initiates design tasks, listens to real-time WebSocket status updates |
 | **Django (backend)** | REST API, input validation, task dispatch |
 | **Celery worker** | Background processing (CAD, PDF, design calculations) |
 | **Redis** | Message broker + Celery result backend |
@@ -506,7 +506,7 @@ python manage.py runserver 8000
 ```bash
 conda activate osdag-web
 cd Osdag-web/backend
-celery -A config worker --loglevel=info
+celery -A config worker -Q calculations,cad,reports,celery --loglevel=info
 ```
 
 > Celery must be running for design calculations, CAD generation, and PDF report creation to work. Without it, requests will hang indefinitely.
@@ -558,7 +558,7 @@ end tell"
 
 # Open Celery worker in a new Terminal tab
 osascript -e "tell application \"Terminal\"
-  do script \"$ACTIVATE && cd $PROJECT_DIR/backend && celery -A config worker --loglevel=info\"
+  do script \"$ACTIVATE && cd $PROJECT_DIR/backend && celery -A config worker -Q calculations,cad,reports,celery --loglevel=info\"
 end tell"
 
 # Open Vite frontend in a new Terminal tab

@@ -10,7 +10,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **1.1 The Asynchronous Calculation Design Pattern:** Separation of lightweight HTTP requests from heavy structural engineering calculations.
 * **1.2 The Osdag Input (.osi) File Exchange Format:** Plain-text format structure, and desktop-to-web / web-to-desktop exchange mechanisms.
 * **1.3 System Component Topology:** The role of the React Frontend, Django Backend, PostgreSQL Database, Redis Message Broker, and Celery Worker Pool.
-* **1.4 Request Lifecycle Walkthrough:** Detailed path of a design request from client clicks to Celery execution and polling updates.
+* **1.4 Request Lifecycle Walkthrough:** Detailed path of a design request from client clicks to Celery execution and real-time WebSocket status pushes.
 
 ### 2. [Chapter 2: Backend Architecture & Configuration](./chapter_2_backend_architecture.md)
 * **2.1 Django Application Structure (`apps/core` vs `apps/modules`):** Core database models and settings vs individual design module logic.

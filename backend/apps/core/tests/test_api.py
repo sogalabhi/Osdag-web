@@ -17,8 +17,17 @@ class APITest(TestCase) :
         static_url = '/static/'
         self.assertEqual(settings.STATIC_URL , static_url)
 
-        allow_origin = True
-        self.assertEqual(settings.CORS_ORIGIN_ALLOW_ALL , allow_origin)
+        allow_origins = [
+            'http://localhost:5173',
+            'http://127.0.0.1:5173',
+            'http://localhost:5174',
+            'http://127.0.0.1:5174',
+            'http://localhost:5175',
+            'http://127.0.0.1:5175',
+            'http://192.168.1.9:5173',
+            'http://10.104.135.9:5173'
+        ]
+        self.assertEqual(settings.CORS_ALLOWED_ORIGINS, allow_origins)
         
 
     ### TESTING MAIN WINDOW API ###

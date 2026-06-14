@@ -51,11 +51,6 @@ import traceback
 import json
 from apps.core.utils import write_stl
 
-old_stdout = sys.stdout  # Backup log
-sys.stdout = open(os.devnull, "w")  # redirect stdout
-sys.stdout = old_stdout  # Reset log
-
-
 def get_required_keys() -> List[str]:
     return [
         "Bolt.Bolt_Hole_Type",

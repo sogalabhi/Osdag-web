@@ -151,7 +151,17 @@ class CADExport(View):
                 status=404,
             )
 
-        response = FileResponse(open(out_abs_path, "rb"), content_type="application/octet-stream")
+        # Read into memory then delete - zero disk accumulation for on-demand exports
+        from io import BytesIO
+        with open(out_abs_path, "rb") as f:
+            file_bytes = f.read()
+        try:
+            os.remove(out_abs_path)
+            logger.info(f"[CADExport] Deleted temp file: {out_abs_path}")
+        except Exception as e:
+            logger.warning(f"[CADExport] Could not delete temp file {out_abs_path}: {e}")
+
+        response = FileResponse(BytesIO(file_bytes), content_type="application/octet-stream")
         response["Content-Disposition"] = f'attachment; filename="{session_id}_{section}.{format_type}"'
         return response
 

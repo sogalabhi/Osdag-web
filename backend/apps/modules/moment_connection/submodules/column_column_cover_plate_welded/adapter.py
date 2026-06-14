@@ -37,11 +37,6 @@ import typing
 from typing import Dict, Any, List
 import traceback
 
-old_stdout = sys.stdout
-sys.stdout = open(os.devnull, "w")
-sys.stdout = old_stdout
-
-
 def get_required_keys() -> List[str]:
     return [
         "Module",

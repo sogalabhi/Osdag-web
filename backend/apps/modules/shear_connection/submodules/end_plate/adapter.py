@@ -18,11 +18,6 @@ import os
 import typing
 from typing import Dict, Any, List
 import traceback
-old_stdout = sys.stdout  # Backup log
-sys.stdout = open(os.devnull, "w")  # redirect stdout
-sys.stdout = old_stdout  # Reset log
-
-
 def get_required_keys() -> List[str]:
     return [
         "Bolt.Bolt_Hole_Type",
@@ -222,67 +217,6 @@ def validate_input(input_values: Dict[str, Any]) -> None:
             or not custom_list_validation(connector_plate_thicknesslist, int_able)):  # Check if all items in Connector.Plate.Thickness_List can be converted to int.
         raise InvalidInputTypeError(
             "Connector.Plate.Thickness_List", "List[str] where all items can be converted to int")
-
-
-def validate_input_new(input_values: Dict[str, Any]) -> None:
-    """Validate type for all values in design dict. Raise error when invalid"""
-
-    # Check if all required keys exist
-    required_keys = get_required_keys()
-    print('required_keys : ' , required_keys)
-    # Check if input_values contains all required keys.
-    missing_keys = contains_keys(input_values, required_keys)
-    print('missing keys : ' , missing_keys)
-    if missing_keys != None:  # If keys are missing.
-        # Raise error for the first missing key.
-        print("missing keys is not None")
-        raise MissingKeyError(missing_keys[0])
-
-    # Validate key types using loops.
-
-    # Validate all strings.
-    str_keys = ["Bolt.Bolt_Hole_Type",  # List of all parameters that are strings
-                "Bolt.TensionType",
-                "Bolt.Type",
-                "Bolt.Connectivity",
-                "Bolt.Connector_Material",
-                "Design.Design_Method",
-                "Detailing.Edge_type",
-                "Material",
-                "Member.Supported_Section.Designation",
-                "Member.Supported_Section.Material",
-                "Member.Supporting_Section.Designation",
-                "Member.Supporting_Section.Material",
-                "Module",
-                "Weld.Fab"]
-    for key in str_keys:  # Loop through all keys.
-        print('validating string key')
-        
-        try : 
-            validate_string(key)  # Check if key is a string. If not, raise error.
-        except : 
-            print('error in validating string keys')
-            print('string key passed  : ' , key )
-
-    # Validate for keys that are numbers
-    num_keys = [("Bolt.Slip_Factor", True),  # List of all parameters that are numbers (key, is_float)
-                ("Detailing.Gap", False),
-                ("Load.Axial", False),
-                ("Load.Shear", False),
-                ("Weld.Material_Grade_OverWrite", False)]
-    for key in num_keys:  # Loop through all keys.
-        # Check if key is a number. If not, raise error.
-        print('validating num keys')
-        validate_num(key[0], key[1])
-
-    # Validate for keys that are arrays
-    arr_keys = [("Bolt.Diameter", False),  # List of all parameters that can be converted to numbers (key, is_float)
-                ("Bolt.Grade", True),
-                ("Connector.Plate.Thickness_List", False)]
-    for key in arr_keys:
-        print('validating arr key')
-        # Check if key is a list where all items can be converted to numbers. If not, raise error.
-        validate_arr(key[0], key[1])
 
 
 def create_module() -> EndPlateConnection:
