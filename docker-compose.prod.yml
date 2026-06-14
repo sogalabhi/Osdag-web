@@ -48,6 +48,7 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
       - osifiles_volume:/app/osifiles
+      - file_storage_volume:/app/file_storage
     depends_on:
       db:
         condition: service_healthy
@@ -111,6 +112,7 @@ services:
     volumes:
       - media_volume:/app/media
       - osifiles_volume:/app/osifiles
+      - file_storage_volume:/app/file_storage
     depends_on:
       db:
         condition: service_healthy
@@ -139,6 +141,7 @@ services:
     volumes:
       - media_volume:/app/media
       - osifiles_volume:/app/osifiles
+      - file_storage_volume:/app/file_storage
     depends_on:
       db:
         condition: service_healthy
@@ -172,6 +175,7 @@ services:
     volumes:
       - media_volume:/app/media
       - osifiles_volume:/app/osifiles
+      - file_storage_volume:/app/file_storage
 
   frontend:
     build:
@@ -193,3 +197,4 @@ volumes:
   static_volume:
   media_volume:
   osifiles_volume:
+  file_storage_volume:

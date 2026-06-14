@@ -85,3 +85,4 @@ file_storage
 # Ignore local database folder
 pgdata/
 
+.env
