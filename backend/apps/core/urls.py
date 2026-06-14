@@ -5,7 +5,7 @@ Extracted from osdag/urls.py
 from django.urls import path
 # Import from new api structure (using re-exports from __init__.py)
 from apps.core.api import (
-    ObtainInputFileView, SaveInputFileView,
+    SaveInputFileView,
     JWTHomeView, GoogleSSOView,
     ProjectAPI, ProjectDetailAPI, ProjectByNameAPI,
     SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
@@ -33,7 +33,6 @@ urlpatterns = [
     
     # User URLs
     path('api/user/saveinput/', SaveInputFileView.as_view()),
-    path('api/user/obtain-input-file/', ObtainInputFileView.as_view()),
     
     # OSI upload via DRF (multipart form-data)
     path('api/save-osi/', SaveInputFileView.as_view()),

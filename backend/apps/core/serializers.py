@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 # importing models 
 from apps.core.models import Anchor_Bolt , Angle_Pitch , Angles , Beams , Bolt , Bolt_fy_fu , CHS , Channels , Columns , EqualAngle , UnequalAngle , Material , RHS , SHS, CustomMaterials 
-from apps.core.models import Design, UserAccount, OsiFile
+from apps.core.models import UserAccount, OsiFile
 
 #########################################################
 # Author : Atharva Pingale ( FOSSEE Summer Fellow '23 ) #
@@ -14,7 +14,7 @@ from apps.core.models import Design, UserAccount, OsiFile
 class UserAccount_Serializer(serializers.ModelSerializer):
     class Meta:
         model = UserAccount
-        fields = ['username', 'email', 'allInputValueFiles']  # No password!
+        fields = ['username', 'email']  # No password!
 
     def create(self, validated_data):
         return UserAccount.objects.create(**validated_data)
@@ -23,7 +23,6 @@ class UserAccount_Serializer(serializers.ModelSerializer):
         # Only update allowed fields
         instance.username = validated_data.get('username', instance.username)
         instance.email = validated_data.get('email', instance.email)
-        instance.allInputValueFiles = validated_data.get('allInputValueFiles', instance.allInputValueFiles)
         instance.save()
         return instance
 
@@ -33,27 +32,6 @@ class OsiFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = OsiFile
         fields = ['id', 'file', 'created_at']
-
-
-class Design_Serializer(serializers.ModelSerializer) : 
-
-    class Meta : 
-        model = Design
-        fields = '__all__'
-
-    def create(self,  validated_data) : 
-        # creating an instance of the Design model 
-        return Design.objects.create(**validated_data)
-    
-    def update(self, instance, validated_data) : 
-        # update the input_values field of the instance 
-        instance.input_values = validated_data.get('input_values' , instance.input_values)
-        
-        # save the instance 
-        instance.save()
-
-        return instance
-
 
 class Anchor_Bolt_Serializer(serializers.ModelSerializer) :
 

@@ -103,10 +103,10 @@ Osdag-Web implements an automated calculation-autosave flow within the [useDesig
 * **The Problem:** Saving the entire JSON payload to the database on *every* successful calculation execution can result in massive database write volumes under heavy user activity.
 * **Resolution:** Implemented a debounced saving mechanism (5-second delay) in the `useDesignSubmission` submission pipeline hook. A React ref-backed timer ensures that successive calculation runs cancel any pending database writes and reschedule a single consolidated write. To prevent data loss when navigating away or unmounting the designer view, an unmount lifecycle cleanup effect triggers an immediate synchronous write of any pending changes.
 
-### 3. Legacy & Unimplemented Database Schema Fields
-* **Unused `Design` Model:** The PostgreSQL schema contains a `Design` table mapped in [models.py](../backend/apps/core/models.py). This was historically designed to cache guest sessions, but it has no active views or endpoints referencing it. It remains in the codebase as dead relational layout.
-* **Unused `Project.osi_file_path` Column:** The `Project` model contains an `osi_file_path` text column. The REST endpoints populate, fetch, and update it as requested by the client, but there is **no backend logic** that automatically compiles, saves, or links a project's state into a real `.osi` file path. It is currently a dead placeholder column.
-* **Redundant output file mapping:** Similarly, `UserAccount.allInputValueFiles` (an PostgreSQL ArrayField) is defined in models but is not actively populated with design inputs.
+### 3. Legacy & Unimplemented Database Schema Fields (Resolved)
+* **Unused `Design` Model:** Removed the legacy `Design` table, model mappings in models and admin, and serializer definitions.
+* **Unused `Project.osi_file_path` Column:** Deleted the `osi_file_path` field from the `Project` model and cleaned up all associated endpoints and serializer references.
+* **Redundant output file mapping:** Removed `UserAccount.allInputValueFiles` (PostgreSQL `ArrayField`) from user models, cleaned authentication creation and sync logic, and completely removed the obsolete `ObtainInputFileView` endpoint along with its routing.
 
 ### 4. Project Creation Before Calculation Run (Resolved)
 * **The Problem:** The user interface historically allowed users to click "Create Project" inside a module design page *before* running any calculations. This saved a project with valid inputs but `null` outputs.

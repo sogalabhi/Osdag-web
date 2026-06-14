@@ -33,7 +33,6 @@ from apps.modules.compression_member.submodules.struts_welded.adapter import cre
 from apps.modules.compression_member.submodules.axially_loaded_column.adapter import create_from_input as axially_loaded_column_create_from_input
 
 # importing models
-from apps.core.models import Design
 
 from django.core.files.storage import default_storage
 

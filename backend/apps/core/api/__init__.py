@@ -3,7 +3,7 @@ Core API package - Re-exports
 """
 # Auth exports
 from .auth.user_view import (
-    ObtainInputFileView, SaveInputFileView
+    SaveInputFileView
 )
 from .auth.jwt_api import JWTHomeView
 from .auth.google_sso_api import GoogleSSOView
@@ -30,7 +30,7 @@ from .modules.modules_api import GetModules
 
 __all__ = [
     # Auth
-    'ObtainInputFileView', 'SaveInputFileView',
+    'SaveInputFileView',
     'JWTHomeView', 'GoogleSSOView',
     # Projects
     'ProjectAPI', 'ProjectDetailAPI', 'ProjectByNameAPI',

@@ -93,7 +93,6 @@ class FirebaseAuthentication(BaseAuthentication):
                 defaults={
                     'user': user,
                     'email': email or '',
-                    'allInputValueFiles': []
                 }
             )
             

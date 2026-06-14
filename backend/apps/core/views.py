@@ -125,8 +125,7 @@ class FirebaseAuthView(APIView):
                 user_account = UserAccount.objects.create(
                     username=uid,
                     user=user,
-                    email=email or '',
-                    allInputValueFiles=[]
+                    email=email or ''
                 )
                 account_created = True
                 logger.info(f"FirebaseAuthView: UserAccount created")

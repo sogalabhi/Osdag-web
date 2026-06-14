@@ -25,7 +25,6 @@ class Project(models.Model):
     inputs_json = models.JSONField(blank=True, null=True)
     # Design outputs persisted as JSON
     outputs_json = models.JSONField(blank=True, null=True)
-    osi_file_path = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user_email = models.CharField(max_length=200, blank=True, null=True)
@@ -54,20 +53,6 @@ class OsiFile(models.Model):
 
     def __str__(self):
         return self.file.name
-
-class Design(models.Model):
-    """Design Session object in Database."""
-    cookie_id = models.CharField(unique=True, max_length=32)
-    module_id = models.CharField(max_length=200)
-    input_values = models.JSONField(blank=True)
-    logs = models.TextField(blank=True)
-    output_values = models.JSONField(blank=True)
-    design_status = models.BooleanField(blank=True)
-    cad_design_status = models.BooleanField(blank=True)
-    
-    class Meta : 
-        app_label = 'core'
-        db_table = "Design"
 
 
 #########################################################
@@ -99,7 +84,6 @@ class UserAccount(models.Model):
     # Firebase UID stored as username (for backward compatibility and direct lookups)
     username = models.TextField(blank=True, unique=True, help_text="Firebase UID")
     email = models.TextField(blank=True, unique=True)
-    allInputValueFiles = ArrayField(models.TextField(blank=True))
 
     class Meta:
         app_label = 'core'
