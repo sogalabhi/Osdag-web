@@ -194,12 +194,16 @@ The tabs displayed inside the Additional Inputs panel are mapped dynamically bas
 
 During the code review of the Design Preferences and sync subsystems, two implementation concerns were identified:
 
-### 1. Inconsistent Driver Key Preservation (Clobbering `connector_material` on Reset)
-* **The Problem:** The utility `mergeParityIntoInputsPreservingDockDrivers` in [mergeDesignPrefSyncIntoInputs.js](../frontend/src/modules/shared/utils/mergeDesignPrefSyncIntoInputs.js) is designed to protect driving material dropdown selections from jumping when a user resets/syncs preferences. However, it only protects `["material", "member_material"]`. The driver field `connector_material` (used heavily across connection submodules) is omitted from this array.
-* **The Risk:** When a user clicks the **Defaults** button, the connector material selection in the basic input dock will be overwritten by default database selections, causing the select boxes to snap back to default steel grades unexpectedly.
-* **Proposed Fix:** Modify the helper loop to include `"connector_material"` in the driver preservation array.
+### 1. Inconsistent Driver Key Preservation (Clobbering `connector_material` on Reset) (Resolved)
+* **The Problem:** The utility `mergeParityIntoInputsPreservingDockDrivers` in [mergeDesignPrefSyncIntoInputs.js](../frontend/src/modules/shared/utils/mergeDesignPrefSyncIntoInputs.js) is designed to protect driving material dropdown selections from jumping when a user resets/syncs preferences. However, it only protected `["material", "member_material"]`. The driver field `connector_material` (used heavily across connection submodules) was omitted from this array.
+* **The Risk:** When a user clicked the **Defaults** button, the connector material selection in the basic input dock would be overwritten by default database selections, causing the select boxes to snap back to default steel grades unexpectedly.
+* **Resolution:** Added `"connector_material"` to the `DOCK_DRIVER_KEYS` constant in [mergeDesignPrefSyncIntoInputs.js](../frontend/src/modules/shared/utils/mergeDesignPrefSyncIntoInputs.js):
+  ```javascript
+  const DOCK_DRIVER_KEYS = ["material", "member_material", "connector_material"];
+  ```
+  The `mergeParityIntoInputsPreservingDockDrivers` function iterates this array and restores each key's current value from `prev` after the server merge, so the connector material dropdown no longer jumps on Defaults or Save.
 
-### 2. Material Refresh State Races inside the Modal
-* **The Problem:** In [DesignPrefSections.jsx](../frontend/src/modules/shared/components/DesignPrefSections.jsx), a `useEffect` block executes a background `runSync("refresh")` whenever driving material variables change.
-* **The Risk:** If a user clicks **Defaults** or **Save**, this writes fresh material configurations to the `inputs` state context. This change immediately fires the `useEffect` block in parallel, launching a redundant background `refresh` request that can clash with the active save/defaults rendering states and cause race conditions.
-* **Proposed Fix:** Introduce an execution lock state (e.g. `isSyncRunning`) to temporarily ignore material change notifications while a defaults reset or save process is in progress.
+### 2. Material Refresh State Races inside the Modal (Resolved)
+* **The Problem:** In [DesignPrefSections.jsx](../frontend/src/modules/shared/components/DesignPrefSections.jsx), a `useEffect` block executes a background `runSync("refresh")` whenever the driving material variables (`inputs.connector_material`, `inputs.material`, `inputs.member_material`) change while the modal is open.
+* **The Risk:** When a user clicked **Defaults** or **Save**, the corresponding handler (`resetInputs` / `saveCoreInputs`) called `setDesignPrefOverrides(toStoredPrefOverrides(...))` after its `await` resolved. This wrote a new `connector_material` (or other material key) into the parent's `inputs` prop. Because `syncLoading` and `syncReady` were already committed to their post-operation values (`false` / `true` respectively) by the time `setDesignPrefOverrides` was called, the material `useEffect` saw valid conditions and launched a redundant `runSync("refresh")` network request in parallel — an unnecessary round-trip that could also collide with residual re-render states.
+* **Resolution:** Extended the existing `skipMaterialRefresh` ref — already used to suppress the first mount-triggered refresh — to also guard the managed-operation cascades. Immediately before each `setDesignPrefOverrides` call in `saveCoreInputs` and `resetInputs`, `skipMaterialRefresh.current` is set to `true`. Because the ref is checked **synchronously during the render triggered by `setDesignPrefOverrides`**, the effect correctly detects the skip flag, returns early without firing the network request, and resets the flag to `false` for genuine future material changes. No new state variables or extra hooks are required.

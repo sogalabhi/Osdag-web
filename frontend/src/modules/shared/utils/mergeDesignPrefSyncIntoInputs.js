@@ -1,11 +1,11 @@
 /**
  * Merge design-pref sync API results into form `inputs` without clobbering
- * input-dock driver fields (material / member_material), matching the
+ * input-dock driver fields (material / member_material / connector_material), matching the
  * stricter policy in `useDesignPrefSync`.
  */
 
 /** Keys that the input dock owns; never overwrite from server merge on save/reset. */
-const DOCK_DRIVER_KEYS = ["material", "member_material"];
+const DOCK_DRIVER_KEYS = ["material", "member_material", "connector_material"];
 
 /**
  * @param {Object|null|undefined} metadata - `metadata` from design-pref sync response

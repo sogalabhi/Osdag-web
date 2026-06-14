@@ -29,7 +29,6 @@ const DesignPrefSections = ({
   setConfirmationModal,
   confirmationModal,
   isInputLocked,
-  /** From `useEngineeringModule`; `ModuleContext.materialList` is empty on engineering-module routes. */
   moduleMaterialList,
   isGuest = false,
   onRefetchModuleOptions,
@@ -242,7 +241,12 @@ const DesignPrefSections = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- run once per modal open.
   }, [runSync, setDesignPrefOverrides, toStoredPrefOverrides]);
 
-  // Driving material changed while modal is open — refresh sync state.
+  // Guards against spurious material-refresh triggers:
+  //  • Set to `true` on mount so the initial open-sync result does not immediately
+  //    re-trigger a refresh.
+  //  • Re-set to `true` before any managed operation (save / defaults) that explicitly
+  //    calls setDesignPrefOverrides, preventing a cascading redundant `refresh` request
+  //    caused by the resulting inputs change re-entering this effect.
   const skipMaterialRefresh = useRef(true);
   useEffect(() => {
     if (!syncReady) return;
@@ -299,7 +303,10 @@ const DesignPrefSections = ({
     if (!r?.success) {
       return;
     }
-    if (r.data?.resolved_inputs) setDesignPrefOverrides?.(toStoredPrefOverrides(r.data.resolved_inputs));
+    if (r.data?.resolved_inputs) {
+      skipMaterialRefresh.current = true;
+      setDesignPrefOverrides?.(toStoredPrefOverrides(r.data.resolved_inputs));
+    }
     invalidateDesignOutputs();
     message.success("Preferences saved. Run design again to refresh outputs.");
     setDesignPrefModalStatus(false);
@@ -319,6 +326,7 @@ const DesignPrefSections = ({
     };
     setDesignPrefInputs(designPrefConfig.getInitialPrefs(mergedDefaults, module));
     if (setDesignPrefOverrides) {
+      skipMaterialRefresh.current = true;
       setDesignPrefOverrides(toStoredPrefOverrides(mergedDefaults));
     }
     invalidateDesignOutputs();

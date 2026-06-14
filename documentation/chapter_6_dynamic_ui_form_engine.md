@@ -16,20 +16,98 @@ When an engineering module page loads, the frontend must populate the dropdown s
 
 ## 6.2 Custom Dropdowns & Section Merging
 
-Osdag-Web allows users to import or create custom structural sections. These custom shapes must be injected into the standard options dropdowns immediately without requiring a full page refresh:
+Osdag-Web allows users to import or create custom structural sections. These custom shapes must be injected into the standard options dropdowns immediately without requiring a full page refresh.
 
-### 1. The custom section event:
-When a user adds a section via the Section Catalog database, the system dispatches a global window event:
+### 1. The Custom Section Event
+
+When a user adds a section via the Section Catalog database, the browser dispatches a global `CustomEvent` on the `window` object using the `notifyCustomSectionAdded` helper exported from [useModuleData.js](../frontend/src/modules/shared/hooks/useModuleData.js):
+
 ```javascript
-window.dispatchEvent(
-  new CustomEvent("osdag:custom-section-added", {
-    detail: { table: "Columns", designation: "CUSTOM_COL_300" },
-  })
-);
+// Called by the Section Catalog component after saving a new entry
+export const notifyCustomSectionAdded = ({ table, designation }) => {
+  window.dispatchEvent(
+    new CustomEvent("osdag:custom-section-added", {
+      detail: { table, designation },
+    })
+  );
+};
 ```
 
-### 2. Live hook merging:
-The hook [useModuleData.js](../frontend/src/modules/shared/hooks/useModuleData.js) intercepts this event and updates its local state list:
+The event `detail` payload carries:
+- **`table`** — the IS section catalog table name (`"Columns"`, `"Beams"`, `"Angles"`, `"Channels"`)
+- **`designation`** — the unique section label string (e.g. `"CUSTOM_COL_300"`)
+
+### 2. `localCustomSections` State
+
+The hook maintains a dedicated piece of React state, `localCustomSections`, whose shape is a dictionary mapping each section table to its list of registered custom designations:
+
+```javascript
+// Example runtime shape
+localCustomSections = {
+  Columns: ["CUSTOM_COL_300", "CUSTOM_COL_400"],
+  Beams:   ["MY_BEAM_600"],
+};
+```
+
+This state is populated exclusively by the event listener registered in a mount-only `useEffect` (empty dependency array), so it is **not** affected by module load or API refresh cycles:
+
+```javascript
+useEffect(() => {
+  const handleCustomSectionAdded = (event) => {
+    const { table, designation } = event.detail || {};
+    if (!table || !designation || !SECTION_TABLE_TO_LIST_KEYS[table]) return;
+    setLocalCustomSections((prev) => ({
+      ...prev,
+      [table]: appendUnique(prev[table], designation),
+    }));
+  };
+
+  window.addEventListener("osdag:custom-section-added", handleCustomSectionAdded);
+  return () => window.removeEventListener("osdag:custom-section-added", handleCustomSectionAdded);
+}, []); // Registered once on mount, never re-fires
+```
+
+### 3. `SECTION_TABLE_TO_LIST_KEYS` — Catalog Table to Dropdown Key Mapping
+
+Because one section table can feed multiple dropdown lists in the form engine, a static lookup table maps each IS catalog table name to the list of React state keys it should populate:
+
+```javascript
+const SECTION_TABLE_TO_LIST_KEYS = {
+  Columns:  ["columnList", "sectionDesignation"],
+  Beams:    ["beamList",   "sectionDesignation"],
+  Angles:   ["angleList",  "topAngleList"],
+  Channels: ["channelList"],
+};
+```
+
+For example, adding a custom `Columns` entry appends the designation to **both** `columnList` (the column selector dropdown) and `sectionDesignation` (the generic profile selector used in some modules).
+
+### 4. `appendUnique` — Deduplication Guard
+
+Before inserting a new designation, the `appendUnique` helper performs a strict string-equality check to prevent duplicate entries appearing in the same dropdown:
+
+```javascript
+const appendUnique = (list = [], value) => {
+  if (!value) return list || [];
+  const safeList = Array.isArray(list) ? list : [];
+  const stringValue = String(value);
+  if (safeList.some((item) => String(item) === stringValue)) return safeList; // already present
+  return [...safeList, value];
+};
+```
+
+### 5. Client-Side Merge via `useMemo`
+
+Rather than merging custom sections inside the API-fetching `useEffect`, the hook uses a `useMemo` block to compute the final merged options object entirely on the client. This guarantees that adding a custom section **never triggers a network request**:
+
+```javascript
+const mergedOptions = useMemo(() => {
+  return mergeLocalCustomSections(baseModuleData, localCustomSections);
+}, [baseModuleData, localCustomSections]);
+```
+
+Where `mergeLocalCustomSections` applies the `SECTION_TABLE_TO_LIST_KEYS` mapping and `appendUnique` across all tracked custom entries:
+
 ```javascript
 const mergeLocalCustomSections = (data, localCustomSections) => {
   const next = { ...data };
@@ -44,7 +122,8 @@ const mergeLocalCustomSections = (data, localCustomSections) => {
   return next;
 };
 ```
-This merges user-defined designations dynamically into the React state lists (`columnList`, `beamList`, etc.), updating the select menus in real time.
+
+The `mergedOptions` value is what `useModuleData` returns to the component. The select menus (`columnList`, `beamList`, etc.) are populated from this merged object, so custom sections appear in real time without any page refresh or API call.
 
 ---
 
@@ -172,12 +251,15 @@ During the code review of the Form Engine components, two critical implementatio
 * **The Problem:** When a calculation completes successfully, Osdag-Web marks the input dock as locked (`isInputLocked = true`). This applies a transparent click-interceptor overlay and the Tailwind class `pointer-events-none` to block mouse input. However, the form controls (inputs and select boxes) inside `InputSection.jsx` **did not** receive `disabled={isInputLocked}` or `readOnly={isInputLocked}` flags, allowing keyboard users to bypass the lock using the Tab key.
 * **Resolution:** Bound the `disabled` property on text `<input>` controls and the `isDisabled` property on React `<Select>` dropdown elements to the `isInputLocked` state passed from the orchestrator. All controls are now properly disabled when the input dock is locked, fully blocking keyboard navigation bypasses.
 
-### 2. Redundant Network Re-fetches on Custom Section Events (Performance Issue)
-* **The Problem:** In the hook [useModuleData.js](../frontend/src/modules/shared/hooks/useModuleData.js), `localCustomSections` is included in the dependency array of the options-fetching `useEffect` block.
-* **The Risk:** Whenever a user registers a new custom section (dispatching `osdag:custom-section-added`), `localCustomSections` changes. This triggers the entire effect to re-run, firing a redundant, heavy API network fetch to `/api/options/<module_id>/` even though the server options catalog hasn't changed.
-* **Proposed Fix:** Remove `localCustomSections` from the `useEffect` dependency array, reserving the API request only for module load or manual resets. Implement client-side merging by wrapping the `mergeLocalCustomSections` call in a `useMemo` block that reacts to updates in either base options or local custom entries:
+### 2. Redundant Network Re-fetches on Custom Section Events (Performance Issue) (Resolved)
+* **The Problem:** In [useModuleData.js](../frontend/src/modules/shared/hooks/useModuleData.js), `localCustomSections` was included in the dependency array of the options-fetching `useEffect` block alongside `designType` and `getModuleData`.
+* **The Risk:** Whenever a user registered a new custom section (dispatching `osdag:custom-section-added`), `localCustomSections` state changed. Because it was listed as a dependency, React re-ran the entire `useEffect`, firing a full `GET /api/options/<module_id>/` network request to the backend even though the server's options catalog had not changed. This caused unnecessary HTTP overhead, redundant re-render cycles, and a temporary overwrite of the dropdown lists with the server's base data, momentarily discarding any previously merged custom entries.
+* **Resolution:** The two responsibilities — **fetching base options from the server** and **merging client-side custom sections** — were separated into independent reactive blocks:
+  1. The `useEffect` dependency array now contains only `designType`, `getModuleData`, and `optionsRefetchKey`. The raw API response is stored in a dedicated `baseModuleData` state variable instead of the old unified `moduleData`.
+  2. A `useMemo` block handles all client-side merging. It re-computes the final merged options object whenever either `baseModuleData` or `localCustomSections` changes — with zero network activity:
   ```javascript
   const mergedOptions = useMemo(() => {
-    return mergeLocalCustomSections(moduleData, localCustomSections);
-  }, [moduleData, localCustomSections]);
+    return mergeLocalCustomSections(baseModuleData, localCustomSections);
+  }, [baseModuleData, localCustomSections]);
   ```
+  The hook now returns `mergedOptions` directly, so consumers always receive both server-sourced options and all registered custom sections in a single, deduplicated object.
