@@ -45,30 +45,9 @@ import { getProjectById } from "../../datasources/projectsDataSource";
 import { saveOsiFromInputs } from "../../datasources/osiDataSource";
 import { getModuleRoute } from "../../constants/moduleRoutes";
 import ProjectActionButtons from './ProjectActionButtons';
+import { normalizeModuleKey } from '../../constants/modules';
 
-const normalizeModuleId = (id) => {
-  if (!id) return id;
-  const normalized = id.toLowerCase().replace(/_/g, '-');
-  const mapping = {
-    'fin-plate': MODULE_KEY_FIN_PLATE,
-    'end-plate': MODULE_KEY_END_PLATE,
-    'cleat-angle': MODULE_KEY_CLEAT_ANGLE,
-    'seated-angle': MODULE_KEY_SEAT_ANGLE,
-    'beam-beam-cover-plate-bolted': MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED,
-    'beam-beam-cover-plate-welded': MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED,
-    'beam-beam-end-plate': MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
-    'beam-column-end-plate': MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
-    'bolted': MODULE_KEY_TENSION_BOLTED,
-    'simply-supported-beam': MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
-    'on-cantilever': MODULE_KEY_ON_CANTILEVER_BEAM,
-    'purlin': MODULE_KEY_PURLIN,
-    'lap-joint-welded': MODULE_KEY_LAP_JOINT_WELDED,
-    'lap-joint-bolted': MODULE_KEY_LAP_JOINT_BOLTED,
-    'butt-joint-welded': MODULE_KEY_BUTT_JOINT_WELDED,
-    'butt-joint-bolted': MODULE_KEY_BUTT_JOINT_BOLTED,
-  };
-  return mapping[normalized] || id;
-};
+const normalizeModuleId = normalizeModuleKey;
 
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
   const [projects, setProjects] = React.useState(projectsProp);
@@ -177,7 +156,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
     try {
       const data = await getProjectById(project.id);
       if (data.success) {
-        const route = getModuleRoute(project.module_id);
+        const route = getModuleRoute(project.submodule);
         if (route) {
           navigate(`${route}/${project.id}`);
         } else {

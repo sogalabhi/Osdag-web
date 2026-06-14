@@ -18,7 +18,7 @@ import platform
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from apps.core.permissions import IsEmailVerifiedIfAuthenticated
 from django.http import FileResponse
 from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
@@ -133,7 +133,7 @@ class ParseReportSections(APIView):
     POST /api/report/parse-sections/
     Body: {"report_id": "string"}
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsEmailVerifiedIfAuthenticated]
     
     def post(self, request):
         try:
@@ -193,7 +193,7 @@ class CustomizeReport(APIView):
         "selected_sections": ["Section1", "Section2/Subsection1", ...]
     }
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsEmailVerifiedIfAuthenticated]
     
     def post(self, request):
         try:

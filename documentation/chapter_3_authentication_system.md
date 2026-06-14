@@ -64,20 +64,18 @@ To encourage immediate engineering exploration, Osdag-Web implements a zero-barr
 
 ## 3.4 Security Assessment & Scopes of Improvement
 
-### 1. Performance Overhead of JWT Token Verification
-* **The Problem:** In the current backend middleware setup, `firebase_auth.verify_id_token(token)` is executed on **every single incoming HTTP request**. While the Firebase Admin SDK internally caches public certificates, token decoding and cryptographic signature validation add unnecessary latency (~15–50ms) to every request.
-* **Scope of Improvement:** Implement local JWT session token caching (e.g., using Redis). When a Firebase token is verified, store its signature, expiration, and UID in Redis. Subsequent requests can be checked against Redis in <1ms instead of executing full RSA signature verification.
+### 1. Performance Overhead of JWT Token Verification (Resolved)
+* **The Problem:** Previously, in the backend middleware setup, `firebase_auth.verify_id_token(token)` was executed on every single incoming HTTP request. This added unnecessary latency (~15–50ms) to every request due to CPU-heavy cryptographic signature verification.
+* **Resolution:** Implemented JWT session token caching using Django's cache framework (backed by Redis in production). When a Firebase token is verified, its metadata (UID, email, email_verified) is cached in Redis with a TTL matching the token's remaining expiration time (`exp - current_time`). Subsequent requests are authenticated using Redis lookups in <1ms, bypassing RSA signature verification entirely.
 
-### 2. Outgoing Network Reliability Dependency
+### 2. Outgoing Network Reliability Dependency (Accepted Risk)
 * **The Problem:** If the server loses connection to the external internet or Firebase APIs (e.g., due to firewall blocks or public DNS failures), the Firebase Admin SDK cannot fetch verification public keys. This will cause all API requests to fail with `401 Unauthorized`.
-* **Scope of Improvement:** Implement a fallback token validation mechanism or configure local proxy caching for certificates.
+* **Status:** Deferred/Accepted. Since Osdag-Web operates on a single baremetal setup and relies on external Firebase validation, local internet reliability is accepted as a prerequisite. If offline capability is needed in the future, transitioning to a local identity provider (like Keycloak or local Django authentication) will be required.
 
-### 3. Logical Email Verification Bypasses
-* **The Problem:** The `SaveOsiFromInputs` endpoint contains a logical path:
-  ```python
-  is_guest = not (hasattr(request, 'user') and request.user.is_authenticated)
-  if is_guest or inline:
-      # Return Base64 payload directly (no DB save)
-  ```
-  If an authenticated user with an *unverified* email submits a request with the `inline` flag set to `True`, the backend bypasses the `email_verified` block entirely and serves the Base64 data. While it does not write to the DB, it allows unverified authenticated accounts to use server-side resources for OSI conversion.
-* **Scope of Improvement:** Require verified email for all paths when the request contains authorization headers (even if `inline` is requested).
+### 3. Logical Email Verification Bypasses (Resolved)
+* **The Problem:** Previously, the `SaveOsiFromInputs` endpoint bypassed email verification checks when the `inline` flag was set to `True`, allowing authenticated users with unverified emails to generate OSI base64 content. Other endpoints like project listing, individual project deletion, and CAD calculations also lacked strict email verification checks for authenticated callers.
+* **Resolution:** 
+  - Implemented the `IsEmailVerifiedIfAuthenticated` permission class as the `DEFAULT_PERMISSION_CLASSES` in `settings.py` to globally secure all endpoints. Guest requests are permitted, but any authenticated request immediately checks and requires `request.email_verified` to be `True`.
+  - Applied `IsEmailVerified` to user-centric views (`ProjectAPI`, `ProjectDetailAPI`, `ProjectByNameAPI`, `OpenOsiById`, `ProjectOsiDownload`, and `JWTHomeView`) to guarantee authenticated and verified access.
+  - Removed redundant manual checks from individual view method bodies, relying on DRF's declarative permission lifecycle instead.
+

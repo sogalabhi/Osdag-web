@@ -1,6 +1,7 @@
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from apps.core.permissions import IsEmailVerified
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -39,7 +40,7 @@ if not firebase_admin._apps:
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsEmailVerified])
 def dashboard_view(request):
     user = request.user
     return Response({

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { message } from "antd";
 
@@ -32,6 +32,9 @@ export const DESIGN_STATUS = {
 export const useDesignSubmission = (service, moduleConfig) => {
   const params = useParams();
   const projectId = params.projectId ? parseInt(params.projectId, 10) : null;
+  /// TODO: verify if this flow is ok or we need to add a save project and not auto save
+  const saveTimeoutRef = useRef(null);
+  const pendingSaveRef = useRef(null);
   const [designData, setDesignData] = useState({});
   const [designLogs, setDesignLogs] = useState([]);
   const [cadModelPaths, setCadModelPaths] = useState({});
@@ -53,6 +56,21 @@ export const useDesignSubmission = (service, moduleConfig) => {
     message: '',
     error: null
   });
+
+  // Cleanup/Flush pending save on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      if (pendingSaveRef.current && projectId && service.updateProject) {
+        console.log('[useDesignSubmission] Component unmounting. Executing immediate pending project save.');
+        service.updateProject(projectId, pendingSaveRef.current).catch(err => {
+          console.error('[useDesignSubmission] Failed to save outputs on unmount:', err);
+        });
+      }
+    };
+  }, [projectId, service.updateProject]);
 
   const submitDesign = async ({
     inputs,
@@ -224,19 +242,32 @@ export const useDesignSubmission = (service, moduleConfig) => {
         return;
       }
 
-      // Save outputs to project if projectId exists
+      // Save outputs to project if projectId exists (debounced)
       if (projectId && service.updateProject) {
-        try {
-          await service.updateProject(projectId, {
-            inputs_json: {
-              dock: dockInputs || { ...inputs, ...extraState },
-              pref: designPrefOverrides || {},
-            },
-            outputs_json: designBody.data,
-          });
-        } catch (err) {
-          console.error('[useDesignSubmission] Failed to save outputs:', err);
+        if (saveTimeoutRef.current) {
+          clearTimeout(saveTimeoutRef.current);
         }
+
+        const savePayload = {
+          inputs_json: {
+            dock: dockInputs || { ...inputs, ...extraState },
+            pref: designPrefOverrides || {},
+          },
+          outputs_json: designBody.data,
+        };
+        pendingSaveRef.current = savePayload;
+
+        saveTimeoutRef.current = setTimeout(async () => {
+          try {
+            console.log('[useDesignSubmission] Executing debounced project save for projectId:', projectId);
+            await service.updateProject(projectId, savePayload);
+            pendingSaveRef.current = null;
+          } catch (err) {
+            console.error('[useDesignSubmission] Failed to save outputs (debounced):', err);
+          } finally {
+            saveTimeoutRef.current = null;
+          }
+        }, 5000);
       }
 
       // CAD Generation step

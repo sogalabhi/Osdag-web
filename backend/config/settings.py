@@ -228,7 +228,7 @@ REST_FRAMEWORK = {
         'apps.core.middleware.firebase_auth.FirebaseAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',
+        'apps.core.permissions.IsEmailVerifiedIfAuthenticated',
     ),
     # Used by ScopedRateThrottle on section import/export views only.
     'DEFAULT_THROTTLE_RATES': {

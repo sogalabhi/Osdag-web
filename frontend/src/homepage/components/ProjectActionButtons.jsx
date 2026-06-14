@@ -20,7 +20,7 @@ const ProjectActionButtons = ({
   const handleOpenProject = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const route = MODULE_ROUTES[project.routeKey] || getModuleRoute(project.module_id);
+    const route = MODULE_ROUTES[project.routeKey] || getModuleRoute(project.submodule);
     if (route) {
       navigate(`${route}/${project.id}`);
       if (onActionComplete) onActionComplete();
@@ -36,7 +36,7 @@ const ProjectActionButtons = ({
       onGenerateReport(project);
       return;
     }
-    const route = MODULE_ROUTES[project.routeKey] || getModuleRoute(project.module_id);
+    const route = MODULE_ROUTES[project.routeKey] || getModuleRoute(project.submodule);
     if (route) {
       navigate(`${route}/${project.id}?action=report`);
       if (onActionComplete) onActionComplete();
@@ -56,7 +56,7 @@ const ProjectActionButtons = ({
       }
       const projectDetail = detailRes.project;
       const inputs = projectDetail?.inputs_json || {};
-      const module_id = projectDetail?.submodule || projectDetail?.module || project.module_id;
+      const module_id = projectDetail?.submodule || projectDetail?.module || project.submodule;
       const data = await saveOsiFromInputs({ name: project.name, moduleId: module_id, inputs, inline: true });
       if (!data.success || !data.content_base64) {
         message.error(data.error || 'Failed to prepare OSI');

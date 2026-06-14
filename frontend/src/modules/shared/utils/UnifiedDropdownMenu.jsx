@@ -394,7 +394,7 @@ function UnifiedDropdownMenu({
         <div className="absolute top-full left-0 bg-white border border-[#ccc] border-t-0 min-w-52 z-[1]">
           {dropdown.map((option, index) => {
             const isDisabled =
-              (option.name === "Create Project" && isExistingProject) ||
+              (option.name === "Create Project" && (isExistingProject || !hasOutput)) ||
               (option.name === "Download Outputs CSV" && !hasOutput);
             const hasSubmenu = Array.isArray(option.options) && option.options.length > 0;
             const isSubmenuOpen = openSubmenu === option.name;

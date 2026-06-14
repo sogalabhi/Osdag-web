@@ -90,21 +90,25 @@ Osdag-Web implements an automated calculation-autosave flow within the [useDesig
 
 ## 4.4 Architecture Assessment & Scopes of Improvement
 
-### 1. Database Redundancy for Compatibility
+### 1. Database Redundancy for Compatibility (Resolved)
 * **The Problem:** The backend returns duplicate JSON attributes for sub-module identification:
   ```python
   'submodule': getattr(project, 'submodule', None),
   'module_id': getattr(project, 'submodule', None),
   ```
   This is a compatibility layer introduced because some historical frontend components expected `module_id` while newer components expected `submodule`. 
-* **Scope of Improvement:** Clean up the legacy `module_id` dependencies in the frontend and deprecate the redundant response key to ensure a cleaner API contract.
+* **Resolution:** Removed the legacy `module_id` fields from backend serialization. Modified all frontend components (recent projects rendering, action buttons, search menus) to consistently read `submodule`. Consolidated all varied module key translations (like hyphenated or cased variants) under a single centralized helper function `normalizeModuleKey` in `modules.js`.
 
-### 2. High DB Write Volume on Auto-save
+### 2. High DB Write Volume on Auto-save (Resolved)
 * **The Problem:** Saving the entire JSON payload to the database on *every* successful calculation execution can result in massive database write volumes under heavy user activity.
-* **Scope of Improvement:** Implement debounced autosaving or restrict autosave events to tab changes, input changes (when user stops typing), or manual save actions, rather than writing to PostgreSQL on every calculation run.
+* **Resolution:** Implemented a debounced saving mechanism (5-second delay) in the `useDesignSubmission` submission pipeline hook. A React ref-backed timer ensures that successive calculation runs cancel any pending database writes and reschedule a single consolidated write. To prevent data loss when navigating away or unmounting the designer view, an unmount lifecycle cleanup effect triggers an immediate synchronous write of any pending changes.
 
 ### 3. Legacy & Unimplemented Database Schema Fields
 * **Unused `Design` Model:** The PostgreSQL schema contains a `Design` table mapped in [models.py](../backend/apps/core/models.py). This was historically designed to cache guest sessions, but it has no active views or endpoints referencing it. It remains in the codebase as dead relational layout.
 * **Unused `Project.osi_file_path` Column:** The `Project` model contains an `osi_file_path` text column. The REST endpoints populate, fetch, and update it as requested by the client, but there is **no backend logic** that automatically compiles, saves, or links a project's state into a real `.osi` file path. It is currently a dead placeholder column.
 * **Redundant output file mapping:** Similarly, `UserAccount.allInputValueFiles` (an PostgreSQL ArrayField) is defined in models but is not actively populated with design inputs.
+
+### 4. Project Creation Before Calculation Run (Resolved)
+* **The Problem:** The user interface historically allowed users to click "Create Project" inside a module design page *before* running any calculations. This saved a project with valid inputs but `null` outputs.
+* **Resolution:** Enforced a unified single flow: project creation is blocked (`Create Project` is disabled in the file dropdown menu, and warnings are thrown on keyboard shortcuts) if no calculations have run (i.e. `hasOutput` is false). Unused legacy project creation workflows (such as dashboard cards triggering modal confirmation) were removed, leaving calculation success as the sole gatekeeper for project registration.
 

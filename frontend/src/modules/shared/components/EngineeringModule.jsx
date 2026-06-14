@@ -198,6 +198,7 @@ export const EngineeringModule = ({
     contextData,
     moduleConfig,
     designPrefOverrides,
+    hasOutput: !!output,
   });
 
   const [showResetButton, setShowResetButton] = useState(false);

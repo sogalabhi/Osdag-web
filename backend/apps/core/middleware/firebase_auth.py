@@ -3,8 +3,11 @@ Firebase Authentication Middleware for Django REST Framework
 Verifies Firebase tokens and syncs users to Django User model
 """
 
+import hashlib
+import time
 from firebase_admin import auth as firebase_auth
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -38,13 +41,34 @@ class FirebaseAuthentication(BaseAuthentication):
         
         if not token:
             return None
+            
+        # Compute a fast cache key based on a hash of the token
+        token_hash = hashlib.sha256(token.encode('utf-8')).hexdigest()
+        cache_key = f"firebase_token:{token_hash}"
         
+        # Check cache first
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            uid = cached_data.get('uid')
+            email = cached_data.get('email')
+            email_verified = cached_data.get('email_verified', False)
+            
+            # Retrieve the corresponding Django user
+            user = User.objects.filter(username=uid).first()
+            if user:
+                # Attach Firebase metadata to request for use in views
+                request.firebase_uid = uid
+                request.email_verified = email_verified
+                return (user, None)
+        
+        # Cache miss or user not found in local DB -> perform standard validation
         try:
             # Verify Firebase token
             decoded = firebase_auth.verify_id_token(token)
             uid = decoded.get('uid')
             email = decoded.get('email')
             email_verified = decoded.get('email_verified', False)
+            exp = decoded.get('exp', 0)
             
             if not uid:
                 raise AuthenticationFailed('Invalid token: missing UID')
@@ -91,6 +115,16 @@ class FirebaseAuthentication(BaseAuthentication):
             # Attach Firebase metadata to request for use in views
             request.firebase_uid = uid
             request.email_verified = email_verified
+            
+            # Cache the successful validation result matching the token's lifetime
+            current_time = int(time.time())
+            timeout = max(0, exp - current_time)
+            if timeout > 0:
+                cache.set(cache_key, {
+                    'uid': uid,
+                    'email': email,
+                    'email_verified': email_verified
+                }, timeout=timeout)
             
             return (user, None)
             

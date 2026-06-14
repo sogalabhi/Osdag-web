@@ -1,4 +1,4 @@
-import { MODULE_ROUTES, MODULE_NAME_TO_KEY } from "./modules";
+import { MODULE_ROUTES, normalizeModuleKey } from "./modules";
 
 /**
  * Get the route path for a stable module key.
@@ -6,7 +6,7 @@ import { MODULE_ROUTES, MODULE_NAME_TO_KEY } from "./modules";
  * @returns {string|undefined}
  */
 export function getModuleRoute(moduleKey) {
-  const stableKey = MODULE_NAME_TO_KEY[moduleKey] || moduleKey;
+  const stableKey = normalizeModuleKey(moduleKey);
   return MODULE_ROUTES[stableKey];
 }
 

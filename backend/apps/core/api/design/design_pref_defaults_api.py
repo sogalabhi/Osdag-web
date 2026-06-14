@@ -3,7 +3,7 @@ POST /api/design-preferences/defaults/
 
 Resolve Additional Inputs defaults from current module + dock inputs.
 """
-from rest_framework.permissions import AllowAny
+from apps.core.permissions import IsEmailVerifiedIfAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,7 +13,7 @@ from apps.core.api.design.sync_merge import build_design_pref_defaults
 
 
 class DesignPreferenceDefaults(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsEmailVerifiedIfAuthenticated]
 
     def post(self, request):
         body = request.data if isinstance(request.data, dict) else {}

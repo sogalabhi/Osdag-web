@@ -45,21 +45,21 @@ const MainContent = () => {
     }
   };
 
-  // Filter to most recent project per unique module_id
+  // Filter to most recent project per unique submodule
   const uniqueModulesMap = {};
   projects.forEach((project) => {
     if (
-      !uniqueModulesMap[project.module_id] ||
-      new Date(project.updated_at || project.created_at) > new Date(uniqueModulesMap[project.module_id].updated_at || uniqueModulesMap[project.module_id].created_at)
+      !uniqueModulesMap[project.submodule] ||
+      new Date(project.updated_at || project.created_at) > new Date(uniqueModulesMap[project.submodule].updated_at || uniqueModulesMap[project.submodule].created_at)
     ) {
-      uniqueModulesMap[project.module_id] = project;
+      uniqueModulesMap[project.submodule] = project;
     }
   });
   const recentModules = Object.values(uniqueModulesMap).map(project => ({
-    name: getModuleDisplayName(project.module_id),
+    name: getModuleDisplayName(project.submodule),
     description: project.name,
     date: project.updated_at ? new Date(project.updated_at).toLocaleDateString() : '',
-    module_id: project.module_id,
+    submodule: project.submodule,
     project_id: project.id,
   }));
 

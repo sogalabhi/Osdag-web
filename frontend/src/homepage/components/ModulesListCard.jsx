@@ -1,63 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import ProjectNameModal from '../components/ProjectNameModal';
-import { isGuestUser, canCreateProjects } from '../../utils/auth';
-import { message } from 'antd';
-import { createProject } from "../../datasources/projectsDataSource";
 import { getModuleRoute } from "../../constants/moduleRoutes";
 
 const ModulesListCard = ({ items }) => {
   const navigate = useNavigate();
-  const [showProjectModal, setShowProjectModal] = useState(false);
-  const [selectedModule, setSelectedModule] = useState(null);
 
   const handleModuleClick = (item) => {
-    const route = getModuleRoute(item.module_id);
+    const route = getModuleRoute(item.submodule);
     if (!route) return;
     navigate(route);
-  };
-
-  const handleProjectModalConfirm = async (projectName) => {
-    if (!selectedModule) return;
-
-    // Check if user can create projects (guests and unverified users cannot)
-    if (!canCreateProjects()) {
-      if (isGuestUser()) {
-        message.warning("Guest users cannot create projects. Please log in to create projects.");
-      } else {
-        message.error("Please verify your email to create projects. Check your inbox for the verification link.");
-      }
-      setShowProjectModal(false);
-      setSelectedModule(null);
-      return;
-    }
-
-    try {
-      const safeProjectName = (projectName || `${selectedModule.name} Project`).replace(/\s+/g, '_');
-      const payload = {
-        name: safeProjectName,
-        module: selectedModule.parent,
-        submodule: selectedModule.module_id,
-      };
-      const data = await createProject(payload);
-      const route = getModuleRoute(selectedModule.module_id);
-      if (data.success && route) {
-        navigate(`${route}/${data.project_id}`);
-      } else if (route) {
-        navigate(route);
-      }
-    } catch (_e) {
-      const route = getModuleRoute(selectedModule.module_id);
-      if (route) navigate(route);
-    } finally {
-      setShowProjectModal(false);
-      setSelectedModule(null);
-    }
-  };
-
-  const handleProjectModalCancel = () => {
-    setShowProjectModal(false);
-    setSelectedModule(null);
   };
 
   const getIcon = () => (

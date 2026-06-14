@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from apps.core.permissions import IsEmailVerified, IsEmailVerifiedIfAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -16,7 +17,7 @@ from apps.core.models import Project
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SaveOsiFromInputs(APIView):
-    permission_classes = [AllowAny]  # Allow guests to generate OSI for download
+    permission_classes = [IsEmailVerifiedIfAuthenticated]  # Allow guests to generate OSI, but require verified email if logged in
 
     def post(self, request):
         try:
@@ -53,14 +54,6 @@ class SaveOsiFromInputs(APIView):
                 }, safe=False, status=200)
 
             # For authenticated users: save to database
-            # Check email verification status (set by FirebaseAuthentication middleware)
-            email_verified = getattr(request, 'email_verified', False)
-            if not email_verified:
-                return JsonResponse({
-                    'success': False, 
-                    'error': 'Please verify your email to save projects. Check your inbox for the verification link.'
-                }, safe=False, status=403)
-
             content_file = make_osifile_contentfile(payload)
 
             # Determine owner email from JWT or user
@@ -126,7 +119,7 @@ class OpenOsiUpload(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class OpenOsiById(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsEmailVerified]
 
     def get(self, request, osifile_id):
         try:
@@ -167,7 +160,7 @@ class ModuleRoutes(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectOsiDownload(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsEmailVerified]
 
     def get(self, request, project_id):
         try:

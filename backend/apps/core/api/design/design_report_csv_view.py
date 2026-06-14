@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from apps.core.permissions import IsEmailVerifiedIfAuthenticated
 from django.utils.crypto import get_random_string
 from django.http import FileResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -106,7 +106,7 @@ def filter_latex_content(latex_content: str, selected_sections):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CreateDesignReport(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsEmailVerifiedIfAuthenticated]
 
     def dispatch(self, request, *args, **kwargs):
         """Override dispatch to log all requests, even if blocked by permissions"""

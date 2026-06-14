@@ -86,3 +86,5 @@ file_storage
 pgdata/
 
 .env
+
+*.osi

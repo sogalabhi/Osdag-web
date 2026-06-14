@@ -250,3 +250,52 @@ export const MODULE_NAME_TO_KEY = {
     "boltedtoendplate": MODULE_KEY_BOLTED_TO_END_GUSSET,
     "ssb": MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
 };
+
+/**
+ * Normalizes any form of module identifier (e.g. from OSI fields, URLs, legacy variables)
+ * to its canonical design key constant.
+ * @param {string} id
+ * @returns {string}
+ */
+export function normalizeModuleKey(id) {
+    if (!id) return id;
+    if (MODULE_NAME_TO_KEY[id]) return MODULE_NAME_TO_KEY[id];
+    
+    const lower = id.toLowerCase();
+    if (MODULE_NAME_TO_KEY[lower]) return MODULE_NAME_TO_KEY[lower];
+    
+    const normHyphen = lower.replace(/_/g, '-').replace(/\s+/g, '-');
+    if (MODULE_NAME_TO_KEY[normHyphen]) return MODULE_NAME_TO_KEY[normHyphen];
+    
+    const mapping = {
+        'fin-plate': MODULE_KEY_FIN_PLATE,
+        'end-plate': MODULE_KEY_END_PLATE,
+        'cleat-angle': MODULE_KEY_CLEAT_ANGLE,
+        'seated-angle': MODULE_KEY_SEAT_ANGLE,
+        'beam-beam-cover-plate-bolted': MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED,
+        'beam-beam-cover-plate-welded': MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED,
+        'beam-beam-end-plate': MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
+        'beam-column-end-plate': MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
+        'bolted': MODULE_KEY_TENSION_BOLTED,
+        'welded': MODULE_KEY_TENSION_WELDED,
+        'simply-supported-beam': MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
+        'on-cantilever': 'OnCantilever',
+        'purlin': MODULE_KEY_PURLIN,
+        'lap-joint-welded': MODULE_KEY_LAP_JOINT_WELDED,
+        'lap-joint-bolted': MODULE_KEY_LAP_JOINT_BOLTED,
+        'butt-joint-welded': MODULE_KEY_BUTT_JOINT_WELDED,
+        'butt-joint-bolted': MODULE_KEY_BUTT_JOINT_BOLTED,
+        'column-to-column-cover-plate-bolted': MODULE_KEY_CC_COVER_PLATE_BOLTED,
+        'column-to-column-cover-plate-welded': MODULE_KEY_CC_COVER_PLATE_WELDED,
+        'column-to-column-end-plate': MODULE_KEY_CC_END_PLATE,
+        'base-plate': MODULE_KEY_BASE_PLATE,
+        'baseplateconnection': MODULE_KEY_BASE_PLATE,
+        'struts-bolted': MODULE_KEY_STRUTS_BOLTED,
+        'struts-welded': MODULE_KEY_STRUTS_WELDED,
+        'axially-loaded-column': MODULE_KEY_AXIALLY_LOADED_COLUMN,
+        'bolted-to-end-gusset': MODULE_KEY_BOLTED_TO_END_GUSSET,
+        'welded-to-end-gusset': MODULE_KEY_WELDED_TO_END_GUSSET,
+    };
+    
+    return mapping[normHyphen] || id;
+}

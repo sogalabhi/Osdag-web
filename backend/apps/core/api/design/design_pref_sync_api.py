@@ -3,7 +3,7 @@ POST /api/design-preferences/sync/
 
 Design preference sync for web.
 """
-from rest_framework.permissions import AllowAny
+from apps.core.permissions import IsEmailVerifiedIfAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,7 +13,7 @@ from apps.core.api.design.sync_merge import merge_design_pref_sync, VALID_OPERAT
 
 
 class DesignPreferenceSync(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsEmailVerifiedIfAuthenticated]
 
     def post(self, request):
         body = request.data if isinstance(request.data, dict) else {}

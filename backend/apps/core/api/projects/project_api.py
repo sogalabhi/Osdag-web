@@ -13,7 +13,7 @@ from django.db.models import Q
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectAPI(APIView):
     """API for managing user projects"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsEmailVerified]
     
     def get(self, request):
         """Get user-specific projects (for recent projects list)"""
@@ -53,8 +53,6 @@ class ProjectAPI(APIView):
                     'name': project.name,
                     'module': getattr(project, 'module', None),
                     'submodule': getattr(project, 'submodule', None),
-                    # keep legacy field for existing frontend behavior
-                    'module_id': getattr(project, 'submodule', None),
                     'osi_file_path': project.osi_file_path,
                     'created_at': project.created_at.isoformat(),
                     'updated_at': project.updated_at.isoformat(),
@@ -76,14 +74,6 @@ class ProjectAPI(APIView):
     def post(self, request):
         """Create a new project"""
         try:
-            # Check email verification status (set by FirebaseAuthentication middleware)
-            email_verified = getattr(request, 'email_verified', False)
-            if not email_verified:
-                return JsonResponse({
-                    'success': False, 
-                    'error': 'Please verify your email to create projects. Check your inbox for the verification link.'
-                }, safe=False, status=403)
-
             # Disallow guest users from creating projects (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
                 return JsonResponse({'success': False, 'error': 'Guest users cannot create projects'}, safe=False, status=403)
@@ -134,7 +124,7 @@ class ProjectAPI(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectDetailAPI(APIView):
     """API for individual project operations"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsEmailVerified]
     
     def get(self, request, project_id):
         """Get a specific project"""
@@ -159,7 +149,6 @@ class ProjectDetailAPI(APIView):
                     'name': project.name,
                     'module': getattr(project, 'module', None),
                     'submodule': getattr(project, 'submodule', None),
-                    'module_id': getattr(project, 'submodule', None),
                     'inputs_json': getattr(project, 'inputs_json', None),
                     'outputs_json': getattr(project, 'outputs_json', None),
                     'osi_file_path': project.osi_file_path,
@@ -184,14 +173,6 @@ class ProjectDetailAPI(APIView):
     def put(self, request, project_id):
         """Update project data (name, inputs_json, osi_file_path)"""
         try:
-            # Check email verification status (set by FirebaseAuthentication middleware)
-            email_verified = getattr(request, 'email_verified', False)
-            if not email_verified:
-                return JsonResponse({
-                    'success': False, 
-                    'error': 'Please verify your email to save projects. Check your inbox for the verification link.'
-                }, safe=False, status=403)
-
             # Disallow guest users from updating projects (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
                 return JsonResponse({'success': False, 'error': 'Guest users cannot update projects'}, safe=False, status=403)
@@ -280,7 +261,7 @@ class ProjectDetailAPI(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectByNameAPI(APIView):
     """API for finding and updating projects by name"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsEmailVerified]
     
     def get(self, request, project_name):
         """Get a specific project by name"""

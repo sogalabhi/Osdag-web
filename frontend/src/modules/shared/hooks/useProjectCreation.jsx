@@ -16,6 +16,7 @@ export const useProjectCreation = ({
   contextData,
   moduleConfig,
   designPrefOverrides,
+  hasOutput = false,
 }) => {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const navigate = useNavigate();
@@ -28,6 +29,10 @@ export const useProjectCreation = ({
     }
     if (!canCreateProjects()) {
       message.error("Please verify your email to create projects. Check your inbox for the verification link.");
+      return;
+    }
+    if (!hasOutput) {
+      message.warning("Please run design calculations first to verify your design before saving it as a project.");
       return;
     }
     setShowProjectModal(true);

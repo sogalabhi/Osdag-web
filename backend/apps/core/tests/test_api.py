@@ -227,3 +227,46 @@ class APITest(TestCase) :
 
         response = self.client.get("/osdag-web/connections/moment-connection/column_to_column_splice/")
         self.assertTrue(response.status_code!=200)  # 301
+
+
+from unittest.mock import patch
+import time
+from apps.core.models import Project
+
+class ProjectAPISerializationTests(TestCase):
+    @patch('firebase_admin.auth.verify_id_token')
+    def test_project_response_no_module_id(self, mock_verify):
+        mock_verify.return_value = {
+            "uid": "user_123",
+            "email": "user@example.com",
+            "email_verified": True,
+            "exp": int(time.time()) + 3600
+        }
+        headers = {"HTTP_AUTHORIZATION": "Bearer fake_token"}
+
+        # 1. Create a project using the API
+        post_data = {
+            "name": "Test Project",
+            "module": "Shear Connection",
+            "submodule": "FinPlateConnection"
+        }
+        r = self.client.post("/api/projects/", data=post_data, content_type="application/json", **headers)
+        self.assertEqual(r.status_code, 201)
+        project_id = r.json().get("project_id")
+        self.assertIsNotNone(project_id)
+
+        # 2. List projects and assert module_id is not in response, but submodule is
+        r = self.client.get("/api/projects/", **headers)
+        self.assertEqual(r.status_code, 200)
+        projects = r.json().get("projects")
+        self.assertTrue(len(projects) > 0)
+        proj_data = projects[0]
+        self.assertNotIn("module_id", proj_data)
+        self.assertEqual(proj_data.get("submodule"), "FinPlateConnection")
+
+        # 3. Get project details and assert module_id is not in response, but submodule is
+        r = self.client.get(f"/api/projects/{project_id}/", **headers)
+        self.assertEqual(r.status_code, 200)
+        detail_data = r.json().get("project")
+        self.assertNotIn("module_id", detail_data)
+        self.assertEqual(detail_data.get("submodule"), "FinPlateConnection")

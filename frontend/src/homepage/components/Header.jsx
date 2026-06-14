@@ -108,6 +108,7 @@ const Header = ({ setshowSideBar, active }) => {
               id: p.id,
               name: p.name,
               type: p.module || p.submodule || 'Project',
+              submodule: p.submodule || p.module,
               module_id: p.submodule || p.module,
               routeKey: routeKey,
               date: new Date(p.updated_at).toLocaleDateString()

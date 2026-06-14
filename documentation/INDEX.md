@@ -84,3 +84,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **11.4 Production Orchestration (`docker-compose.prod.yml`):** Nginx reverse proxy routing, shared static volumes, and specialized Celery worker queue divisions.
 * **11.5 Observations & Areas of Improvement:** Analysis of hardcoded user ID mappings and static database port issues.
 
+### Appendix: [Fixed & Resolved Issues Directory](./issues.md)
+* Tracking directory containing the statuses and fixes for architectural, storage, and security issues resolved in Chapters 1 to 3.
+
+
