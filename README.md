@@ -15,6 +15,12 @@ Under the hood, Osdag-Web uses an asynchronous architecture powered by **Django*
 
 ---
 
+## Developer Documentation
+
+For a comprehensive guide to the codebase topology, API adapters, frontend state management, 3D CAD visualization pipeline, and containerization setup, refer to the [Osdag-Web Code & Architecture Documentation Index](documentation/INDEX.md).
+
+---
+
 ## How to Run Osdag-Web
 
 You can run the Osdag-Web application either using **Docker Compose** (recommended, as it automatically sets up Redis and databases) or **Native Local Development**.
