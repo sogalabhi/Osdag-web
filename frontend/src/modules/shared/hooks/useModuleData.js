@@ -39,6 +39,7 @@ export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) 
   const initialState = MODULE_DATA_LIST_KEYS.reduce((acc, k) => ({ ...acc, [k]: [] }), {});
   const [baseModuleData, setBaseModuleData] = useState(initialState);
   const [localCustomSections, setLocalCustomSections] = useState({});
+  const [loadingOptions, setLoadingOptions] = useState(true);
 
   useEffect(() => {
     const handleCustomSectionAdded = (event) => {
@@ -57,6 +58,7 @@ export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) 
   useEffect(() => {
     const loadModuleData = async () => {
       if (!designType) return;
+      setLoadingOptions(true);
       try {
         const result = await getModuleData(designType);
         if (result && result.success && result.data) {
@@ -70,6 +72,8 @@ export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) 
         }
       } catch (error) {
         console.error("Failed to load module data:", error);
+      } finally {
+        setLoadingOptions(false);
       }
     };
 
@@ -77,8 +81,8 @@ export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) 
   }, [designType, getModuleData, optionsRefetchKey]);
 
   const mergedOptions = useMemo(() => {
-    return mergeLocalCustomSections(baseModuleData, localCustomSections);
-  }, [baseModuleData, localCustomSections]);
+    return { ...mergeLocalCustomSections(baseModuleData, localCustomSections), loadingOptions };
+  }, [baseModuleData, localCustomSections, loadingOptions]);
 
   return mergedOptions;
 };

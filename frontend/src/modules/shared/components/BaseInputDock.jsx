@@ -30,6 +30,7 @@ export const BaseInputDock = React.memo(({
   setModalDynamicSrc,
   onRefetchModuleOptions,
   isOpen,
+  loadingOptions,
 }) => {
   // Use external ref if provided, otherwise create internal one
   const internalLockBtnRef = useRef(null);
@@ -72,7 +73,12 @@ export const BaseInputDock = React.memo(({
           <button
             onClick={openAdditionalInputs}
             // onClick={openDesignPrefModal}
-            className="flex items-center justify-center px-4 py-1 my-2 text-sm font-medium rounded-lg transition-colors bg-osdag-green text-white hover:bg-osdag-dark-green"
+            disabled={loadingOptions}
+            className={`flex items-center justify-center px-4 py-1 my-2 text-sm font-medium rounded-lg transition-colors text-white ${
+              loadingOptions 
+                ? 'bg-gray-400 cursor-not-allowed opacity-70' 
+                : 'bg-osdag-green hover:bg-osdag-dark-green'
+            }`}
             title={isInputLocked ? 'Unlock the dock to edit additional inputs' : 'Open Additional Inputs'}
           >
             Additional Inputs
@@ -148,6 +154,13 @@ export const BaseInputDock = React.memo(({
 
       {/* Scrollable Input Sections */}
       <div className="flex-1 overflow-y-auto subMainBody scroll-data dark:bg-osdag-dark-color bg-white relative">
+        {loadingOptions && (
+          <div className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-white/70 dark:bg-osdag-dark-color/70 backdrop-blur-sm">
+            <div className="w-8 h-8 border-4 border-osdag-green border-t-transparent rounded-full animate-spin"></div>
+            <span className="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Loading Module...</span>
+          </div>
+        )}
+
         {/* Lock overlay */}
         {isInputLocked && (
           <div
@@ -229,7 +242,13 @@ export const BaseInputDock = React.memo(({
         {/* Design Button */}
         <button
           onClick={handleSubmitEnhanced}
-          className="flex flex-1 items-center gap-x-2 bg-osdag-green text-white font-semibold px-4 py-2 rounded-lg shadow-md"
+          disabled={isInputLocked || loadingOptions}
+          title={isInputLocked ? 'Unlock the dock to redesign' : 'Run Design'}
+          className={`flex flex-1 items-center justify-center gap-x-2 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-opacity ${
+            (isInputLocked || loadingOptions)
+              ? 'bg-gray-400 cursor-not-allowed opacity-70' 
+              : 'bg-osdag-green hover:bg-opacity-90'
+          }`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
             <path d="m352-522 86-87-56-57-44 44-56-56 43-44-45-45-87 87 159 158Zm328 329 87-87-45-45-44 43-56-56 43-44-57-56-86 86 158 159Zm24-567 57 57-57-57ZM290-120H120v-170l175-175L80-680l200-200 216 216 151-152q12-12 27-18t31-6q16 0 31 6t27 18l53 54q12 12 18 27t6 31q0 16-6 30.5T816-647L665-495l215 215L680-80 465-295 290-120Zm-90-80h56l392-391-57-57-391 392v56Zm420-419-29-29 57 57-28-28Z" />
