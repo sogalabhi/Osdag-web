@@ -58,7 +58,6 @@ class CADGeneration(View):
             module_type_mapping = {
                 "FinPlateConnection": "FinPlateConnection",
                 "CleatAngleConnection": "CleatAngle", 
-                # "EndPlateConnection": "EndPlate",
                 "HeaderPlateConnection": "HeaderPlate",
                 "SeatedAngleConnection": "SeatedAngleConnection",
                 "Cover-Plate-Bolted-Connection": "CoverPlateBolted",

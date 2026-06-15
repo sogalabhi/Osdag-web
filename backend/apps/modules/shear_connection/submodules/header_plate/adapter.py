@@ -8,7 +8,7 @@ from OCC.Core import BRepTools
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.IGESControl import IGESControl_Writer
 from osdag_core.cad.common_logic import CommonDesignLogic
-from osdag_core.Common import KEY_DISP_HEADERPLATE, KEY_CONN # KEY_DISP_ENDPLATE
+from osdag_core.Common import KEY_DISP_HEADERPLATE, KEY_CONN
 from osdag_core.custom_logger import CustomLogger
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
