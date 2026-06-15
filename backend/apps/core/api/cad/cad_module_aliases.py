@@ -29,7 +29,7 @@ MODULE_ALIASES: Dict[str, str] = {
     # shear slugs
     "shear-connection/fin-plate": "FinPlateConnection",
     "shear-connection/cleat-angle": "CleatAngleConnection",
-    "shear-connection/end-plate": "EndPlateConnection",
+    "shear-connection/header-plate": "HeaderPlateConnection",
     "shear-connection/seated-angle": "SeatedAngleConnection",
     # moment slugs
     "moment-connection/beam-beam-cover-plate-bolted": "Cover-Plate-Bolted-Connection",
