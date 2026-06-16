@@ -253,6 +253,12 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     raw_output_top_spacing_col = module.top_spacing_col(True)
     raw_output_top_spacing_beam = module.top_spacing_beam(True)
     
+    try:
+        raw_output_section_capacities = module.section_capacities(True)
+    except Exception as e:
+        print("Error calling section_capacities:", e)
+        raw_output_section_capacities = []
+    
     raw_seated_spacing_beam = [
         (f"{key}_seated_beam", label, typ, value, visible if len(item) == 5 else True)
         for item in raw_output_seated_spacing_beam
@@ -290,7 +296,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         logs = module.logger.get_logs()
     else:
         logs = module.logs if hasattr(module, "logs") else []
-    raw_output = raw_output_text + raw_output_capacities + raw_seated_spacing_col + raw_seated_spacing_beam + raw_top_spacing_beam + raw_top_spacing_col
+    raw_output = raw_output_text + raw_output_capacities + raw_output_section_capacities + raw_seated_spacing_col + raw_seated_spacing_beam + raw_top_spacing_beam + raw_top_spacing_col
     # os.system("clear")
     # Loop over all the text values and add them to ouptut dict.
     for param in raw_output:

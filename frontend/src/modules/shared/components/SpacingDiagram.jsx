@@ -637,7 +637,10 @@ const SpacingDiagram = ({
     if (width <= 0 && angleLegSize > 0) {
       width = angleLegSize;
     }
-    const height = toNumber(plateHeight);
+    let height = toNumber(plateHeight);
+    if (height <= 0 && angleLegSize > 0) {
+      height = angleLegSize;
+    }
     
     // If required dimensions are missing, return early with error state
     if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
