@@ -42,11 +42,11 @@ export const cleatAngleOutputConfig = {
     SupportingSpacingModal:        { type: "spacingSupporting",    buttonText: "Supporting Spacing" },
     CapacityModal_supported:       { type: "details",              buttonText: "Bolt Capacity Details" },
     CapacityModal_supporting:      { type: "detailsSupporting",    buttonText: "Bolt Capacity Details" },
-    BoltCapSimpleModal_supported:  { type: "boltCapSimpleSptd",   buttonText: "Bolt Capacity" },
-    BoltCapSimpleModal_supporting: { type: "boltCapSimpleSpting",  buttonText: "Bolt Capacity" },
-    PlateCapacityModal_supported:  { type: "plateCapSptd",        buttonText: "Plate Capacity Details" },
-    PlateCapacityModal_supporting: { type: "plateCapSpting",       buttonText: "Plate Capacity Details" },
-    SectionCapacityModal:          { type: "sectionCap",           buttonText: "Section Capacity" },
+    BoltCapSimpleModal_supported:  { type: "boltCapSimpleSptd",   buttonText: "Capacity" },
+    BoltCapSimpleModal_supporting: { type: "boltCapSimpleSpting",  buttonText: "Capacity" },
+    PlateCapacityModal_supported:  { type: "plateCapSptd",        buttonText: "Capacity" },
+    PlateCapacityModal_supporting: { type: "plateCapSpting",       buttonText: "Capacity" },
+    SectionCapacityModal:          { type: "sectionCap",           buttonText: "Capacity" },
   },
 
   modalTypes: {
@@ -76,15 +76,15 @@ export const cleatAngleOutputConfig = {
     },
     boltCapSimpleSptd: {
       title: "Supported Leg — Bolt Capacity",
-      width: "35%",
-      layout: "single-column",
-      hasImage: false,
+      width: "68%",
+      layout: "cleat-bolt-capacity",
+      hasImage: true,
     },
     boltCapSimpleSpting: {
       title: "Supporting Leg — Bolt Capacity",
-      width: "35%",
-      layout: "single-column",
-      hasImage: false,
+      width: "68%",
+      layout: "cleat-bolt-capacity",
+      hasImage: true,
     },
     plateCapSptd: {
       title: "Supported Leg — Plate Capacity Details",
@@ -100,9 +100,9 @@ export const cleatAngleOutputConfig = {
     },
     sectionCap: {
       title: "Section Capacity Details",
-      width: "35%",
-      layout: "single-column",
-      hasImage: false,
+      width: "68%",
+      layout: "cleat-section-capacity",
+      hasImage: true,
     },
   },
 
@@ -181,47 +181,98 @@ export const cleatAngleOutputConfig = {
       ],
     },
     boltCapSimpleSptd: {
-      BoltCapSimpleModal_supported: [
-        { key: "Bolt.Shear_bolt_sptd", label: "Shear Capacity (kN)" },
-        { key: "Bolt.Bearing_bolt_sptd", label: "Bearing Capacity (kN)" },
-        { key: "Bolt.Capacity_bolt_sptd", label: "Bolt Value (kN)" },
-      ],
+      BoltCapSimpleModal_supported: {
+        fields: [
+          { key: "Bolt.Shear_bolt_sptd", label: "Shear Capacity (kN)", section: "Failure Pattern due to Shear" },
+          { key: "Bolt.Bearing_bolt_sptd", label: "Bearing Capacity (kN)", section: "Failure Pattern due to Shear" },
+          { key: "Bolt.Capacity_bolt_sptd", label: "Bolt Value (kN)", section: "Failure Pattern due to Shear" },
+          { key: "Bolt.Shear_bolt_sptd", label: "Shear Capacity (kN)", section: "Failure Pattern due to Tension" },
+          { key: "Bolt.Bearing_bolt_sptd", label: "Bearing Capacity (kN)", section: "Failure Pattern due to Tension" },
+          { key: "Bolt.Capacity_bolt_sptd", label: "Bolt Value (kN)", section: "Failure Pattern due to Tension" },
+        ],
+        diagram: {
+          props: {
+            leg: "supported",
+            plateHeight: "Plate.Height",
+            boltRows: "Bolt.OneLine",
+            boltCols: "Bolt.Line",
+            end: "Bolt.EndDist_supported",
+            pitch: "Bolt.Pitch_supported",
+            edge: "Bolt.Gauge1_supported",
+            gauge1: "Bolt.Gauge2_supported",
+            holeDiameter: "Bolt.Diameter",
+          },
+        },
+      },
     },
     boltCapSimpleSpting: {
-      BoltCapSimpleModal_supporting: [
-        { key: "Bolt.Shear_bolt_spting", label: "Shear Capacity (kN)" },
-        { key: "Bolt.Bearing_bolt_spting", label: "Bearing Capacity (kN)" },
-        { key: "Bolt.Capacity_bolt_spting", label: "Bolt Value (kN)" },
-      ],
+      BoltCapSimpleModal_supporting: {
+        fields: [
+          { key: "Bolt.Shear_bolt_spting", label: "Shear Capacity (kN)", section: "Failure Pattern due to Shear" },
+          { key: "Bolt.Bearing_bolt_spting", label: "Bearing Capacity (kN)", section: "Failure Pattern due to Shear" },
+          { key: "Bolt.Capacity_bolt_spting", label: "Bolt Value (kN)", section: "Failure Pattern due to Shear" },
+          { key: "Bolt.Shear_bolt_spting", label: "Shear Capacity (kN)", section: "Failure Pattern due to Tension" },
+          { key: "Bolt.Bearing_bolt_spting", label: "Bearing Capacity (kN)", section: "Failure Pattern due to Tension" },
+          { key: "Bolt.Capacity_bolt_spting", label: "Bolt Value (kN)", section: "Failure Pattern due to Tension" },
+        ],
+        diagram: {
+          props: {
+            leg: "supporting",
+            plateHeight: "Plate.Height",
+            boltRows: "Cleat.Spting_leg.OneLine",
+            boltCols: "Cleat.Spting_leg.Line",
+            end: "Bolt.EndDist_supporting",
+            pitch: "Bolt.Pitch_supporting",
+            edge: "Bolt.Gauge1_supporting",
+            gauge1: "Bolt.Gauge2_supporting",
+            holeDiameter: "Bolt.Diameter",
+          },
+        },
+      },
     },
     plateCapSptd: {
-      PlateCapacityModal_supported: [
-        { key: "Plate.Shear_sptd_plate", label: "Shear Yielding Capacity (kN)" },
-        { key: "Plate.Rupture_sptd_plate", label: "Shear Rupture Capacity (kN)" },
-        { key: "Plate.BlockShear_sptd_plate", label: "Block Shear (Shear) (kN)" },
-        { key: "Plate.TensionYield_sptd_plate", label: "Tension Yielding Capacity (kN)" },
-        { key: "Plate.TensionRupture_sptd_plate", label: "Tension Rupture Capacity (kN)" },
-        { key: "Plate.BlockShearAxial_sptd_plate", label: "Block Shear (Axial) (kN)" },
-        { key: "Section.BlockShearAxial_sptd_plate", label: "Section Block Shear Capacity (kN)" },
-      ],
+      PlateCapacityModal_supported: {
+        fields: [
+          { key: "Plate.Shear_sptd_plate", label: "Shear Yielding Capacity (kN)", section: "Failure Pattern due to Shear (Supported Leg)" },
+          { key: "Plate.Rupture_sptd_plate", label: "Shear Rupture Capacity (kN)", section: "Failure Pattern due to Shear (Supported Leg)" },
+          { key: "Plate.BlockShear_sptd_plate", label: "Block Shear (Shear) (kN)", section: "Failure Pattern due to Shear (Supported Leg)" },
+          { key: "Plate.TensionYield_sptd_plate", label: "Tension Yielding Capacity (kN)", section: "Failure Pattern due to Tension (Supported Leg)" },
+          { key: "Plate.TensionRupture_sptd_plate", label: "Tension Rupture Capacity (kN)", section: "Failure Pattern due to Tension (Supported Leg)" },
+          { key: "Plate.BlockShearAxial_sptd_plate", label: "Block Shear (Axial) (kN)", section: "Failure Pattern due to Tension (Supported Leg)" },
+          { key: "Section.BlockShearAxial_sptd_plate", label: "Section Block Shear Capacity (kN)", section: "Section (Beam Web) Block Shear" },
+        ],
+      },
     },
     plateCapSpting: {
-      PlateCapacityModal_supporting: [
-        { key: "Plate.Shear_spting_plate", label: "Shear Yielding Capacity (kN)" },
-        { key: "Plate.Rupture_spting_plate", label: "Shear Rupture Capacity (kN)" },
-        { key: "Plate.BlockShear_spting_plate", label: "Block Shear (Shear) (kN)" },
-        { key: "Plate.TensionYield_spting_plate", label: "Tension Yielding Capacity (kN)" },
-        { key: "Plate.TensionRupture_spting_plate", label: "Tension Rupture Capacity (kN)" },
-        { key: "Plate.BlockShearAxial_spting_plate", label: "Block Shear (Axial) (kN)" },
-      ],
+      PlateCapacityModal_supporting: {
+        fields: [
+          { key: "Plate.Shear_spting_plate", label: "Shear Yielding Capacity (kN)", section: "Failure Pattern due to Shear (Supporting Leg)" },
+          { key: "Plate.Rupture_spting_plate", label: "Shear Rupture Capacity (kN)", section: "Failure Pattern due to Shear (Supporting Leg)" },
+          { key: "Plate.BlockShear_spting_plate", label: "Block Shear (Shear) (kN)", section: "Failure Pattern due to Shear (Supporting Leg)" },
+          { key: "Plate.TensionYield_spting_plate", label: "Tension Yielding Capacity (kN)", section: "Failure Pattern due to Tension (Supporting Leg)" },
+          { key: "Plate.TensionRupture_spting_plate", label: "Tension Rupture Capacity (kN)", section: "Failure Pattern due to Tension (Supporting Leg)" },
+          { key: "Plate.BlockShearAxial_spting_plate", label: "Block Shear (Axial) (kN)", section: "Failure Pattern due to Tension (Supporting Leg)" },
+        ],
+      },
     },
     sectionCap: {
-      SectionCapacityModal: [
-        { key: "Cleat.Shear_section", label: "Cleat Shear Yielding Capacity (kN)" },
-        { key: "Cleat.BlockShear_section", label: "Cleat Block Shear Capacity (kN)" },
-        { key: "Cleat.MomDemand_section", label: "Moment Demand (kNm)" },
-        { key: "Cleat.MomCapacity_section", label: "Moment Capacity (kNm)" },
-      ],
+      SectionCapacityModal: {
+        fields: [
+          { key: "Cleat.Shear_section", label: "Cleat Shear Yielding Capacity (kN)", section: "Failure Pattern due to Shear in Supported Section" },
+          { key: "Cleat.BlockShear_section", label: "Cleat Block Shear Capacity (kN)", section: "Failure Pattern due to Shear in Supported Section" },
+          { key: "Cleat.MomDemand_section", label: "Moment Demand (kNm)", section: "Failure Pattern due to Tension in Supporting Section" },
+          { key: "Cleat.MomCapacity_section", label: "Moment Capacity (kNm)", section: "Failure Pattern due to Tension in Supporting Section" },
+        ],
+        diagram: {
+          props: {
+            connectivity: "Connectivity",
+            pitch: "Bolt.Pitch_supported",
+            end: "Bolt.EndDist_supported",
+            edge: "Bolt.Gauge1_supported",
+            gauge1: "Bolt.Gauge2_supported",
+          },
+        },
+      },
     },
   },
 };

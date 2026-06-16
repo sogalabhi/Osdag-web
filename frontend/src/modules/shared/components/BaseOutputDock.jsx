@@ -124,6 +124,12 @@ export const BaseOutputDock = React.memo(({
         return descriptor;
       }
 
+      if (typeof descriptor === "string") {
+        if (["supported", "supporting", "left", "right"].includes(descriptor)) {
+          return descriptor;
+        }
+      }
+
       return getNumeric(descriptor, rawOutput);
     };
 

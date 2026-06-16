@@ -3,6 +3,8 @@ import SpacingDiagram from "../SpacingDiagram";
 import BasePlateSketch from "../BasePlateSketch";
 import CapacityDiagram from "../CapacityDiagram";
 import WeldDiagram from "../WeldDiagram";
+import CleatBoltCapacityDiagram from "../CleatBoltCapacityDiagram";
+import CleatSectionCapacityDiagram from "../CleatSectionCapacityDiagram";
 
 function TwoColumnLayout({ config, fields, output, getOutputValue, ValueBox, getImage }) {
   return (
@@ -142,16 +144,30 @@ function SpacingDiagramLayout({ config, fields, diagram, output, getOutputValue,
 }
 
 function SingleColumnLayout({ fields, output, getOutputValue, ValueBox }) {
+  let lastSection = null;
   return (
     <div className="details-main-body">
       <div className="details-main-body-inside">
         {fields.length > 0 ? (
-          fields.map(({ key, label }, idx) => (
-            <div key={idx} className="details-main-body-align">
-              <h4 dangerouslySetInnerHTML={{ __html: label }} />
-              <ValueBox value={getOutputValue(key, output)} />
-            </div>
-          ))
+          fields.map(({ key, label, section }, idx) => {
+            const showSection = section && section !== lastSection;
+            if (showSection) {
+              lastSection = section;
+            }
+            return (
+              <React.Fragment key={idx}>
+                {showSection && (
+                  <h3 className="text-sm font-bold text-gray-800 border-b pb-1 dark:text-gray-200 mt-4 mb-2 first:mt-0">
+                    {section}
+                  </h3>
+                )}
+                <div className="details-main-body-align">
+                  <h4 dangerouslySetInnerHTML={{ __html: label }} />
+                  <ValueBox value={getOutputValue(key, output)} />
+                </div>
+              </React.Fragment>
+            );
+          })
         ) : (
           <p className="text-sm text-gray-500 px-2 py-4">No details available for this section.</p>
         )}
@@ -224,6 +240,115 @@ function WeldDiagramLayout({ config, fields, diagram, output, getOutputValue, re
     </div>
   );
 }
+function CleatBoltCapacityLayout({
+  config,
+  fields,
+  diagram,
+  output,
+  getOutputValue,
+  resolveDiagramProps,
+  ValueBox,
+}) {
+  const groupedFields = fields.reduce((acc, field) => {
+    const section = field.section || "Default";
+    if (!acc[section]) acc[section] = [];
+    acc[section].push(field);
+    return acc;
+  }, {});
+
+  const diagramProps = resolveDiagramProps ? resolveDiagramProps(diagram, output) : null;
+
+  return (
+    <div className="flex w-full flex-col justify-center pb-4 pt-2">
+      {config.note && (
+        <p className="px-5 pb-4 text-sm text-gray-600">Note: {config.note}</p>
+      )}
+      <div className="flex w-full flex-col gap-6 md:flex-row">
+        <div className="flex w-full flex-col gap-6 px-4 md:w-[45%]">
+          {Object.entries(groupedFields).map(([sectionName, sectionFields], sectionIdx) => (
+            <div key={sectionIdx} className="flex flex-col gap-3">
+              <h3 className="text-sm font-bold text-gray-800 border-b pb-1 dark:text-gray-200">
+                {sectionName}
+              </h3>
+              {sectionFields.map(({ key, label }, idx) => (
+                <div key={idx} className="flex items-center justify-between gap-3 text-sm">
+                  <h4 className="font-medium text-gray-700 dark:text-gray-300" dangerouslySetInnerHTML={{ __html: label }} />
+                  <div className="w-[100px] flex-shrink-0">
+                    <ValueBox value={getOutputValue(key, output)} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="flex w-full flex-1 items-center justify-center px-4 pb-4 md:w-[55%] md:pb-0">
+          {diagramProps ? (
+            <CleatBoltCapacityDiagram className="w-full" {...diagramProps} />
+          ) : (
+            <div className="flex w-full min-h-[280px] items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500">
+              No diagram data available.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CleatSectionCapacityLayout({
+  config,
+  fields,
+  diagram,
+  output,
+  getOutputValue,
+  resolveDiagramProps,
+  ValueBox,
+}) {
+  const groupedFields = fields.reduce((acc, field) => {
+    const section = field.section || "Default";
+    if (!acc[section]) acc[section] = [];
+    acc[section].push(field);
+    return acc;
+  }, {});
+
+  const diagramProps = resolveDiagramProps ? resolveDiagramProps(diagram, output) : null;
+
+  return (
+    <div className="flex w-full flex-col justify-center pb-4 pt-2">
+      {config.note && (
+        <p className="px-5 pb-4 text-sm text-gray-600">Note: {config.note}</p>
+      )}
+      <div className="flex w-full flex-col gap-6 md:flex-row">
+        <div className="flex w-full flex-col gap-6 px-4 md:w-[45%]">
+          {Object.entries(groupedFields).map(([sectionName, sectionFields], sectionIdx) => (
+            <div key={sectionIdx} className="flex flex-col gap-3">
+              <h3 className="text-sm font-bold text-gray-800 border-b pb-1 dark:text-gray-200">
+                {sectionName}
+              </h3>
+              {sectionFields.map(({ key, label }, idx) => (
+                <div key={idx} className="flex items-center justify-between gap-3 text-sm">
+                  <h4 className="font-medium text-gray-700 dark:text-gray-300" dangerouslySetInnerHTML={{ __html: label }} />
+                  <div className="w-[100px] flex-shrink-0">
+                    <ValueBox value={getOutputValue(key, output)} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="flex w-full flex-1 items-center justify-center px-4 pb-4 md:w-[55%] md:pb-0">
+          {diagramProps ? (
+            <CleatSectionCapacityDiagram className="w-full" {...diagramProps} />
+          ) : (
+            <div className="flex w-full min-h-[280px] items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500">
+              No diagram data available.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export const OUTPUT_LAYOUTS = {
   "two-column": TwoColumnLayout,
@@ -233,4 +358,6 @@ export const OUTPUT_LAYOUTS = {
   "single-column": SingleColumnLayout,
   "baseplate-sketch": BasePlateSketchLayout,
   "weld-diagram": WeldDiagramLayout,
+  "cleat-bolt-capacity": CleatBoltCapacityLayout,
+  "cleat-section-capacity": CleatSectionCapacityLayout,
 };

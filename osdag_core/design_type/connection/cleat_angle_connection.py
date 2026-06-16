@@ -461,6 +461,133 @@ class CleatAngleConnection(ShearConnection):
         
         return out_list
 
+    def sptd_leg_capacities(self, flag):
+        """Capacity details for supported leg (connected to beam web)."""
+        capacities = []
+
+        t99 = (None, 'Failure Pattern due to Shear (Supported Leg)', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        capacities.append((KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX,
+            round(self.sptd_leg.cleat_shear_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_RUPTURE, KEY_OUT_DISP_PLATE_RUPTURE, TYPE_TEXTBOX,
+            round(self.sptd_leg.shear_rupture_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX,
+            round(self.sptd_leg.block_shear_capacity_shear / 1000, 2) if flag else ''))
+
+        t99 = (None, 'Failure Pattern due to Tension (Supported Leg)', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        capacities.append((KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
+            round(self.sptd_leg.tension_yielding_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_TENSION_RUP, KEY_OUT_DISP_PLATE_TENSION_RUP, TYPE_TEXTBOX,
+            round(self.sptd_leg.tension_rupture_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_BLK_SHEAR_AXIAL, KEY_OUT_DISP_PLATE_BLK_SHEAR_AXIAL, TYPE_TEXTBOX,
+            round(self.sptd_leg.block_shear_capacity_axial / 1000, 2) if flag else ''))
+
+        t99 = (None, 'Section (Beam Web) Block Shear', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        capacities.append(('Section.BlockShearAxial', 'Section Block Shear Capacity (kN)', TYPE_TEXTBOX,
+            round(self.supported_section.block_shear_capacity_axial / 1000, 2) if flag else ''))
+
+        return capacities
+
+    def spting_leg_capacities(self, flag):
+        """Capacity details for supporting leg (connected to column/supporting member)."""
+        capacities = []
+
+        t99 = (None, 'Failure Pattern due to Shear (Supporting Leg)', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        capacities.append((KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX,
+            round(self.spting_leg.cleat_shear_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_RUPTURE, KEY_OUT_DISP_PLATE_RUPTURE, TYPE_TEXTBOX,
+            round(self.spting_leg.shear_rupture_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX,
+            round(self.spting_leg.block_shear_capacity_shear / 1000, 2) if flag else ''))
+
+        t99 = (None, 'Failure Pattern due to Tension (Supporting Leg)', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        capacities.append((KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
+            round(self.spting_leg.tension_yielding_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_TENSION_RUP, KEY_OUT_DISP_PLATE_TENSION_RUP, TYPE_TEXTBOX,
+            round(self.spting_leg.tension_rupture_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_BLK_SHEAR_AXIAL, KEY_OUT_DISP_PLATE_BLK_SHEAR_AXIAL, TYPE_TEXTBOX,
+            round(self.spting_leg.block_shear_capacity_axial / 1000, 2) if flag else ''))
+
+        return capacities
+
+    def bolt_capacity_supported(self, flag):
+        capacity = []
+
+        t1 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
+             round(self.bolt.bolt_shear_capacity / 1000, 2) if flag else '', True)
+        capacity.append(t1)
+
+        bolt_bearing_capacity_disp = ''
+        if flag is True:
+            if self.bolt.bolt_bearing_capacity != 'N/A':
+                bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+            else:
+                bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
+
+        t2 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX,
+             bolt_bearing_capacity_disp if flag else '', True)
+        capacity.append(t2)
+
+        t3 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX,
+             self.bolt_capacity_disp_sptd if flag else '', True)
+        capacity.append(t3)
+
+        return capacity
+
+    def bolt_capacity_supporting(self, flag):
+        capacity = []
+
+        t1 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
+             round(self.bolt2.bolt_shear_capacity / 1000, 2) if flag else '', True)
+        capacity.append(t1)
+
+        bolt_bearing_capacity_disp = ''
+        if flag is True:
+            if self.bolt2.bolt_bearing_capacity != 'N/A':
+                bolt_bearing_capacity_disp = round(self.bolt2.bolt_bearing_capacity / 1000, 2)
+            else:
+                bolt_bearing_capacity_disp = self.bolt2.bolt_bearing_capacity
+
+        t2 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX,
+             bolt_bearing_capacity_disp if flag else '', True)
+        capacity.append(t2)
+
+        t3 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX,
+             self.bolt_capacity_disp_spting if flag else '', True)
+        capacity.append(t3)
+
+        return capacity
+
+    def section_capacity_details(self, flag):
+        details = []
+
+        t1 = (KEY_OUT_CLEAT_SHEAR, KEY_DISP_SHEAR_YLD, TYPE_TEXTBOX,
+             round(self.sptd_leg.cleat_shear_capacity / 1000, 2) if flag else '', True)
+        details.append(t1)
+
+        t2 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_BLK_SHEAR, TYPE_TEXTBOX,
+             round(self.sptd_leg.block_shear_capacity / 1000, 2) if flag else '', True)
+        details.append(t2)
+
+        t3 = (KEY_OUT_CLEAT_MOM_DEMAND, KEY_DISP_MOM_DEMAND, TYPE_TEXTBOX,
+             round(self.sptd_leg.moment_demand / 1000000, 2) if flag else '', True)
+        details.append(t3)
+
+        t4 = (KEY_OUT_CLEAT_MOM_CAPACITY, KEY_DISP_MOM_CAPACITY, TYPE_TEXTBOX,
+             round(self.sptd_leg.cleat_moment_capacity / 1000000, 2) if flag else '', True)
+        details.append(t4)
+
+        return details
+
     def bolt_capacity_details_supported(self, flag):
 
         bolt_details_sptd = []
