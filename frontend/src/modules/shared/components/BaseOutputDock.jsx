@@ -133,9 +133,12 @@ export const BaseOutputDock = React.memo(({
       return getNumeric(descriptor, rawOutput);
     };
 
+    // Props that should be resolved as raw strings rather than numbers
+    const STRING_PROPS = new Set(["angleDesignation", "endplateType"]);
+
     const resolved = Object.entries(diagramConfig.props || {}).reduce(
       (acc, [key, descriptor]) => {
-        if (key === "angleDesignation") {
+        if (STRING_PROPS.has(key)) {
           const rawVal = getOutputValue(descriptor, rawOutput);
           if (rawVal !== undefined && rawVal !== null && rawVal !== " ") {
             acc[key] = rawVal;

@@ -279,6 +279,26 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "label": label,
                 "val": value  # Changed from "value" to "val" to match frontend expectations
             }  # Set label, key and value in output
+
+    # Extra keys needed by the frontend detailing diagram
+    try:
+        extra_keys = {
+            "Beam.Depth":          ("Beam Depth (mm)",              getattr(module, "beam_D", None)),
+            "Beam.FlangeThickness": ("Beam Flange Thickness (mm)",  getattr(module, "beam_tf", None)),
+            "Beam.WebThickness":    ("Beam Web Thickness (mm)",     getattr(module, "beam_tw", None)),
+            "Stiffener.Height":     ("Stiffener Height (mm)",       getattr(module, "stiffener_height", None)),
+            "Stiffener.Width":      ("Stiffener Width (mm)",        getattr(module, "stiffener_length", None)),
+            "Stiffener.Thickness":  ("Stiffener Thickness (mm)",    getattr(module, "stiffener_thickness", None)),
+            "EndPlateType":         ("End Plate Type",              getattr(module, "endplate_type", None)),
+        }
+        for key, (label, val) in extra_keys.items():
+            if val is not None:
+                if hasattr(val, 'item'):
+                    val = val.item()
+                output[key] = {"key": key, "label": label, "val": val}
+    except Exception as e:
+        print(f"[B2B EP adapter] Warning: could not add extra diagram keys: {e}")
+
     return output, logs
 
 

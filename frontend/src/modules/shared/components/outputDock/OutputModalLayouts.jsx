@@ -6,6 +6,7 @@ import WeldDiagram from "../WeldDiagram";
 import CleatBoltCapacityDiagram from "../CleatBoltCapacityDiagram";
 import CleatSectionCapacityDiagram from "../CleatSectionCapacityDiagram";
 import SeatedSectionCapacityDiagram from "../SeatedSectionCapacityDiagram";
+import B2BEndPlateDetailingDiagram from "../B2BEndPlateDetailingDiagram";
 
 function TwoColumnLayout({ config, fields, output, getOutputValue, ValueBox, getImage }) {
   const imageType = config.imageType || "spacing";
@@ -407,6 +408,38 @@ function SeatedSectionCapacityLayout({
   );
 }
 
+function EndPlateDetailingLayout({ config, fields, diagram, output, getOutputValue, resolveDiagramProps, ValueBox }) {
+  const diagramProps = resolveDiagramProps ? resolveDiagramProps(diagram, output) : null;
+  return (
+    <div className="flex w-full flex-col justify-center pb-4 pt-2">
+      {config.note && (
+        <p className="px-5 pb-4 text-sm text-gray-600">Note: {config.note}</p>
+      )}
+      <div className="flex w-full flex-col gap-6 md:flex-row">
+        <div className="flex w-full flex-col gap-3 px-4 md:w-[45%]">
+          {fields.map(({ key, label }, idx) => (
+            <div key={idx} className="flex items-center justify-between gap-3 text-sm">
+              <h4 className="font-medium text-gray-700 dark:text-gray-300" dangerouslySetInnerHTML={{ __html: label }} />
+              <div className="w-[100px] flex-shrink-0">
+                <ValueBox value={getOutputValue(key, output)} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex w-full flex-1 items-center justify-center px-4 pb-4 md:w-[55%] md:pb-0">
+          {diagramProps ? (
+            <B2BEndPlateDetailingDiagram {...diagramProps} />
+          ) : (
+            <div className="flex w-full min-h-[280px] items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500">
+              No diagram data available.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const OUTPUT_LAYOUTS = {
   "two-column": TwoColumnLayout,
   "capacity-complex": CapacityComplexLayout,
@@ -418,4 +451,5 @@ export const OUTPUT_LAYOUTS = {
   "cleat-bolt-capacity": CleatBoltCapacityLayout,
   "cleat-section-capacity": CleatSectionCapacityLayout,
   "seated-section-capacity": SeatedSectionCapacityLayout,
+  "endplate-detailing": EndPlateDetailingLayout,
 };

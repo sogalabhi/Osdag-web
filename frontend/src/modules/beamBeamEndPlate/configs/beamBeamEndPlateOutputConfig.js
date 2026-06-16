@@ -50,34 +50,33 @@ export const beamBeamEndPlateOutputConfig = {
 
   modals: {
     DimensionsModal: { type: "details", buttonText: "Details" },
-    DetailingModal: { type: "detailing", buttonText: "Details" },
-    SketchModal: { type: "stiffener", buttonText: "Details" },
+    DetailingModal:  { type: "endplate-detailing", buttonText: "Details" },
+    SketchModal:     { type: "stiffener", buttonText: "Details" },
     SketchFlangeModal: { type: "groove", buttonText: "Details" }
   },
 
   modalTypes: {
     details: {
-      title: "Capacity Details",
+      title: "Stiffener Dimensions",
       width: "35%",
       layout: "single-column",
       hasImage: false
     },
-    detailing: {
+    "endplate-detailing": {
       title: "Typical Detailing",
-      width: "40%", 
-      layout: "image-only",
-      hasImage: true,
-      imageType: "detailing"
+      width: "65%",
+      layout: "endplate-detailing",
+      hasImage: false
     },
     stiffener: {
       title: "Stiffener Details",
       width: "40%",
-      layout: "image-only", 
+      layout: "image-only",
       hasImage: true,
       imageType: "stiffener"
     },
     groove: {
-      title: "Stiffener Details",
+      title: "Weld Detail - Beam Flange to End Plate Connection",
       width: "40%",
       layout: "image-only",
       hasImage: true,
@@ -92,6 +91,32 @@ export const beamBeamEndPlateOutputConfig = {
         { key: "Stiffener.Width", label: "Width (mm)" },
         { key: "Stiffener.Thickness", label: "Thickness (mm)" }
       ]
+    },
+    "endplate-detailing": {
+      DetailingModal: {
+        fields: [
+          { key: "Detailing.No. of Bolts",               label: "No. of Bolts" },
+          { key: "Detailing.No. of Columns",             label: "No. of Columns" },
+          { key: "Detailing.No. of Rows",                label: "No. of Rows" },
+          { key: "Detailing.PitchDistanceOut",           label: "Pitch Distance (mm)" },
+          { key: "Detailing.GaugeDistanceOut",           label: "Gauge Distance (mm)" },
+          { key: "Detailing.Cross-centre Gauge Distance",label: "Cross-centre Gauge (mm)" },
+          { key: "Detailing.EndDistanceOut",             label: "End Distance (mm)" },
+          { key: "Detailing.EdgeDistanceOut",            label: "Edge Distance (mm)" },
+          { key: "Plate.Height",                         label: "Plate Height (mm)" }
+        ],
+        diagram: {
+          props: {
+            plateHeight:        "Plate.Height",
+            plateThickness:     "Plate.Thickness",
+            beamDepth:          "Beam.Depth",
+            beamFlangeThick:    "Beam.FlangeThickness",
+            stiffenerHeight:    "Stiffener.Height",
+            stiffenerThickness: "Stiffener.Thickness",
+            endplateType:       "EndPlateType"
+          }
+        }
+      }
     }
   }
 };
