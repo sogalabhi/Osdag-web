@@ -335,6 +335,41 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as e:
         print('CleatAngle - Error calling bolt_capacity_details_suporting:', e)
         raw_bolt_capacity_suporting = []
+
+    try:
+        raw_sptd_leg_capacities = module.sptd_leg_capacities(True)
+        print('CleatAngle - raw_sptd_leg_capacities:', raw_sptd_leg_capacities)
+    except Exception as e:
+        print('CleatAngle - Error calling sptd_leg_capacities:', e)
+        raw_sptd_leg_capacities = []
+
+    try:
+        raw_spting_leg_capacities = module.spting_leg_capacities(True)
+        print('CleatAngle - raw_spting_leg_capacities:', raw_spting_leg_capacities)
+    except Exception as e:
+        print('CleatAngle - Error calling spting_leg_capacities:', e)
+        raw_spting_leg_capacities = []
+
+    try:
+        raw_bolt_cap_sptd_simple = module.bolt_capacity_supported(True)
+        print('CleatAngle - raw_bolt_cap_sptd_simple:', raw_bolt_cap_sptd_simple)
+    except Exception as e:
+        print('CleatAngle - Error calling bolt_capacity_supported:', e)
+        raw_bolt_cap_sptd_simple = []
+
+    try:
+        raw_bolt_cap_spting_simple = module.bolt_capacity_supporting(True)
+        print('CleatAngle - raw_bolt_cap_spting_simple:', raw_bolt_cap_spting_simple)
+    except Exception as e:
+        print('CleatAngle - Error calling bolt_capacity_supporting:', e)
+        raw_bolt_cap_spting_simple = []
+
+    try:
+        raw_section_capacity = module.section_capacity_details(True)
+        print('CleatAngle - raw_section_capacity:', raw_section_capacity)
+    except Exception as e:
+        print('CleatAngle - Error calling section_capacity_details:', e)
+        raw_section_capacity = []
     
     # Add suffixes to duplicate-prone supported keys
     raw_supported = [
@@ -348,7 +383,42 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         for key, label, typ, value, visible in raw_bolt_capacity_suporting
         if key
     ]
-    
+
+    # Plate capacity - supported leg (add _sptd_plate suffix to distinguish from bolt keys)
+    raw_sptd_plate = [
+        (f"{item[0]}_sptd_plate" if item[0] else None, item[1], item[2], item[3], item[4] if len(item) > 4 else True)
+        for item in raw_sptd_leg_capacities
+        if len(item) >= 4 and item[0]
+    ]
+
+    # Plate capacity - supporting leg
+    raw_spting_plate = [
+        (f"{item[0]}_spting_plate" if item[0] else None, item[1], item[2], item[3], item[4] if len(item) > 4 else True)
+        for item in raw_spting_leg_capacities
+        if len(item) >= 4 and item[0]
+    ]
+
+    # Simple bolt capacity - supported
+    raw_bolt_simple_sptd = [
+        (f"{item[0]}_bolt_sptd" if item[0] else None, item[1], item[2], item[3], item[4] if len(item) > 4 else True)
+        for item in raw_bolt_cap_sptd_simple
+        if len(item) >= 4 and item[0]
+    ]
+
+    # Simple bolt capacity - supporting
+    raw_bolt_simple_spting = [
+        (f"{item[0]}_bolt_spting" if item[0] else None, item[1], item[2], item[3], item[4] if len(item) > 4 else True)
+        for item in raw_bolt_cap_spting_simple
+        if len(item) >= 4 and item[0]
+    ]
+
+    # Section capacity
+    raw_sec_cap = [
+        (f"{item[0]}_section" if item[0] else None, item[1], item[2], item[3], item[4] if len(item) > 4 else True)
+        for item in raw_section_capacity
+        if len(item) >= 4 and item[0]
+    ]
+
     # Create spacing outputs with side-specific suffixes to avoid key collisions
     raw_spacing_supported = [
         (f"{key}_supported", label, typ, value, visible if len(item) == 5 else True)
@@ -378,7 +448,14 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         logs = ["No logs generated"]
         print("CleatAngle - Setting default logs message")
     
-    raw_output = raw_spacing_supported + raw_spacing_supporting + raw_output_text + raw_supported + raw_supporting
+    raw_output = (
+        raw_spacing_supported + raw_spacing_supporting
+        + raw_output_text
+        + raw_supported + raw_supporting
+        + raw_sptd_plate + raw_spting_plate
+        + raw_bolt_simple_sptd + raw_bolt_simple_spting
+        + raw_sec_cap
+    )
     print(f'CleatAngle - Total raw_output items: {len(raw_output)}')
     print(f'CleatAngle - Raw output sample: {raw_output[:5] if raw_output else "Empty"}')
     

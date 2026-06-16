@@ -1,5 +1,8 @@
 import React from "react";
 import SpacingDiagram from "../SpacingDiagram";
+import BasePlateSketch from "../BasePlateSketch";
+import CapacityDiagram from "../CapacityDiagram";
+import WeldDiagram from "../WeldDiagram";
 
 function TwoColumnLayout({ config, fields, output, getOutputValue, ValueBox, getImage }) {
   return (
@@ -27,13 +30,24 @@ function TwoColumnLayout({ config, fields, output, getOutputValue, ValueBox, get
   );
 }
 
-function CapacityComplexLayout({ config, fields, output, getOutputValue, ValueBox, getImage }) {
+function CapacityComplexLayout({
+  config,
+  fields,
+  diagram,
+  output,
+  getOutputValue,
+  resolveDiagramProps,
+  ValueBox,
+  getImage,
+}) {
   const groupedFields = fields.reduce((acc, field) => {
     const section = field.section || "Default";
     if (!acc[section]) acc[section] = [];
     acc[section].push(field);
     return acc;
   }, {});
+
+  const diagramProps = resolveDiagramProps ? resolveDiagramProps(diagram, output) : null;
 
   return (
     <div className="spacing-main-body">
@@ -57,10 +71,22 @@ function CapacityComplexLayout({ config, fields, output, getOutputValue, ValueBo
               </div>
               {sectionIdx < 2 && (
                 <div className="Capacity-right-body">
-                  <img
-                    src={getImage(sectionIdx === 0 ? "capacity1" : "capacity2")}
-                    alt={`Capacity Image ${sectionIdx + 1}`}
-                  />
+                  {diagramProps ? (
+                    <CapacityDiagram
+                      {...diagramProps}
+                      fracturePattern={
+                        diagram?.diagramType === "section"
+                          ? (sectionIdx === 0 ? "section-shear" : "section-tension")
+                          : (sectionIdx === 0 ? "shear" : "tension")
+                      }
+                      className="w-full max-w-[300px]"
+                    />
+                  ) : (
+                    <img
+                      src={getImage(sectionIdx === 0 ? "capacity1" : "capacity2")}
+                      alt={`Capacity Image ${sectionIdx + 1}`}
+                    />
+                  )}
                   <h5>Block Shear Pattern</h5>
                 </div>
               )}
@@ -134,10 +160,77 @@ function SingleColumnLayout({ fields, output, getOutputValue, ValueBox }) {
   );
 }
 
+function BasePlateSketchLayout({ config, fields, diagram, output, getOutputValue, resolveDiagramProps, ValueBox }) {
+  const diagramProps = resolveDiagramProps(diagram, output);
+  return (
+    <div className="flex w-full flex-col justify-center pb-4 pt-2">
+      {config.note && (
+        <p className="px-5 pb-4 text-sm text-gray-600">Note: {config.note}</p>
+      )}
+      <div className="flex w-full flex-col gap-6 md:flex-row">
+        <div className="flex w-full flex-col gap-3 px-4 md:w-1/2">
+          {fields.map(({ key, label }, idx) => (
+            <div key={idx} className="flex items-center justify-between gap-3 text-sm">
+              <h4 className="font-medium text-gray-700" dangerouslySetInnerHTML={{ __html: label }} />
+
+              <div className="w-[100px] flex-shrink-0">
+                <ValueBox value={getOutputValue(key, output)} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex w-full flex-1 items-center justify-center px-4 pb-4 md:w-1/2 md:pb-0">
+          {diagramProps ? (
+            <BasePlateSketch className="w-full max-w-[400px]" {...diagramProps} />
+          ) : (
+            <div className="flex w-full min-h-[280px] items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500">
+              No diagram data available.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WeldDiagramLayout({ config, fields, diagram, output, getOutputValue, resolveDiagramProps, ValueBox }) {
+  const diagramProps = resolveDiagramProps ? resolveDiagramProps(diagram, output) : null;
+  return (
+    <div className="flex w-full flex-col justify-center pb-4 pt-2">
+      {config.note && (
+        <p className="px-5 pb-4 text-sm text-gray-600">Note: {config.note}</p>
+      )}
+      <div className="flex w-full flex-col gap-6 md:flex-row">
+        <div className="flex w-full flex-col gap-3 px-4 md:w-1/2">
+          {fields.map(({ key, label }, idx) => (
+            <div key={idx} className="flex items-center justify-between gap-3 text-sm">
+              <h4 className="font-medium text-gray-700" dangerouslySetInnerHTML={{ __html: label }} />
+              <div className="w-[100px] flex-shrink-0">
+                <ValueBox value={getOutputValue(key, output)} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex w-full flex-1 items-center justify-center px-4 pb-4 md:w-1/2 md:pb-0">
+          {diagramProps ? (
+            <WeldDiagram className="w-full max-w-[350px]" {...diagramProps} />
+          ) : (
+            <div className="flex w-full min-h-[200px] items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500">
+              No diagram data available.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const OUTPUT_LAYOUTS = {
   "two-column": TwoColumnLayout,
   "capacity-complex": CapacityComplexLayout,
   "image-only": ImageOnlyLayout,
   "spacing-diagram": SpacingDiagramLayout,
   "single-column": SingleColumnLayout,
+  "baseplate-sketch": BasePlateSketchLayout,
+  "weld-diagram": WeldDiagramLayout,
 };

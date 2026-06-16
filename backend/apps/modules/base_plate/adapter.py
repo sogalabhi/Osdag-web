@@ -346,6 +346,20 @@ def generate_output(input_values: Dict[str, Any]):
             _append_detail_list(output, module.stiffener_across_web_details(True))
         if hasattr(module, "stiffener_hollow_details"):
             _append_detail_list(output, module.stiffener_hollow_details(True))
+
+        # Add column dimensions to output for dynamic sketch drawing
+        if hasattr(module, "column_properties") and module.column_properties:
+            output["Column.Depth"] = {"key": "Column.Depth", "label": "Column Depth", "val": module.column_properties.depth}
+            output["Column.Width"] = {"key": "Column.Width", "label": "Column Flange Width", "val": module.column_properties.flange_width}
+            output["Column.Tf"] = {"key": "Column.Tf", "label": "Column Flange Thickness", "val": module.column_properties.flange_thickness}
+            output["Column.Tw"] = {"key": "Column.Tw", "label": "Column Web/Hollow Thickness", "val": module.column_properties.web_thickness}
+
+        member_designation = input_values.get("Member.Designation", "")
+        if isinstance(member_designation, list) and member_designation:
+            section_str = member_designation[0]
+        else:
+            section_str = str(member_designation)
+        output["Member.Designation"] = {"key": "Member.Designation", "label": "Section Designation", "val": section_str}
     except Exception as e:
         traceback.print_exc()
         raise

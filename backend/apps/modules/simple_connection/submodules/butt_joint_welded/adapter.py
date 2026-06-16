@@ -84,11 +84,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Width of Cover Plate": "Width of Cover Plate",
                 "Length of Cover Plate": "Length of Cover Plate",
                 "Thickness of Cover Plate": "Thickness of Cover Plate",
-                # Spacing details (for Butt Joint Welded)
-                "Bolt.Pitch": "Bolt.Pitch",
-                "Bolt.EndDist": "Bolt.EndDist",
-                "Bolt.Gauge": "Bolt.Gauge",
-                "Bolt.EdgeDist": "Bolt.EdgeDist",
             }
             label_map = {
                 "Weld.Type": "Type",
@@ -99,11 +94,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Width of Cover Plate": "Width of Cover Plate",
                 "Length of Cover Plate": "Length of Cover Plate",
                 "Thickness of Cover Plate": "Thickness of Cover Plate",
-                # Spacing details
-                "Bolt.Pitch": "Pitch Distance (mm)",
-                "Bolt.EndDist": "End Distance (mm)",
-                "Bolt.Gauge": "Gauge Distance (mm)",
-                "Bolt.EdgeDist": "Edge Distance (mm)",
             }
             for tup in tuple_list or []:
                 if len(tup) < 4:
@@ -121,14 +111,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
         if hasattr(module, "output_values"):
             map_tuple_list(module.output_values(True))
-        # Include spacing details for Butt Joint Welded (it has spacing() method in Osdag)
-        if hasattr(module, "spacing") and callable(getattr(module, "spacing", None)):
-            try:
-                map_tuple_list(module.spacing(True))
-            except (TypeError, AttributeError, ImportError) as e:
-                # Resource file access may fail in web environment
-                print(f"[ButtJointWelded] Could not load spacing diagram: {e}")
-                # Continue without spacing diagram
 
         # Supplement with scalars if not already mapped
         def add_scalar(src_attr, target_key, label):

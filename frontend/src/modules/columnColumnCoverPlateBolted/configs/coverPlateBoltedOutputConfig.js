@@ -50,7 +50,7 @@ export const coverPlateBoltedOutputConfig = {
     spacing: {
       title: "Spacing Details",
       width: "68%",
-      layout: "two-column", // ← Configuration instead of JSX
+      layout: "spacing-diagram",
       hasImage: true,
     },
 
@@ -72,42 +72,74 @@ export const coverPlateBoltedOutputConfig = {
   // Modal data - what fields appear in each modal
   modalData: {
     spacing: {
-      WebSpacingDetailsModal: [
-        {
-          key: "Web_plate.pitch_provided_web_spacing",
-          label: "Pitch Distance (mm)",
+      WebSpacingDetailsModal: {
+        fields: [
+          {
+            key: "Web_plate.pitch_provided_web_spacing",
+            label: "Pitch Distance (mm)",
+          },
+          {
+            key: "Web_plate.end_dist_provided_web_spacing",
+            label: "End Distance (mm)",
+          },
+          {
+            key: "Web_plate.gauge_provided_web_spacing",
+            label: "Gauge Distance (mm)",
+          },
+          {
+            key: "Web_plate.edge_dist_provided_web_spacing",
+            label: "Edge Distance (mm)",
+          },
+        ],
+        diagram: {
+          layout: "symmetric",
+          props: {
+            plateWidth: "Web_Plate.Height (mm)",
+            plateHeight: "Web_Plate.Width",
+            rows: "Web_plate.Bolt_OneLine_web_bolt_capacity",
+            cols: "Web_plate.Bolt_Line_web_bolt_capacity",
+            end: "Web_plate.end_dist_provided_web_spacing",
+            pitch: "Web_plate.pitch_provided_web_spacing",
+            gauge: "Web_plate.gauge_provided_web_spacing",
+            edge: "Web_plate.edge_dist_provided_web_spacing",
+            holeDiameter: "Bolt.Diameter",
+          },
         },
-        {
-          key: "Web_plate.end_dist_provided _web_spacing",
-          label: "End Distance (mm)",
+      },
+      FlangeSpacingDetailsModal: {
+        fields: [
+          {
+            key: "Flange_plate.pitch_provided_flange_spacing",
+            label: "Pitch Distance (mm)",
+          },
+          {
+            key: "Flange_plate.end_dist_provided_flange_spacing",
+            label: "End Distance (mm)",
+          },
+          {
+            key: "Flange_plate.gauge_provided_flange_spacing",
+            label: "Gauge Distance (mm)",
+          },
+          {
+            key: "Flange_plate.edge_dist_provided_flange_spacing",
+            label: "Edge Distance (mm)",
+          },
+        ],
+        diagram: {
+          layout: "symmetric",
+          props: {
+            plateWidth: "flange_plate.Length",
+            plateHeight: "Flange_Plate.Width (mm)",
+            rows: "Flange_plate.Bolt_OneLine_flange_bolt_capacity",
+            cols: "Flange_plate.Bolt_Line_flange_bolt_capacity",
+            end: "Flange_plate.end_dist_provided_flange_spacing",
+            pitch: "Flange_plate.pitch_provided_flange_spacing",
+            gauge: "Flange_plate.gauge_provided_flange_spacing",
+            edge: "Flange_plate.edge_dist_provided_flange_spacing",
+            holeDiameter: "Bolt.Diameter",
+          },
         },
-        {
-          key: "Web_plate.gauge_provided _web_spacing",
-          label: "Gauge Distance (mm)",
-        },
-        {
-          key: "Web_plate.edge_dist_provided_web_spacing",
-          label: "Edge Distance (mm)",
-        },
-      ],
-      FlangeSpacingDetailsModal: [
-        {
-          key: "Flange_plate.pitch_provided_flange_spacing",
-          label: "Pitch Distance (mm)",
-        },
-        {
-          key: "Flange_plate.end_dist_provided _flange_spacing",
-          label: "End Distance",
-        },
-        {
-          key: "Flange_plate.gauge_provided _flange_spacing",
-          label: "Gauge Distance (mm)",
-        },
-        {
-          key: "Flange_plate.edge_dist_provided_flange_spacing",
-          label: "Edge Distance (mm)",
-        },
-      ],
+      },
     },
 
     capacity: {

@@ -120,14 +120,27 @@ export const BaseOutputDock = React.memo(({
         return descriptor;
       }
 
+      if (typeof descriptor === "boolean") {
+        return descriptor;
+      }
+
       return getNumeric(descriptor, rawOutput);
     };
 
     const resolved = Object.entries(diagramConfig.props || {}).reduce(
       (acc, [key, descriptor]) => {
-        const value = mapValue(descriptor);
-        if (value !== undefined && value !== null && value !== "") {
-          acc[key] = value;
+        if (key === "angleDesignation") {
+          const rawVal = getOutputValue(descriptor, rawOutput);
+          if (rawVal !== undefined && rawVal !== null && rawVal !== " ") {
+            acc[key] = rawVal;
+          }
+        } else {
+          const value = mapValue(descriptor);
+          if (value !== undefined && value !== null && value !== "") {
+            acc[key] = value;
+          } else if (typeof descriptor === "boolean") {
+            acc[key] = descriptor;
+          }
         }
         return acc;
       },
@@ -142,18 +155,30 @@ export const BaseOutputDock = React.memo(({
       resolved.origin = diagramConfig.origin;
     }
 
+    if (diagramConfig.layout) {
+      resolved.layout = diagramConfig.layout;
+    }
+
+    if (diagramConfig.props?.drawAngleThickness) {
+      resolved.drawAngleThickness = diagramConfig.props.drawAngleThickness;
+    }
+
     return resolved;
   };
 
   const renderModalContent = (modalType, activeSection, output) => {
     const config = outputConfig.modalTypes[modalType];
+    const finalConfig = {
+      ...config,
+      note: (config.layout === 'spacing-diagram' || config.layout === 'capacity-diagram' || config.layout === 'capacity-complex') ? null : config.note
+    };
     const { fields, diagram } = resolveModalEntry(modalType, activeSection);
     const LayoutComponent = OUTPUT_LAYOUTS[config.layout] || OUTPUT_LAYOUTS["single-column"];
     const getImage = (imageType, selectedOption, basePlateState) =>
       getImageForModal(imageType, selectedOption, basePlateState);
 
     const layoutProps = {
-      config,
+      config: finalConfig,
       fields,
       diagram,
       output,

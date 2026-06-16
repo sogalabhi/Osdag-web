@@ -86,10 +86,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Plate.BaseUtilization": "Plate.BaseUtilization",
                 "Bolt.Utilization": "Bolt.Utilization",
                 "Bolt.Connection_Length": "Bolt.ConnLength",
-                "Bolt.Pitch": "Bolt.Pitch",
-                "Bolt.EndDist": "Bolt.EndDist",
-                "Bolt.Gauge": "Bolt.Gauge",
-                "Bolt.EdgeDist": "Bolt.EdgeDist",
             }
             label_map = {
                 "Bolt.Diameter": "Diameter (mm)",
@@ -108,10 +104,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Plate.BaseUtilization": "Connected Plate Utilization",
                 "Bolt.Utilization": "Bolt Utilization",
                 "Bolt.ConnLength": "Length of Connection (mm)",
-                "Bolt.Pitch": "Pitch Distance (mm)",
-                "Bolt.EndDist": "End Distance (mm)",
-                "Bolt.Gauge": "Gauge Distance (mm)",
-                "Bolt.EdgeDist": "Edge Distance (mm)",
             }
             for tup in tuple_list or []:
                 if len(tup) < 4:
@@ -129,8 +121,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
         if hasattr(module, "output_values"):
             map_tuple_list(module.output_values(True))
-        if hasattr(module, "spacing") and callable(getattr(module, "spacing", None)):
-            map_tuple_list(module.spacing(True))
 
         # Spacing diagram expects PlateWidth; module has self.width from input
         if "PlateWidth" not in mapped_output:

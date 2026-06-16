@@ -82,8 +82,7 @@ export const basePlateOutputConfig = {
   modalTypes: {
     basePlateSketch: {
       title: "Typical Sketch",
-      layout: "image-only",
-      imageType: "basePlateSketch",
+      layout: "baseplate-sketch",
       width: "60%",
     },
     basePlateDetailing: {
@@ -118,7 +117,39 @@ export const basePlateOutputConfig = {
 
   // Stiffener Details modal: which output keys to show per button (adapter merges these into output)
   modalData: {
-    basePlateSketch: {},
+    basePlateSketch: {
+      "BasePlate.Sketch": {
+        fields: [
+          { key: "Baseplate.Length", label: "Length (mm)" },
+          { key: "Baseplate.Width", label: "Width (mm)" },
+          { key: "Baseplate.Thickness", label: "Thickness (mm)" },
+        ],
+        diagram: {
+          props: {
+            plateLength: "Baseplate.Length",
+            plateWidth: "Baseplate.Width",
+            plateThickness: "Baseplate.Thickness",
+            columnDepth: "Column.Depth",
+            columnWidth: "Column.Width",
+            columnTf: "Column.Tf",
+            columnTw: "Column.Tw",
+            noOcfBolts: "Anchor Bolt.No of Anchor Bolts",
+            diaOcfBolt: "Anchor Bolt.Diameter",
+            edgeOcf: "Detailing.EdgeDistanceOut",
+            endOcf: "Detailing.EndDistanceOut",
+            pitchOcf: "Detailing.PitchDistanceOut",
+            gaugeOcf: "Detailing.GaugeDistanceOut",
+            noIcfBolts: "Anchor Bolt.No of Anchor Bolts_Uplift",
+            diaIcfBolt: "Anchor Bolt.Diameter_Uplift",
+            edgeIcf: "Detailing.EdgeDistanceIn",
+            endIcf: "Detailing.EndDistanceIn",
+            pitchIcf: "Detailing.PitchDistanceIn",
+            gaugeIcf: "Detailing.GaugeDistanceIn",
+            memberDesignation: "Member.Designation",
+          }
+        }
+      }
+    },
     basePlateDetailing: {},
     stiffenerDetails: {
       "StiffenerPlate.Flange": {

@@ -85,6 +85,32 @@ const distributeRows = (rows, end, pitch, plateHeight) => {
   return positions;
 };
 
+const distributeSymmetric = (count, edge, pitch, totalLength) => {
+  if (count <= 0) {
+    return [];
+  }
+
+  if (count === 1) {
+    return [totalLength / 2];
+  }
+
+  const P = pitch > 0 ? pitch : (totalLength - 2 * edge) / Math.max(count - 1, 1);
+  const positions = [];
+
+  const mid = (count - 1) / 2;
+  for (let i = 0; i < count; i += 1) {
+    if (i < mid) {
+      positions.push(edge + i * P);
+    } else if (i === mid) {
+      positions.push(totalLength / 2);
+    } else {
+      positions.push(totalLength - edge - (count - 1 - i) * P);
+    }
+  }
+
+  return positions;
+};
+
 const DimensionText = ({ x, y, text, anchor = "middle" }) => (
   <text
     x={x}
@@ -565,7 +591,11 @@ const SpacingDiagram = ({
   holeDiameter,
   origin = "left",
   weldSize = 0,
+  layout = "linear",
+  angleDesignation = "",
+  drawAngleThickness = "none",
   className = "",
+  children,
 }) => {
   const numericParams = useMemo(() => {
     const boltRows = Math.max(1, Math.round(toNumber(rows, 1)));
@@ -592,8 +622,21 @@ const SpacingDiagram = ({
     const pitchRaw = toNumber(pitch);
     const pitchDist = Number.isFinite(pitchRaw) && pitchRaw > 0 ? pitchRaw : undefined;
 
+    let angleThickness = 0;
+    let angleLegSize = 0;
+    if (angleDesignation) {
+      const parts = String(angleDesignation).split(/x/i).map(p => parseFloat(p.trim()));
+      if (parts.length >= 3) {
+        angleLegSize = parts[0];
+        angleThickness = parts[2];
+      }
+    }
+
     // All calculations should come from osdag_core - no fallback calculations
-    const width = toNumber(plateWidth);
+    let width = toNumber(plateWidth);
+    if (width <= 0 && angleLegSize > 0) {
+      width = angleLegSize;
+    }
     const height = toNumber(plateHeight);
     
     // If required dimensions are missing, return early with error state
@@ -611,6 +654,8 @@ const SpacingDiagram = ({
         holeDia: 0,
         weld: Math.max(0, toNumber(weldSize, 0)),
         error: 'Missing plate dimensions from backend',
+        angleThickness: 0,
+        angleLegSize: 0,
       };
     }
     
@@ -637,8 +682,19 @@ const SpacingDiagram = ({
       gaugeValues,
       holeDia: holeDia || 0,
       weld: Math.max(0, toNumber(weldSize, 0)),
+      layout,
+      angleThickness,
+      angleLegSize,
     };
-  }, [plateWidth, plateHeight, rows, cols, edge, end, pitch, gauge, holeDiameter, weldSize]);
+  }, [plateWidth, plateHeight, rows, cols, edge, end, pitch, gauge, holeDiameter, weldSize, layout, angleDesignation]);
+
+  if (numericParams.error || numericParams.width <= 0 || numericParams.height <= 0) {
+    return (
+      <div className={`flex min-h-[280px] w-full items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500 ${className}`}>
+        Dimensions Unavailable
+      </div>
+    );
+  }
 
   const scale = useMemo(() => {
     const usableWidth = VIEWBOX_WIDTH - 2 * MARGIN;
@@ -651,20 +707,34 @@ const SpacingDiagram = ({
   const offsetX = (VIEWBOX_WIDTH - numericParams.width * scale) / 2;
   const offsetY = (VIEWBOX_HEIGHT - numericParams.height * scale) / 2;
 
-  const boltColsPositions = distributeWithGauge(
-    numericParams.boltCols,
-    origin,
-    numericParams.edgeDist,
-    numericParams.width,
-    numericParams.gaugeValues
-  );
+  const boltColsPositions = numericParams.layout === "symmetric"
+    ? distributeSymmetric(
+        numericParams.boltCols,
+        numericParams.edgeDist,
+        numericParams.gaugeValues[0] || 0,
+        numericParams.width
+      )
+    : distributeWithGauge(
+        numericParams.boltCols,
+        origin,
+        numericParams.edgeDist,
+        numericParams.width,
+        numericParams.gaugeValues
+      );
 
-  const boltRowsPositions = distributeRows(
-    numericParams.boltRows,
-    numericParams.endDist,
-    numericParams.pitchDist,
-    numericParams.height
-  );
+  const boltRowsPositions = numericParams.layout === "symmetric"
+    ? distributeSymmetric(
+        numericParams.boltRows,
+        numericParams.endDist,
+        numericParams.pitchDist,
+        numericParams.height
+      )
+    : distributeRows(
+        numericParams.boltRows,
+        numericParams.endDist,
+        numericParams.pitchDist,
+        numericParams.height
+      );
 
   return (
     <svg
@@ -708,6 +778,32 @@ const SpacingDiagram = ({
         strokeWidth="2"
       />
 
+      {/* Angle thickness strip */}
+      {drawAngleThickness === 'left' && numericParams.angleThickness > 0 && (
+        <rect
+          x={offsetX}
+          y={offsetY}
+          width={numericParams.angleThickness * scale}
+          height={numericParams.height * scale}
+          fill="rgba(0, 0, 0, 0.15)"
+          stroke="#000"
+          strokeWidth="1"
+          strokeDasharray="4,4"
+        />
+      )}
+      {drawAngleThickness === 'right' && numericParams.angleThickness > 0 && (
+        <rect
+          x={offsetX + (numericParams.width - numericParams.angleThickness) * scale}
+          y={offsetY}
+          width={numericParams.angleThickness * scale}
+          height={numericParams.height * scale}
+          fill="rgba(0, 0, 0, 0.15)"
+          stroke="#000"
+          strokeWidth="1"
+          strokeDasharray="4,4"
+        />
+      )}
+
       {/* Optional weld strip */}
       {numericParams.weld > 0 && (
         <rect
@@ -746,6 +842,17 @@ const SpacingDiagram = ({
         scale,
         origin
       )}
+
+      {typeof children === "function"
+        ? children({
+            offsetX,
+            offsetY,
+            scale,
+            boltColsPositions,
+            boltRowsPositions,
+            numericParams,
+          })
+        : children}
     </svg>
   );
 };

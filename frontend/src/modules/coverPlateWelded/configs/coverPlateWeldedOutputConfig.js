@@ -33,14 +33,14 @@ export const coverPlateWeldedOutputConfig = {
   modalTypes: {
     webWeld: {
       title: "Web Plate Weld",
-      width: "35%",
-      layout: "single-column",
+      width: "68%",
+      layout: "weld-diagram",
       hasImage: false
     },
     flangeWeld: {
       title: "Flange Plate Weld",
-      width: "35%",
-      layout: "single-column",
+      width: "68%",
+      layout: "weld-diagram",
       hasImage: false
     },
     webCapacity: {
@@ -70,22 +70,46 @@ export const coverPlateWeldedOutputConfig = {
   },
   modalData: {
     webWeld: {
-      WebWeldDetailsModal: [
-        { key: "Web_Weld.Size", label: "Web Weld Size (mm)" },
-        { key: "Web_Weld.Strength", label: "Web Weld Strength (N/mm)" },
-        { key: "bolt.long_joint", label: "Strength Red.Factor" },
-        { key: "Weld.Strength_red", label: "Red.Strength (N/mm)" },
-        { key: "Web_Weld.Stress", label: "Web Weld Stress (N/mm)" }
-      ]
+      WebWeldDetailsModal: {
+        fields: [
+          { key: "Web_Weld.Size", label: "Web Weld Size (mm)" },
+          { key: "Web_Weld.Strength", label: "Web Weld Strength (N/mm)" },
+          { key: "bolt.long_joint", label: "Strength Red.Factor" },
+          { key: "Weld.Strength_red", label: "Red.Strength (N/mm)" },
+          { key: "Web_Weld.Stress", label: "Web Weld Stress (N/mm)" }
+        ],
+        diagram: {
+          props: {
+            plateWidth:     "Web_Plate.Height (mm)",
+            plateHeight:    "Web_Plate.Width",
+            plateThickness: "Connector.Web_Plate.Thickness_List",
+            weldSize:       "Web_Weld.Size",
+            weldGap:        "Detailing.Gap",
+            isWebPlate:     true,
+          },
+        },
+      },
     },
     flangeWeld: {
-      FlangeWeldDetailsModal: [
-        { key: "Flange_Weld.Size", label: "Flange Weld Size (mm)" },
-        { key: "Flange_Weld.Strength", label: "Flange Weld Strength (N/mm)" },
-        { key: "bolt.long_joint", label: "Strength Red.Factor" },
-        { key: "Weld.Strength_red", label: "Red.Strength (N/mm)" },
-        { key: "Flange_Weld.Stress", label: "Flange Weld Stress (N/mm)" }
-      ]
+      FlangeWeldDetailsModal: {
+        fields: [
+          { key: "Flange_Weld.Size", label: "Flange Weld Size (mm)" },
+          { key: "Flange_Weld.Strength", label: "Flange Weld Strength (N/mm)" },
+          { key: "bolt.long_joint", label: "Strength Red.Factor" },
+          { key: "Weld.Strength_red", label: "Red.Strength (N/mm)" },
+          { key: "Flange_Weld.Stress", label: "Flange Weld Stress (N/mm)" }
+        ],
+        diagram: {
+          props: {
+            plateWidth:     "flange_plate.Length",
+            plateHeight:    "Flange_Plate.Width (mm)",
+            plateThickness: "Connector.Flange_Plate.Thickness_list",
+            weldSize:       "Flange_Weld.Size",
+            weldGap:        "Detailing.Gap",
+            isWebPlate:     false,
+          },
+        },
+      },
     },
     webCapacity: {
       WebCapacityModal: [

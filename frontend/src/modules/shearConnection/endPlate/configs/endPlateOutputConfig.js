@@ -37,10 +37,10 @@ export const endPlateOutputConfig = {
   },
 
   modals: {
-    BoltCapacityModal: { type: "capacity", buttonText: "Bolt Capacity" },
+    BoltCapacityModal: { type: "details", buttonText: "Bolt Capacity" },
     PlateSpacingModal: { type: "spacing", buttonText: "Plate Spacing" },
     SectionCapacityModal: {
-      type: "capacity",
+      type: "details",
       buttonText: "Section Details Capacity",
     },
   },
@@ -106,8 +106,8 @@ export const endPlateOutputConfig = {
       },
     },
 
-    capacity: {
-      PlateCapacityModal: [
+    details: {
+      BoltCapacityModal: [
         {
           key: "Plate.Shear",
           label: "Shear Yielding Capacity (kN)",
