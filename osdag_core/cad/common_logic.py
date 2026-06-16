@@ -401,7 +401,7 @@ class CommonDesignLogic(object):
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.root_radius, R2=A.cleat.toe_radius)
 
-        elif self.connection == KEY_DISP_HEADERPLATE: # KEY_DISP_ENDPLATE:
+        elif self.connection == KEY_DISP_HEADERPLATE:
             # A = self.module_class()
             plate = Plate(L=A.plate.height, W=A.plate.width, T=A.plate.thickness_provided)
             Fweld1 = FilletWeld(L=A.plate.height, b=A.weld.size, h=A.weld.size)
@@ -442,7 +442,7 @@ class CommonDesignLogic(object):
             # print(notch_R1,notch_height,(A.supporting_section.flange_width / 2.0 -
             #                              (A.supporting_section.web_thickness / 2.0 + gap)) + gap, A.supported_section.flange_width)
 
-        elif self.connection == KEY_DISP_HEADERPLATE: # KEY_DISP_ENDPLATE::
+        elif self.connection == KEY_DISP_HEADERPLATE:
             notchObj = Notch(R1=notch_R1, height=notch_height,
                              width=(A.supporting_section.flange_width / 2.0 - (
                                      A.supporting_section.web_thickness / 2.0 + A.plate.thickness_provided)) + A.plate.gap,
@@ -478,7 +478,7 @@ class CommonDesignLogic(object):
             beamwebconn = FinBeamWebBeamWeb(supporting, supported, notchObj, plate, Fweld1, nutBoltArray, gap)
             # column, beam, notch, plate, Fweld, nut_bolt_array
 
-        elif self.connection == KEY_DISP_HEADERPLATE: # KEY_DISP_ENDPLATE::
+        elif self.connection == KEY_DISP_HEADERPLATE:
             nut_space = A.supporting_section.web_thickness + A.plate.thickness_provided + nut_T
             nutBoltArray = endNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             beamwebconn = EndBeamWebBeamWeb(supporting, supported, notchObj, Fweld1, plate, nutBoltArray)
@@ -585,7 +585,7 @@ class CommonDesignLogic(object):
             topclipangle = Angle(L=A.top_angle.width, A=A.top_angle.leg_a_length, B=A.top_angle.leg_b_length,
                                  T=A.top_angle.thickness, R1=A.top_angle.root_radius, R2=A.top_angle.toe_radius)
 
-        elif self.connection == KEY_DISP_HEADERPLATE: # KEY_DISP_ENDPLATE::
+        elif self.connection == KEY_DISP_HEADERPLATE:
             plate = Plate(L=A.plate.height, W=A.plate.width, T=A.plate.thickness_provided)
             Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
 
@@ -613,7 +613,7 @@ class CommonDesignLogic(object):
             nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colwebconn = FinColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
 
-        elif self.connection == KEY_DISP_HEADERPLATE: # KEY_DISP_ENDPLATE::
+        elif self.connection == KEY_DISP_HEADERPLATE:
             nut_space = A.supporting_section.web_thickness + int(A.plate.thickness_provided) + nut_T
             nutBoltArray = endNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colwebconn = EndColWebBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray)
@@ -707,7 +707,7 @@ class CommonDesignLogic(object):
             topclipangle = Angle(L=A.top_angle.width, A=A.top_angle.leg_a_length, B=A.top_angle.leg_b_length,
                                  T=A.top_angle.thickness, R1=A.top_angle.root_radius, R2=A.top_angle.toe_radius)
 
-        elif self.connection == KEY_DISP_HEADERPLATE: # KEY_DISP_ENDPLATE::
+        elif self.connection == KEY_DISP_HEADERPLATE:
             plate = Plate(L=A.plate.height, W=A.plate.width, T=A.plate.thickness_provided)
             Fweld1 = FilletWeld(L=A.weld.length, b=A.weld.size, h=A.weld.size)
         else:
@@ -743,7 +743,7 @@ class CommonDesignLogic(object):
             nutBoltArray = finNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colflangeconn = FinColFlangeBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray,gap)
 
-        elif self.connection == KEY_DISP_HEADERPLATE: # KEY_DISP_ENDPLATE::
+        elif self.connection == KEY_DISP_HEADERPLATE:
             nut_space = A.supporting_section.flange_thickness + int(A.plate.thickness_provided) + nut_T
             nutBoltArray = endNutBoltArray(A.bolt, A.plate, nut, bolt, nut_space)
             colflangeconn = EndColFlangeBeamWeb(supporting, supported, Fweld1, plate, nutBoltArray)
@@ -2954,7 +2954,7 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.connectivityObj.columnModel, color=column_color, update=True, label=label, canvas=self.cad_widget)
                 label = ["Beam", hover_dict.get("Beam")]
                 osdag_display_shape(self.display, self.connectivityObj.beamModel, color=beam_color, update=True, label=label, canvas=self.cad_widget)
-                if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_HEADERPLATE: # KEY_DISP_ENDPLATE:
+                if self.connection == KEY_DISP_FINPLATE or self.connection == KEY_DISP_HEADERPLATE:
                     # Colors to be set on self.components
                     label = ["Weld", hover_dict.get("Weld")]
                     osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color=weld_color, update=True, label=label, canvas=self.cad_widget)
