@@ -166,13 +166,13 @@ class CreateDesignReport(APIView):
         except Exception:
             pass
 
-        from osdag_core.Common import KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE
+        from osdag_core.Common import KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE
         
         if hasattr(module, 'module'):
             if module.module == 'FinPlateConnection' and module_id == 'FinPlateConnection':
                 module.module = KEY_DISP_FINPLATE
-            elif module.module == 'EndPlateConnection' and module_id == 'EndPlateConnection':
-                module.module = KEY_DISP_ENDPLATE
+            elif module.module == 'HeaderPlateConnection' and module_id == 'HeaderPlateConnection':
+                module.module = KEY_DISP_HEADERPLATE
         
         try:
             if not getattr(module, 'design_status', False):
