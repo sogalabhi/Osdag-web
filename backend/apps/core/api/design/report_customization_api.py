@@ -288,7 +288,7 @@ class CustomizeReport(APIView):
                 print(f'[report_customization_api] CustomizeReport:compiling in {os.getcwd()}')
                 print(f'[report_customization_api] CustomizeReport:tex file exists: {os.path.exists("filtered_report.tex")}')
                 
-                # Compile LaTeX - use system pdflatex (same as working design_report_csv_view.py)
+                # Compile LaTeX - use system pdflatex (same as working design_report_pdf_view.py)
                 print(f'[report_customization_api] CustomizeReport:using system pdflatex')
                 
                 # Check if pdflatex is available
@@ -394,7 +394,7 @@ def generate_initial_report_core(mapped_data):
     """
     try:
         print(f"[GenerateInitialReportCore] mapped_data keys: {list(mapped_data.keys())}")
-        from .design_report_csv_view import CreateDesignReport
+        from .design_report_pdf_view import CreateDesignReport
 
         class MockRequest:
             def __init__(self, data):

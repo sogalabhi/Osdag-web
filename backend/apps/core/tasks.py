@@ -8,6 +8,12 @@ def get_service_class(module_name: str, submodule_slug: str):
     """
     Helper to resolve the ServiceClass based on parent module and submodule slug.
     """
+    from apps.core.registry import BaseModuleRegistry
+    slug = submodule_slug.replace('_', '-')
+    service_class = BaseModuleRegistry._global_registry.get(slug)
+    if service_class:
+        return service_class
+
     if module_name == 'shear-connection':
         from apps.modules.shear_connection.registry import ShearConnectionRegistry
         return ShearConnectionRegistry.get_service_by_slug(submodule_slug)
@@ -37,6 +43,12 @@ def get_create_from_input_func(module_name: str, submodule_slug: str):
     """
     Helper to resolve the create_from_input function for CAD hover_dict generation.
     """
+    from apps.core.registry import BaseModuleRegistry
+    slug = submodule_slug.replace('_', '-')
+    for meta in BaseModuleRegistry._global_metadata.values():
+        if meta.get('slug') == slug and meta.get('adapter_func'):
+            return meta.get('adapter_func')
+
     try:
         if module_name == 'shear-connection':
             slug_clean = submodule_slug.replace('-', '_')
@@ -68,6 +80,7 @@ def get_create_from_input_func(module_name: str, submodule_slug: str):
     except Exception as e:
         logger.warning(f"Could not dynamically import create_from_input for {module_name}/{submodule_slug}: {e}")
     return None
+
 
 
 @shared_task

@@ -255,7 +255,7 @@ assert os.path.exists(result['images']['3d'])
 ## Related Files
 
 - `backend/apps/core/utils/report_image_generator.py` - Main implementation
-- `backend/apps/core/api/design/design_report_csv_view.py` - API endpoint that calls image generation
+- `backend/apps/core/api/design/design_report_pdf_view.py` - API endpoint that calls image generation
 - `osdag_core/design_report/reportGenerator_latex.py` - LaTeX report generator (uses images)
 - `osdag_core/cad/common_logic.py` - CAD generation logic (used by both GUI and web)
 

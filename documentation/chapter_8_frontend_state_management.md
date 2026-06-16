@@ -200,3 +200,119 @@ if (hasLoadedLists) {
 > If API network requests for dropdown options take longer than 1000ms (due to high database load), the prefill storage is cleared *before* form inputs map to their corresponding list values. This results in form inputs reverting to empty selections.
 >
 > **Recommended Fix**: Clear the prefill cache only after the parent list options are successfully loaded and the inputs are mapped.
+
+### 5. Pervasive Debug `console.log` Statements Left in Production Code
+Multiple files contain debug-only `console.log` statements that fire on high-frequency code paths in every production session:
+
+| File | Location | Trigger Frequency |
+|---|---|---|
+| [`api.js`](../frontend/src/api.js) | Line 6 — `console.log(rawBase)` | Once per page load (module import time), leaks `VITE_BASE_URL` env variable to the browser console |
+| [`ModuleReducer.jsx`](../frontend/src/context/ModuleReducer.jsx) | Lines 91–96 — 5 logs in `SET_HOVER_DICT` | Every CAD model render — dumps the full hover dictionary key list to the console |
+| [`ModuleState.jsx`](../frontend/src/context/ModuleState.jsx) | Lines 223–239 — ~8 `[cadissue]`-tagged logs in `createCADModel` | Every CAD generation call — logs full input data keys, response structure, and CAD file keys |
+| [`useModuleForm.js`](../frontend/src/modules/shared/hooks/useModuleForm.js) | Line 119 — `['diameter check']` log | Every module options reload — prints `boltDiameterList` to the console |
+| [`useDesignSubmission.js`](../frontend/src/modules/shared/hooks/useDesignSubmission.js) | Lines 84, 199, 262, 281, 284 | Every design calculation and CAD build sequence |
+
+> [!WARNING]
+> Debug logs in reducers and high-frequency hooks add measurable overhead to production rendering cycles and expose internal API structure in browser DevTools. The `console.log(rawBase)` in `api.js` is especially problematic as it runs at module import time before the app even mounts.
+>
+> **Recommended Fix**: Remove all debug `console.log` statements from production paths. Use conditional `if (import.meta.env.DEV)` guards for development-only diagnostics.
+
+---
+
+### 6. Dead Code: `normalizedFiles` Computation in CAD Submission Path
+In [`useDesignSubmission.js`](../frontend/src/modules/shared/hooks/useDesignSubmission.js), a `normalizedFiles` object is computed (lines 286–295) to remap lowercase CAD file keys (`beam`, `column`, `plate`) to their PascalCase equivalents (`Beam`, `Column`, `Plate`):
+```javascript
+const normalizedFiles = {};
+Object.entries(cadResult.files || {}).forEach(([key, value]) => {
+  const normKey = key.trim();
+  const mapped = normKey === 'beam' ? 'Beam' : normKey === 'column' ? 'Column' : normKey === 'plate' ? 'Plate' : normKey;
+  normalizedFiles[mapped] = value;
+});
+
+setCadModelPaths(cadResult.files || {}); // Uses raw files, NOT normalizedFiles!
+```
+The `normalizedFiles` object is computed but never used — `setCadModelPaths` ignores it and writes the raw `cadResult.files` directly.
+
+> [!NOTE]
+> This dead computation adds a pointless `Object.entries` iteration on every successful CAD call. If PascalCase normalization is required, it should be applied to the argument of `setCadModelPaths`. If not required, the entire block should be removed.
+>
+> **Recommended Fix**: Either apply `normalizedFiles` in `setCadModelPaths(normalizedFiles)`, or remove the normalization block entirely.
+
+---
+
+### 7. Stale `output` State Reference in `submitDesign` Error Handler
+In [`useDesignSubmission.js`](../frontend/src/modules/shared/hooks/useDesignSubmission.js), the outer `catch` block determines the error message category using:
+```javascript
+const hasOutput = output !== null; // Line 335
+```
+The goal is to distinguish between a full calculation failure (`hasOutput = false`) and a partial success where the calculation completed but CAD generation failed (`hasOutput = true`). However, `output` is the React state snapshot captured in the closure when `submitDesign` was first called — always `null` at the start of a fresh run.
+
+The `setOutput(formattedOutput)` call at line 231 (inside the `try` block after calculation succeeds) queues a React state update, but this update has not been committed to the closure by the time execution reaches the catch block. As a result, `hasOutput` evaluates to `false` even when the calculation has successfully produced output, causing the wrong error message ("An error occurred during design" instead of "Calculation succeeded, but [CAD error]") to display.
+
+> [!IMPORTANT]
+> **Recommended Fix**: Track whether output was set using a local variable instead of reading the stale state closure:
+> ```javascript
+> let outputWasSet = false;
+> // ... inside try block after setOutput(formattedOutput):
+> outputWasSet = true;
+> // ... inside catch block:
+> const hasOutput = outputWasSet;
+> ```
+
+---
+
+### 8. `resetFormState` Initialization Logic Duplication
+In [`useModuleForm.js`](../frontend/src/modules/shared/hooks/useModuleForm.js), the `resetFormState` function (lines 193–235) manually re-initializes every state variable by duplicating the identical `.reduce()` calls from the `useState` declarations above:
+```javascript
+// useState declaration (lines 44–49):
+const [selectionStates, setSelectionStates] = useState(
+  (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
+    acc[selection.key] = selection.defaultValue || "All";
+    return acc;
+  }, {})
+);
+
+// resetFormState (lines 198–203 — exact same logic):
+setSelectionStates(
+  (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
+    acc[selection.key] = selection.defaultValue || "All";
+    return acc;
+  }, {})
+);
+```
+This pattern repeats for `allSelected`, `selectedItems`, `modalStates`, `modalDynamicSrc`, and all scalar fields. Any new field added to `moduleConfig.modalConfig` or `moduleConfig.selectionConfig` must be manually updated in **both** the `useState` block and `resetFormState`.
+
+> [!NOTE]
+> **Recommended Fix**: Extract the initial state factories into named functions and call them from both `useState` and `resetFormState`:
+> ```javascript
+> const buildInitialSelectionStates = (config) =>
+>   (config.selectionConfig || []).reduce((acc, s) => ({ ...acc, [s.key]: s.defaultValue || "All" }), {});
+>
+> const [selectionStates, setSelectionStates] = useState(() => buildInitialSelectionStates(moduleConfig));
+> // In resetFormState:
+> setSelectionStates(buildInitialSelectionStates(moduleConfig));
+> ```
+
+---
+
+### 9. Unreliable Navigation Release Window in `useNavigationGuard`
+In [`useNavigationGuard.js`](../frontend/src/modules/shared/hooks/useNavigationGuard.js), `performNavigation` uses an arbitrary 100ms timeout to release the navigation guard and then immediately re-locks it inside the same callback:
+```javascript
+const performNavigation = () => {
+  setAllowNavigation(true);   // Unlocks the popstate guard
+  setShowConfirmation(false);
+  setConfirmationType("reset");
+
+  setTimeout(() => {
+    if (navigationSource === "home") navigate("/home");
+    else if (navigationSource === "back") navigate(-1);
+    setAllowNavigation(false);  // Re-locks — runs inside same timeout
+    setNavigationSource(null);
+  }, 100);
+};
+```
+The `setAllowNavigation(false)` call runs inside the same `setTimeout` as the `navigate()` call. After navigation completes and the component unmounts, this cleanup runs in an unmounted component context — React will log a warning in development and the state update is lost. Additionally, if the user presses the back button a second time in the 100ms window between `setAllowNavigation(true)` being committed and the `setTimeout` firing, the `popstate` handler reads the committed `allowNavigation=true` and allows the navigation, but the `setAllowNavigation(false)` cleanup may then run on the new page's component instance.
+
+> [!CAUTION]
+> **Recommended Fix**: Use a `useRef` for the navigation lock flag instead of `useState`, so the check in `handlePopState` reads the current value synchronously without depending on React's state commit cycle. Clear the flag in a `useEffect` cleanup or by tracking the navigation completion lifecycle rather than an arbitrary timeout.
+

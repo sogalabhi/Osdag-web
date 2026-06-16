@@ -109,6 +109,7 @@ export function subscribeToTask(taskId) {
     let retries = 0;
     const maxRetries = 3;
     let socket = null;
+    let completed = false;
 
     function connect() {
       const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -130,9 +131,27 @@ export function subscribeToTask(taskId) {
         try {
           const data = JSON.parse(event.data);
           if (data.status === "SUCCESS") {
-            resolve(data.result);
+            completed = true;
+            if (data.result !== undefined && data.result !== null) {
+              resolve(data.result);
+            } else {
+              console.log(`Task ${taskId} succeeded. Fetching result via HTTP...`);
+              apiClient(`api/tasks/${taskId}/`, { method: "GET" })
+                .then((res) => res.json())
+                .then((taskData) => {
+                  if (taskData.status === "SUCCESS") {
+                    resolve(taskData.result);
+                  } else {
+                    reject(new Error(taskData.error || "Async task execution failed"));
+                  }
+                })
+                .catch((err) => {
+                  reject(new Error(`Failed to retrieve task result: ${err.message}`));
+                });
+            }
             socket.close();
           } else if (data.status === "FAILURE" || data.status === "REVOKED") {
+            completed = true;
             reject(new Error(data.error || "Async task execution failed"));
             socket.close();
           }
@@ -146,8 +165,12 @@ export function subscribeToTask(taskId) {
       };
 
       socket.onclose = (event) => {
+        if (completed) return;
+
         if (event.wasClean) {
-          console.log(`WebSocket closed cleanly for task ${taskId}`);
+          console.log(`WebSocket closed cleanly for task ${taskId} before completion. Falling back to HTTP polling...`);
+          completed = true;
+          pollTask(taskId).then(resolve).catch(reject);
         } else {
           console.warn(`WebSocket closed unexpectedly for task ${taskId}. Code: ${event.code}`);
           if (retries < maxRetries) {
@@ -156,7 +179,9 @@ export function subscribeToTask(taskId) {
             console.log(`Retrying WebSocket connection in ${delay}ms (Attempt ${retries}/${maxRetries})`);
             setTimeout(connect, delay);
           } else {
-            reject(new Error("WebSocket connection failed after multiple retries."));
+            console.warn(`WebSocket connection failed after multiple retries for task ${taskId}. Falling back to HTTP polling...`);
+            completed = true;
+            pollTask(taskId).then(resolve).catch(reject);
           }
         }
       };
