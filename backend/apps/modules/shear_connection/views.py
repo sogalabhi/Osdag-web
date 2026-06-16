@@ -25,7 +25,6 @@ from apps.sections.options_merge import merge_user_sections_into_options
 SHEAR_REPORT_MODULE_ID_MAP = {
     "fin-plate": "FinPlateConnection",
     "cleat-angle": "CleatAngleConnection",
-    # "end-plate": "EndPlateConnection",
     "header-plate": "HeaderPlateConnection",
     "seated-angle": "Seated-Angle-Connection",
 }

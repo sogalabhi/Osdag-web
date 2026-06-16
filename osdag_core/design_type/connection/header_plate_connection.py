@@ -51,11 +51,9 @@ from importlib.resources import files
 from ...custom_logger import CustomLogger
 
 
-# class EndPlateConnection(ShearConnection):
 class HeaderPlateConnection(ShearConnection):
 
     def __init__(self):
-        # super(EndPlateConnection, self).__init__()
         super(HeaderPlateConnection, self).__init__()
         # self.plate = Plate(thickness=self.plate.thickness_provided, height=plate_height, width=plate_width, material=self.material)
         # self.weld = Weld(material_grade=design_dictionary[KEY_MATERIAL], fabrication=design_dictionary[KEY_DP_WELD_TYPE])
@@ -252,7 +250,7 @@ class HeaderPlateConnection(ShearConnection):
 
     @staticmethod
     def module_name():
-        return KEY_DISP_HEADERPLATE # KEY_DISP_ENDPLATE
+        return KEY_DISP_HEADERPLATE
 
     def input_values(self):
 
@@ -261,10 +259,10 @@ class HeaderPlateConnection(ShearConnection):
         """
 
         # @author: Amir, Umair
-        self.module = KEY_DISP_HEADERPLATE # KEY_DISP_ENDPLATE
+        self.module = KEY_DISP_HEADERPLATE
         options_list = []
 
-        t16 = (KEY_MODULE, KEY_DISP_HEADERPLATE, TYPE_MODULE, None, True, 'No Validator') # KEY_DISP_ENDPLATE
+        t16 = (KEY_MODULE, KEY_DISP_HEADERPLATE, TYPE_MODULE, None, True, 'No Validator')
         options_list.append(t16)
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, True, 'No Validator')

@@ -1,7 +1,6 @@
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
 from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
-# from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
 from osdag_core.design_type.connection.header_plate_connection import HeaderPlateConnection
 from osdag_core.design_type.connection.base_plate_connection import BasePlateConnection
 from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
@@ -21,7 +20,6 @@ from osdag_core.Common import TYPE_TEXTBOX, TYPE_OUT_BUTTON
 from osdag_core.Common import (
     # Shear Connection
     KEY_DISP_FINPLATE,
-    # KEY_DISP_ENDPLATE,
     KEY_DISP_HEADERPLATE
     KEY_DISP_CLEATANGLE,
     KEY_DISP_SEATED_ANGLE,
@@ -55,7 +53,6 @@ available_modules = {
     KEY_DISP_CLEATANGLE:CleatAngleConnection,
     KEY_DISP_COLUMNCOVERPLATE:ColumnCoverPlate, 
     KEY_DISP_COLUMNENDPLATE:ColumnEndPlate, 
-    # KEY_DISP_ENDPLATE:EndPlateConnection,
     KEY_DISP_HEADERPLATE:HeaderPlateConnection,
     KEY_DISP_FINPLATE:FinPlateConnection, 
     KEY_DISP_SEATED_ANGLE:SeatedAngleConnection, 

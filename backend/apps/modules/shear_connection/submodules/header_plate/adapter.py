@@ -12,7 +12,6 @@ from osdag_core.Common import KEY_DISP_HEADERPLATE, KEY_CONN
 from osdag_core.custom_logger import CustomLogger
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
-# from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
 from osdag_core.design_type.connection.header_plate_connection import HeaderPlateConnection
 import sys
 import os
@@ -345,7 +344,6 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     module = create_from_input(input_values)  # Create module from input.
     # Object that will create the CAD model.
     try :
-        # cld = CommonDesignLogic(None, None, '', KEY_DISP_ENDPLATE, module.mainmodule)
         cld = CommonDesignLogic(None, None, '', KEY_DISP_HEADERPLATE, module.mainmodule)
     except Exception as e : 
         print('error in cld e : ' , e)

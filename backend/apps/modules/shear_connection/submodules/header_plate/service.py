@@ -1,7 +1,6 @@
 """
 End Plate Service - Business logic layer
 """
-# from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
 from osdag_core.design_type.connection.header_plate_connection import HeaderPlateConnection
 from .adapter import validate_input, generate_output, create_cad_model
 import traceback
