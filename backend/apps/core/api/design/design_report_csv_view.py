@@ -8,7 +8,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 from apps.modules.shear_connection.submodules.fin_plate.adapter import create_from_input as fin_plate_create_from_input
-# from apps.modules.shear_connection.submodules.end_plate.adapter import create_from_input as end_plate_create_from_input
 from apps.modules.shear_connection.submodules.header_plate.adapter import create_from_input as header_plate_create_from_input
 from apps.modules.shear_connection.submodules.cleat_angle.adapter import create_from_input as cleat_angle_create_from_input
 from apps.modules.shear_connection.submodules.seated_angle.adapter import create_from_input as seated_angle_create_from_input
@@ -133,7 +132,6 @@ class CreateDesignReport(APIView):
         # Map module IDs to their respective create_from_input functions
         module_function_map = {
             'FinPlateConnection': fin_plate_create_from_input,
-            # 'EndPlateConnection': end_plate_create_from_input,
             'HeaderPlateConnection': header_plate_create_from_input,
             'CleatAngleConnection': cleat_angle_create_from_input,
             'Seated-Angle-Connection': seated_angle_create_from_input,
@@ -281,7 +279,7 @@ class CreateDesignReport(APIView):
             # log and continue with original metadata.
             pass
 
-        from osdag_core.Common import KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE # KEY_DISP_ENDPLATE
+        from osdag_core.Common import KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE
         
         # Fix module.module if it doesn't match KEY_DISP_FINPLATE or KEY_DISP_ENDPLATE
         # This is needed for parent save_design() to set report_input
