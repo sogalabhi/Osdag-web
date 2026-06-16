@@ -685,13 +685,13 @@ export const EngineeringModule = ({
       return ["Model", "Beam", "Column", "Plate"];
     }
     else if (moduleConfig.cameraKey === MODULE_KEY_CLEAT_ANGLE) {
-      return ["Model", "Beam", "Column", "CleatAngle"]; // FIXED: Use CleatAngle instead of Connector
+      return ["Model", "Beam", "Column", "CleatAngle"]; 
     }
     else if (moduleConfig.cameraKey === MODULE_KEY_END_PLATE) {
       return ["Model", "Beam", "Column", "Plate"];
     }
     else if (moduleConfig.cameraKey === MODULE_KEY_SEAT_ANGLE) {
-      return ["Model", "Beam", "Column", "SeatedAngle"]; // FIXED: Use SeatedAngle instead of Connector
+      return ["Model", "Beam", "Column", "SeatedAngle"];
     }
     else if (moduleConfig.cameraKey === MODULE_KEY_BEAM_COLUMN_END_PLATE) {
       return ["Model", "Beam", "Column", "End Plate"];

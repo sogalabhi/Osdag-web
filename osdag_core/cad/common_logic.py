@@ -2927,7 +2927,7 @@ class CommonDesignLogic(object):
                     label = ["Bolt", hover_dict.get("Bolt")]
                     osdag_display_shape(self.display, nutbolt, color=bolt_color, update=True, label=label, canvas=self.cad_widget)
 
-            elif self.component == "SeatAngle":
+            elif self.component in ("SeatAngle", "SeatedAngle"):
                 label = ["Angle", hover_dict.get("Angle")]
                 osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color=plate_color, update=True, label=label, canvas=self.cad_widget)
@@ -4071,7 +4071,7 @@ class CommonDesignLogic(object):
                 final_model = self.connectivityObj.plateModel
             elif self.component == "cleatAngle":
                 cadlist = [self.connectivityObj.angleModel, self.connectivityObj.angleLeftModel]
-            elif self.component == "SeatAngle":
+            elif self.component in ("SeatAngle", "SeatedAngle"):
                 cadlist = [self.connectivityObj.topclipangleModel, self.connectivityObj.angleModel]
             elif self.component in ("Bolt", "Bolts", "Connector"):
                 cadlist = self.connectivityObj.nut_bolt_array.get_models()
