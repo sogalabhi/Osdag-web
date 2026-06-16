@@ -167,43 +167,57 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         logs = module.logger.get_logs() or []
     else:
         logs = getattr(module, "logs", []) or []
-    raw_output = (
-        raw_output_text +
-        raw_member_capacity
-        + flange_weld_details +
-        web_weld_details
-        + web_capacity +
-        flange_capacity
-        + web_block_shear_pattern
-    )
-    
-    # Format output
-    for param in raw_output:
+
+    # Process standard text parameters
+    for param in raw_output_text + raw_member_capacity + web_capacity + flange_capacity + web_block_shear_pattern:
         if param[2] == "TextBox":
             key = param[0]
-            label = param[1] 
-            value = param[3]
             output[key] = {
                 "key": key,
-                "label": label,
-                "val": value
+                "label": param[1],
+                "val": param[3]
             }
+
+    # Process flange weld details and map colliding keys
+    for param in flange_weld_details:
+        if param[2] == "TextBox":
+            key = param[0]
+            if key == "bolt.long_joint":
+                key = "Flange_Weld.Reduction"
+            elif key == "Weld.Strength_red":
+                key = "Flange_Weld.Strength_red"
+            output[key] = {
+                "key": key,
+                "label": param[1],
+                "val": param[3]
+            }
+
+    # Process web weld details and map colliding keys
+    for param in web_weld_details:
+        if param[2] == "TextBox":
+            key = param[0]
+            if key == "bolt.long_joint":
+                key = "Web_Weld.Reduction"
+            elif key == "Weld.Strength_red":
+                key = "Web_Weld.Strength_red"
+            output[key] = {
+                "key": key,
+                "label": param[1],
+                "val": param[3]
+            }
+
     return output, logs
 
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP/STL file.
 
-    External API uses section names: "Model", "Column", "CoverPlate".
-    Internally, the legacy CAD logic for column cover plate welded uses
-    component name "Connector" for the cover plate + bolts assembly. Map
-    CoverPlate -> Connector for CAD routing, but keep the external section
-    name for file naming and response keys.
+    External API uses section names: "Model", "Column", "CoverPlate", "Weld".
     """
-    if section not in ("Model", "Column", "CoverPlate"):  # Error checking: If section is valid.
-        raise InvalidInputTypeError(
-            "section", "'Model', 'Column' or 'CoverPlate'")
-    module = create_from_input(input_values)  # Create module from input.
+    if section not in ("Model", "Column", "CoverPlate", "Weld"):
+        raise InvalidInputTypeError("section", "'Model', 'Column', 'CoverPlate' or 'Weld'")
+
+    module = create_from_input(input_values)
 
     # Ensure correct display keys for CAD routing
     from osdag_core.Common import KEY_DISP_COLUMNCOVERPLATEWELD
@@ -215,38 +229,119 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
         module.mainmodule = "Moment Connection"
 
     print(f"[CAD DEBUG] building CommonDesignLogic with module={module.module}, mainmodule={module.mainmodule}, section={section}")
-    # Object that will create the CAD model.
     try:
-        # CommonDesignLogic(display, cad_widget, folder, connection, mainmodule)
         cld = CommonDesignLogic(None, '', "", module.module , module.mainmodule)
-    except Exception as e : 
+    except Exception as e:
         print('error in cld e : ' , e)
     
     try:
-        # Setup the calculations object for generating CAD model.
         setup_for_cad(cld, module)
     except Exception as e:
         traceback.print_exc()
         print('Error in setting up cad e : ' , e)
 
-    # The section of the module that will be generated.
+    # Map external section names to internal component names expected by CommonDesignLogic
     internal_section = section
     if section == "CoverPlate":
-        # CommonDesignLogic expects "Cover Plate" (with space) for cover plate
-        # + welds assembly in the column cover plate welded branch.
         internal_section = "Cover Plate"
 
     cld.component = internal_section
     print(f"[cadissue] CC cover plate welded: cld.component set to {internal_section} for section={section}")
 
+    def normalize_and_fuse(obj):
+        if obj is None:
+            return None
+        from OCC.Core.TopoDS import TopoDS_Shape
+        def _flatten(o):
+            if o is None:
+                return []
+            if isinstance(o, dict):
+                out = []
+                for v in o.values():
+                    out.extend(_flatten(v))
+                return out
+            if isinstance(o, (list, tuple)):
+                out = []
+                for i in o:
+                    out.extend(_flatten(i))
+                return out
+            return [o]
+        def _explode_compound(shape):
+            from OCC.Core.TopExp import TopExp_Explorer
+            from OCC.Core.TopAbs import TopAbs_SOLID
+            solids = []
+            exp = TopExp_Explorer(shape, TopAbs_SOLID)
+            while exp.More():
+                solids.append(exp.Current())
+                exp.Next()
+            return solids if solids else [shape]
+        shapes = []
+        for s in _flatten(obj):
+            if isinstance(s, TopoDS_Shape):
+                shapes.extend(_explode_compound(s))
+        if not shapes:
+            return None
+        from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+        result = shapes[0]
+        for shp in shapes[1:]:
+            result = BRepAlgoAPI_Fuse(result, shp).Shape()
+        return result
+
+    def get_shape_for_part(part_name):
+        if part_name == "Column":
+            return normalize_and_fuse(cld.CPObj.get_column_models())
+        elif part_name in ("CoverPlate", "Cover Plate"):
+            return normalize_and_fuse(cld.CPObj.get_plate_models())
+        elif part_name == "Weld":
+            return normalize_and_fuse(cld.CPObj.get_welded_modules())
+        return None
+
+    part_names = ["Column", "CoverPlate", "Weld"]
+    part_files = {}
+
     try:
-        model = cld.create2Dcad()  # Generate CAD Model.
+        if section == "Model":
+            from OCC.Core.TopoDS import TopoDS_Compound
+            from OCC.Core.BRep import BRep_Builder
+            import json
+
+            builder = BRep_Builder()
+            compound = TopoDS_Compound()
+            builder.MakeCompound(compound)
+
+            for part in part_names:
+                try:
+                    part_shape = get_shape_for_part(part)
+                    if part_shape is None:
+                        continue
+
+                    # Add to compound
+                    builder.Add(compound, part_shape)
+
+                    # Ensure per-part BREP file exists
+                    part_file_name = f"{session}_{part}.brep"
+                    part_file_path_rel = os.path.join("file_storage", "cad_models", part_file_name)
+                    BRepTools.breptools.Write(part_shape, part_file_path_rel, Message_ProgressRange())
+                    part_files[part] = part_file_path_rel
+
+                    # Write STL for this part
+                    try:
+                        part_stl_rel = part_file_path_rel.replace(".brep", ".stl")
+                        write_stl(part_shape, os.path.join(os.getcwd(), part_stl_rel))
+                    except Exception as stle:
+                        print(f"Failed to write STL for part {part}: {stle}")
+                except Exception as e:
+                    print(f"Failed to build/write part {part}: {e}")
+
+            model = compound
+        else:
+            model = get_shape_for_part(section)
     except Exception as e:
-        print('Error in cld.create2Dcad() e : ' , e)
-        return False
+        print('Error in resolving component shape e : ', e)
+        traceback.print_exc()
+        raise
 
     # check if the cad_models folder exists or not 
-    # if no, then create one 
     cad_models_path = os.path.join(os.getcwd(), "file_storage", "cad_models")
     if not os.path.exists(cad_models_path):
         print('path does not exists cad_models , creating one')
@@ -268,6 +363,26 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
             print(f"Warning: Failed to save STL at {file_path}: {stle}")
 
         if section == "Model":
+            try:
+                import json
+                manifest = {
+                    "session": session,
+                    "mergedBrep": file_path,
+                    "parts": [
+                        {"name": name, "brepPath": part_files.get(name)} for name in part_names if part_files.get(name)
+                    ]
+                }
+                for entry in manifest["parts"]:
+                    if entry.get("brepPath"):
+                        entry["stlPath"] = entry["brepPath"].replace(".brep", ".stl")
+                manifest_path = file_path.replace(".brep", ".parts.json")
+                full_manifest_path = os.path.join(os.getcwd(), manifest_path)
+                with open(full_manifest_path, "w", encoding="utf-8") as mf:
+                    json.dump(manifest, mf)
+                print(f"Parts manifest saved at {full_manifest_path}")
+            except Exception as me:
+                print(f"Warning: Failed to write manifest: {me}")
+
             export_formats_lc = {f.lower() for f in export_formats} if export_formats else set()
             # Optional on-demand STEP/IGES exports
             if export_formats_lc:

@@ -65,7 +65,8 @@ export const coverPlateWeldedOutputConfig = {
       title: "Block Shear Pattern",
       width: "68%",
       layout: "two-column",
-      hasImage: true
+      hasImage: true,
+      imageType: "block_shear_welded_beam"
     }
   },
   modalData: {
@@ -74,8 +75,8 @@ export const coverPlateWeldedOutputConfig = {
         fields: [
           { key: "Web_Weld.Size", label: "Web Weld Size (mm)" },
           { key: "Web_Weld.Strength", label: "Web Weld Strength (N/mm)" },
-          { key: "bolt.long_joint", label: "Strength Red.Factor" },
-          { key: "Weld.Strength_red", label: "Red.Strength (N/mm)" },
+          { key: "Web_Weld.Reduction", label: "Strength Red.Factor" },
+          { key: "Web_Weld.Strength_red", label: "Red.Strength (N/mm)" },
           { key: "Web_Weld.Stress", label: "Web Weld Stress (N/mm)" }
         ],
         diagram: {
@@ -95,8 +96,8 @@ export const coverPlateWeldedOutputConfig = {
         fields: [
           { key: "Flange_Weld.Size", label: "Flange Weld Size (mm)" },
           { key: "Flange_Weld.Strength", label: "Flange Weld Strength (N/mm)" },
-          { key: "bolt.long_joint", label: "Strength Red.Factor" },
-          { key: "Weld.Strength_red", label: "Red.Strength (N/mm)" },
+          { key: "Flange_Weld.Reduction", label: "Strength Red.Factor" },
+          { key: "Flange_Weld.Strength_red", label: "Red.Strength (N/mm)" },
           { key: "Flange_Weld.Stress", label: "Flange Weld Stress (N/mm)" }
         ],
         diagram: {

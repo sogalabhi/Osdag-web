@@ -139,6 +139,19 @@ export const coverPlateWeldedConfig = {
           dataSource: "thicknessList"
         }
       ]
+    },
+    {
+      title: "Weld",
+      fields: [
+        {
+          key: "weld_type",
+          label: "Type *",
+          type: "select",
+          options: [
+            { value: "Fillet Weld", label: "Fillet Weld" }
+          ]
+        }
+      ]
     }
   ]
 };

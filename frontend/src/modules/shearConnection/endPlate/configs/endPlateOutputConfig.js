@@ -3,6 +3,7 @@ export const endPlateOutputConfig = {
     Bolt: [
       { key: "Bolt.Diameter", label: "Diameter (mm)" },
       { key: "Bolt.Grade_Provided", label: "Property Class" },
+      { key: "Bolt.Rows", label: "Rows of Bolts" },
       { key: "Bolt.Shear", label: "Shear Capacity (kN)" },
       { key: "Bolt.Bearing", label: "Bearing Capacity (kN)" },
       { key: "Bolt.Capacity", label: "Bolt Value (kN)" },
@@ -10,39 +11,28 @@ export const endPlateOutputConfig = {
       { key: "Bolt.Force (kN)", label: "Bolt Shear Force (kN)" },
       { key: "Bolt.TensionForce", label: "Bolt Tension Force (kN)" },
       { key: "Bolt.PryingForce", label: "Bolt Prying Force (kN)" },
-      { key: "Bolt.TensionTotal", label: "Total Bolt Tension (kN)" },
-      { key: "Bolt.IR", label: "Interaction Ratio" },
-      { key: "Bolt.Rows", label: "Rows of Bolts" },
-      { key: "Bolt.Betalj", label: "β<sub>lj</sub>" },
-      { key: "Bolt.Betalg", label: "β<sub>lg</sub>" },
-      { key: "Bolt.Betapk", label: "β<sub>pk</sub>" },
       { key: "BoltCapacityModal", label: "Capacity" },
+      { key: "PlateSpacingModal", label: "Spacing" },
     ],
     Plate: [
       { key: "Plate.Thickness", label: "Thickness (mm)" },
       { key: "Plate.Height", label: "Height (mm)" },
       { key: "Plate.Length", label: "Width (mm)" },
-      { key: "Plate.Shear", label: "Shear Yielding Capacity (kN)" },
-      { key: "Plate.BlockShear", label: "Block Shear Capacity (kN)" },
-      { key: "Plate.MomDemand", label: "Moment Demand per Bolt (kNm)" },
-      { key: "Plate.MomCapacity", label: "Moment Capacity per Bolt (kNm)" },
-      { key: "PlateSpacingModal", label: "Spacing" },
+      { key: "PlateCapacityModal", label: "Capacity" },
     ],
-    "Section Details": [{ key: "SectionCapacityModal", label: "Capacity" }],
+    // "Section Details": [{ key: "SectionCapacityModal", label: "Capacity" }],
     Weld: [
       { key: "Weld.Size", label: "Size (mm)" },
-      { key: "Weld.Strength", label: "Strength (N/mm2)" },
       { key: "Weld.Stress", label: "Stress (N/mm)" },
+      { key: "Weld.Strength", label: "Strength (N/mm2)" },
     ],
   },
 
   modals: {
     BoltCapacityModal: { type: "details", buttonText: "Bolt Capacity" },
     PlateSpacingModal: { type: "spacing", buttonText: "Plate Spacing" },
-    SectionCapacityModal: {
-      type: "details",
-      buttonText: "Section Details Capacity",
-    },
+    PlateCapacityModal: { type: "capacity", buttonText: "Plate Capacity" },
+    SectionCapacityModal: { type: "capacity", buttonText: "Section Capacity" },
   },
 
   modalTypes: {
@@ -60,9 +50,9 @@ export const endPlateOutputConfig = {
     },
 
     capacity: {
-      title: "Plate Capacity Details",
+      title: "Capacity Details",
       width: "68%",
-      layout: "two-column",
+      layout: "capacity-complex",
       hasImage: true,
     },
   },
@@ -94,7 +84,7 @@ export const endPlateOutputConfig = {
             plateWidth: "Plate.Length",
             plateHeight: "Plate.Height",
             rows: "Bolt.Rows",
-            cols: "Bolt.Line",
+            cols: 2,
             end: "Bolt.EndDist",
             pitch: "Bolt.Pitch",
             gauge: "Bolt.Gauge",
@@ -109,32 +99,127 @@ export const endPlateOutputConfig = {
     details: {
       BoltCapacityModal: [
         {
-          key: "Plate.Shear",
-          label: "Shear Yielding Capacity (kN)",
+          key: "Bolt.Shear",
+          label: "Shear Capacity (kN)",
         },
         {
-          key: "Plate.BlockShear",
-          label: "Block Shear Capacity (kN)",
+          key: "Bolt.Bearing",
+          label: "Bearing Capacity (kN)",
         },
         {
-          key: "Plate.MomDemand",
-          label: "Moment Demand per Bolt (kNm)",
+          key: "Bolt.Betalj",
+          label: "β<sub>lj</sub>",
         },
         {
-          key: "Plate.MomCapacity",
-          label: "Moment Capacity per Bolt (kNm)",
+          key: "Bolt.Betalg",
+          label: "β<sub>lg</sub>",
+        },
+        {
+          key: "Bolt.Betapk",
+          label: "β<sub>pk</sub>",
+        },
+        {
+          key: "Bolt.Capacity",
+          label: "Bolt Value (kN)",
+        },
+        {
+          key: "Bolt.Tension",
+          label: "Bolt Tension Capacity (kN)",
+        },
+        {
+          key: "Bolt.Force (kN)",
+          label: "Bolt Shear Force (kN)",
+        },
+        {
+          key: "Bolt.TensionForce",
+          label: "Bolt Tension Force (kN)",
+        },
+        {
+          key: "Bolt.PryingForce",
+          label: "Bolt Prying Force (kN)",
+        },
+        {
+          key: "Bolt.TensionTotal",
+          label: "Total Bolt Tension (kN)",
+        },
+        {
+          key: "Bolt.IR",
+          label: "Interaction Ratio",
         },
       ],
-      SectionCapacityModal: [
-        {
-          key: "Plate.MomDemand",
-          label: "Moment Demand (kNm)",
+    },
+
+    capacity: {
+      PlateCapacityModal: {
+        fields: [
+          {
+            key: "Plate.Shear",
+            label: "Shear Yielding Capacity (kN)",
+            section: "Failure Pattern due to Shear in Member",
+          },
+          {
+            key: "Plate.BlockShear",
+            label: "Block Shear Capacity (kN)",
+            section: "Failure Pattern due to Shear in Member",
+          },
+          {
+            key: "Plate.MomDemand",
+            label: "Moment Demand per Bolt (kNm)",
+            section: "Moment Analysis",
+          },
+          {
+            key: "Plate.MomCapacity",
+            label: "Moment Capacity per Bolt (kNm)",
+            section: "Moment Analysis",
+          },
+        ],
+        diagram: {
+          origin: "right",
+          diagramType: "plate",
+          props: {
+            plateWidth: "Plate.Length",
+            plateHeight: "Plate.Height",
+            rows: "Bolt.Rows",
+            cols: 2,
+            end: "Bolt.EndDist",
+            pitch: "Bolt.Pitch",
+            gauge: "Bolt.Gauge",
+            edge: "Bolt.EdgeDist",
+            holeDiameter: "Bolt.Diameter",
+            weldSize: "Weld.Size",
+          },
         },
-        {
-          key: "Plate.MomCapacity",
-          label: "Moment Capacity (kNm)",
+      },
+      SectionCapacityModal: {
+        fields: [
+          {
+            key: "Plate.MomDemand",
+            label: "Moment Demand (kNm)",
+            section: "Moment Analysis",
+          },
+          {
+            key: "Plate.MomCapacity",
+            label: "Moment Capacity (kNm)",
+            section: "Moment Analysis",
+          },
+        ],
+        diagram: {
+          origin: "right",
+          diagramType: "section",
+          props: {
+            plateWidth: "Plate.Length",
+            plateHeight: "Plate.Height",
+            rows: "Bolt.Rows",
+            cols: 2,
+            end: "Bolt.EndDist",
+            pitch: "Bolt.Pitch",
+            gauge: "Bolt.Gauge",
+            edge: "Bolt.EdgeDist",
+            holeDiameter: "Bolt.Diameter",
+            weldSize: "Weld.Size",
+          },
         },
-      ],
+      },
     },
   },
 };

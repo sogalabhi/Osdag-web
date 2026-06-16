@@ -37,8 +37,11 @@ export const beamToColumnEndPlateOutputConfig = {
         { key: "Weld.NormalStress", label: "Normal Stress (N/mm2)" },
         { key: "Weld.ShearStress", label: "Shear Stress (N/mm2)" },
         { key: "Weld.StressCombined", label: "Equivalent Stress (N/mm2)" },
-        { key: "Weld.Strength", label: "Strength (N/mm2)" },
-        { key: "Weld.Type", label: "Type" }
+        { key: "Weld.Strength", label: "Strength (N/mm2)" }
+    ],
+    "Section Weld": [
+        { key: "Weld.Type", label: "Type" },
+        { key: "SketchFlangeModal", label: "Typical Sketch" }
     ],
     "Continuity Plate": [
       { key: "ContinuityPlateModal", label: "Continuity Plate Details" },
@@ -55,7 +58,8 @@ export const beamToColumnEndPlateOutputConfig = {
   modals: {
     DetailingModal: { type: "detailing", buttonText: "Details" },
     ContinuityPlateModal: { type: "details", buttonText: "Details" },
-    WebStiffenerModal: { type: "details", buttonText: "Details" }
+    WebStiffenerModal: { type: "details", buttonText: "Details" },
+    SketchFlangeModal: { type: "groove", buttonText: "Details" }
   },
   modalTypes: {
     details: {
@@ -70,6 +74,13 @@ export const beamToColumnEndPlateOutputConfig = {
       layout: "image-only",
       hasImage: true,
       imageType: "detailing"
+    },
+    groove: {
+      title: "Weld Detail - Beam Flange to End Plate Connection",
+      width: "40%",
+      layout: "image-only",
+      hasImage: true,
+      imageType: "groove"
     }
   },
 

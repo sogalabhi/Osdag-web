@@ -8,6 +8,7 @@ import CleatSectionCapacityDiagram from "../CleatSectionCapacityDiagram";
 import SeatedSectionCapacityDiagram from "../SeatedSectionCapacityDiagram";
 
 function TwoColumnLayout({ config, fields, output, getOutputValue, ValueBox, getImage }) {
+  const imageType = config.imageType || "spacing";
   return (
     <div className="spacing-main-body">
       {config.note && (
@@ -25,7 +26,7 @@ function TwoColumnLayout({ config, fields, output, getOutputValue, ValueBox, get
         </div>
         {config.hasImage && (
           <div className="spacing-right-body">
-            <img src={getImage("spacing")} alt="Spacing Image" />
+            <img src={getImage(imageType)} alt={`${imageType} Image`} />
           </div>
         )}
       </div>

@@ -40,8 +40,8 @@ export const cleatAngleOutputConfig = {
   modals: {
     SupportedSpacingModal:         { type: "spacing",              buttonText: "Supported Spacing" },
     SupportingSpacingModal:        { type: "spacingSupporting",    buttonText: "Supporting Spacing" },
-    CapacityModal_supported:       { type: "details",              buttonText: "Bolt Capacity Details" },
-    CapacityModal_supporting:      { type: "detailsSupporting",    buttonText: "Bolt Capacity Details" },
+    CapacityModal_supported:       { type: "details",              buttonText: "Capacity" },
+    CapacityModal_supporting:      { type: "detailsSupporting",    buttonText: "Capacity" },
     BoltCapSimpleModal_supported:  { type: "boltCapSimpleSptd",   buttonText: "Capacity" },
     BoltCapSimpleModal_supporting: { type: "boltCapSimpleSpting",  buttonText: "Capacity" },
     PlateCapacityModal_supported:  { type: "plateCapSptd",        buttonText: "Capacity" },
