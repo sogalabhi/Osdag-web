@@ -100,6 +100,7 @@ INSTALLED_APPS = [
 # Middleware order is CRITICAL - CorsMiddleware MUST be first
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # MUST BE FIRST for CORS to work
+    'apps.core.middleware.metrics_middleware.InfluxMetricsMiddleware',  # Metrics (no-op if InfluxDB unavailable)
     'django.middleware.security.SecurityMiddleware',
     'silk.middleware.SilkyMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -275,6 +276,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SECRET_ROOT = os.path.join(BASE_DIR , 'secret/')
 FILE_STORAGE_ROOT = BASE_DIR / 'file_storage'
 
+
+# ─── InfluxDB observability (load-test metrics) ───────────────────────────────
+# All values come from environment variables so the dev compose and production
+# configs can differ. They default to values used in docker-compose.yml.
+INFLUXDB_URL    = os.getenv('INFLUXDB_URL',    'http://influxdb:8086')
+INFLUXDB_TOKEN  = os.getenv('INFLUXDB_TOKEN',  'osdag-super-secret-token')
+INFLUXDB_ORG    = os.getenv('INFLUXDB_ORG',    'osdag')
+INFLUXDB_BUCKET = os.getenv('INFLUXDB_BUCKET', 'osdag_metrics')
 
 # Add this to the bottom of settings.py
 

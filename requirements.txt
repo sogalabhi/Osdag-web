@@ -107,3 +107,7 @@ pynput==1.6.8
 PyGithub
 
 django-silk==5.1.0
+
+# --- Observability / load-test metrics ---
+influxdb-client>=1.40.0  # InfluxDB v2 write API (middleware + Celery signals)
+psutil>=5.9.0             # System metrics (used by monitoring sidecar)
