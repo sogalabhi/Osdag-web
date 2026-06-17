@@ -19,6 +19,7 @@ from apps.sections.export_scopes import EXPORT_SCOPE_REGISTRY, get_allowed_expor
 from apps.sections.models import TABLE_TO_USER_MODEL
 from apps.sections.serializers import get_user_section_serializer
 from apps.sections.validation import (
+    assert_allowed_catalog_table,
     assert_allowed_table,
     can_insert_custom_section,
     get_catalog_model_for_table,
@@ -41,7 +42,9 @@ def _normalize_designation(value: Any) -> str:
     return str(value).strip()
 
 
-def _safe_table(request, *, source: str = "query") -> Tuple[Optional[str], Optional[Response]]:
+def _safe_table(
+    request, *, source: str = "query", custom_only: bool = True
+) -> Tuple[Optional[str], Optional[Response]]:
     """Resolve `table` from query string or POST form; return (table, error_response)."""
     if source == "query":
         table = request.query_params.get("table")
@@ -53,7 +56,10 @@ def _safe_table(request, *, source: str = "query") -> Tuple[Optional[str], Optio
             status=status.HTTP_400_BAD_REQUEST,
         )
     try:
-        assert_allowed_table(table)
+        if custom_only:
+            assert_allowed_table(table)
+        else:
+            assert_allowed_catalog_table(table)
     except ValueError as exc:
         return None, Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
     return table, None
@@ -101,7 +107,7 @@ class SectionCatalogExportView(APIView):
     def get(self, request):
         from openpyxl import Workbook
 
-        table, err = _safe_table(request, source="query")
+        table, err = _safe_table(request, source="query", custom_only=False)
         if err:
             return err
 

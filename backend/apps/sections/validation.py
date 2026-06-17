@@ -13,16 +13,20 @@ from typing import Any, Dict, List, Optional, Tuple, Type
 
 from django.db import models
 
-from apps.core.models import Angles, Beams, Channels, Columns
+from apps.core.models import Angles, Beams, Channels, Columns, CHS, RHS, SHS
 from apps.sections.models import TABLE_TO_USER_MODEL
 
 ALLOWED_TABLES = frozenset(TABLE_TO_USER_MODEL.keys())
+ALLOWED_CATALOG_TABLES = ALLOWED_TABLES | {"CHS", "SHS", "RHS"}
 
 TABLE_TO_CATALOG_MODEL: Dict[str, Type[models.Model]] = {
     "Columns": Columns,
     "Beams": Beams,
     "Angles": Angles,
     "Channels": Channels,
+    "CHS": CHS,
+    "SHS": SHS,
+    "RHS": RHS,
 }
 
 # Desktop `import_db_validation`: numeric keys must be int or float (openpyxl often uses float).
@@ -119,12 +123,19 @@ def assert_allowed_table(table: str) -> None:
         )
 
 
+def assert_allowed_catalog_table(table: str) -> None:
+    if table not in ALLOWED_CATALOG_TABLES:
+        raise ValueError(
+            f"Invalid catalog table {table!r}; expected one of {sorted(ALLOWED_CATALOG_TABLES)}"
+        )
+
+
 def get_db_header(table: str) -> List[str]:
     """
     Canonical xlsx row-1 headers for `table`, matching catalog field names
     (same strings desktop import expects for `SELECT *`-style column names).
     """
-    assert_allowed_table(table)
+    assert_allowed_catalog_table(table)
     model = TABLE_TO_CATALOG_MODEL[table]
     return [
         f.name
@@ -212,5 +223,5 @@ def get_user_model_for_table(table: str):
 
 
 def get_catalog_model_for_table(table: str):
-    assert_allowed_table(table)
+    assert_allowed_catalog_table(table)
     return TABLE_TO_CATALOG_MODEL[table]
