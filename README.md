@@ -49,6 +49,12 @@ To run the entire stack (Postgres, Redis, Django, Celery Worker, React frontend)
 
 ### Option B: Native Local Development (No Docker)
 
+> [!WARNING]
+> **`python manage.py runserver` cannot be used for load testing.**
+> It is single-process, single-threaded, and does not support WebSockets (Django Channels).
+> Under concurrent load it will queue all requests behind each other, producing completely misleading results.
+> Use **gunicorn + uvicorn** (shown below) for any real testing.
+
 #### Prerequisites
 1. **Redis**: Ensure a Redis server is installed and running:
    ```bash
@@ -64,16 +70,34 @@ To run the entire stack (Postgres, Redis, Django, Celery Worker, React frontend)
    ```bash
    cd backend
    conda activate osdag-web
-   celery -A config worker -Q calculations,cad,reports,celery --loglevel=info
+   celery -A config worker -Q calculations,cad,reports,celery --loglevel=info --concurrency=4
    ```
 
-2. **Start the Django Backend**:
-   Open another terminal session, navigate to the `backend` folder, activate the conda environment, and start the development server:
+2. **Start the Django Backend (ASGI — required for load testing)**:
+   Use **gunicorn with uvicorn workers** — this is the same server the Docker setup uses and the only one that correctly handles concurrent requests and WebSocket connections.
    ```bash
    cd backend
    conda activate osdag-web
-   python manage.py runserver 8000
+   # Run migrations first (only needed once or after model changes)
+   python manage.py migrate
+
+   # Start gunicorn with uvicorn ASGI workers
+   gunicorn config.asgi:application \
+     --bind 0.0.0.0:8000 \
+     --workers 2 \
+     --worker-class uvicorn.workers.UvicornWorker \
+     --timeout 120 \
+     --log-level info
    ```
+
+   > [!NOTE]
+   > Increase `--workers` to match your CPU core count for heavier tests.
+   > A common rule of thumb is `2 × CPU cores + 1`.
+   > Each worker is a separate OS process that handles requests concurrently.
+
+   > [!TIP]
+   > **For quick day-to-day development only** (single user, no WebSocket, no concurrency),
+   > you may still use `python manage.py runserver 8000`. Never use it for performance testing.
 
 3. **Start the Vite Frontend**:
    Open a new terminal session, navigate to the `frontend` folder, and start the React dev server:
@@ -85,6 +109,8 @@ To run the entire stack (Postgres, Redis, Django, Celery Worker, React frontend)
 
 4. **Access the Application**:
    Navigate to `http://localhost:5173/` in your browser.
+
+
 
 ---
 
