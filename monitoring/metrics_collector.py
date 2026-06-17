@@ -97,7 +97,7 @@ def collect_system_metrics():
             .tag("metric_type", "cpu")
             .tag("cpu_core", f"core_{core_idx}")
             .field("cpu_percent", float(cpu_pct))
-            .time(ts, WritePrecision.NANOSECONDS)
+            .time(ts, WritePrecision.NS)
         )
         points.append(p)
 
@@ -109,7 +109,7 @@ def collect_system_metrics():
         .tag("metric_type", "cpu")
         .tag("cpu_core", "total_avg")
         .field("cpu_percent", float(cpu_total))
-        .time(ts, WritePrecision.NANOSECONDS)
+        .time(ts, WritePrecision.NS)
     )
 
     # RAM
@@ -123,7 +123,7 @@ def collect_system_metrics():
         .field("ram_available_mb", float(ram.available / 1024 / 1024))
         .field("ram_total_mb",     float(ram.total / 1024 / 1024))
         .field("ram_percent",      float(ram.percent))
-        .time(ts, WritePrecision.NANOSECONDS)
+        .time(ts, WritePrecision.NS)
     )
 
     # Swap
@@ -136,7 +136,7 @@ def collect_system_metrics():
         .field("swap_used_mb",  float(swap.used / 1024 / 1024))
         .field("swap_total_mb", float(swap.total / 1024 / 1024))
         .field("swap_percent",  float(swap.percent))
-        .time(ts, WritePrecision.NANOSECONDS)
+        .time(ts, WritePrecision.NS)
     )
 
     return points
@@ -162,7 +162,7 @@ def collect_redis_queue_depths():
                 .tag("task_name", "queue_depth")
                 .tag("status",    "queued")
                 .field("queue_depth", int(depth))
-                .time(ts, WritePrecision.NANOSECONDS)
+                .time(ts, WritePrecision.NS)
             )
             points.append(p)
     except Exception as e:
@@ -218,7 +218,7 @@ def collect_redis_info():
             .field("rejected_connections",       int(info.get("rejected_connections",        0)))
             # Persistence / replication
             .field("rdb_changes_since_last_save", int(info.get("rdb_changes_since_last_save", 0)))
-            .time(ts, WritePrecision.NANOSECONDS)
+            .time(ts, WritePrecision.NS)
         )
         return [p]
     except Exception as e:
@@ -345,7 +345,7 @@ def collect_process_threads() -> list:
             .field("threads_running",  int(stats["threads_running"]))
             .field("threads_sleeping", int(stats["threads_sleeping"]))
             .field("threads_other",    int(stats["threads_other"]))
-            .time(ts, WritePrecision.NANOSECONDS)
+            .time(ts, WritePrecision.NS)
         )
         points.append(p)
 

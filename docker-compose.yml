@@ -68,11 +68,14 @@ services:
     command: >
       bash -c "/opt/conda/envs/osdag_env/bin/python manage.py migrate &&
       /opt/conda/envs/osdag_env/bin/python populate_database.py &&
-      exec /opt/conda/envs/osdag_env/bin/gunicorn config.asgi:application 
-      --bind 0.0.0.0:8000 
-      --workers 2 
-      --worker-class uvicorn.workers.UvicornWorker 
-      --timeout 60"
+      exec /opt/conda/envs/osdag_env/bin/gunicorn config.asgi:application
+      --bind 0.0.0.0:8000
+      --workers 8
+      --worker-class uvicorn.workers.UvicornWorker
+      --worker-connections 1000
+      --timeout 180
+      --keep-alive 5
+      --log-level info"
 
 
   celery_worker:
@@ -110,7 +113,7 @@ services:
         condition: service_healthy
       influxdb:
         condition: service_healthy
-    command: bash -c "cd /app && export PYTHONPATH=/app:/app/backend && exec /opt/conda/envs/osdag_env/bin/celery -A config worker -Q calculations,cad,reports,celery --loglevel=info --concurrency=4"
+    command: bash -c "cd /app && export PYTHONPATH=/app:/app/backend && exec /opt/conda/envs/osdag_env/bin/celery -A config worker -Q calculations,cad,reports,celery --loglevel=info --concurrency=18"
 
   frontend:
     platform: linux/amd64
