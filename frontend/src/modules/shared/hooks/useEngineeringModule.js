@@ -53,16 +53,12 @@ export const useEngineeringModule = (moduleConfig) => {
   const service = useEngineeringService();
   const { getModuleData, getDesignPreferences } = service;
 
-  // Access ModuleContext to get resetModuleState function
   const {
     resetModuleState,
     applyStrictLinkedReseed,
     setLastKnownGoodDesignPrefSnapshot,
   } = useContext(ModuleContext);
 
-  // ===================================================================
-  // MODULE DATA - Loaded via dedicated hook
-  // ===================================================================
   const [optionsRefetchKey, setOptionsRefetchKey] = useState(0);
   const moduleData = useModuleData(
     getModuleData,
@@ -73,34 +69,9 @@ export const useEngineeringModule = (moduleConfig) => {
     setOptionsRefetchKey((k) => k + 1);
   }, []);
 
-  // Extract module data for easy access
-  const {
-    beamList,
-    columnList,
-    connectivityList,
-    materialList,
-    boltDiameterList,
-    thicknessList,
-    propertyClassList,
-    angleList,
-    boltTypeList,
-    sectionProfileList,
-    channelList,
-    sectionDesignation,
-    coverPlateList,
-    weldSizeList,
-  } = moduleData;
-
-  // ===================================================================
-  // DESIGN & CAD STATE - Managed via dedicated hook
-  // ===================================================================
   const {
     submitDesign,
-    designData,
-    designLogs,
     cadData,
-    displayPDF,
-    setDisplayPDF,
     output,
     logs,
     loading,
@@ -113,10 +84,8 @@ export const useEngineeringModule = (moduleConfig) => {
     screenshotTrigger,
     setScreenshotTrigger,
     loadSavedOutputs,
-    loadOutputs,
   } = useDesignSubmission(service, moduleConfig);
 
-  // Form & selection state (moved into dedicated hook)
   const {
     inputs,
     setInputs,
@@ -132,7 +101,7 @@ export const useEngineeringModule = (moduleConfig) => {
     modalDynamicSrc,
     setModalDynamicSrc,
     designPrefModalStatus,
-    setDesignPrefModalStatus, // ADD
+    setDesignPrefModalStatus,
     confirmationModal,
     setConfirmationModal,
     displaySaveInputPopup,
@@ -155,53 +124,10 @@ export const useEngineeringModule = (moduleConfig) => {
     pause: designPrefModalStatus,
   });
 
-  const [selectedView, setSelectedView] = useState("Model");
-  const dockDriverSnapshotRef = useRef(null);
-
-  useEffect(() => {
-    const currentDockDrivers = {
-      material: inputs?.material,
-      member_material: inputs?.member_material,
-      connector_material: inputs?.connector_material,
-    };
-
-    // Seed snapshot on first render without mutating overrides.
-    if (!dockDriverSnapshotRef.current) {
-      dockDriverSnapshotRef.current = currentDockDrivers;
-      return;
-    }
-
-    const prev = dockDriverSnapshotRef.current;
-    const dockDriverChanged =
-      prev.material !== currentDockDrivers.material ||
-      prev.member_material !== currentDockDrivers.member_material ||
-      prev.connector_material !== currentDockDrivers.connector_material;
-
-    dockDriverSnapshotRef.current = currentDockDrivers;
-    if (!dockDriverChanged) return;
-
-    // Dock driver changed: clear only linked material overrides so modal reseeds from dock.
-    setDesignPrefOverrides((prevOverrides) => {
-      if (!prevOverrides || typeof prevOverrides !== "object") return prevOverrides;
-      const nextOverrides = { ...prevOverrides };
-      delete nextOverrides.supporting_material;
-      delete nextOverrides.supported_material;
-      delete nextOverrides.connector_material;
-      return nextOverrides;
-    });
-  }, [
-    inputs?.material,
-    inputs?.member_material,
-    inputs?.connector_material,
-    setDesignPrefOverrides,
-  ]);
-
-  // Helper function to check if there's unsaved work
   const hasUnsavedWork = () => {
     return !!(output || renderBoolean);
   };
 
-  // Navigation guard
   const {
     showConfirmation: showResetConfirmation,
     setShowConfirmation: setShowResetConfirmation,
@@ -211,7 +137,6 @@ export const useEngineeringModule = (moduleConfig) => {
     performNavigation,
   } = useNavigationGuard(hasUnsavedWork(), moduleConfig.routePath);
 
-  // Design report
   const report = useDesignReport(
     service,
     moduleConfig,
@@ -223,18 +148,11 @@ export const useEngineeringModule = (moduleConfig) => {
     moduleData
   );
 
-  // Dependent data side-effects
   useDependentData(getDesignPreferences, moduleConfig, inputs, extraState);
 
-  // Comprehensive reset function
   const resetToDefaultState = () => {
-    // Reset ModuleContext state (designData, logs, CAD paths, etc.)
     resetModuleState();
-
-    // Reset design & CAD state (hook-level state)
     resetDesignState();
-
-    // Reset form state
     resetFormState();
     setSelectedView("Model");
   };
@@ -309,120 +227,77 @@ export const useEngineeringModule = (moduleConfig) => {
   };
 
   return {
-    // ===================================================================
-    // CONTEXT DATA - Module state variables
-    // ===================================================================
-    beamList,
-    columnList,
-    connectivityList,
-    materialList,
-    boltDiameterList,
-    thicknessList,
-    propertyClassList,
-    angleList, // FIXED: Added angleList to return object
-    boltTypeList,
-    sectionProfileList,
-    sectionDesignation,
-    channelList,
-    displayPDF,
-    designLogs,
-    designData,
-    renderCadModel: cadData?.render,
-    cadModelPaths: cadData?.paths,
-    hoverDict: cadData?.hover,
-    coverPlateList,
-    weldSizeList,
+    moduleData: {
+      ...moduleData,
+      contextData: moduleData,
+    },
 
-    // contextData = moduleData for dropdowns and expand helpers
-    contextData: moduleData,
+    form: {
+      inputs,
+      setInputs,
+      extraState,
+      setExtraState,
+      designPrefOverrides,
+      setDesignPrefOverrides,
+      selectionStates,
+      setSelectionStates,
+      allSelected,
+      setAllSelected,
+      selectedItems,
+      setSelectedItems,
+      modalDynamicSrc,
+      setModalDynamicSrc,
+      displaySaveInputPopup,
+      saveInputFileName,
+      resetFormState,
+    },
 
-    // SERVICE API - Expose service for advanced usage
-    // ===================================================================
-    service,                    // Full service object for advanced usage
+    uiContext: {
+      modalStates,
+      updateModalState,
+      updateSelectionState,
+      updateSelectedItems,
+      toggleAllSelected,
+      designPrefModalStatus,
+      setDesignPrefModalStatus,
+      confirmationModal,
+      setConfirmationModal,
+      showResetConfirmation,
+      setShowResetConfirmation,
+      confirmationType,
+      setConfirmationType,
+      createDesignReportBool: report.createDesignReportBool,
+      designReportInputs: report.designReportInputs,
+      setDesignReportInputs: report.setDesignReportInputs,
+    },
 
-    refetchModuleOptions,
+    designStatus: {
+      output,
+      logs,
+      loading,
+      status,
+      setStatus,
+      cadModelPaths: cadData?.paths,
+      renderBoolean,
+      modelKey,
+      screenshotTrigger,
+      setScreenshotTrigger,
+      hoverDict: cadData?.hover,
+    },
 
-    // ===================================================================
-    // COMPONENT STATE - Internal hook state
-    // ===================================================================
-    ...moduleData,
-
-    // Form
-    inputs,
-    setInputs,
-    extraState,
-    setExtraState,
-    selectionStates,
-    setSelectionStates,
-    allSelected,
-    setAllSelected,
-    selectedItems,
-    setSelectedItems,
-    modalStates,
-    modalDynamicSrc,
-    setModalDynamicSrc,
-    designPrefModalStatus,
-    setDesignPrefModalStatus, // ADD
-    confirmationModal,
-    setConfirmationModal,
-    displaySaveInputPopup,
-    saveInputFileName,
-    designPrefOverrides,
-    setDesignPrefOverrides,
-
-    // Submission
-    output,
-    logs,
-    loading,
-    renderBoolean,
-    modelKey,
-    cadData,
-    status,
-    setStatus,
-    setDisplayPDF,
-    screenshotTrigger,
-    setScreenshotTrigger,
-
-    // View state
-    selectedView,
-    setSelectedView,
-
-    // Navigation
-    showResetConfirmation,
-    confirmationType,
-
-    // ===================================================================
-    // ACTIONS - Hook action functions
-    // ===================================================================
-    updateModalState,
-    updateSelectionState,
-    updateSelectedItems,
-    toggleAllSelected,
-    handleSubmit,
-    handleReset,
-    handleHomeClick,
-    handleQuitClick,
-    performReset,
-    saveOutput,
-
-    // Report
-    createDesignReportBool: report.createDesignReportBool,
-    designReportInputs: report.designReportInputs,
-    setDesignReportInputs: report.setDesignReportInputs,
-    handleCreateDesignReport: report.open,
-    handleCancelDesignReport: report.close,
-
-    clearDesignResults,
-    loadSavedOutputs,
-    loadOutputs,
-
-    // Explicitly expose reset functions for targeted clears that don't destroy `inputs`
-    resetDesignState,
-
-    // Expose resetFormState for external/loader reset
-    resetFormState,
-
-    // Expose resetModuleState for external use (e.g., module change detection)
-    resetModuleState,
+    // 5. Actions / Handlers
+    actions: {
+      handleSubmit,
+      handleQuitClick,
+      performReset,
+      saveOutput,
+      clearDesignResults,
+      loadSavedOutputs,
+      service,
+      resetModuleState,
+      refetchModuleOptions,
+      handleCreateDesignReport: report.open,
+      handleCancelDesignReport: report.close,
+    },
   };
 };

@@ -10,7 +10,6 @@ export const CadViewer = React.memo(({
   loading,
   isRedesigning,
   renderBoolean,
-  customBgColor,
   cameraPos,
   normalizedCadModelPaths,
   selectedSection,
@@ -45,8 +44,7 @@ export const CadViewer = React.memo(({
         </div>
       ) : renderBoolean ? (
         <div 
-          className={`cadModel relative h-full w-full ${!customBgColor ? 'bg-gradient-to-b from-[#FFFFFF] to-[#D8D8D0] dark:from-[#535353] dark:to-[#000000]' : ''}`}
-          style={customBgColor ? { backgroundColor: customBgColor } : {}}
+          className="cadModel relative h-full w-full bg-gradient-to-b from-[#FFFFFF] to-[#D8D8D0] dark:from-[#535353] dark:to-[#000000]"
         >
           <div
             className="absolute inset-0"

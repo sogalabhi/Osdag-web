@@ -30,10 +30,6 @@ export const menuItems = [
       { name: "Quit" }
     ],
   },
-  // {
-  //  label: "Edit",
-  //  dropdown: [{ name: "Design Preferences", shortcut: "Alt+P" }],
-  // },
   {
     label: "Graphics",
     dropdown: [

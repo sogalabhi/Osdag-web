@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   MODULE_KEY_FIN_PLATE,
   MODULE_KEY_CLEAT_ANGLE,
@@ -157,6 +157,44 @@ export const useModuleForm = (moduleConfig, moduleData) => {
       setTimeout(() => setDisplaySaveInputPopup(false), 4000);
     }
   }, [displaySaveInputPopup]);
+
+  const dockDriverSnapshotRef = useRef(null);
+
+  useEffect(() => {
+    const currentDockDrivers = {
+      material: inputs?.material,
+      member_material: inputs?.member_material,
+      connector_material: inputs?.connector_material,
+    };
+
+    if (!dockDriverSnapshotRef.current) {
+      dockDriverSnapshotRef.current = currentDockDrivers;
+      return;
+    }
+
+    const prev = dockDriverSnapshotRef.current;
+    const dockDriverChanged =
+      prev.material !== currentDockDrivers.material ||
+      prev.member_material !== currentDockDrivers.member_material ||
+      prev.connector_material !== currentDockDrivers.connector_material;
+
+    dockDriverSnapshotRef.current = currentDockDrivers;
+    if (!dockDriverChanged) return;
+
+    setDesignPrefOverrides((prevOverrides) => {
+      if (!prevOverrides || typeof prevOverrides !== "object") return prevOverrides;
+      const nextOverrides = { ...prevOverrides };
+      delete nextOverrides.supporting_material;
+      delete nextOverrides.supported_material;
+      delete nextOverrides.connector_material;
+      return nextOverrides;
+    });
+  }, [
+    inputs?.material,
+    inputs?.member_material,
+    inputs?.connector_material,
+    setDesignPrefOverrides,
+  ]);
 
   const updateModalState = (modalKey, isOpen) => {
     setModalStates((prev) => ({
