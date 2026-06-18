@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from "react";
+/* eslint-disable react/prop-types */
+import { useContext, useEffect, useState, useMemo } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
 import CustomMaterialModal from "./CustomMaterialModal";
@@ -20,7 +21,7 @@ const ConnectorSectionModal = ({
 }) => {
   const { conn_material_details, manageDesignPreferences } =
     useContext(ModuleContext);
-  const materials = materialsFromParent ?? [];
+  const materials = useMemo(() => materialsFromParent ?? [], [materialsFromParent]);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ const ConnectorSectionModal = ({
         materialData: material[0],
       });
     }
-  }, [suppressInitialMaterialDispatch]);
+  }, [suppressInitialMaterialDispatch, designPrefInputs.connector_material, materials, manageDesignPreferences]);
 
   const handleMaterialChange = (value) => {
     if (value === -1) {

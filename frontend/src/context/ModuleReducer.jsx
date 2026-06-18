@@ -6,7 +6,7 @@
     ######################################################### 
 */
 
-export default (state, action) => {
+export default function ModuleReducer(state, action) {
   switch (action.type) {
     // ===================================================================
     // CONSOLIDATED DATA ACTIONS - Replace 10+ individual actions

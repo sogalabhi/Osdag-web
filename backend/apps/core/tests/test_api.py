@@ -25,7 +25,8 @@ class APITest(TestCase) :
             'http://localhost:5175',
             'http://127.0.0.1:5175',
             'http://192.168.1.9:5173',
-            'http://10.104.135.9:5173'
+            'http://10.104.135.9:5173',
+            'http://10.186.46.253:5173'
         ]
         self.assertEqual(settings.CORS_ALLOWED_ORIGINS, allow_origins)
         

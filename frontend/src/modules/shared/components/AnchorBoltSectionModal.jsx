@@ -1,4 +1,5 @@
-import React, { useContext, useState, useEffect } from "react";
+/* eslint-disable react/prop-types */
+import { useContext, useState, useEffect, useMemo } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
 import CustomMaterialModal from "./CustomMaterialModal";
@@ -12,7 +13,6 @@ const readOnlyFontStyle = {
 };
 
 const AnchorBoltSectionModal = ({
-  supportingSectionData,
   designPrefInputs,
   setDesignPrefInputs,
   isInputLocked,
@@ -22,7 +22,7 @@ const AnchorBoltSectionModal = ({
   const {
     manageDesignPreferences,
   } = useContext(ModuleContext);
-  const materials = materialsFromParent ?? [];
+  const materials = useMemo(() => materialsFromParent ?? [], [materialsFromParent]);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const AnchorBoltSectionModal = ({
         materialData: material[0],
       });
     }
-  }, [suppressInitialMaterialDispatch]);
+  }, [suppressInitialMaterialDispatch, designPrefInputs.supporting_material, materials, manageDesignPreferences]);
 
   return (
     <>

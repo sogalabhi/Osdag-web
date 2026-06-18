@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef, useMemo, useImperativeHandle, forwardRef, useCallback } from 'react';
+/* eslint-disable react/prop-types */
+import { useEffect, useState, useRef, useMemo, useImperativeHandle, forwardRef, useCallback } from 'react';
 import * as THREE from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
@@ -7,11 +8,9 @@ import { getPartColor, VALID_PART_KEYS } from './config/partConfig';
 
 export const SceneManager = forwardRef(({
   modelPaths,
-  activeViews,
   modelPosition = [0, 0, 0],
   modelScale = 0.008,
   modelRotation = [Math.PI / -2, 0, 0],
-  orthographicView = null,
   hoverDict = {},
   onHoverLabel = null,
   onHoverEnd = null,
@@ -305,3 +304,5 @@ export const SceneManager = forwardRef(({
     </group>
   );
 });
+
+SceneManager.displayName = 'SceneManager';

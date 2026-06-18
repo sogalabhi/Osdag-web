@@ -1,4 +1,5 @@
-import React, { useContext, useState, useEffect } from "react";
+/* eslint-disable react/prop-types */
+import { useContext, useState, useEffect, useMemo } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
 import CustomMaterialModal from "./CustomMaterialModal";
@@ -12,7 +13,6 @@ const readOnlyFontStyle = {
 };
 
 const BasePlateSectionModal = ({
-  supportingSectionData,
   designPrefInputs,
   setDesignPrefInputs,
   isInputLocked,
@@ -23,7 +23,7 @@ const BasePlateSectionModal = ({
     manageDesignPreferences,
     supporting_material_details,
   } = useContext(ModuleContext);
-  const materials = materialsFromParent ?? [];
+  const materials = useMemo(() => materialsFromParent ?? [], [materialsFromParent]);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const BasePlateSectionModal = ({
         materialData: material[0],
       });
     }
-  }, [suppressInitialMaterialDispatch]);
+  }, [suppressInitialMaterialDispatch, designPrefInputs.supporting_material, materials, manageDesignPreferences]);
 
   const selectedMaterialGrade = designPrefInputs["Base_Plate.Material"] || designPrefInputs.supporting_material || "";
   const selectedMaterialDetails = materials.find((item) => item.Grade === selectedMaterialGrade) || (supporting_material_details && supporting_material_details[0]);

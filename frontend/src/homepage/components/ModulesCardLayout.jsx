@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   MODULE_SUBMODULES,
@@ -13,11 +13,10 @@ const TabbedModulePage = () => {
   const moduleName = window.location.pathname.split("/")[1] || "";
   const navigate = useNavigate();
 
-  const submodules = MODULE_SUBMODULES[moduleName] || [];
+  const submodules = useMemo(() => MODULE_SUBMODULES[moduleName] || [], [moduleName]);
   const [activeSubmodule, setActiveSubmodule] = useState(submodules[0]?.key);
   const [activeSubSubmodule, setActiveSubSubmodule] = useState("");
   const submoduleTabRefs = useRef({});
-  const subSubmoduleTabRefs = useRef({});
 
   // Update activeSubmodule when moduleName or submodules change
   useEffect(() => {
@@ -25,10 +24,11 @@ const TabbedModulePage = () => {
   }, [moduleName, submodules]);
 
   // Derive content based on activeSubmodule
-  const content =
-    moduleName === "Connections"
+  const content = useMemo(() => {
+    return moduleName === "Connections"
       ? CONNECTIONS_TAB_CONTENT[activeSubmodule] || []
       : GENERIC_SUBMODULE_CONTENT[activeSubmodule] || [];
+  }, [moduleName, activeSubmodule]);
 
   // Sync activeSubSubmodule to first section label when activeSubmodule or content changes
   useEffect(() => {
@@ -79,24 +79,7 @@ const TabbedModulePage = () => {
     });
   };
 
-  const handleSubSubmoduleKeyDown = (event, index) => {
-    if (!content.length) return;
-    const isPrev = event.key === "ArrowLeft" || event.key === "ArrowUp";
-    const isNext = event.key === "ArrowRight" || event.key === "ArrowDown";
-    if (!isPrev && !isNext) return;
 
-    const delta = isNext ? 1 : -1;
-    const nextIndex = index + delta;
-    if (nextIndex < 0 || nextIndex >= content.length) return;
-    event.preventDefault();
-    const next = content[nextIndex];
-    if (!next) return;
-
-    setActiveSubSubmodule(next.label);
-    requestAnimationFrame(() => {
-      subSubmoduleTabRefs.current[next.label]?.focus();
-    });
-  };
 
   const handleWrapperKeyDown = (event) => {
     if (isEditableTarget(event.target)) return;

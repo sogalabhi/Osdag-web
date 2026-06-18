@@ -1,4 +1,5 @@
-import React, { useContext, useState, useEffect } from "react";
+/* eslint-disable react/prop-types */
+import { useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
 import { STEEL_CONSTANTS, UNIT_LABELS } from "../constants/engineering";
@@ -48,7 +49,7 @@ const GenericSectionView = ({
   const [editableData, setEditableData] = useState({});
   const [designationStr, setDesignationStr] = useState("");
 
-  const getDropdownOptions = () => {
+  const getDropdownOptions = useCallback(() => {
     const fullList =
       sectionTableName === "Beams"
         ? beamList
@@ -89,10 +90,10 @@ const GenericSectionView = ({
         ? item.Designation || item.value || item.Grade || String(item)
         : String(item)
     );
-  };
+  }, [sectionTableName, beamList, columnList, angleList, channelList, inputs]);
 
   // Safety check for sectionData
-  const safeSectionData = sectionData || {};
+  const safeSectionData = useMemo(() => sectionData || {}, [sectionData]);
 
   useEffect(() => {
     setEditableData(safeSectionData);
@@ -123,20 +124,21 @@ const GenericSectionView = ({
     }
 
     setDesignationStr(desigStr);
-  }, [inputs, displayConfig.designationKey, beamList, columnList, angleList, channelList, hideDropdown]);
+  }, [inputs, displayConfig.designationKey, beamList, columnList, angleList, channelList, hideDropdown, getDropdownOptions, onDesignationChange]);
 
   const materialKey = sectionType === 'supporting' ? 'supporting_material' : 'supported_material';
+  const targetMaterial = designPrefInputs[materialKey];
 
   useEffect(() => {
     if (suppressInitialMaterialDispatch) return;
-    const material = materialList.find((v) => v.Grade === designPrefInputs[materialKey]);
+    const material = materialList.find((v) => v.Grade === targetMaterial);
     if (material) {
       manageDesignPreferences("material_update", {
         materialType: sectionType,
         materialData: material,
       });
     }
-  }, [suppressInitialMaterialDispatch, designPrefInputs[materialKey], materialList, sectionType]);
+  }, [suppressInitialMaterialDispatch, targetMaterial, materialList, sectionType, manageDesignPreferences]);
 
   const handleMaterialChange = (value) => {
     if (value === -1) {

@@ -1,10 +1,7 @@
-import { createContext, useReducer, useState, useEffect, useCallback } from "react";
+/* eslint-disable react/prop-types */
+import { createContext, useReducer, useCallback } from "react";
 import ModuleReducer from "./ModuleReducer";
-
-// crypto packages
-import { decode as base64_decode, encode as base64_encode } from "base-64";
 import { createDesign as apiCreateDesign } from '../modules/shared/api/moduleApi';
-import { apiBase } from "../api";
 import {
   fetchModuleOptions as dsFetchModuleOptions,
   createCad as dsCreateCad,
@@ -90,16 +87,12 @@ let initialValue = {
   },
 };
 
-// const BASE_URL = "http://127.0.0.1:8000/";
-const BASE_URL = `${apiBase}`;
-
 //create context
 export const ModuleContext = createContext(initialValue);
 
 //provider component
 export const ModuleProvider = ({ children }) => {
   const [state, dispatch] = useReducer(ModuleReducer, initialValue);
-  const [projectSaveCallback, setProjectSaveCallback] = useState(null);
 
   // ===================================================================
   // SIMPLIFIED CONTEXT API - 8 CORE FUNCTIONS ONLY
@@ -250,6 +243,9 @@ export const ModuleProvider = ({ children }) => {
           try {
             await onCADSuccess();
           } catch (error) {
+            if (import.meta.env.DEV) {
+              console.error('[ModuleState] onCADSuccess callback failed:', error);
+            }
           }
         }
 
@@ -301,7 +297,7 @@ export const ModuleProvider = ({ children }) => {
     const flattenObject = (obj, prefix = '') => {
       const flattened = {};
       for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
           const newKey = prefix ? `${prefix}.${key}` : key;
           const value = obj[key];
 
@@ -404,49 +400,6 @@ export const ModuleProvider = ({ children }) => {
       return { success: false, error: error.message };
     }
   }, [state.designData, convertToCSV]);
-
-  /**
-   * Upload company logo for reports
-   * @param {File} companyLogo - Logo file
-   * @param {string} companyLogoName - Logo filename
-   */
-  const uploadCompanyLogo = useCallback(async (companyLogo, companyLogoName) => {
-    try {
-
-      // Store in localStorage for caching
-      if (companyLogo && companyLogoName) {
-        const existingLogos = JSON.parse(localStorage.getItem("companyLogo") || "[]");
-        const existingNames = JSON.parse(localStorage.getItem("companyLogoName") || "[]");
-
-        existingLogos.push(base64_encode(companyLogo));
-        existingNames.push(base64_encode(companyLogoName));
-
-        localStorage.setItem("companyLogo", JSON.stringify(existingLogos));
-        localStorage.setItem("companyLogoName", JSON.stringify(existingNames));
-      }
-
-      // Upload to server
-      const formData = new FormData();
-      formData.append("file", companyLogo, companyLogoName);
-
-      const response = await fetch(`${BASE_URL}api/company-logo/`, {
-        method: "POST",
-        mode: "cors",
-        credentials: "include",
-        body: formData,
-      });
-
-      if (response.status === 201) {
-        const result = await response.json();
-        return { success: true, logoPath: result.logoFullPath };
-      } else {
-        throw new Error(`Logo upload failed: ${response.status}`);
-      }
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  }, []);
-
   const syncDesignPrefMaterialsFromBase = (
     baseMaterialGrade,
     materialList,

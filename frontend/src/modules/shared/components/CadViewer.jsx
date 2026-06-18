@@ -1,9 +1,10 @@
+/* eslint-disable react/prop-types */
 import React, { useRef, Suspense, useState, useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, PerspectiveCamera } from "@react-three/drei";
 import { CadScene, CadSceneProvider, CadSceneBbox, ScreenshotCapture, ReportCaptureDev } from "./cad";
 
-export const CadViewer = React.memo(({
+const CadViewerComponent = ({
   isMobile,
   showCad,
   showLogs,
@@ -163,4 +164,7 @@ export const CadViewer = React.memo(({
       )}
     </div>
   );
-});
+};
+
+export const CadViewer = React.memo(CadViewerComponent);
+CadViewer.displayName = "CadViewer";

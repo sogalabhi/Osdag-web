@@ -71,7 +71,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
         });
       }
     };
-  }, [projectId, service.updateProject]);
+  }, [projectId, service]);
 
   const submitDesign = async ({
     inputs,
@@ -195,7 +195,6 @@ export const useDesignSubmission = (service, moduleConfig) => {
 
     try {
       const designResult = await service.createDesign(moduleConfig.designType, param);
-      const designStatus = designResult?.status;
       const designBody = designResult?.body;
       const designSuccess =
         (designResult?.status === 200 || designResult?.status === 201) &&

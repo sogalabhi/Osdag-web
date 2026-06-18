@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import {
   MODULE_KEY_FIN_PLATE,
   MODULE_KEY_CLEAT_ANGLE,
@@ -41,7 +41,7 @@ const buildInitialModalDynamicSrc = (config) =>
   }, {});
 
 export const useModuleForm = (moduleConfig, moduleData) => {
-  const safeModuleData = moduleData || {};
+  const safeModuleData = useMemo(() => moduleData || {}, [moduleData]);
 
   const [inputs, setInputs] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
