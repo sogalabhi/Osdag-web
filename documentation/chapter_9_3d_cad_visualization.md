@@ -169,24 +169,15 @@ To ensure tooltips resolve successfully, the mapping logic attempts matches in a
 
 ## 9.7 Observations & Areas of Improvement
 
-During the architectural review of the 3D rendering pipeline, the following items were identified:
+During the architectural review of the 3D rendering pipeline, the following items were identified and resolved:
 
-### 1. WebGL Context Loss Recovery
-The current React Three Fiber canvas context does not register listeners for `webglcontextlost` events. If a user's system runs out of GPU memory or wakes up from system sleep:
-* The 3D canvas crashes, displaying a black frame.
-* **Recommended Fix**: Bind an event listener to the canvas element to detect WebGL loss and programmatically re-instantiate the renderer.
+### 1. WebGL Context Loss Recovery (Resolved)
+* **The Problem:** The React Three Fiber canvas context did not register listeners for `webglcontextlost` events. If a user's system ran out of GPU memory or woke up from system sleep, the 3D canvas would crash and show a black frame.
+* **The Risk:** Once crashed, the renderer would remain broken until the user manually refreshed the entire webpage, potentially losing current form inputs or calculated logs.
+* **Resolution:** Added a native `webglcontextlost` event listener in the `onCreated` callback of the R3F `<Canvas>` in [CadViewer.jsx](../frontend/src/modules/shared/components/CadViewer.jsx#L49-L60). When triggered, it calls `event.preventDefault()` to allow context recovery and increments a state-driven key `canvasKey` on the Canvas component to force-re-mount a clean WebGLRenderer instance automatically.
 
-### 2. Pointer Event Race Hazards
-In `SceneManager.jsx`, the hover exit function `handlePartHoverEnd` is checked using a simple pointer ID match:
-```javascript
-const handlePartHoverEnd = useCallback((meshId) => {
-  if (hoveredMeshId === meshId) {
-    if (onHoverEnd) onHoverEnd();
-    setHoveredMeshId(null);
-  }
-}, [hoveredMeshId, onHoverEnd]);
-```
-> [!WARNING]
-> If a user moves their mouse rapidly across multiple components, pointer-out events may fire out of order. This can cause the hovered state to become locked on a specific part even after the mouse has moved away.
->
-> **Recommended Fix**: Reset the hovered state when any pointer-out event fires, or use a debounce check to ensure the tooltip aligns with the raycaster's current focus.
+### 2. Pointer Event Race Hazards (Resolved)
+* **The Problem:** In `SceneManager.jsx`, the hover exit function `handlePartHoverEnd` was checked using a simple state variable match: `if (hoveredMeshId === meshId)`.
+* **The Risk:** If a user moved their mouse rapidly across multiple components, pointer-out events could be processed out of order or fire with stale closures. This caused the hovered state to become locked on a specific part even after the mouse had moved away.
+* **Resolution:** Implemented the "latest ref" pattern by tracking the current hover mesh ID inside a `hoveredMeshIdRef` in [SceneManager.jsx](../frontend/src/modules/shared/components/cad/SceneManager.jsx#L28-L30). [handlePartHover](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/components/cad/SceneManager.jsx#L181-L186) and [handlePartHoverEnd](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/components/cad/SceneManager.jsx#L188-L194) now read and write to this ref synchronously. Since the callback only reads from the ref, it does not suffer from stale React state closures during rapid pointer actions.
+

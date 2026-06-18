@@ -179,13 +179,10 @@ export const ModuleProvider = ({ children }) => {
 
         case 'update': {
           const { materialType, materialData } = data;
-          if (materialType === "connector") {
-            dispatch({ type: "SAVE_CM_DETAILS", payload: [materialData] });
-          } else if (materialType === "supported") {
-            dispatch({ type: "SAVE_SDM_DETAILS", payload: [materialData] });
-          } else if (materialType === "supporting") {
-            dispatch({ type: "SAVE_STM_DETAILS", payload: [materialData] });
-          }
+          dispatch({
+            type: "SAVE_MATERIAL_DETAILS",
+            payload: { materialType, materialData: [materialData] },
+          });
           return { success: true, message: "Material details updated" };
         }
 
@@ -220,23 +217,8 @@ export const ModuleProvider = ({ children }) => {
    * @param {Function} onCADSuccess - Success callback function
    */
   const createCADModel = useCallback(async (inputData, moduleId, onCADSuccess = null) => {
-    console.log('[cadissue] createCADModel CALLED');
-    console.log('[cadissue] moduleId:', moduleId);
-    console.log('[cadissue] inputData keys:', inputData ? Object.keys(inputData) : 'N/A');
     try {
       const { status, data } = await dsCreateCad(moduleId, inputData);
-
-      // Log the API response to debug CAD files and hover_dict
-      console.log('[cadissue] CAD API Response status:', status);
-      console.log('[cadissue] CAD API Response keys:', Object.keys(data));
-      console.log('[cadissue] CAD files keys:', data.files ? Object.keys(data.files) : 'NO files');
-      if (data.files) {
-        console.log('[cadissue] CAD files has Model:', !!data.files.Model);
-        console.log('[cadissue] CAD files has Beam:', !!data.files.Beam);
-        console.log('[cadissue] CAD files has CoverPlate:', !!data.files.CoverPlate);
-        console.log('[cadissue] CAD files has Plate:', !!data.files.Plate);
-      }
-      console.log('[cadissue] hover_dict keys:', data.hover_dict && typeof data.hover_dict === 'object' ? Object.keys(data.hover_dict) : 'NO hover_dict');
 
       // Handle "coming soon" status (200 with coming_soon status)
       if (status === 200 && data.status === "coming_soon") {
@@ -258,13 +240,8 @@ export const ModuleProvider = ({ children }) => {
         // Store CAD data and trigger rendering
         dispatch({ type: "SET_CAD_MODEL_PATHS", payload: data.files });
 
-        // Log before dispatching hover_dict
-        console.log('[cadissue] Before dispatch - data.hover_dict:', data.hover_dict);
         if (data.hover_dict) {
-          console.log('[cadissue] Dispatching SET_HOVER_DICT with keys:', Object.keys(data.hover_dict || {}));
           dispatch({ type: "SET_HOVER_DICT", payload: data.hover_dict });
-        } else {
-          console.warn('[ModuleState] data.hover_dict is missing or empty!');
         }
         dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: true });
 
@@ -281,9 +258,9 @@ export const ModuleProvider = ({ children }) => {
         throw new Error(`CAD generation failed: ${data.message || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('[ModuleState] createCADModel ERROR:', error);
-      console.error('[ModuleState] Error message:', error.message);
-      console.error('[ModuleState] Error stack:', error.stack);
+      if (import.meta.env.DEV) {
+        console.error('[ModuleState] createCADModel ERROR:', error);
+      }
       dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
       return { success: false, error: error.message };
     }
@@ -327,7 +304,7 @@ export const ModuleProvider = ({ children }) => {
         if (obj.hasOwnProperty(key)) {
           const newKey = prefix ? `${prefix}.${key}` : key;
           const value = obj[key];
-          
+
           if (value === null || value === undefined) {
             flattened[newKey] = '';
           } else if (typeof value === 'object' && !Array.isArray(value)) {
@@ -335,7 +312,7 @@ export const ModuleProvider = ({ children }) => {
             Object.assign(flattened, flattenObject(value, newKey));
           } else if (Array.isArray(value)) {
             // Convert arrays to comma-separated string
-            flattened[newKey] = value.map(v => 
+            flattened[newKey] = value.map(v =>
               typeof v === 'object' ? JSON.stringify(v) : String(v)
             ).join('; ');
           } else {
@@ -366,7 +343,7 @@ export const ModuleProvider = ({ children }) => {
 
     // CSV header row
     const header = keys.map(escapeCSV).join(',');
-    
+
     // CSV data row
     const row = values.map(escapeCSV).join(',');
 
@@ -389,14 +366,14 @@ export const ModuleProvider = ({ children }) => {
         case 'csv': {
           // Get output data from params or state
           const outputData = params.outputData || state.designData;
-          
+
           if (!outputData || typeof outputData !== 'object' || Object.keys(outputData).length === 0) {
             return { success: false, error: 'No output data available. Please run design calculation first.' };
           }
 
           // Convert to CSV
           const csvContent = convertToCSV(outputData);
-          
+
           if (!csvContent) {
             return { success: false, error: 'Failed to generate CSV. Output data is empty.' };
           }
@@ -476,36 +453,36 @@ export const ModuleProvider = ({ children }) => {
     currentDesignPrefInputs
   ) => {
     if (!baseMaterialGrade || !materialList?.length) return;
-  
+
     const selectedMaterial = materialList.find(
       (mat) => mat.Grade === baseMaterialGrade
     );
-  
+
     if (!selectedMaterial) return;
-  
+
     const updatedInputs = {
       ...currentDesignPrefInputs,
       supporting_material: baseMaterialGrade,
       supported_material: baseMaterialGrade,
       connector_material: baseMaterialGrade,
     };
-  
+
     // Dispatch updates
     manageDesignPreferences("material_update", {
       materialType: "supporting",
       materialData: selectedMaterial,
     });
-  
+
     manageDesignPreferences("material_update", {
       materialType: "supported",
       materialData: selectedMaterial,
     });
-  
+
     manageDesignPreferences("material_update", {
       materialType: "connector",
       materialData: selectedMaterial,
     });
-  
+
     return updatedInputs;
   };
 
@@ -535,25 +512,22 @@ export const ModuleProvider = ({ children }) => {
         case 'material_update': {
           const { materialType, materialData } = params;
 
-          if (materialType === "connector") {
-            dispatch({ type: "SAVE_CM_DETAILS", payload: [materialData] });
-          } else if (materialType === "supported") {
-            dispatch({ type: "SAVE_SDM_DETAILS", payload: [materialData] });
-          } else if (materialType === "supporting") {
-            dispatch({ type: "SAVE_STM_DETAILS", payload: [materialData] });
-          }
+          dispatch({
+            type: "SAVE_MATERIAL_DETAILS",
+            payload: { materialType, materialData: [materialData] },
+          });
 
           return { success: true, message: "Material details updated" };
         }
 
         case 'section_update': {
           const { id, materialValue } = params;
+          const sectionType = id === 1 ? "supporting" : "supported";
 
-          if (id === 1) {
-            dispatch({ type: "UPDATE_SUPPORTING_ST_DATA", payload: materialValue });
-          } else if (id === 2) {
-            dispatch({ type: "UPDATE_SUPPORTED_ST_DATA", payload: materialValue });
-          }
+          dispatch({
+            type: "UPDATE_SECTION_DATA",
+            payload: { sectionType, materialValue },
+          });
 
           return { success: true, message: "Section data updated" };
         }

@@ -151,168 +151,54 @@ Acts as a passive material parity synchronizer. It listens to dock drivers (e.g.
 
 ## 8.4 Observations & Areas of Improvement
 
-During the code review of Osdag-Web's state architecture, several design anti-patterns and performance bottlenecks were identified:
+During the code review of Osdag-Web's state architecture, several design anti-patterns and performance bottlenecks were identified and resolved:
 
-### 1. Global State Cache Mutation
-In `GlobalState.jsx`, the request cache tracker is modified via direct object property mutation:
-```javascript
-const getDesignTypes = async (conn_type) => {
-  const URL_KEY = `designTypes:${conn_type}`;
-  if (initialValue.fetch_cache === URL_KEY) return;
-  initialValue.fetch_cache = URL_KEY; // Direct mutation of configuration object
-  // ...
-};
-```
-> [!WARNING]
-> Directly mutating `initialValue.fetch_cache` bypasses React's render cycles. If multiple catalog selectors are mounted, it may cause cache-clobbering and state race conditions.
->
-> **Recommended Fix**: Implement the cache variable inside a React `useRef` or local state.
+### 1. Global State Cache Mutation (Resolved)
+* **The Problem:** In `GlobalState.jsx`, the request cache tracker was modified via direct object property mutation on `initialValue.fetch_cache`, bypassing React's render cycles.
+* **The Risk:** If multiple catalog selectors were mounted, it could cause cache-clobbering and state race conditions.
+* **Resolution:** Replaced the direct mutation of `initialValue.fetch_cache` with a React `useRef` (`fetchCacheRef`) inside the [GlobalProvider](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/context/GlobalState.jsx#L23-L45) to manage the request cache state synchronously and safely.
 
-### 2. Redundant Legacy Reducer Actions
-`ModuleReducer.jsx` retains several redundant legacy actions alongside consolidated ones:
-* `SAVE_CM_DETAILS`, `SAVE_SDM_DETAILS`, and `SAVE_STM_DETAILS` perform isolated updates that are already handled by `SAVE_MATERIAL_DETAILS`.
-* `UPDATE_SUPPORTING_ST_DATA` and `UPDATE_SUPPORTED_ST_DATA` duplicate calculations that are unified under `UPDATE_SECTION_DATA`.
-> [!NOTE]
-> Maintaining deprecated reducer branches increases bundle size and complicates codebase audits. These legacy functions should be removed.
+### 2. Redundant Legacy Reducer Actions (Resolved)
+* **The Problem:** `ModuleReducer.jsx` retained several redundant legacy actions (`SAVE_CM_DETAILS`, `SAVE_SDM_DETAILS`, `SAVE_STM_DETAILS`, `UPDATE_SUPPORTING_ST_DATA`, `UPDATE_SUPPORTED_ST_DATA`, and `UPDATE_MATERIAL_FROM_CACHES`) alongside consolidated ones.
+* **The Risk:** Maintaining deprecated reducer branches increased bundle size and complicated codebase audits.
+* **Resolution:** Completely purged all deprecated legacy actions from [ModuleReducer.jsx](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/context/ModuleReducer.jsx#L140-L190). Refactored [ModuleState.jsx](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/context/ModuleState.jsx#L170-L195) to dispatch unified actions (`SAVE_MATERIAL_DETAILS` and `UPDATE_SECTION_DATA`).
 
-### 3. Typing-Induced Network Spams in Dependent Data
-In `useDependentData.js`, state updates on input parameters trigger immediate API requests:
-```javascript
-useEffect(() => {
-  loadSupportedData();
-}, [inputs.section_designation, inputs.member_designation, inputs.section_profile]);
-```
-> [!IMPORTANT]
-> If a user enters text or toggles custom section parameters rapidly, this useEffect fires multiple API queries concurrently. This can lead to database connection bottlenecks.
->
-> **Recommended Fix**: Add a debounce delay of 250ms to `useDependentData` before firing backend API fetches.
+### 3. Typing-Induced Network Spams in Dependent Data (Resolved)
+* **The Problem:** In `useDependentData.js`, state updates on input parameters triggered immediate API requests.
+* **The Risk:** Rapid typing or section updates fired multiple API queries concurrently, leading to database connection bottlenecks.
+* **Resolution:** Integrated a 250ms debounce window using `setTimeout` and `clearTimeout` inside the API query `useEffect` hooks in [useDependentData.js](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/hooks/useDependentData.js#L10-L100) to aggregate rapid input events before triggering backend queries.
 
-### 4. OSI Prefill Timing Race Hazard
-In `useModuleForm.js`, imported OSI files prefill forms via a sessionStorage hook. Once loaded, the code deletes the session cache using a fixed timeout:
-```javascript
-if (hasLoadedLists) {
-  setTimeout(() => {
-    sessionStorage.removeItem(`prefill:${moduleKey}`);
-  }, 1000); // Arbitrary timeout
-}
-```
-> [!CAUTION]
-> If API network requests for dropdown options take longer than 1000ms (due to high database load), the prefill storage is cleared *before* form inputs map to their corresponding list values. This results in form inputs reverting to empty selections.
->
-> **Recommended Fix**: Clear the prefill cache only after the parent list options are successfully loaded and the inputs are mapped.
+### 4. OSI Prefill Timing Race Hazard (Resolved)
+* **The Problem:** In `useModuleForm.js`, imported OSI files prefilled forms via a session storage loader. Once loaded, the cache was deleted using a fixed 1000ms timeout.
+* **The Risk:** If options API fetches took longer than 1000ms, the prefill session storage was cleared before inputs were mapped, causing inputs to revert to empty.
+* **Resolution:** Bound the prefill cache clearing to options readiness (`hasLoadedLists`) inside the prefill loader effect in [useModuleForm.js](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/hooks/useModuleForm.js#L90-L117). The session cache is now cleared synchronously only after options are successfully populated.
 
-### 5. Pervasive Debug `console.log` Statements Left in Production Code
-Multiple files contain debug-only `console.log` statements that fire on high-frequency code paths in every production session:
+### 5. Pervasive Debug `console.log` Statements Left in Production Code (Resolved)
+* **The Problem:** Multiple files contained debug-only `console.log` statements that fired on high-frequency paths (reducers, state providers, and hooks).
+* **The Risk:** Debug logs added rendering overhead and exposed environment parameters or database schemas in browser DevTools.
+* **Resolution:** Removed debug console statements from production paths in hooks, state providers, and reducers. Wrapped development-only diagnostics inside conditional `if (import.meta.env.DEV)` checks.
 
-| File | Location | Trigger Frequency |
-|---|---|---|
-| [`api.js`](../frontend/src/api.js) | Line 6 — `console.log(rawBase)` | Once per page load (module import time), leaks `VITE_BASE_URL` env variable to the browser console |
-| [`ModuleReducer.jsx`](../frontend/src/context/ModuleReducer.jsx) | Lines 91–96 — 5 logs in `SET_HOVER_DICT` | Every CAD model render — dumps the full hover dictionary key list to the console |
-| [`ModuleState.jsx`](../frontend/src/context/ModuleState.jsx) | Lines 223–239 — ~8 `[cadissue]`-tagged logs in `createCADModel` | Every CAD generation call — logs full input data keys, response structure, and CAD file keys |
-| [`useModuleForm.js`](../frontend/src/modules/shared/hooks/useModuleForm.js) | Line 119 — `['diameter check']` log | Every module options reload — prints `boltDiameterList` to the console |
-| [`useDesignSubmission.js`](../frontend/src/modules/shared/hooks/useDesignSubmission.js) | Lines 84, 199, 262, 281, 284 | Every design calculation and CAD build sequence |
+### 6. Dead Code: `normalizedFiles` Computation in CAD Submission Path (Resolved)
+* **The Problem:** In `useDesignSubmission.js`, a `normalizedFiles` mapping logic was computed but immediately ignored, as `setCadModelPaths` read from the raw `cadResult.files`.
+* **The Risk:** Lowercase file keys (`beam`, `column`, `plate`) were not normalized to PascalCase as intended, leaving the translation block dead.
+* **Resolution:** Applied `normalizedFiles` directly in the state setter call in [useDesignSubmission.js](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/hooks/useDesignSubmission.js#L281-L293):
+  ```javascript
+  setCadModelPaths(normalizedFiles);
+  ```
 
-> [!WARNING]
-> Debug logs in reducers and high-frequency hooks add measurable overhead to production rendering cycles and expose internal API structure in browser DevTools. The `console.log(rawBase)` in `api.js` is especially problematic as it runs at module import time before the app even mounts.
->
-> **Recommended Fix**: Remove all debug `console.log` statements from production paths. Use conditional `if (import.meta.env.DEV)` guards for development-only diagnostics.
+### 7. Stale `output` State Reference in `submitDesign` Error Handler (Resolved)
+* **The Problem:** In `useDesignSubmission.js`, the catch block checked the React state `output` snapshot, which was stale within the closure, resulting in inaccurate error prompts.
+* **The Risk:** When CAD generation failed but calculations succeeded, the UI displayed "An error occurred during design" instead of indicating that calculations completed but CAD failed.
+* **Resolution:** Introduced a local `outputWasSet` boolean tracker in [useDesignSubmission.js](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/hooks/useDesignSubmission.js#L82) to dynamically verify if calculation outputs were set before any subsequent CAD generation exceptions occurred.
 
----
+### 8. `resetFormState` Initialization Logic Duplication (Resolved)
+* **The Problem:** In `useModuleForm.js`, the `resetFormState` function duplicated the identical `.reduce()` initialization blocks from `useState` declarations.
+* **The Risk:** Any updates to `moduleConfig` required duplicating the reduce blocks in both state initializers and `resetFormState`.
+* **Resolution:** Extracted initial state factories (`buildInitialSelectionStates`, `buildInitialAllSelected`, etc.) into helper functions outside the hook in [useModuleForm.js](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/hooks/useModuleForm.js#L13-L42). These are now shared by both the `useState` blocks and [resetFormState](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/hooks/useModuleForm.js#L226-L242).
 
-### 6. Dead Code: `normalizedFiles` Computation in CAD Submission Path
-In [`useDesignSubmission.js`](../frontend/src/modules/shared/hooks/useDesignSubmission.js), a `normalizedFiles` object is computed (lines 286–295) to remap lowercase CAD file keys (`beam`, `column`, `plate`) to their PascalCase equivalents (`Beam`, `Column`, `Plate`):
-```javascript
-const normalizedFiles = {};
-Object.entries(cadResult.files || {}).forEach(([key, value]) => {
-  const normKey = key.trim();
-  const mapped = normKey === 'beam' ? 'Beam' : normKey === 'column' ? 'Column' : normKey === 'plate' ? 'Plate' : normKey;
-  normalizedFiles[mapped] = value;
-});
+### 9. Unreliable Navigation Release Window in `useNavigationGuard` (Resolved)
+* **The Problem:** In `useNavigationGuard.js`, `performNavigation` used an arbitrary 100ms timeout to release the navigation lock, which could run on unmounted components and cause race conditions.
+* **The Risk:** Navigation lock updates clashed with routing transitions, leading to state updates on unmounted components or locks leaking.
+* **Resolution:** Refactored the navigation lock flag (`allowNavigation`) into a React `useRef` in [useNavigationGuard.js](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/hooks/useNavigationGuard.js#L12) to track and release navigation guard blocks synchronously without depending on timeouts.
 
-setCadModelPaths(cadResult.files || {}); // Uses raw files, NOT normalizedFiles!
-```
-The `normalizedFiles` object is computed but never used — `setCadModelPaths` ignores it and writes the raw `cadResult.files` directly.
-
-> [!NOTE]
-> This dead computation adds a pointless `Object.entries` iteration on every successful CAD call. If PascalCase normalization is required, it should be applied to the argument of `setCadModelPaths`. If not required, the entire block should be removed.
->
-> **Recommended Fix**: Either apply `normalizedFiles` in `setCadModelPaths(normalizedFiles)`, or remove the normalization block entirely.
-
----
-
-### 7. Stale `output` State Reference in `submitDesign` Error Handler
-In [`useDesignSubmission.js`](../frontend/src/modules/shared/hooks/useDesignSubmission.js), the outer `catch` block determines the error message category using:
-```javascript
-const hasOutput = output !== null; // Line 335
-```
-The goal is to distinguish between a full calculation failure (`hasOutput = false`) and a partial success where the calculation completed but CAD generation failed (`hasOutput = true`). However, `output` is the React state snapshot captured in the closure when `submitDesign` was first called — always `null` at the start of a fresh run.
-
-The `setOutput(formattedOutput)` call at line 231 (inside the `try` block after calculation succeeds) queues a React state update, but this update has not been committed to the closure by the time execution reaches the catch block. As a result, `hasOutput` evaluates to `false` even when the calculation has successfully produced output, causing the wrong error message ("An error occurred during design" instead of "Calculation succeeded, but [CAD error]") to display.
-
-> [!IMPORTANT]
-> **Recommended Fix**: Track whether output was set using a local variable instead of reading the stale state closure:
-> ```javascript
-> let outputWasSet = false;
-> // ... inside try block after setOutput(formattedOutput):
-> outputWasSet = true;
-> // ... inside catch block:
-> const hasOutput = outputWasSet;
-> ```
-
----
-
-### 8. `resetFormState` Initialization Logic Duplication
-In [`useModuleForm.js`](../frontend/src/modules/shared/hooks/useModuleForm.js), the `resetFormState` function (lines 193–235) manually re-initializes every state variable by duplicating the identical `.reduce()` calls from the `useState` declarations above:
-```javascript
-// useState declaration (lines 44–49):
-const [selectionStates, setSelectionStates] = useState(
-  (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
-    acc[selection.key] = selection.defaultValue || "All";
-    return acc;
-  }, {})
-);
-
-// resetFormState (lines 198–203 — exact same logic):
-setSelectionStates(
-  (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
-    acc[selection.key] = selection.defaultValue || "All";
-    return acc;
-  }, {})
-);
-```
-This pattern repeats for `allSelected`, `selectedItems`, `modalStates`, `modalDynamicSrc`, and all scalar fields. Any new field added to `moduleConfig.modalConfig` or `moduleConfig.selectionConfig` must be manually updated in **both** the `useState` block and `resetFormState`.
-
-> [!NOTE]
-> **Recommended Fix**: Extract the initial state factories into named functions and call them from both `useState` and `resetFormState`:
-> ```javascript
-> const buildInitialSelectionStates = (config) =>
->   (config.selectionConfig || []).reduce((acc, s) => ({ ...acc, [s.key]: s.defaultValue || "All" }), {});
->
-> const [selectionStates, setSelectionStates] = useState(() => buildInitialSelectionStates(moduleConfig));
-> // In resetFormState:
-> setSelectionStates(buildInitialSelectionStates(moduleConfig));
-> ```
-
----
-
-### 9. Unreliable Navigation Release Window in `useNavigationGuard`
-In [`useNavigationGuard.js`](../frontend/src/modules/shared/hooks/useNavigationGuard.js), `performNavigation` uses an arbitrary 100ms timeout to release the navigation guard and then immediately re-locks it inside the same callback:
-```javascript
-const performNavigation = () => {
-  setAllowNavigation(true);   // Unlocks the popstate guard
-  setShowConfirmation(false);
-  setConfirmationType("reset");
-
-  setTimeout(() => {
-    if (navigationSource === "home") navigate("/home");
-    else if (navigationSource === "back") navigate(-1);
-    setAllowNavigation(false);  // Re-locks — runs inside same timeout
-    setNavigationSource(null);
-  }, 100);
-};
-```
-The `setAllowNavigation(false)` call runs inside the same `setTimeout` as the `navigate()` call. After navigation completes and the component unmounts, this cleanup runs in an unmounted component context — React will log a warning in development and the state update is lost. Additionally, if the user presses the back button a second time in the 100ms window between `setAllowNavigation(true)` being committed and the `setTimeout` firing, the `popstate` handler reads the committed `allowNavigation=true` and allows the navigation, but the `setAllowNavigation(false)` cleanup may then run on the new page's component instance.
-
-> [!CAUTION]
-> **Recommended Fix**: Use a `useRef` for the navigation lock flag instead of `useState`, so the check in `handlePopState` reads the current value synchronously without depending on React's state commit cycle. Clear the flag in a `useEffect` cleanup or by tracking the navigation completion lifecycle rather than an arbitrary timeout.
 

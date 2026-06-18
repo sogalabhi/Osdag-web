@@ -10,6 +10,36 @@ import {
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { loadStateFromOsi } from "../utils/osiLoader";
 
+const buildInitialSelectionStates = (config) =>
+  (config.selectionConfig || []).reduce((acc, selection) => {
+    acc[selection.key] = selection.defaultValue || "All";
+    return acc;
+  }, {});
+
+const buildInitialAllSelected = (config) =>
+  (config.selectionConfig || []).reduce((acc, selection) => {
+    acc[selection.inputKey] = true;
+    return acc;
+  }, {});
+
+const buildInitialSelectedItems = (config) =>
+  (config.selectionConfig || []).reduce((acc, selection) => {
+    acc[selection.inputKey] = [];
+    return acc;
+  }, {});
+
+const buildInitialModalStates = (config) =>
+  (config.modalConfig || []).reduce((acc, modal) => {
+    acc[modal.key] = false;
+    return acc;
+  }, {});
+
+const buildInitialModalDynamicSrc = (config) =>
+  (config.modalConfig || []).reduce((acc, modal) => {
+    if (!modal?.dataSource) acc[modal.key] = [];
+    return acc;
+  }, {});
+
 export const useModuleForm = (moduleConfig, moduleData) => {
   const safeModuleData = moduleData || {};
 
@@ -41,40 +71,15 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
   const [extraState, setExtraState] = useState(resolveInitialExtraState());
 
-  const [selectionStates, setSelectionStates] = useState(
-    (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
-      acc[selection.key] = selection.defaultValue || "All";
-      return acc;
-    }, {})
-  );
+  const [selectionStates, setSelectionStates] = useState(() => buildInitialSelectionStates(moduleConfig));
 
-  const [allSelected, setAllSelected] = useState(
-    (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
-      acc[selection.inputKey] = true;
-      return acc;
-    }, {})
-  );
+  const [allSelected, setAllSelected] = useState(() => buildInitialAllSelected(moduleConfig));
 
-  const [selectedItems, setSelectedItems] = useState(
-    (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
-      acc[selection.inputKey] = [];
-      return acc;
-    }, {})
-  );
+  const [selectedItems, setSelectedItems] = useState(() => buildInitialSelectedItems(moduleConfig));
 
-  const [modalStates, setModalStates] = useState(
-    (moduleConfig.modalConfig || []).reduce((acc, modal) => {
-      acc[modal.key] = false;
-      return acc;
-    }, {})
-  );
+  const [modalStates, setModalStates] = useState(() => buildInitialModalStates(moduleConfig));
 
-  const [modalDynamicSrc, setModalDynamicSrc] = useState(
-    (moduleConfig.modalConfig || []).reduce((acc, modal) => {
-      if (!modal?.dataSource) acc[modal.key] = [];
-      return acc;
-    }, {})
-  );
+  const [modalDynamicSrc, setModalDynamicSrc] = useState(() => buildInitialModalDynamicSrc(moduleConfig));
 
   const [designPrefModalStatus, setDesignPrefModalStatus] = useState(false);
   const [confirmationModal, setConfirmationModal] = useState(false);
@@ -88,37 +93,27 @@ export const useModuleForm = (moduleConfig, moduleData) => {
       if (moduleKey) {
         const raw = sessionStorage.getItem(`prefill:${moduleKey}`);
         if (raw) {
-          const uiObj = JSON.parse(raw);
           const hasLoadedLists = Object.keys(safeModuleData).length > 0;
-          
-          loadStateFromOsi(uiObj, {
-            setInputs,
-            setDesignPrefOverrides,
-            setExtraState,
-            setSelectionStates,
-            setAllSelected,
-            setSelectedItems,
-            moduleConfig,
-            safeModuleData,
-          });
-          
           if (hasLoadedLists) {
-            setTimeout(() => {
-              sessionStorage.removeItem(`prefill:${moduleKey}`);
-            }, 1000);
+            const uiObj = JSON.parse(raw);
+            loadStateFromOsi(uiObj, {
+              setInputs,
+              setDesignPrefOverrides,
+              setExtraState,
+              setSelectionStates,
+              setAllSelected,
+              setSelectedItems,
+              moduleConfig,
+              safeModuleData,
+            });
+            sessionStorage.removeItem(`prefill:${moduleKey}`);
           }
         }
       }
     } catch (e) {
       console.warn("Prefill from OSI failed:", e);
     }
-  }, [safeModuleData]);
-
-  useEffect(() => {
-    if (moduleData && Object.keys(moduleData).length > 0) {
-      console.log("['diameter check'] Loaded Database Options (once API resolves):", moduleData.boltDiameterList);
-    }
-  }, [moduleData]);
+  }, [safeModuleData, moduleConfig]);
 
   useEffect(() => {
     setInputs((prev) => {
@@ -233,37 +228,11 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     console.log('[useModuleForm] resetFormState: setting inputs to config defaults', resolvedInputs);
     setInputs(resolvedInputs);
     setExtraState(resolveInitialExtraState());
-    setSelectionStates(
-      (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
-        acc[selection.key] = selection.defaultValue || "All";
-        return acc;
-      }, {})
-    );
-    setAllSelected(
-      (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
-        acc[selection.inputKey] = true;
-        return acc;
-      }, {})
-    );
-    setSelectedItems(
-      (moduleConfig.selectionConfig || []).reduce((acc, selection) => {
-        acc[selection.inputKey] = [];
-        return acc;
-      }, {})
-    );
-
-    setModalStates(
-      (moduleConfig.modalConfig || []).reduce((acc, modal) => {
-        acc[modal.key] = false;
-        return acc;
-      }, {})
-    );
-    setModalDynamicSrc(
-      (moduleConfig.modalConfig || []).reduce((acc, modal) => {
-        if (!modal?.dataSource) acc[modal.key] = [];
-        return acc;
-      }, {})
-    );
+    setSelectionStates(buildInitialSelectionStates(moduleConfig));
+    setAllSelected(buildInitialAllSelected(moduleConfig));
+    setSelectedItems(buildInitialSelectedItems(moduleConfig));
+    setModalStates(buildInitialModalStates(moduleConfig));
+    setModalDynamicSrc(buildInitialModalDynamicSrc(moduleConfig));
 
     setDesignPrefModalStatus(false);
     setConfirmationModal(false);

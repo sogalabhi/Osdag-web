@@ -64,9 +64,10 @@ export const useDesignSubmission = (service, moduleConfig) => {
         clearTimeout(saveTimeoutRef.current);
       }
       if (pendingSaveRef.current && projectId && service.updateProject) {
-        console.log('[useDesignSubmission] Component unmounting. Executing immediate pending project save.');
         service.updateProject(projectId, pendingSaveRef.current).catch(err => {
-          console.error('[useDesignSubmission] Failed to save outputs on unmount:', err);
+          if (import.meta.env.DEV) {
+            console.error('[useDesignSubmission] Failed to save outputs on unmount:', err);
+          }
         });
       }
     };
@@ -81,11 +82,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
     moduleData,
     extraState,
   }) => {
-    console.log("[useDesignSubmission] submitDesign start", {
-      designType: moduleConfig.designType,
-      inputs,
-      allSelected,
-    });
+    let outputWasSet = false;
 
     // Pass full moduleData as lists so buildSubmissionParams can use sectionDesignation, anchorDiameterList, etc.
     const lists = moduleData;
@@ -182,7 +179,9 @@ export const useDesignSubmission = (service, moduleConfig) => {
         error: err
       });
       alert("Error preparing submission parameters. See console for details.");
-      console.error("buildSubmissionParams threw:", err);
+      if (import.meta.env.DEV) {
+        console.error("buildSubmissionParams threw:", err);
+      }
       return;
     }
 
@@ -196,7 +195,6 @@ export const useDesignSubmission = (service, moduleConfig) => {
 
     try {
       const designResult = await service.createDesign(moduleConfig.designType, param);
-      console.log("[useDesignSubmission] designResult", designResult);
       const designStatus = designResult?.status;
       const designBody = designResult?.body;
       const designSuccess =
@@ -229,6 +227,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
       setDesignLogs(nextLogs);
       setLogs(nextLogs);
       setOutput(formattedOutput);
+      outputWasSet = true;
       setDisplayOutput(true);
 
       if (designBody?.design_status === false) {
@@ -242,7 +241,6 @@ export const useDesignSubmission = (service, moduleConfig) => {
         return;
       }
 
-      // Save outputs to project if projectId exists (debounced)
       if (projectId && service.updateProject) {
         if (saveTimeoutRef.current) {
           clearTimeout(saveTimeoutRef.current);
@@ -259,18 +257,18 @@ export const useDesignSubmission = (service, moduleConfig) => {
 
         saveTimeoutRef.current = setTimeout(async () => {
           try {
-            console.log('[useDesignSubmission] Executing debounced project save for projectId:', projectId);
             await service.updateProject(projectId, savePayload);
             pendingSaveRef.current = null;
           } catch (err) {
-            console.error('[useDesignSubmission] Failed to save outputs (debounced):', err);
+            if (import.meta.env.DEV) {
+              console.error('[useDesignSubmission] Failed to save outputs (debounced):', err);
+            }
           } finally {
             saveTimeoutRef.current = null;
           }
         }, 5000);
       }
 
-      // CAD Generation step
       setStatus({
         step: DESIGN_STATUS.CAD_GENERATING,
         message: 'Building 3D model...',
@@ -278,11 +276,8 @@ export const useDesignSubmission = (service, moduleConfig) => {
       });
 
       const cadResult = await service.createCADModel(moduleConfig.designType, param);
-      console.log("[useDesignSubmission] CAD result", cadResult);
 
       if (cadResult?.success) {
-        console.log('[useDesignSubmission] CAD success, files:', cadResult.files);
-        // Normalize CAD keys to expected case
         const normalizedFiles = {};
         Object.entries(cadResult.files || {}).forEach(([key, value]) => {
           if (!key) return;
@@ -295,7 +290,7 @@ export const useDesignSubmission = (service, moduleConfig) => {
           normalizedFiles[mapped] = value;
         });
 
-        setCadModelPaths(cadResult.files || {});
+        setCadModelPaths(normalizedFiles);
         setHoverDict(cadResult.hover_dict || {});
         setRenderCadModel(true);
         setRenderBoolean(true);
@@ -303,14 +298,12 @@ export const useDesignSubmission = (service, moduleConfig) => {
         setLoading(false);
         setModelKey((prev) => prev + 1);
 
-        // Complete
         setStatus({
           step: DESIGN_STATUS.COMPLETE,
           message: 'Design complete!',
           error: null
         });
 
-        // Auto-dismiss after 1 second
         setTimeout(() => {
           setStatus({
             step: DESIGN_STATUS.IDLE,
@@ -319,7 +312,6 @@ export const useDesignSubmission = (service, moduleConfig) => {
           });
         }, 1000);
       } else {
-        // CAD failed but calculation succeeded - partial success
         const cadErrorMessage = cadResult?.error || 'Failed to generate 3D model';
         setStatus({
           step: DESIGN_STATUS.ERROR,
@@ -328,22 +320,18 @@ export const useDesignSubmission = (service, moduleConfig) => {
         });
         setLoading(false);
         setRenderBoolean(false);
-        // Keep output visible since calculation succeeded
       }
     } catch (e) {
-      // Determine if this is a calculation error or CAD error
-      const hasOutput = output !== null;
+      const hasOutput = outputWasSet;
       const errorMessage = e.message || 'An error occurred during design';
 
       if (hasOutput) {
-        // Partial success: calculation worked, CAD failed
         setStatus({
           step: DESIGN_STATUS.ERROR,
           message: `Calculation succeeded, but ${errorMessage.toLowerCase()}`,
           error: e
         });
       } else {
-        // Complete failure: calculation failed
         setStatus({
           step: DESIGN_STATUS.ERROR,
           message: errorMessage,

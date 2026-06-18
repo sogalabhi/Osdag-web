@@ -88,15 +88,9 @@ export default (state, action) => {
       };
 
     case "SET_HOVER_DICT":
-      console.log('[ModuleReducer] SET_HOVER_DICT action received');
-      console.log('[ModuleReducer] action.payload:', action.payload);
-      console.log('[ModuleReducer] action.payload type:', typeof action.payload);
-      console.log('[ModuleReducer] action.payload keys:', action.payload ? Object.keys(action.payload) : 'N/A');
-      const newHoverDict = action.payload || {};
-      console.log('[ModuleReducer] Setting hoverDict to:', newHoverDict);
       return {
         ...state,
-        hoverDict: newHoverDict,
+        hoverDict: action.payload || {},
       };
 
     // ===================================================================
@@ -148,39 +142,6 @@ export default (state, action) => {
       };
     }
 
-    // Legacy actions for backward compatibility
-    case "UPDATE_SUPPORTING_ST_DATA":
-      return {
-        ...state,
-        ...((state, action) => {
-          const designPrefData = { ...state.designPrefData };
-          if (designPrefData.supporting_section_results?.[0]) {
-            const sectionResults = { ...designPrefData.supporting_section_results[0] };
-            const isCustom = action.payload?.includes?.("Cus") || false;
-            sectionResults.Source = isCustom ? "Custom" : "IS808_Rev";
-            sectionResults.Type = isCustom ? "Welded" : "Rolled";
-            designPrefData.supporting_section_results = [sectionResults];
-          }
-          return { designPrefData, error_msg: "" };
-        })(state, action)
-      };
-
-    case "UPDATE_SUPPORTED_ST_DATA":
-      return {
-        ...state,
-        ...((state, action) => {
-          const designPrefData = { ...state.designPrefData };
-          if (designPrefData.supported_section_results?.[0]) {
-            const sectionResults = { ...designPrefData.supported_section_results[0] };
-            const isCustom = action.payload?.includes?.("Cus") || false;
-            sectionResults.Source = isCustom ? "Custom" : "IS808_Rev";
-            sectionResults.Type = isCustom ? "Welded" : "Rolled";
-            designPrefData.supported_section_results = [sectionResults];
-          }
-          return { designPrefData, error_msg: "" };
-        })(state, action)
-      };
-
     // ===================================================================
     // MATERIAL MANAGEMENT - Consolidated
     // ===================================================================
@@ -199,35 +160,6 @@ export default (state, action) => {
           return state;
       }
     }
-
-    // Legacy material actions for backward compatibility
-    case "SAVE_CM_DETAILS":
-      return {
-        ...state,
-        conn_material_details: action.payload,
-        error_msg: "",
-      };
-
-    case "SAVE_SDM_DETAILS":
-      return {
-        ...state,
-        supported_material_details: action.payload,
-        error_msg: "",
-      };
-
-    case "SAVE_STM_DETAILS":
-      return {
-        ...state,
-        supporting_material_details: action.payload,
-        error_msg: "",
-      };
-
-    case "UPDATE_MATERIAL_FROM_CACHES":
-      return {
-        ...state,
-        materialList: [...(state.materialList || []), ...(action.payload || [])],
-        error_msg: "",
-      };
 
     // ===================================================================
     // UTILITY ACTIONS

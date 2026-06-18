@@ -26,6 +26,7 @@ export const SceneManager = forwardRef(({
 }, ref) => {
   const [parsedModels, setParsedModels] = useState(null);
   const [hoveredMeshId, setHoveredMeshId] = useState(null);
+  const hoveredMeshIdRef = useRef(null);
   
   // Refs for internal state
   const groupRef = useRef();
@@ -181,16 +182,18 @@ export const SceneManager = forwardRef(({
   const handlePartHover = useCallback((label, clientX, clientY, renderOrder, meshId, meshObject) => {
     if (onHoverLabel) onHoverLabel(label, clientX, clientY);
     setHoveredMeshId(meshId);
+    hoveredMeshIdRef.current = meshId;
     activeMeshRef.current = meshObject;
   }, [onHoverLabel]);
 
   const handlePartHoverEnd = useCallback((meshId) => {
-    if (hoveredMeshId === meshId) {
+    if (hoveredMeshIdRef.current === meshId) {
       if (onHoverEnd) onHoverEnd();
       setHoveredMeshId(null);
+      hoveredMeshIdRef.current = null;
       activeMeshRef.current = null;
     }
-  }, [hoveredMeshId, onHoverEnd]);
+  }, [onHoverEnd]);
 
   // --- 6. RENDER ---
   const finalRotation = isColumnWebBeamWeb ? [0, Math.PI / -2, 0] : modelRotation;

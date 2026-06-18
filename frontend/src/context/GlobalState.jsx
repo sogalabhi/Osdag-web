@@ -1,4 +1,4 @@
-import { createContext, useReducer, useEffect } from 'react';
+import { createContext, useReducer, useEffect, useRef } from 'react';
 import AppReducer from './AppReducer';
 
 /*
@@ -24,6 +24,7 @@ export const GlobalContext = createContext(initialValue);
 //provider component
 export const GlobalProvider = ({ children }) => {
     const [state, dispatch] = useReducer(AppReducer, initialValue);
+    const fetchCacheRef = useRef('');
 
     //action
     const getInitialData = async () => {
@@ -36,8 +37,8 @@ export const GlobalProvider = ({ children }) => {
     }
     const getDesignTypes = async (conn_type) => {
         const URL_KEY = `designTypes:${conn_type}`;
-        if (initialValue.fetch_cache === URL_KEY) return;
-        initialValue.fetch_cache = URL_KEY;
+        if (fetchCacheRef.current === URL_KEY) return;
+        fetchCacheRef.current = URL_KEY;
         try {
             const data = await fetchDesignTypes(conn_type);
             dispatch({ type: 'GET_DESIGNTYPES', payload: data });

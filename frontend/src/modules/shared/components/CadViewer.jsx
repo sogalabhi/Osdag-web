@@ -1,4 +1,4 @@
-import React, { useRef, Suspense } from "react";
+import React, { useRef, Suspense, useState, useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, PerspectiveCamera } from "@react-three/drei";
 import { CadScene, CadSceneProvider, CadSceneBbox, ScreenshotCapture, ReportCaptureDev } from "./cad";
@@ -27,6 +27,15 @@ export const CadViewer = React.memo(({
   hasOutput,
 }) => {
   const cameraRef = useRef();
+  const [canvasKey, setCanvasKey] = useState(0);
+
+  const handleContextLost = useCallback((event) => {
+    event.preventDefault();
+    if (import.meta.env.DEV) {
+      console.warn("[CadViewer] WebGL context lost. Re-mounting Canvas renderer to recover...");
+    }
+    setCanvasKey((prev) => prev + 1);
+  }, []);
 
   if (isMobile && !showCad) return null;
 
@@ -51,8 +60,15 @@ export const CadViewer = React.memo(({
             style={!isMobile && !showOutputDock && hasOutput ? { right: '40px' } : {}}
           >
           <Canvas
+            key={canvasKey}
             gl={{ antialias: true, preserveDrawingBuffer: true, alpha: true }}
             style={{ width: "100%", height: "100%", background: 'transparent' }}
+            onCreated={({ gl }) => {
+              const canvasEl = gl.domElement;
+              if (canvasEl) {
+                canvasEl.addEventListener("webglcontextlost", handleContextLost);
+              }
+            }}
           >
             <PerspectiveCamera
               ref={cameraRef}

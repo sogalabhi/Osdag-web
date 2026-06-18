@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -12,8 +12,8 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationType, setConfirmationType] = useState("reset"); // 'reset' | 'navigation'
 
-  // Navigation State
-  const [allowNavigation, setAllowNavigation] = useState(false);
+  // Navigation Lock
+  const allowNavigationRef = useRef(false);
   const [navigationSource, setNavigationSource] = useState(null); // 'home' | 'back'
 
   const hasUnsaved = typeof hasUnsavedWork === "function" ? hasUnsavedWork() : !!hasUnsavedWork;
@@ -30,7 +30,7 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
     };
 
     const handlePopState = () => {
-      if (hasUnsaved && !allowNavigation) {
+      if (hasUnsaved && !allowNavigationRef.current) {
         try {
           // Preserve the full current path (including projectId) so we don't
           // lose the project context when trapping the back button.
@@ -53,7 +53,7 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [allowNavigation, hasUnsaved, routePath]);
+  }, [hasUnsaved, routePath]);
 
   // Ensure there's a history entry to trap back navigation when work is unsaved
   useEffect(() => {
@@ -76,19 +76,16 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
   };
 
   const performNavigation = () => {
-    setAllowNavigation(true);
+    allowNavigationRef.current = true;
     setShowConfirmation(false);
     setConfirmationType("reset");
 
-    setTimeout(() => {
-      if (navigationSource === "home") {
-        navigate("/home");
-      } else if (navigationSource === "back") {
-        navigate(-1);
-      }
-      setAllowNavigation(false);
-      setNavigationSource(null);
-    }, 100);
+    if (navigationSource === "home") {
+      navigate("/home");
+    } else if (navigationSource === "back") {
+      navigate(-1);
+    }
+    setNavigationSource(null);
   };
 
   const cancelNavigation = () => {
