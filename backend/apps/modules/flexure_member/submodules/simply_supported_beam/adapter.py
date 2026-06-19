@@ -183,6 +183,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         print("Error in generate_output:", str(e))
         print(traceback.format_exc())
 
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 

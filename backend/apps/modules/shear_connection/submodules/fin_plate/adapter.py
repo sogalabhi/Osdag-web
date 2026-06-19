@@ -517,6 +517,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
     print("=" * 60)
     
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 

@@ -399,6 +399,10 @@ def generate_output(input_values: Dict[str, Any]):
 
     # print(f"[Purlin] Final Output : {output}")
     # sys.exit()
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 

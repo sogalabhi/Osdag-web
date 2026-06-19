@@ -258,6 +258,10 @@ def generate_output(
     design_status = getattr(module, "design_status", False)
     if not design_status:
         logs = logs + ["Design failed or no valid section found. Check inputs."]
+        try:
+            logs = list(reversed(logs))
+        except Exception:
+            pass
         return {}, logs
 
     raw_output = module.output_values(True)
@@ -279,6 +283,10 @@ def generate_output(
                 pass
         output[key] = {"key": key, "label": label, "val": val}
 
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 

@@ -299,6 +299,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as e:
         print(f"[B2B EP adapter] Warning: could not add extra diagram keys: {e}")
 
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 

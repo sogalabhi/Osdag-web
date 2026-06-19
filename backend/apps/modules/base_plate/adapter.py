@@ -364,6 +364,10 @@ def generate_output(input_values: Dict[str, Any]):
         traceback.print_exc()
         raise
 
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 

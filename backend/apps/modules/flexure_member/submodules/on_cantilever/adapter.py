@@ -236,6 +236,10 @@ def generate_output(input_values: Dict[str, Any]):
         print("Error in OnCantilever generate_output:", str(e))
         print(traceback.format_exc())
 
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 

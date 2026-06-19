@@ -315,6 +315,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "label": label,
                 "val": value  # Changed from "value" to "val" to match frontend expectations
             }  # Set label, key and value in output
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 

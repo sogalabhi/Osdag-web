@@ -209,6 +209,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "val": param[3]
             }
 
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 

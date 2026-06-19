@@ -325,12 +325,20 @@ def generate_output(input_values: Dict[str, Any]) -> tuple:
         print(f"   Logs extracted: {len(logs)} items")
         
         print("\ngenerate_output() completed successfully")
+        try:
+            logs = list(reversed(logs))
+        except Exception:
+            pass
         return output, logs
         
     except Exception as e:
         print(f"\n ERROR in generate_output(): {type(e).__name__}: {e}")
         traceback.print_exc()
         logs.append({"msg": f"Error in generate_output: {str(e)}", "type": "error"})
+        try:
+            logs = list(reversed(logs))
+        except Exception:
+            pass
         return output, logs
 
 

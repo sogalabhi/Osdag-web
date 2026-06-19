@@ -162,6 +162,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             logs = []
         logs.append(error_msg)
         traceback.print_exc()
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:

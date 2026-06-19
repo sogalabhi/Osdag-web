@@ -304,6 +304,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
     logger.info(f"Output generation completed. Generated {len(output)} output fields and {len(logs)} log messages")
     logger.debug(f"Final logs being returned: {logs}")
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 

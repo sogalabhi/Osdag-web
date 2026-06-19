@@ -296,6 +296,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 logs = getattr(module, 'logs', []) or []
             if not logs:
                 logs = ["No logs generated"]
+            try:
+                logs = list(reversed(logs))
+            except Exception:
+                pass
             return {}, logs
             
         # Generate output values in unformatted form.
@@ -476,6 +480,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     print(f'CleatAngle - Final output keys: {list(output.keys())}')
     print(f'CleatAngle - Final output size: {len(output)}')
     print(f'CleatAngle - Final logs being returned: {logs}')
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 #we do not have plate in just like in finplate case, we have cleatAngle which is combination of angle & nutbolts

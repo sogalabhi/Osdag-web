@@ -371,6 +371,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         logger.error(traceback.format_exc())
         # Return what we have so far
     logger.debug(f"Final logs being returned: {logs}")
+    try:
+        logs = list(reversed(logs))
+    except Exception:
+        pass
     return output, logs
 
 
