@@ -1,6 +1,6 @@
-# Fixed & Resolved Issues (Chapters 1 to 9)
+# Fixed & Resolved Issues (Chapters 1 to 11)
 
-This document tracks all the architecture, storage, performance, and security issues resolved across Chapters 1 through 9 of the Osdag-Web codebase.
+This document tracks all the architecture, storage, performance, and security issues resolved across Chapters 1 through 11 of the Osdag-Web codebase.
 
 | # | Chapter / Issue Title | Target Component | Description (1-2 lines) | Resolution Summary |
 |---|------------------------|------------------|--------------------------|--------------------|
@@ -34,3 +34,7 @@ This document tracks all the architecture, storage, performance, and security is
 | **28** | **Chapter 8: `resetFormState` Initialization Logic Duplication** | `useModuleForm.js` / Form State Hook | The `resetFormState` function duplicated the identical `.reduce()` initialization blocks from state definitions to reset individual state properties. | Extracted initial state factory helpers (`buildInitialSelectionStates`, `buildInitialAllSelected`, etc.) to be shared by both `useState` initializers and `resetFormState`. |
 | **29** | **Chapter 9: WebGL Context Loss Recovery** | `CadViewer.jsx` / R3F Canvas | The R3F Canvas context did not listen to `webglcontextlost` events, causing the canvas to crash on sleep or memory exhaustion. | Added a native listener inside `onCreated` callback that triggers `event.preventDefault()` and increments a state-driven key to force a clean re-mount of the Canvas. |
 | **30** | **Chapter 9: Pointer Event Race Hazards** | `SceneManager.jsx` / Hover Handlers | Stale state closures inside R3F pointer-out callbacks caused the hovered state to become locked on components during rapid mouse movements. | Refactored hover callbacks to use the latest ref pattern (`hoveredMeshIdRef`) to read and write current hover state synchronously. |
+| **31** | **Chapter 10: Hardcoded UI Status Flags** | `ModulesCardLayout.jsx` / catalog configuration | Submodule availability was hardcoded via string checks (`key === "Truss"` and `label === "PEB"`). | Added `status: "development"` directly to catalog configurations and dynamically checked this attribute in `ModulesCardLayout.jsx` and `SectionCards.jsx`. |
+| **32** | **Chapter 10: Incomplete Route Cleanups** | `ModulesCardLayout.jsx` / `SectionCards.jsx` | Unrouted submodules (like `PlateGirder`) caused silent click failures on the homepage. | Configured `PlateGirder` with `status: "development"` to disable/grey out the card, and integrated `react-toastify` in `handleModuleClick` to show toast alerts for any unmapped routes. |
+| **33** | **Chapter 11: Hardcoded User ID Permissions** | `docker-compose.yml` / User mapping | Hardcoded user setting `1000:1000` caused file permission issues on developer environments with different UIDs. | Replaced the static string with variable interpolation: `user: "${HOST_UID:-1000}:${HOST_GID:-1000}"`. |
+| **34** | **Chapter 11: Static Database Port Mappings** | `docker-compose.yml` / db ports | Static mapping of PostgreSQL to host port 5433 created conflicts with local DB instances. | Updated host port configuration to support environment variable overrides: `ports: - "${DB_HOST_PORT:-5433}:5432"`. |

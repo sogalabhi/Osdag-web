@@ -178,6 +178,8 @@ user: "1000:1000"
 >
 > **Recommended Fix**: Remove the hardcoded user attribute from development compose configurations, or pass the active UID as a variable inside the `.env` file (e.g. `user: "${HOST_UID}:${HOST_GID}"`).
 
+**Resolution**: Resolved by updating `backend` and `celery_worker` service user mappings in [docker-compose.yml](../docker-compose.yml) to use environment variable interpolation with fallback: `user: "${HOST_UID:-1000}:${HOST_GID:-1000}"`.
+
 ### 2. Static Database Port Mappings
 The database service maps PostgreSQL to host port 5433:
 ```yaml
@@ -188,3 +190,6 @@ ports:
 > If a developer runs multiple local instances of Osdag-Web or has other local postgres services mapped to port 5433, container startup will fail due to port conflicts.
 >
 > **Recommended Fix**: Map database ports using environment variables (e.g. `ports: - "${DB_HOST_PORT:-5433}:5432"`) to allow dynamic port allocation.
+
+**Resolution**: Resolved by modifying the `ports` attribute of the `db` service in [docker-compose.yml](../docker-compose.yml) to use environment variable interpolation with default fallback: `ports: - "${DB_HOST_PORT:-5433}:5432"`.
+

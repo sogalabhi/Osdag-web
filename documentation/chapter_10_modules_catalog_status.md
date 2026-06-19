@@ -114,6 +114,11 @@ disabled={label === "PEB"}
 >
 > **Recommended Fix**: Add an `active` or `status` flag directly within the database catalog entries or dynamic configuration registries (e.g. `status: "production" | "development"`), and read this flag in `ModulesCardLayout.jsx`.
 
+**Resolution**: Resolved by adding a `status: "development"` attribute directly inside catalog entries in [modules.js](../frontend/src/constants/modules.js). The layout component [ModulesCardLayout.jsx](../frontend/src/homepage/components/ModulesCardLayout.jsx) now dynamically reads `status === "development"` to disable corresponding submodule tabs and sub-submodule buttons.
+
 ### 2. Incomplete Route Cleanups
 * `PlateGirder` lacks a router path, causing a silent failure (no feedback) when a user clicks the card on the homepage.
 * **Recommended Fix**: Add a user-facing toast alert notifying the user that the module is under development, or filter out options that lack matching `MODULE_ROUTES` entries from the UI card lists automatically.
+
+**Resolution**: Resolved by adding `status: "development"` to `PlateGirder` in [modules.js](../frontend/src/constants/modules.js) and updating [SectionCards.jsx](../frontend/src/homepage/components/SectionCards.jsx) to automatically disable and grey out options marked in development. In addition, integrated `react-toastify` in `handleModuleClick` inside [ModulesCardLayout.jsx](../frontend/src/homepage/components/ModulesCardLayout.jsx) to trigger a toast notification (e.g., *"Plate Girder module is under development."*) as a fallback if any option lacking a matching route is clicked.
+
