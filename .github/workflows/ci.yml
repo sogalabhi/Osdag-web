@@ -70,7 +70,7 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
         run: |
           cd backend
-          pytest --ds=config.settings
+          python -m pytest --ds=config.settings
 
       - name: Teardown
         if: always()
