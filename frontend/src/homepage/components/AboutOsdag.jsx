@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import { useState } from "react";
 import osdagLogo from "../../assets/homepage/osdag_logo.png";
 
 import { ABOUT_OSDAG_TABS } from "../constants/aboutOsdag/tabs";

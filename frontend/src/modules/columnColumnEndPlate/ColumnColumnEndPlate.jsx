@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../shared/components/EngineeringModule';
 import { columnColumnEndPlateConfig } from './configs/columnColumnEndPlateConfig';
 import { columnColumnEndPlateOutputConfig } from './configs/columnColumnEndPlateOutputConfig';

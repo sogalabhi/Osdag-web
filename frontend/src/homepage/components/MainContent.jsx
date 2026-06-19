@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import DashboardSectionCard from './DashboardSectionCard';
 import ProjectsListCard from './ProjectsListCard';
 import ModulesListCard from './ModulesListCard';
@@ -18,7 +18,6 @@ const MainContent = () => {
       return;
     }
     fetchRecentProjects();
-    // eslint-disable-next-line
   }, [isGuest]);
 
   const fetchRecentProjects = async () => {

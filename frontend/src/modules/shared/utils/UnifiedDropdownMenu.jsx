@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useEngineeringService } from "../hooks/useEngineeringService";
 import { MODULE_KEY_FIN_PLATE } from '../../../constants/DesignKeys';
 import { message } from 'antd';
-import { apiBase } from "../../../api";
+import { apiBase } from "../../../api"; // eslint-disable-line no-unused-vars
 import { openOsiFile } from "../../../datasources/osiDataSource";
 import { loadStateFromOsi } from "./osiLoader";
 import { downloadSectionCatalog } from "../../../datasources/sectionsDataSource";
@@ -30,36 +30,30 @@ function UnifiedDropdownMenu({
   setSelectionStates = () => { },
   setSelectedItems = () => { },
   logs,
-  setCreateDesignReportBool,
-  setSaveInputFileName,
   triggerScreenshotCapture,
   selectedOption = null,
-  setSelectedOption = () => { },
   boltDiameterList = [],
   propertyClassList = [],
   thicknessList = [],
   angleList = [],
   topAngleList = [],
   cadModelPaths = null,
-  contextData = null, // moduleData from hook; used for expandAllSelectedInputs
-  /** Cleat / selection-driven validateInputs (optional) */
+  contextData = null,
   selectionStates = {},
   onMenuClick,
   onCreateProject = null,
-  isExistingProject = false, // When true, disable "Create Project" menu item
+  isExistingProject = false,
   hasOutput = false,
   moduleConfig = null,
   extraState = {},
 }) {
   const service = useEngineeringService();
-  const BASE_URL = `${apiBase}`;
-
 
   const [isOpen, setIsOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const parentRef = useRef(null);
 
-  const getModuleConfig = () => {
+  const getLocalModuleConfig = () => {
     const moduleName = inputs?.module;
     return getModuleConfig(moduleName);
   };
@@ -81,9 +75,7 @@ function UnifiedDropdownMenu({
     element.addEventListener("change", async (e) => {
       const file = e.target.files[0];
 
-      // Handle user cancellation
       if (!file) {
-        // User cancelled file selection - silently return (expected behavior)
         if (parentRef.current && element && parentRef.current.contains(element)) {
           parentRef.current.removeChild(element);
         }
@@ -114,7 +106,6 @@ function UnifiedDropdownMenu({
         console.error('Error loading OSI file:', err);
         message.error('Failed to open OSI file');
       } finally {
-        // Ensure we remove the temporary input element after handling the file
         if (parentRef.current && element && parentRef.current.contains(element)) {
           parentRef.current.removeChild(element);
         }
@@ -140,7 +131,6 @@ function UnifiedDropdownMenu({
     }
     const inputsForSave = expandAllSelectedInputs(inputs, allSelected, getContextData());
 
-    // Determine module_id and projectName with defaults
     const module_id = inputs?.module || MODULE_KEY_FIN_PLATE;
     const projectName = inputs?.project_name || inputs?.name || 'project';
 
@@ -149,7 +139,6 @@ function UnifiedDropdownMenu({
 
       if (result.success && result.content_base64) {
         try {
-          // Convert base64 to blob and download
           const binaryString = atob(result.content_base64);
           const bytes = new Uint8Array(binaryString.length);
           for (let i = 0; i < binaryString.length; i++) {
@@ -225,9 +214,6 @@ function UnifiedDropdownMenu({
       case "Save Log Messages":
         saveLogMessages();
         break;
-      // case "Create Design Report":
-      //   setCreateDesignReportBool(true);
-      //   break;
       case "Save 3D Model":
         (async () => {
           await downloadCadSectionsAsStl(cadModelPaths, message);
@@ -307,7 +293,7 @@ function UnifiedDropdownMenu({
         window.location.href = '/home';
         break;
       case "Design Preferences": {
-        const mod = getModuleConfig();
+        const mod = getLocalModuleConfig();
         const guard = canOpenAdditionalInputs(
           mod,
           inputs,

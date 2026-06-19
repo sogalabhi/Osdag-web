@@ -1,4 +1,3 @@
-import React from "react";
 import { BaseOutputDock } from "../../../shared/components/BaseOutputDock";
 import { buttJointBoltedOutputConfig } from "../config/buttJointBoltedOutputConfig";
 import { UI_STRINGS } from '../../../../constants/UIStrings';

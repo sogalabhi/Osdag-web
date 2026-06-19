@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Select, Input } from "antd";
 import { KEY_DISP_DP_DETAILING_PACKING_PLATE } from "../../../constants/DesignKeys";
 

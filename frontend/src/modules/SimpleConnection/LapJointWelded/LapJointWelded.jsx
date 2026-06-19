@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
 import { lapJointWeldedConfig } from './config/lapJointWeldedConfig';
 import { lapJointWeldedOutputConfig } from './config/lapJointWeldedOutputConfig';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
 import { purlinConfig } from './configs/purlinConfig';
 import { purlinOutputConfig } from './configs/purlinOutputConfig';

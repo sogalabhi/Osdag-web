@@ -1,4 +1,3 @@
-import React from "react";
 import { BaseInputDock } from "./BaseInputDock";
 import { BaseOutputDock } from "./BaseOutputDock";
 import { CadViewer } from "./CadViewer";

@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useRef, useState, useEffect, useMemo, useCallback } from "react";
+/* eslint-disable react-refresh/only-export-components, react/prop-types */
+import { createContext, useContext, useRef, useState, useEffect, useMemo, useCallback } from "react";
 import { useViewport } from "../hooks/useViewport";
 import { useHover } from "../hooks/useHover";
 import { useDockPanels } from "../hooks/useDockPanels";
@@ -39,7 +40,7 @@ export const useEngineeringContext = () => {
 
 const EngineeringShortcutsRunner = () => {
   const context = useEngineeringContext();
-  const { form, uiContext, designStatus, actions, docks, navigate, isMobile } = context;
+  const { form, uiContext, designStatus, docks, navigate } = context;
 
   const handleOpenDesignPrefFromShortcut = () => {
     const mod = getDesignPrefModuleConfig(form.inputs?.module);
@@ -419,8 +420,7 @@ export const EngineeringProvider = ({ moduleConfig, outputConfig, title, childre
 
   const cameraSettings = useViewCamera(
     moduleConfig.cameraKey,
-    selectedCameraView,
-    getConnectivity()
+    selectedCameraView
   );
 
   const { position: cameraPos } = cameraSettings;

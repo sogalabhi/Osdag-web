@@ -232,11 +232,11 @@ export const LICENSE_HTML = `
   </p>
   <p>
     Notice of third-party software licenses: Osdag contains open-source software packages from
-    third parties, available on an \"as is\" basis and subject to their individual license agreements.
+    third parties, available on an "as is" basis and subject to their individual license agreements.
   </p>
   <p>
     Read the full LGPL v3 license here:
-    <a href=\"https://www.gnu.org/licenses/lgpl-3.0.html\" target=\"_blank\" rel=\"noreferrer\">
+    <a href="https://www.gnu.org/licenses/lgpl-3.0.html" target="_blank" rel="noreferrer">
       https://www.gnu.org/licenses/lgpl-3.0.html
     </a>
   </p>

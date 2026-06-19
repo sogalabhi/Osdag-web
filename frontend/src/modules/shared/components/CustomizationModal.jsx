@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import { useState, useEffect } from 'react';
 import { Modal, Transfer, Button, message } from 'antd';
 import { useViewport } from '../hooks/useViewport';
 

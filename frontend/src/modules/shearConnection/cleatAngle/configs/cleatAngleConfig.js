@@ -49,7 +49,7 @@ export const cleatAngleConfig = {
     { key: "cleatSectionSelect", inputKey: "cleat_section", defaultValue: "All" },
   ],
 
-  validateInputs: (inputs, extraState = {}, contextData = {}, selectionStates = {}) => {
+  validateInputs: (inputs, contextData = {}, selectionStates = {}) => {
     const allSelected = selectionStates?.cleatSectionSelect === 'All';
     const optionsList = (contextData && contextData.angleList) || [];
     const selectedList = Array.isArray(inputs.cleat_section) ? inputs.cleat_section : [];

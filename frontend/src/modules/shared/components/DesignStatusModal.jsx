@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import { useEffect } from 'react';
 import { Modal } from 'antd';
 import { DESIGN_STATUS } from '../hooks/useDesignSubmission';
 

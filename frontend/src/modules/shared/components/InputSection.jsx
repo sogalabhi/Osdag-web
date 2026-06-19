@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect, useContext } from 'react';
 import Select, { components } from 'react-select';
 import { getOptionsForField, getListForInputKey } from '../utils/fieldOptionUtils';
@@ -165,10 +166,8 @@ export const InputSection = ({
       const selectedImage = (conn ? imageMap[conn]?.[epType] : null) || imageMap[extraState.selectedOption] || ErrorImg;
       setImageSource(selectedImage);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [extraState.selectedOption, safeInputs.connectivity]);
 
-  // Set default selected values when lists/options arrive
   useEffect(() => {
     setInputs((prev) => {
       let isChanged = false;
@@ -232,7 +231,6 @@ export const InputSection = ({
         setExtraState((prev) => ({ ...prev, selectedProfile: currentValue }));
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safeContextData, section.fields]);
 
   const handleCustomizableSelect = (field, value) => {

@@ -1,4 +1,3 @@
-import React from "react";
 import { EngineeringModule } from "../shared/components/EngineeringModule";
 import { axiallyLoadedColumnConfig } from "./configs/axiallyLoadedColumnConfig";
 import { axiallyLoadedColumnOutputConfig } from "./configs/axiallyLoadedColumnOutputConfig";

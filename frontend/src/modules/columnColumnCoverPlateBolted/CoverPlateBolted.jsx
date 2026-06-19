@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../shared/components/EngineeringModule';
 import { coverPlateBoltedConfig } from './configs/coverPlateBoltedConfig';
 import { coverPlateBoltedOutputConfig } from './configs/coverPlateBoltedOutputConfig';

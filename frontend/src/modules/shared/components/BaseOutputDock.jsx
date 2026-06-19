@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 import { Input, Modal } from 'antd';
 import { getOutputImage } from "../config/outputImageMap";

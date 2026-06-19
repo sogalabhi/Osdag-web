@@ -1,5 +1,5 @@
+/* eslint-disable react/prop-types */
 // CleatAngleOutputDock.jsx - Fixed version
-import React from "react";
 import { BaseOutputDock } from "../../../shared/components/BaseOutputDock";
 import { cleatAngleOutputConfig } from "../configs/cleatAngleOutputConfig";
 import { UI_STRINGS } from '../../../../constants/UIStrings';

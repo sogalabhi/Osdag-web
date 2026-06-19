@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
 import { boltedToEndConfig } from './configs/boltedToEndConfig';
 import { boltedToEndOutputConfig } from './configs/boltedToEndOutputConfig';

@@ -1,13 +1,9 @@
-// Config for Struts Bolted to End Gusset (Compression Member with Bolted Connection)
-// Keys must match backend API (see compression_bolted.py input_values)
-// Section profile images
 import ANGLES from "../../../assets/CompressionMember/bA.png";
 import BACK_TO_BACK_ANGLES from "../../../assets/CompressionMember/bBBA.png";
 import STAR_ANGLES from "../../../assets/CompressionMember/bSA.png";
 import CHANNELS from "../../../assets/CompressionMember/bC.png";
 import BACK_TO_BACK_CHANNELS from "../../../assets/CompressionMember/bBBC.png";
 import ErrorImg from "../../../assets/notSelected.png";
-// End condition images
 import FIXED_FIXED from "../../../assets/CompressionMember/RRRRstrut.png";
 import FIXED_HINGED from "../../../assets/CompressionMember/RFRFstrut.png";
 import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
@@ -93,7 +89,7 @@ export const strutsBoltedConfig = {
     return FIXED_FIXED;
   },
 
-  validateInputs: (inputs, extraState) => {
+  validateInputs: (inputs) => {
     if (!inputs.section_profile) {
       return { isValid: false, message: "Please select a Section Profile." };
     }
@@ -103,7 +99,7 @@ export const strutsBoltedConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     // Helper to resolve lists
     const getList = (key, listName) => {
       if (allSelected?.[key]) {
@@ -209,7 +205,7 @@ export const strutsBoltedConfig = {
           key: "section_profile",
           label: "Section Profile*",
           type: "sectionProfileList",
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
+          onChange: (value, setInputs,setExtraState) => {
             const imageSource = strutsBoltedConfig.getSectionImage(value);
             setExtraState((extState) => ({
               ...extState,
@@ -237,7 +233,7 @@ export const strutsBoltedConfig = {
           key: "location",
           label: "Conn_Location *",
           type: "dynamicSelect",
-          getOptions: (inputs, extraState) => {
+          getOptions: (inputs) => {
             return strutsBoltedConfig.getLocationOptions(inputs.section_profile);
           }
         },
@@ -296,7 +292,7 @@ export const strutsBoltedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
+          onChange: (value, inputs, setInputs, setExtraState) => {
             const endImage = strutsBoltedConfig.getEndConditionImage(value, inputs.end_condition_2);
             setExtraState((extState) => ({
               ...extState,
@@ -316,7 +312,7 @@ export const strutsBoltedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
+          onChange: (value, inputs, setInputs, setExtraState) => {
             const endImage = strutsBoltedConfig.getEndConditionImage(inputs.end_condition_1, value);
             setExtraState((extState) => ({
               ...extState,
@@ -333,7 +329,7 @@ export const strutsBoltedConfig = {
           label: "",
           type: "image",
           conditionalDisplay: () => true,
-          imageSource: (extraState, inputs) => {
+          imageSource: (inputs) => {
             const end1 = inputs?.end_condition_1 || "Hinged";
             const end2 = inputs?.end_condition_2 || "Hinged";
             return strutsBoltedConfig.getEndConditionImage(end1, end2);

@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable react/prop-types */
 import { BaseOutputDock } from "../../../shared/components/BaseOutputDock";
 import { basePlateOutputConfig } from "../configs/basePlateOutputConfig";
 import { UI_STRINGS } from '../../../../constants/UIStrings';

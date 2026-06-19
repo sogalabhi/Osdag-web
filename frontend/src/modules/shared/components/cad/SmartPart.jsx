@@ -1,4 +1,6 @@
-import React, { useMemo, useState, useCallback } from 'react';
+/* eslint-disable react/prop-types */
+/* eslint-disable react/no-unknown-property */
+import { useMemo, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { useCursor } from '@react-three/drei';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
 import { onCantileverConfig } from './configs/onCantileverConfig';
 import { onCantileverOutputConfig } from './configs/onCantileverOutputConfig';

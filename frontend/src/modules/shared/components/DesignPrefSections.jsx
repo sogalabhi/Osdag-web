@@ -1,4 +1,5 @@
-import React, { useRef, useState, useContext, useEffect, useCallback } from "react";
+/* eslint-disable react/prop-types */
+import { useRef, useState, useContext, useEffect, useCallback } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import GenericSectionView from "./GenericSectionView";
 import { BEAM_DISPLAY_CONFIG, COLUMN_DISPLAY_CONFIG, ANGLE_DISPLAY_CONFIG } from "../config/sectionDisplayConfig";
@@ -238,15 +239,8 @@ const DesignPrefSections = ({
       cancelled = true;
       syncAbortRef.current?.abort();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once per modal open.
   }, [runSync, setDesignPrefOverrides, toStoredPrefOverrides]);
 
-  // Guards against spurious material-refresh triggers:
-  //  • Set to `true` on mount so the initial open-sync result does not immediately
-  //    re-trigger a refresh.
-  //  • Re-set to `true` before any managed operation (save / defaults) that explicitly
-  //    calls setDesignPrefOverrides, preventing a cascading redundant `refresh` request
-  //    caused by the resulting inputs change re-entering this effect.
   const skipMaterialRefresh = useRef(true);
   useEffect(() => {
     if (!syncReady) return;
@@ -260,7 +254,6 @@ const DesignPrefSections = ({
         setDesignPrefOverrides?.(toStoredPrefOverrides(r.data.resolved_inputs));
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runSync is stable; avoid reruns on callback identity.
   }, [
     inputs?.connector_material,
     inputs?.material,

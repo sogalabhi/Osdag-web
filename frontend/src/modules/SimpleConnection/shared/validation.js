@@ -13,8 +13,8 @@
  * @param {string} options.moduleType - 'bolted' or 'welded'
  * @returns {Object} Validation result with isValid, errors, and message
  */
-export function validateSimpleConnectionInputs(inputs, extraStateOrOptions, lists, selectionStates) {
-    // Handle both calling patterns:
+export function validateSimpleConnectionInputs(inputs, extraStateOrOptions, lists) {
+    // Handle both calling patterns:    
     // 1. validateSimpleConnectionInputs(inputs, { moduleType: 'bolted' })
     // 2. validateSimpleConnectionInputs(inputs, extraState, lists, selectionStates)
     let moduleType = 'bolted';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
 import { buttJointWeldedConfig } from './config/buttJointWeldedConfig';
 import { buttJointWeldedOutputConfig } from './config/buttJointWeldedOutputConfig';

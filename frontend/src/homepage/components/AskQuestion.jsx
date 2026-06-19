@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable react/prop-types */
 import osdagLogo from '../../assets/homepage/osdag_logo.png';
 
 export default function AskQuestion({ onClose }) {

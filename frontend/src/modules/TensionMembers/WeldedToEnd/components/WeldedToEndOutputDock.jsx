@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable react/prop-types */
 import { BaseOutputDock } from "../../../shared/components/BaseOutputDock";
 import { weldedToEndOutputConfig } from "../configs/weldedToEndOutputConfig";
 import { UI_STRINGS } from '../../../../constants/UIStrings';

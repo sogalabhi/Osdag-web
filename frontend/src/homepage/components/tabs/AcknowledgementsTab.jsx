@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import iitbLogo from "../../../assets/homepage/iitb_logo.png";
 import fosseeLogo from "../../../assets/homepage/fossee_logo.png";
 import insdagLogo from "../../../assets/homepage/insdag_logo.png";

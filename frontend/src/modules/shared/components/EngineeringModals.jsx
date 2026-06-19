@@ -1,4 +1,3 @@
-import React from "react";
 import { Modal, Button, Radio } from "antd";
 import { DesignReportModal } from "./DesignReportModal";
 import { CustomizationModal } from "./CustomizationModal";

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useContext, useEffect, useState } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
@@ -34,7 +35,6 @@ const OptimizationSectionModal = ({
         materialData: material[0],
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suppressInitialMaterialDispatch]);
 
   const handleMaterialChange = (value) => {

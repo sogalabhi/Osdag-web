@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { BaseOutputDock } from "../../../shared/components/BaseOutputDock";
 import { simplySupportedBeamOutputConfig } from "../configs/simplySupportedBeamOutputConfig";
 

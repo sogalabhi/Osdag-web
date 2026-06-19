@@ -40,14 +40,14 @@ export const buttJointWeldedConfig = {
 
     ],
 
-    validateInputs: (inputs, extraState, lists, selectionStates) => {
+    validateInputs: (inputs) => {
         // Validate inputs before API call - return early if invalid
         return validateSimpleConnectionInputs(inputs, { 
             moduleType: 'welded'
         });
     },
 
-    buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+    buildSubmissionParams: (inputs, allSelected, lists) => {
         const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
             if (allSelectedFlag) {
                 // Prefer full list; if not loaded yet, use already-synced selectedList (e.g. from useEffect)
@@ -86,7 +86,7 @@ export const buttJointWeldedConfig = {
                     label: KEY_DISP_PLATE1_THICKNESS,
                     type: "select",
                     options: "thicknessList",
-                    onChange: (value, inputs, setInputs, options) => {
+                    onChange: (value, inputs, setInputs) => {
                         setInputs({
                             ...inputs,
                             "plate1_thickness": value,
@@ -98,7 +98,7 @@ export const buttJointWeldedConfig = {
                     label: KEY_DISP_PLATE2_THICKNESS,
                     type: "select",
                     options: "thicknessList",
-                    onChange: (value, inputs, setInputs, options) => {
+                    onChange: (value, inputs, setInputs) => {
                         setInputs({
                             ...inputs,
                             "plate2_thickness": value,
@@ -130,7 +130,7 @@ export const buttJointWeldedConfig = {
                     label: KEY_DISP_COVER_PLT,
                     type: "select",
                     options: 'coverPlateList',
-                    onChange: (value, inputs, setInputs, options) => {
+                    onChange: (value, inputs, setInputs) => {
                         setInputs({
                             ...inputs,
                             "cover_plate": value,

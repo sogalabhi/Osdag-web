@@ -1,4 +1,4 @@
-import React from 'react';
+/* eslint-disable react/prop-types */
 import { Button, message } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';

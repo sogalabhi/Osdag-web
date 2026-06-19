@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
 import { weldedToEndConfig } from './configs/weldedToEndConfig';
 import { weldedToEndOutputConfig } from './configs/weldedToEndOutputConfig';

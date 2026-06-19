@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+/* eslint-disable react/prop-types */
+import { useEffect, useMemo, useState } from "react";
 import HelpDialogShell from "./HelpDialogShell";
 import {
   ABOUT_HTML,

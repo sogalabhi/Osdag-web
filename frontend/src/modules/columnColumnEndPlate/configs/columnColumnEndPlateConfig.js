@@ -52,7 +52,7 @@ export const columnColumnEndPlateConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraData) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
 
     return {
       "Member.Designation": inputs.supported_designation,

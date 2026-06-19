@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+/* eslint-disable react/prop-types */
+import { useMemo } from "react";
 
 /**
  * WeldDiagram renders an SVG representation of a splice plate weld layout.

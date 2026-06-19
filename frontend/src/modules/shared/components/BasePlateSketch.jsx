@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+/* eslint-disable react/prop-types */
+import { useMemo } from "react";
 
 const VIEWBOX_WIDTH = 600;
 const VIEWBOX_HEIGHT = 400;

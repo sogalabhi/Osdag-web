@@ -99,7 +99,7 @@ export const boltedToEndConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
       if (allSelectedFlag) {
         // Exclude "All" if present in the list
@@ -153,7 +153,7 @@ export const boltedToEndConfig = {
           key: "section_profile",
           label: "Section Profile*",
           type: "sectionProfileList",
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
+          onChange: (value, setInputs, _contextData, setExtraState) => {
             // Update image and reset section designation when profile changes
             const imageSource = boltedToEndConfig.getSectionImage(value);
             setExtraState((extState) => ({
@@ -182,7 +182,7 @@ export const boltedToEndConfig = {
           key: "location",
           label: "Conn_Location *",
           type: "dynamicSelect",
-          getOptions: (inputs, extraState) => {
+          getOptions: (inputs) => {
             return boltedToEndConfig.getLocationOptions(inputs.section_profile);
           }
         },

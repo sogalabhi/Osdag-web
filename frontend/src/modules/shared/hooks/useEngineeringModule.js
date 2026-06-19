@@ -1,4 +1,4 @@
-import { useState, useContext, useCallback, useEffect, useRef } from "react";
+import { useState, useContext, useCallback } from "react";
 import { useDesignPrefSync } from "./useDesignPrefSync";
 import { useNavigate } from "react-router-dom";
 import { ModuleContext } from "../../../context/ModuleState";
@@ -154,7 +154,7 @@ export const useEngineeringModule = (moduleConfig) => {
     resetModuleState();
     resetDesignState();
     resetFormState();
-    setSelectedView("Model");
+    // setSelectedView is managed by the CAD viewer component
   };
 
   const handleSubmit = async () => {
@@ -170,18 +170,6 @@ export const useEngineeringModule = (moduleConfig) => {
     });
   };
 
-  const handleReset = () => {
-    setConfirmationType("reset");
-    setShowResetConfirmation(true);
-  };
-
-  const handleHomeClick = () => {
-    if (hasUnsavedWork()) {
-      confirmNavigation("navigation", "home");
-    } else {
-      navigate("/home");
-    }
-  };
 
   const handleQuitClick = () => {
     if (hasUnsavedWork()) {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../../shared/components/EngineeringModule';
 import { simplySupportedBeamConfig } from './configs/simplySupportedBeamConfig';
 import { simplySupportedBeamOutputConfig } from './configs/simplySupportedBeamOutputConfig';

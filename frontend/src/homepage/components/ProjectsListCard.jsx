@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { Button, Popconfirm, message, Spin, Empty } from 'antd';
 import { DesignReportModal } from '../../modules/shared/components/DesignReportModal';

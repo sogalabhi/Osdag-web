@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+/* eslint-disable react/prop-types */
+import { useMemo } from "react";
 
 /**
  * Renders an SVG based spacing diagram similar to the desktop client.

@@ -20,6 +20,7 @@ export const createDesign = async (param, module_id, onCADSuccess = null, dispat
     } else if (status === 400) {
       dispatch && dispatch({ type: "SET_RENDER_CAD_MODEL_BOOLEAN", payload: false });
     } else {
+      // Non-400 error
     }
     return { status, body: jsonResponse };
   } catch (error) {

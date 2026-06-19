@@ -222,9 +222,6 @@ export const ModuleProvider = ({ children }) => {
 
       if (status < 200 || status >= 300) {
         let message = data.message || "CAD generation failed";
-
-        // eslint-disable-next-line no-alert
-        alert(message + " " + status);
         throw new Error(`CAD generation failed: ${status}`);
       }
 

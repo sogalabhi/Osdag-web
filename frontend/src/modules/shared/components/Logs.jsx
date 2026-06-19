@@ -1,4 +1,4 @@
-import React from 'react';
+/* eslint-disable react/prop-types */
 
 const Logs = ({ logs }) => {
   const safeLogs = logs || [];

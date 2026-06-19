@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from "react";
+/* eslint-disable react/prop-types */
+import { useRef, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 

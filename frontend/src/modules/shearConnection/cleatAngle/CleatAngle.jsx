@@ -1,5 +1,4 @@
 // CleatAngle.jsx - Fixed version
-import React from "react";
 import { EngineeringModule } from "../../shared/components/EngineeringModule";
 import { cleatAngleConfig } from "./configs/cleatAngleConfig";
 import { cleatAngleOutputConfig } from "./configs/cleatAngleOutputConfig";

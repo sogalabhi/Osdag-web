@@ -1,2 +1,3 @@
-import * as api from '../api/moduleApi';
-import * as utils from '../utils/moduleUtils';
+// Module context placeholder - re-exported utilities are consumed via direct imports
+export { createDesign } from '../api/moduleApi';
+export { convertToCSV, menuItems } from '../utils/moduleUtils';

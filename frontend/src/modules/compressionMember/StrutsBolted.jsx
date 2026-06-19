@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../shared/components/EngineeringModule';
 import { strutsBoltedConfig } from './configs/strutsBoltedConfig';
 import { strutsBoltedOutputConfig } from './configs/strutsBoltedOutputConfig';

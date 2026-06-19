@@ -89,13 +89,11 @@ export const weldedToEndConfig = {
         return { isValid: true };
     },
 
-    buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+    buildSubmissionParams: (inputs, allSelected, lists) => {
         const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
             if (allSelectedFlag) {
-                // Exclude "All" if present in the list
                 return fullList.filter(item => item !== "All");
             }
-            // Ensure always array
             if (Array.isArray(selectedList)) {
                 return selectedList.filter(item => item !== "All");
             }
@@ -134,8 +132,7 @@ export const weldedToEndConfig = {
                     key: "section_profile",
                     label: "Section Profile*",
                     type: "sectionProfileList",
-                    onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
-                        // Update image and reset section designation when profile changes
+                    onChange: (value, inputs, setInputs, _contextData, _extraState, setExtraState) => {
                         const imageSource = weldedToEndConfig.getSectionImage(value);
                         setExtraState((extState) => ({
                             ...extState,
@@ -145,7 +142,7 @@ export const weldedToEndConfig = {
                         setInputs((inps) => ({
                             ...inps,
                             section_profile: value,
-                            section_designation: [], // Reset section designation
+                            section_designation: [], 
                             location: weldedToEndConfig.getLocationOptions(value)[0]?.value || "Long Leg"
                         }));
                     }
@@ -163,7 +160,7 @@ export const weldedToEndConfig = {
                     key: "location",
                     label: "Conn_Location *",
                     type: "dynamicSelect",
-                    getOptions: (inputs, extraState) => {
+                    getOptions: (inputs) => {
                         return weldedToEndConfig.getLocationOptions(inputs.section_profile);
                     }
                 },

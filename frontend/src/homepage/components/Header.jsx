@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MODULE_ROUTES, MODULE_NAME_TO_KEY, CONNECTIONS_TAB_CONTENT, GENERIC_SUBMODULE_CONTENT } from '../../constants/modules';

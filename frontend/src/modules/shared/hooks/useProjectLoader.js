@@ -191,5 +191,5 @@ export const useProjectLoader = ({
       abortController.abort();
     };
 
-  }, [projectIdFromUrl, user, loading]);
+  }, [projectIdFromUrl, user, loading, designCompletedRef]);
 };

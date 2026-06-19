@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Select, Input } from "antd";
 import GenericConfigView from "./GenericConfigView";
 

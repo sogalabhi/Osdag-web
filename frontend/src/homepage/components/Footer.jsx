@@ -1,4 +1,3 @@
-import React from 'react';
 import fosseeLogo from '../../assets/homepage/fossee_logo.png';
 import governmentLogo from '../../assets/homepage/mos_logo.png';
 import constructsteelLogo from '../../assets/homepage/constructsteel_logo.png';

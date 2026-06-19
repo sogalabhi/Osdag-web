@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useMemo, useRef } from "react";
+/* eslint-disable react-refresh/only-export-components, react/prop-types */
+import { createContext, useContext, useEffect, useMemo, useRef } from "react";
 
 const ShortcutContext = createContext(null);
 
@@ -185,6 +186,6 @@ export const useShortcutLayer = ({
       },
     });
     return unregister;
-  }, [blockLower, id, priority, registerLayer]);
+  }, [blockLower, id, priority, registerLayer, detectMac]);
 };
 

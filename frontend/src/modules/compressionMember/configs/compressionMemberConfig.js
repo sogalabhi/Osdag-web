@@ -1,10 +1,5 @@
-// Config for Compression Member (Struts in Trusses)
-// Keys must match backend API (see compression.py input_values)
-
 export const compressionMemberConfig = {
   sessionName: "Compression Member Design",
-  // Must stay in sync with App route `/design/:designType/struts_in_trusses/:projectId?`
-  // and MODULE_ROUTES.StrutsInTrusses
   routePath: "/design/compression-member/struts_in_trusses",
   designType: "Compression-Member-Design",
   cameraKey: "CompressionMember", 
@@ -32,8 +27,6 @@ export const compressionMemberConfig = {
     { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
   ],
 
-
-  // Helper function to get section list based on profile  
   getDynamicSectionList: (profile, angleList) => {
     switch (profile) {
       case "Angles":
@@ -66,16 +59,7 @@ export const compressionMemberConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
-    const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
-      if (allSelectedFlag) {
-        return fullList.filter(item => item !== "All");
-      }
-      if (Array.isArray(selectedList)) {
-        return selectedList.filter(item => item !== "All");
-      }
-      return [selectedList].filter(item => item !== "All");
-    };
+  buildSubmissionParams: (inputs, allSelected, lists) => {
 
     const dynamicSectionList = compressionMemberConfig.getDynamicSectionList(
       inputs.section_profile,
@@ -115,7 +99,7 @@ export const compressionMemberConfig = {
             { value: "Back to Back Angles - Opposite side of gusset", label: "Back to Back Angles - Opposite side of gusset" }
           ],
           defaultValue: "Angles",
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
+          onChange: (value, inputs, setInputs) => {
             setInputs({
               ...inputs,
               section_profile: value,

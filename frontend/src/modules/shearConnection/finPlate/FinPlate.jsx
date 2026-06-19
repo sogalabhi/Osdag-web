@@ -1,4 +1,3 @@
-import React from "react";
 import { EngineeringModule } from "../../shared/components/EngineeringModule";
 import { finPlateConfig } from "./configs/finPlateConfig";
 import { finPlateOutputConfig } from "./configs/finPlateOutputConfig";

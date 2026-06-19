@@ -1,4 +1,3 @@
-import React from 'react';
 import { EngineeringModule } from '../shared/components/EngineeringModule';
 import { beamToColumnEndPlateConfig } from './configs/beamToColumnEndPlateConfig';
 import { beamToColumnEndPlateOutputConfig } from './configs/beamToColumnEndPlateOutputConfig';

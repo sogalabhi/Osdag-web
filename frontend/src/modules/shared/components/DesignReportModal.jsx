@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+/* eslint-disable react/prop-types */
+import { useState } from 'react';
 import { Modal, Row, Col, Input, Button, Upload, Spin, message } from 'antd';
 import { ReportCustomizationModal } from './ReportCustomizationModal';
 import { useEngineeringService } from '../hooks/useEngineeringService';

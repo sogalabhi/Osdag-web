@@ -30,8 +30,6 @@ export const buttJointBoltedConfig = {
         detailing_edge_type: "Sheared or hand flame cut",
         cover_plate: "Single-Cover",
         bolt_tension_type: "Non Pre-tensioned",
-        bolt_hole_type: "Standard",
-        bolt_slip_factor: "0.3",
         design_for: "Tension",
     },
 
@@ -46,17 +44,15 @@ export const buttJointBoltedConfig = {
 
     ],
 
-    validateInputs: (inputs, extraState, lists, selectionStates) => {
-        // Validate inputs before API call - return early if invalid
+    validateInputs: (inputs) => {
         return validateSimpleConnectionInputs(inputs, { 
             moduleType: 'bolted'
         });
     },
 
-    buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+    buildSubmissionParams: (inputs, allSelected, lists) => {
         const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
             if (allSelectedFlag) {
-                // Prefer full list; if not loaded yet, use already-synced selectedList (e.g. from useEffect)
                 const list = Array.isArray(fullList) && fullList.length ? fullList : (Array.isArray(selectedList) ? selectedList : []);
                 return list.filter(item => item !== "All");
             }
@@ -107,7 +103,7 @@ export const buttJointBoltedConfig = {
                     label: KEY_DISP_PLATE1_THICKNESS,
                     type: "select",
                     options: "thicknessList",
-                    onChange: (value, inputs, setInputs, options) => {
+                    onChange: (value, inputs, setInputs) => {
                         setInputs({
                             ...inputs,
                             "plate1_thickness": value,
@@ -119,7 +115,7 @@ export const buttJointBoltedConfig = {
                     label: KEY_DISP_PLATE2_THICKNESS,
                     type: "select",
                     options: "thicknessList",
-                    onChange: (value, inputs, setInputs, options) => {
+                    onChange: (value, inputs, setInputs) => {
                         setInputs({
                             ...inputs,
                             "plate2_thickness": value,
@@ -136,7 +132,7 @@ export const buttJointBoltedConfig = {
                     label: KEY_DISP_COVER_PLT,
                     type: "select",
                     options: 'coverPlateList',
-                    onChange: (value, inputs, setInputs, options) => {
+                    onChange: (value, inputs, setInputs) => {
                         setInputs({
                             ...inputs,
                             "cover_plate": value,

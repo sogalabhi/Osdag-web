@@ -7,7 +7,7 @@ import {
   KEY_MODULE, KEY_SEC_PROFILE, KEY_SECSIZE, KEY_MATERIAL, KEY_SEC_MATERIAL,
   KEY_DP_DESIGN_METHOD, KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, 
   KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH, KEY_SHEAR, KEY_MOMENT,
-  KEY_LENGTH, KEY_SUPPORT, KEY_TORSIONAL_RES, KEY_WARPING_RES, KEY_DESIGN_TYPE_FLEXURE
+  KEY_LENGTH, KEY_SUPPORT, KEY_TORSIONAL_RES, KEY_WARPING_RES
 } from "../../../../constants/DesignKeys";
 
 export const simplySupportedBeamConfig = {
@@ -94,16 +94,7 @@ export const simplySupportedBeamConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
-    const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
-      if (allSelectedFlag) {
-        return fullList.filter(item => item !== "All");
-      }
-      if (Array.isArray(selectedList)) {
-        return selectedList.filter(item => item !== "All");
-      }
-      return [selectedList].filter(item => item !== "All");
-    };
+  buildSubmissionParams: (inputs, allSelected, lists) => {
 
     const dynamicSectionList = simplySupportedBeamConfig.getDynamicSectionList(
       inputs.section_profile,

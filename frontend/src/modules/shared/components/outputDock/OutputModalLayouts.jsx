@@ -1,5 +1,5 @@
-/* eslint-disable react-refresh/only-export-components */
-import React from "react";
+/* eslint-disable react-refresh/only-export-components, react/prop-types */
+import { Fragment } from "react";
 import SpacingDiagram from "../SpacingDiagram";
 import BasePlateSketch from "../BasePlateSketch";
 import CapacityDiagram from "../CapacityDiagram";
@@ -159,7 +159,7 @@ function SingleColumnLayout({ fields, output, getOutputValue, ValueBox }) {
               lastSection = section;
             }
             return (
-              <React.Fragment key={idx}>
+              <Fragment key={idx}>
                 {showSection && (
                   <h3 className="text-sm font-bold text-gray-800 border-b pb-1 dark:text-gray-200 mt-4 mb-2 first:mt-0">
                     {section}
@@ -169,7 +169,7 @@ function SingleColumnLayout({ fields, output, getOutputValue, ValueBox }) {
                   <h4 dangerouslySetInnerHTML={{ __html: label }} />
                   <ValueBox value={getOutputValue(key, output)} />
                 </div>
-              </React.Fragment>
+              </Fragment>
             );
           })
         ) : (

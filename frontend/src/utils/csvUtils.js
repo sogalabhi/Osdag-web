@@ -12,7 +12,7 @@ export const convertToCSV = (data) => {
   const flattenObject = (obj, prefix = '') => {
     const flattened = {};
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const newKey = prefix ? `${prefix}.${key}` : key;
         const value = obj[key];
 

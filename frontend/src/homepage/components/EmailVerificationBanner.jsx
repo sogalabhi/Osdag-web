@@ -1,6 +1,7 @@
+/* eslint-disable react/prop-types */
 import { Alert, Button, Space } from 'antd';
 import { MailOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { resendEmailVerification } from '../../utils/firebaseAuth';
 
 /**

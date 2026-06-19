@@ -73,7 +73,7 @@ export const strutsWeldedConfig = {
     return FIXED_FIXED;
   },
 
-  validateInputs: (inputs, extraState) => {
+  validateInputs: (inputs) => {
     if (!inputs.section_profile) {
       return { isValid: false, message: "Please select a Section Profile." };
     }
@@ -83,7 +83,7 @@ export const strutsWeldedConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     const getList = (key, listName) => {
       if (allSelected?.[key]) {
         return lists?.[listName]?.map(item => String(item.value || item.Grade || item)) || [];
@@ -173,7 +173,7 @@ export const strutsWeldedConfig = {
           key: "section_profile",
           label: "Section Profile*",
           type: "sectionProfileList",
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
+          onChange: (value, setInputs, setExtraState) => {
             const imageSource = strutsWeldedConfig.getSectionImage(value);
             setExtraState((extState) => ({
               ...extState,
@@ -201,7 +201,7 @@ export const strutsWeldedConfig = {
           key: "location",
           label: "Conn_Location *",
           type: "dynamicSelect",
-          getOptions: (inputs, extraState) => {
+          getOptions: (inputs) => {
             return strutsWeldedConfig.getLocationOptions(inputs.section_profile);
           }
         },
@@ -251,7 +251,7 @@ export const strutsWeldedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
+          onChange: (value, inputs, setInputs, setExtraState) => {
             const endImage = strutsWeldedConfig.getEndConditionImage(value, inputs.end_condition_2);
             setExtraState((extState) => ({
               ...extState,
@@ -271,7 +271,7 @@ export const strutsWeldedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
+          onChange: (value, inputs, setInputs, setExtraState) => {
             const endImage = strutsWeldedConfig.getEndConditionImage(inputs.end_condition_1, value);
             setExtraState((extState) => ({
               ...extState,
@@ -288,7 +288,7 @@ export const strutsWeldedConfig = {
           label: "",
           type: "image",
           conditionalDisplay: () => true,
-          imageSource: (extraState, inputs) => {
+          imageSource: (inputs) => {
             const end1 = inputs?.end_condition_1 || "Hinged";
             const end2 = inputs?.end_condition_2 || "Hinged";
             return strutsWeldedConfig.getEndConditionImage(end1, end2);

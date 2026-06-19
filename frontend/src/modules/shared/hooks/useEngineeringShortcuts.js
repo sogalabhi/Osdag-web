@@ -12,7 +12,6 @@ export const useEngineeringShortcuts = ({
   handleResetEnhanced,
   handleLockToggle,
   showCad,
-  selectedCameraView,
   setSelectedCameraView,
   hasModalContext,
   output,

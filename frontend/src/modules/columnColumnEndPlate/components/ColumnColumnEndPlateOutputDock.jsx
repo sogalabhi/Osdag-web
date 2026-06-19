@@ -1,4 +1,4 @@
-import React from 'react';
+/* eslint-disable react/prop-types */
 import { BaseOutputDock } from '../../shared/components/BaseOutputDock';
 import { columnColumnEndPlateOutputConfig } from '../configs/columnColumnEndPlateOutputConfig';
 

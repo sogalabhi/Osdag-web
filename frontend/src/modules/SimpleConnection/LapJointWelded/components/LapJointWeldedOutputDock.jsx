@@ -1,4 +1,3 @@
-import React from "react";
 import { BaseOutputDock } from "../../../shared/components/BaseOutputDock";
 import { lapJointWeldedOutputConfig } from "../config/lapJointWeldedOutputConfig";
 import { UI_STRINGS } from '../../../../constants/UIStrings';

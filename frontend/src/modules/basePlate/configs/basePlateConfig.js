@@ -28,7 +28,7 @@ export const basePlateConfig = {
     weld_type: "Fillet Weld",
   },
 
-  validateInputs: (inputs, extraState, lists, selectionStates) => {
+  validateInputs: (inputs, _extraState, _lists, selectionStates) => {
     if (!inputs.connectivity || !inputs.material) {
       return { isValid: false, message: UI_STRINGS.PLEASE_INPUT_ALL_FIELDS };
     }
@@ -62,7 +62,7 @@ export const basePlateConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     const section = inputs.member_designation;
     const memberDesignation =
       section != null && String(section).trim() !== "" ? String(section).trim() : "";

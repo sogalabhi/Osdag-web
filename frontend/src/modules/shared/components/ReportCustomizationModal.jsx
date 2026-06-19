@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import { useState, useEffect } from 'react';
 import { Modal, Row, Col, Input, Button, Upload, Tree, Checkbox, Spin, message } from 'antd';
 
 const { TreeNode } = Tree;

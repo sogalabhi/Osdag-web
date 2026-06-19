@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { BaseOutputDock } from "../../shared/components/BaseOutputDock";
 import { compressionMemberOutputConfig } from "../configs/compressionMemberOutputConfig";
 

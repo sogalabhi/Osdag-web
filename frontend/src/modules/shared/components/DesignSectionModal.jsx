@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Select } from "antd";
 
 const { Option } = Select;

@@ -13,9 +13,7 @@ export const useOsiFileHandlers = ({ form, moduleData, actions }, moduleConfig) 
     setDesignPrefOverrides,
     extraState,
     setExtraState,
-    selectionStates,
     setSelectionStates,
-    selectedItems,
     setSelectedItems,
   } = form;
 
@@ -100,7 +98,7 @@ export const useOsiFileHandlers = ({ form, moduleData, actions }, moduleConfig) 
             setDesignPrefOverrides,
             setExtraState,
             setSelectionStates,
-            setAllSelected,
+            setAllSelected: () => {},
             setSelectedItems,
             moduleConfig,
             safeModuleData: contextData || {},
