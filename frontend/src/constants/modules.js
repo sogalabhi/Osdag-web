@@ -33,7 +33,7 @@ export const MODULE_SUBMODULES = {
         { key: "Shear", label: UI_STRINGS.SHEAR_CONNECTION },
         { key: "Moment", label: UI_STRINGS.MOMENT_CONNECTION },
         { key: "BasePlate", label: UI_STRINGS.BASE_PLATE },
-        { key: "Truss", label: "Truss Connection" },
+        { key: "Truss", label: "Truss Connection", status: "development" },
     ],
     TensionMember: [{ key: "Tension", label: UI_STRINGS.TENSION_MEMBER }],
     CompressionMember: [{ key: "Compression", label: UI_STRINGS.COMPRESSION_MEMBER }],
@@ -89,6 +89,7 @@ export const CONNECTIONS_TAB_CONTENT = {
         {
             label: "PEB",
             options: [],
+            status: "development",
         },
     ],
     BasePlate: [
@@ -127,7 +128,7 @@ export const GENERIC_SUBMODULE_CONTENT = {
             options: [
                 { key: MODULE_KEY_SIMPLY_SUPPORTED_BEAM, label: "Simply Supported Beam", img: "ss_beam_flexural_mem.png" },
                 { key: "OnCantilever", label: "Cantilever Beam", img: "cantilever_beam_flexural_mem.png" },
-                { key: "PlateGirder", label: "Plate Girder", img: "plate_girder_flexural_mem.png" },
+                { key: "PlateGirder", label: "Plate Girder", img: "plate_girder_flexural_mem.png", status: "development" },
             ],
         },
     ],

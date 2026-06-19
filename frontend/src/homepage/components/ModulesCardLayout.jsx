@@ -8,6 +8,7 @@ import {
 } from "../../constants/modules";
 
 import SectionCards from "./SectionCards";
+import { toast } from "react-toastify";
 
 const TabbedModulePage = () => {
   const moduleName = window.location.pathname.split("/")[1] || "";
@@ -41,6 +42,21 @@ const TabbedModulePage = () => {
 
     if (route) {
       navigate(route);
+    } else {
+      let optionLabel = "";
+      const allContents = [
+        ...Object.values(CONNECTIONS_TAB_CONTENT).flat(),
+        ...Object.values(GENERIC_SUBMODULE_CONTENT).flat(),
+      ];
+      for (const section of allContents) {
+        const option = section.options?.find((o) => o.key === optionKey);
+        if (option) {
+          optionLabel = option.label;
+          break;
+        }
+      }
+      const labelToShow = optionLabel || optionKey;
+      toast.info(`${labelToShow} module is under development.`);
     }
   };
 
@@ -113,8 +129,8 @@ const TabbedModulePage = () => {
     <div className="w-full p-4 sm:p-8 dark:text-gray-300" onKeyDown={handleWrapperKeyDown}>
       {/* Submodules Tabs */}
       <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row mb-8 gap-2" role="tablist" aria-label="Submodules">
-        {submodules.map(({ key, label }, index) => {
-          const isDisabled = key === "Truss";
+        {submodules.map(({ key, label, status }, index) => {
+          const isDisabled = status === "development";
 
           return (
             <button
@@ -149,14 +165,14 @@ const TabbedModulePage = () => {
       {/* Sub-SubModules Tabs */}
       {activeSubmodule === "Moment" && (
         <div className="flex flex-row mb-8 gap-3">
-          {content.map(({ label }) => (
+          {content.map(({ label, status }) => (
             <button
               key={label}
-              onClick={() => label !== "PEB" && setActiveSubSubmodule(label)}
-              disabled={label === "PEB"}
+              onClick={() => status !== "development" && setActiveSubSubmodule(label)}
+              disabled={status === "development"}
               className={`flex-1 py-2 sm:py-3 text-base sm:text-lg font-semibold border rounded-md transition-colors duration-150
               ${
-                label === "PEB"
+                status === "development"
                 ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
                 : activeSubSubmodule === label
                 ? "bg-osdag-green text-white border-osdag-green"

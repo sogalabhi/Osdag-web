@@ -56,6 +56,8 @@ import CoverPlateWelded from "./modules/coverPlateWelded/CoverPlateWelded";
 import BasePlate from "./modules/basePlate/BasePlate";
 
 import "./App.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import BeamToColumnEndPlate from "./modules/beamToColumnEndPlate/BeamToColumnEndPlate";
 import ShortcutHelpModal from "./components/ShortcutHelpModal";
 
@@ -122,6 +124,7 @@ function App() {
           <ShortcutProvider>
             <div className="app">
               <ShortcutHelpModal />
+              <ToastContainer position="top-right" autoClose={3000} />
               <RouterProvider router={router} />
             </div>
           </ShortcutProvider>

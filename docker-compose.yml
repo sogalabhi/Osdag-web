@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-password}
       POSTGRES_DB: ${DATABASE_NAME:-postgres_Intg_osdag}
     ports:
-      - "5433:5432"
+      - "${DB_HOST_PORT:-5433}:5432"
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
     healthcheck:
@@ -34,7 +34,7 @@ services:
       dockerfile: Dockerfile
       network: host
     restart: unless-stopped
-    user: "1000:1000"
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     ports:
       - "8000:8000"
     volumes:
@@ -85,7 +85,7 @@ services:
       dockerfile: Dockerfile
       network: host
     restart: unless-stopped
-    user: "1000:1000" # Fixed mapping profile matching your laptop workspace properties
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     volumes:
       - .:/app
     environment:
