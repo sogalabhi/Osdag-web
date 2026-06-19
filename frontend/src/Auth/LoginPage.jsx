@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import icon from '../assets/logo-osdag.png';
 import { Modal, Button, Alert, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { apiBase } from '../api';
 import {
     signupWithFirebase,
     loginWithFirebase,
@@ -159,7 +158,7 @@ const LoginPage = () => {
         try {
             if (isSignup) {
                 // Firebase Email/Password Signup
-                const { emailVerified } = await signupWithFirebase(email, password);
+                await signupWithFirebase(email, password);
 
                 setSuccessMessage("Account created successfully! Please check your email to verify your account.");
                 setIsSignup(false);
@@ -168,7 +167,7 @@ const LoginPage = () => {
                 setConfirmPassword('');
             } else {
                 // Firebase Email/Password Login
-                const { emailVerified, user } = await loginWithFirebase(email, password);
+                const { emailVerified } = await loginWithFirebase(email, password);
 
                 // Always allow login - verification is for authorization, not authentication
                 navigate('/home');
@@ -582,7 +581,7 @@ const LoginPage = () => {
                             )}
 
                             <p className="mb-4 text-sm text-gray-600">
-                                Enter your email address and we'll send you a link to reset your password.
+                                {"Enter your email address and we'll send you a link to reset your password."}
                             </p>
 
                             <label htmlFor="resetemail" className='flex flex-col'>

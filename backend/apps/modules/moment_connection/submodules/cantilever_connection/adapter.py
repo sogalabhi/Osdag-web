@@ -476,7 +476,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 # Check if it's a TextBox type and has a valid key
                 if param_type == "TextBox" and key is not None:
                     # Handle numpy types
-                    if hasattr(value, 'item'):  # numpy scalar
+                    if hasattr(value, 'item'):
                         value = value.item()
                     
                     output[key] = {
@@ -487,10 +487,9 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                     processed_count += 1
                 else:
                     skipped_count += 1
-                    if i < 5:  # Only print details for first few
-                        print(f"    âš ï¸ Skipped: type={param_type}, key={key}")
+                    if i < 5:
+                        print(f"    Skipped: type={param_type}, key={key}")
         
-        print(f"âœ… Processed {processed_count} parameters, skipped {skipped_count}")
     except Exception as e:
         print("\n" + "=" * 60)
         print("ERROR in generate_output()")
@@ -510,7 +509,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 if hasattr(module, 'design_status'):
                     print(f"   Module design_status: {module.design_status}")
         
-        # Check if exception has error attribute
         if hasattr(e, 'error'):
             print(f"Exception has 'error' attribute: {e.error}")
             if e.error is None:
@@ -525,8 +523,6 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         import traceback
         traceback.print_exc()
         print("=" * 60)
-        
-        # Re-raise the exception so service layer can handle it
         raise
     
     print("\n" + "=" * 60)
@@ -547,22 +543,15 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
 def create_cad_model(input_values: Dict[str, Any], section: str, session: str, export_formats=None) -> str:
     """Generate the CAD model from input values as a BREP file. Return file path."""
-    if section not in ("Model", "Beam", "Column", "Plate"):  # Error checking: If section is valid.
+    if section not in ("Model", "Beam", "Column", "Plate"):
         raise InvalidInputTypeError(
             "section", "'Model', 'Beam', 'Column' or 'Plate'")
-    module = create_from_input(input_values)  # Create module from input.
+    module = create_from_input(input_values)
     print('module from input values : ' , module)
     print('module.module value:', repr(module.module))
-    # IMPORTANT: Ensure module.module is set to KEY_DISP_Cantilever for CAD generation
-    # module.module might be overwritten by input dictionary value
     if module.module != KEY_DISP_Cantilever:
         print(f'WARNING: module.module is {repr(module.module)}, setting to KEY_DISP_Cantilever')
         module.module = KEY_DISP_Cantilever
-    # Object that will create the CAD model.
-    # CommonDesignLogic signature: (display, cad_widget, folder, connection, mainmodule)
-    # connection should be KEY_DISP_Cantilever ('CantileverConnection') for proper CAD generation
-    # Force use of KEY_DISP_Cantilever since module.module might be set to input value (e.g., "CantileverConnection")
-    # instead of the display constant ("CantileverConnection")
     connection_key = KEY_DISP_Cantilever
     print('Using connection key:', repr(connection_key))
     print('KEY_DISP_Cantilever value:', repr(KEY_DISP_Cantilever))
@@ -572,18 +561,14 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     except Exception as e : 
         print('error in cld e : ' , e)
         traceback.print_exc()
-        raise  # Re-raise to prevent using undefined cld
+        raise 
     
     try : 
-        # Setup the calculations object for generating CAD model.
         scc.setup_for_cad(cld, module)
     except Exception as e : 
         traceback.print_exc()
         print('Error in setting up cad e : ' , e)
-        raise  # Re-raise to prevent using undefined cld
-
-    # The section of the module that will be generated.
-    # Explicitly skip merged Model generation; only per-part files are needed.
+        raise  
     if section == "Model":
         print("[CAD Adapter] Skipping Model generation (per requirement: only per-part files)")
         return None
@@ -591,28 +576,18 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     cld.component = section
     print(f'[CAD Adapter] Setting cld.component = {section}')
 
-    # Only per-part generation
-    part_names = []
-    part_files = {}
-    compound_model = None
 
     try:
-        print(f'[CAD Adapter] Generating individual part: cld.component = {cld.component}')
         model = cld.create2Dcad()
-        print(f'[CAD Adapter] Generated model type: {type(model)}')
     except Exception as e :
-        print('Error in cld.create2Dcad() e : ' , e)
         return False
 
-    # check if the cad_models folder exists or not 
-    # if no, then create one 
     cad_models_path = os.path.join(os.getcwd(), "file_storage", "cad_models")
     if not os.path.exists(cad_models_path):
         print('path does not exists cad_models , creating one')
         os.makedirs(cad_models_path, exist_ok=True)
       
     print('2d model : ' , model)
-    # os.system("clear")  # clear the terminal
     file_name = session + "_" + section + ".brep"
     file_path = "file_storage/cad_models/" + file_name
     print('brep file path in create_cad_model : ' , file_path)
@@ -622,7 +597,6 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     except Exception as e : 
         print('Writing to BREP file failed e : ' , e)
 
-    # Export single STL next to BREP
     try:
         single_stl_rel = file_path.replace(".brep", ".stl")
         write_stl(model, os.path.join(os.getcwd(), single_stl_rel))

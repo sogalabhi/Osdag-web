@@ -2,7 +2,7 @@ import { Navigate, useParams, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProjectAuthGuard = () => {
-  const { user, loading, isGuest } = useAuth();
+  const { loading, isGuest } = useAuth();
   const { projectId } = useParams();
   const location = useLocation();
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React from "react";
 import SpacingDiagram from "../SpacingDiagram";
 import BasePlateSketch from "../BasePlateSketch";

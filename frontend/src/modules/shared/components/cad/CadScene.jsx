@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import { OrbitControls } from "@react-three/drei";
 import { useMemo, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
@@ -22,7 +23,9 @@ function CadScene({
   ];
 
   // 1. Prepare View Logic
-  const activeViews = selectedViews && Array.isArray(selectedViews) ? selectedViews : [selectedView];
+  const activeViews = useMemo(() => {
+    return selectedViews && Array.isArray(selectedViews) ? selectedViews : [selectedView];
+  }, [selectedViews, selectedView]);
   const primaryView = activeViews[0] || selectedView;
 
   // 2. Prepare Position Logic

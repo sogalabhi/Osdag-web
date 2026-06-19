@@ -34,6 +34,7 @@ const OptimizationSectionModal = ({
         materialData: material[0],
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suppressInitialMaterialDispatch]);
 
   const handleMaterialChange = (value) => {

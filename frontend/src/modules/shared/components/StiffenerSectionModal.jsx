@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
 import CustomMaterialModal from "./CustomMaterialModal";
@@ -12,7 +12,6 @@ const readOnlyFontStyle = {
 };
 
 const StiffenerSectionModal = ({
-  supportingSectionData,
   designPrefInputs,
   setDesignPrefInputs,
   isInputLocked,
@@ -37,6 +36,7 @@ const StiffenerSectionModal = ({
         materialData: material[0],
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suppressInitialMaterialDispatch]);
 
   const selectedMaterialGrade = designPrefInputs["Stiffener_Key.Material"] || designPrefInputs.supporting_material || "";
