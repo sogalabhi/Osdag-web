@@ -221,8 +221,8 @@ export const ModuleProvider = ({ children }) => {
       }
 
       if (status < 200 || status >= 300) {
-        let message = data.message || "CAD generation failed";
-        throw new Error(`CAD generation failed: ${status}`);
+        const errMsg = data.message || `CAD generation failed: ${status}`;
+        throw new Error(errMsg);
       }
 
       if (status === 201 && data.status === "success") {

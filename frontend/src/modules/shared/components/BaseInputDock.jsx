@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { message } from "antd";
 import { InputSection } from "./InputSection";
 import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
@@ -260,3 +260,4 @@ export const BaseInputDock = React.memo(({
     </div>
   );
 });
+BaseInputDock.displayName = "BaseInputDock";

@@ -54,11 +54,8 @@ export const EngineeringLayout = () => {
     setInputs,
     selectionStates,
     updateSelectionState,
-    allSelected,
     toggleAllSelected,
-    selectedItems,
     updateSelectedItems,
-    modalDynamicSrc,
     setModalDynamicSrc,
   } = form;
 

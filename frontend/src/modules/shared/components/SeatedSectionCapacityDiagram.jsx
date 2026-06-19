@@ -6,10 +6,6 @@ const BlueBolt = ({ cx, cy }) => (
 
 const SeatedSectionCapacityDiagram = ({
   gauge = 70.0,
-  end = 65.0,
-  pitch = 290.0,
-  rows = 1,
-  cols = 2,
   className = "",
 }) => {
   const gVal = Number(gauge) || 70.0;
@@ -127,7 +123,7 @@ const SeatedSectionCapacityDiagram = ({
 };
 
 // Simple scale factor helper to make dimension readings relative
-const scaleFactor = (gauge) => {
+const scaleFactor = () => {
   return 1;
 };
 

@@ -37,6 +37,7 @@ const StiffenerSectionModal = ({
         materialData: material[0],
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suppressInitialMaterialDispatch]);
 
   const selectedMaterialGrade = designPrefInputs["Stiffener_Key.Material"] || designPrefInputs.supporting_material || "";

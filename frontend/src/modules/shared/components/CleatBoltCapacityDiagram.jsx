@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import { useMemo } from "react";
 
 /**
  * CleatBoltCapacityDiagram renders the bolt-capacity failure pattern drawing
@@ -23,12 +22,9 @@ import { useMemo } from "react";
  *  - angleDesignation: e.g. "75 75 6" — leg lengths from first two digits
  */
 
-const W = 500;   // SVG width for one panel
-const H = 290;   // SVG height for one panel
 const PLATE_W = 160;
 const PLATE_H = 230;
 const STRIP_W = 14;
-const START_X = 80;
 const START_Y = 30;
 
 const toNum = (v, fallback = 0) => {
@@ -37,19 +33,7 @@ const toNum = (v, fallback = 0) => {
 };
 
 // Minimal annotation arrow
-const HorizDim = ({ x1, x2, y, label, above = true }) => {
-  if (Math.abs(x2 - x1) < 4) return null;
-  const mid = (x1 + x2) / 2;
-  const textY = above ? y - 16 : y + 6;
-  return (
-    <g>
-      <line x1={x1} y1={y} x2={x2} y2={y} stroke="#555" strokeWidth="1" />
-      <line x1={x1} y1={y - 5} x2={x1} y2={y + 5} stroke="#555" strokeWidth="1" />
-      <line x1={x2} y1={y - 5} x2={x2} y2={y + 5} stroke="#555" strokeWidth="1" />
-      <text x={mid} y={textY} textAnchor="middle" fontSize="10" fill="#444" fontFamily="monospace">{label}</text>
-    </g>
-  );
-};
+
 
 const VertDim = ({ x, y1, y2, label }) => {
   if (Math.abs(y2 - y1) < 4) return null;
@@ -134,7 +118,7 @@ function TensionFailureLines({ x, topBoltY, botBoltY, leg }) {
   }
 }
 
-function CapPanel({ mode, leg, topBoltY, botBoltY, leftX, rightX, end, pitch }) {
+function CapPanel({ mode, leg, topBoltY, botBoltY, leftX, rightX }) {
   const stripOnRight = leg === "supported";  // supported: strip on right (plate connects to beam)
   return (
     <g>
@@ -164,14 +148,9 @@ function CapPanel({ mode, leg, topBoltY, botBoltY, leftX, rightX, end, pitch }) 
 
 const CleatBoltCapacityDiagram = ({
   leg = "supported",
-  plateHeight,
   boltRows,
-  boltCols,
   pitch,
   end,
-  edge,
-  gauge1,
-  holeDiameter,
   className = "",
 }) => {
   const rows = toNum(boltRows, 2);
@@ -193,7 +172,7 @@ const CleatBoltCapacityDiagram = ({
       <div>
         <p className="mb-1 text-xs font-semibold text-gray-600 uppercase tracking-wide">Failure Pattern due to Shear</p>
         <svg viewBox={`0 0 ${FULL_W} ${PANEL_H}`} className="w-full max-w-xl h-auto">
-          <CapPanel mode="shear" leg={leg} topBoltY={topBoltY} botBoltY={botBoltY} leftX={leftX} rightX={rightX} end={endV} pitch={pitchV} />
+          <CapPanel mode="shear" leg={leg} topBoltY={topBoltY} botBoltY={botBoltY} leftX={leftX} rightX={rightX} />
           {/* Dim annotations */}
           {endV > 0 && <VertDim x={rightX + PLATE_W + 18} y1={START_Y} y2={topBoltY} label={`${endV}`} />}
           {pitchV > 0 && rows >= 2 && <VertDim x={rightX + PLATE_W + 18} y1={topBoltY} y2={botBoltY} label={`${pitchV}`} />}
@@ -204,7 +183,7 @@ const CleatBoltCapacityDiagram = ({
       <div>
         <p className="mb-1 text-xs font-semibold text-gray-600 uppercase tracking-wide">Failure Pattern due to Tension</p>
         <svg viewBox={`0 0 ${FULL_W} ${PANEL_H}`} className="w-full max-w-xl h-auto">
-          <CapPanel mode="tension" leg={leg} topBoltY={topBoltY} botBoltY={botBoltY} leftX={leftX} rightX={rightX} end={endV} pitch={pitchV} />
+          <CapPanel mode="tension" leg={leg} topBoltY={topBoltY} botBoltY={botBoltY} leftX={leftX} rightX={rightX} />
           {endV > 0 && <VertDim x={rightX + PLATE_W + 18} y1={START_Y} y2={topBoltY} label={`${endV}`} />}
           {pitchV > 0 && rows >= 2 && <VertDim x={rightX + PLATE_W + 18} y1={topBoltY} y2={botBoltY} label={`${pitchV}`} />}
           {endV > 0 && <VertDim x={rightX + PLATE_W + 18} y1={botBoltY} y2={START_Y + PLATE_H} label={`${endV}`} />}

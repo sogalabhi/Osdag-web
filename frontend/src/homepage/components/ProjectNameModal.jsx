@@ -102,7 +102,7 @@ const ProjectNameModal = ({
               fontSize: '14px',
               color: '#666'
             }}>
-              You're about to {title.toLowerCase().includes('open') ? 'open' : 'create'} a project for: <strong>{moduleName}</strong>
+              You&apos;re about to {title.toLowerCase().includes('open') ? 'open' : 'create'} a project for: <strong>{moduleName}</strong>
             </p>
           )}
           <p style={{

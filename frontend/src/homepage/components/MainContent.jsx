@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import DashboardSectionCard from './DashboardSectionCard';
 import ProjectsListCard from './ProjectsListCard';
 import ModulesListCard from './ModulesListCard';
-import { isGuestUser, getCurrentUserEmail } from '../../utils/auth';
+import { isGuestUser } from '../../utils/auth';
 import { getModuleDisplayName } from '../../constants/moduleNames';
 import { listProjects, deleteProject as deleteProjectApi } from "../../datasources/projectsDataSource";
 
@@ -10,7 +10,6 @@ const MainContent = () => {
   const isGuest = isGuestUser();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const userEmail = getCurrentUserEmail();
 
   useEffect(() => {
     if (isGuest) {

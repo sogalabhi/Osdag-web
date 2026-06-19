@@ -18,9 +18,7 @@ import { lapJointWeldedConfig } from '../../modules/SimpleConnection/LapJointWel
 import { lapJointBoltedConfig } from '../../modules/SimpleConnection/LapJointBolted/config/lapJointBoltedConfig';
 import { buttJointWeldedConfig } from '../../modules/SimpleConnection/ButtJointWelded/config/buttJointWeldedConfig';
 import { buttJointBoltedConfig } from '../../modules/SimpleConnection/ButtJointBolted/config/buttJointBoltedConfig';
-import { ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
-import { isGuestUser, getCurrentUserEmail } from '../../utils/auth';
+import { isGuestUser } from '../../utils/auth';
 import {
   MODULE_KEY_FIN_PLATE,
   MODULE_KEY_CLEAT_ANGLE,
@@ -28,12 +26,9 @@ import {
   MODULE_KEY_SEAT_ANGLE,
   MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED,
   MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED,
-  MODULE_KEY_COVER_PLATE_BOLTED,
-  MODULE_KEY_COVER_PLATE_WELDED,
   MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
   MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
   MODULE_KEY_TENSION_BOLTED,
-  MODULE_KEY_TENSION_WELDED,
   MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
   MODULE_KEY_PURLIN,
   MODULE_KEY_ON_CANTILEVER_BEAM,
@@ -43,8 +38,6 @@ import {
   MODULE_KEY_BUTT_JOINT_BOLTED,
 } from '../../constants/DesignKeys';
 import { getProjectById } from "../../datasources/projectsDataSource";
-import { saveOsiFromInputs } from "../../datasources/osiDataSource";
-import { getModuleRoute } from "../../constants/moduleRoutes";
 import ProjectActionButtons from './ProjectActionButtons';
 import { normalizeModuleKey } from '../../constants/modules';
 
@@ -53,8 +46,6 @@ const normalizeModuleId = normalizeModuleKey;
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
   const [projects, setProjects] = React.useState(projectsProp);
   const [loading, setLoading] = React.useState(loadingProp);
-  const [deletingProject, setDeletingProject] = React.useState(null);
-  const [reportProject, setReportProject] = React.useState(null);
   const [reportModalOpen, setReportModalOpen] = React.useState(false);
   const [designReportInputs, setDesignReportInputs] = React.useState({
     companyName: "Your company",
@@ -73,10 +64,9 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   const [reportModuleConfig, setReportModuleConfig] = React.useState(null);
   const [reportAllSelected, setReportAllSelected] = React.useState({});
   const [reportExtraState, setReportExtraState] = React.useState({});
-  const navigate = useNavigate();
+
 
   const isGuest = isGuestUser();
-  const userEmail = getCurrentUserEmail();
 
   React.useEffect(() => {
     if (isGuest) {
@@ -96,15 +86,12 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   }, [isGuest, projectsProp, loadingProp]);
 
   const handleDeleteProject = async (projectId) => {
-    setDeletingProject(projectId);
     if (onDeleteProject) await onDeleteProject(projectId);
-    setDeletingProject(null);
   };
 
   const handleGenerateReportClick = async (project) => {
     try {
       const detail = await fetchProjectDetail(project.id);
-      setReportProject(project);
       setReportInputValues(detail?.inputs_json || {});
       const rawModId = detail?.submodule || detail?.module || MODULE_KEY_FIN_PLATE;
       const modId = normalizeModuleId(rawModId);
@@ -153,107 +140,6 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
     return data.project;
   };
 
-  const handleOpenProject = async (project) => {
-    try {
-      const data = await getProjectById(project.id);
-      if (data.success) {
-        const route = getModuleRoute(project.submodule);
-        if (route) {
-          navigate(`${route}/${project.id}`);
-        } else {
-          message.error('Module route not found');
-        }
-      } else {
-        message.error(data.error || 'Failed to load project');
-      }
-    } catch (_e) {
-      message.error('Failed to load project');
-    }
-  };
-
-  const handleDownloadOsi = async (project) => {
-    try {
-      const detailRes = await getProjectById(project.id);
-      if (!detailRes.success) {
-        message.error('Failed to load project');
-        return;
-      }
-      const projectDetail = detailRes.project;
-      const inputs = projectDetail?.inputs_json || {};
-      const rawModuleId = projectDetail?.submodule || projectDetail?.module || MODULE_KEY_FIN_PLATE;
-      const module_id = normalizeModuleId(rawModuleId);
-
-      const resolver = {
-        [MODULE_KEY_FIN_PLATE]: finPlateConfig,
-        [MODULE_KEY_END_PLATE]: endPlateConfig,
-        [MODULE_KEY_CLEAT_ANGLE]: cleatAngleConfig,
-        [MODULE_KEY_SEAT_ANGLE]: seatedAngleConfig,
-        [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED]: coverPlateBoltedConfig,
-        [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED]: coverPlateWeldedConfig,
-        [MODULE_KEY_BEAM_BEAM_END_PLATE_ALT]: beamBeamEndPlateConfig,
-        [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: beamToColumnEndPlateConfig,
-        [MODULE_KEY_TENSION_BOLTED]: boltedToEndConfig,
-        [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: simplySupportedBeamConfig,
-        [MODULE_KEY_PURLIN]: purlinConfig,
-        [MODULE_KEY_ON_CANTILEVER_BEAM]: onCantileverConfig,
-        [MODULE_KEY_LAP_JOINT_WELDED]: lapJointWeldedConfig,
-        [MODULE_KEY_LAP_JOINT_BOLTED]: lapJointBoltedConfig,
-        [MODULE_KEY_BUTT_JOINT_WELDED]: buttJointWeldedConfig,
-        [MODULE_KEY_BUTT_JOINT_BOLTED]: buttJointBoltedConfig,
-      };
-      const cfg = resolver[module_id] || null;
-
-      const isNested = (inputs.dock || inputs.pref) || (inputs.inputs && (inputs.inputs.dock || inputs.inputs.pref));
-      const dock = isNested ? (inputs.dock || inputs.inputs?.dock || {}) : inputs;
-      const pref = isNested ? (inputs.pref || inputs.inputs?.pref || {}) : {};
-
-      let flatInputs = {};
-      if (cfg && typeof cfg.buildSubmissionParams === "function") {
-        try {
-          flatInputs = cfg.buildSubmissionParams(
-            dock,
-            {},
-            {},
-            { selectedOption: dock.connectivity }
-          ) || {};
-        } catch (e) {
-          flatInputs = { ...dock };
-        }
-      } else {
-        flatInputs = { ...dock };
-      }
-
-      Object.entries(pref).forEach(([key, val]) => {
-        flatInputs[`Pref.${key}`] = val;
-      });
-
-      const data = await saveOsiFromInputs({
-        name: project.name,
-        moduleId: module_id,
-        inputs: flatInputs,
-        inline: true,
-      });
-      if (!data.success || !data.content_base64) {
-        message.error(data.error || 'Failed to prepare OSI');
-        return;
-      }
-
-      const binaryString = atob(data.content_base64);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
-      const blob = new Blob([bytes], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = data.filename || `${project.name}.osi`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (_e) {
-      message.error('Failed to download OSI');
-    }
-  };
 
   if (isGuest) {
     return (
@@ -331,8 +217,8 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
 
       <DesignReportModal
         isOpen={reportModalOpen}
-        onCancel={() => { setReportModalOpen(false); setReportProject(null); }}
-        onOk={() => { setReportModalOpen(false); setReportProject(null); }}
+        onCancel={() => { setReportModalOpen(false); }}
+        onOk={() => { setReportModalOpen(false); }}
         designReportInputs={designReportInputs}
         setDesignReportInputs={setDesignReportInputs}
         output={{}} /* truthy to satisfy modal precondition */

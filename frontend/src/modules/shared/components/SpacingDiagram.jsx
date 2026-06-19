@@ -29,10 +29,7 @@ const toNumber = (value, fallback = 0) => {
   return Number.isFinite(num) ? num : fallback;
 };
 
-const clampPositive = (value, fallback) => {
-  const n = toNumber(value, fallback);
-  return n > 0 ? n : fallback;
-};
+
 
 const distributeWithGauge = (count, origin, edge, plateWidth, gaugeValues) => {
   if (count <= 0) {
@@ -692,6 +689,17 @@ const SpacingDiagram = ({
     };
   }, [plateWidth, plateHeight, rows, cols, edge, end, pitch, gauge, holeDiameter, weldSize, layout, angleDesignation]);
 
+  const scale = useMemo(() => {
+    if (numericParams.error || numericParams.width <= 0 || numericParams.height <= 0) {
+      return 1;
+    }
+    const usableWidth = VIEWBOX_WIDTH - 2 * MARGIN;
+    const usableHeight = VIEWBOX_HEIGHT - 2 * MARGIN;
+    const scaleX = usableWidth / numericParams.width;
+    const scaleY = usableHeight / numericParams.height;
+    return Math.min(scaleX, scaleY);
+  }, [numericParams.width, numericParams.height, numericParams.error]);
+
   if (numericParams.error || numericParams.width <= 0 || numericParams.height <= 0) {
     return (
       <div className={`flex min-h-[280px] w-full items-center justify-center rounded-md border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500 ${className}`}>
@@ -699,14 +707,6 @@ const SpacingDiagram = ({
       </div>
     );
   }
-
-  const scale = useMemo(() => {
-    const usableWidth = VIEWBOX_WIDTH - 2 * MARGIN;
-    const usableHeight = VIEWBOX_HEIGHT - 2 * MARGIN;
-    const scaleX = usableWidth / numericParams.width;
-    const scaleY = usableHeight / numericParams.height;
-    return Math.min(scaleX, scaleY);
-  }, [numericParams.width, numericParams.height]);
 
   const offsetX = (VIEWBOX_WIDTH - numericParams.width * scale) / 2;
   const offsetY = (VIEWBOX_HEIGHT - numericParams.height * scale) / 2;

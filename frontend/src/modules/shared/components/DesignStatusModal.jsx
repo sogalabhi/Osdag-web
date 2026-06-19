@@ -15,7 +15,7 @@ import { DESIGN_STATUS } from '../hooks/useDesignSubmission';
  * - Shows error details if status.step === ERROR
  * - Auto-dismisses when COMPLETE (or stays visible briefly)
  */
-export const DesignStatusModal = ({ status, isMobile, onRetry, onClose }) => {
+export const DesignStatusModal = ({ status, isMobile, onClose }) => {
   const isVisible = status.step !== DESIGN_STATUS.IDLE;
   
   // Auto-dismiss on complete after 1 second

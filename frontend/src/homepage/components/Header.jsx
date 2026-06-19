@@ -84,7 +84,7 @@ const Header = ({ setshowSideBar, active }) => {
   useEffect(() => {
     const dynamicModules = [];
     const extractModules = (contentObj, categoryName) => {
-      Object.entries(contentObj).forEach(([key, sections]) => {
+      Object.entries(contentObj).forEach(([, sections]) => {
         sections.forEach(section => {
           section.options.forEach(opt => {
             dynamicModules.push({
@@ -308,7 +308,7 @@ const Header = ({ setshowSideBar, active }) => {
               if (moduleKey) {
                 sessionStorage.setItem(`prefill:${moduleKey}`, JSON.stringify(data.inputs));
               }
-            } catch (_) { }
+            } catch (_) { /* ignore */ }
             navigate(route);
           } catch (err) {
             console.error('Failed to import OSI:', err);
@@ -1123,7 +1123,7 @@ const Header = ({ setshowSideBar, active }) => {
                     {searchResults.modules.length === 0 && searchResults.projects.length === 0 && (
                       <div className="p-8 text-center">
                         <div className="text-osdag-text-muted dark:text-gray-500">
-                          No results found for "{searchQuery}"
+                          No results found for &quot;{searchQuery}&quot;
                         </div>
                       </div>
                     )}

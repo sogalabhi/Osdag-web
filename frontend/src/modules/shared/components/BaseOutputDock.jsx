@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
-import { Input, Modal } from 'antd';
+import { Modal } from 'antd';
 import { getOutputImage } from "../config/outputImageMap";
 import { OUTPUT_LAYOUTS } from "./outputDock/OutputModalLayouts";
 import { useViewport } from "../hooks/useViewport";
@@ -8,12 +8,10 @@ import { useViewport } from "../hooks/useViewport";
 export const BaseOutputDock = React.memo(({
   output,
   outputConfig,
-  title = "Output Dock",
   extraState = {},
   handleCreateDesignReport,
   saveOutput,
 }) => {
-  const normalizedOutput = output && output.data ? output.data : output;
   const { isMobile } = useViewport();
 
   // Shared state management
@@ -293,3 +291,4 @@ export const BaseOutputDock = React.memo(({
     </>
   );
 });
+BaseOutputDock.displayName = "BaseOutputDock";

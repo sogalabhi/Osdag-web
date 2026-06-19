@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react';
-import { Modal, Row, Col, Input, Button, Upload, Tree, Checkbox, Spin, message } from 'antd';
+import { Modal, Button, Tree, Spin, message } from 'antd';
 
 const { TreeNode } = Tree;
 
@@ -9,7 +9,6 @@ export const ReportCustomizationModal = ({
   onCancel,
   onOpenPDF,
   onSavePDF,
-  reportId,
   sections = {},
   selectedSections = [],
   onSectionsChange,
@@ -38,7 +37,7 @@ export const ReportCustomizationModal = ({
     }
   }, [sections]);
 
-  const onCheck = (checkedKeysValue, info) => {
+  const onCheck = (checkedKeysValue) => {
     setCheckedKeys(checkedKeysValue);
     onSectionsChange && onSectionsChange(checkedKeysValue);
   };
@@ -63,8 +62,9 @@ export const ReportCustomizationModal = ({
         <TreeNode
           title={section}
           key={section}
-          children={children}
-        />
+        >
+          {children}
+        </TreeNode>
       );
     });
   };

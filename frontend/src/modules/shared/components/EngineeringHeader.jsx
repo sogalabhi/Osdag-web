@@ -78,7 +78,7 @@ export const EngineeringHeader = () => {
 
         {displaySaveInputPopup && (
           <span id="save-input-style" style={{ marginTop: "18px" }}>
-            <strong>Saved input file as "{saveInputFileName}"</strong>
+            <strong>Saved input file as &quot;{saveInputFileName}&quot;</strong>
           </span>
         )}
       </div>

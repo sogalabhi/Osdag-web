@@ -122,7 +122,7 @@ export const SmartPart = ({
     setLocalHovered(true);
   }, []);
 
-  const handlePointerOut = useCallback((e) => {
+  const handlePointerOut = useCallback(() => {
     setLocalHovered(false);
     if (onHoverEnd) {
       onHoverEnd(meshId);

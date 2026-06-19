@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState } from 'react';
-import osdagLogo from '../../assets/homepage/osdag_logo.png';
+
 import iitbLogo from '../../assets/homepage/iitb_logo.png';
 import homeIcon from '../../assets/homepage/home_default.svg';
 import connectionIcon from '../../assets/homepage/connection.svg';
@@ -14,71 +13,69 @@ import frame3dIcon from '../../assets/homepage/3d_frame.svg';
 import { Link, useParams } from 'react-router-dom';
 import { APP_METADATA } from "../../constants/metadata";
 const Sidebar = ({ setshowSideBar, active }) => {
-  const [navigationItems, setnavigationItems] = useState(() =>
-    [
-      {
-        name: 'Home',
-        icon: <img src={homeIcon} alt="Home" className="w-10 h-10" />,
-        link: '/home',
-      },
-      {
-        name: 'Connection',
-        icon: <img src={connectionIcon} alt="Connection" className="w-10 h-10" />,
-        active: false,
-        link: '/Connections',
-      },
-      {
-        name: 'Tension Member',
-        icon: <img src={tensionIcon} alt="Tension Member" className="w-10 h-10" />,
-        active: false,
-        link: '/TensionMember',
-      },
-      {
-        name: 'Compression Member',
-        icon: <img src={compressionIcon} alt="Compression Member" className="w-10 h-10" />,
-        active: false,
-        link: '/CompressionMember',
-      },
-      {
-        name: 'Flexural Member',
-        icon: <img src={flexuralIcon} alt="Flexural Member" className="w-10 h-10" />,
-        active: false,
-        link: '/FlexureMember',
-        // comingSoon: true,
-      },
-      {
-        name: 'Beam-Column',
-        icon: <img src={beamcolumnIcon} alt="Beam-Column" className="w-10 h-10" />,
-        active: false,
-        link: '/Beam-Column',
-        comingSoon: true,
-      },
-      {
-        name: 'Truss',
-        icon: <img src={trussIcon} alt="Truss" className="w-10 h-10" />,
-        active: false,
-        link: '/Truss',
-        comingSoon: true,
-      },
-      {
-        name: '2D Frame',
-        icon: <img src={frame2dIcon} alt="2D Frame" className="w-10 h-10" />,
-        active: false,
-        link: '/2DFrame',
-        comingSoon: true,
-      },
-      {
-        name: '3D Frame',
-        icon: <img src={frame3dIcon} alt="3D Frame" className="w-10 h-10" />,
-        active: false,
-        link: '/3DFrame',
-        comingSoon: true,
-      },
-    ].map(item =>
-      item.name === active
-        ? { ...item, highlight: true }
-        : item
-    )
+  const navigationItems = [
+    {
+      name: 'Home',
+      icon: <img src={homeIcon} alt="Home" className="w-10 h-10" />,
+      link: '/home',
+    },
+    {
+      name: 'Connection',
+      icon: <img src={connectionIcon} alt="Connection" className="w-10 h-10" />,
+      active: false,
+      link: '/Connections',
+    },
+    {
+      name: 'Tension Member',
+      icon: <img src={tensionIcon} alt="Tension Member" className="w-10 h-10" />,
+      active: false,
+      link: '/TensionMember',
+    },
+    {
+      name: 'Compression Member',
+      icon: <img src={compressionIcon} alt="Compression Member" className="w-10 h-10" />,
+      active: false,
+      link: '/CompressionMember',
+    },
+    {
+      name: 'Flexural Member',
+      icon: <img src={flexuralIcon} alt="Flexural Member" className="w-10 h-10" />,
+      active: false,
+      link: '/FlexureMember',
+      // comingSoon: true,
+    },
+    {
+      name: 'Beam-Column',
+      icon: <img src={beamcolumnIcon} alt="Beam-Column" className="w-10 h-10" />,
+      active: false,
+      link: '/Beam-Column',
+      comingSoon: true,
+    },
+    {
+      name: 'Truss',
+      icon: <img src={trussIcon} alt="Truss" className="w-10 h-10" />,
+      active: false,
+      link: '/Truss',
+      comingSoon: true,
+    },
+    {
+      name: '2D Frame',
+      icon: <img src={frame2dIcon} alt="2D Frame" className="w-10 h-10" />,
+      active: false,
+      link: '/2DFrame',
+      comingSoon: true,
+    },
+    {
+      name: '3D Frame',
+      icon: <img src={frame3dIcon} alt="3D Frame" className="w-10 h-10" />,
+      active: false,
+      link: '/3DFrame',
+      comingSoon: true,
+    },
+  ].map(item =>
+    item.name === active
+      ? { ...item, highlight: true }
+      : item
   );
 
   const handleCloseSidebar = () => {

@@ -5,7 +5,7 @@ import SpacingDiagram from "./SpacingDiagram";
  * CapacityDiagram wraps SpacingDiagram and layers failure paths (block shear, yielding, rupture lines)
  * on top of the computed SVG bolt grid coordinates.
  */
-const CapacityDiagram = ({ fracturePattern, isBeamBeam = false, ...props }) => {
+const CapacityDiagram = ({ fracturePattern, ...props }) => {
   return (
     <SpacingDiagram {...props}>
       {({ offsetX, offsetY, scale, boltColsPositions, boltRowsPositions, numericParams }) => {

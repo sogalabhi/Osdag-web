@@ -170,6 +170,7 @@ export const EngineeringProvider = ({ moduleConfig, outputConfig, title, childre
         return next;
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.inputs?.graphicsOption, selectedSection]);
 
   const prevPathsRef = useRef(null);
@@ -241,12 +242,14 @@ export const EngineeringProvider = ({ moduleConfig, outputConfig, title, childre
 
     prevModuleRef.current = currentModule;
     prevProjectIdRef.current = currentProjectId;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleConfig.designType, location.search, location.pathname, actions.resetModuleState, actions.clearDesignResults, isMobile]);
 
   useEffect(() => {
     return () => {
       actions.resetModuleState();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions.resetModuleState]);
 
   const projectIdFromUrl = getProjectIdFromUrl();
@@ -312,6 +315,7 @@ export const EngineeringProvider = ({ moduleConfig, outputConfig, title, childre
         setIsInputLocked(false);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [designStatus.status.step, isRedesigning, isMobile]);
 
   useEffect(() => {
@@ -325,6 +329,7 @@ export const EngineeringProvider = ({ moduleConfig, outputConfig, title, childre
         setDocks({ output: true, logs: true });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [designStatus.status.step, designStatus.output, isRedesigning, isMobile]);
 
   const handleSubmitEnhanced = useCallback(async () => {
@@ -349,6 +354,7 @@ export const EngineeringProvider = ({ moduleConfig, outputConfig, title, childre
     } finally {
       setIsRedesigning(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDesignComplete, designStatus.renderBoolean, designStatus.output, isMobile, actions.clearDesignResults, actions.resetModuleState, actions.handleSubmit]);
 
   const handleLockToggle = useCallback(() => {

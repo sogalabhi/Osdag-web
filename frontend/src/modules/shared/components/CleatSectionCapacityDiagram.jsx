@@ -9,7 +9,6 @@ const CleatSectionCapacityDiagram = ({
   pitch = 60,
   end = 40,
   edge = 50,
-  gauge1 = 60,
   className = "",
 }) => {
   const isBeamBeam = connectivity === "Beam-Beam";

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState } from 'react';
-import { Modal, Row, Col, Input, Button, Upload, Spin, message } from 'antd';
+import { Modal, Row, Col, Input, Button, Upload, message } from 'antd';
 import { ReportCustomizationModal } from './ReportCustomizationModal';
 import { useEngineeringService } from '../hooks/useEngineeringService';
 
@@ -32,7 +32,6 @@ export const DesignReportModal = ({
   const [reportId, setReportId] = useState(null);
   const [sections, setSections] = useState({});
   const [selectedSections, setSelectedSections] = useState([]);
-  const [loadingSections, setLoadingSections] = useState(false);
   const service = useEngineeringService();
 
   const handleFieldChange = (field, value) => {
@@ -526,7 +525,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
         sections={sections}
         selectedSections={selectedSections}
         onSectionsChange={handleSectionsChange}
-        loading={loadingSections}
+        loading={false}
       />
     </>
   );

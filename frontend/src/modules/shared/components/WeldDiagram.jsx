@@ -70,7 +70,6 @@ const WeldDiagram = ({
   const ws_px = ws * scale;
   const wg_px = wg * scale;
   const pt_px = pt * scale;
-  const halfGap = wg_px / 2;
   const halfHeight = (H - wg_px) / 2;
 
   // Dimension label helpers

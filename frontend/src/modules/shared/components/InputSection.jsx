@@ -166,6 +166,7 @@ export const InputSection = ({
       const selectedImage = (conn ? imageMap[conn]?.[epType] : null) || imageMap[extraState.selectedOption] || ErrorImg;
       setImageSource(selectedImage);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [extraState.selectedOption, safeInputs.connectivity]);
 
   useEffect(() => {
@@ -231,6 +232,7 @@ export const InputSection = ({
         setExtraState((prev) => ({ ...prev, selectedProfile: currentValue }));
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safeContextData, section.fields]);
 
   const handleCustomizableSelect = (field, value) => {

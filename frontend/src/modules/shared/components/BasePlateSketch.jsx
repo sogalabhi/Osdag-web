@@ -40,14 +40,10 @@ const BasePlateSketch = ({
   diaOcfBolt,
   edgeOcf,
   endOcf,
-  pitchOcf,
-  gaugeOcf,
   noIcfBolts,
   diaIcfBolt,
   edgeIcf,
   endIcf,
-  pitchIcf,
-  gaugeIcf,
   memberDesignation = "",
   className = "",
 }) => {
@@ -120,7 +116,7 @@ const BasePlateSketch = ({
   const bpH = params.pW * scale;
 
   // Bolts positioning helper
-  const getBolts = (count, edge, end, isOutside = true) => {
+  const getBolts = (count, edge, end) => {
     const num = toNumber(count);
     const ed = toNumber(edge);
     const en = toNumber(end);
@@ -168,8 +164,6 @@ const BasePlateSketch = ({
   };
 
   // Dimension lines helper
-  const extLength = 8;
-  const textOffset = 14;
 
   return (
     <svg viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`} className={`h-auto w-full ${className}`} role="img">

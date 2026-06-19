@@ -11,8 +11,6 @@ import { getModuleRoute } from "../../constants/moduleRoutes";
 const ProjectActionButtons = ({
   project,
   onActionComplete,
-  showDelete = false,
-  onDelete,
   onGenerateReport,
 }) => {
   const navigate = useNavigate();
