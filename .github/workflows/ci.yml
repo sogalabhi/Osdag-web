@@ -96,7 +96,7 @@ jobs:
           REDIS_URL: redis://localhost:6379/0
         run: |
           cd backend
-          python -m pytest --ds=config.settings
+          xvfb-run python -m pytest --ds=config.settings
 
       - name: Teardown
         if: always()
