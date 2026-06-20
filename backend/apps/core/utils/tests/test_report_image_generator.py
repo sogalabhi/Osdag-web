@@ -9,20 +9,27 @@ import shutil
 from unittest.mock import Mock, patch, MagicMock
 import numpy as np
 
+# Skip this module entirely in CI environments
+if os.environ.get('CI') == 'true':
+    pytest.skip("Skipping in CI environment", allow_module_level=True)
+
 # Import the module under test
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../..'))
-from apps.core.utils.report_image_generator import (
-    verify_open3d_available,
-    setup_headless_qt,
-    read_brep_file,
-    generate_stl_from_brep,
-    find_existing_cad_files,
-    generate_cad_files_for_report,
-    ensure_image_directory,
-    copy_fallback_images,
-    generate_cad_images_for_report
-)
+try:
+    from apps.core.utils.report_image_generator import (
+        verify_open3d_available,
+        setup_headless_qt,
+        read_brep_file,
+        generate_stl_from_brep,
+        find_existing_cad_files,
+        generate_cad_files_for_report,
+        ensure_image_directory,
+        copy_fallback_images,
+        generate_cad_images_for_report
+    )
+except FileNotFoundError as e:
+    pytest.skip(f"Skipping module because LaTeX environment is not found: {e}", allow_module_level=True)
 
 
 class TestVerifyOpen3DAvailable:

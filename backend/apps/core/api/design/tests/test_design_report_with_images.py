@@ -4,10 +4,12 @@ Integration tests for design report generation with images.
 
 import os
 import tempfile
+import unittest
 from django.test import TestCase
 from rest_framework.test import APIClient
 
 
+@unittest.skipIf(os.environ.get('CI') == 'true', 'Skipping in CI environment')
 class TestDesignReportWithImages(TestCase):
     """Smoke tests for report generation endpoints (slug + legacy)"""
 

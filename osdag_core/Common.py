@@ -121,7 +121,10 @@ def configure_latex_runtime_windows():
 
 
 PATH_TO_DATABASE = _get_resource_path("data", "ResourceFiles", "Database", "Intg_osdag.sqlite")
-PDFLATEX = get_latex_executable()
+try:
+    PDFLATEX = get_latex_executable()
+except FileNotFoundError:
+    PDFLATEX = "pdflatex"
 
 class OurLog(logging.Handler):
 
