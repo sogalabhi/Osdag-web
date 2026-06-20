@@ -79,3 +79,62 @@ To encourage immediate engineering exploration, Osdag-Web implements a zero-barr
   - Applied `IsEmailVerified` to user-centric views (`ProjectAPI`, `ProjectDetailAPI`, `ProjectByNameAPI`, `OpenOsiById`, `ProjectOsiDownload`, and `JWTHomeView`) to guarantee authenticated and verified access.
   - Removed redundant manual checks from individual view method bodies, relying on DRF's declarative permission lifecycle instead.
 
+---
+
+## 3.5 OAuth & Email/Password Provider Merging & Conflict Resolution
+
+Osdag-Web supports signing in via Google (OAuth 2.0) and traditional Email/Password credentials. To prevent account duplicate bloat or authentication hijack, the system handles identity verification conflicts across both the client-side Firebase Auth layer and the backend Django model layer:
+
+```mermaid
+graph TD
+    UserAction[User Logs In / Registers] --> ProviderCheck{Provider Type}
+    
+    ProviderCheck -->|Google OAuth| GoogleFlow[Firebase verifies Google token]
+    GoogleFlow --> GoogleEmailVerify{Email already in use by Email/Pass?}
+    GoogleEmailVerify -->|Yes| AutoLink[Firebase links Google credentials to existing account]
+    GoogleEmailVerify -->|No| CreateGoogleUser[Create new Firebase account with Google UID]
+    
+    ProviderCheck -->|Email & Password| EmailPassFlow[User signs up with Email/Password]
+    EmailPassFlow --> EmailCheck{Email already exists via Google?}
+    EmailCheck -->|Yes| BlockEmailPass[Firebase rejects with auth/email-already-in-use]
+    EmailCheck -->|No| CreateEmailUser[Create new Firebase account with Email UID]
+
+    AutoLink --> DjangoSync[Django Middleware parses ID Token UID]
+    CreateGoogleUser --> DjangoSync
+    CreateEmailUser --> DjangoSync
+    
+    DjangoSync --> get_or_create[User.objects.get_or_create: username=UID]
+    get_or_create --> db_synced[User Account mapped with same UID & synced email]
+```
+
+### 1. Conflict Resolution Scopes (Firebase Client Layer)
+Firebase Authentication enforces the **"One account per email address"** rule at the project level, resolving conflicts depending on the registration sequence:
+* **Scenario A: Email/Password First, Google Second**:
+  If a user creates an account with `engineer@example.com` and password, and later clicks **"Login with Google"** using the same `engineer@example.com` Gmail account:
+  * Since Google is a trusted identity provider that verifies emails, Firebase automatically **merges/links** the Google credential to the existing Email/Password user account.
+  * The account retains the exact same Firebase `uid`.
+* **Scenario B: Google First, Email/Password Second**:
+  If a user signs up with **"Login with Google"** using `engineer@example.com`, and later tries to register a new account on the signup form using the same `engineer@example.com` email and a password:
+  * Firebase rejects the signup request, throwing the error `auth/email-already-in-use`.
+  * The frontend client intercepts this error in `firebaseAuth.js` via `getFirebaseErrorMessage` and shows a user-friendly instruction: *"This email is already registered. Please log in or use 'Login with Google'"*, blocking duplicate creation.
+
+### 2. Backend Conflict Resolution (Django Middleware Layer)
+The Django backend is agnostic of the sign-in provider (Google vs. Email/Password). It only receives and cryptographically validates the Firebase ID token.
+* **UID as the Primary Identifier**:
+  The custom `FirebaseAuthentication` middleware uses the Firebase `uid` claim as the Django `username` to create or retrieve accounts:
+  ```python
+  user, created = User.objects.get_or_create(
+      username=uid,
+      defaults={'email': email or ''}
+  )
+  ```
+  Because Firebase links both providers under the **same UID** in the scenarios above, the Django middleware always maps the user to the same Django `User` and `UserAccount` records. No duplicate entries or conflict warnings are generated in the PostgreSQL database.
+* **Dynamic Email Syncing**:
+  If the user's email was updated or linked during the authentication step, the Django middleware automatically updates the database models:
+  ```python
+  if email and user.email != email:
+      user.email = email
+      user.save()
+  ```
+
+

@@ -24,6 +24,8 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **3.1 Firebase Auth Integration:** Google/Github/Email identity provider setup, token validation, and the `FirebaseAuthentication` middleware in Django.
 * **3.2 User Account Management & Email Verification:** Flow of registration, email verification checks (`IsEmailVerified` permissions), and conditional access blocks.
 * **3.3 Guest Mode vs. Authenticated Mode:** Behavior differences in saving projects, generating and downloading `.osi` files, and session persistence.
+* **3.4 Security Assessment & Scopes of Improvement:** Performance overhead of JWT token verification, and verification bypass fixes.
+* **3.5 OAuth & Email/Password Provider Merging & Conflict Resolution:** Firebase client-side provider linking vs. email-in-use rejection rules, and backend UID-based syncing.
 
 ### 4. [Chapter 4: Project Lifecycle & CRUD Operations](./chapter_4_project_lifecycle_crud.md)
 * **4.1 Project Model & Data Structs:** Structure of `inputs_json` (merged dock + pref states) and `outputs_json`.
@@ -84,6 +86,11 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **11.3 Development Orchestration (`docker-compose.yml`):** Dev container layout, hot-reloading configurations, and database migrations and seeding.
 * **11.4 Production Orchestration (`docker-compose.prod.yml`):** Nginx reverse proxy routing, shared static volumes, and specialized Celery worker queue divisions.
 * **11.5 Observations & Areas of Improvement:** Analysis of hardcoded user ID mappings and static database port issues.
+
+### 12. [Chapter 12: Load Test Monitoring & Observability](./chapter_12_load_testing_observability.md)
+* **12.1 Collected Telemetry Data Schema:** Telemetry measurements, collector sources, and metric scopes.
+* **12.2 Observability Stack Run Guide:** Running diagnostic services (InfluxDB, Grafana) via Docker or native setups, and configuring backend collectors.
+* **12.3 Post-Test Offline Analysis:** Exporting collected telemetry logs for post-test analysis.
 
 ### Appendix: [Fixed & Resolved Issues Directory](./issues.md)
 * Tracking directory containing the statuses and fixes for architectural, storage, and security issues resolved in Chapters 1 to 3.
