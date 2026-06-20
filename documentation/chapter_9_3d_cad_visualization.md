@@ -181,3 +181,37 @@ During the architectural review of the 3D rendering pipeline, the following item
 * **The Risk:** If a user moved their mouse rapidly across multiple components, pointer-out events could be processed out of order or fire with stale closures. This caused the hovered state to become locked on a specific part even after the mouse had moved away.
 * **Resolution:** Implemented the "latest ref" pattern by tracking the current hover mesh ID inside a `hoveredMeshIdRef` in [SceneManager.jsx](../frontend/src/modules/shared/components/cad/SceneManager.jsx#L28-L30). [handlePartHover](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/components/cad/SceneManager.jsx#L181-L186) and [handlePartHoverEnd](file:///home/abhijith/coding/osdag/Osdag-web/frontend/src/modules/shared/components/cad/SceneManager.jsx#L188-L194) now read and write to this ref synchronously. Since the callback only reads from the ref, it does not suffer from stale React state closures during rapid pointer actions.
 
+---
+
+## 9.8 CAD Model Exporting & Multiple Formats
+
+Osdag-Web provides CAD export features enabling engineers to download calculated connection geometries in various formats for integration into professional CAD/BIM tools.
+
+### 1. Supported Export Formats
+The system supports exporting 3D models in five industry-standard formats:
+* **BREP (Boundary Representation)**: The raw native geometry model representing solid boundary edges and surfaces.
+* **STL (Stereolithography)**: Triangulated surface mesh representation of the model, widely used for 3D printing and rapid prototyping.
+* **STEP (Standard for the Exchange of Product Model Data)**: Universal ISO-standard exchange format supported by mainstream mechanical CAD suites (e.g. AutoCAD, SolidWorks, Fusion 360).
+* **IGS/IGES (Initial Graphics Exchange Specification)**: Neutral vector-based file format for exchanging 3D CAD models.
+* **IFC (Industry Foundation Classes)**: Platform-neutral open file format specification for Building Information Modeling (BIM) workflows.
+
+### 2. Export Architecture: Client-Side Cache vs. Backend Generation
+To optimize speed and bandwidth, the frontend splits the download logic into two routes:
+1. **Client-Side Cached Download**:
+   If the full-model representation in the requested format (such as BREP or STL) has already been fetched and cached in client-side memory (`cadModelPaths`) during the initial design calculation run, the system immediately downloads it from browser memory without sending a new network request to the backend. This is orchestrated by `downloadCachedModelByFormat`.
+2. **On-Demand Backend Export**:
+   If the requested format (like STEP, IGS, or IFC) is not present in client-side memory, the system uses the Django API service endpoints (`exportCADModel()`). It compiles the active form inputs using `buildSubmissionParams` and streams the resulting binary file directly from the Django backend. This is orchestrated by `downloadExportCadResponse`.
+
+### 3. Exporter Utility Functions (`cadExport.js`)
+The visualization utilities file [cadExport.js](../frontend/src/modules/shared/utils/cadExport.js) contains the following core modular exporting functions:
+
+* **`decodeBase64ToBlob(base64Data)`**:
+  Extracts the raw base64 string (ignoring any data URI scheme prefix like `data:application/octet-stream;base64,`), decodes it using window-native `atob`, converts it into a `Uint8Array`, and packages it as an octet-stream `Blob`.
+* **`downloadCachedModelByFormat({ cadModelPaths, format, moduleId, message })`**:
+  Attempts to resolve and decode the pre-calculated model geometry from `cadModelPaths` for the requested format (e.g., `BREP` or `STL`). If found, it triggers a direct browser download.
+* **`downloadExportCadResponse({ blob, disposition, fallbackFilename })`**:
+  Accepts a raw binary blob returned from a backend API call, parses the `Content-Disposition` header if available to preserve the server-provided filename, and prompts a file download.
+* **`downloadCadSectionsAsStl(cadModelPaths, message)`**:
+  Downloads individual structural component meshes (e.g., Column mesh, Beam mesh, Plate mesh) stored in the browser as individual separate `.stl` files sequentially, incorporating a brief delay to avoid browser queue blockages.
+
+

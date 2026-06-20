@@ -24,8 +24,7 @@ export const menuItems = [
       {
         name: "Save 3D Model",
         shortcut: getMenuShortcutLabel("Save 3D Model"),
-        options: ["Export BREP", "Export STL", "Export STEP", "Export IGS", "Export IFC"],
-      },      
+      },
       { name: "Save Cad Image" },
       { name: "Quit" }
     ],

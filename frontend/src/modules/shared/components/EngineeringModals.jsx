@@ -32,6 +32,7 @@ export const EngineeringModals = () => {
     selectedSection,
     setSelectedSection,
     moduleConfig,
+    setDocks,
   } = useEngineeringContext();
 
   const {
@@ -207,6 +208,7 @@ export const EngineeringModals = () => {
         onClose={() => {
           if (status.step === DESIGN_STATUS.ERROR) {
             setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
+            setDocks({ logs: true });
           }
         }}
       />

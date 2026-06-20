@@ -88,11 +88,6 @@ export const downloadCadSectionsAsStl = async (cadModelPaths, message) => {
     return;
   }
 
-  if (!window.showSaveFilePicker) {
-    message.error('File picker not supported in this browser. Please use a modern browser like Chrome or Edge.');
-    return;
-  }
-
   try {
     for (const section of availableSections) {
       const base64Data = cadModelPaths[section];
@@ -102,27 +97,8 @@ export const downloadCadSectionsAsStl = async (cadModelPaths, message) => {
       }
 
       try {
-        const base64String =
-          typeof base64Data === 'string' && base64Data.includes(',')
-            ? base64Data.split(',')[1]
-            : base64Data;
-
-        const binaryString = atob(base64String);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-
-        const blob = new Blob([bytes], { type: 'application/octet-stream' });
-
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${section.toLowerCase()}_model.stl`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        const blob = decodeBase64ToBlob(base64Data);
+        triggerBrowserDownload(blob, `${section.toLowerCase()}_model.stl`);
 
         if (availableSections.indexOf(section) < availableSections.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 300));

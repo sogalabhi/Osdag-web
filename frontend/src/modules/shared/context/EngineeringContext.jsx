@@ -451,6 +451,15 @@ export const EngineeringProvider = ({ moduleConfig, outputConfig, title, childre
   }, [designStatus.hoverDict]);
 
   const handleNavbarMenuClick = async (name) => {
+    if (name === "Save 3D Model") {
+      if (!normalizedCadModelPaths || Object.keys(normalizedCadModelPaths).length === 0) {
+        message.warning("No 3D model available. Run design first to enable Save 3D Model.");
+        return;
+      }
+      setSelectedSave3dType("Export STL");
+      setShowSave3dTypeModal(true);
+      return;
+    }
     if (name === "Download Inputs CSV") {
       const inputsExpanded = expandAllSelectedInputs(form.inputs, form.allSelected, moduleData.contextData);
       const effectiveInputs = { ...inputsExpanded, ...(form.designPrefOverrides || {}) };

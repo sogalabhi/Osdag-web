@@ -70,6 +70,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **9.5 SmartPart & Performance Optimization:** Edge geometry memoization, raycast state separation, and material optimization to maintain 60 FPS.
 * **9.6 3D Component Hover & Tooltips:** Semantic part name aliasing, coordinate translation, and key variations fallback loops.
 * **9.7 Observations & Areas of Improvement:** Analysis of WebGL context loss recovery and pointer event race hazards.
+* **9.8 CAD Model Exporting & Multiple Formats:** Supported export formats (BREP, STL, STEP, IGS, IFC), client-side cache vs. on-demand backend export routes, and helper functions in `cadExport.js`.
 
 ### 10. [Chapter 10: Modules Catalog & Status Directory](./chapter_10_modules_catalog_status.md)
 * **10.1 Active Modules Directory:** Operational catalog details, routes, and adapter mappings.

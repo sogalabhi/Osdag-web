@@ -11,7 +11,6 @@ import { getModuleConfig } from "./moduleConfig";
 import { expandAllSelectedInputs } from "./osiInputSerializer";
 import { buildLogFileContent } from "./logExport";
 import {
-  downloadCadSectionsAsStl,
   downloadCachedModelByFormat,
   downloadExportCadResponse,
 } from "./cadExport";
@@ -215,9 +214,9 @@ function UnifiedDropdownMenu({
         saveLogMessages();
         break;
       case "Save 3D Model":
-        (async () => {
-          await downloadCadSectionsAsStl(cadModelPaths, message);
-        })();
+        if (onMenuClick) {
+          onMenuClick(option.name);
+        }
         break;
       case "Export BREP":
       case "Export STL":
