@@ -1,6 +1,6 @@
 # Fixed & Resolved Issues (Chapters 1 to 11)
 
-This document tracks all the architecture, storage, performance, and security issues resolved across Chapters 1 through 11 of the Osdag-Web codebase.
+This document tracks all the architecture, storage, performance, and security issues resolved across Chapters 1 through 12 of the Osdag-Web codebase.
 
 | # | Chapter / Issue Title | Target Component | Description (1-2 lines) | Resolution Summary |
 |---|------------------------|------------------|--------------------------|--------------------|
@@ -40,4 +40,6 @@ This document tracks all the architecture, storage, performance, and security is
 | **34** | **Chapter 11: Static Database Port Mappings** | `docker-compose.yml` / db ports | Static mapping of PostgreSQL to host port 5433 created conflicts with local DB instances. | Updated host port configuration to support environment variable overrides: `ports: - "${DB_HOST_PORT:-5433}:5432"`. |
 | **35** | **Chapter 9: CAD Export Submenu Experience** | Navbar / CAD Export | Save 3D Model had nested sub-options that forced nested hover menus. | Removed options submenu from moduleUtils and mapped Save 3D Model click to trigger the CAD export format selection modal directly. |
 | **36** | **Chapter 8/9: Failure logs dock transition** | Modals / Docks | Dismissing the calculation failure/unsafe design modal left the logs dock closed, keeping failure details hidden. | Configured DesignStatusModal's onClose callback to call setDocks({ logs: true }) on error modal dismiss. |
+| **37** | **Chapter 3: Google Login Concurrency & Duplicate Keys** | Firebase Auth / Backend | Concurrent sync requests on Google login caused duplicate UserAccount insertions, throwing IntegrityError and locking up UI. | Implemented frontend request deduplication per token and backend transaction atomic blocks with IntegrityError fallbacks. |
+| **38** | **Chapter 4: Missing Project Creation Naming Dialog** | Project Creation Hook | Naming modal returned by useProjectCreation hook was never rendered in JSX, causing click on Create Project to do nothing. | Extracted and rendered projectCreationModal inside EngineeringModals to mount the dialog correctly in the DOM. |
 

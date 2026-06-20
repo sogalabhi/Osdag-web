@@ -33,6 +33,9 @@ export const getFirebaseErrorMessage = (errorCode) => {
     return errorMessages[errorCode] || `Authentication error: ${errorCode || 'Unknown error'}`;
 };
 
+let activeSyncPromise = null;
+let activeSyncToken = null;
+
 /**
  * Sync Firebase user to Django backend
  * Backend syncs user to Django User model and returns user info
@@ -40,12 +43,31 @@ export const getFirebaseErrorMessage = (errorCode) => {
 export const syncUserToBackend = async (firebaseUser) => {
     try {
         const idToken = await firebaseUser.getIdToken();
-        console.log("Syncing user to backend. Token length:", idToken?.length || 0);
         
-        const data = await firebaseLoginWithToken(idToken);
-        console.log("Backend sync response payload:", data);
+        // Deduplicate concurrent sync calls for the same ID token
+        if (activeSyncToken === idToken && activeSyncPromise) {
+            console.log("Reusing active backend sync promise for token");
+            return activeSyncPromise;
+        }
         
-        return data;
+        activeSyncToken = idToken;
+        activeSyncPromise = (async () => {
+            console.log("Syncing user to backend. Token length:", idToken?.length || 0);
+            const data = await firebaseLoginWithToken(idToken);
+            console.log("Backend sync response payload:", data);
+            return data;
+        })();
+        
+        try {
+            const data = await activeSyncPromise;
+            return data;
+        } finally {
+            // Clean up active sync promise when this exact token sync completes
+            if (activeSyncToken === idToken) {
+                activeSyncPromise = null;
+                activeSyncToken = null;
+            }
+        }
     } catch (error) {
         console.error("Error syncing user to backend:", error);
         console.error("Error details:", {

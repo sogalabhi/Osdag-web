@@ -24,7 +24,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **3.1 Firebase Auth Integration:** Google/Github/Email identity provider setup, token validation, and the `FirebaseAuthentication` middleware in Django.
 * **3.2 User Account Management & Email Verification:** Flow of registration, email verification checks (`IsEmailVerified` permissions), and conditional access blocks.
 * **3.3 Guest Mode vs. Authenticated Mode:** Behavior differences in saving projects, generating and downloading `.osi` files, and session persistence.
-* **3.4 Security Assessment & Scopes of Improvement:** Performance overhead of JWT token verification, and verification bypass fixes.
+* **3.4 Security Assessment & Scopes of Improvement:** Performance overhead of JWT verification, verification bypasses, token cache invalidation on immediate verification, and account deletion orphaned data.
 * **3.5 OAuth & Email/Password Provider Merging & Conflict Resolution:** Firebase client-side provider linking vs. email-in-use rejection rules, and backend UID-based syncing.
 
 ### 4. [Chapter 4: Project Lifecycle & CRUD Operations](./chapter_4_project_lifecycle_crud.md)

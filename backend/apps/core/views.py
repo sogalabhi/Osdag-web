@@ -84,17 +84,30 @@ class FirebaseAuthView(APIView):
                 return Response({"error": "Invalid token: missing UID"}, status=400)
             
             # Sync user to Django (use Firebase UID as username)
-            user, created = User.objects.get_or_create(
-                username=uid,
-                defaults={'email': email or ''}
-            )
-            logger.info(f"FirebaseAuthView: User {'created' if created else 'retrieved'}. Username: {user.username}, Email: {user.email}")
+            from django.db import IntegrityError, transaction
+            
+            try:
+                with transaction.atomic():
+                    user, created = User.objects.get_or_create(
+                        username=uid,
+                        defaults={'email': email or ''}
+                    )
+                logger.info(f"FirebaseAuthView: User {'created' if created else 'retrieved'}. Username: {user.username}, Email: {user.email}")
+            except IntegrityError:
+                # Concurrency safety: if created concurrently, fetch it
+                user = User.objects.get(username=uid)
+                created = False
+                logger.info(f"FirebaseAuthView: User retrieved after IntegrityError on creation. Username: {user.username}")
             
             # Update email if changed
             if email and user.email != email:
-                user.email = email
-                user.save()
-                logger.info(f"FirebaseAuthView: Updated user email to {email}")
+                try:
+                    with transaction.atomic():
+                        user.email = email
+                        user.save()
+                    logger.info(f"FirebaseAuthView: Updated user email to {email}")
+                except IntegrityError:
+                    pass
             
             # Sync UserAccount if it doesn't exist
             from apps.core.models import UserAccount
@@ -114,21 +127,46 @@ class FirebaseAuthView(APIView):
                         user_account = UserAccount.objects.get(email=email)
                         logger.info(f"FirebaseAuthView: UserAccount found by email, updating username to UID")
                         # Update the username to the Firebase UID
-                        user_account.username = uid
-                        user_account.user = user
-                        user_account.save()
+                        with transaction.atomic():
+                            user_account.username = uid
+                            user_account.user = user
+                            user_account.save()
                     except UserAccount.DoesNotExist:
                         pass
+                    except IntegrityError:
+                        # Concurrency safety: if another thread updated it first
+                        try:
+                            user_account = UserAccount.objects.get(username=uid)
+                            logger.info(f"FirebaseAuthView: UserAccount found by username after IntegrityError on email update")
+                        except UserAccount.DoesNotExist:
+                            pass
             
             # If still not found, create new UserAccount
             if not user_account:
-                user_account = UserAccount.objects.create(
-                    username=uid,
-                    user=user,
-                    email=email or ''
-                )
-                account_created = True
-                logger.info(f"FirebaseAuthView: UserAccount created")
+                try:
+                    with transaction.atomic():
+                        user_account = UserAccount.objects.create(
+                            username=uid,
+                            user=user,
+                            email=email or ''
+                        )
+                        account_created = True
+                        logger.info(f"FirebaseAuthView: UserAccount created")
+                except IntegrityError:
+                    # Concurrency safety: if it was created in another thread
+                    try:
+                        user_account = UserAccount.objects.get(username=uid)
+                        logger.info(f"FirebaseAuthView: UserAccount found by username after IntegrityError on creation")
+                    except UserAccount.DoesNotExist:
+                        # Fallback to search by email
+                        if email:
+                            try:
+                                user_account = UserAccount.objects.get(email=email)
+                                logger.info(f"FirebaseAuthView: UserAccount found by email after IntegrityError on creation")
+                            except UserAccount.DoesNotExist:
+                                raise
+                        else:
+                            raise
             
             # Update UserAccount if user link is missing or email changed
             needs_save = False
@@ -143,8 +181,12 @@ class FirebaseAuthView(APIView):
                 needs_save = True
             
             if needs_save:
-                user_account.save()
-                logger.info(f"FirebaseAuthView: UserAccount updated")
+                try:
+                    with transaction.atomic():
+                        user_account.save()
+                        logger.info(f"FirebaseAuthView: UserAccount updated")
+                except IntegrityError:
+                    pass
             
             logger.info(f"FirebaseAuthView: Authentication successful for UID: {uid}")
             return Response({

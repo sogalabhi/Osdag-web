@@ -33,6 +33,7 @@ export const EngineeringModals = () => {
     setSelectedSection,
     moduleConfig,
     setDocks,
+    projectCreationModal,
   } = useEngineeringContext();
 
   const {
@@ -254,6 +255,8 @@ export const EngineeringModals = () => {
           </Radio.Group>
         </div>
       </Modal>
+
+      {projectCreationModal}
     </>
   );
 };

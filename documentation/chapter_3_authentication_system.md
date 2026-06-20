@@ -79,6 +79,20 @@ To encourage immediate engineering exploration, Osdag-Web implements a zero-barr
   - Applied `IsEmailVerified` to user-centric views (`ProjectAPI`, `ProjectDetailAPI`, `ProjectByNameAPI`, `OpenOsiById`, `ProjectOsiDownload`, and `JWTHomeView`) to guarantee authenticated and verified access.
   - Removed redundant manual checks from individual view method bodies, relying on DRF's declarative permission lifecycle instead.
 
+### 4. Cache Invalidation on Immediate Email Verification (Accepted Risk / Client Mitigation)
+* **The Problem:** The backend middleware caches the token verification status (including `email_verified=False`) in Redis for performance. If a user registers, attempts an action (caching `email_verified=False`), and immediately clicks the verification link in their email, they would remain blocked during the active session:
+  * Firebase ID tokens do not dynamically update their internal claims. The client will keep sending the same token.
+  * Even if a fresh token could be obtained, if the backend uses the token string as the cache key, it reads the stale cache state until the Redis TTL expires.
+* **Resolution/Mitigation:** 
+  - The client-side application must force-refresh the Firebase token (`user.getIdToken(true)`) after email verification is completed.
+  - The backend cache key is generated from a SHA-256 hash of the token string. Once the client forces a token refresh, a new token string is sent. This results in a cache miss, prompting the backend to verify the token with Firebase and update the cached verification state to `email_verified=True`.
+
+### 5. Orphaned Database Records on Account Deletion (Accepted Risk / Future Work)
+* **The Problem:** Osdag-Web currently does not provide an account deletion option in the frontend interface or backend REST views. If a user's account is deleted directly via Firebase Auth:
+  * The Firebase `uid` is destroyed.
+  * The Django `User`, `UserAccount`, and associated `Project` database tables will retain their records, leading to orphaned user data in PostgreSQL.
+* **Resolution/Status:** Accepted risk. Individual project deletion is fully supported. For user account deletion, the proposed future work is to register a Firebase Cloud Function reacting to `functions.auth.user().onDelete()` that fires a secure webhook to the Django backend to cascade-delete all matching database records.
+
 ---
 
 ## 3.5 OAuth & Email/Password Provider Merging & Conflict Resolution
