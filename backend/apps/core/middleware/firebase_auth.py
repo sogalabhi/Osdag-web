@@ -56,6 +56,8 @@ class FirebaseAuthentication(BaseAuthentication):
             # Retrieve the corresponding Django user
             user = User.objects.filter(username=uid).first()
             if user:
+                if not user.is_active:
+                    raise AuthenticationFailed('User account is disabled/pending deletion.')
                 # Attach Firebase metadata to request for use in views
                 request.firebase_uid = uid
                 request.email_verified = email_verified
@@ -80,6 +82,9 @@ class FirebaseAuthentication(BaseAuthentication):
                     'email': email or '',
                 }
             )
+            
+            if not user.is_active:
+                raise AuthenticationFailed('User account is disabled/pending deletion.')
             
             # Update email if changed
             if email and user.email != email:

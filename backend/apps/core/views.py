@@ -99,6 +99,15 @@ class FirebaseAuthView(APIView):
                 created = False
                 logger.info(f"FirebaseAuthView: User retrieved after IntegrityError on creation. Username: {user.username}")
             
+            # Check if user account is soft-deleted / pending deletion
+            if not user.is_active:
+                logger.warning(f"FirebaseAuthView: Attempted login by inactive user UID: {uid}")
+                return Response({
+                    "error": "Account pending deletion",
+                    "pending_deletion": True,
+                    "uid": uid
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
             # Update email if changed
             if email and user.email != email:
                 try:

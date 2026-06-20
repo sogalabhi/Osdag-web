@@ -66,8 +66,9 @@ const createApiClient = (baseUrl) => {
 
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}`;
+      let errorData = {};
       try {
-        const errorData = await response.json().catch(() => ({}));
+        errorData = await response.json().catch(() => ({}));
         errorMessage = errorData.error || errorData.message || errorMessage;
       } catch {
         try {
@@ -77,7 +78,13 @@ const createApiClient = (baseUrl) => {
           // ignore
         }
       }
-      throw new Error(errorMessage);
+      
+      const errorObj = new Error(errorMessage);
+      if (errorData.pending_deletion) {
+        errorObj.pending_deletion = true;
+        errorObj.uid = errorData.uid;
+      }
+      throw errorObj;
     }
 
     return response;

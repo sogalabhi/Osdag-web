@@ -6,6 +6,8 @@ import { isGuestUser } from '../../utils/auth';
 import { useAuth } from '../../context/AuthContext';
 import { searchProjects } from '../../datasources/projectsDataSource';
 import { downloadSectionCatalog, importSectionXlsx } from '../../datasources/sectionsDataSource';
+import { apiClient } from '../../utils/apiClient';
+import { AUTH } from '../../datasources/endpoints';
 import ProjectActionButtons from './ProjectActionButtons';
 import dayButton from '../../assets/homepage/day_button.svg';
 import infoDefault from '../../assets/homepage/info_default.svg';
@@ -39,6 +41,10 @@ const Header = ({ setshowSideBar, active }) => {
   const [showAskQuestion, setShowAskQuestion] = useState(false);
   const [showPluginsTooltip, setShowPluginsTooltip] = useState(false);
   const [showThemeTooltip, setShowThemeTooltip] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!showPluginsTooltip) return;
@@ -76,6 +82,54 @@ const Header = ({ setshowSideBar, active }) => {
   // Handle login navigation
   const handleLogin = () => {
     navigate('/');
+  };
+
+  // Handle GDPR data export
+  const handleExportData = async () => {
+    try {
+      const response = await apiClient(AUTH.exportData, { method: "GET" });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const userEmailStr = firebaseUser?.email || 'user';
+      a.download = `osdag_user_data_${userEmailStr.split('@')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Failed to export data:", err);
+      alert("Failed to export user data. Please try again.");
+    }
+  };
+
+  // Handle GDPR account soft-deletion
+  const handleDeleteAccount = async () => {
+    const userEmailStr = firebaseUser?.email || '';
+    if (deleteConfirmText.trim() !== userEmailStr) {
+      setDeleteError(`Please type your exact email address: ${userEmailStr}`);
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError('');
+    try {
+      const response = await apiClient(AUTH.deleteAccount, { method: "DELETE" });
+      const result = await response.json();
+      if (result.success) {
+        setShowDeleteModal(false);
+        setDeleteConfirmText('');
+        await logout();
+      } else {
+        setDeleteError(result.error || "Failed to request account deletion");
+      }
+    } catch (err) {
+      console.error("Failed to delete account:", err);
+      setDeleteError(err.message || "An unexpected error occurred during account deletion.");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const [projects, setProjects] = useState([]);
@@ -636,7 +690,24 @@ const Header = ({ setshowSideBar, active }) => {
                           </p>
                         </div>
                         <div className="py-2">
-                          <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
+                          <button 
+                            onClick={handleExportData} 
+                            className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors"
+                          >
+                            Export My Data
+                          </button>
+                          <button 
+                            onClick={() => {
+                              setShowDeleteModal(true);
+                              setDeleteConfirmText('');
+                              setDeleteError('');
+                              setShowProfileDropdown(false);
+                            }} 
+                            className="w-full px-4 py-2 text-left text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+                          >
+                            Delete Account
+                          </button>
+                          <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors border-t dark:border-osdag-green/30">
                             Logout
                           </button>
                         </div>
@@ -988,7 +1059,24 @@ const Header = ({ setshowSideBar, active }) => {
                       </p>
                     </div>
                     <div className="py-2">
-                      <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors">
+                      <button 
+                        onClick={handleExportData} 
+                        className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors"
+                      >
+                        Export My Data
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setShowDeleteModal(true);
+                          setDeleteConfirmText('');
+                          setDeleteError('');
+                          setShowProfileDropdown(false);
+                        }} 
+                        className="w-full px-4 py-2 text-left text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+                      >
+                        Delete Account
+                      </button>
+                      <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors border-t dark:border-osdag-green/30">
                         Logout
                       </button>
                     </div>
@@ -1145,6 +1233,58 @@ const Header = ({ setshowSideBar, active }) => {
       )}
       {showAskQuestion && (
         <AskQuestion onClose={() => setShowAskQuestion(false)} />
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-osdag-dark-color w-[500px] max-w-[90vw] rounded-lg shadow-xl p-6">
+            <h3 className="text-lg font-bold text-red-600 mb-4">Confirm Permanent Account Deletion</h3>
+            
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+              You are requesting to delete your Osdag account and all associated data. 
+              Your account will be <strong>disabled immediately</strong>, and you will be logged out.
+            </p>
+
+            <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900 rounded-lg p-3 mb-4 text-xs text-orange-800 dark:text-orange-300 whitespace-normal">
+              <strong>Grace Period Notice:</strong> We will securely retain your projects and configurations 
+              for <strong>7 days</strong>. You can restore your account within this window simply by logging 
+              back in. After 7 days, your account and all data will be permanently and irreversibly deleted.
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-semibold mb-2 text-black dark:text-white">
+                Type your email to confirm deletion: <span className="font-mono text-xs block text-gray-500 mt-0.5">{firebaseUser?.email}</span>
+              </label>
+              <input
+                type="text"
+                placeholder={firebaseUser?.email || ""}
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                className="w-full p-2.5 border rounded focus:outline-none focus:ring-2 focus:ring-red-500 text-sm dark:bg-gray-800 dark:border-gray-700 text-black dark:text-white"
+              />
+              {deleteError && (
+                <p className="text-red-500 text-xs mt-2">{deleteError}</p>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3 border-t pt-4">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                className="px-4 py-2 border rounded hover:bg-gray-50 dark:hover:bg-gray-800 text-sm transition-colors text-black dark:text-white"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={isDeleting || deleteConfirmText.trim() !== (firebaseUser?.email || '')}
+                className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {isDeleting ? "Deleting..." : "Request Deletion"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
