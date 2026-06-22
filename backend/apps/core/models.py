@@ -84,7 +84,6 @@ class UserAccount(models.Model):
     # Firebase UID stored as username (for backward compatibility and direct lookups)
     username = models.TextField(blank=True, unique=True, help_text="Firebase UID")
     email = models.TextField(blank=True, unique=True)
-    deletion_requested_at = models.DateTimeField(null=True, blank=True, help_text="Timestamp when user requested account deletion")
 
     class Meta:
         app_label = 'core'

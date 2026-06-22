@@ -7,7 +7,7 @@ from django.urls import path
 from apps.core.api import (
     SaveInputFileView,
     JWTHomeView, GoogleSSOView,
-    DeleteAccountAPIView, ReactivateAccountAPIView,
+    DeleteAccountAPIView,
     ExportUserDataAPIView,
     ProjectAPI, ProjectDetailAPI, ProjectByNameAPI,
     SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
@@ -32,7 +32,6 @@ urlpatterns = [
     path('googlesso/', GoogleSSOView.as_view()),
     path('api/auth/firebase-login/', views.FirebaseAuthView.as_view(), name="firebase_auth"),
     path('api/auth/delete-account/', DeleteAccountAPIView.as_view(), name="delete_account"),
-    path('api/auth/reactivate-account/', ReactivateAccountAPIView.as_view(), name="reactivate_account"),
     path('api/auth/export-data/', ExportUserDataAPIView.as_view(), name="export_data"),
     path('api/dashboard/', views.dashboard_view, name='dashboard'),
     

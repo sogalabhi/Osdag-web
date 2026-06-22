@@ -45,20 +45,16 @@ const LoginPage = () => {
     const [acceptPolicy, setAcceptPolicy] = useState(false);
 
     // Reactivation states
-    const [showReactivateModal, setShowReactivateModal] = useState(false);
-    const [reactivateUid, setReactivateUid] = useState('');
-    const [reactivateError, setReactivateError] = useState('');
-    const [isReactivating, setIsReactivating] = useState(false);
     const [isLoggingIn, setIsLoggingIn] = useState(false);
 
     // Firebase user state (from shared auth hook)
     const { user: currentUser, loading: authLoading } = useAuth();
 
     useEffect(() => {
-        if (!authLoading && currentUser && !isLoggingIn && !showReactivateModal) {
+        if (!authLoading && currentUser && !isLoggingIn) {
             navigate('/home');
         }
-    }, [currentUser, authLoading, navigate, isLoggingIn, showReactivateModal]);
+    }, [currentUser, authLoading, navigate, isLoggingIn]);
 
     // Clear errors when switching between login/signup
     useEffect(() => {
@@ -156,46 +152,7 @@ const LoginPage = () => {
         }
     };
 
-    const handleReactivate = async () => {
-        setIsReactivating(true);
-        setReactivateError('');
-        try {
-            const user = auth.currentUser;
-            if (!user) {
-                throw new Error("No active session found. Please try logging in again.");
-            }
-            const idToken = await user.getIdToken(true);
-            const res = await apiClient(AUTH.reactivateAccount, {
-                method: "POST",
-                body: JSON.stringify({ token: idToken }),
-            });
-            const data = await res.json();
-            if (data.success) {
-                // Sync user with backend
-                await syncUserToBackend(user);
-                setShowReactivateModal(false);
-                setIsLoggingIn(false);
-                navigate('/home');
-            } else {
-                setReactivateError(data.error || "Failed to reactivate account.");
-            }
-        } catch (err) {
-            console.error("Reactivation failed:", err);
-            setReactivateError(err.message || "An error occurred during reactivation.");
-        } finally {
-            setIsReactivating(false);
-        }
-    };
 
-    const handleCancelReactivate = async () => {
-        try {
-            await signOut(auth);
-        } catch (err) {
-            console.error("Error signing out user:", err);
-        }
-        setShowReactivateModal(false);
-        setIsLoggingIn(false);
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -233,25 +190,18 @@ const LoginPage = () => {
             }
         } catch (error) {
             console.error("Firebase Auth Error:", error);
-            if (error.pending_deletion) {
-                setReactivateUid(error.uid);
-                setShowReactivateModal(true);
-            } else {
-                const errorMessage = getFirebaseErrorMessage(error.code);
-                setGeneralError(errorMessage);
+            const errorMessage = getFirebaseErrorMessage(error.code);
+            setGeneralError(errorMessage);
 
-                // Handle specific account linking scenarios
-                if (error.code === 'auth/email-already-in-use' && !isSignup) {
-                    setGeneralError('Account exists with this email. Please log in or use "Login with Google".');
-                } else if (error.code === 'auth/wrong-password') {
-                    setGeneralError('Incorrect password. If you created this account with Google, please use "Login with Google" or reset your password.');
-                }
+            // Handle specific account linking scenarios
+            if (error.code === 'auth/email-already-in-use' && !isSignup) {
+                setGeneralError('Account exists with this email. Please log in or use "Login with Google".');
+            } else if (error.code === 'auth/wrong-password') {
+                setGeneralError('Incorrect password. If you created this account with Google, please use "Login with Google" or reset your password.');
             }
         } finally {
             setIsLoading(false);
-            if (!showReactivateModal) {
-                setIsLoggingIn(false);
-            }
+            setIsLoggingIn(false);
         }
     };
 
@@ -295,38 +245,31 @@ const LoginPage = () => {
                 status: error.response?.status,
             });
 
-            if (error.pending_deletion) {
-                setReactivateUid(error.uid);
-                setShowReactivateModal(true);
-            } else {
-                // Handle Firebase auth errors
-                if (error.code) {
-                    const errorMessage = getFirebaseErrorMessage(error.code);
-                    setGeneralError(errorMessage);
-                } else if (error.response) {
-                    // Handle backend errors
-                    const backendError = error.response.data?.error || error.response.data?.message || "Unknown backend error";
-                    console.error("Backend error:", backendError);
-                    if (backendError === "Invalid Firebase token" || backendError.includes("Invalid")) {
-                        setGeneralError("Invalid Google authentication. Please try again.");
-                    } else if (backendError === "No token provided") {
-                        setGeneralError("Authentication token missing. Please try again.");
-                    } else {
-                        setGeneralError(`Login failed: ${backendError}`);
-                    }
-                } else if (error.message) {
-                    // Handle other errors with messages
-                    setGeneralError(`Login failed: ${error.message}`);
+            // Handle Firebase auth errors
+            if (error.code) {
+                const errorMessage = getFirebaseErrorMessage(error.code);
+                setGeneralError(errorMessage);
+            } else if (error.response) {
+                // Handle backend errors
+                const backendError = error.response.data?.error || error.response.data?.message || "Unknown backend error";
+                console.error("Backend error:", backendError);
+                if (backendError === "Invalid Firebase token" || backendError.includes("Invalid")) {
+                    setGeneralError("Invalid Google authentication. Please try again.");
+                } else if (backendError === "No token provided") {
+                    setGeneralError("Authentication token missing. Please try again.");
                 } else {
-                    // Handle network or other errors
-                    setGeneralError("Something went wrong. Please check your connection and try again.");
+                    setGeneralError(`Login failed: ${backendError}`);
                 }
+            } else if (error.message) {
+                // Handle other errors with messages
+                setGeneralError(`Login failed: ${error.message}`);
+            } else {
+                // Handle network or other errors
+                setGeneralError("Something went wrong. Please check your connection and try again.");
             }
         } finally {
             setIsLoading(false);
-            if (!showReactivateModal) {
-                setIsLoggingIn(false);
-            }
+            setIsLoggingIn(false);
         }
     };
 
@@ -667,43 +610,6 @@ const LoginPage = () => {
                                     className='p-2.5 w-full border border-gray-300 text-sm m-1.5 rounded transition-colors duration-300 focus:outline-none focus:border-osdag-green focus:shadow-[0_0_0_2px_rgba(145,176,20,0.1)]'
                                 />
                             </label>
-                        </div>
-                    </Modal>
-
-                    {/* Reactivate Account Modal */}
-                    <Modal
-                        title="Reactivate Your Account"
-                        visible={showReactivateModal}
-                        onCancel={handleCancelReactivate}
-                        footer={[
-                            <Button key="cancel" onClick={handleCancelReactivate}>
-                                Cancel
-                            </Button>,
-                            <Button
-                                key="reactivate"
-                                type="primary"
-                                onClick={handleReactivate}
-                                loading={isReactivating}
-                                style={{ backgroundColor: '#91b014', borderColor: '#91b014' }}
-                            >
-                                Reactivate Account
-                            </Button>,
-                        ]}
-                        maskClosable={false}
-                    >
-                        <div>
-                            {reactivateError && (
-                                <Alert
-                                    message={reactivateError}
-                                    type="error"
-                                    showIcon
-                                    className='mb-4'
-                                />
-                            )}
-
-                            <p className="mb-4 text-sm text-gray-600">
-                                Your account is currently scheduled for deletion (pending grace period). Would you like to reactivate your account and restore all your projects?
-                            </p>
                         </div>
                     </Modal>
                 </div>

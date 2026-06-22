@@ -7,7 +7,7 @@ from .auth.user_view import (
 )
 from .auth.jwt_api import JWTHomeView
 from .auth.google_sso_api import GoogleSSOView
-from .auth.delete_account_api import DeleteAccountAPIView, ReactivateAccountAPIView
+from .auth.delete_account_api import DeleteAccountAPIView
 from .auth.export_data_api import ExportUserDataAPIView
 
 # Project exports
@@ -34,7 +34,7 @@ __all__ = [
     # Auth
     'SaveInputFileView',
     'JWTHomeView', 'GoogleSSOView',
-    'DeleteAccountAPIView', 'ReactivateAccountAPIView',
+    'DeleteAccountAPIView',
     'ExportUserDataAPIView',
     # Projects
     'ProjectAPI', 'ProjectDetailAPI', 'ProjectByNameAPI',

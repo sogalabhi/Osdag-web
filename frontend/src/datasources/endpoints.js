@@ -88,7 +88,6 @@ export const SECTIONS = {
 export const AUTH = {
   firebaseLogin: `${API_PREFIX}auth/firebase-login/`, // POST
   deleteAccount: `${API_PREFIX}auth/delete-account/`, // DELETE
-  reactivateAccount: `${API_PREFIX}auth/reactivate-account/`, // POST
   exportData: `${API_PREFIX}auth/export-data/`, // GET
 };
 

@@ -30,14 +30,10 @@ export default function PrivacyTab() {
         <li><strong>Right to Erasure (Account Deletion):</strong> You can request the deletion of your account and all associated data at any time via your profile dropdown.</li>
       </ul>
 
-      <h3 className="mb-2 text-lg font-semibold text-black">4. Account Deletion & Retention Grace Period</h3>
+      <h3 className="mb-2 text-lg font-semibold text-black">4. Account Deletion & Permanent Purge</h3>
       <p className="mb-4">
-        When you request account deletion, your account is immediately deactivated and placed into a <strong>7-day grace period</strong>.
+        When you request account deletion, all your account records, user profile details, and design projects are immediately, permanently, and irreversibly purged from our databases. No grace period is provided, and the deletion cannot be undone.
       </p>
-      <ul className="list-disc pl-6 mb-4 space-y-1">
-        <li><strong>Reactivation:</strong> Within these 7 days, you can log in to reactivate your account, which cancels the deletion request.</li>
-        <li><strong>Permanent Purge:</strong> After 7 days, all your account records, user profile details, and design projects are permanently and irreversibly purged from our databases. No orphaned records are retained.</li>
-      </ul>
 
       <p className="mt-6 text-sm text-gray-500 italic">
         The Osdag developers' community does not condone unauthorized usage of private data and remains dedicated to user data safety and sovereignty.

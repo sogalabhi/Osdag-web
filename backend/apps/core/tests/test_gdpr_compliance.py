@@ -7,7 +7,6 @@ from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
 from apps.core.models import UserAccount, Project, CustomMaterials
-from apps.core.tasks import purge_expired_deletion_accounts
 
 class GDPRComplianceTests(TestCase):
     def setUp(self):
@@ -25,8 +24,17 @@ class GDPRComplianceTests(TestCase):
         )
 
     @patch('firebase_admin.auth.verify_id_token')
-    @patch('firebase_admin.auth.revoke_refresh_tokens')
-    def test_delete_account_success(self, mock_revoke, mock_verify):
+    @patch('firebase_admin.auth.delete_user')
+    def test_delete_account_success(self, mock_delete_user, mock_verify):
+        Project.objects.create(
+            name="Project Alpha",
+            module="Shear Connection",
+            submodule="FinPlateConnection",
+            inputs_json={"material": "Fe 410"},
+            outputs_json={"status": "pass"},
+            user_email="test@example.com"
+        )
+        
         # Setup authentication
         mock_verify.return_value = {
             "uid": "test_uid_123",
@@ -41,106 +49,13 @@ class GDPRComplianceTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json().get("success"))
 
-        # Verify DB updates
-        self.user.refresh_from_db()
-        self.user_account.refresh_from_db()
-        self.assertFalse(self.user.is_active)
-        self.assertIsNotNone(self.user_account.deletion_requested_at)
-        mock_revoke.assert_called_once_with("test_uid_123")
-
-        # Verify middleware blocks subsequent requests
-        response_blocked = self.client.get("/api/projects/", **headers)
-        self.assertEqual(response_blocked.status_code, 401)
-
-    @patch('firebase_admin.auth.verify_id_token')
-    def test_reactivate_account_success(self, mock_verify):
-        # First, soft-delete the user
-        self.user.is_active = False
-        self.user.save()
-        self.user_account.deletion_requested_at = timezone.now()
-        self.user_account.save()
-
-        # Mock verify token for reactivation
-        mock_verify.return_value = {
-            "uid": "test_uid_123",
-            "email": "test@example.com",
-            "email_verified": True,
-            "exp": int(time.time()) + 3600
-        }
-
-        # Reactivate account
-        response = self.client.post(
-            "/api/auth/reactivate-account/",
-            data={"token": "fake_reactivate_token"},
-            content_type="application/json"
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json().get("success"))
-
-        # Verify DB updates
-        self.user.refresh_from_db()
-        self.user_account.refresh_from_db()
-        self.assertTrue(self.user.is_active)
-        self.assertIsNone(self.user_account.deletion_requested_at)
-
-    @patch('firebase_admin.auth.verify_id_token')
-    def test_firebase_auth_view_intercepts_inactive(self, mock_verify):
-        # Soft-delete the user
-        self.user.is_active = False
-        self.user.save()
-        self.user_account.deletion_requested_at = timezone.now()
-        self.user_account.save()
-
-        # Mock verify token for login sync
-        mock_verify.return_value = {
-            "uid": "test_uid_123",
-            "email": "test@example.com",
-            "email_verified": True,
-            "exp": int(time.time()) + 3600
-        }
-
-        # Login/Sync request
-        response = self.client.post(
-            "/api/auth/firebase-login/",
-            data={"token": "fake_login_token"},
-            content_type="application/json"
-        )
-        self.assertEqual(response.status_code, 400)
-        self.assertTrue(response.json().get("pending_deletion"))
-        self.assertEqual(response.json().get("uid"), "test_uid_123")
-
-    @patch('firebase_admin.auth.delete_user')
-    def test_celery_purge_task(self, mock_delete_user):
-        # Create second user who is also deleted but still in grace period
-        other_user = User.objects.create_user(
-            username="test_uid_456",
-            email="other@example.com",
-            password="testpassword"
-        )
-        other_account = UserAccount.objects.create(
-            user=other_user,
-            username="test_uid_456",
-            email="other@example.com",
-            deletion_requested_at=timezone.now() - timedelta(days=2)
-        )
-
-        # Set first user's deletion requested timestamp to 8 days ago (expired)
-        self.user.is_active = False
-        self.user.save()
-        self.user_account.deletion_requested_at = timezone.now() - timedelta(days=8)
-        self.user_account.save()
-
-        # Run Celery purge task
-        purge_expired_deletion_accounts()
-
-        # First user (expired) should be deleted
+        # Verify DB updates User, UserAccount and associated data are completely purged
         self.assertFalse(User.objects.filter(username="test_uid_123").exists())
         self.assertFalse(UserAccount.objects.filter(username="test_uid_123").exists())
-        mock_delete_user.assert_any_call("test_uid_123")
-
-        # Second user (within grace period) should NOT be deleted
-        self.assertTrue(User.objects.filter(username="test_uid_456").exists())
-        self.assertTrue(UserAccount.objects.filter(username="test_uid_456").exists())
+        self.assertFalse(Project.objects.filter(user_email="test@example.com").exists())
+        
+        # Verify Firebase deletion call
+        mock_delete_user.assert_called_once_with("test_uid_123")
 
     @patch('firebase_admin.auth.verify_id_token')
     def test_data_portability_export(self, mock_verify):

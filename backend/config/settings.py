@@ -175,10 +175,6 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour=0, minute=0),
         'args': (24,),
     },
-    'purge-expired-deletion-accounts-daily': {
-        'task': 'apps.core.tasks.purge_expired_deletion_accounts',
-        'schedule': crontab(hour=1, minute=0), # Run daily at 1:00 AM
-    },
 }
 
 
@@ -332,6 +328,3 @@ LOGGING = {
         },
     },
 }
-
-# GDPR Account Deletion settings
-ACCOUNT_DELETION_GRACE_PERIOD_DAYS = 7

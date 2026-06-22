@@ -57,7 +57,7 @@ class FirebaseAuthentication(BaseAuthentication):
             user = User.objects.filter(username=uid).first()
             if user:
                 if not user.is_active:
-                    raise AuthenticationFailed('User account is disabled/pending deletion.')
+                    raise AuthenticationFailed('User account is disabled.')
                 # Attach Firebase metadata to request for use in views
                 request.firebase_uid = uid
                 request.email_verified = email_verified
@@ -84,7 +84,7 @@ class FirebaseAuthentication(BaseAuthentication):
             )
             
             if not user.is_active:
-                raise AuthenticationFailed('User account is disabled/pending deletion.')
+                raise AuthenticationFailed('User account is disabled.')
             
             # Update email if changed
             if email and user.email != email:
