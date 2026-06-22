@@ -77,3 +77,21 @@ export const ANGLE_DISPLAY_CONFIG = {
     ]
   }
 };
+
+export const CHANNEL_DISPLAY_CONFIG = {
+  ...BEAM_DISPLAY_CONFIG,
+  designationKey: "Designation",
+  dimensions: [
+    ...BEAM_DISPLAY_CONFIG.dimensions,
+  ],
+  properties: {
+    middle: [
+      ...BEAM_DISPLAY_CONFIG.properties.middle,
+      { label: "Cy", key: "Cy", unit: UNIT_LABELS.RADIUS_OF_GYRATION }
+    ],
+    right: [
+      ...BEAM_DISPLAY_CONFIG.properties.right
+    ]
+  }
+};
+

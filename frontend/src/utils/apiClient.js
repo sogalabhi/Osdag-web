@@ -68,15 +68,35 @@ const createApiClient = (baseUrl) => {
       let errorMessage = `HTTP ${response.status}`;
       let errorData = {};
       try {
-        errorData = await response.json().catch(() => ({}));
-        errorMessage = errorData.error || errorData.message || errorMessage;
-      } catch {
-        try {
-          const text = await response.text();
-          if (text) errorMessage = text;
-        } catch {
-          // ignore
+        const text = await response.text().catch(() => "");
+        if (text) {
+          try {
+            errorData = JSON.parse(text);
+            if (errorData.error) {
+              errorMessage = errorData.error;
+            } else if (errorData.message) {
+              errorMessage = errorData.message;
+            } else if (errorData.detail) {
+              errorMessage = errorData.detail;
+            } else if (typeof errorData === "object" && errorData !== null) {
+              const fieldErrors = [];
+              for (const [key, value] of Object.entries(errorData)) {
+                if (Array.isArray(value)) {
+                  fieldErrors.push(`${key}: ${value.join(", ")}`);
+                } else if (typeof value === "string") {
+                  fieldErrors.push(`${key}: ${value}`);
+                }
+              }
+              if (fieldErrors.length > 0) {
+                errorMessage = fieldErrors.join(" | ");
+              }
+            }
+          } catch {
+            errorMessage = text;
+          }
         }
+      } catch {
+        // ignore
       }
       
       const errorObj = new Error(errorMessage);

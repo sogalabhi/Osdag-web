@@ -18,7 +18,6 @@ class Project(models.Model):
     """Project object to store minimal project info and file location."""
     name = models.CharField(max_length=200)
     # Optional module and submodule identifiers for routing/reporting
-    
     module = models.CharField(max_length=200, blank=True, null=True)
     submodule = models.CharField(max_length=200, blank=True, null=True)
     # Design inputs persisted as JSON

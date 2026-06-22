@@ -52,8 +52,8 @@ class UserCustomBeam(UserOwnedSectionBase):
     Zpy = models.DecimalField(max_digits=10, decimal_places=2)
     It = models.DecimalField(null=True, max_digits=10, decimal_places=2)
     Iw = models.DecimalField(null=True, max_digits=10, decimal_places=2)
-    Source = models.CharField(max_length=100)
-    Type = models.CharField(null=True, max_length=100)
+    Source = models.CharField(max_length=100, blank=True)
+    Type = models.CharField(null=True, blank=True, max_length=100)
 
     class Meta:
         db_table = "UserCustomBeam"
@@ -91,8 +91,8 @@ class UserCustomColumn(UserOwnedSectionBase):
     Zpy = models.DecimalField(max_digits=10, decimal_places=2)
     It = models.DecimalField(null=True, max_digits=10, decimal_places=2)
     Iw = models.DecimalField(null=True, max_digits=10, decimal_places=2)
-    Source = models.CharField(max_length=100)
-    Type = models.CharField(null=True, max_length=100)
+    Source = models.CharField(max_length=100, blank=True)
+    Type = models.CharField(null=True, blank=True, max_length=100)
 
     class Meta:
         db_table = "UserCustomColumn"
@@ -134,8 +134,8 @@ class UserCustomAngle(UserOwnedSectionBase):
     Zpz = models.DecimalField(max_digits=10, decimal_places=2)
     Zpy = models.DecimalField(max_digits=10, decimal_places=2)
     It = models.DecimalField(max_digits=10, decimal_places=2)
-    Source = models.CharField(max_length=100)
-    Type = models.CharField(max_length=100, null=True)
+    Source = models.CharField(max_length=100, blank=True)
+    Type = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         db_table = "UserCustomAngle"
@@ -174,8 +174,8 @@ class UserCustomChannel(UserOwnedSectionBase):
     Zpy = models.DecimalField(max_digits=10, decimal_places=2)
     It = models.DecimalField(max_digits=10, decimal_places=2)
     Iw = models.DecimalField(max_digits=10, decimal_places=2)
-    Source = models.CharField(max_length=100)
-    Type = models.CharField(null=True, max_length=100)
+    Source = models.CharField(max_length=100, blank=True)
+    Type = models.CharField(null=True, blank=True, max_length=100)
 
     class Meta:
         db_table = "UserCustomChannel"

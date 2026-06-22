@@ -9,6 +9,7 @@ from .auth.jwt_api import JWTHomeView
 from .auth.google_sso_api import GoogleSSOView
 from .auth.delete_account_api import DeleteAccountAPIView
 from .auth.export_data_api import ExportUserDataAPIView
+from .auth.my_data_api import MyDataAPIView
 
 # Project exports
 from .projects.project_api import ProjectAPI, ProjectDetailAPI, ProjectByNameAPI
@@ -36,6 +37,7 @@ __all__ = [
     'JWTHomeView', 'GoogleSSOView',
     'DeleteAccountAPIView',
     'ExportUserDataAPIView',
+    'MyDataAPIView',
     # Projects
     'ProjectAPI', 'ProjectDetailAPI', 'ProjectByNameAPI',
     'SaveOsiFromInputs', 'OpenOsiUpload', 'OpenOsiById', 'ModuleRoutes', 'ProjectOsiDownload',
@@ -48,3 +50,4 @@ __all__ = [
     # Modules
     'GetModules',
 ]
+

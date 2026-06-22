@@ -53,7 +53,9 @@ class MaterialDetails(APIView):
             "Yield_Stress_between_20_and_neg40": fy_20_40,
             "Yield_Stress_greater_than_40": fy_40,
             "Ultimate_Tensile_Stress": fu,
+            "Elongation": 0,
         })
+
 
         if serializer.is_valid():
             serializer.save()
@@ -61,3 +63,45 @@ class MaterialDetails(APIView):
         else:
             print('serializer.errors : ', serializer.errors)
         return Response({"message": "Something went wrong", "success": True}, status=500)
+
+    def delete(self, request, material_id=None):
+        if not (hasattr(request, "user") and request.user.is_authenticated):
+            return Response({"message": "Authentication required", "success": False}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        if not material_id:
+            material_id = request.query_params.get("id")
+            
+        if not material_id:
+            return Response({"message": "Material ID is required", "success": False}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            material = CustomMaterials.objects.get(id=material_id, user=request.user)
+            material.delete()
+            return Response({"message": "Material deleted successfully", "success": True}, status=status.HTTP_200_OK)
+        except CustomMaterials.DoesNotExist:
+            return Response({"message": "Material not found or access denied", "success": False}, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, material_id=None):
+        if not (hasattr(request, "user") and request.user.is_authenticated):
+            return Response({"message": "Authentication required", "success": False}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        if not material_id:
+            material_id = request.data.get("id") or request.query_params.get("id")
+            
+        if not material_id:
+            return Response({"message": "Material ID is required", "success": False}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            material = CustomMaterials.objects.get(id=material_id, user=request.user)
+            material.Grade = request.data.get("Grade", material.Grade)
+            material.Yield_Stress_less_than_20 = request.data.get("Yield_Stress_less_than_20", material.Yield_Stress_less_than_20)
+            material.Yield_Stress_between_20_and_neg40 = request.data.get("Yield_Stress_between_20_and_neg40", material.Yield_Stress_between_20_and_neg40)
+            material.Yield_Stress_greater_than_40 = request.data.get("Yield_Stress_greater_than_40", material.Yield_Stress_greater_than_40)
+            material.Ultimate_Tensile_Stress = request.data.get("Ultimate_Tensile_Stress", material.Ultimate_Tensile_Stress)
+            material.Elongation = request.data.get("Elongation", material.Elongation)
+            material.save()
+            
+            serializer = CustomMaterials_Serializer(material)
+            return Response({"message": "Material updated successfully", "success": True, "data": serializer.data}, status=status.HTTP_200_OK)
+        except CustomMaterials.DoesNotExist:
+            return Response({"message": "Material not found or access denied", "success": False}, status=status.HTTP_404_NOT_FOUND)

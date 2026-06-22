@@ -392,6 +392,31 @@ class SectionCustomView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def put(self, request):
+        table, err = _safe_table(request, source="query")
+        if err:
+            return err
+        id = request.data.get("id")
+        if not id:
+            return Response(
+                {"detail": "Field `id` is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        Model = TABLE_TO_USER_MODEL[table]
+        try:
+            instance = Model.objects.get(id=id, user=request.user)
+        except Model.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+            
+        Ser = get_user_section_serializer(table)
+        ser = Ser(instance, data=request.data, partial=True, context={"request": request})
+        if not ser.is_valid():
+            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        updated_instance = ser.save()
+        out = Ser(updated_instance, context={"request": request})
+        return Response(out.data, status=status.HTTP_200_OK)
+
+
 
 class SectionCustomBulkDeleteView(APIView):
     """DELETE all user custom sections across Columns/Beams/Angles/Channels."""

@@ -18,6 +18,8 @@ import LoginPage from "./Auth/LoginPage";
 // Homepage components
 import Homepage from "./homepage/pages/Homepage";
 import SelectModulePage from "./homepage/pages/SelectModulePage";
+import MyDataPage from "./homepage/pages/MyDataPage";
+
 
 // Shear connection modules
 import FinPlate from "./modules/shearConnection/finPlate/FinPlate";
@@ -80,6 +82,7 @@ function App() {
         <Route path="/:moduleName" element={<SelectModulePage />} />
 
         <Route element={<ProjectAuthGuard />}>
+          <Route path="/my-data" element={<MyDataPage />} />
           <Route path="/design/:designType/shear/fin_plate/:projectId?" element={<FinPlate />} />
           <Route path="/design/:designType/shear/end_plate/:projectId?" element={<EndPlate />} />
           <Route path="/design/:designType/shear/seatAngle/:projectId?" element={<SeatedAngle />} />

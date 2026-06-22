@@ -9,6 +9,7 @@ from apps.core.api import (
     JWTHomeView, GoogleSSOView,
     DeleteAccountAPIView,
     ExportUserDataAPIView,
+    MyDataAPIView,
     ProjectAPI, ProjectDetailAPI, ProjectByNameAPI,
     SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
     ParseReportSections, CustomizeReport,
@@ -25,6 +26,7 @@ urlpatterns = [
     path('api/design-preferences/defaults/', DesignPreferenceDefaults.as_view(), name="design-pref-defaults"),
     path('api/design-preferences/sync/', DesignPreferenceSync.as_view(), name="design-pref-sync"),
     path('api/materialDetails/', MaterialDetails.as_view()),
+    path('api/materialDetails/<int:material_id>/', MaterialDetails.as_view()),
     path('api/company-logo/', CompanyLogoView.as_view()),
     
     # Authentication and authorization
@@ -33,10 +35,12 @@ urlpatterns = [
     path('api/auth/firebase-login/', views.FirebaseAuthView.as_view(), name="firebase_auth"),
     path('api/auth/delete-account/', DeleteAccountAPIView.as_view(), name="delete_account"),
     path('api/auth/export-data/', ExportUserDataAPIView.as_view(), name="export_data"),
+    path('api/auth/my-data/', MyDataAPIView.as_view(), name="my_data"),
     path('api/dashboard/', views.dashboard_view, name='dashboard'),
     
     # User URLs
     path('api/user/saveinput/', SaveInputFileView.as_view()),
+
     
     # OSI upload via DRF (multipart form-data)
     path('api/save-osi/', SaveInputFileView.as_view()),

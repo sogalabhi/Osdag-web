@@ -691,10 +691,13 @@ const Header = ({ setshowSideBar, active }) => {
                         </div>
                         <div className="py-2">
                           <button 
-                            onClick={handleExportData} 
+                            onClick={() => {
+                              navigate("/my-data");
+                              setShowProfileDropdown(false);
+                            }} 
                             className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors"
                           >
-                            Export My Data
+                            My Data
                           </button>
                           <button 
                             onClick={() => {
@@ -1059,11 +1062,14 @@ const Header = ({ setshowSideBar, active }) => {
                       </p>
                     </div>
                     <div className="py-2">
-                      <button 
-                        onClick={handleExportData} 
+                       <button 
+                        onClick={() => {
+                          navigate("/my-data");
+                          setShowProfileDropdown(false);
+                        }} 
                         className="w-full px-4 py-2 text-left text-osdag-green hover:bg-osdag-green/10 dark:hover:bg-osdag-green/20 transition-colors"
                       >
-                        Export My Data
+                        My Data
                       </button>
                       <button 
                         onClick={() => {

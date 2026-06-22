@@ -48,6 +48,7 @@ const GenericSectionView = ({
   const [showModal, setShowModal] = useState(false);
   const [editableData, setEditableData] = useState({});
   const [designationStr, setDesignationStr] = useState("");
+  const [lastPropDesignation, setLastPropDesignation] = useState("");
 
   const getDropdownOptions = useCallback(() => {
     const fullList =
@@ -123,8 +124,12 @@ const GenericSectionView = ({
       }
     }
 
-    setDesignationStr(desigStr);
-  }, [inputs, displayConfig.designationKey, beamList, columnList, angleList, channelList, hideDropdown, getDropdownOptions, onDesignationChange]);
+    if (desigStr !== lastPropDesignation) {
+      setDesignationStr(desigStr);
+      setLastPropDesignation(desigStr);
+    }
+  }, [inputs, displayConfig.designationKey, beamList, columnList, angleList, channelList, hideDropdown, getDropdownOptions, onDesignationChange, lastPropDesignation]);
+
 
   const materialKey = sectionType === 'supporting' ? 'supporting_material' : 'supported_material';
   const targetMaterial = designPrefInputs[materialKey];

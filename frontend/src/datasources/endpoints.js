@@ -52,6 +52,7 @@ export const CAD = {
 // ----------------------
 export const MATERIALS = {
   customMaterial: `${API_PREFIX}materialDetails/`, // POST
+  delete: (id) => `${API_PREFIX}materialDetails/${id}/`, // DELETE
 };
 
 export const DESIGN_PREFERENCES = {
@@ -89,6 +90,7 @@ export const AUTH = {
   firebaseLogin: `${API_PREFIX}auth/firebase-login/`, // POST
   deleteAccount: `${API_PREFIX}auth/delete-account/`, // DELETE
   exportData: `${API_PREFIX}auth/export-data/`, // GET
+  myData: `${API_PREFIX}auth/my-data/`, // GET
 };
 
 // ----------------------
