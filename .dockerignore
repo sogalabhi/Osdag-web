@@ -33,10 +33,6 @@ ENV/
 dist/
 build/
 
-# Application Logs & Diagnostics
-*.log
-logs/
-    
 # Local Database Files
 *.sqlite3
 *.db
@@ -48,4 +44,9 @@ logs/
 # Crucial Space Additions: Local Data Volumes & Generated Assets
 volumes/
 postgres_data*/
-media/*
+media/
+backend/file_storage/
+frontend/
+osdagclient/
+*.log
+logs/

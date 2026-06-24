@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:14-alpine
+    image: mirror.gcr.io/library/postgres:14-alpine
     platform: linux/amd64
     restart: unless-stopped
     environment:
@@ -18,7 +18,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:7-alpine
+    image: mirror.gcr.io/library/redis:7-alpine
     platform: linux/amd64
     restart: unless-stopped
     healthcheck:
@@ -136,7 +136,7 @@ services:
 
   # ─── Observability stack ────────────────────────────────────────────────────
   influxdb:
-    image: influxdb:2.7-alpine
+    image: mirror.gcr.io/library/influxdb:2.7-alpine
     platform: linux/amd64
     restart: unless-stopped
     ports:
@@ -159,7 +159,7 @@ services:
       retries: 10
 
   grafana:
-    image: grafana/grafana:10.4.2
+    image: mirror.gcr.io/grafana/grafana:10.4.2
     platform: linux/amd64
     restart: unless-stopped
     ports:
@@ -194,6 +194,8 @@ services:
       REDIS_URL:           redis://redis:6379/0
       SAMPLE_INTERVAL_S:   "0.5"
       HOST_LABEL:          osdag-server
+    volumes:
+      - .:/app
     depends_on:
       influxdb:
         condition: service_healthy

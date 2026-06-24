@@ -1,4 +1,4 @@
-FROM node:20.11.1-alpine3.19
+FROM mirror.gcr.io/library/node:20.11.1-alpine3.19
 
 WORKDIR /app
 

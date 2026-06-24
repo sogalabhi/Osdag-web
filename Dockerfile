@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:24.11.1-0
+FROM mirror.gcr.io/continuumio/miniconda3:24.11.1-0
 
 WORKDIR /app
 
