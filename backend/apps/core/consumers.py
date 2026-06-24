@@ -5,6 +5,7 @@ import os
 import logging
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
 from celery.result import AsyncResult
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,27 @@ _active_ws_count = 0  # live gauge: total open WS connections across all workers
 
 INFLUXDB_BUCKET = os.getenv("INFLUXDB_BUCKET", "osdag_metrics")
 INFLUXDB_ORG    = os.getenv("INFLUXDB_ORG",    "osdag")
+
+
+@database_sync_to_async
+def _check_task_status_sync(task_id: str):
+    """Query Celery result backend synchronously in a thread pool."""
+    task_result = AsyncResult(task_id)
+    if task_result.ready():
+        state      = task_result.status
+        result_val = None
+        error_val  = None
+        if task_result.successful():
+            result_val = task_result.result
+        else:
+            error_val = str(task_result.result)
+        return {
+            "ready": True,
+            "status": state,
+            "result": result_val,
+            "error": error_val
+        }
+    return {"ready": False}
 
 
 def _write_ws_point_sync(event: str, task_id: str, channel_name: str,
@@ -79,20 +101,12 @@ class TaskStatusConsumer(AsyncWebsocketConsumer):
         logger.debug("[WSMetrics] connect: task=%s  active=%d", self.task_id, current_count)
 
         # Check if the task is already completed (race condition mitigation)
-        task_result = AsyncResult(self.task_id)
-        if task_result.ready():
-            state      = task_result.status
-            result_val = None
-            error_val  = None
-            if task_result.successful():
-                result_val = task_result.result
-            else:
-                error_val = str(task_result.result)
-
+        status_data = await _check_task_status_sync(self.task_id)
+        if status_data["ready"]:
             await self.send(text_data=json.dumps({
-                "status": state,
-                "result": result_val,
-                "error":  error_val,
+                "status": status_data["status"],
+                "result": status_data["result"],
+                "error":  status_data["error"],
             }))
 
     async def disconnect(self, close_code):
