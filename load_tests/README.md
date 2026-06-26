@@ -1,62 +1,105 @@
 # Axially Loaded Column Backend Load Tests
 
-This load testing suite measures the performance and concurrency limits of the **Axially Loaded Column** calculation module. 
+This load testing suite measures the performance and concurrency limits of the **Axially Loaded Column** calculation module.
 
-The test models the real user flow:
-1. `POST` request to enqueue the design task (receives `task_id`).
-2. Polling `GET` requests every 1 second until the task completes (`SUCCESS` or `FAILURE`).
+Two test modes are available:
 
-We track two custom aggregated metrics in Locust:
-* `design_enqueue`: Latency of the initial `POST` request (the queuing phase).
-* `design_round_trip`: Total time from the initial `POST` to the final `SUCCESS` or `FAILURE` status (queuing + calculation time).
+| Mode | Locustfile | Description |
+| :--- | :--- | :--- |
+| **HTTP Polling** | `locustfile.py` | POST to enqueue, then poll `GET /api/tasks/{id}/` every 1 s until done |
+| **WebSocket** | `locustfile_ws.py` | POST to enqueue, then open a persistent WebSocket and wait for the result message |
+
+Both modes track two custom aggregated metrics in Locust:
+* `design_enqueue` — Latency of the initial `POST` request (queuing phase only).
+* `design_round_trip` — Total time from `POST` to final `SUCCESS`/`FAILURE` (queuing + calculation time).
+
+The WebSocket mode additionally tracks:
+* `design_ws_connect` — WS handshake latency, useful for spotting file-descriptor exhaustion under high load.
 
 ---
 
 ## Setup Instructions
 
-### 1. Install Locust
-It is recommended to run this in your Python virtual environment:
+### 1. Install dependencies
+It is recommended to run this inside a Python virtual environment:
 ```bash
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Start the Load Test Web UI
-Start the Locust server locally. The target host is set to the remote backend server:
+### 2. Run interactively via the Locust Web UI
+
+**HTTP Polling mode:**
 ```bash
 locust -f locustfile.py --host http://10.104.135.9:8000
 ```
+
+**WebSocket mode:**
+```bash
+locust -f locustfile_ws.py --host http://10.104.135.9:8000
+```
+
 Open your browser and navigate to **[http://localhost:8089](http://localhost:8089)**.
+
+---
+
+## Automated 4-Tier Run (`run_automated_tests.py`)
+
+`run_automated_tests.py` orchestrates the full 4-tier stress test automatically (no UI needed) and produces a single self-contained HTML dashboard.
+
+### Usage
+
+```bash
+# Full WebSocket run against the default host (http://10.104.135.9:8000)
+python run_automated_tests.py
+
+# Point at a different host
+python run_automated_tests.py --host http://localhost:8000
+
+# Use the HTTP polling locustfile instead of the default WebSocket one
+python run_automated_tests.py --locustfile locustfile.py
+
+# Quick smoke-test (10 s/tier, 5 s cooldown) to verify plumbing before a real run
+python run_automated_tests.py --dry-run
+
+# All options
+python run_automated_tests.py --help
+```
+
+After the run completes, open **`report_dashboard_ws.html`** (or `report_dashboard.html` for HTTP mode) in a browser to inspect the results.
 
 ---
 
 ## Load Test Methodology (4-Tier Progression)
 
-To evaluate server performance under increasing pressure, run the test in **4 sequential tiers**. Run each tier for **3 minutes**, then stop the test and let the Celery queue drain completely before starting the next tier.
+Each tier runs for **3 minutes** with a **30-second cooldown** between tiers so the Celery queue fully drains before the next tier begins.
 
 | Tier | Concurrent Users | Spawn Rate (users/sec) | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Tier 1** | 10 | 2 | **Baseline**: Standard operational behavior. |
-| **Tier 2** | 50 | 5 | **Light Load**: Approaching Celery worker concurrency (18). |
-| **Tier 3** | 100 | 10 | **Moderate Load**: Queue begins to build, testing backlog processing. |
-| **Tier 4** | 200 | 20 | **Full Stress**: Maximum load, identifying capacity and bottlenecks. |
+| **Tier 1** | 10 | 20 | **Baseline** — Standard operational behaviour. |
+| **Tier 2** | 50 | 20 | **Light Load** — Approaching Celery worker concurrency (18). |
+| **Tier 3** | 100 | 20 | **Moderate Load** — Queue begins to build; tests backlog processing. |
+| **Tier 4** | 200 | 20 | **Full Stress** — Maximum load; identifies capacity ceiling and bottlenecks. |
 
-### How to Run a Tier:
-1. In the Locust Web UI, enter the **Number of users** and **Spawn rate** according to the table above.
+### Manual tier run (Web UI)
+1. In the Locust Web UI, enter the **Number of users** and **Spawn rate** from the table above.
 2. Click **Start swarming**.
 3. Let it run for 3 minutes.
-4. Click **Stop** in Locust.
-5. **CRITICAL**: Wait for all active Celery tasks to finish processing (you can verify this via Grafana or by checking that the active tasks count drops to 0) before starting the next tier.
+4. Click **Stop**.
+5. **CRITICAL**: Wait for all active Celery tasks to finish (verify in Grafana or by checking the active tasks count drops to 0) before starting the next tier.
 
 ---
 
 ## Metrics to Monitor
 
-### 1. Locust Web UI / CSV Reports (`http://localhost:8089`)
-- **`design_enqueue` (POST)**: Should remain fast (typically < 500ms) regardless of the tier since it only enqueues the task in Redis.
-- **`design_round_trip`**: This will increase proportionally as concurrency goes beyond the Celery worker pool size (18). Watch how it scales across the tiers.
-- **Failures / Errors**: Observe if any tasks fail on the backend due to computational errors, timeouts, or connection failures.
+### 1. Locust Web UI / Reports (`http://localhost:8089`)
+- **`design_enqueue`** — Should stay fast (< 500 ms) regardless of tier; it only enqueues to Redis.
+- **`design_round_trip`** — Will increase as concurrency exceeds the Celery worker pool (18 workers). Watch how it scales across tiers.
+- **`design_ws_connect`** *(WebSocket mode only)* — Spike here signals file-descriptor exhaustion; ensure `ulimit -n ≥ 65536` on the server.
+- **Failures / Errors** — Watch for backend timeouts, connection errors, or calculation failures.
 
 ### 2. Grafana Dashboard (`http://10.104.135.9:3001`)
-- **Host CPU / RAM Utilization**: Celery worker calculations are CPU-intensive. Watch for high utilization and potential OOM issues.
-- **Redis Queue Depth**: Monitor the number of queued tasks during Tiers 3 and 4 to observe the queue size and draining behavior.
-- **Database Connection Pool**: Check if the PostgreSQL database connections are exhausted by the API or workers.
+- **Host CPU / RAM** — Celery worker calculations are CPU-intensive; watch for saturation and OOM events.
+- **Redis Queue Depth** — Monitor queued task count during Tiers 3 & 4 to observe backlog behaviour.
+- **DB Connection Pool** — Check that PostgreSQL connections aren't exhausted by the API or workers.

@@ -18,7 +18,7 @@ TIERS = [
     (10, "10 Users (Tier 1)"),
     (50, "50 Users (Tier 2)"),
     (100, "100 Users (Tier 3)"),
-    (200, "200 Users (Tier 4)")
+    (200, "200 Users (Tier 4)"),
 ]
 
 def run_locust_tier(locustfile, host, users, spawn_rate, duration, report_path):

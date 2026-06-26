@@ -119,6 +119,10 @@ class AxiallyLoadedColumnWSUser(HttpUser):
             )
             return
 
+        # Set a socket-level read timeout so a silent WS drop doesn't freeze
+        # the greenlet indefinitely. 60s is generous for the heaviest tier.
+        ws.sock.settimeout(60.0)
+
         # 3. Read loop waiting for completion
         try:
             while True:

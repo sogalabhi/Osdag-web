@@ -27,7 +27,7 @@ class AxiallyLoadedColumnUser(HttpUser):
             json=PAYLOAD_DATA,
             headers=headers,
             catch_response=True,
-            name="POST design"
+            name="design_enqueue"
         ) as post_response:
             enqueue_time_ms = int((time.time() - enqueue_start) * 1000)
             
