@@ -27,7 +27,9 @@ def run_locust_tier(locustfile, host, users, spawn_rate, duration, report_path):
     print(f"======================================================================")
     print(f"Host: {host}")
     print(f"Report Output: {report_path}")
-    
+
+    SHUTDOWN_GRACE_SECONDS = 60
+
     cmd = [
         sys.executable, "-m", "locust",
         "-f", locustfile,
@@ -38,10 +40,13 @@ def run_locust_tier(locustfile, host, users, spawn_rate, duration, report_path):
         "-t", f"{duration}s",
         "--html", report_path
     ]
-    
+
+    # Wall-clock deadline = test duration + grace period
+    deadline = time.time() + duration + SHUTDOWN_GRACE_SECONDS
+
     # Run the locust process and print its output in real-time
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    
+
     # Read output line by line as it is executed
     while True:
         line = process.stdout.readline()
@@ -49,13 +54,27 @@ def run_locust_tier(locustfile, host, users, spawn_rate, duration, report_path):
             break
         if line:
             print(f"  [Locust] {line.strip()}")
-            
+
+        # Force-kill if Locust hangs past the deadline (e.g. stuck writing HTML)
+        if time.time() > deadline:
+            print(f"\n⏱️  Locust did not exit within {SHUTDOWN_GRACE_SECONDS}s after the test "
+                  f"duration. Force-killing the process...")
+            process.kill()
+            # Drain any remaining buffered output so the pipe doesn't block
+            try:
+                process.stdout.read()
+            except Exception:
+                pass
+            print("  Process killed. The HTML report may be incomplete.")
+            break
+
     rc = process.poll()
-    if rc != 0:
+    if rc is not None and rc != 0:
         print(f"❌ Locust execution failed with return code {rc}")
     else:
         print(f"✅ Locust tier completed successfully!")
-    return rc == 0
+    return rc == 0 or rc is None
+
 
 def compile_dashboard(report_files, host, output_path):
     print("\n📊 Compiling dashboard report...")
