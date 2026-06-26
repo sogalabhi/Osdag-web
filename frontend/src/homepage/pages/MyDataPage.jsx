@@ -9,6 +9,35 @@ import { AUTH, PROJECTS, MATERIALS, SECTIONS } from "../../datasources/endpoints
 import { MODULE_ROUTES } from "../../constants/modules";
 import { getModuleRoute } from "../../constants/moduleRoutes";
 
+/** ── DEBUG: catches render crashes in each section and logs which one ── */
+class DebugErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    console.error(
+      `[MyDataPage] ❌ Crash in section: "${this.props.section}"`,
+      "\nError:", error.message,
+      "\nComponent stack:", info.componentStack
+    );
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 16, background: '#fee', border: '1px solid red', borderRadius: 8, margin: 8 }}>
+          <b>💥 Crash in: {this.props.section}</b>
+          <pre style={{ fontSize: 11, marginTop: 8, whiteSpace: 'pre-wrap' }}>{this.state.error?.message}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const _BEAM_FIELDS = {
   dimensions: [
     { label: "Depth, D", key: "D" },
@@ -498,14 +527,18 @@ const MyDataPage = () => {
               onClick={() => setShowSideBar(false)}
             />
             <div className="relative flex-shrink-0 w-sidebar h-screen border-r border-osdag-border dark:border-gray-700 z-40">
-              <Sidebar setshowSideBar={setShowSideBar} />
+              <DebugErrorBoundary section="Sidebar (mobile overlay)">
+                <Sidebar setshowSideBar={setShowSideBar} />
+              </DebugErrorBoundary>
             </div>
           </div>
         )}
 
         {/* Sidebar for desktop */}
         <div className="flex-shrink-0 bg-white dark:bg-osdag-dark-color hidden lg:block">
-          <Sidebar setshowSideBar={setShowSideBar} active="Home" />
+          <DebugErrorBoundary section="Sidebar (desktop)">
+            <Sidebar setshowSideBar={setShowSideBar} active="Home" />
+          </DebugErrorBoundary>
         </div>
 
         {/* Main Area */}
@@ -518,7 +551,9 @@ const MyDataPage = () => {
 
           <div className="relative flex-1 flex flex-col min-w-0 min-h-0">
             {/* Header */}
-            <Header setshowSideBar={setShowSideBar} />
+            <DebugErrorBoundary section="Header">
+              <Header setshowSideBar={setShowSideBar} />
+            </DebugErrorBoundary>
 
             {/* Scrollable Dashboard Body */}
             <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 max-w-7xl mx-auto w-full">
@@ -846,6 +881,7 @@ const MyDataPage = () => {
       </div>
 
       {/* Styled Confirmation Warning Modal */}
+      <DebugErrorBoundary section="Delete Confirm Modal">
       {deleteModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
           <div className="relative w-full max-w-md bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl overflow-hidden transform scale-100 transition-all duration-300">
@@ -883,8 +919,10 @@ const MyDataPage = () => {
           </div>
         </div>
       )}
+      </DebugErrorBoundary>
 
       {/* View Details Modal */}
+      <DebugErrorBoundary section="View Details Modal">
       {viewModal.isOpen && viewModal.itemData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
           <div className="relative w-full max-w-2xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
@@ -963,8 +1001,10 @@ const MyDataPage = () => {
           </div>
         </div>
       )}
+      </DebugErrorBoundary>
 
       {/* Edit Properties Modal */}
+      <DebugErrorBoundary section="Edit Properties Modal">
       {editModal.isOpen && editModal.itemData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
           <div className="relative w-full max-w-3xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
@@ -1070,6 +1110,7 @@ const MyDataPage = () => {
           </div>
         </div>
       )}
+      </DebugErrorBoundary>
     </div>
   );
 };

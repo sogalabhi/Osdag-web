@@ -377,9 +377,9 @@ function UnifiedDropdownMenu({
   }, []);
 
   return (
-    <div className="relative flex justify-center items-center hover:bg-[#91b014] hover:text-white p-1" ref={parentRef}>
+    <div className="relative flex justify-center items-stretch hover:bg-[#91b014] hover:text-white h-full" ref={parentRef}>
       <div
-        className="font-medium  cursor-pointer"
+        className="font-medium cursor-pointer px-4 flex items-center h-full select-none"
         onClick={handleToggle}
       >
         {label}

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { Button, Popconfirm, message, Spin, Empty } from 'antd';
+import { toast } from 'react-toastify';
 import { DesignReportModal } from '../../modules/shared/components/DesignReportModal';
 import { finPlateConfig } from '../../modules/shearConnection/finPlate/configs/finPlateConfig';
 import { endPlateConfig } from '../../modules/shearConnection/endPlate/configs/endPlateConfig';
@@ -130,7 +130,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
       setReportExtraState({ selectedOption });
       setReportModalOpen(true);
     } catch (e) {
-      message.error(e.message || 'Failed to load project');
+      toast.error(e.message || 'Failed to load project');
     }
   };
 
@@ -143,8 +143,8 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
 
   if (isGuest) {
     return (
-      <div className="text-center p-10">
-        <Empty description="Projects are not available in guest mode" />
+      <div className="text-center p-10 text-gray-500 dark:text-gray-400">
+        Projects are not available in guest mode
       </div>
     );
   }
@@ -152,8 +152,8 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   if (loading) {
     return (
       <div className="text-center p-10">
-        <Spin size="large" />
-        <div className="mt-4 dark:text-white">Loading recent projects...</div>
+        <div className="w-10 h-10 border-4 border-osdag-green border-t-transparent rounded-full animate-spin mx-auto" />
+        <div className="mt-4 text-gray-500 dark:text-white">Loading recent projects...</div>
       </div>
     );
   }
@@ -161,8 +161,8 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   if (projects.length === 0) {
     return (
       <div className="text-center p-10 dark:text-white">
-        <Empty description="No recent projects" />
-        <p className="text-gray-600 mb-4">Start designing to see your projects here</p>
+        <p className="text-gray-500 dark:text-gray-400 mb-2">No recent projects</p>
+        <p className="text-gray-600 dark:text-gray-500 text-sm">Start designing to see your projects here</p>
       </div>
     );
   }
@@ -198,16 +198,20 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
                     onGenerateReport={handleGenerateReportClick}
                   />
 
-                  <Popconfirm
-                    title="Are you sure you want to delete this project?"
-                    onConfirm={() => handleDeleteProject(project.id)}
-                    okText="Yes"
-                    cancelText="No"
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-red-300 dark:border-red-700 rounded-lg bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 hover:border-red-400 transition-all active:scale-95"
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to delete this project?')) {
+                        handleDeleteProject(project.id);
+                      }
+                    }}
                   >
-                    <Button type="text" danger>
-                      Delete
-                    </Button>
-                  </Popconfirm>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete
+                  </button>
                 </div>
               </div>
             </div>

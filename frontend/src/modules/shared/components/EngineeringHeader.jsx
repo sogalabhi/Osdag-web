@@ -42,7 +42,7 @@ export const EngineeringHeader = () => {
 
   return (
     <div className="sticky top-0 z-[60] h-[52px] flex flex-row justify-between items-center bg-[#d2d4d2] w-full text-sm flex-shrink-0 px-4">
-      <div className="flex flex-row items-center gap-x-4">
+      <div className="flex flex-row items-stretch h-full">
         {menuItems.map((item, index) => (
           <UnifiedDropdownMenu
             key={index}
@@ -77,7 +77,7 @@ export const EngineeringHeader = () => {
         ))}
 
         {displaySaveInputPopup && (
-          <span id="save-input-style" style={{ marginTop: "18px" }}>
+          <span id="save-input-style" className="self-center ml-4">
             <strong>Saved input file as &quot;{saveInputFileName}&quot;</strong>
           </span>
         )}
