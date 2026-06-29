@@ -6,6 +6,7 @@
 **/*.pyc
 *.xml
 **/*.txt
+!**/requirements.txt
 **/.idea/
 *~
 .vscode
