@@ -47,6 +47,8 @@ export const EngineeringLayout = () => {
     moduleConfig,
     docks,
     outputConfig,
+    hoverText,
+    hoverPos,
   } = useEngineeringContext();
 
   const {
@@ -356,6 +358,26 @@ export const EngineeringLayout = () => {
               </span>
             ))}
           </div>
+        </div>
+      )}
+
+      {hoverText && (
+        <div
+          style={{
+            position: "fixed",
+            left: hoverPos.x,
+            top: hoverPos.y,
+            background: "rgba(0, 0, 0, 0.75)",
+            color: "#fff",
+            padding: "4px 8px",
+            borderRadius: 6,
+            pointerEvents: "none",
+            fontSize: 12,
+            zIndex: 1000,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {hoverText}
         </div>
       )}
     </div>
