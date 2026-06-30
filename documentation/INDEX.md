@@ -87,10 +87,28 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **11.4 Production Orchestration (`docker-compose.prod.yml`):** Nginx reverse proxy routing, shared static volumes, and specialized Celery worker queue divisions.
 * **11.5 Observations & Areas of Improvement:** Analysis of hardcoded user ID mappings and static database port issues.
 
-### 12. [Chapter 12: Load Test Monitoring & Observability](./chapter_12_load_testing_observability.md)
-* **12.1 Collected Telemetry Data Schema:** Telemetry measurements, collector sources, and metric scopes.
-* **12.2 Observability Stack Run Guide:** Running diagnostic services (InfluxDB, Grafana) via Docker or native setups, and configuring backend collectors.
-* **12.3 Post-Test Offline Analysis:** Exporting collected telemetry logs for post-test analysis.
+### 12. [Chapter 12: Load Testing & Performance Benchmarking](./chapter_12_load_testing.md)
+* **12.1 Introduction & Goals of Osdag Load Testing:** Performance goals of structural engineering simulations and 3D CAD model generation.
+* **12.2 Test Environment & Topology:** ASGI Daphne gateway, Redis broker, Celery worker calculations pool, and DB instances mapping under load.
+* **12.3 Locust Load Testing Framework Integration:** Asynchronous concurrency modeling via gevent greenlets, user parameters, and think times.
+* **12.4 Locust HTTP Polling Test Suite (`locustfile.py`):** In-depth code walkthrough of HTTP polling client flow and custom event emissions.
+* **12.5 Locust WebSocket Test Suite (`locustfile_ws.py`):** Walkthrough of ASGI persistent WebSocket client connection loops, timeouts, and handlers.
+* **12.6 Automated Test Orchestrator (`run_automated_tests.py`):** Headless multi-tier user loops orchestration, subprocess runner structure, and execution safety timeouts.
+* **12.7 Multi-Tier Results Compiler:** Extraction of templates JSON variables and compiled output dashboard layout.
+* **12.8 Analysis of Load Test Results:** Saturation checks, CPU load, socket drops, and failures metrics across 10, 50, 100, and 200 VUs.
+* **12.9 Architectural Recommendations & Performance Tuning Guide:** Optimizing file descriptor limits, Daphne ASGI workers, Redis databases isolation, and PgBouncer connection pooling.
+
+### 13. [Chapter 13: System Telemetry & Metrics Collection](./chapter_13_metrics_telemetry.md)
+* **13.1 Telemetry Infrastructure Overview:** Non-blocking sidecar collector architecture, InfluxDB time-series storage, and Grafana UI dashboard overlays.
+* **13.2 System Metrics Schema (`osdag_system`):** CPU per-core utilization, aggregate host CPU loads, RAM memory metrics, and swap allocations.
+* **13.3 Celery Task Queue Metrics Schema (`osdag_tasks`):** Tracking queue depths per channel name via Redis queues polling loops.
+* **13.4 Redis In-Memory Store Telemetry Schema (`osdag_redis`):** Monitoring connected clients, Pub/Sub channels scaling factor, used memory, and processing throughputs.
+* **13.5 Process Thread Telemetry Schema (`osdag_threads`):** Grouping process roles by regex naming rules and scanning active thread state allocations.
+* **13.6 In-Depth Analysis of the Sidecar Script (`metrics_collector.py`):** Walkthrough of the python-psutil instrumented collector runner code.
+* **13.7 Django Application Telemetry Integration:** Logging HTTP request durations in middleware and ASGI WebSocket connections state changes.
+* **13.8 Telemetry Stack Deployment & Configuration:** Automatic provisioning of Grafana dashboards and InfluxDB datasources in Docker Compose.
+* **13.9 Time-Series Data Querying and Offline Exporting:** InfluxDB Flux querying syntax examples and exporting datasets to offline CSV spreadsheets.
+* **13.10 Advanced Scaling Strategies & HA Recommendations:** Separating message broker Redis from state channels Redis, Prometheus integrations, and load balancing Daphne.
 
 ### Appendix: [Fixed & Resolved Issues Directory](./issues.md)
 * Tracking directory containing the statuses and fixes for architectural, storage, and security issues resolved in Chapters 1 to 3.

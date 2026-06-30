@@ -196,7 +196,7 @@ services:
       SAMPLE_INTERVAL_S:   "0.5"
       HOST_LABEL:          osdag-server
     volumes:
-      - .:/app
+      - ./monitoring:/app
     depends_on:
       influxdb:
         condition: service_healthy
