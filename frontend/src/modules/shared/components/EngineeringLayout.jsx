@@ -374,11 +374,9 @@ export const EngineeringLayout = () => {
             pointerEvents: "none",
             fontSize: 12,
             zIndex: 1000,
-            whiteSpace: "nowrap",
           }}
-        >
-          {hoverText}
-        </div>
+          dangerouslySetInnerHTML={{ __html: hoverText }}
+        />
       )}
     </div>
   );
