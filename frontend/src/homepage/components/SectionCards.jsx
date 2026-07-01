@@ -80,7 +80,6 @@ const SectionCards = ({ section, onModuleClick }) => {
               <div className={`font-semibold mb-2 ${isDev ? "text-gray-400 dark:text-gray-500" : "text-black dark:text-white group-hover:text-white"}`}>
                 {opt.label}
               </div>
-
               {!isDev && (
                 <div
                   className="absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-full group-hover:translate-y-0

@@ -194,6 +194,14 @@ const MyDataPage = () => {
   const [activeTab, setActiveTab] = useState("projects");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Rename Modal State
+  const [renameModal, setRenameModal] = useState({
+    isOpen: false,
+    projectId: null,
+    currentName: "",
+    newName: "",
+  });
+
   // Modal State
   const [deleteModal, setDeleteModal] = useState({
     isOpen: false,
@@ -295,6 +303,50 @@ const MyDataPage = () => {
     } catch (err) {
       console.error(err);
       toast.error("Failed to download OSI file");
+    }
+  };
+
+  const handleOpenRename = (project) => {
+    setRenameModal({
+      isOpen: true,
+      projectId: project.id,
+      currentName: project.name,
+      newName: project.name,
+    });
+  };
+
+  const handleConfirmRename = async () => {
+    const { projectId, newName, currentName } = renameModal;
+    if (!newName.trim()) {
+      toast.error("Project name cannot be empty");
+      return;
+    }
+    if (newName.trim() === currentName) {
+      setRenameModal({ isOpen: false, projectId: null, currentName: "", newName: "" });
+      return;
+    }
+
+    try {
+      const url = PROJECTS.detail(projectId);
+      const response = await apiClient(url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName.trim() }),
+      });
+      
+      const data = await response.json().catch(() => ({}));
+      if (response.ok || data.success) {
+        toast.success(`Project renamed successfully`);
+        setProjects((prev) =>
+          prev.map((p) => (p.id === projectId ? { ...p, name: newName.trim() } : p))
+        );
+        setRenameModal({ isOpen: false, projectId: null, currentName: "", newName: "" });
+      } else {
+        toast.error(data.error || data.message || "Failed to rename project");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred during renaming");
     }
   };
 
@@ -704,6 +756,12 @@ const MyDataPage = () => {
                                       OSI
                                     </button>
                                     <button
+                                      onClick={() => handleOpenRename(project)}
+                                      className="px-3 py-1.5 text-xs font-semibold border border-gray-300 hover:border-blue-500 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 rounded-lg transition-all"
+                                    >
+                                      Rename
+                                    </button>
+                                    <button
                                       onClick={() => triggerDeleteConfirm("project", project.id, project.name)}
                                       className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-all"
                                       title="Delete Project"
@@ -879,6 +937,57 @@ const MyDataPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Rename Project Modal */}
+      <DebugErrorBoundary section="Rename Project Modal">
+      {renameModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
+          <div className="relative w-full max-w-md bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-2xl overflow-hidden transform scale-100 transition-all duration-300">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+              Rename Project
+            </h3>
+            
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">
+                  Project Name
+                </label>
+                <input
+                  type="text"
+                  value={renameModal.newName}
+                  onChange={(e) => setRenameModal(prev => ({ ...prev, newName: e.target.value }))}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleConfirmRename();
+                    }
+                  }}
+                  autoFocus
+                  className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-750 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-osdag-green text-gray-900 dark:text-white transition-all"
+                  placeholder="Enter new project name"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setRenameModal({ isOpen: false, projectId: null, currentName: "", newName: "" })}
+                className="flex-1 py-2.5 border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900/50 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 transition-all active:scale-95"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmRename}
+                className="flex-1 py-2.5 bg-osdag-green hover:bg-osdag-green/90 text-white rounded-xl text-sm font-semibold transition-all shadow-md active:scale-95"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      </DebugErrorBoundary>
 
       {/* Styled Confirmation Warning Modal */}
       <DebugErrorBoundary section="Delete Confirm Modal">
@@ -1116,4 +1225,3 @@ const MyDataPage = () => {
 };
 
 export default MyDataPage;
-
