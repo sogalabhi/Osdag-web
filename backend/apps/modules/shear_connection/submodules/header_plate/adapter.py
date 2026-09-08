@@ -385,6 +385,10 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     part_files = {}
     compound_model = None
 
+    cad_models_path = os.path.join(os.getcwd(), "file_storage", "cad_models")
+    if not os.path.exists(cad_models_path):
+        os.makedirs(cad_models_path, exist_ok=True)
+
     try:
         if section == "Model":
             # Build compound by adding each part shape without fusing

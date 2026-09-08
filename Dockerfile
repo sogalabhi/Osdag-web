@@ -12,15 +12,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglu1-mesa \
     wkhtmltopdf \
+    curl \
+    ca-certificates \
+    bzip2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/requirements.txt
 
-RUN conda config --add channels conda-forge && \
-    conda config --add channels osdag && \
-    conda config --set channel_priority strict && \
-    conda create -n osdag_env python=3.12 pythonocc-core cairo osdag_latex_env -y && \
-    conda clean -afy
+RUN curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj -C /usr/local/bin --strip-components=1 bin/micromamba && \
+    micromamba create -p /opt/conda/envs/osdag_env -c osdag -c conda-forge --channel-priority strict python=3.12 pythonocc-core cairo osdag_latex_env -y && \
+    micromamba clean -afy
 
 RUN /opt/conda/envs/osdag_env/bin/pip install --no-cache-dir -r requirements.txt
 

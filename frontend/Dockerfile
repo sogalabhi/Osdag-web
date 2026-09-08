@@ -1,12 +1,16 @@
-FROM mirror.gcr.io/library/node:20.11.1-alpine3.19
+FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json /app/
+COPY package*.json ./
 
-RUN npm install && npm cache clean --force
+RUN npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000 && \
+    npm config set fetch-retries 5 && \
+    npm install --legacy-peer-deps && \
+    npm cache clean --force
 
-COPY . /app
+COPY . ./
 
 EXPOSE 5173
 

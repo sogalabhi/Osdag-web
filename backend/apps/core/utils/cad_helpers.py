@@ -15,6 +15,7 @@ SECTION_MAPPINGS = {
         'fin-plate': ['Model', 'Beam', 'Column', 'Plate', 'Bolt', 'Weld'],
         'cleat-angle': ['Model', 'Beam', 'Column', 'cleatAngle', 'Bolt', 'Weld'],
         'end-plate': ['Model', 'Beam', 'Column', 'Plate', 'Bolt', 'Weld'],
+        'header-plate': ['Model', 'Beam', 'Column', 'Plate', 'Bolt', 'Weld'],
         'seated-angle': ['Model', 'Beam', 'Column', 'SeatedAngle', 'Bolt', 'Weld'],
     },
     'moment-connection': {
@@ -64,7 +65,20 @@ def get_default_sections(module_name: str, submodule_slug: str) -> List[str]:
     Returns:
         List of section names to generate
     """
-    return SECTION_MAPPINGS.get(module_name, {}).get(submodule_slug, ['Model'])
+    module_dict = SECTION_MAPPINGS.get(module_name, {})
+    if submodule_slug in module_dict:
+        return module_dict[submodule_slug]
+    
+    # Try normalized variants
+    hyphen_slug = submodule_slug.replace('_', '-')
+    if hyphen_slug in module_dict:
+        return module_dict[hyphen_slug]
+        
+    underscore_slug = submodule_slug.replace('-', '_')
+    if underscore_slug in module_dict:
+        return module_dict[underscore_slug]
+
+    return ['Model']
 
 
 def resolve_file_path(path: str, repo_root: str, backend_root: str) -> tuple[str, str]:
