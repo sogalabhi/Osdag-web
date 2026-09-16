@@ -27,6 +27,7 @@ services:
 
   backend:
     platform: linux/amd64
+    image: osdag-web-backend:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -78,6 +79,7 @@ services:
 
   celery_worker:
     platform: linux/amd64
+    image: osdag-web-backend:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -114,11 +116,9 @@ services:
     command: bash -c "cd /app && export PYTHONPATH=/app:/app/backend && exec /opt/conda/envs/osdag_env/bin/celery -A config worker -Q calculations,cad,reports,celery --loglevel=info --concurrency=18"
 
   frontend:
-    platform: linux/amd64
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      network: host
     restart: unless-stopped
     ports:
       - "5173:5173"
