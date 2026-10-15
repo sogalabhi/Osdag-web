@@ -42,7 +42,10 @@
     "vite": "^8.3.0"
   },
   "overrides": {
-    "tar": "7.5.16"
+    "tar": "7.5.16",
+    "@grpc/grpc-js": "1.14.6",
+    "probe-image-size": "7.4.0",
+    "source-map-js": "1.2.2"
   },
   "allowScripts": {
     "@firebase/util@1.13.0": true,

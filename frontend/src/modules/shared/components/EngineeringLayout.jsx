@@ -397,8 +397,9 @@ export const EngineeringLayout = () => {
             fontSize: 12,
             zIndex: 1000,
           }}
-          dangerouslySetInnerHTML={{ __html: hoverText }}
-        />
+        >
+          {hoverText}
+        </div>
       )}
       <EngineeringModals />
     </div>

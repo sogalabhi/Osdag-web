@@ -1619,8 +1619,9 @@ ${!isMobile ? (docks.output ? 'pr-0' : 'pr-[40px]') : ''}
             lineHeight: '1.4',
             boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
           }}
-          dangerouslySetInnerHTML={{ __html: hoverText }}
-        />
+        >
+          {hoverText}
+        </div>
       )}
       {projectCreationModal}
       <HelpLinkModal

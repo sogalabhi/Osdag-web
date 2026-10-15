@@ -4,12 +4,19 @@ Verifies Firebase tokens and syncs users to Django User model
 """
 
 import hashlib
+import logging
 import time
 from firebase_admin import auth as firebase_auth
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
+
+logger = logging.getLogger(__name__)
+
+# Upper bound on how long a verified token is trusted without re-checking Firebase,
+# so disabled/revoked users lose access within this window.
+TOKEN_CACHE_MAX_SECONDS = 300
 
 
 class FirebaseAuthentication(BaseAuthentication):
@@ -65,8 +72,8 @@ class FirebaseAuthentication(BaseAuthentication):
         
         # Cache miss or user not found in local DB -> perform standard validation
         try:
-            # Verify Firebase token
-            decoded = firebase_auth.verify_id_token(token)
+            # Verify Firebase token (check_revoked also rejects disabled users)
+            decoded = firebase_auth.verify_id_token(token, check_revoked=True)
             uid = decoded.get('uid')
             email = decoded.get('email')
             email_verified = decoded.get('email_verified', False)
@@ -122,7 +129,7 @@ class FirebaseAuthentication(BaseAuthentication):
             
             # Cache the successful validation result matching the token's lifetime
             current_time = int(time.time())
-            timeout = max(0, exp - current_time)
+            timeout = min(max(0, exp - current_time), TOKEN_CACHE_MAX_SECONDS)
             if timeout > 0:
                 cache.set(cache_key, {
                     'uid': uid,
@@ -132,10 +139,16 @@ class FirebaseAuthentication(BaseAuthentication):
             
             return (user, None)
             
-        except firebase_auth.InvalidIdTokenError:
-            raise AuthenticationFailed('Invalid Firebase token')
+        # Expired/Revoked are subclasses of InvalidIdTokenError, so they must come first
         except firebase_auth.ExpiredIdTokenError:
             raise AuthenticationFailed('Firebase token has expired')
-        except Exception as e:
-            raise AuthenticationFailed(f'Authentication failed: {str(e)}')
+        except (firebase_auth.RevokedIdTokenError, firebase_auth.UserDisabledError):
+            raise AuthenticationFailed('Firebase token has been revoked or the account is disabled')
+        except firebase_auth.InvalidIdTokenError:
+            raise AuthenticationFailed('Invalid Firebase token')
+        except AuthenticationFailed:
+            raise
+        except Exception:
+            logger.exception('Firebase authentication failed')
+            raise AuthenticationFailed('Authentication failed')
 
