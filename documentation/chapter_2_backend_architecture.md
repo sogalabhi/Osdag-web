@@ -100,6 +100,30 @@ Creates the CAD geometry objects using `CommonDesignLogic` (from `osdag_core.cad
 
 ---
 
+## 2.3a API Error Format
+
+Every API error response has one shape:
+
+```json
+{"error": {"code": "missing_key", "message": "Please specify Bolt.Diameter in input values.",
+           "fields": {"Bolt.Diameter": "Please specify Bolt.Diameter in input values."}}}
+```
+
+* `code` is a stable `snake_case` identifier (`validation_error`, `missing_key`, `invalid_type`, `not_found`, `not_authenticated`, `permission_denied`, `throttled`, `internal_error`, ...).
+* `message` is human readable and safe to show to the user.
+* `fields` is optional and keyed by the input key a message belongs to, so a form can highlight the input. Nested serializer errors use dotted keys; errors not tied to a field use `non_field_errors`.
+
+The format is defined once in `apps/core/utils/api_errors.py`:
+
+* `error_response(code, message, status, fields=None)` builds a DRF `Response`; `error_json_response(...)` builds a `JsonResponse` for plain Django views. Extra keyword arguments become top-level keys next to `error` (used only for legacy flags such as `success: False` and for extra context such as `allowed_scopes`).
+* `exception_handler` is `REST_FRAMEWORK["EXCEPTION_HANDLER"]`. It converts DRF exceptions (`ValidationError` to `fields`, `NotAuthenticated`, `PermissionDenied`, `NotFound`, `Throttled`, ...) and the `OsdagApiException` family (`MissingKeyError` -> `missing_key`, `InvalidInputTypeError` -> `invalid_type`, `RangeValidationError` -> `out_of_range`) to this shape. Any other exception becomes a 500 `internal_error` with a generic message; the traceback is logged, never returned.
+
+Views should raise or return through these helpers instead of building `{'error': ...}` dicts by hand. On the frontend, `apiClient.js` (via `utils/apiError.js`) throws an `Error` whose `message` is `error.message`, with `code`, `status`, `fields` and the raw `data` attached.
+
+**Not covered.** Celery task results (`{'success': False, 'error': msg}`, delivered over the task WebSocket or `GET /api/tasks/<id>/`) are a separate channel with their own shape and are unchanged. They stay until request-time validation (refactor Phase 3) moves input errors into the HTTP response.
+
+---
+
 ## 2.4 Database Schema & Models
 
 ### 1. `Project` Model
