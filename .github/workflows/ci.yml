@@ -65,6 +65,8 @@ jobs:
       DATABASE_PASSWORD: password
       SECRET_KEY: ci-dummy-secret-key
       INFLUXDB_TOKEN: ci-dummy-influxdb-token
+      INFLUXDB_ADMIN_PASSWORD: ci-dummy-influxdb-password
+      GRAFANA_ADMIN_PASSWORD: ci-dummy-grafana-password
     steps:
       - uses: actions/checkout@v4
 
