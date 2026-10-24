@@ -36,7 +36,7 @@ class UnknownMaterialTriggerTests(TestCase):
             r = self.client.post(DESIGN_URL, data={"inputs": inputs}, content_type="application/json")
         self.assertEqual(r.status_code, 400)
         self.assertFalse(r.json()["success"])
-        self.assertIn("Deleted Steel", r.json()["error"])
+        self.assertIn("Deleted Steel", r.json()["error"]["message"])
         delay.assert_not_called()
 
 
