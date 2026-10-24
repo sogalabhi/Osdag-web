@@ -1,7 +1,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import * as Sentry from '@sentry/react'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext'
+
+// Error tracking is optional: Vite inlines VITE_SENTRY_DSN at build time, so it
+// must be passed as a build arg. Works with sentry.io or self-hosted GlitchTip.
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    environment: import.meta.env.VITE_SENTRY_ENVIRONMENT || import.meta.env.MODE,
+    release: import.meta.env.VITE_SENTRY_RELEASE || undefined,
+    tracesSampleRate: 0,
+    sendDefaultPii: false,
+  });
+}
 
 class RootErrorBoundary extends React.Component {
   constructor(props) {
@@ -12,6 +25,7 @@ class RootErrorBoundary extends React.Component {
     return { hasError: true, error };
   }
   componentDidCatch(error, info) {
+    Sentry.captureException(error, { extra: { componentStack: info.componentStack } });
     console.error(
       '🔴 [ROOT BOUNDARY] Uncaught render error:',
       '\nMessage:', error.message,

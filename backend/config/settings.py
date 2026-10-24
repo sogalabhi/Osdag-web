@@ -105,11 +105,13 @@ INSTALLED_APPS = [
     # DRF
     'rest_framework',
     'silk',
+    'django_prometheus',  # /metrics for Prometheus (issue #140)
 ]
 
 # Middleware order is CRITICAL - CorsMiddleware MUST be first
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # MUST BE FIRST for CORS to work
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',  # as early as possible so latency covers the stack
     'apps.core.middleware.metrics_middleware.InfluxMetricsMiddleware',  # Metrics (no-op if InfluxDB unavailable)
     'django.middleware.security.SecurityMiddleware',
     'silk.middleware.SilkyMiddleware',
@@ -119,6 +121,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',  # must be last
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -180,6 +183,9 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = os.getenv('CELERY_TIMEZONE', 'UTC')
 CELERY_TASK_ALWAYS_EAGER = 'test' in sys.argv or any('pytest' in arg for arg in sys.argv)
 CELERY_RESULT_EXPIRES = 1800
+# Task events feed celery-exporter (queue wait time, runtime, failures per queue).
+CELERY_WORKER_SEND_TASK_EVENTS = True
+CELERY_TASK_SEND_SENT_EVENT = True
 
 from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
@@ -298,6 +304,29 @@ INFLUXDB_URL    = os.getenv('INFLUXDB_URL',    'http://influxdb:8086')
 INFLUXDB_TOKEN  = os.getenv('INFLUXDB_TOKEN')
 INFLUXDB_ORG    = os.getenv('INFLUXDB_ORG',    'osdag')
 INFLUXDB_BUCKET = os.getenv('INFLUXDB_BUCKET', 'osdag_metrics')
+
+# ─── Prometheus (django-prometheus) ──────────────────────────────────────────
+# Don't run the migration-state collector on every scrape/startup.
+PROMETHEUS_EXPORT_MIGRATIONS = False
+
+# ─── Sentry / GlitchTip error tracking (optional) ────────────────────────────
+# Disabled unless SENTRY_DSN is set. Works with sentry.io or self-hosted
+# GlitchTip (Sentry-compatible). Settings are imported by web and Celery
+# processes alike, so both report errors.
+SENTRY_DSN = os.getenv('SENTRY_DSN', '')
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.celery import CeleryIntegration
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration(), CeleryIntegration()],
+        environment=os.getenv('SENTRY_ENVIRONMENT', 'production'),
+        release=os.getenv('SENTRY_RELEASE') or None,
+        traces_sample_rate=float(os.getenv('SENTRY_TRACES_SAMPLE_RATE', '0')),
+        send_default_pii=False,
+    )
 
 # Add this to the bottom of settings.py
 

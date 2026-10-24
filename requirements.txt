@@ -112,3 +112,7 @@ django-silk==5.1.0
 # --- Observability / load-test metrics ---
 influxdb-client>=1.40.0  # InfluxDB v2 write API (middleware + Celery signals)
 psutil>=5.9.0             # System metrics (used by monitoring sidecar)
+
+# --- Production monitoring (issue #140) ---
+django-prometheus==2.5.0                # /metrics: request rate, latency, errors per view
+sentry-sdk[django,celery]==2.73.0       # optional error tracking (sentry.io / GlitchTip), enabled by SENTRY_DSN
