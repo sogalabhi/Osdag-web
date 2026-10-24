@@ -300,7 +300,7 @@ export const strutsWeldedConfig = {
           label: "",
           type: "image",
           conditionalDisplay: () => true,
-          imageSource: (inputs) => {
+          imageSource: (extraState, inputs) => {
             const end1 = inputs?.end_condition_1 || "Hinged";
             const end2 = inputs?.end_condition_2 || "Hinged";
             return strutsWeldedConfig.getEndConditionImage(end1, end2);
