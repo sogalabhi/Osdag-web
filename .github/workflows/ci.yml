@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [25april]
 
+# A newer push to the same branch/PR supersedes the older run. Runs on the
+# deploy branch are never cancelled so every merge still gets a CI result and
+# a CD run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/25april' }}
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
