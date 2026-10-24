@@ -1,5 +1,5 @@
 """
-Known-good design inputs for every module adapter (refactor phase 0).
+Known-good design inputs for every module adapter.
 
 Each JSON file under fixtures/design_inputs/<module-slug>/ holds a flat dotted-key
 request body that the web app sends today. These tests assert that the matching
