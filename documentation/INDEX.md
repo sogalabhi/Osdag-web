@@ -87,6 +87,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **11.4 Production Orchestration (`docker-compose.prod.yml`):** Nginx reverse proxy routing, shared static volumes, and specialized Celery worker queue divisions.
 * **11.5 Observations & Areas of Improvement:** Analysis of hardcoded user ID mappings and static database port issues.
 * **11.6 Deploying the Custom Sections & Materials Change:** Restarting Celery workers with the web app, and restoring the catalog SQLite in dev setups that mount `.:/app`.
+* **11.7 Section Catalog: One Source of Truth:** The catalog is read from `osdag_core`'s SQLite through `apps/core/catalog.py`; the Postgres copy and `populate_database.py` are removed.
 
 ### 12. [Chapter 12: Load Testing & Performance Benchmarking](./chapter_12_load_testing.md)
 * **12.1 Introduction & Goals of Osdag Load Testing:** Performance goals of structural engineering simulations and 3D CAD model generation.

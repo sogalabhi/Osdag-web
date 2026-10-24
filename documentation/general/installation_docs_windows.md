@@ -139,12 +139,9 @@ This single command:
 | Frontend (React) | http://localhost:5173 |
 | Backend (Django API) | http://localhost:8000 |
 
-### A.8 — Populate the Database (First Time Only)
+### A.8 — Section Catalog (Nothing to Do)
 
-Once the services are up and running, open a new terminal window and run:
-```cmd
-docker compose exec backend bash -c "source /opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && python populate_database.py"
-```
+The steel-section catalog is read from the SQLite file bundled with `osdag_core`, so there is nothing to load into Postgres. The backend container runs the database migrations itself on start-up.
 
 ### A.9 — Useful Docker Commands
 
@@ -411,7 +408,7 @@ Open **http://localhost:5173**.
 | A.5 | Create `.env` file |
 | A.6 | `docker compose up --build` |
 | A.7 | Open http://localhost:5173 |
-| A.8 | Populate DB (first time only) |
+| A.8 | Section catalog (nothing to do) |
 
 ### Manual WSL 2 Path
 

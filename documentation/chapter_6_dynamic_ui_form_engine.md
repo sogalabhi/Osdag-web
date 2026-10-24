@@ -6,10 +6,10 @@ Osdag-Web implements a declarative, configuration-driven UI form engine. Rather 
 
 ## 6.1 Dynamic Option Loading (`/options/` endpoints)
 
-When an engineering module page loads, the frontend must populate the dropdown selectors with standard structural sections (Beams, Columns, Channels, Angles) and material values (Steel grades, Bolt grades, Plate thicknesses) from the database:
+When an engineering module page loads, the frontend must populate the dropdown selectors with standard structural sections (Beams, Columns, Channels, Angles) and material values (Steel grades, Bolt grades, Plate thicknesses) from the backend catalog:
 
 1. **Option Queries:** The application issues a GET request to `/api/options/<module_id>/` on load.
-2. **Stateless Options Resolution:** The backend queries standard catalogs (such as the Indian Standard structural tables) and returns arrays of JSON records matching the active submodule's requirements.
+2. **Stateless Options Resolution:** The backend reads the standard catalog (the Indian Standard structural tables bundled with `osdag_core`, via `apps/core/catalog.py`) and returns arrays of JSON records matching the active submodule's requirements.
 3. **Frontend Caching:** The returned catalog lists (e.g. `boltDiameterList`, `thicknessList`, `beamList`) are saved in the module's React state context.
 
 ---

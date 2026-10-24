@@ -104,7 +104,7 @@ graph TD
 ### 2. Django & Celery Integration
 * **Shared Context**: Both `backend` and `celery_worker` build from the root `Dockerfile` and share the same environment variables.
 * **Code Mounting**: The root project folder is mounted into the container workspace (`.:/app`) to enable code hot-reloading.
-* **Initialization Commands**: The backend service runs migrations, seeds structural sections (`populate_database.py`), and executes ASGI-bound Gunicorn workers.
+* **Initialization Commands**: The backend service runs migrations and executes ASGI-bound Gunicorn workers. The steel-section catalog is not seeded: it is read from the SQLite file bundled with `osdag_core` (see 11.7).
 
 ### 3. Frontend Integration
 * **Polling Config**: Vite uses a polling driver (`CHOKIDAR_USEPOLLING: "true"`) to capture file modifications inside mounted container volumes.
@@ -205,3 +205,14 @@ Users' custom sections and materials are no longer written into the bundled SQLi
   git checkout -- osdag_core/data/ResourceFiles/Database/Intg_osdag.sqlite
   ```
 * **Production containers** copy the repository at build time and are clean after a rebuild; nothing needs to be restored.
+
+---
+
+## 11.7 Section Catalog: One Source of Truth
+
+The standard catalog (Beams, Columns, Angles, Channels, EqualAngle, UnequalAngle, SHS, RHS, CHS, Bolt, Bolt_fy_fu, Anchor_Bolt, Angle_Pitch and Material) exists once: in the SQLite file bundled with `osdag_core` (`osdag_core/data/ResourceFiles/Database/Intg_osdag.sqlite`, path `osdag_core.Common.PATH_TO_DATABASE`). The calculation engine reads it directly, and the web backend reads it through [catalog.py](../backend/apps/core/catalog.py), which opens it read-only, caches each table and returns rows keyed by the API's field names (for example `Yield_Stress_less_than_20` for Material's `Yield Stress (< 20)`). When `osdag_core` is upgraded, the web UI sees the new catalog without any import step.
+
+Earlier versions kept a second copy of the catalog in PostgreSQL, loaded by `populate_database.py`. That copy rounded values to two decimals and had drifted from the SQLite file, so it was removed: the catalog models, `populate_database.py` and `postgres_Intg_osdag.sql` are gone, and migration `core.0017_delete_postgres_catalog` drops the old tables. User data stays in PostgreSQL (`CustomMaterials` and the `UserCustom*` section tables) and is merged in ahead of the catalog.
+
+Dropdown lists list each designation once, even where the catalog repeats it (such as `WB 200`), because `osdag_core` only ever uses the first matching row.
+

@@ -170,13 +170,9 @@ This single command:
 | Frontend (React) | http://localhost:5173 |
 | Backend (Django API) | http://localhost:8000 |
 
-### A.8 — Populate the Database (First Time Only)
+### A.8 — Section Catalog (Nothing to Do)
 
-After the services are running, populate the structural section database:
-
-```bash
-docker compose exec backend bash -c "source /opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && python populate_database.py"
-```
+The steel-section catalog is read from the SQLite file bundled with `osdag_core`, so there is nothing to load into Postgres. The backend container runs the database migrations itself on start-up.
 
 ### A.9 — Useful Docker Commands
 
@@ -450,13 +446,9 @@ python manage.py migrate
 cd ..
 ```
 
-### B.15 — Populate the Structural Database (First Time Only)
+### B.15 — Section Catalog (Nothing to Do)
 
-```bash
-python populate_database.py
-```
-
-> This script reads `osdag_core/data/ResourceFiles/Database/postgres_Intg_osdag.sql` and populates the section tables.
+The steel-section catalog is read from the SQLite file bundled with `osdag_core` (`osdag_core/data/ResourceFiles/Database/Intg_osdag.sqlite`), so there is no catalog to load into Postgres. The migrations above are all the database setup needed.
 
 ### B.16 — Install Node.js and NPM (for the Frontend)
 
@@ -587,7 +579,6 @@ chmod +x ~/run-osdag.sh
 | Docker build takes very long | Large dependencies (VTK, TeX Live, etc.) | Expected on first build; subsequent builds use Docker cache |
 | `docker compose: command not found` | Old Docker Compose v1 installed | Install Docker Compose v2 plugin (Step A.2); use `docker compose` not `docker-compose` |
 | `LD_PRELOAD` errors in Docker container | libstdc++ path | Already set in Dockerfile: `ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6` |
-| `populate_database.py` fails | Wrong DB connection | Verify Postgres is running and credentials in Step B.11 match the script defaults |
 
 ---
 
@@ -604,7 +595,7 @@ chmod +x ~/run-osdag.sh
 | A.5 | Create `.env` file |
 | A.6 | `docker compose up --build` |
 | A.7 | Open http://localhost:5173 |
-| A.8 | Populate DB (first time only) |
+| A.8 | Section catalog (nothing to do) |
 
 ### Native Path
 
@@ -624,7 +615,7 @@ chmod +x ~/run-osdag.sh
 | B.12 | Install Redis |
 | B.13 | Configure Django environment variables |
 | B.14 | Run `python manage.py migrate` |
-| B.15 | Run `python populate_database.py` |
+| B.15 | Section catalog (nothing to do) |
 | B.16 | Install Node.js 20 via NVM |
 | B.17 | Install frontend deps (`npm install`) |
 | B.18 | Configure frontend `.env` |

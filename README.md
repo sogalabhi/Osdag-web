@@ -121,6 +121,7 @@ To run the entire stack (Postgres, Redis, Django, Celery Worker, React frontend)
    sudo systemctl start redis-server
    ```
 2. **Postgres**: Make sure Postgres is running and the database is configured according to the [Installation Instructions](documentation/installation.md).
+   Run `python manage.py migrate` once. Postgres holds only project and user data (custom sections and materials); the steel-section catalog is read from the SQLite file bundled with `osdag_core`, so there is no catalog to load.
 
 #### Step-by-Step Setup
 

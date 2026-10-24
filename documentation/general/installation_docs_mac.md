@@ -133,13 +133,9 @@ This single command:
 | Frontend (React) | http://localhost:5173 |
 | Backend (Django API) | http://localhost:8000 |
 
-### A.8 — Populate the Database (First Time Only)
+### A.8 — Section Catalog (Nothing to Do)
 
-After the services are running, populate the structural section database:
-
-```bash
-docker compose exec backend bash -c "source /opt/miniconda/etc/profile.d/conda.sh && conda activate myenv && python populate_database.py"
-```
+The steel-section catalog is read from the SQLite file bundled with `osdag_core`, so there is nothing to load into Postgres. The backend container runs the database migrations itself on start-up.
 
 ### A.9 — Useful Docker Commands
 
@@ -455,13 +451,9 @@ python manage.py migrate
 cd ..
 ```
 
-### B.17 — Populate the Structural Database (First Time Only)
+### B.17 — Section Catalog (Nothing to Do)
 
-```bash
-python populate_database.py
-```
-
-> This script reads `osdag_core/data/ResourceFiles/Database/postgres_Intg_osdag.sql` and populates the section tables.
+The steel-section catalog is read from the SQLite file bundled with `osdag_core` (`osdag_core/data/ResourceFiles/Database/Intg_osdag.sqlite`), so there is no catalog to load into Postgres. The migrations above are all the database setup needed.
 
 ### B.18 — Install Node.js (for the Frontend)
 
@@ -596,7 +588,6 @@ chmod +x ~/run-osdag.sh
 | Docker build takes very long | Large dependencies (VTK, TeX Live, etc.) | Expected on first build; subsequent builds use Docker cache |
 | `WARNING: The requested image's platform ... does not match` | Apple Silicon running x86_64 image | Expected warning; Docker uses Rosetta 2 — services work normally |
 | `pip install` fails on Apple Silicon | Native ARM binary not available | Use `CONDA_SUBDIR=osx-64` environment (see Step B.9 note) |
-| `populate_database.py` fails | Wrong DB connection | Verify Postgres is running and credentials match Step B.13 |
 | `pdflatex: command not found` | TeX not in PATH | Add `/Library/TeX/texbin` to PATH (see Step B.6) |
 | `psql: command not found` | PostgreSQL bin not in PATH | Add PostgreSQL bin to PATH (see Step B.12) |
 | Docker Desktop says "not enough memory" | Docker resource limit too low | Increase Memory in Docker Desktop → Settings → Resources |
@@ -616,7 +607,7 @@ chmod +x ~/run-osdag.sh
 | A.5 | Create `.env` file |
 | A.6 | `docker compose up --build` |
 | A.7 | Open http://localhost:5173 |
-| A.8 | Populate DB (first time only) |
+| A.8 | Section catalog (nothing to do) |
 
 ### Native Path
 
@@ -638,7 +629,7 @@ chmod +x ~/run-osdag.sh
 | B.14 | Install Redis via Homebrew |
 | B.15 | Configure Django environment variables |
 | B.16 | Run `python manage.py migrate` |
-| B.17 | Run `python populate_database.py` |
+| B.17 | Section catalog (nothing to do) |
 | B.18 | Install Node.js 20 via NVM |
 | B.19 | Install frontend deps (`npm install`) |
 | B.20 | Configure frontend `.env` |

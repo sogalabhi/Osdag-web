@@ -218,13 +218,9 @@ cd ..
 
 ---
 
-## Step 12 — Populate the Structural Database (First Time Only)
+## Step 12 — Section Catalog (Nothing to Do)
 
-```bash
-python populate_database.py
-```
-
-> This script reads the SQL dump from `osdag_core/data/ResourceFiles/Database/postgres_Intg_osdag.sql` and populates the section tables. It usually finishes in seconds and skips itself if the data is already loaded.
+The steel-section catalog is read from the SQLite file bundled with `osdag_core` (`osdag_core/data/ResourceFiles/Database/Intg_osdag.sqlite`), so there is no catalog to load into Postgres. The migrations from Step 11 are all the database setup needed.
 
 ---
 
@@ -365,7 +361,7 @@ konsole --new-tab -e bash -c "cd $PROJECT_DIR/frontend && npm run dev; bash" &
 | `redis-cli ping` returns `Connection refused` | Redis not running | Run `sudo systemctl start redis` |
 | `cairo` import error | Cairo installed via pip instead of conda | Run `conda install -c conda-forge cairo -y` |
 | `pythonocc` import error | OCC not installed | Run `conda install -c conda-forge pythonocc-core -y` |
-| `Permission denied` on `populate_database.py` | Wrong PostgreSQL auth | Check `pg_hba.conf` at `/var/lib/postgres/data/pg_hba.conf` — set auth to `md5` for local connections |
+| `FATAL: Peer authentication failed` / `Permission denied` connecting to Postgres | Wrong PostgreSQL auth | Check `pg_hba.conf` at `/var/lib/postgres/data/pg_hba.conf` — set auth to `md5` for local connections |
 | Frontend shows blank page / API errors | Wrong `VITE_BASE_URL` | Check `frontend/.env` has `VITE_BASE_URL=http://127.0.0.1:8000/` |
 | `npm: command not found` | Node.js not installed | Run `sudo pacman -S nodejs npm` |
 
@@ -402,7 +398,7 @@ sudo systemctl restart postgresql
 | 9 | Install + start Redis |
 | 10 | Configure Django environment variables + Firebase key |
 | 11 | Run `python manage.py migrate` |
-| 12 | Run `python populate_database.py` |
+| 12 | Section catalog (nothing to do) |
 | 13 | Install Node.js |
 | 14 | Install frontend deps (`npm install`) |
 | 15 | Configure `frontend/.env` |
