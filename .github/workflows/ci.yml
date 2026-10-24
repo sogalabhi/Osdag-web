@@ -38,11 +38,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create dummy Firebase config
-        run: |
-          mkdir -p backend
-          echo '{}' > backend/firebase-service-account.json
-
       - name: Start DB and Redis
         run: docker compose up -d db redis
 
