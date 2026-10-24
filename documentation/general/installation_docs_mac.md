@@ -206,6 +206,8 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 ## Option B: Native Local Development (No Docker)
 
+> **Automated setup:** `setup_mac.sh` in the repository root performs all of the steps below (packages, Conda env, PostgreSQL, Redis, `.env`, migrations, database population, frontend). Run `bash setup_mac.sh` from the repo root; it is safe to re-run and prints a per-step timing summary. Requires [Homebrew](https://brew.sh). It has not been tested on every macOS version; report problems. Use the manual steps below if you need to customise anything.
+
 Use this if you prefer to run services directly on your Mac or cannot use Docker.
 
 ### B.1 — System Requirements

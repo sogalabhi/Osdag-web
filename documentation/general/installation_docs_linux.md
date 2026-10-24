@@ -242,6 +242,8 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 Use this if you prefer to run services directly on your machine or cannot use Docker.
 
+> **Automated setup:** `setup_ubuntu.sh` in the repository root performs all of the steps below (packages, Conda env, PostgreSQL, Redis, `.env`, migrations, database population, frontend). Run `bash setup_ubuntu.sh` from the repo root; it is safe to re-run and prints a per-step timing summary. (Arch Linux users: `setup_arch.sh` and [installation_arch.md](installation_arch.md).) The scripts have not been tested on every distro version; report problems. Use the manual steps below if you need to customise anything.
+
 ### B.1 — System Requirements
 
 - Ubuntu 20.04 LTS / 22.04 LTS or Arch Linux

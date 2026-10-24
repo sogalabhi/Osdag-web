@@ -220,6 +220,8 @@ Once your Ubuntu instance is running:
 
 Runs everything directly on Windows with Conda, pip, and Node.js. A few things behave differently from Linux — read **C.0** first.
 
+> **Automated setup:** `setup_windows.ps1` in the repository root performs C.1–C.7 (winget installs, Conda env, PostgreSQL role/database, `.env`, migrations, database population, frontend). Run `powershell -ExecutionPolicy Bypass -File .\setup_windows.ps1` from the repo root; it is safe to re-run and prints a per-step timing summary. It has not been tested on every Windows version; if a command is not found after an install, close and reopen PowerShell and re-run.
+
 ### C.0 — What Differs on Native Windows
 
 | Feature | Linux | Native Windows |
