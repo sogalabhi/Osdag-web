@@ -1,0 +1,44 @@
+{
+  "source": "osi:bb_ep_splice_1.osi",
+  "notes": "Desktop example bb_ep_splice_1.osi (Module: \"Beam-Beam End Plate Splice\") parsed by parse_osi(), loaded by the frontend osiLoader into beamBeamEndPlateConfig's form state, then beamBeamEndPlateConfig.buildSubmissionParams (All-selected flags as the loader sets them).",
+  "inputs": {
+    "Bolt.Bolt_Hole_Type": "Standard",
+    "Bolt.Diameter": [
+      "20",
+      "24",
+      "30"
+    ],
+    "Bolt.Grade": [
+      "6.8",
+      "8.8"
+    ],
+    "Bolt.Slip_Factor": "0.3",
+    "Bolt.TensionType": "Non pre-tensioned",
+    "Bolt.Type": "Bearing Bolt",
+    "Connectivity *": "Coplanar Tension-Compression Flange",
+    "Connectivity": "Coplanar Tension-Compression Flange",
+    "EndPlateType": "Flushed - Reversible Moment",
+    "Connector.Plate.Thickness_List": [
+      "20",
+      "22",
+      "25",
+      "28",
+      "32"
+    ],
+    "Connector.Material": "E 250 (Fe 410 W)A",
+    "Design.Design_Method": "Limit State Design",
+    "Detailing.Corrosive_Influences": "No",
+    "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+    "Detailing.Gap": "0",
+    "Load.Axial": "35",
+    "Load.Moment": "100",
+    "Load.Shear": "120",
+    "Material": "E 250 (Fe 410 W)C",
+    "Member.Supported_Section.Designation": "WB 500",
+    "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
+    "Weld.Fab": "Shop Weld",
+    "Weld.Material_Grade_OverWrite": "500",
+    "Weld.Type": "Groove Weld",
+    "Module": "Beam-Beam-End-Plate-Connection"
+  }
+}
