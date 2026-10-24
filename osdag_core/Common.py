@@ -144,7 +144,9 @@ class OurLog(logging.Handler):
             # QTextEdit C++ object has been deleted - skip appending
             pass
 
-# this is to fix the issue of sqlite db in core an psql for custom
+# Optional per-run hook for host apps (e.g. a web backend) to supply section/material
+# rows that are not in the bundled SQLite. Set it to a callable
+# `override(table, value) -> row tuple or None`; None (default) means SQLite only.
 row_override = ContextVar("osdag_row_override", default=None)
 
 
