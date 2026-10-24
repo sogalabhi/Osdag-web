@@ -17,7 +17,6 @@ from apps.core.utils.module_helpers import (
     trigger_async_report
 )
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
-from apps.core.utils.errors import format_error_response, get_error_status_code
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from .registry import SimpleConnectionRegistry
 

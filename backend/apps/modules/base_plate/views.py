@@ -15,7 +15,6 @@ from apps.core.utils.module_helpers import (
     trigger_async_cad,
     trigger_async_report
 )
-from apps.core.utils.errors import format_error_response, get_error_status_code
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 
 from .service import BasePlateService
