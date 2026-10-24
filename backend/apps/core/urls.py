@@ -17,10 +17,14 @@ from apps.core.api import (
     CADGeneration, CADDownload, CADExport
 )
 from apps.core import views
+from apps.core.health import health_view
 
 app_name = 'core'
 
 urlpatterns = [
+    # Health check (DB + Redis) for Docker healthchecks and the CD smoke test
+    path('api/health/', health_view, name='health'),
+
     # Design preferences
     path('api/design-preferences/', DesignPreference.as_view(), name="design-pref"),
     path('api/design-preferences/defaults/', DesignPreferenceDefaults.as_view(), name="design-pref-defaults"),
