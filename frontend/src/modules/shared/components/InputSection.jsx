@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useMemo } from 'react';
 import Select, { components } from 'react-select';
 import { Modal } from 'antd';
 import { getOptionsForField, getListForInputKey } from '../utils/fieldOptionUtils';
+import { stripRequiredMark } from '../utils/validation';
 import { ModuleContext } from "../../../context/ModuleState";
 import CustomMaterialModal from "./CustomMaterialModal";
 import FRM from "../../../assets/flush_ep.png";
@@ -350,7 +351,7 @@ export const InputSection = ({
             }
           }
         }}
-        placeholder={field.placeholder || `ex. ${field.label}`}
+        placeholder={field.placeholder || `ex. ${stripRequiredMark(field.label)}`}
         disabled={field.disabled || isInputLocked}
         className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70"
       />
@@ -664,7 +665,7 @@ export const InputSection = ({
             <div key={index}>
               <div className="flex w-full justify-between items-center mb-3">
                 <h4 className="w-[40%] text-sm font-medium text-osdag-text-primary dark:text-white">
-                  {field.label}{field.required !== false && field.type !== 'image' ? ' *' : ''}
+                  {stripRequiredMark(field.label)}{field.required !== false && field.type !== 'image' ? ' *' : ''}
                 </h4>
                 {renderField(field)}
               </div>
@@ -695,7 +696,7 @@ export const InputSection = ({
       {boundsModalField && (
         <Modal
           open={!!boundsModalField}
-          title={`Set Optimization Bounds - ${boundsModalField.label?.replace('*', '').trim()}`}
+          title={`Set Optimization Bounds - ${stripRequiredMark(boundsModalField.label)?.trim()}`}
           onCancel={() => setBoundsModalField(null)}
           onOk={() => setBoundsModalField(null)}
           okText="Done"

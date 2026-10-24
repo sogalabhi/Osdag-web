@@ -98,7 +98,7 @@ export const endPlateConfig = {
       "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
       "Detailing.Edge_type": inputs.detailing_edge_type,
       "Detailing.Gap": inputs.detailing_gap,
-      "Load.Axial": inputs.load_axial || "",
+      "Load.Axial": inputs.load_axial || "0",
       "Load.Shear": inputs.load_shear || "",
       "Material": inputs.connector_material,
       "Member.Supported_Section.Designation": connectivity === "Beam-Beam" ? inputs.secondary_beam : inputs.beam_section,
@@ -141,7 +141,7 @@ export const endPlateConfig = {
       title: "Factored Loads",
       fields: [
         { key: "load_shear", label: "Shear Force (kN)", type: "number", required: true },
-        { key: "load_axial", label: "Axial Force (kN)", type: "number" },
+        { key: "load_axial", label: "Axial Force (kN)", type: "number", required: false },
       ],
     },
     {

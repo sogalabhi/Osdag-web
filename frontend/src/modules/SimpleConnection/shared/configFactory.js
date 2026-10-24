@@ -71,7 +71,7 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, routePath, desig
             [KEY_MATERIAL]: String(inputs.material),
             ...(hasCoverPlate ? { [KEY_COVER_PLATE]: String(inputs.cover_plate) } : {}),
             ...(hasCoverPlate ? { [KEY_DP_DETAILING_PACKING_PLATE]: String(inputs.detailing_packing_plate || "Yes") } : {}),
-            [KEY_AXIAL]: String(inputs.axial_force),
+            [KEY_AXIAL]: String(inputs.axial_force || "0"),
             [KEY_D]: getArrayParam(allSelected.bolt_diameter, lists.boltDiameterList, inputs.bolt_diameter),
             [KEY_GRD]: getArrayParam(allSelected.bolt_grade, lists.propertyClassList, inputs.bolt_grade),
             [KEY_TYP]: String(inputs.bolt_type),
@@ -122,7 +122,7 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, routePath, desig
             },
             {
                 title: "Factored Loads",
-                fields: [{ key: "axial_force", label: "Axial Force (kN)", type: "number" }]
+                fields: [{ key: "axial_force", label: "Axial Force (kN)", type: "number", required: false }]
             },
             {
                 title: "Bolt",
@@ -211,7 +211,7 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, routePath, desig
             [KEY_PLATE_WIDTH]: String(inputs.plate_width),
             [KEY_MATERIAL]: String(inputs.material),
             ...(hasCoverPlate ? { [KEY_COVER_PLATE]: String(inputs.cover_plate) } : {}),
-            [KEY_AXIAL]: String(inputs.axial_force),
+            [KEY_AXIAL]: String(inputs.axial_force || "0"),
             [KEY_WELD_SIZE]: getArrayParam(allSelected.weld_size, lists.weldSizeList, inputs.weld_size),
             [KEY_DESIGN_FOR]: String(inputs.design_for),
             [KEY_DP_WELD_TYPE]: String(inputs.weld_fab || "Shop weld"),
@@ -260,7 +260,7 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, routePath, desig
             },
             {
                 title: "Factored Loads",
-                fields: [{ key: "axial_force", label: "Axial Force (kN)", type: "number" }]
+                fields: [{ key: "axial_force", label: "Axial Force (kN)", type: "number", required: false }]
             },
             {
                 title: "Weld",

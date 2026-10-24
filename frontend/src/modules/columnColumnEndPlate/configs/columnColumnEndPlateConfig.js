@@ -77,7 +77,7 @@ export const columnColumnEndPlateConfig = {
       "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
       "Detailing.Edge_type": inputs.detailing_edge_type,
       "Detailing.Gap": inputs.detailing_gap,
-      "Load.Axial": inputs.load_axial || "",
+      "Load.Axial": inputs.load_axial || "0",
       "Load.Moment": inputs.load_moment || "",
       "Load.Shear": inputs.load_shear || "",
       Material: inputs.material,
@@ -132,7 +132,7 @@ export const columnColumnEndPlateConfig = {
       fields: [
         { key: "load_shear", label: "Shear Force(kN)", type: "number", required: true },
         { key: "load_moment", label: "Bending Moment (kNm)", type: "number", required: true },
-        { key: "load_axial", label: "Axial Force(kN)", type: "number" }
+        { key: "load_axial", label: "Axial Force(kN)", type: "number", required: false }
       ]
     },
     {

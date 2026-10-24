@@ -13,10 +13,10 @@ export const UI_STRINGS = {
 
   // Field Labels
   CONNECTIVITY: "Connectivity",
-  COLUMN_SECTION: "Column Section*",
-  BEAM_SECTION: "Beam Section*",
-  PRIMARY_BEAM: "Primary Beam*",
-  SECONDARY_BEAM: "Secondary Beam*",
+  COLUMN_SECTION: "Column Section",
+  BEAM_SECTION: "Beam Section",
+  PRIMARY_BEAM: "Primary Beam",
+  SECONDARY_BEAM: "Secondary Beam",
   MATERIAL: "Material",
   SHEAR_FORCE: "Shear Force(kN)",
   AXIAL_FORCE: "Axial Force(kN)",
@@ -24,8 +24,8 @@ export const UI_STRINGS = {
   TYPE: "Type",
   PROPERTY_CLASS: "Property Class",
   THICKNESS: "Thickness(mm)",
-  SEATEDANGLE: "Seated Angle*",
-  TOPANGLE: "Top Angle*",
+  SEATEDANGLE: "Seated Angle",
+  TOPANGLE: "Top Angle",
 
   // Button Texts
   RESET: "Reset",
