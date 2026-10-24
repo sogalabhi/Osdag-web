@@ -211,5 +211,5 @@ class DesignPrefCatalogTests(TestCase):
         self.assertEqual(r.status_code, 200)
         row = r.json()["supported_section_results"][0]
         self.assertEqual(row["Designation"], "20 x 20 x 3")
-        self.assertAlmostEqual(row["It"], 0.033)
+        self.assertEqual(row["It"], 0.033)
         self.assertIn("lumax", row)

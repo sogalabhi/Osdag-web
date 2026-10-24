@@ -85,6 +85,9 @@ def _load(table: str) -> Tuple[Dict[str, Any], ...]:
         # Tables without an "Id" column ("ID" in Angle_Pitch) get their rowid as `id`.
         row = {"id": raw[0]}
         for column, value in zip(columns, raw[1:]):
+            if isinstance(value, float):
+                # Some stored values carry float noise (0.033 is stored as 0.03300000000000001).
+                value = float(f"{value:.12g}")
             row["id" if column.lower() == "id" else names.get(column, column)] = value
         rows.append(row)
     rows.sort(key=lambda row: row["id"])

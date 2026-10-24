@@ -52,9 +52,9 @@ class CatalogRowsTests(SimpleTestCase):
         self.assertIn("lvmin", row)
         self.assertNotIn("Iumax", row)
 
-    def test_values_are_not_rounded(self):
+    def test_values_are_not_rounded_to_two_decimals(self):
         # Postgres kept two decimals and turned 0.033 into 0.03.
-        self.assertAlmostEqual(catalog.find("Angles", Designation="20 x 20 x 3")["It"], 0.033)
+        self.assertEqual(catalog.find("Angles", Designation="20 x 20 x 3")["It"], 0.033)
 
     def test_numbers_stay_numbers(self):
         row = catalog.find("Beams", Designation="MB 300")
