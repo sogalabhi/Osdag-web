@@ -152,7 +152,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.core.tasks import run_design_calculation_task, run_cad_generation_task, run_report_generation_task
 from apps.core.utils.cad_helpers import get_default_sections
-from apps.core.osdag_overrides import user_id_from_request
+from apps.core.osdag_overrides import unknown_material_error, user_id_from_request
+
+
+def _unknown_material_response(inputs, user_id):
+    """400 response when a material grade cannot be resolved, else None."""
+    error = unknown_material_error(inputs, user_id)
+    if error:
+        return Response({'success': False, 'error': error}, status=status.HTTP_400_BAD_REQUEST)
+    return None
+
 
 def trigger_async_design(module_name: str, submodule_slug: str, ServiceClass, request) -> Response:
     """
@@ -160,10 +169,15 @@ def trigger_async_design(module_name: str, submodule_slug: str, ServiceClass, re
     """
     if not ServiceClass:
         return Response({'error': f'Sub-module {submodule_slug} not found'}, status=404)
-        
+
     inputs = request.data.get('inputs', request.data)
     project_id = request.data.get('project_id')
-    
+    user_id = user_id_from_request(request)
+
+    material_error = _unknown_material_response(inputs, user_id)
+    if material_error:
+        return material_error
+
     context = handle_design_request(
         request=request,
         inputs=inputs,
@@ -178,7 +192,7 @@ def trigger_async_design(module_name: str, submodule_slug: str, ServiceClass, re
         inputs=inputs,
         project_id=project_id if not context.get('is_guest') else None,
         user_email=context.get('user_email'),
-        user_id=user_id_from_request(request),
+        user_id=user_id,
     )
     
     response_data = {
@@ -214,13 +228,18 @@ def trigger_async_cad(module_name: str, submodule_slug: str, ServiceClass, reque
         
     if not sections:
         return Response({'error': f'No sections defined for {submodule_slug}'}, status=400)
-        
+
+    user_id = user_id_from_request(request)
+    material_error = _unknown_material_response(inputs, user_id)
+    if material_error:
+        return material_error
+
     task = run_cad_generation_task.delay(
         module_name=module_name,
         submodule_slug=submodule_slug,
         inputs=inputs,
         sections=sections,
-        user_id=user_id_from_request(request),
+        user_id=user_id,
     )
     
     return Response({
@@ -251,6 +270,11 @@ def trigger_async_report(module_name: str, submodule_slug: str, module_id_map: d
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    user_id = user_id_from_request(request)
+    material_error = _unknown_material_response(input_values, user_id)
+    if material_error:
+        return material_error
+
     mapped_data = {
         "module_id": module_id,
         "input_values": input_values,
@@ -266,7 +290,7 @@ def trigger_async_report(module_name: str, submodule_slug: str, module_id_map: d
     if "images" in request.data:
         mapped_data["images"] = request.data.get("images")
 
-    task = run_report_generation_task.delay(mapped_data, user_id=user_id_from_request(request))
+    task = run_report_generation_task.delay(mapped_data, user_id=user_id)
     
     return Response({
         "success": True,

@@ -77,12 +77,12 @@ class PlateGirderService:
         Returns:
             Dictionary with options data (materials, thickness lists, etc.)
         """
-        email = request.query_params.get("email") if request else None
+        user = getattr(request, "user", None)
 
         def material_list():
             mats = list(Material.objects.all().values())
-            if email:
-                mats += list(CustomMaterials.objects.filter(email=email).values())
+            if user is not None and user.is_authenticated:
+                mats += list(CustomMaterials.objects.filter(user=user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 

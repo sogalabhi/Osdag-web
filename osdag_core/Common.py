@@ -2723,6 +2723,8 @@ def get_leg_lengths(designation):
         Function to fetch designation values from respective Tables.
     """
     row = fetch_row("Angles", designation)
+    if row is None:
+        raise ValueError(f"Section '{designation}' not found in 'Angles' table of the database.")
 
     a = row[4]
     b = row[5]

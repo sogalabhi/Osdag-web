@@ -193,3 +193,15 @@ ports:
 
 **Resolution**: Resolved by modifying the `ports` attribute of the `db` service in [docker-compose.yml](../docker-compose.yml) to use environment variable interpolation with default fallback: `ports: - "${DB_HOST_PORT:-5433}:5432"`.
 
+---
+
+## 11.6 Deploying the Custom Sections & Materials Change
+
+Users' custom sections and materials are no longer written into the bundled SQLite catalog (`osdag_core/data/ResourceFiles/Database/Intg_osdag.sqlite`). They live only in PostgreSQL, and each design, CAD and report run receives the owner's rows through a per-run override (`apps/core/osdag_overrides.py`). When rolling this out:
+
+* **Restart the Celery workers together with the web app.** `run_design_calculation_task`, `run_cad_generation_task`, `run_report_generation_task` and `run_pso_optimization` gained a `user_id` argument. A worker still running the old code rejects tasks queued by the new web app (and the reverse), so redeploy `backend`, `celery_worker` (or the `celery_worker_calc`, `celery_worker_cad` and `celery_worker_reports` splits) in one step.
+* **Dev setups with the `.:/app` mount** (see 11.3) may have custom rows written into the git-tracked `Intg_osdag.sqlite` by the old code. Restore the catalog with:
+  ```bash
+  git checkout -- osdag_core/data/ResourceFiles/Database/Intg_osdag.sqlite
+  ```
+* **Production containers** copy the repository at build time and are clean after a rebuild; nothing needs to be restored.

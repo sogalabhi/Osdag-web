@@ -1,4 +1,16 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { getAccessToken } from '../../../utils/apiClient';
+
+// The Firebase token lets the server use the signed-in user's custom materials.
+// It travels in the message rather than the URL, which servers log. Guests send none.
+const sendStartMessage = async (ws, inputData) => {
+  const token = await getAccessToken();
+  ws.send(JSON.stringify({
+    type: 'start_optimization',
+    data: inputData,
+    ...(token && { token }),
+  }));
+};
 
 /**
  * WebSocket hook for PSO optimization with real-time updates
@@ -47,13 +59,12 @@ export const useWebSocketOptimization = (onUpdate, onComplete, onError) => {
         if (pendingStartRef.current) {
           const payload = pendingStartRef.current;
           pendingStartRef.current = null;
-          try {
-            ws.send(JSON.stringify({ type: 'start_optimization', data: payload }));
-            setIsOptimizing(true);
-          } catch (err) {
-            console.error('[WebSocket] Error sending queued start_optimization:', err);
-            if (onError) onError('Failed to start optimization');
-          }
+          sendStartMessage(ws, payload)
+            .then(() => setIsOptimizing(true))
+            .catch((err) => {
+              console.error('[WebSocket] Error sending queued start_optimization:', err);
+              if (onError) onError('Failed to start optimization');
+            });
         }
       };
 
@@ -156,16 +167,12 @@ export const useWebSocketOptimization = (onUpdate, onComplete, onError) => {
   const startOptimization = useCallback((inputData) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       console.log('[WebSocket] Starting optimization with data:', inputData);
-      try {
-        wsRef.current.send(JSON.stringify({
-          type: 'start_optimization',
-          data: inputData,
-        }));
-        setIsOptimizing(true);
-      } catch (err) {
-        console.error('[WebSocket] Error sending message:', err);
-        if (onError) onError('Failed to start optimization');
-      }
+      sendStartMessage(wsRef.current, inputData)
+        .then(() => setIsOptimizing(true))
+        .catch((err) => {
+          console.error('[WebSocket] Error sending message:', err);
+          if (onError) onError('Failed to start optimization');
+        });
       return;
     }
 

@@ -20,7 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 from apps.core.module_finder import get_module_api
-from apps.core.osdag_overrides import user_id_from_request, user_rows
+from apps.core.osdag_overrides import unknown_material_error, user_id_from_request, user_rows
 from .cad_module_aliases import resolve_module_id
 
 
@@ -78,6 +78,9 @@ class CADExport(View):
             return JsonResponse({"status": "error", "message": "format is required"}, status=400)
         if format_type not in ("step", "iges", "brep", "stl", "ifc"):
             return JsonResponse({"status": "error", "message": "Invalid format type requested"}, status=400)
+        material_error = unknown_material_error(input_values, user_id_from_request(request))
+        if material_error:
+            return JsonResponse({"status": "error", "message": material_error}, status=400)
 
         resolved_module_id = resolve_module_id(module_id)
 

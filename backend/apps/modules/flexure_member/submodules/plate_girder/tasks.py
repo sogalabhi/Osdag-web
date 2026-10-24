@@ -96,11 +96,18 @@ def _sanitize_for_channels(obj: Any) -> Any:
 
 
 @shared_task(bind=True, max_retries=3)
-def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
+def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any], user_id=None):
     """
     Celery task that runs Plate Girder PSO optimization and streams results
     to a WebSocket channel identified by `channel_name`.
     """
+    from apps.core.osdag_overrides import user_rows
+    # Make the requesting user's custom materials visible to osdag_core.
+    with user_rows(user_id):
+        return _run_pso_optimization(self, channel_name, input_data)
+
+
+def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
     # Track statistics for logging
     update_count = 0
     throttled_count = 0
@@ -109,7 +116,7 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
     logger.info("=" * 80)
     logger.info("PSO Optimization Task STARTED")
     logger.info("=" * 80)
-    logger.info(f"Task ID: {getattr(self.request, 'id', 'local')}")
+    logger.info(f"Task ID: {getattr(task.request, 'id', 'local')}")
     logger.info(f"Channel: {channel_name}")
     logger.info(f"Input keys: {list(input_data.keys())[:10]}...")
 
@@ -353,7 +360,7 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
             from apps.modules.flexure_member.submodules.plate_girder.adapter import (
                 build_plate_girder_cad,
             )
-            cad_session = f"pso_{getattr(self.request, 'id', 'local')}"
+            cad_session = f"pso_{getattr(task.request, 'id', 'local')}"
             for cad_section in ("Model", "Web", "Top Flange", "Bottom Flange", "Stiffeners"):
                 try:
                     rel_path = build_plate_girder_cad(module, cad_section, cad_session)
@@ -409,7 +416,7 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any]):
         logger.error("=" * 80)
         logger.error("PSO Optimization Task FAILED")
         logger.error("=" * 80)
-        logger.error(f"Task ID: {getattr(self.request, 'id', 'local')}")
+        logger.error(f"Task ID: {getattr(task.request, 'id', 'local')}")
         logger.error(f"Channel: {channel_name}")
         logger.error(f"Duration before failure: {total_duration:.2f} seconds")
         logger.error(f"Exception Type: {type(e).__name__}")

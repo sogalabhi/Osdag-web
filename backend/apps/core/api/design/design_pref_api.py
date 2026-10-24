@@ -2,7 +2,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from apps.core.models import Beams, Columns, Material, Angles, Channels
+from apps.core.api.design.sync_merge import first_row, lookup_sources
 
 
 class DesignPreference(APIView):
@@ -16,31 +16,37 @@ class DesignPreference(APIView):
         section_type = request.GET.get("section_type")
         # Session validation removed - now stateless
 
-        connector_material_details = []
+        # Signed-in users' custom rows are searched before the catalog.
+        sources = lookup_sources(request.user)
+
+        def matching(key, **lookup):
+            row = first_row(sources[key], **lookup)
+            return [row] if row else []
+
         if material:
-            connector_material_details = Material.objects.filter(Grade=material).values()
+            connector_material_details = matching("material_model", Grade=material)
             return Response({"connector_material_details": connector_material_details }, status=status.HTTP_200_OK)
-        
+
         if section_type:
             model_map = {
-                "angles": Angles.objects,
-                "channels": Channels.objects,
-                "columns": Columns.objects,
-                "beams": Beams.objects,
+                "angles": "angles_model",
+                "channels": "channels_model",
+                "columns": "columns_model",
+                "beams": "beams_model",
             }
-            target_model = model_map.get(section_type.lower())
-            if target_model:
-                supported_section_results = target_model.filter(Designation=supported_section).values()
+            target_key = model_map.get(section_type.lower())
+            if target_key:
+                supported_section_results = matching(target_key, Designation=supported_section)
                 return Response({"supported_section_results": supported_section_results}, status=status.HTTP_200_OK)
 
         if connectivity == 'Beam-Beam':
-            supported_section_results = Beams.objects.filter(Designation=supported_section).values()
-            supporting_section_results = Beams.objects.filter(Designation=supporting_section).values()
+            supported_section_results = matching("beams_model", Designation=supported_section)
+            supporting_section_results = matching("beams_model", Designation=supporting_section)
         elif not connectivity:
-            supported_section_results = Beams.objects.filter(Designation=supported_section).values()
+            supported_section_results = matching("beams_model", Designation=supported_section)
             return Response({"supported_section_results": supported_section_results}, status=status.HTTP_200_OK)
         else :
-            supported_section_results = Beams.objects.filter(Designation=supported_section).values()
-            supporting_section_results = Columns.objects.filter(Designation=supporting_section).values()
+            supported_section_results = matching("beams_model", Designation=supported_section)
+            supporting_section_results = matching("columns_model", Designation=supporting_section)
 
         return Response({"supported_section_results": supported_section_results, "supporting_section_results":supporting_section_results}, status=status.HTTP_200_OK)

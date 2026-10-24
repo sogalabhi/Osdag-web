@@ -2,9 +2,13 @@
 Unit tests for design preference sync merge and HTTP API.
 """
 
+from django.contrib.auth.models import User
 from django.test import TestCase
 
-from apps.core.api.design.sync_merge import merge_design_pref_sync, list_registered_session_names
+from apps.core.api.design.sync_merge import lookup_sources, merge_design_pref_sync, list_registered_session_names
+from apps.core.models import CustomMaterials
+from apps.core.tests.auth_utils import authenticated_as
+from apps.core.tests.test_osdag_overrides import make_beam
 
 
 class DesignPrefSyncMergeTests(TestCase):
@@ -118,3 +122,55 @@ class DesignPrefSyncAPITests(TestCase):
             content_type="application/json",
         )
         self.assertEqual(r.status_code, 400)
+
+
+class DesignPrefCustomRowsTests(TestCase):
+    """Custom sections and materials reach the design preference dialog for their owner only."""
+
+    INPUTS = {"material": "My Steel", "section_designation": ["MY 200"]}
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="u1", email="u1@example.com", password="x")
+        self.other = User.objects.create_user(username="u2", email="u2@example.com", password="x")
+        make_beam(self.user, mass=30.0)
+        CustomMaterials.objects.create(
+            user=self.user, Grade="My Steel", Yield_Stress_less_than_20=300,
+            Yield_Stress_between_20_and_neg40=290, Yield_Stress_greater_than_40=280,
+            Ultimate_Tensile_Stress=450, Elongation=0,
+        )
+
+    def merge(self, user):
+        return merge_design_pref_sync(
+            "Simply Supported Beam Design", self.INPUTS, "open", **lookup_sources(user),
+        )
+
+    def test_owner_gets_custom_rows(self):
+        _resolved, _meta, material_details, section_details = self.merge(self.user)
+        self.assertEqual(section_details["supported"]["Designation"], "MY 200")
+        self.assertEqual(float(section_details["supported"]["Mass"]), 30.0)
+        self.assertEqual(material_details["connector"][0]["Grade"], "My Steel")
+        self.assertEqual(material_details["connector"][0]["Ultimate_Tensile_Stress"], 450)
+
+    def test_other_user_and_guest_get_nothing(self):
+        for user in (self.other, None):
+            _resolved, _meta, material_details, section_details = self.merge(user)
+            self.assertEqual(section_details["supported"], {})
+            self.assertEqual(material_details["connector"], [])
+
+    def test_sync_api_returns_custom_details(self):
+        body = {"module_session_name": "Simply Supported Beam Design", "inputs": self.INPUTS, "operation": "open"}
+        with authenticated_as(self.user):
+            r = self.client.post("/api/design-preferences/sync/", data=body, content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+        data = r.json()
+        self.assertEqual(data["section_details"]["supported"]["Designation"], "MY 200")
+        self.assertEqual(data["material_details"]["connector"][0]["Grade"], "My Steel")
+
+    def test_defaults_api_returns_custom_details(self):
+        body = {"module_session_name": "Simply Supported Beam Design", "inputs": self.INPUTS}
+        with authenticated_as(self.user):
+            r = self.client.post("/api/design-preferences/defaults/", data=body, content_type="application/json")
+        self.assertEqual(r.status_code, 200)
+        data = r.json()
+        self.assertEqual(data["section_details"]["supported"]["Designation"], "MY 200")
+        self.assertEqual(data["material_details"]["connector"][0]["Grade"], "My Steel")

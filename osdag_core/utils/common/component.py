@@ -1654,6 +1654,8 @@ class Channel(Material):
 
     def connect_to_database_update_other_attributes(self, designation, material_grade):
         row = fetch_row("Channels", designation)
+        if row is None:
+            raise ValueError(f"Section '{designation}' not found in 'Channels' table of the database.")
         self.designation = designation
         self.mass = row[2]
         self.area = row[3] * 100
@@ -1885,6 +1887,8 @@ class Angle(Material):
 
     def connect_to_database_update_other_attributes(self, designation, material_grade=""):
         row = fetch_row("Angles", designation)
+        if row is None:
+            raise ValueError(f"Section '{designation}' not found in 'Angles' table of the database.")
 
         self.mass = row[2]
         self.area = row[3] * 100
@@ -2158,6 +2162,8 @@ class HollowSection(Material):
 
     def connect_to_database_update_other_attributes(self, table, designation, material_grade=""):
         row = fetch_row(table, designation)
+        if row is None:
+            raise ValueError(f"Section '{designation}' not found in '{table}' table of the database.")
         self.mass = row[5]  # kg/m
         self.area = row[6] * 100  # mm^2
         self.depth = row[2]  # mm
@@ -2198,6 +2204,8 @@ class CHS(Material):
 
     def connect_to_database_update_other_attributes(self, designation, material_grade=""):
         row = fetch_row("CHS", designation)
+        if row is None:
+            raise ValueError(f"Section '{designation}' not found in 'CHS' table of the database.")
         self.mass = row[5]  # kg/m
         self.area = row[6] * 100  # mm^2
         self.nominal_bore = row[2]  # mm

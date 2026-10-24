@@ -18,6 +18,7 @@ from apps.core.utils.cad_helpers import generate_cad_models, get_default_section
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from apps.core.constants import get_report_module_id
 from apps.core.models import Material, CustomMaterials, Bolt, Angles, Channels, Beams, Columns, RHS, SHS, CHS
+from apps.core.osdag_overrides import unknown_material_error, user_id_from_request, user_rows
 from apps.sections.options_merge import merge_user_sections_into_options
 
 
@@ -241,7 +242,12 @@ class CompressionMemberViewSet(viewsets.ViewSet):
                 {'error': f'No sections defined for {normalized_slug}'},
                 status=400
             )
-        
+
+        user_id = user_id_from_request(request)
+        material_error = unknown_material_error(inputs, user_id)
+        if material_error:
+            return Response({'error': material_error, 'status': 'error'}, status=400)
+
         try:
             # Import adapter to get create_from_input function for hover_dict
             create_from_input_func = None
@@ -258,12 +264,14 @@ class CompressionMemberViewSet(viewsets.ViewSet):
             except ImportError as e:
                 print(f"[CompressionMemberViewSet] Could not import create_from_input for {normalized_slug}: {e}")
             
-            result = generate_cad_models(
-                service_class=ServiceClass,
-                inputs=inputs,
-                sections=sections,
-                create_from_input_func=create_from_input_func
-            )
+            # Runs in the web process (not Celery), so the user's custom rows are installed here.
+            with user_rows(user_id):
+                result = generate_cad_models(
+                    service_class=ServiceClass,
+                    inputs=inputs,
+                    sections=sections,
+                    create_from_input_func=create_from_input_func
+                )
             
             if not result['files']:
                 return Response(
@@ -326,6 +334,11 @@ class CompressionMemberViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        user_id = user_id_from_request(request)
+        material_error = unknown_material_error(input_values, user_id)
+        if material_error:
+            return Response({"success": False, "error": material_error}, status=status.HTTP_400_BAD_REQUEST)
+
         mapped_data = {
             "module_id": module_id,
             "input_values": input_values,
@@ -341,5 +354,7 @@ class CompressionMemberViewSet(viewsets.ViewSet):
         if "images" in request.data:
             mapped_data["images"] = request.data.get("images")
 
-        payload, status_code = generate_initial_report_core(mapped_data)
+        # Runs in the web process (not Celery), so the user's custom rows are installed here.
+        with user_rows(user_id):
+            payload, status_code = generate_initial_report_core(mapped_data)
         return Response(payload, status=status_code)

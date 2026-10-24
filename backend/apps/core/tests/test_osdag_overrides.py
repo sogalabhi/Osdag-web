@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from apps.core.models import CustomMaterials
-from apps.core.osdag_overrides import user_rows
+from apps.core.osdag_overrides import unknown_material_error, user_rows
 from apps.sections.models import UserCustomAngle, UserCustomBeam
 from osdag_core.Common import fetch_row, get_leg_lengths, row_override
 from osdag_core.utils.common.component import Angle, Beam
@@ -67,11 +67,29 @@ class OsdagOverrideTests(TestCase):
         with user_rows(self.user.id):
             self.assertIsNone(fetch_row("Beams", "MY 200"))
 
-    def test_no_override_for_guests_or_users_without_custom_data(self):
+    def test_guests_resolve_only_well_formed_custom_grades(self):
         with user_rows(None):
-            self.assertIsNone(row_override.get())
+            mat = Material("Cus_250_240_230_410", 10)
+            self.assertEqual((mat.fy, mat.fu), (250, 410))
+            # Below osdag's 165-1500 MPa range, and not numeric.
+            self.assertIsNone(fetch_row("Material", "Cus_100_240_230_410", key="Grade"))
+            self.assertIsNone(fetch_row("Material", "Cus_abc_1_2_3", key="Grade"))
+            # Catalog sections still come from SQLite.
+            self.assertAlmostEqual(fetch_row("Beams", CATALOG_BEAM)[2], 46.02)
+        self.assertIsNone(row_override.get())
+
+    def test_saved_custom_material_takes_precedence_over_name_parsing(self):
+        CustomMaterials.objects.create(
+            user=self.user, Grade="Cus_250_240_230_410", Yield_Stress_less_than_20=300,
+            Yield_Stress_between_20_and_neg40=290, Yield_Stress_greater_than_40=280,
+            Ultimate_Tensile_Stress=450, Elongation=0,
+        )
         with user_rows(self.user.id):
-            self.assertIsNone(row_override.get())
+            mat = Material("Cus_250_240_230_410", 10)
+            self.assertEqual((mat.fy, mat.fu), (300, 450))
+        with user_rows(self.other.id):
+            mat = Material("Cus_250_240_230_410", 10)
+            self.assertEqual((mat.fy, mat.fu), (250, 410))
 
     def test_custom_material_strengths(self):
         CustomMaterials.objects.create(
@@ -96,3 +114,40 @@ class OsdagOverrideTests(TestCase):
             self.assertEqual(get_leg_lengths("MY L"), (60.0, 40.0, 6.0, 6.5))
             angle = Angle(designation="MY L", material_grade=CATALOG_GRADE)
             self.assertEqual((angle.a, angle.b, angle.thickness), (60.0, 40.0, 6.0))
+
+
+class UnknownMaterialErrorTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="u1", email="u1@example.com", password="x")
+        self.other = User.objects.create_user(username="u2", email="u2@example.com", password="x")
+        for user, grade in ((self.user, "My Steel"), (self.other, "Their Steel")):
+            CustomMaterials.objects.create(
+                user=user, Grade=grade, Yield_Stress_less_than_20=300,
+                Yield_Stress_between_20_and_neg40=290, Yield_Stress_greater_than_40=280,
+                Ultimate_Tensile_Stress=450, Elongation=0,
+            )
+
+    def test_known_grades_give_no_error(self):
+        for grade in (CATALOG_GRADE, "Cus_250_240_230_410", "My Steel"):
+            self.assertIsNone(unknown_material_error({"Material": grade}, self.user.id), grade)
+
+    def test_unknown_grade_gives_message(self):
+        message = unknown_material_error({"Material": "No Such Steel"}, self.user.id)
+        self.assertIn("No Such Steel", message)
+        # Not a Cus_ name, so it only resolves for its owner.
+        self.assertIn("Their Steel", unknown_material_error({"Material": "Their Steel"}, self.user.id))
+        self.assertIn("My Steel", unknown_material_error({"Material": "My Steel"}, None))
+
+    def test_only_grade_keys_are_checked(self):
+        inputs = {
+            "Material": "Select Material",
+            "Member.Material": "",
+            "Material.Fu": "410",
+            "Bolt.Material_Grade_OverWrite": "No Such Steel",
+            "Member.Designation": ["No Such Steel"],
+        }
+        self.assertIsNone(unknown_material_error(inputs, self.user.id))
+
+    def test_dotted_material_keys_are_checked(self):
+        inputs = {"Material": CATALOG_GRADE, "Connector.Material": "No Such Steel"}
+        self.assertIn("No Such Steel", unknown_material_error(inputs, self.user.id))

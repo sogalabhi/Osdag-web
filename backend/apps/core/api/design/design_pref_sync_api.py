@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from apps.core.models import Material, Beams, Columns, Angles, Channels
-from apps.core.api.design.sync_merge import merge_design_pref_sync, VALID_OPERATIONS
+from apps.core.api.design.sync_merge import lookup_sources, merge_design_pref_sync, VALID_OPERATIONS
+from apps.core.osdag_overrides import user_id_from_request, user_rows
 
 
 class DesignPreferenceSync(APIView):
@@ -33,17 +33,15 @@ class DesignPreferenceSync(APIView):
             )
 
         try:
-            resolved_inputs, meta, material_details, section_details = merge_design_pref_sync(
-                module_session_name=module_session_name,
-                inputs=inputs,
-                operation=operation,
-                design_pref_draft=design_pref_draft,
-                material_model=Material.objects,
-                beams_model=Beams.objects,
-                columns_model=Columns.objects,
-                angles_model=Angles.objects,
-                channels_model=Channels.objects,
-            )
+            # osdag_core computes some defaults from the selected material, so it must see custom rows too.
+            with user_rows(user_id_from_request(request)):
+                resolved_inputs, meta, material_details, section_details = merge_design_pref_sync(
+                    module_session_name=module_session_name,
+                    inputs=inputs,
+                    operation=operation,
+                    design_pref_draft=design_pref_draft,
+                    **lookup_sources(request.user),
+                )
         except Exception as e:
             return Response(
                 {"error": str(e), "success": False},
