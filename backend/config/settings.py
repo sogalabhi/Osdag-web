@@ -105,7 +105,7 @@ INSTALLED_APPS = [
     # DRF
     'rest_framework',
     'silk',
-    'django_prometheus',  # /metrics for Prometheus (issue #140)
+    'django_prometheus',  # serves /metrics for Prometheus
 ]
 
 # Middleware order is CRITICAL - CorsMiddleware MUST be first

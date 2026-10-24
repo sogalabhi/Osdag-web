@@ -1,4 +1,4 @@
-# Production monitoring stack (issue #140). Runs independently of the app:
+# Production monitoring stack. Runs independently of the app:
 #   docker compose -f docker-compose.monitoring.yml up -d
 # so redeploying docker-compose.prod.yml never restarts or wipes monitoring.
 #
