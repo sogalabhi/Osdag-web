@@ -40,6 +40,24 @@ jobs:
       - name: Build
         run: npm run build
 
+  backend-lint:
+    # Non-blocking until the existing backend passes Ruff. The current
+    # findings are listed by `ruff check backend`. Remove continue-on-error
+    # once the count reaches zero.
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Ruff
+        run: |
+          python -m pip install ruff==0.17.2
+          ruff check backend
+
   backend-qa:
     runs-on: ubuntu-latest
     steps:
