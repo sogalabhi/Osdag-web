@@ -4,6 +4,7 @@ This guide covers two ways to run **Osdag-Web** on Windows:
 
 - **[Option A — Docker Compose (Recommended)](#option-a-docker-compose-recommended)** — spins up all services (Postgres, Redis, Django, Celery, React) in containers with a single command.
 - **[Option B — Manual Setup via WSL 2 (No Docker)](#option-b-manual-setup-via-wsl-2-no-docker)** — run services manually inside the Windows Subsystem for Linux (WSL 2) using Conda, pip, and Node.js.
+- **[Option C — Native Windows (No WSL, No Docker)](#option-c-native-windows-setup-no-wsl-no-docker)** — run everything directly on Windows; requires a Windows Redis (Memurai) and the Celery `solo` pool.
 
 ---
 
@@ -194,9 +195,7 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 ## Option B: Manual Setup via WSL 2 (No Docker)
 
-Because Osdag-Web relies heavily on Linux-specific dependencies (such as the Cairo libraries, system packages, and Celery prefork behavior), running a native development environment directly on Windows without virtualization is not supported.
-
-The only supported way to perform a manual, native-like setup on Windows is by installing **Ubuntu in WSL 2** and running the application inside that Linux environment.
+This option runs the application inside a Linux environment (Ubuntu on WSL 2), which matches production most closely. To avoid WSL entirely, see [Option C](#option-c-native-windows-setup-no-wsl-no-docker).
 
 ### B.1 — Set Up WSL 2 and Ubuntu
 
@@ -214,6 +213,175 @@ Once your Ubuntu instance is running:
 2. Follow the exact step-by-step setup guide for Linux in [installation_docs_linux.md](installation_docs_linux.md).
 3. Ensure you install all dependencies inside the WSL/Ubuntu terminal (such as Miniconda, TeX Live, wkhtmltopdf, Postgres, and Redis).
 4. Since WSL 2 automatically forwards ports to your Windows localhost, you will be able to access the React frontend and Django backend at `http://localhost:5173` and `http://localhost:8000` directly from your Windows web browsers!
+
+---
+
+## Option C: Native Windows Setup (No WSL, No Docker)
+
+Runs everything directly on Windows with Conda, pip, and Node.js. A few things behave differently from Linux — read **C.0** first.
+
+### C.0 — What Differs on Native Windows
+
+| Feature | Linux | Native Windows |
+|---|---|---|
+| **Redis** | `apt`/`pacman` package | No official build. Use **Memurai Developer** (free, Redis-compatible) or the community **tporadowski/redis** port. Redis is required: it is the Celery broker/result backend **and** the Django Channels (WebSocket) layer. |
+| **Celery worker** | prefork pool | Prefork is unsupported on Windows and crashes. Start the worker with `--pool=solo` (one task at a time). |
+| **PDF reports** | TeX Live | Install **MiKTeX**; `pdflatex` must be on `PATH`. |
+| **Shell scripts** (`osdagweb.sh`, `setup_*.sh`) | `bash` | Do not run natively; use the commands below in PowerShell/cmd. |
+
+### C.1 — Install Prerequisites
+
+Open **PowerShell** and install with `winget` (or download the installers manually):
+
+```powershell
+winget install --id Git.Git -e
+winget install --id OpenJS.NodeJS.LTS -e
+winget install --id PostgreSQL.PostgreSQL.16 -e
+winget install --id Anaconda.Miniconda3 -e
+winget install --id MiKTeX.MiKTeX -e
+winget install --id Memurai.MemuraiDeveloper -e
+```
+
+Notes:
+- During the PostgreSQL install, set the `postgres` superuser password and remember it (default port `5432`).
+- In MiKTeX setup, set **"Install missing packages on-the-fly"** to **Yes**, otherwise report generation will hang on a missing `.sty` prompt.
+- Memurai installs as a Windows service and starts automatically on port `6379`.
+- If `winget` has no Memurai package, download it from [memurai.com](https://www.memurai.com/get-memurai), or use the [tporadowski/redis releases](https://github.com/tporadowski/redis/releases) `.msi`.
+
+**Close and reopen your terminal** so the new `PATH` entries are picked up, then verify:
+
+```powershell
+git --version
+node --version
+psql --version
+pdflatex --version
+memurai-cli ping      # or: redis-cli ping   -> PONG
+```
+
+If `psql` or `pdflatex` is not found, add these to your `PATH` (adjust version/location):
+- `C:\Program Files\PostgreSQL\16\bin`
+- MiKTeX's `miktex\bin\x64` folder (e.g. `%LOCALAPPDATA%\Programs\MiKTeX\miktex\bin\x64`)
+
+### C.2 — Create the Conda Environment
+
+Open **Anaconda Prompt** (or run `conda init powershell` once and reopen PowerShell):
+
+```powershell
+conda create -n osdag-web python=3.11 -y
+conda activate osdag-web
+conda install -c conda-forge pythonocc-core cairo -y
+```
+
+> `pythonocc-core` and `cairo` must come from conda-forge; they do not build reliably via pip on Windows.
+
+### C.3 — Clone and Install Python Dependencies
+
+```powershell
+git clone https://github.com/osdag-admin/Osdag-web.git
+cd Osdag-web
+pip install --upgrade pip pyopenssl
+pip install -r requirements.txt
+```
+
+If a package fails to build, install the [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) ("Desktop development with C++") and retry.
+
+### C.4 — Create the Database
+
+```powershell
+psql -U postgres -h localhost
+```
+
+At the `psql` prompt:
+
+```sql
+CREATE ROLE osdagdeveloper PASSWORD 'password' SUPERUSER CREATEDB CREATEROLE INHERIT REPLICATION LOGIN;
+CREATE DATABASE "postgres_Intg_osdag" WITH OWNER osdagdeveloper;
+\q
+```
+
+### C.5 — Configure Environment
+
+Create `.env` in the project root (Notepad: save as **All Files**, not `.env.txt`), or in PowerShell:
+
+```powershell
+Set-Content -Path .env -Value @"
+DATABASE_NAME=postgres_Intg_osdag
+DATABASE_USER=osdagdeveloper
+DATABASE_PASSWORD=password
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+SECRET_KEY=dev-secret-key
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+REDIS_URL=redis://127.0.0.1:6379/0
+CELERY_BROKER_URL=redis://127.0.0.1:6379/0
+CELERY_RESULT_BACKEND=redis://127.0.0.1:6379/0
+USE_REDIS_CACHE=false
+"@
+```
+
+> These are development-only values. Do not reuse them in production.
+
+Place your Firebase service account key at `backend\firebase-service-account.json` (see [A.5.1](#a51--add-firebase-service-account-key-json)).
+
+### C.6 — Migrate and Populate the Database
+
+```powershell
+cd backend
+python manage.py migrate
+cd ..
+python populate_database.py
+```
+
+### C.7 — Install and Configure the Frontend
+
+```powershell
+cd frontend
+npm install
+Set-Content -Path .env -Value "VITE_BASE_URL=http://127.0.0.1:8000/"
+cd ..
+```
+
+### C.8 — Start All Services
+
+Open **three** terminals. Activate the conda env in the first two.
+
+**Terminal 1 — Django:**
+```powershell
+conda activate osdag-web
+cd Osdag-web\backend
+python manage.py runserver 8000
+```
+
+**Terminal 2 — Celery worker (note `--pool=solo`):**
+```powershell
+conda activate osdag-web
+cd Osdag-web\backend
+celery -A config worker -Q calculations,cad,reports,celery --pool=solo --loglevel=info
+```
+
+**Terminal 3 — Vite:**
+```powershell
+cd Osdag-web\frontend
+npm run dev
+```
+
+Open **http://localhost:5173**.
+
+> With `--pool=solo` the worker runs one task at a time, so a long CAD or report job blocks other tasks until it finishes. This is acceptable for development.
+
+### C.9 — Native Windows Troubleshooting
+
+| Error | Likely Cause | Solution |
+|---|---|---|
+| `ValueError: not enough values to unpack` / `PermissionError` on Celery start | Prefork pool on Windows | Add `--pool=solo` to the Celery command |
+| `Error 10061 connecting to localhost:6379` | Redis/Memurai not running | Start the **Memurai** service (`services.msc`) or run `redis-server` |
+| `LaTeX (pdflatex) not found` | MiKTeX not on `PATH` | Add MiKTeX's `bin\x64` folder to `PATH` and reopen the terminal |
+| PDF generation hangs | MiKTeX waiting to install a package | In MiKTeX Console → Settings, set "Install missing packages" to **Always** |
+| `psql` is not recognized | PostgreSQL `bin` not on `PATH` | Add `C:\Program Files\PostgreSQL\16\bin` to `PATH` |
+| `ImportError: DLL load failed` (cairo / OCC) | Mixed pip/conda installs | Reinstall with `conda install -c conda-forge cairo pythonocc-core -y` |
+| `password authentication failed for user "osdagdeveloper"` | Role not created or wrong password | Re-run the SQL in C.4 |
+| WebSocket status never updates | Redis unreachable by Channels | Confirm `redis-cli ping` returns `PONG` and `REDIS_URL` is correct |
 
 ---
 
@@ -248,3 +416,17 @@ Once your Ubuntu instance is running:
 |---|---|
 | B.1 | Install WSL 2 and Ubuntu 22.04 (`wsl --install -d Ubuntu-22.04`) |
 | B.2 | Follow the manual setup steps in [installation_docs_linux.md](installation_docs_linux.md) inside WSL |
+
+### Native Windows Path
+
+| Step | Task |
+|---|---|
+| C.0 | Read the native Windows differences (Redis, Celery pool, MiKTeX) |
+| C.1 | Install Git, Node, PostgreSQL, Miniconda, MiKTeX, Memurai |
+| C.2 | Create conda env, install `pythonocc-core` + `cairo` |
+| C.3 | Clone repo, `pip install -r requirements.txt` |
+| C.4 | Create database role + database |
+| C.5 | Write `.env`, add Firebase key |
+| C.6 | `migrate` + `populate_database.py` |
+| C.7 | `npm install`, write `frontend\.env` |
+| C.8 | Start Django, Celery (`--pool=solo`), Vite |
