@@ -120,7 +120,7 @@ The format is defined once in `apps/core/utils/api_errors.py`:
 
 Views should raise or return through these helpers instead of building `{'error': ...}` dicts by hand. On the frontend, `apiClient.js` (via `utils/apiError.js`) throws an `Error` whose `message` is `error.message`, with `code`, `status`, `fields` and the raw `data` attached.
 
-**Not covered.** Celery task results (`{'success': False, 'error': msg}`, delivered over the task WebSocket or `GET /api/tasks/<id>/`) are a separate channel with their own shape and are unchanged. They stay until request-time validation (refactor Phase 3) moves input errors into the HTTP response.
+**Not covered.** Celery task results (`{'success': False, 'error': msg}`, delivered over the task WebSocket or `GET /api/tasks/<id>/`) are a separate channel with their own shape and are unchanged. Input errors found while a task runs are reported through that channel, not in the HTTP response.
 
 ---
 
