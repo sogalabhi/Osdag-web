@@ -326,14 +326,15 @@ USE_REDIS_CACHE=false
 
 Place your Firebase service account key at `backend\firebase-service-account.json` (see [A.5.1](#a51--add-firebase-service-account-key-json)).
 
-### C.6 — Migrate and Populate the Database
+### C.6 — Migrate the Database
 
 ```powershell
 cd backend
 python manage.py migrate
 cd ..
-python populate_database.py
 ```
+
+The steel-section catalog is read from the SQLite file bundled with `osdag_core`, so there is no catalog to load into PostgreSQL.
 
 ### C.7 — Install and Configure the Frontend
 
@@ -429,6 +430,6 @@ Open **http://localhost:5173**.
 | C.3 | Clone repo, `pip install -r requirements.txt` |
 | C.4 | Create database role + database |
 | C.5 | Write `.env`, add Firebase key |
-| C.6 | `migrate` + `populate_database.py` |
+| C.6 | `migrate` |
 | C.7 | `npm install`, write `frontend\.env` |
 | C.8 | Start Django, Celery (`--pool=solo`), Vite |

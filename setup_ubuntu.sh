@@ -120,9 +120,6 @@ fi
 step "11/17 Django migrations"
 ( cd backend && python manage.py migrate )
 
-step "12/17 Populate structural database"
-python populate_database.py
-
 step "13-15/17 Frontend"
 ( cd frontend && npm install )
 echo "VITE_BASE_URL=http://127.0.0.1:8000/" > frontend/.env

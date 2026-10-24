@@ -65,7 +65,6 @@ services:
         condition: service_healthy
     command: >
       bash -c "/opt/conda/envs/osdag_env/bin/python manage.py migrate &&
-      /opt/conda/envs/osdag_env/bin/python populate_database.py &&
       exec /opt/conda/envs/osdag_env/bin/gunicorn config.asgi:application
       --bind 0.0.0.0:8000
       --workers 8

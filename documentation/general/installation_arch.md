@@ -2,8 +2,6 @@
 
 This guide covers native local development of **Osdag-Web** on Arch Linux, running all services directly on your machine using Conda, pip, and Node.js.
 
-> **Automated setup:** run `bash setup_arch.sh` from the repository root to perform all steps below. It asks for your `sudo` password once, is safe to re-run, and prints a per-step timing summary (a full run took about 6 minutes on a fast connection). It must be run in a real terminal, not a prompt without a TTY. The AUR `wkhtmltopdf` package is skipped by default (it builds OpenSSL 1.1 from source and Osdag does not use it); set `WITH_WKHTMLTOPDF=1` to install it.
-
 ---
 
 ## Architecture Overview
@@ -32,7 +30,8 @@ This guide covers native local development of **Osdag-Web** on Arch Linux, runni
 sudo pacman -Syu
 sudo pacman -S --needed \
   base-devel cmake curl wget git \
-  postgresql-libs openssl mesa glu
+  postgresql-libs openssl mesa glu \
+  wkhtmltopdf
 ```
 
 > `postgresql-libs` provides `libpq-dev` equivalent headers needed to build `psycopg2`.
@@ -392,7 +391,7 @@ sudo systemctl restart postgresql
 
 | Step | Task |
 |---|---|
-| 1 | Install system build tools (`base-devel`, `cmake`) |
+| 1 | Install system build tools (`base-devel`, `cmake`, `wkhtmltopdf`) |
 | 2 | Install TeX Live packages |
 | 3 | Install Miniconda |
 | 4 | Create conda env (Python 3.11) |

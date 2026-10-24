@@ -157,9 +157,6 @@ USE_REDIS_CACHE=false
     & $Conda run -n $EnvName --no-capture-output python manage.py migrate; Check 'migrate'
     Pop-Location
 
-    Step 'Populate structural database'
-    & $Conda run -n $EnvName --no-capture-output python populate_database.py; Check 'populate_database'
-
     Step 'Frontend'
     Push-Location (Join-Path $ProjectDir 'frontend')
     npm install; Check 'npm install'
