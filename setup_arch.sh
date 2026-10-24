@@ -10,7 +10,34 @@ DB_NAME="postgres_Intg_osdag"
 DB_USER="osdagdeveloper"
 DB_PASS="password"
 
-step() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
+SCRIPT_START=$SECONDS
+STEP_START=$SECONDS
+STEP_NAME=""
+TIMINGS=()
+
+fmt() { printf '%dm%02ds' $(( $1 / 60 )) $(( $1 % 60 )); }
+
+end_step() {
+  if [ -n "$STEP_NAME" ]; then
+    TIMINGS+=("$(fmt $(( SECONDS - STEP_START )))  $STEP_NAME")
+    printf '\033[1;32m    done in %s\033[0m\n' "$(fmt $(( SECONDS - STEP_START )))"
+  fi
+}
+
+step() {
+  end_step
+  STEP_NAME="$*"
+  STEP_START=$SECONDS
+  printf '\n\033[1;34m==> [%s elapsed] %s\033[0m\n' "$(fmt $(( SECONDS - SCRIPT_START )))" "$*"
+}
+
+summary() {
+  end_step; STEP_NAME=""
+  printf '\n\033[1;34m==> Timing summary\033[0m\n'
+  printf '  %s\n' "${TIMINGS[@]}"
+  printf '  %s  TOTAL\n' "$(fmt $(( SECONDS - SCRIPT_START )))"
+}
+trap summary EXIT
 
 step "Caching sudo credentials"
 sudo -v
@@ -24,16 +51,14 @@ sudo pacman -Syu --needed --noconfirm \
   texlive-basic texlive-latex texlive-latexrecommended texlive-latexextra \
   texlive-fontsrecommended texlive-fontutils
 
-step "wkhtmltopdf (AUR)"
-if ! command -v wkhtmltopdf >/dev/null; then
-  if command -v yay >/dev/null; then
-    yay -S --needed --noconfirm wkhtmltopdf-static || yay -S --needed --noconfirm wkhtmltopdf || \
-      echo "WARNING: wkhtmltopdf install failed; install it manually from the AUR."
-  elif command -v paru >/dev/null; then
-    paru -S --needed --noconfirm wkhtmltopdf-static || echo "WARNING: wkhtmltopdf install failed."
-  else
-    echo "WARNING: no AUR helper found; install wkhtmltopdf manually."
-  fi
+step "wkhtmltopdf (AUR, optional)"
+# Not used by Osdag (reports use pdflatex). Its AUR dependency openssl-1.1 compiles from source
+# and is slow, so it is opt-in:  WITH_WKHTMLTOPDF=1 bash setup_arch.sh
+if [ "${WITH_WKHTMLTOPDF:-0}" = "1" ] && ! command -v wkhtmltopdf >/dev/null; then
+  yay -S --needed --noconfirm --mflags --nocheck wkhtmltopdf-static || \
+    echo "WARNING: wkhtmltopdf install failed; install it manually from the AUR."
+else
+  echo "Skipped."
 fi
 
 step "3/17 Miniconda"
