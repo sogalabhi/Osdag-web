@@ -1,0 +1,30 @@
+# Pre-commit hooks. Install once with:
+#   pip install pre-commit && pre-commit install
+# Run on everything with:
+#   pre-commit run --all-files
+#
+# Hook versions are pinned. Update them with `pre-commit autoupdate`, and keep
+# the ruff version in sync with CONTRIBUTING.md and .github/workflows/ci.yml.
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.2
+    hooks:
+      # Lints backend/ using the settings in pyproject.toml. Reports only; it
+      # does not rewrite files.
+      - id: ruff-check
+        files: ^backend/
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
