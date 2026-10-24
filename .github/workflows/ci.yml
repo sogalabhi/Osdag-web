@@ -60,6 +60,12 @@ jobs:
 
   backend-qa:
     runs-on: ubuntu-latest
+    # docker compose requires these now that .env is untracked; CI-only dummies.
+    # DATABASE_PASSWORD must match what the test step connects with.
+    env:
+      DATABASE_PASSWORD: password
+      SECRET_KEY: ci-dummy-secret-key
+      INFLUXDB_TOKEN: ci-dummy-influxdb-token
     steps:
       - uses: actions/checkout@v4
 
