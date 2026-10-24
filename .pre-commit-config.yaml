@@ -19,10 +19,13 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.2
     hooks:
-      # Lints backend/ using the settings in pyproject.toml. Reports only; it
-      # does not rewrite files.
+      # Blocks commits only on rules that catch real bugs (syntax errors,
+      # undefined names), which the backend already passes. The full rule set
+      # in pyproject.toml still has old findings in most files; switch to it
+      # (drop args) after the one-time cleanup. Does not rewrite files.
       - id: ruff-check
         files: ^backend/
+        args: [--select, "E9,F63,F7,F82"]
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1

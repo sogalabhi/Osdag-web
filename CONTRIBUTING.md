@@ -67,7 +67,8 @@ Use the database settings from `.env` (or the values shown in `.github/workflows
 
 ```bash
 pip install ruff==0.17.2
-ruff check backend
+ruff check backend --select E9,F63,F7,F82   # must pass: CI fails on these (syntax errors, undefined names)
+ruff check backend                          # full rule set: old code still has findings; don't add new ones
 ```
 
 **Pre-commit hooks** (optional, but they catch most problems before a push): run ruff, gitleaks, and basic file checks on each commit.
