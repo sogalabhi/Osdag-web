@@ -15,7 +15,8 @@ from apps.core.utils.module_helpers import (
     trigger_async_report
 )
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
-from apps.core.models import Material, CustomMaterials, Bolt, Angles, Channels
+from apps.core import catalog
+from apps.core.models import CustomMaterials
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from apps.sections.options_merge import merge_user_sections_into_options
 
@@ -87,16 +88,14 @@ class TensionMemberViewSet(viewsets.ViewSet):
 
         # Shared helpers
         def material_list():
-            mats = list(Material.objects.all().values())
+            mats = catalog.rows("Material")
             if hasattr(request, "user") and request.user.is_authenticated:
                 mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 
         def bolt_diameters():
-            lst = list(Bolt.objects.values_list('Bolt_diameter', flat=True))
-            lst.sort()
-            return [str(x) for x in lst]
+            return catalog.bolt_diameters()
 
         property_classes = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
         thickness_list = [
@@ -117,8 +116,8 @@ class TensionMemberViewSet(viewsets.ViewSet):
                     'materialList': material_list(),
                     'connectorMaterialList': material_list(),
                     'sectionProfileList': section_profiles,
-                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
-                    'channelList': list(Channels.objects.values_list('Designation', flat=True)),
+                    'angleList': catalog.designations("Angles"),
+                    'channelList': catalog.designations("Channels"),
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,
                     'thicknessList': thickness_list,
@@ -139,8 +138,8 @@ class TensionMemberViewSet(viewsets.ViewSet):
                     'materialList': material_list(),
                     'connectorMaterialList': material_list(),
                     'sectionProfileList': section_profiles,
-                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
-                    'channelList': list(Channels.objects.values_list('Designation', flat=True)),
+                    'angleList': catalog.designations("Angles"),
+                    'channelList': catalog.designations("Channels"),
                     'thicknessList': thickness_list,
                     'designMethodList': design_method_list,
                     'edgeTypeList': edge_type_list,

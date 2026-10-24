@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from apps.core.models import CustomMaterials, Material
+from apps.core import catalog
+from apps.core.models import CustomMaterials
 from apps.core.tests.auth_utils import authenticated_as
 
 URL = "/api/materialDetails/"
@@ -14,10 +15,35 @@ def strengths(**extra):
     )
 
 
+class MaterialDetailsListTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="u1", email="u1@example.com", password="x")
+        CustomMaterials.objects.create(user=self.user, Grade="Mine 1", **strengths())
+
+    def test_guest_gets_catalog_grades_then_the_custom_sentinel(self):
+        data = self.client.get(URL).json()
+        grades = [m["Grade"] for m in data["materialList"]]
+        self.assertEqual(grades, [m["Grade"] for m in catalog.rows("Material")] + ["Custom"])
+        self.assertEqual(data["materialList"][-1], {"id": -1, "Grade": "Custom"})
+        self.assertEqual(data["custom_materials"], [])
+        self.assertEqual(data["material_details"][1]["Ultimate_Tensile_Stress"], 410)
+
+    def test_signed_in_user_gets_own_grades_between_catalog_and_sentinel(self):
+        with authenticated_as(self.user):
+            data = self.client.get(URL).json()
+        grades = [m["Grade"] for m in data["materialList"]]
+        self.assertEqual(grades[-2:], ["Mine 1", "Custom"])
+        self.assertEqual(len(grades), len(catalog.rows("Material")) + 2)
+        self.assertEqual([m["Grade"] for m in data["custom_materials"]], ["Mine 1"])
+
+    def test_material_filter_returns_one_catalog_grade(self):
+        data = self.client.get(URL, {"material": "E 250 (Fe 410 W)A"}).json()
+        self.assertEqual([m["Grade"] for m in data["material_details"]], ["E 250 (Fe 410 W)A"])
+
+
 class MaterialDetailsConflictTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="u1", email="u1@example.com", password="x")
-        Material.objects.create(Grade="E 250 (Fe 410 W)A", **strengths())
         self.first = CustomMaterials.objects.create(user=self.user, Grade="Mine 1", **strengths())
         self.second = CustomMaterials.objects.create(user=self.user, Grade="Mine 2", **strengths())
 

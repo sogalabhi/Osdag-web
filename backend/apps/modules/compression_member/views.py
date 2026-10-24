@@ -17,7 +17,8 @@ from apps.core.utils.module_helpers import (
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from apps.core.constants import get_report_module_id
-from apps.core.models import Material, CustomMaterials, Bolt, Angles, Channels, Beams, Columns, RHS, SHS, CHS
+from apps.core import catalog
+from apps.core.models import CustomMaterials
 from apps.core.osdag_overrides import unknown_material_error, user_id_from_request, user_rows
 from apps.sections.options_merge import merge_user_sections_into_options
 
@@ -94,16 +95,14 @@ class CompressionMemberViewSet(viewsets.ViewSet):
 
         # Shared helpers
         def material_list():
-            mats = list(Material.objects.all().values())
+            mats = catalog.rows("Material")
             if hasattr(request, "user") and request.user.is_authenticated:
                 mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 
         def bolt_diameters():
-            lst = list(Bolt.objects.values_list('Bolt_diameter', flat=True))
-            lst.sort()
-            return [str(x) for x in lst]
+            return catalog.bolt_diameters()
 
         property_classes = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
         thickness_list = [
@@ -127,8 +126,8 @@ class CompressionMemberViewSet(viewsets.ViewSet):
                     'materialList': material_list(),
                     'connectorMaterialList': material_list(),
                     'sectionProfileList': section_profiles,
-                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
-                    'channelList': list(Channels.objects.values_list('Designation', flat=True)),
+                    'angleList': catalog.designations("Angles"),
+                    'channelList': catalog.designations("Channels"),
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,
                     'thicknessList': thickness_list,
@@ -152,8 +151,8 @@ class CompressionMemberViewSet(viewsets.ViewSet):
                     'materialList': material_list(),
                     'connectorMaterialList': material_list(),
                     'sectionProfileList': section_profiles,
-                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
-                    'channelList': list(Channels.objects.values_list('Designation', flat=True)),
+                    'angleList': catalog.designations("Angles"),
+                    'channelList': catalog.designations("Channels"),
                     'thicknessList': thickness_list,
                     'designMethodList': design_method_list,
                     'edgeTypeList': edge_type_list,
@@ -177,13 +176,13 @@ class CompressionMemberViewSet(viewsets.ViewSet):
                     "Channels",
                     "Back to Back Channels",
                 ]
-                beams_list = list(Beams.objects.values_list("Designation", flat=True))
-                columns_list = list(Columns.objects.values_list("Designation", flat=True))
-                rhs_list = list(RHS.objects.values_list("Designation", flat=True))
-                shs_list = list(SHS.objects.values_list("Designation", flat=True))
-                chs_list = list(CHS.objects.values_list("Designation", flat=True))
-                angles_list = list(Angles.objects.values_list("Designation", flat=True))
-                channels_list = list(Channels.objects.values_list("Designation", flat=True))
+                beams_list = catalog.designations("Beams")
+                columns_list = catalog.designations("Columns")
+                rhs_list = catalog.designations("RHS")
+                shs_list = catalog.designations("SHS")
+                chs_list = catalog.designations("CHS")
+                angles_list = catalog.designations("Angles")
+                channels_list = catalog.designations("Channels")
 
                 end_condition_list = ["Fixed", "Free", "Hinged", "Roller"]
 

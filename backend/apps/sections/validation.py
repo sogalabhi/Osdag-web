@@ -9,25 +9,16 @@ Ports behaviour from Osdag desktop:
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Dict, List, Optional, Tuple
 
-from django.db import models
-
-from apps.core.models import Angles, Beams, Channels, Columns, CHS, RHS, SHS
+from apps.core import catalog
 from apps.sections.models import TABLE_TO_USER_MODEL
 
 ALLOWED_TABLES = frozenset(TABLE_TO_USER_MODEL.keys())
 ALLOWED_CATALOG_TABLES = ALLOWED_TABLES | {"CHS", "SHS", "RHS"}
 
-TABLE_TO_CATALOG_MODEL: Dict[str, Type[models.Model]] = {
-    "Columns": Columns,
-    "Beams": Beams,
-    "Angles": Angles,
-    "Channels": Channels,
-    "CHS": CHS,
-    "SHS": SHS,
-    "RHS": RHS,
-}
+# Fields of a UserCustom* row that are not part of a catalog row.
+_USER_ROW_FIELDS = frozenset({"user", "created_at", "updated_at", "is_active"})
 
 # osdag_core looks I-sections up in Beams, then Columns (fetch_beam_or_column), so a
 # designation must be unique across both or one row silently shadows the other.
@@ -141,14 +132,18 @@ def get_db_header(table: str) -> List[str]:
     """
     Canonical xlsx row-1 headers for `table`, matching catalog field names
     (same strings desktop import expects for `SELECT *`-style column names).
+
+    Sections users can import take them from their `UserCustom*` model, whose fields
+    mirror the catalog's; the others (CHS, SHS, RHS) from the catalog itself.
     """
     assert_allowed_catalog_table(table)
-    model = TABLE_TO_CATALOG_MODEL[table]
-    return [
-        f.name
-        for f in model._meta.concrete_fields
-        if not getattr(f, "primary_key", False)
-    ]
+    if table in TABLE_TO_USER_MODEL:
+        return [
+            f.name
+            for f in TABLE_TO_USER_MODEL[table]._meta.concrete_fields
+            if not f.primary_key and f.name not in _USER_ROW_FIELDS
+        ]
+    return [name for name in catalog.fields(table) if name != "id"]
 
 
 def headers_match_table(header_row: List[str], table: str) -> bool:
@@ -229,7 +224,7 @@ def can_insert_custom_section(
         return False, "missing_designation"
 
     tables = _SHARED_DESIGNATION_TABLES.get(table, (table,))
-    if any(TABLE_TO_CATALOG_MODEL[t].objects.filter(Designation=designation).exists() for t in tables):
+    if any(catalog.find(t, Designation=designation) for t in tables):
         return False, "catalog_duplicate"
 
     for t in tables:
@@ -245,8 +240,3 @@ def can_insert_custom_section(
 def get_user_model_for_table(table: str):
     assert_allowed_table(table)
     return TABLE_TO_USER_MODEL[table]
-
-
-def get_catalog_model_for_table(table: str):
-    assert_allowed_catalog_table(table)
-    return TABLE_TO_CATALOG_MODEL[table]

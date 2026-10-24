@@ -17,7 +17,8 @@ from apps.core.utils.module_helpers import (
     trigger_async_report
 )
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
-from apps.core.models import Columns, Beams, Bolt, Material, CustomMaterials, Angles
+from apps.core import catalog
+from apps.core.models import CustomMaterials
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from apps.sections.options_merge import merge_user_sections_into_options
 
@@ -71,16 +72,14 @@ class ShearConnectionViewSet(viewsets.ViewSet):
 
         # Common data helpers
         def material_list():
-            mats = list(Material.objects.all().values())
+            mats = catalog.rows("Material")
             if hasattr(request, "user") and request.user.is_authenticated:
                 mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 
         def bolt_diameters():
-            lst = list(Bolt.objects.values_list('Bolt_diameter', flat=True))
-            lst.sort()
-            return lst
+            return catalog.bolt_diameters()
 
         property_classes = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
         thickness_list = [
@@ -93,8 +92,8 @@ class ShearConnectionViewSet(viewsets.ViewSet):
             if slug == 'fin-plate':
                 data = {
                     'connectivityList': connectivity_common,
-                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
-                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'columnList': catalog.designations("Columns"),
+                    'beamList': catalog.designations("Beams"),
                     'materialList': material_list(),
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,
@@ -109,10 +108,10 @@ class ShearConnectionViewSet(viewsets.ViewSet):
             if slug == 'cleat-angle':
                 data = {
                     'connectivityList': connectivity_common,
-                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
-                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'columnList': catalog.designations("Columns"),
+                    'beamList': catalog.designations("Beams"),
                     'materialList': material_list(),
-                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
+                    'angleList': catalog.designations("Angles"),
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,
                 }
@@ -125,8 +124,8 @@ class ShearConnectionViewSet(viewsets.ViewSet):
                 data = {
                     'connectivityList': connectivity_common,
                     'boltTypeList': ['Bearing Bolt', 'Friction Grip Bolt'],
-                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
-                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'columnList': catalog.designations("Columns"),
+                    'beamList': catalog.designations("Beams"),
                     'materialList': material_list(),
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,
@@ -140,11 +139,11 @@ class ShearConnectionViewSet(viewsets.ViewSet):
             if slug == 'seated-angle':
                 data = {
                     'connectivityList': ['Column Flange-Beam-Web', 'Column Web-Beam-Web'],
-                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
-                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'columnList': catalog.designations("Columns"),
+                    'beamList': catalog.designations("Beams"),
                     'materialList': material_list(),
-                    'angleList': list(Angles.objects.values_list('Designation', flat=True)),
-                    'topAngleList': list(Angles.objects.values_list('Designation', flat=True)),
+                    'angleList': catalog.designations("Angles"),
+                    'topAngleList': catalog.designations("Angles"),
                     'boltDiameterList': bolt_diameters(),
                     'boltTypeList': ['Bearing Bolt', 'Friction Grip Bolt'],
                     'propertyClassList': property_classes,

@@ -16,7 +16,8 @@ from apps.core.utils.module_helpers import (
     trigger_async_report
 )
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
-from apps.core.models import Columns, Beams, Bolt, Material, CustomMaterials
+from apps.core import catalog
+from apps.core.models import CustomMaterials
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from apps.sections.options_merge import merge_user_sections_into_options
 
@@ -73,16 +74,14 @@ class MomentConnectionViewSet(viewsets.ViewSet):
 
         # Common data helpers
         def material_list():
-            mats = list(Material.objects.all().values())
+            mats = catalog.rows("Material")
             if hasattr(request, "user") and request.user.is_authenticated:
                 mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 
         def bolt_diameters():
-            lst = list(Bolt.objects.values_list('Bolt_diameter', flat=True))
-            lst.sort()
-            return lst
+            return catalog.bolt_diameters()
 
         property_classes = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
         thickness_list = [
@@ -94,7 +93,7 @@ class MomentConnectionViewSet(viewsets.ViewSet):
             # Beam-to-Beam Cover Plate Bolted
             if slug == 'beam-beam-cover-plate-bolted':
                 data = {
-                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'beamList': catalog.designations("Beams"),
                     'materialList': material_list(),
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,
@@ -108,7 +107,7 @@ class MomentConnectionViewSet(viewsets.ViewSet):
             # Beam-to-Beam Cover Plate Welded
             if slug == 'beam-beam-cover-plate-welded':
                 data = {
-                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'beamList': catalog.designations("Beams"),
                     'materialList': material_list(),
                     'weldTypes': [
                         {'value': 'Fillet Weld', 'label': 'Fillet Weld'},
@@ -128,7 +127,7 @@ class MomentConnectionViewSet(viewsets.ViewSet):
             # Beam-Beam End Plate
             if slug == 'beam-beam-end-plate':
                 data = {
-                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'beamList': catalog.designations("Beams"),
                     'materialList': material_list(),
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,
@@ -143,8 +142,8 @@ class MomentConnectionViewSet(viewsets.ViewSet):
             if slug == 'beam-column-end-plate':
                 data = {
                     'connectivityList': ['Column-Flange-Beam-Web', 'Column Web-Beam Web'],
-                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
-                    'beamList': list(Beams.objects.values_list('Designation', flat=True)),
+                    'columnList': catalog.designations("Columns"),
+                    'beamList': catalog.designations("Beams"),
                     'materialList': material_list(),
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,
@@ -159,7 +158,7 @@ class MomentConnectionViewSet(viewsets.ViewSet):
             # Column-to-Column Cover Plate Bolted
             if slug == 'column-column-cover-plate-bolted':
                 data = {
-                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
+                    'columnList': catalog.designations("Columns"),
                     'materialList': material_list(),
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,
@@ -173,7 +172,7 @@ class MomentConnectionViewSet(viewsets.ViewSet):
             # Column-to-Column Cover Plate Welded
             if slug == 'column-column-cover-plate-welded':
                 data = {
-                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
+                    'columnList': catalog.designations("Columns"),
                     'materialList': material_list(),
                     'weldTypes': [
                         {'value': 'Fillet Weld', 'label': 'Fillet Weld'},
@@ -193,7 +192,7 @@ class MomentConnectionViewSet(viewsets.ViewSet):
             # Column-to-Column End Plate
             if slug == 'column-column-end-plate':
                 data = {
-                    'columnList': list(Columns.objects.values_list('Designation', flat=True)),
+                    'columnList': catalog.designations("Columns"),
                     'materialList': material_list(),
                     'boltDiameterList': bolt_diameters(),
                     'propertyClassList': property_classes,

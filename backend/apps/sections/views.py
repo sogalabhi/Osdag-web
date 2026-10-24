@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from apps.core import catalog
 from apps.sections.export_scopes import EXPORT_SCOPE_REGISTRY, get_allowed_export_scopes
 from apps.sections.models import TABLE_TO_USER_MODEL
 from apps.sections.serializers import get_user_section_serializer
@@ -23,7 +24,6 @@ from apps.sections.validation import (
     assert_allowed_table,
     can_insert_custom_section,
     cell_problem,
-    get_catalog_model_for_table,
     get_db_header,
     headers_match_table,
     row_dict_to_create_kwargs,
@@ -111,9 +111,8 @@ class SectionCatalogExportView(APIView):
         if err:
             return err
 
-        Model = get_catalog_model_for_table(table)
         headers = get_db_header(table)
-        rows = list(Model.objects.values_list(*headers))
+        rows = [[row[h] for h in headers] for row in catalog.rows(table)]
 
         if len(rows) > SECTION_EXPORT_MAX_ROWS:
             return Response(

@@ -13,6 +13,8 @@ VALID_OPERATIONS = frozenset({"open", "refresh", "save", "reset"})
 
 import importlib
 
+from apps.core import catalog
+
 _CORE_CLASS_MAP = {
     "FinPlateConnection": ("osdag_core.design_type.connection.fin_plate_connection", "FinPlateConnection"),
     "EndPlateConnection": ("osdag_core.design_type.connection.end_plate_connection", "EndPlateConnection"),
@@ -128,18 +130,19 @@ def lookup_sources(user=None) -> Dict[str, List[Any]]:
     """
     Model kwargs for merge_design_pref_sync / build_design_pref_defaults.
 
-    Each value lists querysets searched in order. A signed-in user's custom rows come
-    before the catalog, the same precedence osdag_core uses (apps.core.osdag_overrides).
+    Each value lists the sources searched in order: querysets of a signed-in user's
+    custom rows first, then the name of the catalog table. That is the same precedence
+    osdag_core uses (apps.core.osdag_overrides).
     """
-    from apps.core.models import Angles, Beams, Channels, Columns, CustomMaterials, Material
+    from apps.core.models import CustomMaterials
     from apps.sections.models import UserCustomAngle, UserCustomBeam, UserCustomChannel, UserCustomColumn
 
     sources = {
-        "material_model": [Material.objects],
-        "beams_model": [Beams.objects],
-        "columns_model": [Columns.objects],
-        "angles_model": [Angles.objects],
-        "channels_model": [Channels.objects],
+        "material_model": ["Material"],
+        "beams_model": ["Beams"],
+        "columns_model": ["Columns"],
+        "angles_model": ["Angles"],
+        "channels_model": ["Channels"],
     }
     if user is not None and getattr(user, "is_authenticated", False):
         sources["material_model"].insert(0, CustomMaterials.objects.filter(user=user))
@@ -154,11 +157,19 @@ def lookup_sources(user=None) -> Dict[str, List[Any]]:
 
 
 def first_row(sources, **lookup) -> Optional[Dict[str, Any]]:
-    """First row matching `lookup` across `sources` (one queryset or a list searched in order)."""
+    """
+    First row matching `lookup` across `sources`, searched in order.
+
+    `sources` is one source or a list of them; a source is a queryset (user rows) or
+    the name of a catalog table.
+    """
     if sources is None:
         return None
     for source in sources if isinstance(sources, (list, tuple)) else (sources,):
-        row = source.filter(**lookup).values().first()
+        if isinstance(source, str):
+            row = catalog.find(source, **lookup)
+        else:
+            row = source.filter(**lookup).values().first()
         if row:
             return row
     return None

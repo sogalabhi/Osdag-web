@@ -174,3 +174,42 @@ class DesignPrefCustomRowsTests(TestCase):
         data = r.json()
         self.assertEqual(data["section_details"]["supported"]["Designation"], "MY 200")
         self.assertEqual(data["material_details"]["connector"][0]["Grade"], "My Steel")
+
+
+class DesignPrefCatalogTests(TestCase):
+    """Without custom rows, section and material details come from the SQLite catalog."""
+
+    INPUTS = {"material": "E 250 (Fe 410 W)A", "section_designation": ["MB 300"]}
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="u1", email="u1@example.com", password="x")
+
+    def merge(self, user):
+        return merge_design_pref_sync(
+            "Simply Supported Beam Design", self.INPUTS, "open", **lookup_sources(user),
+        )
+
+    def test_guest_gets_catalog_rows(self):
+        _resolved, _meta, material_details, section_details = self.merge(None)
+        self.assertEqual(section_details["supported"]["Designation"], "MB 300")
+        self.assertAlmostEqual(section_details["supported"]["Mass"], 46.02)
+        self.assertEqual(material_details["connector"][0]["Grade"], "E 250 (Fe 410 W)A")
+        self.assertEqual(material_details["connector"][0]["Yield_Stress_less_than_20"], 250)
+
+    def test_custom_row_wins_over_catalog_row_of_the_same_designation(self):
+        make_beam(self.user, designation="MB 300", mass=99.0)
+        _resolved, _meta, _md, section_details = self.merge(self.user)
+        self.assertEqual(float(section_details["supported"]["Mass"]), 99.0)
+
+    def test_catalog_row_is_found_after_the_users_rows(self):
+        make_beam(self.user, designation="MY 200")
+        _resolved, _meta, _md, section_details = self.merge(self.user)
+        self.assertAlmostEqual(section_details["supported"]["Mass"], 46.02)
+
+    def test_design_preferences_api_returns_catalog_row(self):
+        r = self.client.get("/api/design-preferences/", {"section_type": "angles", "supported_section": "20 x 20 x 3"})
+        self.assertEqual(r.status_code, 200)
+        row = r.json()["supported_section_results"][0]
+        self.assertEqual(row["Designation"], "20 x 20 x 3")
+        self.assertAlmostEqual(row["It"], 0.033)
+        self.assertIn("lumax", row)
