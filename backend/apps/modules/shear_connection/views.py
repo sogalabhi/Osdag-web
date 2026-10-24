@@ -21,6 +21,7 @@ from apps.core import catalog
 from apps.core.models import CustomMaterials
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from apps.sections.options_merge import merge_user_sections_into_options
+from apps.core.utils.api_errors import error_response
 
 
 SHEAR_REPORT_MODULE_ID_MAP = {
@@ -154,9 +155,9 @@ class ShearConnectionViewSet(viewsets.ViewSet):
                     status=status.HTTP_200_OK,
                 )
 
-            return Response({'error': f'Sub-module {slug} not found'}, status=404)
+            return error_response('submodule_not_found', f'Sub-module {slug} not found', 404)
         except Exception as e:
-            return Response({'error': str(e)}, status=500)
+            return error_response('internal_error', str(e), 500)
     
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/cad')
     def cad(self, request, submodule_slug=None):

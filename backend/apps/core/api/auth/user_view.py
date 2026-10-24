@@ -25,6 +25,7 @@ from django.contrib.auth.models import User
 import os
 import uuid
 import base64
+from apps.core.utils.api_errors import error_response, flatten_validation_errors
 
 
 # obtain the attributes 
@@ -45,7 +46,7 @@ class SaveInputFileView(APIView) :
         try:
             uploaded_file = request.FILES.get('file')
             if not uploaded_file:
-                return Response({'message': 'No file provided under field "file"'}, status=status.HTTP_400_BAD_REQUEST)
+                return error_response('bad_request', 'No file provided under field "file"', status.HTTP_400_BAD_REQUEST)
 
             serializer = OsiFileSerializer(data={'file': uploaded_file})
             if serializer.is_valid():
@@ -53,7 +54,8 @@ class SaveInputFileView(APIView) :
                 file_url = osifile.file.url
                 return Response({'message': 'File stored successfully', 'url': file_url, 'id': osifile.id}, status=status.HTTP_201_CREATED)
             else:
-                return Response({'message': 'Invalid file upload', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                return error_response('validation_error', 'Invalid file upload', status.HTTP_400_BAD_REQUEST,
+                                      fields=flatten_validation_errors(serializer.errors))
         except Exception as e:
             print('Error saving OSI file via OsiFile model: ', e)
-            return Response({'message': 'Failed to store the file'}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('bad_request', 'Failed to store the file', status.HTTP_400_BAD_REQUEST)

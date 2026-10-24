@@ -10,6 +10,7 @@ from rest_framework import status
 
 from apps.core.api.design.sync_merge import build_design_pref_defaults, lookup_sources
 from apps.core.osdag_overrides import user_id_from_request, user_rows
+from apps.core.utils.api_errors import error_response
 
 
 class DesignPreferenceDefaults(APIView):
@@ -20,10 +21,7 @@ class DesignPreferenceDefaults(APIView):
         module_session_name = body.get("module_session_name") or body.get("module") or ""
         inputs = body.get("inputs") or {}
         if not module_session_name:
-            return Response(
-                {"error": "module_session_name is required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('missing_field', "module_session_name is required", status.HTTP_400_BAD_REQUEST)
 
         try:
             # osdag_core computes some defaults from the selected material, so it must see custom rows too.
@@ -34,10 +32,7 @@ class DesignPreferenceDefaults(APIView):
                     **lookup_sources(request.user),
                 )
         except Exception as exc:
-            return Response(
-                {"error": str(exc), "success": False},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return error_response('internal_error', str(exc), status.HTTP_500_INTERNAL_SERVER_ERROR, success=False)
 
         return Response(
             {

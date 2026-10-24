@@ -22,6 +22,7 @@ from django.utils.decorators import method_decorator
 from apps.core.module_finder import get_module_api
 from apps.core.osdag_overrides import unknown_material_error, user_id_from_request, user_rows
 from .cad_module_aliases import resolve_module_id
+from apps.core.utils.api_errors import error_json_response
 
 
 def _resolve_file_path(path: str, repo_root: str, backend_root: str) -> str:
@@ -63,7 +64,7 @@ class CADExport(View):
         try:
             request_data = json.loads(request.body)
         except Exception:
-            return JsonResponse({"status": "error", "message": "Invalid JSON body"}, status=400)
+            return error_json_response('invalid_json', "Invalid JSON body", 400)
 
         module_id = request_data.get("module_id")
         input_values = request_data.get("input_values") or request_data.get("inputs")
@@ -71,16 +72,16 @@ class CADExport(View):
         format_type = (request_data.get("format") or "").lower()
 
         if not module_id:
-            return JsonResponse({"status": "error", "message": "module_id is required"}, status=400)
+            return error_json_response('missing_field', "module_id is required", 400)
         if not input_values:
-            return JsonResponse({"status": "error", "message": "input_values are required"}, status=400)
+            return error_json_response('missing_field', "input_values are required", 400)
         if not format_type:
-            return JsonResponse({"status": "error", "message": "format is required"}, status=400)
+            return error_json_response('missing_field', "format is required", 400)
         if format_type not in ("step", "iges", "brep", "stl", "ifc"):
-            return JsonResponse({"status": "error", "message": "Invalid format type requested"}, status=400)
+            return error_json_response('invalid_format', "Invalid format type requested", 400)
         material_error = unknown_material_error(input_values, user_id_from_request(request))
         if material_error:
-            return JsonResponse({"status": "error", "message": material_error}, status=400)
+            return error_json_response('bad_request', material_error, 400)
 
         resolved_module_id = resolve_module_id(module_id)
 
@@ -103,10 +104,7 @@ class CADExport(View):
             brep_path = module_api.create_cad_model(input_values, section, session_id)
 
         if not brep_path:
-            return JsonResponse(
-                {"status": "error", "message": "CAD export failed: adapter returned empty brep_path"},
-                status=422,
-            )
+            return error_json_response('cad_export_failed', "CAD export failed: adapter returned empty brep_path", 422)
 
         brep_abs = _resolve_file_path(brep_path, repo_root, backend_root)
 
@@ -135,10 +133,7 @@ class CADExport(View):
                     brep_abs,
                     out_abs_path,
                 )
-                return JsonResponse(
-                    {"status": "error", "message": f"IFC export failed: {e!s}"},
-                    status=500,
-                )
+                return error_json_response('cad_export_failed', f"IFC export failed: {e!s}", 500)
         elif format_type == "brep":
             out_abs_path = _swap_ext(brep_abs, ".brep")
         elif format_type == "stl":
@@ -151,14 +146,8 @@ class CADExport(View):
             out_abs_path = _swap_ext(brep_abs, f".{format_type}")
 
         if not os.path.exists(out_abs_path):
-            return JsonResponse(
-                {
-                    "status": "error",
-                    "message": f"{format_type.upper()} file does not exist.",
-                    "expected_path": out_abs_path,
-                },
-                status=404,
-            )
+            logger.error("[CADExport] Expected output file missing: %s", out_abs_path)
+            return error_json_response('file_not_found', f"{format_type.upper()} file does not exist.", 404)
 
         # Read into memory then delete - zero disk accumulation for on-demand exports
         from io import BytesIO

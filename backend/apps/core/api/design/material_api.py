@@ -4,6 +4,7 @@ from rest_framework import status
 from apps.core import catalog
 from apps.core.models import CustomMaterials
 from apps.core.serializers import CustomMaterials_Serializer
+from apps.core.utils.api_errors import error_response
 
 
 def _grade_conflict(user, grade, exclude_pk=None):
@@ -53,11 +54,11 @@ class MaterialDetails(APIView):
         fu = request.data.get("fu")
 
         if not (hasattr(request, "user") and request.user.is_authenticated):
-            return Response({"message": "Authentication required", "success": False}, status=401)
+            return error_response('not_authenticated', "Authentication required", 401, success=False)
 
         conflict = _grade_conflict(request.user, materialName)
         if conflict:
-            return Response({"message": conflict, "success": False}, status=403)
+            return error_response('already_exists', conflict, 403, success=False)
 
         serializer = CustomMaterials_Serializer(data={
             "user": request.user.id,
@@ -75,34 +76,34 @@ class MaterialDetails(APIView):
             return Response({"message": "Material added successfuly", "success": True}, status=201)
         else:
             print('serializer.errors : ', serializer.errors)
-        return Response({"message": "Something went wrong", "success": True}, status=500)
+        return error_response('internal_error', "Something went wrong", 500, success=False)
 
     def delete(self, request, material_id=None):
         if not (hasattr(request, "user") and request.user.is_authenticated):
-            return Response({"message": "Authentication required", "success": False}, status=status.HTTP_401_UNAUTHORIZED)
+            return error_response('not_authenticated', "Authentication required", status.HTTP_401_UNAUTHORIZED, success=False)
         
         if not material_id:
             material_id = request.query_params.get("id")
             
         if not material_id:
-            return Response({"message": "Material ID is required", "success": False}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('missing_field', "Material ID is required", status.HTTP_400_BAD_REQUEST, success=False)
             
         try:
             material = CustomMaterials.objects.get(id=material_id, user=request.user)
             material.delete()
             return Response({"message": "Material deleted successfully", "success": True}, status=status.HTTP_200_OK)
         except CustomMaterials.DoesNotExist:
-            return Response({"message": "Material not found or access denied", "success": False}, status=status.HTTP_404_NOT_FOUND)
+            return error_response('not_found', "Material not found or access denied", status.HTTP_404_NOT_FOUND, success=False)
 
     def put(self, request, material_id=None):
         if not (hasattr(request, "user") and request.user.is_authenticated):
-            return Response({"message": "Authentication required", "success": False}, status=status.HTTP_401_UNAUTHORIZED)
+            return error_response('not_authenticated', "Authentication required", status.HTTP_401_UNAUTHORIZED, success=False)
         
         if not material_id:
             material_id = request.data.get("id") or request.query_params.get("id")
             
         if not material_id:
-            return Response({"message": "Material ID is required", "success": False}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('missing_field', "Material ID is required", status.HTTP_400_BAD_REQUEST, success=False)
             
         try:
             material = CustomMaterials.objects.get(id=material_id, user=request.user)
@@ -110,7 +111,7 @@ class MaterialDetails(APIView):
             if new_grade != material.Grade:
                 conflict = _grade_conflict(request.user, new_grade, exclude_pk=material.pk)
                 if conflict:
-                    return Response({"message": conflict, "success": False}, status=403)
+                    return error_response('already_exists', conflict, 403, success=False)
             material.Grade = new_grade
             material.Yield_Stress_less_than_20 = request.data.get("Yield_Stress_less_than_20", material.Yield_Stress_less_than_20)
             material.Yield_Stress_between_20_and_neg40 = request.data.get("Yield_Stress_between_20_and_neg40", material.Yield_Stress_between_20_and_neg40)
@@ -122,4 +123,4 @@ class MaterialDetails(APIView):
             serializer = CustomMaterials_Serializer(material)
             return Response({"message": "Material updated successfully", "success": True, "data": serializer.data}, status=status.HTTP_200_OK)
         except CustomMaterials.DoesNotExist:
-            return Response({"message": "Material not found or access denied", "success": False}, status=status.HTTP_404_NOT_FOUND)
+            return error_response('not_found', "Material not found or access denied", status.HTTP_404_NOT_FOUND, success=False)

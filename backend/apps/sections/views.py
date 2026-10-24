@@ -28,6 +28,7 @@ from apps.sections.validation import (
     headers_match_table,
     row_dict_to_create_kwargs,
 )
+from apps.core.utils.api_errors import error_response
 
 SECTION_IMPORT_MAX_ROWS = 5000
 SECTION_EXPORT_MAX_ROWS = 10000
@@ -51,17 +52,14 @@ def _safe_table(
     else:
         table = request.data.get("table") if hasattr(request, "data") else None
     if not table:
-        return None, Response(
-            {"detail": "Parameter `table` is required."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return None, error_response('missing_field', "Parameter `table` is required.", status.HTTP_400_BAD_REQUEST)
     try:
         if custom_only:
             assert_allowed_table(table)
         else:
             assert_allowed_catalog_table(table)
     except ValueError as exc:
-        return None, Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        return None, error_response('bad_request', str(exc), status.HTTP_400_BAD_REQUEST)
     return table, None
 
 
@@ -115,15 +113,7 @@ class SectionCatalogExportView(APIView):
         rows = [[row[h] for h in headers] for row in catalog.rows(table)]
 
         if len(rows) > SECTION_EXPORT_MAX_ROWS:
-            return Response(
-                {
-                    "detail": (
-                        f"Too many rows to export ({len(rows)}); "
-                        f"maximum is {SECTION_EXPORT_MAX_ROWS}."
-                    )
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('too_many_rows', f"Too many rows to export ({len(rows)}); " f"maximum is {SECTION_EXPORT_MAX_ROWS}.", status.HTTP_400_BAD_REQUEST)
 
         wb = Workbook()
         ws = wb.active
@@ -171,63 +161,37 @@ class SectionImportView(APIView):
         logger.info("[SectionImport] resolved table=%r", table)
         if not table:
             logger.warning("[SectionImport] 400 — table field missing")
-            return Response(
-                {"detail": "Form field `table` is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('missing_field', "Form field `table` is required.", status.HTTP_400_BAD_REQUEST)
         try:
             assert_allowed_table(table)
         except ValueError as exc:
             logger.warning("[SectionImport] 400 — table not allowed: %s", exc)
-            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('bad_request', str(exc), status.HTTP_400_BAD_REQUEST)
 
         upload = request.FILES.get("file")
         logger.info("[SectionImport] upload file=%r (size=%s)",
                     getattr(upload, "name", None), getattr(upload, "size", None))
         if not upload:
             logger.warning("[SectionImport] 400 — file field missing")
-            return Response(
-                {"detail": "Form file field `file` is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('missing_field', "Form file field `file` is required.", status.HTTP_400_BAD_REQUEST)
 
         try:
             wb = load_workbook(upload, data_only=True)
         except Exception as exc:  # noqa: BLE001
             logger.warning("[SectionImport] 400 — could not read workbook: %s", exc)
-            return Response(
-                {"detail": f"Could not read Excel file: {exc}"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('bad_request', f"Could not read Excel file: {exc}", status.HTTP_400_BAD_REQUEST)
 
         try:
             logger.info("[SectionImport] workbook sheet names=%s", wb.sheetnames)
             if table not in wb.sheetnames:
                 logger.warning("[SectionImport] 400 — sheet %r not found in %s", table, wb.sheetnames)
-                return Response(
-                    {
-                        "detail": (
-                            f"Worksheet named {table!r} not found in workbook "
-                            f"(available sheets: {wb.sheetnames}). "
-                            "The sheet tab must be named Columns, Beams, Angles, or Channels."
-                        )
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                return error_response('bad_request', f"Worksheet named {table!r} not found in workbook " f"(available sheets: {wb.sheetnames}). " "The sheet tab must be named Columns, Beams, Angles, or Channels.", status.HTTP_400_BAD_REQUEST)
 
             sheet = wb[table]
             max_r = sheet.max_row or 1
             data_rows = max_r - 1 if max_r else 0
             if data_rows > SECTION_IMPORT_MAX_ROWS:
-                return Response(
-                    {
-                        "detail": (
-                            f"Too many data rows ({data_rows}); "
-                            f"maximum is {SECTION_IMPORT_MAX_ROWS}."
-                        )
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                return error_response('too_many_rows', f"Too many data rows ({data_rows}); " f"maximum is {SECTION_IMPORT_MAX_ROWS}.", status.HTTP_400_BAD_REQUEST)
 
             first_row = next(
                 sheet.iter_rows(min_row=1, max_row=1, values_only=True),
@@ -242,13 +206,12 @@ class SectionImportView(APIView):
             if not headers_match_table(header_row, table):
                 logger.warning("[SectionImport] 400 — header mismatch for table=%r | got=%s | expected=%s",
                                table, header_row, get_db_header(table))
-                return Response(
-                    {
-                        "detail": "Header row does not match expected headers for this table.",
-                        "expected": get_db_header(table),
-                        "got": header_row,
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
+                return error_response(
+                    'header_mismatch',
+                    "Header row does not match expected headers for this table.",
+                    status.HTTP_400_BAD_REQUEST,
+                    expected=get_db_header(table),
+                    got=header_row,
                 )
 
             # Build a name → column-index map from the actual header row.
@@ -381,8 +344,7 @@ class SectionCustomView(APIView):
             return err
         Ser = get_user_section_serializer(table)
         ser = Ser(data=request.data, context={"request": request})
-        if not ser.is_valid():
-            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        ser.is_valid(raise_exception=True)
         instance = ser.save()
         out = Ser(instance, context={"request": request})
         return Response(out.data, status=status.HTTP_201_CREATED)
@@ -393,10 +355,7 @@ class SectionCustomView(APIView):
             return err
         designation = request.query_params.get("designation")
         if not designation:
-            return Response(
-                {"detail": "Query parameter `designation` is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('missing_field', "Query parameter `designation` is required.", status.HTTP_400_BAD_REQUEST)
         Model = TABLE_TO_USER_MODEL[table]
         qs = Model.objects.filter(user=request.user, Designation=designation)
         total_deleted, _ = qs.delete()
@@ -410,10 +369,7 @@ class SectionCustomView(APIView):
             return err
         id = request.data.get("id")
         if not id:
-            return Response(
-                {"detail": "Field `id` is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('missing_field', "Field `id` is required.", status.HTTP_400_BAD_REQUEST)
         Model = TABLE_TO_USER_MODEL[table]
         try:
             instance = Model.objects.get(id=id, user=request.user)
@@ -422,8 +378,7 @@ class SectionCustomView(APIView):
             
         Ser = get_user_section_serializer(table)
         ser = Ser(instance, data=request.data, partial=True, context={"request": request})
-        if not ser.is_valid():
-            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        ser.is_valid(raise_exception=True)
         updated_instance = ser.save()
         out = Ser(updated_instance, context={"request": request})
         return Response(out.data, status=status.HTTP_200_OK)
@@ -466,25 +421,16 @@ class SectionExportView(APIView):
         scope = request.query_params.get("scope", "user")
         handler = EXPORT_SCOPE_REGISTRY.get(scope)
         if handler is None:
-            return Response(
-                {
-                    "detail": f"Unknown export scope {scope!r}.",
-                    "allowed_scopes": get_allowed_export_scopes(),
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+            return error_response(
+                'invalid_scope',
+                f"Unknown export scope {scope!r}.",
+                status.HTTP_400_BAD_REQUEST,
+                allowed_scopes=get_allowed_export_scopes(),
             )
 
         UserModel = TABLE_TO_USER_MODEL[table]
         count = UserModel.objects.filter(user=request.user, is_active=True).count()
         if count > SECTION_EXPORT_MAX_ROWS:
-            return Response(
-                {
-                    "detail": (
-                        f"Too many rows to export ({count}); "
-                        f"maximum is {SECTION_EXPORT_MAX_ROWS}."
-                    )
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('too_many_rows', f"Too many rows to export ({count}); " f"maximum is {SECTION_EXPORT_MAX_ROWS}.", status.HTTP_400_BAD_REQUEST)
 
         return handler(table, request.user)
