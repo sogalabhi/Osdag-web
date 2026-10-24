@@ -7,7 +7,7 @@ import {
   KEY_MODULE, KEY_SEC_PROFILE, KEY_SECSIZE, KEY_MATERIAL, KEY_SEC_MATERIAL,
   KEY_DP_DESIGN_METHOD, KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, 
   KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH, KEY_SHEAR, KEY_MOMENT,
-  KEY_LENGTH, KEY_SUPPORT, KEY_TORSIONAL_RES, KEY_WARPING_RES,
+  KEY_LENGTH, KEY_TORSIONAL_RES, KEY_WARPING_RES,
   KEY_DISP_FLEXURE,
 } from "../../../../constants/generated/coreKeys";
 
@@ -225,7 +225,7 @@ export const simplySupportedBeamConfig = {
             // From Warping_Restraint_list in Common.py
             { value: "Both flanges fully restrained", label: "Both flanges fully restrained" },
             { value: "Compression flange fully restrained", label: "Compression flange fully restrained" },
-            { value: "Compressicm flange partially restrained", label: "Compressicm flange partially restrained" },
+            { value: "Compression flange partially restrained", label: "Compression flange partially restrained" },
             { value: "Warping not restrained in both flanges", label: "Warping not restrained in both flanges" }
           ]
         },
@@ -299,22 +299,4 @@ export const simplySupportedBeamConfig = {
       ]
     }
   ],
-
-  backendKeys: {
-    "Member.Profile": KEY_SEC_PROFILE,
-    "Member.Designation": KEY_SECSIZE,
-    "Material": KEY_MATERIAL,
-    "Member.Material": KEY_SEC_MATERIAL,
-    "Design.Design_Method": "Flexure.Type",      // KEY_DESIGN_TYPE_FLEXURE actual value
-    "Optimum.Class": KEY_ALLOW_CLASS,
-    "Effective.Area_Para": KEY_EFFECTIVE_AREA_PARA,
-    "Design.Length_Overwrite": KEY_LENGTH_OVERWRITE,
-    "Design.Bearing_Length": KEY_BEARING_LENGTH,
-    "Load.Shear": KEY_SHEAR,
-    "Load.Moment": KEY_MOMENT,
-    "Member.Length": KEY_LENGTH,
-    "Support.Type": KEY_SUPPORT,
-    "Torsional.Restraint": KEY_TORSIONAL_RES,
-    "Warping.Restraint": KEY_WARPING_RES,
-  },
 }; 

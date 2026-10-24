@@ -19,7 +19,7 @@ export const seatedAngleConfig = {
     bolt_type: "Bearing_Bolt",
     connector_material: "E 250 (Fe 410 W)A",
     load_shear: "70",
-    load_axial: "30",
+    load_axial: "0",
     module: KEY_DISP_SEATED_ANGLE,
     beam_section: "MB 300",
     column_section: "HB 150",

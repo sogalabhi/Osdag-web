@@ -68,7 +68,6 @@ export const columnColumnEndPlateConfig = {
       "Bolt.Slip_Factor": inputs.bolt_slip_factor,
       "Bolt.TensionType": inputs.bolt_tension_type,
       "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-      "Connectivity *": inputs.connectivity,
       "Connectivity": inputs.connectivity,
       "Connector.Plate.Thickness_List": allSelected.plate_thickness 
         ? lists.thicknessList : inputs.plate_thickness,
