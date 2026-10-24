@@ -41,7 +41,7 @@ class EmailVerificationTests(TestCase):
         # 1. Project API list -> should return 403 Forbidden
         r = self.client.get("/api/projects/", **headers)
         self.assertEqual(r.status_code, 403)
-        self.assertIn("verify your email", r.json().get("detail", ""))
+        self.assertIn("verify your email", r.json()["error"]["message"])
 
         # 2. Save OSI even with inline=True -> should return 403 Forbidden
         osi_data = {
@@ -52,7 +52,7 @@ class EmailVerificationTests(TestCase):
         }
         r = self.client.post("/api/save-osi-from-inputs/", data=osi_data, content_type="application/json", **headers)
         self.assertEqual(r.status_code, 403)
-        self.assertIn("verify your email", r.json().get("detail", ""))
+        self.assertIn("verify your email", r.json()["error"]["message"])
 
         # 3. Design Preference Sync -> should return 403 Forbidden
         sync_data = {
@@ -62,7 +62,7 @@ class EmailVerificationTests(TestCase):
         }
         r = self.client.post("/api/design-preferences/sync/", data=sync_data, content_type="application/json", **headers)
         self.assertEqual(r.status_code, 403)
-        self.assertIn("verify your email", r.json().get("detail", ""))
+        self.assertIn("verify your email", r.json()["error"]["message"])
 
     @patch('firebase_admin.auth.verify_id_token')
     def test_authenticated_verified_email_allowed(self, mock_verify):

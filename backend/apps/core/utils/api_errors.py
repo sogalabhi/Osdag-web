@@ -77,7 +77,7 @@ def error_json_response(
     return JsonResponse(error_payload(code, message, fields, **extra), status=status)
 
 
-def _flatten_detail(detail: Any, prefix: str = "") -> Dict[str, str]:
+def flatten_validation_errors(detail: Any, prefix: str = "") -> Dict[str, str]:
     """Flatten a DRF ValidationError detail into ``{field: message}``.
 
     Nested dicts use dotted keys; messages in a list are joined; errors that do
@@ -87,7 +87,7 @@ def _flatten_detail(detail: Any, prefix: str = "") -> Dict[str, str]:
     if isinstance(detail, dict):
         out: Dict[str, str] = {}
         for key, value in detail.items():
-            out.update(_flatten_detail(value, f"{prefix}.{key}" if prefix else str(key)))
+            out.update(flatten_validation_errors(value, f"{prefix}.{key}" if prefix else str(key)))
         return out
     if isinstance(detail, (list, tuple)):
         if any(isinstance(item, dict) for item in detail):
@@ -95,7 +95,7 @@ def _flatten_detail(detail: Any, prefix: str = "") -> Dict[str, str]:
             out = {}
             for index, item in enumerate(detail):
                 if item:
-                    out.update(_flatten_detail(item, f"{prefix}.{index}" if prefix else str(index)))
+                    out.update(flatten_validation_errors(item, f"{prefix}.{index}" if prefix else str(index)))
             return out
         messages = [str(item) for item in detail]
         return {prefix or "non_field_errors": " ".join(messages)}
@@ -138,7 +138,7 @@ def exception_handler(exc: Exception, context: Dict[str, Any]) -> Response:
         return error_response("internal_error", INTERNAL_ERROR_MESSAGE, 500)
 
     if isinstance(exc, drf_exceptions.ValidationError):
-        fields = _flatten_detail(exc.detail)
+        fields = flatten_validation_errors(exc.detail)
         return error_response(
             "validation_error", _message_from_fields(fields), response.status_code, fields=fields
         )
