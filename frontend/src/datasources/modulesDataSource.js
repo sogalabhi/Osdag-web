@@ -1,6 +1,7 @@
 import { apiClient, subscribeToTask } from "../utils/apiClient";
 import { MODULES, CAD, MATERIALS, DESIGN_PREFERENCES } from "./endpoints";
 import { getModuleSlug } from "../constants/apiRoutes";
+import { getErrorMessage } from "../utils/apiError";
 
 /**
  * Fetch module options / lists for a given module key.
@@ -117,7 +118,7 @@ export async function exportCad(module_id, input_values, format, section = "Mode
     let errorMsg = "CAD export failed";
     try {
       const errorJson = await res.json();
-      errorMsg = errorJson.message || errorJson.error || errorMsg;
+      errorMsg = getErrorMessage(errorJson, errorMsg);
     } catch {
       // Response body isn't JSON; keep the default message
     }

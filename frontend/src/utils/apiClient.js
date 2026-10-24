@@ -1,5 +1,6 @@
 import { apiBase } from "../api";
 import { auth } from "../Auth/firebase";
+import { parseApiError } from "./apiError";
 
 export const getAccessToken = async (forceRefresh = false) => {
   const user = auth.currentUser;
@@ -57,30 +58,17 @@ const createApiClient = (baseUrl) => {
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}`;
       let errorData = {};
+      let errorCode = null;
+      let errorFields = null;
       try {
         const text = await response.text().catch(() => "");
         if (text) {
           try {
             errorData = JSON.parse(text);
-            if (errorData.error) {
-              errorMessage = errorData.error;
-            } else if (errorData.message) {
-              errorMessage = errorData.message;
-            } else if (errorData.detail) {
-              errorMessage = errorData.detail;
-            } else if (typeof errorData === "object" && errorData !== null) {
-              const fieldErrors = [];
-              for (const [key, value] of Object.entries(errorData)) {
-                if (Array.isArray(value)) {
-                  fieldErrors.push(`${key}: ${value.join(", ")}`);
-                } else if (typeof value === "string") {
-                  fieldErrors.push(`${key}: ${value}`);
-                }
-              }
-              if (fieldErrors.length > 0) {
-                errorMessage = fieldErrors.join(" | ");
-              }
-            }
+            const parsed = parseApiError(errorData);
+            if (parsed.message) errorMessage = parsed.message;
+            errorCode = parsed.code;
+            errorFields = parsed.fields;
           } catch {
             errorMessage = text;
           }
@@ -88,8 +76,12 @@ const createApiClient = (baseUrl) => {
       } catch {
         // ignore
       }
-      
+
       const errorObj = new Error(errorMessage);
+      errorObj.status = response.status;
+      errorObj.code = errorCode;
+      // { <input key>: <message> } when the backend reports per-field errors
+      errorObj.fields = errorFields;
       errorObj.data = errorData;
       if (errorData.pending_deletion) {
         errorObj.pending_deletion = true;
