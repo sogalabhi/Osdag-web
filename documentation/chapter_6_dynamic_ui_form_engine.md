@@ -238,7 +238,7 @@ The frontend takes key strings from exactly two files under `frontend/src/consta
 * **[generated/coreKeys.js](../frontend/src/constants/generated/coreKeys.js):** One `export const NAME = "value";` for every string constant named `KEY_*` or `DISP_*` in `osdag_core/Common.py`, sorted by name. Configs import from here instead of typing a key such as `"Bolt.Diameter"` by hand. The values are exactly the core's, including the trailing `*` that many core display labels carry; `stripRequiredMark()` in `validation.js` removes it and the renderer adds the required marker from `field.required`. Never change a key's string: it is sent to the backend and stored in `.osi` files and saved projects.
 * **[UIStrings.js](../frontend/src/constants/UIStrings.js):** Labels that exist only in the UI (section titles, buttons, reworded field labels). A UI label that should differ from the core's display string is added here under its own name rather than redefining a core constant.
 
-Module IDs (`MODULE_KEY_*`) are frontend identifiers with no counterpart in `Common.py`; they live in [modules.js](../frontend/src/constants/modules.js) next to the module menu.
+A module's id is also a `Common.py` constant: its desktop module name (for example `KEY_DISP_FINPLATE`, `'Fin Plate Connection'`). See the module registry below.
 
 **Do not edit `coreKeys.js` by hand.** After `Common.py` changes, regenerate it from the repository root:
 
@@ -247,6 +247,26 @@ python scripts/gen_core_keys.py
 ```
 
 The script imports `osdag_core.Common`, so run it in the backend environment (set `QT_QPA_PLATFORM=offscreen` on a machine without a display; the script does this by default). The `backend-qa` CI job runs the generator and then `git diff --exit-code frontend/src/constants/generated/`, so a stale file fails the build.
+
+### 4. Module Registry (`registry.js`)
+[registry.js](../frontend/src/modules/registry.js) holds one entry per design module in the `MODULES` array. The router in [App.jsx](../frontend/src/App.jsx), the module selection menu, the API slugs and the design-preference data all read from it, so a module is described in one place.
+
+| Field | Meaning |
+| :--- | :--- |
+| `id` | The module's desktop name, imported from `generated/coreKeys.js` (`KEY_DISP_*`). It is also the backend `MODULE_ID`, the `designType` of the module's config, and the value stored in a project's `submodule` and in the `Module:` line of an `.osi` file. |
+| `path` | The design page URL. `App.jsx` registers `${path}/:projectId?` for every entry under `ProjectAuthGuard`. |
+| `title` | Page title passed to `EngineeringModule`. |
+| `load` | Lazy imports of the module's input config and output config, so each module is its own chunk. [ModulePage.jsx](../frontend/src/modules/ModulePage.jsx) renders `EngineeringModule` from the result. |
+| `apiSlug` | Backend URL slug for options, design, CAD and report calls (omitted when the module id is the slug). |
+| `menu` | Optional `{ tab, section, label, img }` placing the module on a selection page. Entries without `menu` (such as Purlin) have a route but no card. |
+| `designPref` | Optional per-module design-preference data, such as the fin plate connectivity names. |
+
+`MENU_GROUPS` in the same file lists the tabs and sections of each selection page, including entries marked `status: "development"` (Truss, PEB). Helpers: `findModule(id)`, `getModuleRoute(id)`, `getModuleSlug(id)`, `getModuleDesignPref(id)`, `loadModuleConfigs(id)` and `getMenuSections(tabKey)`. Lookups use the exact id; there are no aliases.
+
+**Adding a module**
+1. Backend: add the submodule with `MODULE_ID = KEY_DISP_...` from `osdag_core.Common` (see [ADDING_MODULES_AND_SUBMODULES_BACKEND.md](./general/ADDING_MODULES_AND_SUBMODULES_BACKEND.md)). If the desktop module has a new constant, run `python scripts/gen_core_keys.py` to add it to `coreKeys.js`.
+2. Frontend: create the `*Config.js` and `*OutputConfig.js` files with `designType` set to the same constant.
+3. Add one entry to `MODULES` in `registry.js`. The route, menu card, API slug and report/open-project navigation follow from it; no other file lists the module.
 
 ---
 

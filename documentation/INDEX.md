@@ -50,6 +50,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **6.6 `EngineeringModule` Orchestration Controller:** The core shared frontend shell component managing module rendering, docks, validation states, API submission loops, and 3D CAD canvas integration.
 * **6.7 Module Input & Output Configurations (`*Config.js`, `*OutputConfig.js`):** Declarative schemas defining field metadata, units, validation criteria, and grouped structures for each connection type.
 * **6.7.3 Key Constants (`generated/coreKeys.js` and `UIStrings.js`):** Where frontend key strings come from, how to regenerate them from `Common.py`, and the CI check that fails on a stale file.
+* **6.7.4 Module Registry (`registry.js`):** The single module list that drives routes, menus, API slugs and module lookup, and how to add a module with one entry.
 * **6.8 Shared Display Configurations (`sectionDisplayConfig.js` & `outputImageMap.js`):** Mapping specific structural section details and linking calculated dimensions to dynamic visual schematic overlays.
 
 ### 7. [Chapter 7: Additional Inputs & Design Preferences](./chapter_7_additional_inputs_design_preferences.md)
@@ -76,9 +77,9 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **9.8 CAD Model Exporting & Multiple Formats:** Supported export formats (BREP, STL, STEP, IGS, IFC), client-side cache vs. on-demand backend export routes, and helper functions in `cadExport.js`.
 
 ### 10. [Chapter 10: Modules Catalog & Status Directory](./chapter_10_modules_catalog_status.md)
-* **10.1 Active Modules Directory:** Operational catalog details, routes, and adapter mappings.
+* **10.1 Active Modules Directory:** Operational catalog details, module ids, routes, and adapter mappings.
 * **10.2 Under-Development & Hidden Modules Directory:** Analysis of disabled tabs, missing routes, and hidden backend-only adapters.
-* **10.3 Backend Adapter & Auto-Discovery Registry:** Auto-discovery logic (`module_finder.py`), adapter interfaces, and legacy fallback registries.
+* **10.3 Backend Adapter & Auto-Discovery Registry:** Auto-discovery logic (`module_finder.py`), `MODULE_ID` from `Common.py`, adapter interfaces, and legacy fallback registries.
 * **10.4 Observations & Areas of Improvement:** Hardcoded UI status flags and route configuration mismatches.
 
 ### 11. [Chapter 11: Local Conda Environment & Docker Containerization Setup](./chapter_11_conda_and_docker_setup.md)

@@ -261,12 +261,15 @@ This file is critical for auto-discovery. It must define `MODULE_ID` and export 
 """
 NewConnection Sub-module
 """
-MODULE_ID = 'NewConnection'  # Must match the module identifier used in osdag_core
+from osdag_core.Common import KEY_DISP_NEWCONNECTION
+
+MODULE_ID = KEY_DISP_NEWCONNECTION  # The desktop module name from osdag_core.Common
 from .service import NewConnectionService as Service
 ```
 
 **Important Notes:**
-- `MODULE_ID` must be a unique string identifier (typically matches the osdag_core class name)
+- `MODULE_ID` is the desktop module name: import the `KEY_DISP_*` constant for the module from `osdag_core.Common` instead of typing the string. The frontend registry (`frontend/src/modules/registry.js`) uses the same constant as the module's `id`, and the value is what projects and `.osi` files store
+- A module with no constant in `Common.py` needs one added to the core first
 - `Service` must be exported and point to your service class
 - The directory name (`new_connection`) will be converted to URL slug (`new-connection`)
 
@@ -773,20 +776,25 @@ class YourService:
 1. Create directory: `backend/apps/modules/shear_connection/submodules/seated_angle/`
 2. Create `__init__.py`:
    ```python
-   MODULE_ID = 'SeatedAngleConnection'
+   from osdag_core.Common import KEY_DISP_SEATED_ANGLE
+
+   MODULE_ID = KEY_DISP_SEATED_ANGLE
    from .service import SeatedAngleService as Service
    ```
 3. Create `adapter.py` with functions for SeatedAngleConnection
 4. Create `service.py` with SeatedAngleService class
 5. Auto-discovery will register it automatically
-6. Access via: `POST /api/modules/shear-connection/seated-angle/design/`
+6. Add the module's entry to `frontend/src/modules/registry.js` (see the module registry section of `documentation/chapter_6_dynamic_ui_form_engine.md`)
+7. Access via: `POST /api/modules/shear-connection/seated-angle/design/`
 
 ### Example 2: Adding `bolted` to `tension_member`
 
 1. Create directory: `backend/apps/modules/tension_member/submodules/bolted/`
 2. Create `__init__.py`:
    ```python
-   MODULE_ID = 'BoltedTensionMember'
+   from osdag_core.Common import KEY_DISP_TENSION_BOLTED
+
+   MODULE_ID = KEY_DISP_TENSION_BOLTED
    from .service import BoltedTensionMemberService as Service
    ```
 3. Create adapter and service files
@@ -873,7 +881,7 @@ class YourService:
 1. **Naming Conventions**:
    - Directory names: use underscores (`fin_plate`)
    - URL slugs: automatically converted to hyphens (`fin-plate`)
-   - MODULE_ID: use PascalCase (`FinPlateConnection`)
+   - MODULE_ID: the `KEY_DISP_*` constant from `osdag_core.Common` (`KEY_DISP_FINPLATE`)
    - Service class: use PascalCase with "Service" suffix (`FinPlateService`)
 
 2. **Error Handling**:

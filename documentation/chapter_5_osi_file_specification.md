@@ -118,7 +118,7 @@ When a user uploads a `.osi` file using the **Load Input** option:
 
 ### 2. Frontend Configuration Normalizer & Hydrator (Frontend)
 Once the backend returns the parsed dictionary:
-* **Client-Side Key Resolution:** The frontend uses module-specific configurations (like `moduleConfig.js` and `osiNormalizer.js`) to translate the parsed keys (e.g. mapping desktop dotted PascalCase parameters from the backend into snake_case) and map standard dropdown inputs.
+* **Client-Side Key Resolution:** The frontend uses module-specific configurations (like the `*Config.js` files and `osiNormalizer.js`) to translate the parsed keys (e.g. mapping desktop dotted PascalCase parameters from the backend into snake_case) and map standard dropdown inputs.
 * This separates concerns: the backend performs raw file format deserialization, while the frontend handles visual form binding, default values, and interface state hydration.
 
 ---
