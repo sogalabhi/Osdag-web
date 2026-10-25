@@ -101,6 +101,9 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 param_type_lower = str(param_type).lower()
                 if "button" in param_type_lower or callable(val):
                     continue
+                # Section titles carry no key and no value
+                if src_key is None:
+                    continue
                 target_key = key_map.get(src_key, src_key)
                 display_label = label_map.get(target_key, label or target_key)
                 mapped_output[target_key] = {"key": target_key, "label": display_label, "val": val}

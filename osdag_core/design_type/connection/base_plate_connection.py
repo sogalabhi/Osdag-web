@@ -503,6 +503,8 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         
         # Clear any existing handlers
         self.logger.handlers.clear()
+        # The logger is reused by every run in this process, so drop earlier messages
+        self.logger.clear_logs()
         self.logger.setLevel(logging.DEBUG)
         
         # Shared formatter for all handlers

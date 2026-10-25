@@ -210,6 +210,8 @@ class Flexure_Cantilever(Member):
         
         # Clear any existing handlers
         self.logger.handlers.clear()
+        # The logger is reused by every run in this process, so drop earlier messages
+        self.logger.clear_logs()
         self.logger.setLevel(logging.DEBUG)
         
         # Shared formatter for all handlers
