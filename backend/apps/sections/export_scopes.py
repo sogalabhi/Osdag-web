@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict, List
 
 from django.http import FileResponse
 
-from apps.sections.validation import get_db_header, get_user_model_for_table
+from apps.sections.validation import excel_safe, get_db_header, get_user_model_for_table
 
 # Increase only when product adds `global` / `effective` handlers.
 EXPORT_SCOPE_REGISTRY: Dict[str, Callable[..., FileResponse]] = {}
@@ -32,7 +32,7 @@ def build_user_scope_xlsx(table: str, user: Any) -> FileResponse:
     ws.title = table
     ws.append(headers)
     for obj in qs.iterator(chunk_size=500):
-        ws.append([getattr(obj, h) for h in headers])
+        ws.append([excel_safe(getattr(obj, h)) for h in headers])
 
     buf = BytesIO()
     wb.save(buf)

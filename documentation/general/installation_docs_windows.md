@@ -169,7 +169,7 @@ docker compose logs --tail=50 celery_worker
 
 Production is not started by hand from a checkout. Merges to `25april` build images tagged with the commit SHA and a GitHub Actions workflow deploys that SHA with `docker-compose.prod.yml` on the production server. It runs migrations once, waits for healthchecks and runs a smoke test. See [Chapter 11.8](../chapter_11_conda_and_docker_setup.md#118-continuous-deployment--rollback) for the pipeline, rollback and the one-time setup.
 
-On the production server, set `SECRET_KEY` and `DATABASE_PASSWORD` (both required) and `ALLOWED_HOSTS` in the environment or a `.env` file (copied from `.env.example`) in the deploy directory (`/opt/osdag-web`).
+On the production server, set `SECRET_KEY`, `DATABASE_PASSWORD` and `REDIS_PASSWORD` (all required) and `ALLOWED_HOSTS` in the environment or a `.env` file (copied from `.env.example`) in the deploy directory (`/opt/osdag-web`).
 
 ---
 

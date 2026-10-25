@@ -24,6 +24,7 @@ from apps.sections.validation import (
     assert_allowed_table,
     can_insert_custom_section,
     cell_problem,
+    excel_safe,
     get_db_header,
     headers_match_table,
     row_dict_to_create_kwargs,
@@ -32,6 +33,7 @@ from apps.core.utils.api_errors import error_response
 
 SECTION_IMPORT_MAX_ROWS = 5000
 SECTION_EXPORT_MAX_ROWS = 10000
+SECTION_IMPORT_MAX_BYTES = 5 * 1024 * 1024
 
 
 def _normalize_designation(value: Any) -> str:
@@ -124,7 +126,7 @@ class SectionCatalogExportView(APIView):
 
         for row_idx, row in enumerate(rows, start=2):
             for col_idx, value in enumerate(row, start=1):
-                ws.cell(row=row_idx, column=col_idx, value=value)
+                ws.cell(row=row_idx, column=col_idx, value=excel_safe(value))
 
         buf = BytesIO()
         wb.save(buf)
@@ -174,6 +176,12 @@ class SectionImportView(APIView):
         if not upload:
             logger.warning("[SectionImport] 400 — file field missing")
             return error_response('missing_field', "Form file field `file` is required.", status.HTTP_400_BAD_REQUEST)
+
+        if upload.size > SECTION_IMPORT_MAX_BYTES:
+            return Response(
+                {"detail": "File too large; maximum is 5 MB."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             wb = load_workbook(upload, data_only=True)

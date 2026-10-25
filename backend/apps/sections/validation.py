@@ -240,3 +240,13 @@ def can_insert_custom_section(
 def get_user_model_for_table(table: str):
     assert_allowed_table(table)
     return TABLE_TO_USER_MODEL[table]
+
+
+_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+
+
+def excel_safe(value: Any) -> Any:
+    """Neutralise spreadsheet formula injection in exported text cells."""
+    if isinstance(value, str) and value.startswith(_FORMULA_PREFIXES):
+        return "'" + value
+    return value

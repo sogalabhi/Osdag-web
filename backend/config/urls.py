@@ -13,8 +13,10 @@ urlpatterns = [
     path('api/sections/', include('apps.sections.urls')),
     path('api/modules/', include('apps.modules.urls')),  # All module URLs aggregated here
     path('metrics', internal_metrics, name='prometheus-metrics'),  # internal only, see metrics_view
-    path('silk/', include('silk.urls', namespace='silk')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if getattr(settings, 'ENABLE_SILK', False):
+    urlpatterns.append(path('silk/', include('silk.urls', namespace='silk')))
 
 if settings.DEBUG:
     urlpatterns += static(settings.OSIFILES_URL, document_root=settings.OSIFILES_ROOT)

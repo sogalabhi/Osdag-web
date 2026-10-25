@@ -21,6 +21,7 @@ from apps.core.routing import websocket_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
-    "websocket": URLRouter(websocket_urlpatterns),
+    # Reject cross-site WebSocket connections (Origin must match ALLOWED_HOSTS)
+    "websocket": AllowedHostsOriginValidator(URLRouter(websocket_urlpatterns)),
 })
 

@@ -47,14 +47,16 @@ DATABASE_PORT = get_port()
 DATABASE_HOST = get_host()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+# Secure by default: DEBUG must be switched on explicitly for local development.
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 
 # SECURITY WARNING: DEV ONLY - Never use ['*'] in production!
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
 
-# CORS Configuration (DEV ONLY - Allow all origins for LAN testing)
-CORS_ALLOWED_ORIGINS = [
+# CORS: in production the SPA is same-origin behind nginx, so only the explicit
+# CORS_ALLOWED_ORIGINS env list applies. The Vite dev-server origins are added in DEBUG only.
+_DEV_CORS_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'http://localhost:5174',
@@ -65,6 +67,10 @@ CORS_ALLOWED_ORIGINS = [
     'http://10.104.135.9:5173',
     'http://10.186.46.253:5173'
 ]
+CORS_ALLOWED_ORIGINS = [o.strip() for o in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if o.strip()]
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += _DEV_CORS_ORIGINS
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
@@ -104,9 +110,15 @@ INSTALLED_APPS = [
 
     # DRF
     'rest_framework',
-    'silk',
     'django_prometheus',  # serves /metrics for Prometheus
 ]
+
+# django-silk records full requests (including headers) - development only.
+ENABLE_SILK = DEBUG and os.getenv('ENABLE_SILK', 'true').lower() == 'true'
+if ENABLE_SILK:
+    INSTALLED_APPS.append('silk')
+    SILKY_AUTHENTICATION = True
+    SILKY_AUTHORISATION = True
 
 # Middleware order is CRITICAL - CorsMiddleware MUST be first
 MIDDLEWARE = [
@@ -114,7 +126,6 @@ MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',  # as early as possible so latency covers the stack
     'apps.core.middleware.metrics_middleware.InfluxMetricsMiddleware',  # Metrics (no-op if InfluxDB unavailable)
     'django.middleware.security.SecurityMiddleware',
-    'silk.middleware.SilkyMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -123,6 +134,21 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',  # must be last
 ]
+if ENABLE_SILK:
+    MIDDLEWARE.insert(MIDDLEWARE.index('django.middleware.security.SecurityMiddleware') + 1,
+                      'silk.middleware.SilkyMiddleware')
+
+# Security headers / cookies. TLS terminates at Cloudflare, which forwards
+# X-Forwarded-Proto through nginx.
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '31536000'))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 
 ROOT_URLCONF = 'config.urls'
 
@@ -253,11 +279,21 @@ REST_FRAMEWORK = {
         'apps.core.permissions.IsEmailVerifiedIfAuthenticated',
     ),
     # Used by ScopedRateThrottle on section import/export views only.
+    # Global limits protect the guest (AllowAny) design/CAD/report endpoints from abuse.
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ),
     'DEFAULT_THROTTLE_RATES': {
+        'anon': os.getenv('THROTTLE_ANON_RATE', '120/minute'),
+        'user': os.getenv('THROTTLE_USER_RATE', '300/minute'),
         'sections_import': '60/hour',
         'sections_export': '120/hour',
     },
 }
+if CELERY_TASK_ALWAYS_EAGER:
+    # Test runs fire many requests from one client; don't let the global throttles interfere.
+    REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'].update({'anon': '100000/minute', 'user': '100000/minute'})
 
 
 # Internationalization

@@ -27,6 +27,15 @@ from osdag_core.Common import PDFLATEX
 from apps.core.utils.api_errors import error_response
 
 
+
+# Report ids are 16-char alphanumerics from get_random_string; anything else could escape file_storage.
+_REPORT_ID_RE = re.compile(r'^[A-Za-z0-9]{16}$')
+
+
+def _is_valid_report_id(report_id):
+    return isinstance(report_id, str) and bool(_REPORT_ID_RE.match(report_id))
+
+
 class LaTeXParser:
     """
     Parses LaTeX files to extract document structure.
@@ -141,6 +150,8 @@ class ParseReportSections(APIView):
         try:
             print('[report_customization_api] ParseReportSections:request', request.data)
             report_id = request.data.get('report_id')
+            if report_id and not _is_valid_report_id(report_id):
+                return Response({"error": "Invalid report_id"}, status=status.HTTP_400_BAD_REQUEST)
             if not report_id:
                 return error_response('missing_field', "report_id is required", status.HTTP_400_BAD_REQUEST)
             
@@ -190,6 +201,8 @@ class CustomizeReport(APIView):
             print('[report_customization_api] CustomizeReport:starting')
             print('[report_customization_api] CustomizeReport:request', request.data)
             report_id = request.data.get('report_id')
+            if report_id and not _is_valid_report_id(report_id):
+                return Response({"error": "Invalid report_id"}, status=status.HTTP_400_BAD_REQUEST)
             selected_sections = request.data.get('selected_sections', [])
             print('[report_customization_api] CustomizeReport:parsed', {'report_id': report_id, 'selected_count': len(selected_sections)})
             
@@ -281,7 +294,7 @@ class CustomizeReport(APIView):
                     print(f"[report_customization_api] CustomizeReport:running pdflatex on {platform.system().lower()}")
                     for pass_num in (1, 2):
                         result = subprocess.run([
-                            pdflatex_exe, '-interaction=nonstopmode',
+                            pdflatex_exe, '-interaction=nonstopmode', '-no-shell-escape',
                             'filtered_report.tex'
                         ], capture_output=True, text=True, timeout=60)
                         print(f'[report_customization_api] CustomizeReport:pdflatex pass {pass_num} result: {result.returncode}')

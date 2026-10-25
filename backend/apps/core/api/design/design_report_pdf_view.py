@@ -17,6 +17,37 @@ from apps.core.utils.api_errors import error_response
 
 logger = logging.getLogger(__name__)
 
+COMPANY_LOGO_EXTENSIONS = {'.png', '.jpg', '.jpeg'}
+COMPANY_LOGO_MAX_BYTES = 2 * 1024 * 1024
+REPORT_IMAGE_MAX_BYTES = 10 * 1024 * 1024
+
+
+def _company_logo_dir():
+    return os.path.realpath(os.path.join(os.getcwd(), "file_storage", "company_logo"))
+
+
+_COMPANY_LOGO_NAME = re.compile(r"[0-9a-f]{32}\.(png|jpg|jpeg)")
+
+
+def _safe_company_logo_path(path):
+    """Only allow logos previously stored by CompanyLogoView; anything else is dropped.
+
+    CompanyLogoView names files <uuid hex><ext>, so only that file name is taken
+    from the client value and it is always looked up inside the logo directory.
+    """
+    if not path or not isinstance(path, str):
+        return ""
+    name = path.replace("\\", "/").rsplit("/", 1)[-1]
+    if not _COMPANY_LOGO_NAME.fullmatch(name):
+        logger.warning("[Report] rejected CompanyLogo path: %r", path)
+        return ""
+    logo_dir = _company_logo_dir()
+    candidate = os.path.normpath(os.path.join(logo_dir, name))
+    if not candidate.startswith(logo_dir + os.sep) or not os.path.isfile(candidate):
+        logger.warning("[Report] CompanyLogo not found in logo storage: %r", path)
+        return ""
+    return candidate.replace("\\", "/")
+
 
 def filter_latex_content(latex_content: str, selected_sections):
     if not selected_sections or not isinstance(selected_sections, (list, tuple)):
@@ -122,8 +153,13 @@ class CreateDesignReport(APIView):
             for key in metadata_other.keys():
                 metadata_final[key] = metadata_other[key]
         else:
+            if not isinstance(metadata, dict):
+                return Response({"error": "metadata must be an object"}, status=status.HTTP_400_BAD_REQUEST)
             metadata_final = metadata
             metadata_final['filename'] = file_path
+            profile = metadata_final.get('ProfileSummary')
+            if isinstance(profile, dict):
+                profile['CompanyLogo'] = _safe_company_logo_path(profile.get('CompanyLogo'))
 
         metadata_final['does_design_exist'] = design_status
         if logs and isinstance(logs, list):
@@ -197,10 +233,16 @@ class CreateDesignReport(APIView):
                             _, b64 = data_url.split(',', 1)
                         else:
                             b64 = data_url
-                        img_bytes = base64.b64decode(b64)
-
+                        # Only known view names map to files; never build paths from client keys
                         normalized_key = str(key).lower()
-                        filename = filename_map.get(normalized_key, f"{key}.png")
+                        filename = filename_map.get(normalized_key)
+                        if not filename:
+                            logger.warning("[ReportImages] ignoring unknown image key %r", key)
+                            continue
+                        img_bytes = base64.b64decode(b64)
+                        if len(img_bytes) > REPORT_IMAGE_MAX_BYTES:
+                            logger.warning("[ReportImages] image %r too large, skipped", key)
+                            continue
                         out_path = os.path.join(image_base_dir, filename)
                         with open(out_path, "wb") as img_f:
                             img_f.write(img_bytes)
@@ -256,12 +298,27 @@ class CompanyLogoView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request):
-        file = request.data['file']
-        
-        original_ext = os.path.splitext(file.name)[1].lower() or ".png"
-        fileName = ''.join(str(uuid.uuid4()).split('-')) + original_ext
-        currentDirectory = os.getcwd()
-        logo_dir = os.path.join(currentDirectory, "file_storage", "company_logo")
+        file = request.data.get('file')
+        if not file:
+            return Response({'message': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        original_ext = os.path.splitext(file.name)[1].lower()
+        if original_ext not in COMPANY_LOGO_EXTENSIONS:
+            return Response({'message': 'Logo must be a PNG or JPEG image'}, status=status.HTTP_400_BAD_REQUEST)
+        if file.size > COMPANY_LOGO_MAX_BYTES:
+            return Response({'message': 'Logo must be 2 MB or smaller'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            from PIL import Image
+            with Image.open(file) as img:
+                img.verify()
+                if img.format not in ('PNG', 'JPEG'):
+                    raise ValueError(img.format)
+            file.seek(0)
+        except Exception:
+            return Response({'message': 'Logo is not a valid PNG or JPEG image'}, status=status.HTTP_400_BAD_REQUEST)
+
+        fileName = uuid.uuid4().hex + original_ext
+        logo_dir = _company_logo_dir()
         os.makedirs(logo_dir, exist_ok=True)
         
         try: 
@@ -272,5 +329,6 @@ class CompanyLogoView(APIView):
 
             logoFullPath = file_full_path.replace("\\", "/")
             return Response({'message' : 'successfully saved file', 'logoFullPath' : logoFullPath}, status = status.HTTP_201_CREATED)
-        except Exception as e:
-            return error_response('bad_request', f'Error in saving the file: {str(e)}', status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            logger.exception('[CompanyLogo] failed to save logo')
+            return error_response('bad_request', 'Error in saving the file', status.HTTP_400_BAD_REQUEST)
