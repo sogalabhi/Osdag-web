@@ -13,7 +13,8 @@ backend/
 ├── apps/
 │   ├── core/                  # Base platform logic
 │   │   ├── api/               # Platform REST endpoints (projects, OSI, tasks)
-│   │   ├── models.py          # PostgreSQL core models (Project, UserAccount, OsiFile)
+│   │   ├── models.py          # PostgreSQL core models (Project, UserAccount, OsiFile, CustomMaterials)
+│   │   ├── catalog.py         # Read-only steel-section/material catalog from osdag_core's SQLite
 │   │   ├── middleware.py      # Token auth parsing and user synchronization
 │   │   └── tasks.py           # Celery tasks wrappers
 │   ├── modules/               # Engineering design modules

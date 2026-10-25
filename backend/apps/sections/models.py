@@ -1,8 +1,8 @@
 """
 User-owned custom section rows.
 
-Catalog shapes mirror apps.core.models: Angles, Beams, Channels, Columns.
-Global Beams/Columns/Angles/Channels tables are not mutated from here.
+Rows mirror the catalog tables Angles, Beams, Channels and Columns (apps.core.catalog).
+The catalog itself is read-only and is not changed from here.
 """
 
 from django.conf import settings
@@ -30,7 +30,7 @@ class UserOwnedSectionBase(models.Model):
 
 
 class UserCustomBeam(UserOwnedSectionBase):
-    """Mirrors core.models.Beams — one row per user-owned custom beam section."""
+    """Mirrors the catalog's Beams table — one row per user-owned custom beam section."""
 
     Designation = models.CharField(max_length=50)
     Mass = models.DecimalField(max_digits=10, decimal_places=2)
@@ -69,7 +69,7 @@ class UserCustomBeam(UserOwnedSectionBase):
 
 
 class UserCustomColumn(UserOwnedSectionBase):
-    """Mirrors core.models.Columns."""
+    """Mirrors the catalog's Columns table."""
 
     Designation = models.CharField(max_length=50)
     Mass = models.DecimalField(max_digits=10, decimal_places=2)
@@ -108,7 +108,7 @@ class UserCustomColumn(UserOwnedSectionBase):
 
 
 class UserCustomAngle(UserOwnedSectionBase):
-    """Mirrors core.models.Angles."""
+    """Mirrors the catalog's Angles table."""
 
     Designation = models.CharField(max_length=50)
     Mass = models.DecimalField(max_digits=10, decimal_places=2)
@@ -151,7 +151,7 @@ class UserCustomAngle(UserOwnedSectionBase):
 
 
 class UserCustomChannel(UserOwnedSectionBase):
-    """Mirrors core.models.Channels."""
+    """Mirrors the catalog's Channels table."""
 
     Designation = models.CharField(max_length=50)
     Mass = models.DecimalField(max_digits=10, decimal_places=2)

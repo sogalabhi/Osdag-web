@@ -8,7 +8,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from apps.core.models import Material, CustomMaterials, Bolt
+from apps.core import catalog
+from apps.core.models import CustomMaterials
 from apps.core.utils.module_helpers import (
     handle_design_request,
     trigger_async_design,
@@ -57,17 +58,14 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
         slug = submodule_slug
 
         def material_list():
-            mats = list(Material.objects.all().values())
+            mats = catalog.rows("Material")
             if hasattr(request, "user") and request.user.is_authenticated:
                 mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 
         def bolt_diameters():
-            lst = list(Bolt.objects.values_list('Bolt_diameter', flat=True))
-            lst.sort()
-            # frontend expects strings convertible to numbers
-            return [str(x) for x in lst]
+            return catalog.bolt_diameters()
 
         property_classes = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9']
         thickness_list = [

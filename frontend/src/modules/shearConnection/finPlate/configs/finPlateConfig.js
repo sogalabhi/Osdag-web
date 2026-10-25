@@ -99,7 +99,7 @@ export const finPlateConfig = {
         "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
         "Detailing.Edge_type": inputs.detailing_edge_type,
         "Detailing.Gap": inputs.detailing_gap,
-        "Load.Axial": inputs.load_axial || "",
+        "Load.Axial": inputs.load_axial || "0",
         "Load.Shear": inputs.load_shear || "",
         "Material": inputs.connector_material,
         "Member.Supported_Section.Designation": inputs.beam_section,
@@ -125,7 +125,7 @@ export const finPlateConfig = {
         "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
         "Detailing.Edge_type": inputs.detailing_edge_type,
         "Detailing.Gap": inputs.detailing_gap,
-        "Load.Axial": inputs.load_axial || "",
+        "Load.Axial": inputs.load_axial || "0",
         "Load.Shear": inputs.load_shear || "",
         "Material": inputs.connector_material,
         "Member.Supported_Section.Designation": inputs.secondary_beam,
@@ -202,7 +202,7 @@ export const finPlateConfig = {
       title: UI_STRINGS.FACTORED_LOADS,
       fields: [
         { key: "load_shear", label: UI_STRINGS.SHEAR_FORCE, type: "number", required: true },
-        { key: "load_axial", label: UI_STRINGS.AXIAL_FORCE, type: "number" }
+        { key: "load_axial", label: UI_STRINGS.AXIAL_FORCE, type: "number", required: false }
       ]
     },
     {

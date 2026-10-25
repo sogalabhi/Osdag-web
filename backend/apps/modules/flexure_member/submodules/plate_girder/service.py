@@ -3,7 +3,8 @@ Plate Girder Service - Business logic layer
 Bridges between API and osdag_core
 """
 from .adapter import validate_input, generate_output, create_cad_model, create_from_input
-from apps.core.models import Material, CustomMaterials
+from apps.core import catalog
+from apps.core.models import CustomMaterials
 import traceback
 
 
@@ -80,7 +81,7 @@ class PlateGirderService:
         user = getattr(request, "user", None)
 
         def material_list():
-            mats = list(Material.objects.all().values())
+            mats = catalog.rows("Material")
             if user is not None and user.is_authenticated:
                 mats += list(CustomMaterials.objects.filter(user=user).values())
             mats.append({"id": -1, "Grade": "Custom"})

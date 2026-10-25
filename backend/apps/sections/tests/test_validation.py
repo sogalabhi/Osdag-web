@@ -1,10 +1,10 @@
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
-from apps.core.models import Beams
+from apps.core import catalog
 from apps.core.tests.test_osdag_overrides import make_beam
-from apps.sections.models import UserCustomColumn
-from apps.sections.validation import can_insert_custom_section
+from apps.sections.models import TABLE_TO_USER_MODEL, UserCustomColumn
+from apps.sections.validation import can_insert_custom_section, get_db_header
 
 SECTION = dict(
     Mass=30.0, Area=38.0, D=250.0, B=125.0, tw=6.9, T=9.7, FlangeSlope=98, R1=10.0, R2=5.0,
@@ -25,8 +25,14 @@ class CanInsertCustomSectionTests(TestCase):
         self.assertEqual(can_insert_custom_section("Beams", "NEW 1", self.user), (True, ""))
 
     def test_column_named_like_catalog_beam_is_a_catalog_duplicate(self):
-        Beams.objects.create(Designation="CAT 100", Source="", **SECTION)
-        self.assertEqual(can_insert_custom_section("Columns", "CAT 100", self.user), (False, "catalog_duplicate"))
+        self.assertEqual(can_insert_custom_section("Columns", "MB 300", self.user), (False, "catalog_duplicate"))
+
+    def test_beam_named_like_catalog_column_is_a_catalog_duplicate(self):
+        self.assertEqual(can_insert_custom_section("Beams", "HB 150", self.user), (False, "catalog_duplicate"))
+
+    def test_angle_named_like_catalog_angle_is_a_catalog_duplicate(self):
+        self.assertEqual(can_insert_custom_section("Angles", "20 x 20 x 3", self.user), (False, "catalog_duplicate"))
+        self.assertEqual(can_insert_custom_section("Channels", "20 x 20 x 3", self.user), (True, ""))
 
     def test_column_named_like_own_beam_is_a_user_duplicate(self):
         make_beam(self.user, designation="X")
@@ -43,3 +49,13 @@ class CanInsertCustomSectionTests(TestCase):
             (True, ""),
         )
         self.assertEqual(can_insert_custom_section("Columns", "X", self.user), (False, "user_duplicate"))
+
+
+class DbHeaderTests(SimpleTestCase):
+    def test_user_tables_use_the_catalog_field_names_in_catalog_order(self):
+        for table in TABLE_TO_USER_MODEL:
+            self.assertEqual(get_db_header(table), [f for f in catalog.fields(table) if f != "id"], table)
+
+    def test_catalog_only_tables_take_their_header_from_the_catalog(self):
+        self.assertEqual(get_db_header("CHS")[:3], ["Designation", "NB", "OD"])
+        self.assertEqual(get_db_header("SHS")[-1], "Source")

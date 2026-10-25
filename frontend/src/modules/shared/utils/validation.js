@@ -7,6 +7,13 @@ const SIMPLE_VALUE_TYPES = new Set([
   'sectionProfileSelect', 'sectionProfileList', 'dynamicSelect', 'thickness',
 ]);
 
+/**
+ * Labels copied from osdag_core keep its trailing "*" (e.g. "Width of Plate (mm) *"). That star
+ * is part of the key's display string, not our required marker, which comes from `field.required`.
+ */
+export const stripRequiredMark = (label) =>
+  typeof label === 'string' ? label.replace(/\s*\*\s*$/, '') : label;
+
 const isEmptyValue = (value) => {
   if (value === undefined || value === null || value === '') return true;
   if (Array.isArray(value) && value.length === 0) return true;
@@ -52,6 +59,6 @@ export const getMissingRequiredFields = (inputSections, inputs, extraState, sele
 export const validateRequiredFields = (inputSections, inputs, extraState, selectionStates, message) => {
   const missing = getMissingRequiredFields(inputSections, inputs, extraState, selectionStates);
   if (missing.length === 0) return { isValid: true };
-  const label = missing[0].label?.replace(/\*\s*$/, '').trim() || missing[0].key;
+  const label = stripRequiredMark(missing[0].label)?.trim() || missing[0].key;
   return { isValid: false, message: message || `Please fill: ${label}` };
 };

@@ -7,7 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from apps.core.models import Material, CustomMaterials, Columns, Beams
+from apps.core import catalog
+from apps.core.models import CustomMaterials
 from apps.core.utils.module_helpers import (
     handle_design_request,
     trigger_async_design,
@@ -53,7 +54,7 @@ class BasePlateViewSet(viewsets.ViewSet):
         """
         
         def material_list():
-            mats = list(Material.objects.all().values())
+            mats = catalog.rows("Material")
             if hasattr(request, "user") and request.user.is_authenticated:
                 mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({'id': -1, 'Grade': 'Custom'})
@@ -61,8 +62,8 @@ class BasePlateViewSet(viewsets.ViewSet):
 
         # Beams and Columns: combine column and beam designations for section list (desktop VALUE_BEAM_COL)
         def section_designation():
-            cols = list(Columns.objects.values_list('Designation', flat=True).distinct())
-            beams = list(Beams.objects.values_list('Designation', flat=True).distinct())
+            cols = catalog.designations("Columns")
+            beams = catalog.designations("Beams")
             combined = sorted(set(cols) | set(beams))
             return combined
 

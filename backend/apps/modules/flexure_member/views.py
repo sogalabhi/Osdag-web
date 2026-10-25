@@ -16,7 +16,8 @@ from apps.core.utils.module_helpers import (
 )
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from rest_framework import status
-from apps.core.models import Columns, Beams, Material, CustomMaterials
+from apps.core import catalog
+from apps.core.models import CustomMaterials
 from apps.sections.options_merge import merge_user_sections_into_options
 
 
@@ -65,17 +66,17 @@ class FlexureMemberViewSet(viewsets.ViewSet):
         # ---- Common Helpers ---- #
 
         def material_list():
-            mats = list(Material.objects.all().values())
+            mats = catalog.rows("Material")
             if hasattr(request, "user") and request.user.is_authenticated:
                 mats += list(CustomMaterials.objects.filter(user=request.user).values())
             mats.append({"id": -1, "Grade": "Custom"})
             return mats
 
         def beam_list():
-            return list(Beams.objects.values_list('Designation', flat=True))
+            return catalog.designations("Beams")
 
         def column_list():
-            return list(Columns.objects.values_list('Designation', flat=True))
+            return catalog.designations("Columns")
 
         support_types = [
             {'value': 'Laterally Supported', 'label': 'Laterally Supported'},

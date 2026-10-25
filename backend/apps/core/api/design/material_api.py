@@ -1,14 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from apps.core.models import Material, CustomMaterials
+from apps.core import catalog
+from apps.core.models import CustomMaterials
 from apps.core.serializers import CustomMaterials_Serializer
 
 
 def _grade_conflict(user, grade, exclude_pk=None):
     """Message if `grade` clashes with the catalog or another of the user's materials, else None."""
     # A custom row named like a catalog grade would silently replace it in this user's designs.
-    if Material.objects.filter(Grade=grade).exists():
+    if catalog.find("Material", Grade=grade):
         return "This grade already exists in the standard catalog"
     qs = CustomMaterials.objects.filter(user=user, Grade=grade)
     if exclude_pk is not None:
@@ -22,10 +23,9 @@ class MaterialDetails(APIView):
 
     def get(self, request):
         material = request.GET.get("material")
-        material_qs = Material.objects.all()
+        material_details = catalog.rows("Material")
         if material:
-            material_qs = material_qs.filter(Grade=material)
-        material_details = list(material_qs.values())
+            material_details = [row for row in material_details if row["Grade"] == material]
 
         custom_materials = []
         if hasattr(request, "user") and request.user.is_authenticated:
