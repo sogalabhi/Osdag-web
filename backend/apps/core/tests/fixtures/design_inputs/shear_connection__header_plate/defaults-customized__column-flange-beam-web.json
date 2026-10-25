@@ -1,6 +1,6 @@
 {
   "source": "frontend-defaults:endPlateConfig.js",
-  "notes": "Run of endPlateConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"bolt_diameter\":[\"16\",\"20\"],\"bolt_grade\":[\"8.8\",\"10.9\"],\"plate_thickness\":[\"10\",\"12\",\"16\"]}. Connectivity \"Column Flange-Beam-Web\" (extraState.selectedOption). Defaults left empty and filled with realistic catalog values: {\"column_section\":\"HB 150\",\"beam_section\":\"MB 300\",\"primary_beam\":\"JB 200\",\"secondary_beam\":\"JB 150\"}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
+  "notes": "Run of endPlateConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"bolt_diameter\":[\"16\",\"20\"],\"bolt_grade\":[\"8.8\",\"10.9\"],\"plate_thickness\":[\"10\",\"12\",\"16\"]}. Connectivity \"Column Flange-Beam Web\" (extraState.selectedOption). Defaults left empty and filled with realistic catalog values: {\"column_section\":\"HB 150\",\"beam_section\":\"MB 300\",\"primary_beam\":\"JB 200\",\"secondary_beam\":\"JB 150\"}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
     "Bolt.Bolt_Hole_Type": "Standard",
     "Bolt.Diameter": [
@@ -27,7 +27,7 @@
     "Member.Supported_Section.Material": "E 165 (Fe 290)",
     "Member.Supporting_Section.Designation": "HB 150",
     "Member.Supporting_Section.Material": "E 165 (Fe 290)",
-    "Module": "HeaderPlateConnection",
+    "Module": "Header Plate Connection",
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": "410",
     "Connector.Plate.Thickness_List": [

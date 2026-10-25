@@ -2,7 +2,7 @@
   "source": "frontend-defaults:lapJointBoltedConfig.js",
   "notes": "Run of lapJointBoltedConfig.buildSubmissionParams on defaultInputs; every customizable list set to \"All\" (the UI default; full option lists sent). Defaults left empty and filled with realistic catalog values: {\"plate1_thickness\":\"10\",\"plate2_thickness\":\"12\"}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "LapJointBolted",
+    "Module": "Lap Joint Bolted Connection",
     "Plate1Thickness": "10",
     "Plate2Thickness": "12",
     "PlateWidth": "200",

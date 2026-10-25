@@ -2,7 +2,7 @@
   "source": "frontend-defaults:simplySupportedBeamConfig.js",
   "notes": "Run of simplySupportedBeamConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"section_designation\":[\"MB 300\",\"MB 350\"]}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "Simply-Supported-Beam",
+    "Module": "Flexural Members - Simply Supported",
     "Member.Profile": "Beams and Columns",
     "Member.Designation": [
       "MB 300",

@@ -4,7 +4,7 @@ Writes one JSON document to the path given as argv[1] (stdout is noisy: osdag_co
 prints import-time INFO lines):
 
     {
-      "osi": {"<file>": {"module_line": str, "dock": {...}, "pref": {...}}, ...},
+      "osi": {"<file>": {"module_line": str, "dock": {...}, "pref": {...}, "flat": {...}}, ...},
       "catalog": {"beams": [...], "columns": [...], ..., "materials": [...]}
     }
 
@@ -40,7 +40,7 @@ def dump_osi():
             continue
         with open(os.path.join(EXAMPLES, name), encoding="utf-8") as fh:
             module_line, _name, inputs = parse_osi(fh.read())
-        out[name] = {"module_line": module_line, "dock": inputs["dock"], "pref": inputs["pref"]}
+        out[name] = {"module_line": module_line, "dock": inputs["dock"], "pref": inputs["pref"], "flat": inputs["flat"]}
     return out
 
 

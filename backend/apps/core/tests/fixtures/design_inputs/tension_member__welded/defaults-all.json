@@ -216,7 +216,7 @@
     "Member.Length": "1250",
     "Member.Profile": "Back to Back Angles",
     "Conn_Location": "Long Leg",
-    "Module": "Tension-Member-Welded-Design",
+    "Module": "Tension Member Design - Welded to End Gusset",
     "Connector.Plate.Thickness_List": [
       "8",
       "10",

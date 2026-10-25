@@ -2,7 +2,7 @@
   "source": "frontend-defaults:simplySupportedBeamConfig.js",
   "notes": "Run of simplySupportedBeamConfig.buildSubmissionParams on defaultInputs; every customizable list set to \"All\" (the UI default; full option lists sent). Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "Simply-Supported-Beam",
+    "Module": "Flexural Members - Simply Supported",
     "Member.Profile": "Beams and Columns",
     "Member.Designation": [
       "JB 150",

@@ -2,7 +2,7 @@
   "source": "frontend-defaults:strutsWeldedConfig.js",
   "notes": "Run of strutsWeldedConfig.buildSubmissionParams on defaultInputs; every customizable list set to \"All\" (the UI default; full option lists sent). Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "Struts-Welded-Design",
+    "Module": "Struts Welded to End Gusset",
     "Member.Profile": "Angles",
     "Member.Designation": [
       "20 x 20 x 3",

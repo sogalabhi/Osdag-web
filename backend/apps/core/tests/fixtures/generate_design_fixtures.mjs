@@ -23,7 +23,7 @@
  * into a temp directory.
  */
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readdirSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -106,7 +106,7 @@ function toCatalog(c) {
 const PROPERTY_CLASSES = ['3.6', '4.6', '4.8', '5.6', '5.8', '6.8', '8.8', '9.8', '10.9', '12.9'];
 const THICKNESS = ['8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50', '56', '63', '75', '80', '90', '100', '110', '120'];
 const BOLT_TYPES = ['Bearing Bolt', 'Friction Grip Bolt'];
-const SHEAR_CONNECTIVITY = ['Column Flange-Beam-Web', 'Column Web-Beam-Web', 'Beam-Beam'];
+const SHEAR_CONNECTIVITY = ['Column Flange-Beam Web', 'Column Web-Beam Web', 'Beam-Beam'];
 const ANCHOR_DIAMETERS = ['M8', 'M10', 'M12', 'M16', 'M20', 'M24', 'M30', 'M36', 'M42', 'M48', 'M56', 'M64', 'M72'];
 const PG_THICKNESS = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32', '36', '40'];
 const PG_STIFFENER_THICKNESS = ['6', '8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32', '36', '40'];
@@ -116,12 +116,12 @@ const LISTS = {
   shear: (c) => ({ connectivityList: SHEAR_CONNECTIVITY, columnList: c.columns, beamList: c.beams, materialList: c.materialList, boltDiameterList: c.boltDiameters, propertyClassList: PROPERTY_CLASSES, thicknessList: THICKNESS }),
   cleat: (c) => ({ ...LISTS.shear(c), thicknessList: undefined, angleList: c.angles }),
   header: (c) => ({ ...LISTS.shear(c), boltTypeList: BOLT_TYPES }),
-  seated: (c) => ({ ...LISTS.shear(c), connectivityList: ['Column Flange-Beam-Web', 'Column Web-Beam-Web'], angleList: c.angles, topAngleList: c.angles, boltTypeList: BOLT_TYPES }),
+  seated: (c) => ({ ...LISTS.shear(c), connectivityList: ['Column Flange-Beam Web', 'Column Web-Beam Web'], angleList: c.angles, topAngleList: c.angles, boltTypeList: BOLT_TYPES }),
   momentBeamBolted: (c) => ({ beamList: c.beams, materialList: c.materialList, boltDiameterList: c.boltDiameters, propertyClassList: PROPERTY_CLASSES, thicknessList: THICKNESS }),
   momentColumnBolted: (c) => ({ columnList: c.columns, materialList: c.materialList, boltDiameterList: c.boltDiameters, propertyClassList: PROPERTY_CLASSES, thicknessList: THICKNESS }),
   momentBeamWelded: (c) => ({ beamList: c.beams, materialList: c.materialList, thicknessList: THICKNESS }),
   momentColumnWelded: (c) => ({ columnList: c.columns, materialList: c.materialList, thicknessList: THICKNESS }),
-  bcEndPlate: (c) => ({ connectivityList: ['Column-Flange-Beam-Web', 'Column Web-Beam Web'], columnList: c.columns, beamList: c.beams, materialList: c.materialList, boltDiameterList: c.boltDiameters, propertyClassList: PROPERTY_CLASSES, thicknessList: THICKNESS, boltTypeList: BOLT_TYPES }),
+  bcEndPlate: (c) => ({ connectivityList: ['Column Flange-Beam Web', 'Column Web-Beam Web'], columnList: c.columns, beamList: c.beams, materialList: c.materialList, boltDiameterList: c.boltDiameters, propertyClassList: PROPERTY_CLASSES, thicknessList: THICKNESS, boltTypeList: BOLT_TYPES }),
   ccEndPlate: (c) => ({ columnList: c.columns, materialList: c.materialList, boltDiameterList: c.boltDiameters, propertyClassList: PROPERTY_CLASSES, thicknessList: THICKNESS, boltTypeList: BOLT_TYPES }),
   simpleBolted: (c) => ({ materialList: c.materialList, thicknessList: THICKNESS, coverPlateList: ['Single-Cover', 'Double-Cover'], boltDiameterList: c.boltDiameters, propertyClassList: PROPERTY_CLASSES }),
   simpleWelded: (c) => ({ materialList: c.materialList, thicknessList: THICKNESS, coverPlateList: ['Single-Cover', 'Double-Cover'], weldSizeList: ['4', '5', '6', '8', '10', '12'] }),
@@ -158,7 +158,7 @@ const MODULES = [
   { slug: 'shear_connection__fin_plate', cfg: 'finPlateConfig', lists: 'shear', connectivities: SHEAR_CONNECTIVITY, custom: BOLT_CUSTOM },
   { slug: 'shear_connection__cleat_angle', cfg: 'cleatAngleConfig', lists: 'cleat', connectivities: SHEAR_CONNECTIVITY, custom: { bolt_diameter: ['16', '20'], bolt_grade: ['8.8', '10.9'], cleat_section: ['50 x 50 x 6', '60 x 60 x 6'] } },
   { slug: 'shear_connection__header_plate', cfg: 'endPlateConfig', lists: 'header', connectivities: SHEAR_CONNECTIVITY, fill: SHEAR_FILL, custom: BOLT_CUSTOM },
-  { slug: 'shear_connection__seated_angle', cfg: 'seatedAngleConfig', lists: 'seated', connectivities: ['Column Flange-Beam-Web', 'Column Web-Beam-Web'], custom: { bolt_diameter: ['16', '20'], bolt_grade: ['8.8', '10.9'], angle_list: ['ISA 100x100x10'], topangle_list: ['ISA 100x100x10'] } },
+  { slug: 'shear_connection__seated_angle', cfg: 'seatedAngleConfig', lists: 'seated', connectivities: ['Column Flange-Beam Web', 'Column Web-Beam Web'], custom: { bolt_diameter: ['16', '20'], bolt_grade: ['8.8', '10.9'], angle_list: ['ISA 100x100x10'], topangle_list: ['ISA 100x100x10'] } },
   // ----- moment connection -----
   { slug: 'moment_connection__beam_beam_cover_plate_bolted', cfg: 'bbCoverBolted', lists: 'momentBeamBolted', custom: COVER_CUSTOM },
   { slug: 'moment_connection__column_column_cover_plate_bolted', cfg: 'ccCoverBolted', lists: 'momentColumnBolted', custom: COVER_CUSTOM },
@@ -200,18 +200,17 @@ const MODULES = [
   { slug: 'flexure_member__plate_girder', cfg: 'plateGirderConfig', lists: 'plateGirder', custom: { web_thickness: ['20'], top_flange_thickness: ['40'], bottom_flange_thickness: ['40'] } },
 ];
 
-// Desktop "Module:" line -> adapter slug (+ config) for the OSI source.
+// Module id parse_osi() returns for a desktop "Module:" line -> adapter slug (+ config) for the OSI source.
 const OSI_MODULE_MAP = {
   'Fin Plate Connection': 'shear_connection__fin_plate',
   'Cleat Angle Connection': 'shear_connection__cleat_angle',
   'Seated Angle Connection': 'shear_connection__seated_angle',
-  'End Plate Connection': 'shear_connection__header_plate',
+  'Header Plate Connection': 'shear_connection__header_plate',
   'Beam-to-Beam Cover Plate Bolted Connection': 'moment_connection__beam_beam_cover_plate_bolted',
   'Column-to-Column Cover Plate Bolted Connection': 'moment_connection__column_column_cover_plate_bolted',
   'Beam-to-Beam Cover Plate Welded Connection': 'moment_connection__beam_beam_cover_plate_welded',
   'Column-to-Column Cover Plate Welded Connection': 'moment_connection__column_column_cover_plate_welded',
   'Beam-to-Beam End Plate Connection': 'moment_connection__beam_beam_end_plate',
-  'Beam-Beam End Plate Splice': 'moment_connection__beam_beam_end_plate',
   'Beam-to-Column End Plate Connection': 'moment_connection__beam_column_end_plate',
   'Column-to-Column End Plate Connection': 'moment_connection__column_column_end_plate',
   'Tension Member Design - Bolted to End Gusset': 'tension_member__bolted',
@@ -232,7 +231,7 @@ const INPUT_KEY_TO_LIST = {
 };
 
 function initialExtraState(config, connectivity) {
-  const base = typeof config.getInitialExtraState === 'function' ? config.getInitialExtraState() : { selectedOption: 'Column Flange-Beam-Web' };
+  const base = typeof config.getInitialExtraState === 'function' ? config.getInitialExtraState() : { selectedOption: 'Column Flange-Beam Web' };
   return connectivity ? { ...base, selectedOption: connectivity } : base;
 }
 
@@ -324,9 +323,14 @@ try {
   }
 
   // --- OSI fixtures: parse_osi -> loadStateFromOsi -> buildSubmissionParams ---
+  const unsupportedOsi = {};
   for (const [file, rec] of Object.entries(osi)) {
     const slug = OSI_MODULE_MAP[rec.module_line];
-    check(slug, `no adapter mapping for Module line "${rec.module_line}" (${file})`);
+    if (!slug) {
+      // A module name that is not a current desktop module name (older desktop releases).
+      unsupportedOsi[file] = rec.module_line;
+      continue;
+    }
     const m = MODULES.find((x) => x.slug === slug);
     const config = mod[m.cfg];
     const lists = Object.fromEntries(Object.entries(LISTS[m.lists](catalog)).filter(([, v]) => v !== undefined));
@@ -337,7 +341,7 @@ try {
     let extraState = initialExtraState(config);
     let prefOverrides = {};
     const apply = (cur) => (v) => (typeof v === 'function' ? v(cur()) : v);
-    mod.loadStateFromOsi({ dock: rec.dock, pref: rec.pref }, {
+    mod.loadStateFromOsi({ dock: rec.dock, pref: rec.pref, flat: rec.flat }, {
       setInputs: (v) => { inputs = v; },
       setDesignPrefOverrides: (v) => { prefOverrides = v; },
       setExtraState: (f) => { extraState = apply(() => extraState)(f); },
@@ -350,7 +354,7 @@ try {
     const merged = { ...inputs, ...prefOverrides }; // useEngineeringModule.handleSubmit
     const payload = json(config.buildSubmissionParams(merged, allSelected, lists, extraState));
     writeFixture(slug, `osi-${slugify(file.replace(/\.osi$/, ''))}`, `osi:${file}`,
-      `Desktop example ${file} (Module: "${rec.module_line}") parsed by parse_osi(), loaded by the frontend osiLoader into ${m.cfg}'s form state, then ${m.cfg}.buildSubmissionParams (All-selected flags as the loader sets them).`,
+      `Desktop example ${file} (Module: "${rec.flat.Module}") parsed by parse_osi(), loaded by the frontend osiLoader into ${m.cfg}'s form state, then ${m.cfg}.buildSubmissionParams (All-selected flags as the loader sets them).`,
       payload);
     bump(slug);
   }
@@ -360,7 +364,11 @@ try {
   execFileSync(PYTHON, [join(HERE, 'check_fixtures.py'), STAGE, resultsPath], { stdio: ['ignore', 'ignore', 'inherit'] });
   const results = JSON.parse(readFileSync(resultsPath, 'utf8'));
 
-  rmSync(OUT, { recursive: true, force: true });
+  mkdirSync(OUT, { recursive: true });
+  for (const entry of readdirSync(OUT, { withFileTypes: true })) {
+    if (entry.isDirectory()) rmSync(join(OUT, entry.name), { recursive: true, force: true });
+    else if (entry.name.endsWith('.json')) rmSync(join(OUT, entry.name));
+  }
   const rejectedOsi = {};
   const kept = {};
   const xfailed = {};
@@ -386,6 +394,7 @@ try {
   console.log('fixtures kept per adapter:', JSON.stringify(kept, null, 1));
   console.log(`xfail (real frontend payloads rejected today): ${Object.keys(xfailed).length}`);
   Object.entries(xfailed).forEach(([k, v]) => console.log(`  ${k}: ${v}`));
+  console.log(`desktop examples with a module name the web does not know (skipped): ${JSON.stringify(unsupportedOsi)}`);
   console.log(`desktop examples rejected on the web path (not written; see design_inputs/osi_rejected.json): ${Object.keys(rejectedOsi).length}`);
 } finally {
   rmSync(tmp, { recursive: true, force: true });

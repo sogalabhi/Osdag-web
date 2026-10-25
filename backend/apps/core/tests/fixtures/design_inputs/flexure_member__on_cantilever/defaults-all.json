@@ -2,7 +2,7 @@
   "source": "frontend-defaults:onCantileverConfig.js",
   "notes": "Run of onCantileverConfig.buildSubmissionParams on defaultInputs; every customizable list set to \"All\" (the UI default; full option lists sent). Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "On-Cantilever-Beam",
+    "Module": "Flexural Members - Cantilever",
     "Member.Profile": "Beams and Columns",
     "Member.Designation": [
       "JB 150",

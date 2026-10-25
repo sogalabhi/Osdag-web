@@ -13,7 +13,7 @@
     "Bolt.TensionType": "Non Pre-tensioned",
     "Bolt.Type": "Bearing Bolt",
     "Connectivity": "Column Web-Beam Web",
-    "EndPlateType": "Column Web-Beam Web",
+    "EndPlateType": "Flushed - Reversible Moment",
     "Connector.Plate.Thickness_List": [
       "8",
       "10",
@@ -45,16 +45,16 @@
     "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
     "Detailing.Gap": "0",
     "Load.Axial": "0",
-    "Load.Moment": "2",
+    "Load.Moment": "45",
     "Load.Shear": "70",
     "Material": "E 250 (Fe 410 W)A",
     "Member.Supported_Section.Designation": "MB 300",
-    "Member.Supported_Section.Material": "E 165 (Fe 290)",
+    "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
     "Member.Supporting_Section.Designation": "UC 305 x 305 x 118",
-    "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+    "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": "435",
     "Weld.Type": "Groove Weld",
-    "Module": "Beam-to-Column-End-Plate-Connection"
+    "Module": "Beam-to-Column End Plate Connection"
   }
 }

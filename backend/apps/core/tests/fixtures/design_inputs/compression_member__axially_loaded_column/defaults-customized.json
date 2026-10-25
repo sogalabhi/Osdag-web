@@ -2,7 +2,7 @@
   "source": "frontend-defaults:axiallyLoadedColumnConfig.js",
   "notes": "Run of axiallyLoadedColumnConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"section_designation\":[\"MB 300\",\"MB 350\"]}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "AxiallyLoadedColumn",
+    "Module": "Columns with known support conditions",
     "Member.Profile": "Beams and Columns",
     "Member.Designation": [
       "MB 300",

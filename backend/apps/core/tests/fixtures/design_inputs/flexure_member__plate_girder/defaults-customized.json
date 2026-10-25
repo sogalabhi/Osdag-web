@@ -2,7 +2,7 @@
   "source": "frontend-defaults:plateGirderConfig.js",
   "notes": "Run of plateGirderConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"web_thickness\":[\"20\"],\"top_flange_thickness\":[\"40\"],\"bottom_flange_thickness\":[\"40\"]}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "Plate-Girder",
+    "Module": "PLATE GIRDER",
     "Material": "E 250 (Fe 410 W)A",
     "Member.Length": "20000",
     "Loading.Condition": "Normal",

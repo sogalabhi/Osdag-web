@@ -70,11 +70,11 @@
     "Detailing.Edge_type": "Sheared or hand flame cut",
     "Detailing.Gap": "10",
     "Load.Axial": "30",
-    "Load.Moment": "70",
+    "Load.Moment": "100",
     "Load.Shear": "50",
     "Material": "E 250 (Fe 410 W)A",
     "Member.Designation": "SC 250",
     "Member.Material": "E 250 (Fe 410 W)A",
-    "Module": "Column-to-Column-Cover-Plate-Bolted-Connection"
+    "Module": "Column-to-Column Cover Plate Bolted Connection"
   }
 }

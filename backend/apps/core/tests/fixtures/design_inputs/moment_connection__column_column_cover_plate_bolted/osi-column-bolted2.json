@@ -98,11 +98,11 @@
     "Detailing.Edge_type": "Sheared or hand flame cut",
     "Detailing.Gap": "3",
     "Load.Axial": "30",
-    "Load.Moment": "70",
+    "Load.Moment": "50",
     "Load.Shear": "30",
     "Material": "E 250 (Fe 410 W)A",
     "Member.Designation": "UC 356 x 406 x 467",
     "Member.Material": "E 250 (Fe 410 W)A",
-    "Module": "Column-to-Column-Cover-Plate-Bolted-Connection"
+    "Module": "Column-to-Column Cover Plate Bolted Connection"
   }
 }

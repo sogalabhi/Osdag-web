@@ -64,7 +64,7 @@
     "Material": "E 165 (Fe 290)",
     "Member.Designation": "MB 600",
     "Member.Material": "E 165 (Fe 290)",
-    "Module": "Column-to-Column-Cover-Plate-Welded-Connection",
+    "Module": "Column-to-Column Cover Plate Welded Connection",
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": "290",
     "Weld.Type": "Fillet Weld",
