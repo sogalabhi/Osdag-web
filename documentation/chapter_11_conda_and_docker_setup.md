@@ -269,4 +269,4 @@ GitHub (repository settings):
 
 Server:
 * Docker with Compose v2.20 or newer (the deploy uses `up --wait`, `--wait-timeout` and `run --no-deps`), and `curl`.
-* `/opt/osdag-web` must exist and be writable by the runner. The deploy copies `docker-compose.prod.yml` there. Compose reads secrets from the environment or a `.env` file in that directory: `SECRET_KEY` and `DATABASE_PASSWORD` are required, and `ALLOWED_HOSTS` must include the host name used to reach the site, otherwise Django rejects requests (including the health check through Nginx). Never commit this file.
+* `/opt/osdag-web` must exist and be writable by the runner. The deploy copies `docker-compose.prod.yml` there. Compose reads secrets from the environment or a `.env` file in that directory: `SECRET_KEY`, `DATABASE_PASSWORD` and `REDIS_PASSWORD` are required (Redis runs with that password, and the monitoring exporters use it too), and `ALLOWED_HOSTS` must include the host name used to reach the site, otherwise Django rejects requests (including the health check through Nginx). Never commit this file.
