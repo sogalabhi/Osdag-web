@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from apps.core.models import UserAccount, Project, OsiFile
 from firebase_admin import auth as firebase_auth
 import logging
+from apps.core.utils.api_errors import error_response
 
 logger = logging.getLogger(__name__)
 
@@ -46,8 +47,5 @@ class DeleteAccountAPIView(APIView):
 
         except Exception as e:
             logger.error(f"Error deleting account: {e}", exc_info=True)
-            return Response({
-                "success": False,
-                "error": str(e)
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('bad_request', str(e), status.HTTP_400_BAD_REQUEST, success=False)
 

@@ -67,7 +67,7 @@ class FirebaseAuthView(APIView):
         token = request.data.get("token")
         if not token:
             logger.error("FirebaseAuthView: No token provided in request")
-            return Response({"error": "No token provided"}, status=400)
+            return error_response('missing_token', "No token provided", 400)
         
         logger.info(f"FirebaseAuthView: Token received (length: {len(token) if token else 0})")
         
@@ -81,7 +81,7 @@ class FirebaseAuthView(APIView):
             
             if not uid:
                 logger.error("FirebaseAuthView: Token decoded but missing UID")
-                return Response({"error": "Invalid token: missing UID"}, status=400)
+                return error_response('invalid_token', "Invalid token: missing UID", 400)
             
             # Sync user to Django (use Firebase UID as username)
             from django.db import IntegrityError, transaction
@@ -102,7 +102,7 @@ class FirebaseAuthView(APIView):
             # Check if user account is active
             if not user.is_active:
                 logger.warning(f"FirebaseAuthView: Attempted login by inactive user UID: {uid}")
-                return Response({"error": "User account is disabled."}, status=status.HTTP_400_BAD_REQUEST)
+                return error_response('account_disabled', "User account is disabled.", status.HTTP_400_BAD_REQUEST)
             
             # Update email if changed
             if email and user.email != email:
@@ -205,13 +205,13 @@ class FirebaseAuthView(APIView):
             
         except firebase_auth.InvalidIdTokenError as e:
             logger.error(f"FirebaseAuthView: Invalid Firebase token error: {str(e)}")
-            return Response({"error": "Invalid Firebase token"}, status=400)
+            return error_response('invalid_token', "Invalid Firebase token", 400)
         except firebase_auth.ExpiredIdTokenError as e:
             logger.error(f"FirebaseAuthView: Expired Firebase token error: {str(e)}")
-            return Response({"error": "Firebase token has expired"}, status=400)
+            return error_response('token_expired', "Firebase token has expired", 400)
         except Exception as e:
             logger.error(f"FirebaseAuthView: Unexpected error: {str(e)}", exc_info=True)
-            return Response({"error": str(e)}, status=400)
+            return error_response('bad_request', str(e), 400)
 
 
 @api_view(['GET'])
@@ -278,6 +278,7 @@ def get_tension_member(request):
 
 
 from celery.result import AsyncResult
+from apps.core.utils.api_errors import error_response
 
 class TaskStatusAPIView(APIView):
     """

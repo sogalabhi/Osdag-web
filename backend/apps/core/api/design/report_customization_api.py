@@ -24,6 +24,7 @@ from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from osdag_core.Common import PDFLATEX
+from apps.core.utils.api_errors import error_response
 
 
 class LaTeXParser:
@@ -141,18 +142,12 @@ class ParseReportSections(APIView):
             print('[report_customization_api] ParseReportSections:request', request.data)
             report_id = request.data.get('report_id')
             if not report_id:
-                return Response(
-                    {"error": "report_id is required"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return error_response('missing_field', "report_id is required", status.HTTP_400_BAD_REQUEST)
             
             # Check if LaTeX file exists
             tex_file_path = os.path.join(os.getcwd(), 'file_storage', 'design_report', report_id, f'{report_id}.tex')
             if not os.path.exists(tex_file_path):
-                return Response(
-                    {"error": "LaTeX file not found. Please generate report first."}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                return error_response('file_not_found', "LaTeX file not found. Please generate report first.", status.HTTP_404_NOT_FOUND)
             
             # Read LaTeX content
             with open(tex_file_path, 'r', encoding='utf-8') as f:
@@ -163,10 +158,7 @@ class ParseReportSections(APIView):
             sections = parser.parse_sections(latex_content)
             
             if not sections:
-                return Response(
-                    {"error": "No sections found in LaTeX file"}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                return error_response('file_not_found', "No sections found in LaTeX file", status.HTTP_404_NOT_FOUND)
             
             response_payload = {
                 "success": True,
@@ -177,10 +169,7 @@ class ParseReportSections(APIView):
             return Response(response_payload, status=status.HTTP_200_OK)
             
         except Exception as e:
-            return Response(
-                {"error": f"Failed to parse sections: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return error_response('internal_error', f"Failed to parse sections: {str(e)}", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -205,18 +194,12 @@ class CustomizeReport(APIView):
             print('[report_customization_api] CustomizeReport:parsed', {'report_id': report_id, 'selected_count': len(selected_sections)})
             
             if not report_id:
-                return Response(
-                    {"error": "report_id is required"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return error_response('missing_field', "report_id is required", status.HTTP_400_BAD_REQUEST)
             
             # Check if LaTeX file exists
             tex_file_path = os.path.join(os.getcwd(), 'file_storage', 'design_report', report_id, f'{report_id}.tex')
             if not os.path.exists(tex_file_path):
-                return Response(
-                    {"error": "LaTeX file not found. Please generate report first."}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                return error_response('file_not_found', "LaTeX file not found. Please generate report first.", status.HTTP_404_NOT_FOUND)
             
             # Read original LaTeX content
             print('[report_customization_api] CustomizeReport:reading file')
@@ -292,10 +275,7 @@ class CustomizeReport(APIView):
                     print('[report_customization_api] CustomizeReport:pdflatex is available')
                 except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError, PermissionError, OSError):
                     print('[report_customization_api] CustomizeReport:pdflatex not found, trying alternative approach')
-                    return Response(
-                        {"error": "LaTeX (pdflatex) not found. Please install a LaTeX distribution like MiKTeX or TeX Live."},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
+                    return error_response('internal_error', "LaTeX (pdflatex) not found. Please install a LaTeX distribution like MiKTeX or TeX Live.", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
                 try:
                     print(f"[report_customization_api] CustomizeReport:running pdflatex on {platform.system().lower()}")
@@ -346,30 +326,18 @@ class CustomizeReport(APIView):
                     if result.stdout:
                         error_msg += f"\n\nOutput:\n{result.stdout[:500]}"
                     
-                    return Response(
-                        {"error": error_msg}, 
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
+                    return error_response('internal_error', error_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
                     
             except subprocess.TimeoutExpired:
-                return Response(
-                    {"error": "PDF compilation timed out (>60s)"}, 
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+                return error_response('internal_error', "PDF compilation timed out (>60s)", status.HTTP_500_INTERNAL_SERVER_ERROR)
             except FileNotFoundError:
-                return Response(
-                    {"error": "LaTeX (pdflatex) not found. Please install a LaTeX distribution."}, 
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+                return error_response('internal_error', "LaTeX (pdflatex) not found. Please install a LaTeX distribution.", status.HTTP_500_INTERNAL_SERVER_ERROR)
             finally:
                 # Restore original working directory
                 os.chdir(original_cwd)
                 
         except Exception as e:
-            return Response(
-                {"error": f"Failed to customize report: {str(e)}"}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return error_response('internal_error', f"Failed to customize report: {str(e)}", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 def generate_initial_report_core(mapped_data):
@@ -413,8 +381,11 @@ def generate_initial_report_core(mapped_data):
             # Prefer any existing message/error keys for client display
             message = None
             if isinstance(error_payload, dict):
+                inner = error_payload.get("error")
+                if isinstance(inner, dict):  # standard API error format
+                    inner = inner.get("message")
                 message = (
-                    error_payload.get("error")
+                    inner
                     or error_payload.get("message")
                     or str(error_payload)
                 )

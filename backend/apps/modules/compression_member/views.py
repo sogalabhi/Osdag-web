@@ -21,6 +21,7 @@ from apps.core import catalog
 from apps.core.models import CustomMaterials
 from apps.core.osdag_overrides import unknown_material_error, user_id_from_request, user_rows
 from apps.sections.options_merge import merge_user_sections_into_options
+from apps.core.utils.api_errors import error_response
 
 
 # Mapping from compression-member submodule slug to legacy report module_id
@@ -203,9 +204,9 @@ class CompressionMemberViewSet(viewsets.ViewSet):
                     status=status.HTTP_200_OK,
                 )
 
-            return Response({'error': f'Sub-module {slug} not found'}, status=status.HTTP_404_NOT_FOUND)
+            return error_response('submodule_not_found', f'Sub-module {slug} not found', status.HTTP_404_NOT_FOUND)
         except Exception as exc:
-            return Response({'error': str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return error_response('internal_error', str(exc), status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/cad')
     def cad(self, request, submodule_slug=None):
@@ -217,19 +218,13 @@ class CompressionMemberViewSet(viewsets.ViewSet):
         ServiceClass = CompressionMemberRegistry.get_service_by_slug_or_404(normalized_slug, COMPRESSION_MEMBER_ALLOWED_SLUGS)
 
         if not ServiceClass:
-            return Response(
-                {'error': f'Sub-module {normalized_slug} not found'},
-                status=404
-            )
+            return error_response('submodule_not_found', f'Sub-module {normalized_slug} not found', 404)
         
         # Extract inputs
         inputs = request.data.get('inputs', request.data)
         
         if not inputs:
-            return Response(
-                {'error': 'inputs are required'},
-                status=400
-            )
+            return error_response('missing_field', 'inputs are required', 400)
         
         # Get sections from request or use defaults
         sections = request.data.get('sections')
@@ -237,15 +232,12 @@ class CompressionMemberViewSet(viewsets.ViewSet):
             sections = get_default_sections('compression-member', normalized_slug)
         
         if not sections:
-            return Response(
-                {'error': f'No sections defined for {normalized_slug}'},
-                status=400
-            )
+            return error_response('no_sections', f'No sections defined for {normalized_slug}', 400)
 
         user_id = user_id_from_request(request)
         material_error = unknown_material_error(inputs, user_id)
         if material_error:
-            return Response({'error': material_error, 'status': 'error'}, status=400)
+            return error_response('bad_request', material_error, 400)
 
         try:
             # Import adapter to get create_from_input function for hover_dict
@@ -273,13 +265,11 @@ class CompressionMemberViewSet(viewsets.ViewSet):
                 )
             
             if not result['files']:
-                return Response(
-                    {
-                        'status': 'error',
-                        'message': 'No CAD models were generated',
-                        'errors': result['warnings']
-                    },
-                    status=422
+                return error_response(
+                    'cad_generation_failed',
+                    'No CAD models were generated',
+                    422,
+                    errors=result['warnings'],
                 )
             
             return Response({
@@ -294,10 +284,7 @@ class CompressionMemberViewSet(viewsets.ViewSet):
             print(f"[CompressionMemberViewSet] Error generating CAD: {e}")
             import traceback
             traceback.print_exc()
-            return Response(
-                {'error': str(e), 'status': 'error'},
-                status=500
-            )
+            return error_response('internal_error', str(e), 500)
 
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
     def report_generate_initial(self, request, submodule_slug=None):
@@ -318,25 +305,16 @@ class CompressionMemberViewSet(viewsets.ViewSet):
         normalized_slug = self._normalize_slug(submodule_slug)
         module_id = get_report_module_id(normalized_slug)
         if not module_id:
-            return Response(
-                {
-                    "success": False,
-                    "error": f"Report generation is not supported for compression-member sub-module '{normalized_slug}'",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('unsupported_report', f"Report generation is not supported for compression-member sub-module '{normalized_slug}'", status.HTTP_400_BAD_REQUEST, success=False)
 
         input_values = request.data.get("input_values") or request.data.get("inputs")
         if not input_values:
-            return Response(
-                {"success": False, "error": "input_values are required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('missing_field', "input_values are required", status.HTTP_400_BAD_REQUEST, success=False)
 
         user_id = user_id_from_request(request)
         material_error = unknown_material_error(input_values, user_id)
         if material_error:
-            return Response({"success": False, "error": material_error}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('bad_request', material_error, status.HTTP_400_BAD_REQUEST, success=False)
 
         mapped_data = {
             "module_id": module_id,
@@ -356,4 +334,7 @@ class CompressionMemberViewSet(viewsets.ViewSet):
         # Runs in the web process (not Celery), so the user's custom rows are installed here.
         with user_rows(user_id):
             payload, status_code = generate_initial_report_core(mapped_data)
+        if status_code >= 400:
+            return error_response('report_generation_failed', payload.get('error', 'Failed to generate report'),
+                                  status_code, success=False)
         return Response(payload, status=status_code)

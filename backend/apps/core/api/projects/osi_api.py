@@ -13,6 +13,7 @@ from apps.core.models import OsiFile
 from apps.core.serializers import OsiFileSerializer
 from apps.core.utils.osi_files import build_osi_payload, make_osifile_contentfile, parse_osi
 from apps.core.models import Project
+from apps.core.utils.api_errors import error_json_response
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -43,7 +44,7 @@ class SaveOsiFromInputs(APIView):
             }, safe=False, status=200)
         except Exception as e:
             print('Error in SaveOsiFromInputs:', e)
-            return JsonResponse({'success': False, 'error': str(e)}, safe=False, status=400)
+            return error_json_response('bad_request', str(e), 400, success=False)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -57,7 +58,7 @@ class OpenOsiUpload(APIView):
             # Optional policy: guests may open uploads read-only; configurable. For now allow.
             uploaded = request.FILES.get('file')
             if not uploaded:
-                return JsonResponse({'success': False, 'error': 'No file provided under field "file"'}, safe=False, status=400)
+                return error_json_response('bad_request', 'No file provided under field "file"', 400, success=False)
 
             content = uploaded.read().decode('utf-8', errors='replace')
             module_id, name, inputs = parse_osi(content)
@@ -74,7 +75,7 @@ class OpenOsiUpload(APIView):
             return JsonResponse(mapped, safe=False)
         except Exception as e:
             print('Error in OpenOsiUpload:', e)
-            return JsonResponse({'success': False, 'error': str(e)}, safe=False, status=400)
+            return error_json_response('bad_request', str(e), 400, success=False)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -90,15 +91,15 @@ class OpenOsiById(APIView):
             if not requester_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 requester_email = request.auth.get('email')
             if owner_email and requester_email != owner_email:
-                return JsonResponse({'success': False, 'error': 'Access denied'}, safe=False, status=403)
+                return error_json_response('permission_denied', 'Access denied', 403, success=False)
             content = osifile.file.read().decode('utf-8', errors='replace')
             module_id, name, inputs = parse_osi(content)
             return JsonResponse({'success': True, 'module_id': module_id, 'name': name, 'inputs': inputs, 'module': None, 'submodule': module_id, 'inputs_json': inputs, 'url': osifile.file.url}, safe=False)
         except OsiFile.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'OSI file not found'}, safe=False, status=404)
+            return error_json_response('file_not_found', 'OSI file not found', 404, success=False)
         except Exception as e:
             print('Error in OpenOsiById:', e)
-            return JsonResponse({'success': False, 'error': str(e)}, safe=False, status=400)
+            return error_json_response('bad_request', str(e), 400, success=False)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -145,8 +146,8 @@ class ProjectOsiDownload(APIView):
             resp['Content-Disposition'] = f'attachment; filename="{filename}"'
             return resp
         except Project.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Project not found or access denied'}, safe=False, status=404)
+            return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
         except Exception as e:
             print('Error generating OSI for project:', e)
-            return JsonResponse({'success': False, 'error': str(e)}, safe=False, status=400)
+            return error_json_response('bad_request', str(e), 400, success=False)
 

@@ -9,6 +9,7 @@ from apps.core.models import Project
 from apps.core.permissions import IsEmailVerified
 import json
 from django.db.models import Q
+from apps.core.utils.api_errors import error_json_response
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectAPI(APIView):
@@ -20,7 +21,7 @@ class ProjectAPI(APIView):
         try:
             # Disallow guest users from listing projects (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
-                return JsonResponse({'success': False, 'error': 'Guest users cannot access projects'}, safe=False, status=403)
+                return error_json_response('guest_not_allowed', 'Guest users cannot access projects', 403, success=False)
 
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
@@ -62,17 +63,14 @@ class ProjectAPI(APIView):
             
         except Exception as e:
             print(f"Error getting projects: {e}")
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            }, safe=False, status=400)
+            return error_json_response('bad_request', str(e), 400, success=False)
     
     def post(self, request):
         """Create a new project"""
         try:
             # Disallow guest users from creating projects (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
-                return JsonResponse({'success': False, 'error': 'Guest users cannot create projects'}, safe=False, status=403)
+                return error_json_response('guest_not_allowed', 'Guest users cannot create projects', 403, success=False)
 
             data = request.data
             print(f"Creating project with data: {data}")
@@ -81,17 +79,14 @@ class ProjectAPI(APIView):
             required_fields = ['name']
             for field in required_fields:
                 if field not in data:
-                    return JsonResponse({
-                        'success': False,
-                        'error': f'Missing required field: {field}'
-                    }, safe=False, status=400)
+                    return error_json_response('missing_field', f'Missing required field: {field}', 400, success=False)
             
             # Determine user email from authenticated user or JWT claims
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
             if not user_email:
-                return JsonResponse({'success': False, 'error': 'Authenticated user email not found'}, safe=False, status=400)
+                return error_json_response('bad_request', 'Authenticated user email not found', 400, success=False)
 
             # Create new project with user email
             project = Project.objects.create(
@@ -111,10 +106,7 @@ class ProjectAPI(APIView):
             
         except Exception as e:
             print(f"Error creating project: {e}")
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            }, safe=False, status=400)
+            return error_json_response('bad_request', str(e), 400, success=False)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectDetailAPI(APIView):
@@ -128,7 +120,7 @@ class ProjectDetailAPI(APIView):
             #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from reading projects (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
-                return JsonResponse({'success': False, 'error': 'Guest users cannot access projects'}, safe=False, status=403)
+                return error_json_response('guest_not_allowed', 'Guest users cannot access projects', 403, success=False)
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
@@ -153,23 +145,17 @@ class ProjectDetailAPI(APIView):
             
         except Project.DoesNotExist:
             print(f"Project {project_id} not found or access denied")
-            return JsonResponse({
-                'success': False,
-                'error': 'Project not found or access denied'
-            }, safe=False, status=404)
+            return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
         except Exception as e:
             print(f"Error getting project {project_id}: {e}")
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            }, safe=False, status=400)
+            return error_json_response('bad_request', str(e), 400, success=False)
     
     def put(self, request, project_id):
         """Update project data (name, inputs_json, osi_file_path)"""
         try:
             # Disallow guest users from updating projects (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
-                return JsonResponse({'success': False, 'error': 'Guest users cannot update projects'}, safe=False, status=403)
+                return error_json_response('guest_not_allowed', 'Guest users cannot update projects', 403, success=False)
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
@@ -206,16 +192,10 @@ class ProjectDetailAPI(APIView):
             
         except Project.DoesNotExist:
             print(f"Project {project_id} not found or access denied")
-            return JsonResponse({
-                'success': False,
-                'error': 'Project not found or access denied'
-            }, safe=False, status=404)
+            return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
         except Exception as e:
             print(f"Error updating project {project_id}: {e}")
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            }, safe=False, status=400)
+            return error_json_response('bad_request', str(e), 400, success=False)
     
     def delete(self, request, project_id):
         """Delete a project"""
@@ -224,7 +204,7 @@ class ProjectDetailAPI(APIView):
             #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from deleting projects (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
-                return JsonResponse({'success': False, 'error': 'Guest users cannot delete projects'}, safe=False, status=403)
+                return error_json_response('guest_not_allowed', 'Guest users cannot delete projects', 403, success=False)
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
@@ -239,16 +219,10 @@ class ProjectDetailAPI(APIView):
             }, safe=False)
             
         except Project.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'error': 'Project not found or access denied'
-            }, safe=False, status=404)
+            return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
         except Exception as e:
             print(f"Error deleting project {project_id}: {e}")
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            }, safe=False, status=400) 
+            return error_json_response('bad_request', str(e), 400, success=False) 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectByNameAPI(APIView):
@@ -262,7 +236,7 @@ class ProjectByNameAPI(APIView):
             #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from reading projects by name (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
-                return JsonResponse({'success': False, 'error': 'Guest users cannot access projects'}, safe=False, status=403)
+                return error_json_response('guest_not_allowed', 'Guest users cannot access projects', 403, success=False)
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
@@ -283,16 +257,10 @@ class ProjectByNameAPI(APIView):
             
         except Project.DoesNotExist:
             print(f"Project '{project_name}' not found or access denied")
-            return JsonResponse({
-                'success': False,
-                'error': 'Project not found or access denied'
-            }, safe=False, status=404)
+            return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
         except Exception as e:
             print(f"Error getting project '{project_name}': {e}")
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            }, safe=False, status=400) 
+            return error_json_response('bad_request', str(e), 400, success=False) 
 
     def put(self, request, project_name):
         """Update project data (name, osi_file_path) by name"""
@@ -301,7 +269,7 @@ class ProjectByNameAPI(APIView):
             #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from updating projects by name (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
-                return JsonResponse({'success': False, 'error': 'Guest users cannot update projects'}, safe=False, status=403)
+                return error_json_response('guest_not_allowed', 'Guest users cannot update projects', 403, success=False)
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
                 user_email = request.auth.get('email')
@@ -319,12 +287,6 @@ class ProjectByNameAPI(APIView):
                 'message': 'Project updated successfully'
             }, safe=False)
         except Project.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'error': 'Project not found or access denied'
-            }, safe=False, status=404)
+            return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
         except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            }, safe=False, status=400) 
+            return error_json_response('bad_request', str(e), 400, success=False) 

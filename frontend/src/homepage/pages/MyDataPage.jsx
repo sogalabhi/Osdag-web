@@ -8,6 +8,7 @@ import { apiClient } from "../../utils/apiClient";
 import { AUTH, PROJECTS, MATERIALS, SECTIONS } from "../../datasources/endpoints";
 import { MODULE_ROUTES } from "../../constants/modules";
 import { getModuleRoute } from "../../constants/moduleRoutes";
+import { getErrorMessage } from "../../utils/apiError";
 
 /** ── DEBUG: catches render crashes in each section and logs which one ── */
 class DebugErrorBoundary extends React.Component {
@@ -342,7 +343,7 @@ const MyDataPage = () => {
         );
         setRenameModal({ isOpen: false, projectId: null, currentName: "", newName: "" });
       } else {
-        toast.error(data.error || data.message || "Failed to rename project");
+        toast.error(getErrorMessage(data, "Failed to rename project"));
       }
     } catch (err) {
       console.error(err);
@@ -385,7 +386,7 @@ const MyDataPage = () => {
           toast.success(`Project "${itemLabel}" deleted successfully`);
           setProjects((prev) => prev.filter((p) => p.id !== itemId));
         } else {
-          toast.error(data.error || "Failed to delete project");
+          toast.error(getErrorMessage(data, "Failed to delete project"));
         }
       } else if (itemType === "material") {
         const url = MATERIALS.delete(itemId);
@@ -395,7 +396,7 @@ const MyDataPage = () => {
           toast.success(`Material "${itemLabel}" deleted successfully`);
           setMaterials((prev) => prev.filter((m) => m.id !== itemId));
         } else {
-          toast.error(data.message || "Failed to delete material");
+          toast.error(getErrorMessage(data, "Failed to delete material"));
         }
       } else if (itemType === "section") {
         const url = `${SECTIONS.customDelete}?table=${extraData}&designation=${encodeURIComponent(itemLabel)}`;
@@ -499,7 +500,7 @@ const MyDataPage = () => {
           );
           setEditModal({ isOpen: false, itemType: "", itemData: null, formData: {} });
         } else {
-          toast.error(data.message || "Failed to update material");
+          toast.error(getErrorMessage(data, "Failed to update material"));
         }
       } catch (err) {
         console.error(err);

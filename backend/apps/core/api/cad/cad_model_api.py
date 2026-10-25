@@ -23,6 +23,7 @@ from io import BytesIO
 from rest_framework import status
 from rest_framework.response import Response
 from .cad_module_aliases import resolve_module_id
+from apps.core.utils.api_errors import error_json_response
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CADGeneration(View):
@@ -48,10 +49,10 @@ class CADGeneration(View):
             input_values = request_data.get('input_values')
             
             if not module_id:
-                return JsonResponse({"status": "error", "message": "module_id is required"}, status=400)
+                return error_json_response('missing_field', "module_id is required", 400)
             
             if not input_values:
-                return JsonResponse({"status": "error", "message": "input_values are required"}, status=400)
+                return error_json_response('missing_field', "input_values are required", 400)
             
             # Normalize hyphenated ids to backend ids
             resolved_module_id = resolve_module_id(module_id)
@@ -83,12 +84,12 @@ class CADGeneration(View):
             print("resolved_module_id: ", resolved_module_id)
             session_type = module_type_mapping.get(resolved_module_id)
             if not session_type:
-                return JsonResponse({"status": "error", "message": f"Unknown module type: {module_id}"}, status=400)
+                return error_json_response('unknown_module', f"Unknown module type: {module_id}", 400)
                 
         except json.JSONDecodeError:
-            return JsonResponse({"status": "error", "message": "Invalid JSON in request body"}, status=400)
+            return error_json_response('invalid_json', "Invalid JSON in request body", 400)
         except Exception as e:
-            return JsonResponse({"status": "error", "message": f"Error parsing request: {str(e)}"}, status=500)
+            return error_json_response('internal_error', f"Error parsing request: {str(e)}", 500)
         
         # Directory setup
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -124,7 +125,7 @@ class CADGeneration(View):
         elif session_type in ("ButtJointWelded", "ButtJointBolted", "LapJointWelded", "LapJointBolted"):
             sections = ["Model", "Column", "Plate"]
         else:
-            return JsonResponse({"status": "error", "message": "Unknown module type"}, status=400)
+            return error_json_response('unknown_module', "Unknown module type", 400)
         
         print(f"[cadissue] cad_model_api: module_id={module_id}, session_type={session_type}, sections={sections}")
 
@@ -252,7 +253,7 @@ class CADGeneration(View):
 
         if not output_files:
             # Unprocessable due to inputs or environment; include details to aid debugging
-            return JsonResponse({"status": "error", "message": "No CAD models were generated.", "errors": error_details}, status=422)
+            return error_json_response('cad_generation_failed', "No CAD models were generated.", 422, errors=error_details)
                 
         # Build hover_dict if possible using module APIs (e.g., FinPlateConnection)
         # hover_dict is populated in output_details() which is called from output_values()

@@ -19,6 +19,7 @@ from apps.core import catalog
 from apps.core.models import CustomMaterials
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from apps.sections.options_merge import merge_user_sections_into_options
+from apps.core.utils.api_errors import error_response
 
 
 # Mapping from tension-member slug to legacy report module_id
@@ -150,9 +151,9 @@ class TensionMemberViewSet(viewsets.ViewSet):
                     status=status.HTTP_200_OK,
                 )
 
-            return Response({'error': f'Sub-module {slug} not found'}, status=status.HTTP_404_NOT_FOUND)
+            return error_response('submodule_not_found', f'Sub-module {slug} not found', status.HTTP_404_NOT_FOUND)
         except Exception as exc:
-            return Response({'error': str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return error_response('internal_error', str(exc), status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/cad')
     def cad(self, request, submodule_slug=None):

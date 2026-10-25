@@ -17,9 +17,9 @@ from apps.core.utils.module_helpers import (
     trigger_async_report
 )
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
-from apps.core.utils.errors import format_error_response, get_error_status_code
 from apps.core.api.design.report_customization_api import generate_initial_report_core
 from .registry import SimpleConnectionRegistry
+from apps.core.utils.api_errors import error_response
 
 logger = logging.getLogger(__name__)
 
@@ -132,9 +132,9 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
                 }
                 return Response(data, status=status.HTTP_200_OK)
 
-            return Response({'error': f'Sub-module {slug} not found'}, status=404)
+            return error_response('submodule_not_found', f'Sub-module {slug} not found', 404)
         except Exception as exc:
-            return Response({'error': str(exc)}, status=500)
+            return error_response('internal_error', str(exc), 500)
     
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/cad')
     def cad(self, request, submodule_slug=None):

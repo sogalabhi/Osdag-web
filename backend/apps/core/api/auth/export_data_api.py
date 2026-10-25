@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.core.serializers.json import DjangoJSONEncoder
 from apps.core.models import Project, CustomMaterials
+from apps.core.utils.api_errors import error_response
 import json
 import logging
 
@@ -25,11 +26,7 @@ class ExportUserDataAPIView(APIView):
                 user_email = request.auth.get('email')
         
         if not user_email:
-            return HttpResponse(
-                json.dumps({"error": "No email address found for the authenticated user."}),
-                content_type='application/json',
-                status=400
-            )
+            return error_response('missing_email', "No email address found for the authenticated user.", 400)
 
         try:
             # 1. Fetch user projects efficiently (skipping heavy model instantiations)
@@ -67,8 +64,4 @@ class ExportUserDataAPIView(APIView):
 
         except Exception as e:
             logger.error(f"Error during user data export for {user_email}: {e}", exc_info=True)
-            return HttpResponse(
-                json.dumps({"error": f"Failed to generate data export: {str(e)}"}),
-                content_type='application/json',
-                status=500
-            )
+            return error_response('internal_error', f"Failed to generate data export: {str(e)}", 500)

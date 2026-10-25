@@ -153,13 +153,14 @@ from rest_framework import status
 from apps.core.tasks import run_design_calculation_task, run_cad_generation_task, run_report_generation_task
 from apps.core.utils.cad_helpers import get_default_sections
 from apps.core.osdag_overrides import unknown_material_error, user_id_from_request
+from apps.core.utils.api_errors import error_response
 
 
 def _unknown_material_response(inputs, user_id):
     """400 response when a material grade cannot be resolved, else None."""
     error = unknown_material_error(inputs, user_id)
     if error:
-        return Response({'success': False, 'error': error}, status=status.HTTP_400_BAD_REQUEST)
+        return error_response('bad_request', error, status.HTTP_400_BAD_REQUEST, success=False)
     return None
 
 
@@ -168,7 +169,7 @@ def trigger_async_design(module_name: str, submodule_slug: str, ServiceClass, re
     Triggers asynchronous design calculations using Celery.
     """
     if not ServiceClass:
-        return Response({'error': f'Sub-module {submodule_slug} not found'}, status=404)
+        return error_response('submodule_not_found', f'Sub-module {submodule_slug} not found', 404)
 
     inputs = request.data.get('inputs', request.data)
     project_id = request.data.get('project_id')
@@ -216,18 +217,18 @@ def trigger_async_cad(module_name: str, submodule_slug: str, ServiceClass, reque
     Triggers asynchronous CAD model generation using Celery.
     """
     if not ServiceClass:
-        return Response({'error': f'Sub-module {submodule_slug} not found'}, status=404)
+        return error_response('submodule_not_found', f'Sub-module {submodule_slug} not found', 404)
         
     inputs = request.data.get('inputs', request.data)
     if not inputs:
-        return Response({'error': 'inputs are required'}, status=400)
+        return error_response('missing_field', 'inputs are required', 400)
         
     sections = request.data.get('sections')
     if not sections:
         sections = get_default_sections(module_name, submodule_slug)
         
     if not sections:
-        return Response({'error': f'No sections defined for {submodule_slug}'}, status=400)
+        return error_response('no_sections', f'No sections defined for {submodule_slug}', 400)
 
     user_id = user_id_from_request(request)
     material_error = _unknown_material_response(inputs, user_id)
@@ -255,20 +256,11 @@ def trigger_async_report(module_name: str, submodule_slug: str, module_id_map: d
     """
     module_id = module_id_map.get(submodule_slug) if module_id_map else submodule_slug
     if not module_id:
-        return Response(
-            {
-                "success": False,
-                "error": f"Report generation is not supported for {module_name} sub-module '{submodule_slug}'",
-            },
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return error_response('unsupported_report', f"Report generation is not supported for {module_name} sub-module '{submodule_slug}'", status.HTTP_400_BAD_REQUEST, success=False)
 
     input_values = request.data.get("input_values") or request.data.get("inputs")
     if not input_values:
-        return Response(
-            {"success": False, "error": "input_values are required"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return error_response('missing_field', "input_values are required", status.HTTP_400_BAD_REQUEST, success=False)
 
     user_id = user_id_from_request(request)
     material_error = _unknown_material_response(input_values, user_id)

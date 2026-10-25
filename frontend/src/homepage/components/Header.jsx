@@ -60,6 +60,7 @@ import { useShortcutLayer } from '../../utils/shortcuts/ShortcutProvider';
 import { SHORTCUT_ACTION_BY_ID } from '../../constants/shortcuts';
 import XlsxImportTrigger from '../../modules/shared/components/XlsxImportTrigger';
 import XlsxDownloadModal from './XlsxDownloadModal';
+import { getErrorMessage } from '../../utils/apiError';
 
 const Header = ({ setshowSideBar, active }) => {
   const [isDark, setIsDark] = useState(false);
@@ -427,7 +428,7 @@ const Header = ({ setshowSideBar, active }) => {
             const data = await res.json();
 
             if (!res.ok || !data.success) {
-              alert(data.error || "Failed to import OSI file.");
+              alert(getErrorMessage(data, "Failed to import OSI file."));
               e.target.value = '';
               return;
             }

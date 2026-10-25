@@ -13,6 +13,7 @@ import uuid
 import re
 import base64
 from apps.core.registry import BaseModuleRegistry
+from apps.core.utils.api_errors import error_response
 
 logger = logging.getLogger(__name__)
 
@@ -87,10 +88,10 @@ class CreateDesignReport(APIView):
         
         metadata_entry = BaseModuleRegistry.get_metadata_by_module_id(module_id)
         if not metadata_entry or not metadata_entry.get('adapter_func'):
-            return Response({"error": f"Invalid or unsupported module_id: {module_id}"}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('unknown_module', f"Invalid or unsupported module_id: {module_id}", status.HTTP_400_BAD_REQUEST)
             
         if not input_values:
-            return Response({"error": "Missing input_values"}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('missing_field', "Missing input_values", status.HTTP_400_BAD_REQUEST)
             
         create_module_func = metadata_entry['adapter_func']
 
@@ -255,7 +256,8 @@ class CreateDesignReport(APIView):
             f = open(tex_path, 'rb')
             return Response({'success': 'Design report created', 'report_id': report_id, 'fileContents : ': f}, status=status.HTTP_201_CREATED)
         else: 
-            return Response({"message" : "Error in generating the design report"})
+            return error_response('report_generation_failed', "Error in generating the design report",
+                                  status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CompanyLogoView(APIView): 
@@ -279,4 +281,4 @@ class CompanyLogoView(APIView):
             logoFullPath = file_full_path.replace("\\", "/")
             return Response({'message' : 'successfully saved file', 'logoFullPath' : logoFullPath}, status = status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({'message' : f'Error in saving the file: {str(e)}'}, status = status.HTTP_400_BAD_REQUEST)
+            return error_response('bad_request', f'Error in saving the file: {str(e)}', status.HTTP_400_BAD_REQUEST)

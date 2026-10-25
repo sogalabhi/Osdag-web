@@ -13,6 +13,7 @@ import { EmailVerificationStatus } from './EmailVerificationStatus';
 import { useAuth } from '../context/AuthContext';
 // import { useAuth } from '../hooks/useAuth';
 import { Link } from "react-router";
+import { getErrorMessage } from "../utils/apiError";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -246,7 +247,7 @@ const LoginPage = () => {
                 setGeneralError(errorMessage);
             } else if (error.response) {
                 // Handle backend errors
-                const backendError = error.response.data?.error || error.response.data?.message || "Unknown backend error";
+                const backendError = getErrorMessage(error.response.data, "Unknown backend error");
                 console.error("Backend error:", backendError);
                 if (backendError === "Invalid Firebase token" || backendError.includes("Invalid")) {
                     setGeneralError("Invalid Google authentication. Please try again.");

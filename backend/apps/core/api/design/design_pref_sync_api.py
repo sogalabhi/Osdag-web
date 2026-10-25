@@ -10,6 +10,7 @@ from rest_framework import status
 
 from apps.core.api.design.sync_merge import lookup_sources, merge_design_pref_sync, VALID_OPERATIONS
 from apps.core.osdag_overrides import user_id_from_request, user_rows
+from apps.core.utils.api_errors import error_response
 
 
 class DesignPreferenceSync(APIView):
@@ -22,15 +23,14 @@ class DesignPreferenceSync(APIView):
         design_pref_draft = body.get("design_pref_draft")
         operation = (body.get("operation") or "open").strip().lower()
         if operation not in VALID_OPERATIONS:
-            return Response(
-                {"error": "Invalid operation", "valid": list(VALID_OPERATIONS)},
-                status=status.HTTP_400_BAD_REQUEST,
+            return error_response(
+                'invalid_operation',
+                "Invalid operation",
+                status.HTTP_400_BAD_REQUEST,
+                valid=list(VALID_OPERATIONS),
             )
         if not module_session_name:
-            return Response(
-                {"error": "module_session_name is required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('missing_field', "module_session_name is required", status.HTTP_400_BAD_REQUEST)
 
         try:
             # osdag_core computes some defaults from the selected material, so it must see custom rows too.
@@ -43,10 +43,7 @@ class DesignPreferenceSync(APIView):
                     **lookup_sources(request.user),
                 )
         except Exception as e:
-            return Response(
-                {"error": str(e), "success": False},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return error_response('internal_error', str(e), status.HTTP_500_INTERNAL_SERVER_ERROR, success=False)
 
         return Response(
             {
