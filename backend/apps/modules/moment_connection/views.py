@@ -11,7 +11,7 @@ from rest_framework import status
 from osdag_core.Common import (
     KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BB_EP_SPLICE,
     KEY_DISP_BCENDPLATE, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
-    KEY_DISP_COLUMNENDPLATE,
+    KEY_DISP_COLUMNENDPLATE, VALUES_CONN_1,
 )
 from .registry import MomentConnectionRegistry
 from apps.core.utils.module_helpers import (
@@ -147,7 +147,7 @@ class MomentConnectionViewSet(viewsets.ViewSet):
             # Beam-Column End Plate
             if slug == 'beam-column-end-plate':
                 data = {
-                    'connectivityList': ['Column-Flange-Beam-Web', 'Column Web-Beam Web'],
+                    'connectivityList': list(VALUES_CONN_1),
                     'columnList': catalog.designations("Columns"),
                     'beamList': catalog.designations("Beams"),
                     'materialList': material_list(),

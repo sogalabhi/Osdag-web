@@ -1,14 +1,12 @@
-import { KEY_DISP_FINPLATE, KEY_DISP_BB_EP_SPLICE, KEY_DISP_BEAMCOVERPLATE } from '../../../constants/generated/coreKeys';
+import { KEY_DISP_FINPLATE, KEY_DISP_BB_EP_SPLICE, KEY_DISP_BEAMCOVERPLATE, CONN_CFBW, CONN_CWBW } from '../../../constants/generated/coreKeys';
 import { INPUT_KEY_TO_LIST } from '../constants/moduleDataKeys';
 import { getModuleDesignPref } from '../../registry';
 
 // Fin plate member designations for the selected connectivity.
 const getFinPlateMemberData = (selectedOption, inputs) => {
-  const config = getModuleDesignPref(KEY_DISP_FINPLATE);
-  if (!config.connectivityMap?.[selectedOption]) return null;
+  if (!selectedOption) return null;
 
-  const connectivity = config.connectivityMap[selectedOption];
-  if (connectivity === 'Column Flange-Beam Web' || connectivity === 'Column Web-Beam Web') {
+  if (selectedOption === CONN_CFBW || selectedOption === CONN_CWBW) {
     return {
       memberSupported: inputs.beam_section,
       memberSupporting: inputs.column_section,
@@ -87,7 +85,7 @@ export const buildOsiContent = ({
 
   // Module-specific connectivity handling
   if (moduleName === KEY_DISP_FINPLATE) {
-    content += `Connectivity: ${moduleConfig.connectivityMap?.[selectedOption]}\n`;
+    content += `Connectivity: ${selectedOption}\n`;
   } else if (moduleName === KEY_DISP_BB_EP_SPLICE) {
     content += `Connectivity *: ${inputs.connectivity}\n`;
     content += `EndPlateType: ${moduleConfig.connectivityMap?.[selectedOption]}\n`;

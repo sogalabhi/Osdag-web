@@ -1,7 +1,7 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
-import { KEY_DISP_SEATED_ANGLE } from "../../../../constants/generated/coreKeys";
+import { KEY_DISP_SEATED_ANGLE, CONN_CFBW, CONN_CWBW } from "../../../../constants/generated/coreKeys";
 export const seatedAngleConfig = {
   sessionName: KEY_DISP_SEATED_ANGLE,
   designType: KEY_DISP_SEATED_ANGLE,
@@ -13,7 +13,7 @@ export const seatedAngleConfig = {
     // (required-field validation checks raw inputs.connectivity) alongside
     // the array[0]-derived fallback in validateInputs/buildSubmissionParams
     // below.
-    connectivity: "Column Flange-Beam-Web",
+    connectivity: CONN_CFBW,
     bolt_diameter: [],
     bolt_grade: [],
     bolt_type: "Bearing_Bolt",
@@ -66,7 +66,7 @@ export const seatedAngleConfig = {
     // the live list rather than a hardcoded literal.
     const connectivity = extraState?.selectedOption || inputs.connectivity || lists?.connectivityList?.[0];
     
-    if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
+    if (connectivity === CONN_CFBW || connectivity === CONN_CWBW) {
       if (!inputs.beam_section || !inputs.column_section || 
           inputs.beam_section === "Select Section" || 
           inputs.column_section === "Select Section") {
@@ -82,16 +82,11 @@ export const seatedAngleConfig = {
   },
 
   buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
-    const conn_map = {
-      "Column Flange-Beam-Web": "Column Flange-Beam Web",
-      "Column Web-Beam-Web": "Column Web-Beam Web",
-      // "Beam-Beam": "Beam-Beam",
-    };
 
     // See validateInputs's identical comment on this fallback chain.
     const connectivity = extraState?.selectedOption || inputs.connectivity || lists?.connectivityList?.[0];
 
-    if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
+    if (connectivity === CONN_CFBW || connectivity === CONN_CWBW) {
       return {
         "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
         "Bolt.Diameter": allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
@@ -99,7 +94,7 @@ export const seatedAngleConfig = {
         "Bolt.Slip_Factor": inputs.bolt_slip_factor,
         "Bolt.TensionType": inputs.bolt_tension_type,
         "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-        "Connectivity": conn_map[connectivity],
+        "Connectivity": connectivity,
         "Connector.Material": inputs.connector_material,
         "Design.Design_Method": inputs.design_method,
         "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
@@ -126,7 +121,7 @@ export const seatedAngleConfig = {
         "Bolt.Slip_Factor": inputs.bolt_slip_factor,
         "Bolt.TensionType": inputs.bolt_tension_type,
         "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-        "Connectivity": conn_map[connectivity],
+        "Connectivity": connectivity,
         "Connector.Material": inputs.connector_material,
         "Design.Design_Method": inputs.design_method,
         "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
@@ -164,7 +159,7 @@ export const seatedAngleConfig = {
           options: "columnList",
           conditionalDisplay: (extraState) => {
             const connectivity = extraState?.selectedOption;
-            return connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web";
+            return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
         {
@@ -174,7 +169,7 @@ export const seatedAngleConfig = {
           options: "beamList",
           conditionalDisplay: (extraState) => {
             const connectivity = extraState?.selectedOption;
-            return connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web";
+            return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
         // {

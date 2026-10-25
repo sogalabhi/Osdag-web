@@ -1,6 +1,6 @@
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
-import { KEY_DISP_HEADERPLATE } from "../../../../constants/generated/coreKeys";
+import { KEY_DISP_HEADERPLATE, CONN_CFBW, CONN_CWBW } from "../../../../constants/generated/coreKeys";
 export const endPlateConfig = {
   sessionName: KEY_DISP_HEADERPLATE,
   designType: KEY_DISP_HEADERPLATE,
@@ -10,7 +10,7 @@ export const endPlateConfig = {
   // IMPROVEMENT: Removed hardcoded defaults for API-driven lists (e.g., beam_section).
   // Defaults should be set dynamically after fetching data to prevent mismatches.
   defaultInputs: {
-    connectivity: "Column Flange-Beam-Web",
+    connectivity: CONN_CFBW,
     column_section: "", // Set to empty string, to be populated from list
     beam_section: "",   // Set to empty string, to be populated from list
     primary_beam: "",   // Set to empty string, to be populated from list
@@ -59,7 +59,7 @@ export const endPlateConfig = {
 
     const connectivity = extraState?.selectedOption || inputs.connectivity;
     // IMPROVEMENT: Simplified validation logic for conciseness.
-    if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
+    if (connectivity === CONN_CFBW || connectivity === CONN_CWBW) {
       if (!inputs.beam_section || !inputs.column_section) {
         return { isValid: false, message: "Please select all required sections." };
       }
@@ -78,11 +78,6 @@ export const endPlateConfig = {
       ? toStrList(lists.thicknessList)
       : toStrList(inputs.plate_thickness);
 
-    const conn_map = {
-      "Column Flange-Beam-Web": "Column Flange-Beam Web",
-      "Column Web-Beam-Web": "Column Web-Beam Web",
-      "Beam-Beam": "Beam-Beam",
-    };
     const connectivity = extraState?.selectedOption || inputs.connectivity;
     const params = {
       "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
@@ -91,7 +86,7 @@ export const endPlateConfig = {
       "Bolt.Slip_Factor": inputs.bolt_slip_factor,
       "Bolt.TensionType": inputs.bolt_tension_type,
       "Bolt.Type": inputs.bolt_type, // No need for replaceAll now
-      "Connectivity": conn_map[connectivity],
+      "Connectivity": connectivity,
       "Connector.Material": inputs.connector_material,
       "Design.Design_Method": inputs.design_method,
       "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
@@ -119,8 +114,8 @@ export const endPlateConfig = {
         { key: "connectivity", label: "Connectivity", type: "connectivitySelect", options: "connectivityList" },
         { key: "primary_beam", label: "Primary Beam", type: "select", options: "beamList", conditionalDisplay: (extraState) => extraState?.selectedOption === "Beam-Beam" },
         { key: "secondary_beam", label: "Secondary Beam", type: "select", options: "beamList", conditionalDisplay: (extraState) => extraState?.selectedOption === "Beam-Beam" },
-        { key: "column_section", label: "Column Section", type: "select", options: "columnList", conditionalDisplay: (extraState) => ["Column Flange-Beam-Web", "Column Web-Beam-Web"].includes(extraState?.selectedOption) },
-        { key: "beam_section", label: "Beam Section", type: "select", options: "beamList", conditionalDisplay: (extraState) => ["Column Flange-Beam-Web", "Column Web-Beam-Web"].includes(extraState?.selectedOption) },
+        { key: "column_section", label: "Column Section", type: "select", options: "columnList", conditionalDisplay: (extraState) => [CONN_CFBW, CONN_CWBW].includes(extraState?.selectedOption) },
+        { key: "beam_section", label: "Beam Section", type: "select", options: "beamList", conditionalDisplay: (extraState) => [CONN_CFBW, CONN_CWBW].includes(extraState?.selectedOption) },
         {
           key: "connector_material", label: "Material", type: "select", options: "materialList",
           onChange: (value, inputs, setInputs, materialList, setShowModal) => {

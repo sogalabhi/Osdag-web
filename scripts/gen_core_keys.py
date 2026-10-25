@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Generate frontend/src/constants/generated/coreKeys.js from osdag_core/Common.py.
 
-Every module-level string constant named KEY_* or DISP_* is written out as an
+Every module-level string constant named KEY_*, DISP_* or CONN_* is written out as an
 exported JS constant, sorted by name. Run from the repository root:
 
     python scripts/gen_core_keys.py
@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUTPUT = ROOT / "frontend" / "src" / "constants" / "generated" / "coreKeys.js"
-PREFIXES = ("KEY_", "DISP_")
+PREFIXES = ("KEY_", "DISP_", "CONN_")
 
 HEADER = """\
 // Generated from osdag_core/Common.py by scripts/gen_core_keys.py.

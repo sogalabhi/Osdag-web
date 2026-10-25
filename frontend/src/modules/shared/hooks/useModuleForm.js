@@ -6,6 +6,7 @@ import {
   KEY_DISP_HEADERPLATE,
   KEY_DISP_BB_EP_SPLICE,
   KEY_DISP_BCENDPLATE,
+  CONN_CFBW,
 } from "../../../constants/generated/coreKeys";
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { loadStateFromOsi } from "../utils/osiLoader";
@@ -54,19 +55,19 @@ export const useModuleForm = (moduleConfig, moduleData) => {
       return moduleConfig.getInitialExtraState();
     }
     if (moduleConfig.cameraKey === KEY_DISP_FINPLATE) {
-      return { selectedOption: "Column Flange-Beam-Web" };
+      return { selectedOption: CONN_CFBW };
     } else if (moduleConfig.cameraKey === KEY_DISP_CLEATANGLE) {
-      return { selectedOption: "Column Flange-Beam-Web" };
+      return { selectedOption: CONN_CFBW };
     } else if (moduleConfig.cameraKey === KEY_DISP_SEATED_ANGLE) {
-      return { selectedOption: "Column Flange-Beam-Web" };
+      return { selectedOption: CONN_CFBW };
     } else if (moduleConfig.cameraKey === KEY_DISP_HEADERPLATE) {
-      return { selectedOption: "Column Flange-Beam-Web" };
+      return { selectedOption: CONN_CFBW };
     } else if (moduleConfig.cameraKey === KEY_DISP_BB_EP_SPLICE) {
       return { selectedOption: "Flushed - Reversible Moment" };
     } else if (moduleConfig.cameraKey === KEY_DISP_BCENDPLATE) {
       return { selectedOption: "Flushed - Reversible Moment" };
     }
-    return { selectedOption: "Column Flange-Beam-Web" };
+    return { selectedOption: CONN_CFBW };
   };
 
   const [extraState, setExtraState] = useState(resolveInitialExtraState());

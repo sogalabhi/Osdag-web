@@ -5,7 +5,7 @@ import { isGuestUser } from '../../utils/auth';
 import { getProjectById } from "../../datasources/projectsDataSource";
 import ProjectActionButtons from './ProjectActionButtons';
 import { loadModuleConfigs } from '../../modules/registry';
-import { KEY_DISP_FINPLATE } from '../../constants/generated/coreKeys';
+import { KEY_DISP_FINPLATE, CONN_CFBW } from '../../constants/generated/coreKeys';
 
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
   const [projects, setProjects] = React.useState(projectsProp);
@@ -71,7 +71,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
         setReportAllSelected({});
       }
       // extraState: carry connectivity for FinPlate (or default)
-      const defaultConnectivity = 'Column Flange-Beam-Web';
+      const defaultConnectivity = CONN_CFBW;
       const selectedOption = (detail?.inputs_json && detail.inputs_json.connectivity) || defaultConnectivity;
       setReportExtraState({ selectedOption });
       setReportModalOpen(true);

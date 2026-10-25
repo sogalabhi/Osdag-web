@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import { toast } from 'react-toastify';
 import { findModule, getModuleRoute, loadModuleConfigs, MENU_GROUPS, getMenuSections } from '../../modules/registry';
-import { KEY_DISP_FINPLATE } from '../../constants/generated/coreKeys';
+import { KEY_DISP_FINPLATE, CONN_CFBW } from '../../constants/generated/coreKeys';
 import { isGuestUser } from '../../utils/auth';
 import { useAuth } from '../../context/AuthContext';
 import { searchProjects, getProjectById, deleteProject } from '../../datasources/projectsDataSource';
@@ -104,7 +104,7 @@ const Header = ({ setshowSideBar, active }) => {
       } else {
         setReportAllSelected({});
       }
-      const defaultConnectivity = 'Column Flange-Beam-Web';
+      const defaultConnectivity = CONN_CFBW;
       const selectedOption = (detail?.inputs_json && detail.inputs_json.connectivity) || defaultConnectivity;
       setReportExtraState({ selectedOption });
       setReportModalOpen(true);

@@ -130,7 +130,7 @@ The `mergedOptions` value is what `useModuleData` returns to the component. The 
 ## 6.3 Interdependent Fields & Conditional Logic
 
 Form input components can depend on other field values. For example, in a Fin Plate Shear Connection:
-* If **Connectivity** is set to `Column Flange-Beam-Web`, the form must display selectors for **Column Section** and **Beam Section**.
+* If **Connectivity** is set to `Column Flange-Beam Web` (`CONN_CFBW`), the form must display selectors for **Column Section** and **Beam Section**.
 * If **Connectivity** is set to `Beam-Beam`, the form must hide the Column Section and display **Primary Beam** and **Secondary Beam** selectors.
 
 Osdag-Web implements this declaratively within the module's input config file (e.g., `finPlateConfig.js`) using the `conditionalDisplay` selector callback:
@@ -142,7 +142,7 @@ Osdag-Web implements this declaratively within the module's input config file (e
   options: "columnList",
   conditionalDisplay: (extraState) => {
     const connectivity = extraState?.selectedOption;
-    return connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web";
+    return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
   }
 }
 ```

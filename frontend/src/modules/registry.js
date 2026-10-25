@@ -134,19 +134,8 @@ export const MODULES = [
       import("./shearConnection/finPlate/configs/finPlateConfig"), "finPlateConfig",
       import("./shearConnection/finPlate/configs/finPlateOutputConfig"), "finPlateOutputConfig",
     ),
-    // Connectivity names the web form uses, and their .osi equivalents.
     designPref: {
       connectivityField: "Connectivity",
-      connectivityMap: {
-        "Column Flange-Beam-Web": "Column Flange-Beam Web",
-        "Column Web-Beam-Web": "Column Web-Beam Web",
-        "Beam-Beam": "Beam-Beam",
-      },
-      connectivityMapInverse: {
-        "Column Flange-Beam Web": "Column Flange-Beam-Web",
-        "Column Web-Beam Web": "Column Web-Beam-Web",
-        "Beam-Beam": "Beam-Beam",
-      },
       fields: {
         memberSupported: "Member.Supported_Section.Designation",
         memberSupporting: "Member.Supporting_Section.Designation",
