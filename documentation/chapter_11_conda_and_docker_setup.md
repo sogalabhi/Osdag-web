@@ -97,6 +97,8 @@ graph TD
     Celery --> Broker
 ```
 
+Compose reads variables from a root `.env` file, created by copying `.env.example`. `SECRET_KEY`, `DATABASE_PASSWORD`, `INFLUXDB_TOKEN`, `INFLUXDB_ADMIN_PASSWORD` and `GRAFANA_ADMIN_PASSWORD` have no defaults and Compose refuses to start without them; see the "Create the `.env` File" step of the [Linux installation guide](general/installation_docs_linux.md) for details.
+
 ### 1. Database & Cache Services
 * **`db`**: Runs PostgreSQL 14 on container port 5432, mapping to host port 5433 to avoid conflicts. Declares the volume `postgres_data_dev` to persist transactional tables.
 * **`redis`**: Instantiates a Redis 7 cache server to manage Celery task queues.
