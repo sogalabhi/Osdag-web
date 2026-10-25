@@ -1,0 +1,126 @@
+{
+  "baseplate_1.osi": {
+    "slug": "base_plate",
+    "error": "MissingKeyError: Please specify Load.Axial in input values."
+  },
+  "baseplate_2.osi": {
+    "slug": "base_plate",
+    "error": "MissingKeyError: Please specify Load.Axial in input values."
+  },
+  "baseplate_3.osi": {
+    "slug": "base_plate",
+    "error": "MissingKeyError: Please specify Load.Axial in input values."
+  },
+  "baseplate_4.osi": {
+    "slug": "base_plate",
+    "error": "MissingKeyError: Please specify Load.Axial in input values."
+  },
+  "baseplate_5.osi": {
+    "slug": "base_plate",
+    "error": "MissingKeyError: Please specify Load.Axial in input values."
+  },
+  "beam_bolted1.osi": {
+    "slug": "moment_connection__beam_beam_cover_plate_bolted",
+    "error": "MissingKeyError: Please specify Load.Shear in input values."
+  },
+  "beam_bolted2.osi": {
+    "slug": "moment_connection__beam_beam_cover_plate_bolted",
+    "error": "MissingKeyError: Please specify Load.Shear in input values."
+  },
+  "beam_bolted3.osi": {
+    "slug": "moment_connection__beam_beam_cover_plate_bolted",
+    "error": "MissingKeyError: Please specify Load.Shear in input values."
+  },
+  "beam_bolted4.osi": {
+    "slug": "moment_connection__beam_beam_cover_plate_bolted",
+    "error": "InvalidInputTypeError: Input Parameter Connector.Flange_Plate.Thickness_list should be of type List[str] where all items can be converted to int ."
+  },
+  "column_bolted1.osi": {
+    "slug": "moment_connection__column_column_cover_plate_bolted",
+    "error": "MissingKeyError: Please specify Load.Shear in input values."
+  },
+  "column_welded2.osi": {
+    "slug": "moment_connection__column_column_cover_plate_welded",
+    "error": "TypeError: Input validation failed: InvalidInputTypeError.__init__() missing 1 required positional argument: 'type'"
+  },
+  "column_welded4.osi": {
+    "slug": "moment_connection__column_column_cover_plate_welded",
+    "error": "TypeError: Input validation failed: InvalidInputTypeError.__init__() missing 1 required positional argument: 'type'"
+  },
+  "column_welded5.osi": {
+    "slug": "moment_connection__column_column_cover_plate_welded",
+    "error": "TypeError: Input validation failed: InvalidInputTypeError.__init__() missing 1 required positional argument: 'type'"
+  },
+  "ccep2.osi": {
+    "slug": "moment_connection__column_column_end_plate",
+    "error": "MissingKeyError: Please specify Load.Shear in input values."
+  },
+  "cleat_1.osi": {
+    "slug": "shear_connection__cleat_angle",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "cleat_2.osi": {
+    "slug": "shear_connection__cleat_angle",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "cleat_3.osi": {
+    "slug": "shear_connection__cleat_angle",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "cleat_4.osi": {
+    "slug": "shear_connection__cleat_angle",
+    "error": "MissingKeyError: Please specify Load.Shear in input values."
+  },
+  "fin1.osi": {
+    "slug": "shear_connection__fin_plate",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "fin2.osi": {
+    "slug": "shear_connection__fin_plate",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "fin3.osi": {
+    "slug": "shear_connection__fin_plate",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "EP-1.osi": {
+    "slug": "shear_connection__header_plate",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "EP-2.osi": {
+    "slug": "shear_connection__header_plate",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "EP-3.osi": {
+    "slug": "shear_connection__header_plate",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "EP-4.osi": {
+    "slug": "shear_connection__header_plate",
+    "error": "MissingKeyError: Please specify Member.Supported_Section.Designation in input values."
+  },
+  "EP-5.osi": {
+    "slug": "shear_connection__header_plate",
+    "error": "MissingKeyError: Please specify Member.Supported_Section.Designation in input values."
+  },
+  "SA-1.osi": {
+    "slug": "shear_connection__seated_angle",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "SA-2.osi": {
+    "slug": "shear_connection__seated_angle",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "SA-3.osi": {
+    "slug": "shear_connection__seated_angle",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "SA-4.osi": {
+    "slug": "shear_connection__seated_angle",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  },
+  "SA-5.osi": {
+    "slug": "shear_connection__seated_angle",
+    "error": "MissingKeyError: Please specify Connectivity in input values."
+  }
+}

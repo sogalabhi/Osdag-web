@@ -15,7 +15,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 ### 2. [Chapter 2: Backend Architecture & Configuration](./chapter_2_backend_architecture.md)
 * **2.1 Django Application Structure (`apps/core` vs `apps/modules`):** Core database models and settings vs individual design module logic.
 * **2.2 Celery & Redis Integration:** Configuration details (`CELERY_BROKER_URL`, queues: `calculations`, `cad`, `reports`, `celery`), concurrency tuning, task scheduling, and signal handling (`exec` wrappers).
-* **2.3 The Adapter Pattern for Osdag Desktop Modules:** How backend adapters bridge Django web requests to the underlying Osdag desktop computational engine.
+* **2.3 The Adapter Pattern for Osdag Desktop Modules:** How backend adapters bridge Django web requests to the underlying Osdag desktop computational engine, and the input fixtures that test every adapter's `validate_input()`.
 * **2.4 DB Schema & Models:** Detail `Project`, `Design`, `UserAccount`, and `OsiFile` fields and constraints.
 * **2.5 Asset Storage Lifecycle (CAD Models & Reports):** Filesystem storage structure of generated component geometries (BREP, STL) and PDF reports.
 
