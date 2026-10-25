@@ -112,6 +112,14 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **13.8 Telemetry Stack Deployment & Configuration:** Automatic provisioning of Grafana dashboards and InfluxDB datasources in Docker Compose.
 * **13.9 Time-Series Data Querying and Offline Exporting:** InfluxDB Flux querying syntax examples and exporting datasets to offline CSV spreadsheets.
 * **13.10 Advanced Scaling Strategies & HA Recommendations:** Separating message broker Redis from state channels Redis, Prometheus integrations, and load balancing Daphne.
+* **13.11 Production Monitoring Stack:** Prometheus, node-exporter, cAdvisor, Postgres/Redis/Celery exporters, Loki, Alloy, Alertmanager and Grafana in `docker-compose.monitoring.yml`, with memory limits and retention.
+* **13.12 Starting the Stack on the Server:** Environment variables, finding the app network, starting it, and reaching Grafana over an SSH tunnel.
+* **13.13 How the Backend Exposes Metrics:** django-prometheus with Gunicorn multiprocess mode, the internal-only `/metrics` endpoint, and Celery task events.
+* **13.14 Dashboards:** What the host/containers, Django, Celery and Postgres/Redis dashboards show, and querying logs in Loki.
+* **13.15 Alerts:** The alert rules, Telegram delivery through Alertmanager, and an email alternative.
+* **13.16 Right-Sizing the Celery Worker Pools:** Using the Celery dashboard to size the 18 calculation, 8 CAD and 4 report workers.
+* **13.17 Error Tracking (Sentry or GlitchTip):** Optional backend and frontend exception reporting enabled by a DSN.
+* **13.18 Troubleshooting the Production Stack:** Common failures of the monitoring stack and their fixes.
 
 ### Appendix: [Fixed & Resolved Issues Directory](./issues.md)
 * Tracking directory containing the statuses and fixes for architectural, storage, and security issues resolved in Chapters 1 to 3.

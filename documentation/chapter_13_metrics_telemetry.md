@@ -707,10 +707,163 @@ from(bucket: "osdag_metrics")
 When taking Osdag-Web to production, the monitoring topology should be scaled to handle persistent traffic:
 
 ### 1. Prometheus vs InfluxDB
-For cloud deployments, Osdag can be adapted to expose a Prometheus `/metrics` endpoint on the Django and Celery nodes. While InfluxDB (Push model) is ideal for discrete event tracking (like individual calculation jobs), Prometheus (Pull model) reduces database ingestion limits on the application node by scraping pre-aggregated counters.
+For cloud deployments, Osdag can be adapted to expose a Prometheus `/metrics` endpoint on the Django and Celery nodes. While InfluxDB (Push model) is ideal for discrete event tracking (like individual calculation jobs), Prometheus (Pull model) reduces database ingestion limits on the application node by scraping pre-aggregated counters. The production stack now does exactly this; see 13.11 to 13.18.
 
 ### 2. Redis HA Clustering
 In multi-node worker pools, Redis must be configured with replication (Sentinel) or clustered backends. To prevent ASGI broadcast traffic from blocking Celery tasks, split the system into two distinct Redis deployments:
 * **Broker Redis:** Dedicated exclusively to handling Celery job queues (`calculations`, `cad`, `reports`).
 * **State Redis:** Dedicated exclusively to Django Channels WebSocket group routing and server sessions cache.
 This separation ensures that high WebSocket event throughput does not block Celery calculations.
+
+
+---
+
+## 13.11 Production Monitoring Stack (Prometheus, Loki, Grafana)
+
+Sections 13.1 to 13.9 describe the **InfluxDB path**, which exists for load tests (`load_tests/`) and runs only in the dev compose file. Production uses a separate, pull-based stack defined in `docker-compose.monitoring.yml`. The two do not interfere: the backend still writes to InfluxDB when `INFLUXDB_TOKEN` is set, and the production stack never needs it.
+
+```
+ app network (<project>_default)                    monitoring network
+┌──────────────────────────────────┐   scrape    ┌───────────────────────────────────────┐
+│ backend :8000/metrics            │◄────────────│ Prometheus ──► Alertmanager ──► Telegram│
+│ db ◄── postgres-exporter         │◄────────────│     ▲                                  │
+│ redis ◄── redis-exporter         │◄────────────│     │ node-exporter (host)             │
+│ redis ◄── celery-exporter        │◄────────────│     │ cAdvisor (containers)            │
+└──────────────────────────────────┘             │                                        │
+   Docker socket (read-only) ───────────────────►│ Alloy ──► Loki                         │
+                                                 │ Grafana (127.0.0.1:3000) ◄─ Prom, Loki │
+                                                 └───────────────────────────────────────┘
+```
+
+| Service | Purpose | Memory limit |
+|---|---|---|
+| `prometheus` | Metrics storage and alert evaluation (15 days, 8 GB cap) | 1 GB |
+| `node-exporter` | Host CPU, RAM, disk, network | 64 MB |
+| `cadvisor` | Per-container CPU, RAM, I/O | 384 MB |
+| `postgres-exporter` | Connections, transactions, cache hit ratio | 64 MB |
+| `redis-exporter` | Memory, clients, ops/s | 64 MB |
+| `celery-exporter` | Queue length, task runtime, queue wait, failures per queue | 192 MB |
+| `loki` | Log storage (15 days) | 512 MB |
+| `alloy` | Ships every container's logs to Loki | 256 MB |
+| `alertmanager` | Routes alerts to Telegram | 64 MB |
+| `grafana` | Dashboards | 384 MB |
+
+The limits add up to about 3 GB at most. A fresh, idle stack measured about 1 GB in total (Prometheus and Loki grow with data). The limits exist so that a runaway monitoring container is OOM-killed on its own instead of taking memory from the Celery workers.
+
+---
+
+## 13.12 Starting the Stack on the Server
+
+1. **Set environment variables** in the same `.env` that `docker-compose.prod.yml` already uses (`DATABASE_*` are reused). See `monitoring/.env.example`:
+   * `GRAFANA_ADMIN_PASSWORD` (required).
+   * `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` (alerts are not delivered until both are set).
+   * `APP_NETWORK` if the app network is not `osdag-web_default`.
+2. **Find the app network name.** Compose names it `<project>_default`, where the project is the directory holding `docker-compose.prod.yml`:
+   ```bash
+   docker network ls | grep default
+   ```
+   The app must be running first, because the monitoring stack joins that existing (external) network.
+3. **Start it** (independent of app redeploys; run from the same directory as `.env`):
+   ```bash
+   docker compose -f docker-compose.monitoring.yml up -d
+   docker compose -f docker-compose.monitoring.yml ps
+   ```
+4. **Open Grafana.** Nothing is published publicly; Grafana is bound to `127.0.0.1:3000` on the server. From your machine:
+   ```bash
+   ssh -L 3000:127.0.0.1:3000 user@server     # then browse http://localhost:3000
+   ```
+   Log in as `admin` with `GRAFANA_ADMIN_PASSWORD`. Prometheus, Alertmanager and Loki have no authentication and are reachable only from inside Docker. To look at them, tunnel through a container or temporarily use `docker exec`.
+5. **Check the targets.** In Grafana, Explore, query `up`: every job should be `1`. Prometheus is not published; use `docker compose -f docker-compose.monitoring.yml exec prometheus wget -qO- http://localhost:9090/api/v1/targets`.
+
+Updating configuration: edit the files under `monitoring/` and restart the affected service (`docker compose -f docker-compose.monitoring.yml restart prometheus`). Dashboards under `monitoring/grafana/dashboards/` reload within 10 seconds.
+
+Wiring the application side (needs an image rebuild and a redeploy of the app):
+* `django-prometheus`, the Celery task events and `gunicorn.conf.py` are part of the backend image.
+* `docker-compose.prod.yml` lists backend environment variables explicitly, so to enable Sentry add `SENTRY_DSN` (and optionally `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE`) to the `backend` and `celery_worker_*` services.
+* Prometheus scrapes `backend:8000`. If your backend service has another name, edit `monitoring/prometheus/prometheus.yml`.
+
+---
+
+## 13.13 How the Backend Exposes Metrics
+
+* **django-prometheus** adds `PrometheusBeforeMiddleware` and `PrometheusAfterMiddleware` (`backend/config/settings.py`) and records request counts, latency histograms and response codes per Django view name.
+* **Multiple Gunicorn workers.** With four workers each process would keep its own counters, and a scrape would randomly hit one. `gunicorn.conf.py` (found automatically in the working directory `/app`) sets `PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_multiproc`, wipes it on startup, and calls `mark_process_dead` when a worker exits. `/metrics` then aggregates the files of all workers. Using one port per worker would have forced Prometheus to know the worker count and ports, so multiprocess mode was chosen.
+* **`/metrics` is internal only.** nginx does not proxy it (it returns 404), cloudflared only reaches nginx, and the Django view (`apps/core/metrics_view.py`) also returns 404 for any request that carries `X-Forwarded-For` or `CF-Connecting-IP`, which every public request has.
+* **Celery.** `CELERY_WORKER_SEND_TASK_EVENTS` and `CELERY_TASK_SEND_SENT_EVENT` are enabled so celery-exporter can see task events and measure queue wait time. The exporter reads queue lengths directly from Redis.
+* **Postgres and Redis** are read by their own exporters, using the same credentials as the app.
+
+---
+
+## 13.14 Dashboards
+
+All are provisioned from `monitoring/grafana/dashboards/` and open with the Prometheus datasource.
+
+| Dashboard | What it shows |
+|---|---|
+| **Osdag: Host and containers** | Host CPU, memory, swap, disk usage per mount point, disk I/O; per-container CPU, memory working set, memory versus limit, disk I/O, network, OOM kills. Writable-layer disk usage needs the overlay2 storage driver. |
+| **Osdag: Django requests** | Backend up, request rate, 4xx and 5xx ratios, latency p50/p95/p99, and per-view request rate, latency and errors (filter by the `view` variable). Tables rank the views with the most 5xx and the highest mean latency. A Loki panel lists backend and worker error log lines. |
+| **Osdag: Celery** | Workers up, queue length per queue, tasks running per worker, runtime p50/p95 per queue, queue wait p95, tasks per minute by outcome, failure ratio, and the worker-sizing panels of 13.16. |
+| **Osdag: Postgres and Redis** | Postgres up, connections by state against `max_connections`, cache hit ratio, transactions, row throughput, deadlocks, database size; Redis up, clients, memory, ops/s, hit ratio, evictions, network. |
+
+Logs: in Grafana, Explore, choose Loki, and query by compose service, for example `{service="celery_worker_cad"} |= "Traceback"` or `{service="backend"} |~ "(?i)error"`. Labels are `service`, `project` and `container`. Logs are kept for 15 days.
+
+---
+
+## 13.15 Alerts
+
+Rules live in `monitoring/prometheus/rules/osdag.yml`; thresholds are starting points to tune after a week of real data.
+
+| Alert | Fires when |
+|---|---|
+| `SiteDown` | Backend scrape fails for 2 minutes (no blackbox probe is used) |
+| `TargetDown` | Any scrape target is down for 3 minutes |
+| `PostgresDown`, `RedisDown` | The exporter cannot reach the database or Redis for 1 minute |
+| `DiskAlmostFull` | A filesystem is more than 85% full for 10 minutes |
+| `HostMemoryHigh` | Host memory use is above 90% for 10 minutes |
+| `ContainerOOMKilled` | A container had an OOM kill in the last 5 minutes |
+| `CeleryQueueBacklog` | A queue holds more than 20 tasks for 10 minutes |
+| `CeleryTaskFailureSpike` | More than 5 task failures and more than 25% of tasks failed in 10 minutes on a queue |
+| `CeleryNoWorkers` | No worker heartbeat for 5 minutes |
+| `Http5xxRateHigh` | More than 5% of responses are 5xx for 10 minutes (ignored under about 3 requests per minute) |
+
+**Delivery.** Alertmanager cannot read environment variables, so `monitoring/alertmanager/entrypoint.sh` renders `alertmanager.yml.tmpl` at start. With `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` set, alerts go to Telegram. Without them the route uses a `blackhole` receiver so the stack still starts, and alerts are visible only in Alertmanager. To get the chat id, create a bot with @BotFather, message it, and open `https://api.telegram.org/bot<TOKEN>/getUpdates`. For email, uncomment the SMTP example at the bottom of the template, add an `email` receiver, point the route at it, and pass the password through a file as the Telegram token is. If the site is down, the `django` `TargetDown` alert is inhibited so you get one message instead of two.
+
+Check configuration changes with the tools from the pinned images:
+```bash
+docker run --rm -v "$PWD/monitoring/prometheus:/etc/prometheus:ro" --entrypoint promtool prom/prometheus:v3.15.1 check config /etc/prometheus/prometheus.yml
+```
+
+---
+
+## 13.16 Right-Sizing the Celery Worker Pools
+
+Production starts 34 heavy Python processes: 4 Gunicorn workers, 18 `calculations`, 8 `cad` and 4 `reports` workers. At roughly 290 MB each that is about 10 GB of RAM for workers alone, and 18 calculation workers is probably more than the load needs. Use the **Osdag: Celery** dashboard to size each pool from data. Do not shrink anything before you have at least a week of traffic including a busy day.
+
+1. **Find the real demand.** The row "Worker sizing" shows *Average busy workers per queue*, computed as task-seconds of work per second (`rate(celery_task_runtime_sum)`, Little's law). *Peak busy workers per queue (1h window)* is the same value at its busiest. Compare the peak with the pool size (18, 8, 4).
+2. **Check whether users wait.** *Queue wait p95 per queue* and *Queue length* show how long tasks sit before a worker takes them. If wait stays near zero while the peak busy value is far below the pool size, the pool is oversized.
+3. **Pick a size.** A reasonable rule is `ceil(peak busy x 1.25)` as long as p95 queue wait stays within what users tolerate (for example under 2 seconds). If the peak for `calculations` is 3, start with 4 to 6.
+4. **Do not exceed the CPU.** Calculations are CPU bound, so more workers than host cores add memory use but not speed. The host CPU panel and the container CPU panel show how many cores are really used.
+5. **Change one pool at a time**, edit `--concurrency` for that service in `docker-compose.prod.yml`, redeploy, and watch queue wait and the failure ratio for a few days. Each removed process frees about 290 MB; the memory panels and `HostMemoryHigh` confirm it.
+6. **Keep headroom for CAD.** The CAD pool uses `--max-tasks-per-child 10`, so its processes restart regularly; do not read a short memory dip as spare capacity. A task running longer than the scrape window only shows up in the runtime metrics after it finishes.
+
+Re-check after any release that changes calculation cost, and when traffic grows. The `CeleryQueueBacklog` alert is the safety net if a pool becomes too small.
+
+---
+
+## 13.17 Error Tracking (Sentry or GlitchTip)
+
+Both the backend and the frontend can report exceptions with stack traces to sentry.io or to a self-hosted GlitchTip, which speaks the same protocol. Nothing is sent unless a DSN is set.
+
+* **Backend and Celery:** set `SENTRY_DSN` in the container environment (see 13.12). `sentry-sdk[django,celery]` is initialised in `backend/config/settings.py`, which web and Celery processes both import. Optional: `SENTRY_ENVIRONMENT` (default `production`), `SENTRY_RELEASE`, `SENTRY_TRACES_SAMPLE_RATE` (default `0`, performance tracing off). Personal data is not attached (`send_default_pii=False`).
+* **Frontend:** `@sentry/react` is initialised in `frontend/src/main.jsx` and the root error boundary reports render errors. Vite bakes the value in at build time, so pass `VITE_SENTRY_DSN` as a Docker build argument when building the production frontend image (`frontend/Dockerfile.prod` accepts `VITE_SENTRY_DSN`, `VITE_SENTRY_ENVIRONMENT` and `VITE_SENTRY_RELEASE`). A DSN in a browser bundle is public by design; use a project that only accepts events.
+
+---
+
+## 13.18 Troubleshooting the Production Stack
+
+* **`network ... declared as external, but could not be found`:** the app is not running, or `APP_NETWORK` is wrong. Run `docker network ls`.
+* **A scrape target is down:** `up` in Grafana Explore shows which job. For `django`, confirm the backend image was rebuilt with `django-prometheus` and that the service is called `backend`.
+* **`pg_up` is 0:** the database name or credentials in `.env` differ from the running database. `postgres-exporter` uses `DATABASE_NAME`, `DATABASE_USER` and `DATABASE_PASSWORD`.
+* **Celery panels are empty:** the workers must have been restarted after the image with `CELERY_WORKER_SEND_TASK_EVENTS` was deployed. Series appear only after the first task event, and the queue wait histogram needs the publisher (the backend) to send `task-sent` events.
+* **Container disk usage panel is empty:** cAdvisor only reports a container's writable layer on the overlay2 storage driver.
+* **Alerts do not arrive:** Alertmanager logs a warning at start when Telegram is not configured. Check `docker compose -f docker-compose.monitoring.yml logs alertmanager`.
