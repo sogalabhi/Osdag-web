@@ -1,4 +1,4 @@
-import { MODULE_KEY_END_PLATE, MODULE_DISPLAY_END_PLATE } from "../../../../constants/DesignKeys";
+import { MODULE_KEY_END_PLATE, MODULE_DISPLAY_END_PLATE } from "../../../../constants/modules";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 export const endPlateConfig = {

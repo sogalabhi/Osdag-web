@@ -232,6 +232,22 @@ Each engineering module defines its interface declaratively:
 * **`modals` & `modalTypes`:** Configures output sub-modals (spacing calculations, yielding capacities) and their visual layout classes.
 * **`modalData`:** Declares lists of properties to display within each capacity detail sub-modal.
 
+### 3. Key Constants (`generated/coreKeys.js` and `UIStrings.js`)
+The frontend takes key strings from exactly two files under `frontend/src/constants/`:
+
+* **[generated/coreKeys.js](../frontend/src/constants/generated/coreKeys.js):** One `export const NAME = "value";` for every string constant named `KEY_*` or `DISP_*` in `osdag_core/Common.py`, sorted by name. Configs import from here instead of typing a key such as `"Bolt.Diameter"` by hand. The values are exactly the core's, including the trailing `*` that many core display labels carry; `stripRequiredMark()` in `validation.js` removes it and the renderer adds the required marker from `field.required`. Never change a key's string: it is sent to the backend and stored in `.osi` files and saved projects.
+* **[UIStrings.js](../frontend/src/constants/UIStrings.js):** Labels that exist only in the UI (section titles, buttons, reworded field labels). A UI label that should differ from the core's display string is added here under its own name rather than redefining a core constant.
+
+Module IDs (`MODULE_KEY_*`) are frontend identifiers with no counterpart in `Common.py`; they live in [modules.js](../frontend/src/constants/modules.js) next to the module menu.
+
+**Do not edit `coreKeys.js` by hand.** After `Common.py` changes, regenerate it from the repository root:
+
+```bash
+python scripts/gen_core_keys.py
+```
+
+The script imports `osdag_core.Common`, so run it in the backend environment (set `QT_QPA_PLATFORM=offscreen` on a machine without a display; the script does this by default). The `backend-qa` CI job runs the generator and then `git diff --exit-code frontend/src/constants/generated/`, so a stale file fails the build.
+
 ---
 
 ## 6.8 Shared Display Configurations (`sectionDisplayConfig.js` & `outputImageMap.js`)

@@ -32,7 +32,7 @@ import {
   MODULE_KEY_PURLIN,
   MODULE_KEY_ON_CANTILEVER_BEAM,
   MODULE_KEY_PLATE_GIRDER,
-} from "./DesignKeys";
+} from "./modules";
 
 // Centralized API route mappings for engineering modules.
 export const MODULE_SLUGS = {

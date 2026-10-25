@@ -6,7 +6,7 @@ import {
     KEY_DISP_PLATE2_THICKNESS, KEY_D, KEY_TYP, KEY_GRD, KEY_DP_BOLT_HOLE_TYPE,
     KEY_DP_BOLT_TYPE, KEY_DESIGN_FOR, KEY_DISP_WELD_SIZE,
     KEY_DP_WELD_TYPE, KEY_DP_WELD_MATERIAL_G_O,
-} from "../../../constants/DesignKeys";
+} from "../../../constants/generated/coreKeys";
 import { validateSimpleConnectionInputs } from "./validation";
 import { validateRequiredFields } from "../../shared/utils/validation";
 

@@ -43,7 +43,7 @@ import {
   MODULE_KEY_LAP_JOINT_BOLTED,
   MODULE_KEY_BUTT_JOINT_WELDED,
   MODULE_KEY_BUTT_JOINT_BOLTED,
-} from '../../constants/DesignKeys';
+} from '../../constants/modules';
 import dayButton from '../../assets/homepage/day_button.svg';
 import infoDefault from '../../assets/homepage/info_default.svg';
 import infoHover from '../../assets/homepage/info_hover.svg';

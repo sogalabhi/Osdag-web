@@ -35,7 +35,7 @@ import {
   MODULE_KEY_LAP_JOINT_BOLTED,
   MODULE_KEY_BUTT_JOINT_WELDED,
   MODULE_KEY_BUTT_JOINT_BOLTED,
-} from '../../constants/DesignKeys';
+} from '../../constants/modules';
 import { getProjectById } from "../../datasources/projectsDataSource";
 import ProjectActionButtons from './ProjectActionButtons';
 import { normalizeModuleKey } from '../../constants/modules';

@@ -6,7 +6,7 @@ import {
   MODULE_KEY_END_PLATE,
   MODULE_KEY_BEAM_BEAM_END_PLATE,
   MODULE_KEY_BEAM_COLUMN_END_PLATE,
-} from "../../../constants/DesignKeys";
+} from "../../../constants/modules";
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { loadStateFromOsi } from "../utils/osiLoader";
 

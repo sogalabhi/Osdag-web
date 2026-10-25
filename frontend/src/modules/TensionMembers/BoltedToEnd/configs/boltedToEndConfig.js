@@ -9,7 +9,7 @@ import {
   KEY_DP_BOLT_SLIP_FACTOR, KEY_CONNECTOR_MATERIAL, KEY_DP_DETAILING_EDGE_TYPE,
   KEY_DP_DETAILING_GAP, KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
   KEY_DP_DESIGN_METHOD, KEY_PLATETHK, KEY_SEC_MATERIAL, KEY_DP_BOLT_TYPE
-} from "../../../../constants/DesignKeys";
+} from "../../../../constants/generated/coreKeys";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 export const boltedToEndConfig = {

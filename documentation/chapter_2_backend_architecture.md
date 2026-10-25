@@ -86,6 +86,8 @@ A typical `adapter.py` implements the following key interfaces:
 ### 1. `get_required_keys() -> List[str]`
 Defines the required inputs schema. This is used by validation utilities to check incoming payloads.
 
+Every key it returns should be a value of a string constant in `osdag_core/Common.py`; `backend/apps/core/tests/test_required_keys_in_core.py` checks this for all adapters. The few keys that are web request names mapped to core keys inside the adapter (the strut `Member.End_1`/`Member.End_2` and several plate girder inputs) are listed as explicit exceptions in that test. The frontend gets its copy of the core keys from `frontend/src/constants/generated/coreKeys.js`, generated from `Common.py` (see [Chapter 6, section 6.7](./chapter_6_dynamic_ui_form_engine.md)).
+
 ### 2. `validate_input(input_values: Dict[str, Any]) -> None`
 Checks the existence and types of incoming values, raising `MissingKeyError` or `InvalidInputTypeError` on mismatch.
 

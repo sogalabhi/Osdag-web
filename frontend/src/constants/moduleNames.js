@@ -13,7 +13,7 @@ import {
   MODULE_DISPLAY_FIN_PLATE,
   MODULE_DISPLAY_CLEAT_ANGLE,
   MODULE_DISPLAY_SEAT_ANGLE,
-} from "./DesignKeys";
+} from "./modules";
 
 // Centralized display names keyed by stable module keys.
 const DISPLAY_BY_KEY = {

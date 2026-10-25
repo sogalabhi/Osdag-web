@@ -49,6 +49,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **6.5 The Input Dock Form Engine vs. Output Dock Display:** Handling read-only output parameters, failure checks, and styling rules.
 * **6.6 `EngineeringModule` Orchestration Controller:** The core shared frontend shell component managing module rendering, docks, validation states, API submission loops, and 3D CAD canvas integration.
 * **6.7 Module Input & Output Configurations (`*Config.js`, `*OutputConfig.js`):** Declarative schemas defining field metadata, units, validation criteria, and grouped structures for each connection type.
+* **6.7.3 Key Constants (`generated/coreKeys.js` and `UIStrings.js`):** Where frontend key strings come from, how to regenerate them from `Common.py`, and the CI check that fails on a stale file.
 * **6.8 Shared Display Configurations (`sectionDisplayConfig.js` & `outputImageMap.js`):** Mapping specific structural section details and linking calculated dimensions to dynamic visual schematic overlays.
 
 ### 7. [Chapter 7: Additional Inputs & Design Preferences](./chapter_7_additional_inputs_design_preferences.md)

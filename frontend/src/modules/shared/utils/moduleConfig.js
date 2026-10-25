@@ -1,4 +1,4 @@
-import { MODULE_KEY_FIN_PLATE } from '../../../constants/DesignKeys';
+import { MODULE_KEY_FIN_PLATE } from '../../../constants/modules';
 
 // Centralized module-specific configurations previously in UnifiedDropdownMenu.
 export const MODULE_CONFIGS = {

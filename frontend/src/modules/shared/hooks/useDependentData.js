@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { MODULE_KEY_FIN_PLATE, MODULE_KEY_CLEAT_ANGLE } from "../../../constants/DesignKeys";
+import { MODULE_KEY_FIN_PLATE, MODULE_KEY_CLEAT_ANGLE } from "../../../constants/modules";
 
 /**
  * Handles side-effect data fetches that depend on form inputs.

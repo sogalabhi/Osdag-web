@@ -1,4 +1,4 @@
-import { MODULE_KEY_BEAM_COLUMN_END_PLATE, MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT } from "../../../constants/DesignKeys";
+import { MODULE_KEY_BEAM_COLUMN_END_PLATE, MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT } from "../../../constants/modules";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
 export const beamToColumnEndPlateConfig = {

@@ -8,7 +8,7 @@ import {
   KEY_SEC_MATERIAL,
   KEY_TORSIONAL_RES,
   KEY_WARPING_RES,
-} from "../../../../constants/DesignKeys";
+} from "../../../../constants/generated/coreKeys";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 export const purlinConfig = {

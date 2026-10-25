@@ -1,7 +1,7 @@
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 import { openOsiFile } from "../../../datasources/osiDataSource";
 import { loadStateFromOsi } from "../utils/osiLoader";
-import { MODULE_KEY_SEAT_ANGLE } from "../../../constants/DesignKeys";
+import { MODULE_KEY_SEAT_ANGLE } from "../../../constants/modules";
 import { message } from "antd";
 
 export const useOsiFileHandlers = ({ form, moduleData, actions }, moduleConfig) => {

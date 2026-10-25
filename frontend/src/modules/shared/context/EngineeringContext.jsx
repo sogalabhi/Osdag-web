@@ -10,7 +10,7 @@ import { useEngineeringModule } from "../hooks/useEngineeringModule";
 import {
   MODULE_KEY_FIN_PLATE,
   MODULE_KEY_SEAT_ANGLE,
-} from "../../../constants/DesignKeys";
+} from "../../../constants/modules";
 import { DESIGN_STATUS } from "../hooks/useDesignSubmission";
 import { useViewCamera } from "../components/cad";
 import { message } from "antd";
