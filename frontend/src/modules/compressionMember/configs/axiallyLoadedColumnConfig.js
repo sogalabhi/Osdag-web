@@ -1,4 +1,4 @@
-import { MODULE_KEY_AXIALLY_LOADED_COLUMN } from "../../../constants/DesignKeys";
+import { MODULE_KEY_AXIALLY_LOADED_COLUMN } from "../../../constants/modules";
 import img_1_RRFF from "../../../assets/CompressionMember/1.RRFF.PNG";
 import img_1_RRFF_rotated from "../../../assets/CompressionMember/1.RRFF_rotated.PNG";
 import img_2_FRFR from "../../../assets/CompressionMember/2.FRFR.PNG";

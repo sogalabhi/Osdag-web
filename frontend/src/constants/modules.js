@@ -1,36 +1,60 @@
-import {
-    MODULE_KEY_FIN_PLATE,
-    MODULE_KEY_CLEAT_ANGLE,
-    MODULE_KEY_END_PLATE,
-    MODULE_KEY_SEAT_ANGLE,
-    MODULE_KEY_COVER_PLATE_BOLTED,
-    MODULE_KEY_COVER_PLATE_WELDED,
-    MODULE_KEY_BEAM_BEAM_END_PLATE,
-    MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
-    MODULE_KEY_BEAM_COLUMN_END_PLATE,
-    MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
-    MODULE_KEY_CC_COVER_PLATE_BOLTED,
-    MODULE_KEY_CC_COVER_PLATE_WELDED,
-    MODULE_KEY_CC_END_PLATE,
-    MODULE_KEY_BUTT_JOINT_WELDED,
-    MODULE_KEY_BUTT_JOINT_BOLTED,
-    MODULE_KEY_LAP_JOINT_WELDED,
-    MODULE_KEY_LAP_JOINT_BOLTED,
-    MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
-    MODULE_KEY_BOLTED_TO_END_GUSSET,
-    MODULE_KEY_WELDED_TO_END_GUSSET,
-    MODULE_KEY_TENSION_BOLTED,
-    MODULE_KEY_TENSION_WELDED,
-    MODULE_KEY_STRUTS_BOLTED,
-    MODULE_KEY_AXIALLY_LOADED_COLUMN,
-    MODULE_KEY_STRUTS_WELDED,
-    MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED,
-    MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED,
-    MODULE_KEY_PURLIN,
-    MODULE_KEY_PLATE_GIRDER,
-    MODULE_KEY_BASE_PLATE,
-} from "./DesignKeys";
+// Module IDs (sent to the backend and used in routes) and the module menu.
+// Module IDs are frontend-only; they are not defined in osdag_core/Common.py.
+
 import { UI_STRINGS } from "./UIStrings";
+
+// Shear connections
+export const MODULE_KEY_FIN_PLATE = 'FinPlateConnection';
+export const MODULE_DISPLAY_FIN_PLATE = 'FinPlateConnection';
+export const MODULE_KEY_SEAT_ANGLE = 'SeatedAngleConnection';
+export const MODULE_DISPLAY_SEAT_ANGLE = 'SeatedAngleConnection';
+export const MODULE_KEY_CLEAT_ANGLE = 'CleatAngleConnection';
+export const MODULE_DISPLAY_CLEAT_ANGLE = 'CleatAngleConnection';
+export const MODULE_KEY_END_PLATE = 'HeaderPlateConnection';
+export const MODULE_DISPLAY_END_PLATE = 'HeaderPlateConnection';
+
+// End plate moment connections
+export const MODULE_KEY_BEAM_COLUMN_END_PLATE = 'BeamToColumnEndPlate';
+export const MODULE_KEY_BEAM_BEAM_END_PLATE = 'BeamBeamEndPlate';
+
+// Cover plate moment connections
+export const MODULE_KEY_COVER_PLATE_BOLTED = 'CoverPlateBolted';
+export const MODULE_KEY_COVER_PLATE_WELDED = 'CoverPlateWelded';
+export const MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED = 'Beam-to-Beam-Cover-Plate-Bolted-Connection';
+export const MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED = 'Beam-to-Beam-Cover-Plate-Welded-Connection';
+export const MODULE_KEY_COVER_PLATE_BOLTED_ALT = 'Cover-Plate-Bolted-Connection';
+export const MODULE_KEY_COVER_PLATE_WELDED_ALT = 'Cover-Plate-Welded-Connection';
+export const MODULE_KEY_BEAM_BEAM_END_PLATE_ALT = 'Beam-Beam-End-Plate-Connection';
+export const MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT = 'Beam-to-Column-End-Plate-Connection';
+export const MODULE_KEY_CC_COVER_PLATE_BOLTED = 'Column-to-Column-Cover-Plate-Bolted-Connection';
+export const MODULE_KEY_CC_COVER_PLATE_WELDED = 'Column-to-Column-Cover-Plate-Welded-Connection';
+export const MODULE_KEY_CC_END_PLATE = 'Column-to-Column-End-Plate-Connection';
+
+// Base plate
+export const MODULE_KEY_BASE_PLATE = 'BasePlateConnection';
+
+// Simple connections
+export const MODULE_KEY_BUTT_JOINT_BOLTED = 'ButtJointBolted';
+export const MODULE_KEY_BUTT_JOINT_WELDED = 'ButtJointWelded';
+export const MODULE_KEY_LAP_JOINT_BOLTED = 'LapJointBolted';
+export const MODULE_KEY_LAP_JOINT_WELDED = 'LapJointWelded';
+
+// Tension members
+export const MODULE_KEY_TENSION_BOLTED = 'Tension-Member-Bolted-Design';
+export const MODULE_KEY_TENSION_WELDED = 'Tension-Member-Welded-Design';
+export const MODULE_KEY_BOLTED_TO_END_GUSSET = 'BoltedToEndGusset';
+export const MODULE_KEY_WELDED_TO_END_GUSSET = 'WeldedToEndGusset';
+
+// Flexural members
+export const MODULE_KEY_SIMPLY_SUPPORTED_BEAM = 'Simply-Supported-Beam';
+export const MODULE_KEY_PURLIN = 'Purlin';
+export const MODULE_KEY_ON_CANTILEVER_BEAM = 'On-Cantilever-Beam';
+export const MODULE_KEY_PLATE_GIRDER = 'Plate-Girder';
+
+// Compression members
+export const MODULE_KEY_STRUTS_BOLTED = 'Struts-Bolted-Design';
+export const MODULE_KEY_STRUTS_WELDED = 'Struts-Welded-Design';
+export const MODULE_KEY_AXIALLY_LOADED_COLUMN = 'AxiallyLoadedColumn';
 
 export const MODULE_SUBMODULES = {
     Connections: [

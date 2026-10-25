@@ -1,4 +1,4 @@
-import { MODULE_KEY_FIN_PLATE } from '../../../constants/DesignKeys';
+import { MODULE_KEY_FIN_PLATE } from '../../../constants/modules';
 import { INPUT_KEY_TO_LIST } from '../constants/moduleDataKeys';
 import { getModuleConfig, getFinPlateMemberData } from './moduleConfig';
 

@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useEngineeringService } from "../hooks/useEngineeringService";
-import { MODULE_KEY_FIN_PLATE } from '../../../constants/DesignKeys';
+import { MODULE_KEY_FIN_PLATE } from '../../../constants/modules';
 import { message } from 'antd';
 import { apiBase } from "../../../api"; // eslint-disable-line no-unused-vars
 import { openOsiFile } from "../../../datasources/osiDataSource";

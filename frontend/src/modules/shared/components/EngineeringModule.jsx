@@ -30,7 +30,7 @@ import { loadStateFromOsi } from "../utils/osiLoader";
 import { getModuleConfig as getDesignPrefModuleConfig } from "../utils/moduleConfig";
 import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
 import { downloadCachedModelByFormat, downloadExportCadResponse, downloadCadSectionsAsStl } from "../utils/cadExport";
-import { MODULE_KEY_SEAT_ANGLE, MODULE_KEY_FIN_PLATE, MODULE_KEY_CLEAT_ANGLE, MODULE_KEY_END_PLATE, MODULE_KEY_BEAM_COLUMN_END_PLATE } from "../../../constants/DesignKeys";
+import { MODULE_KEY_SEAT_ANGLE, MODULE_KEY_FIN_PLATE, MODULE_KEY_CLEAT_ANGLE, MODULE_KEY_END_PLATE, MODULE_KEY_BEAM_COLUMN_END_PLATE } from "../../../constants/modules";
 import { deleteAllCustomSections } from "../../../datasources/sectionsDataSource";
 import { openOsiFile } from "../../../datasources/osiDataSource";
 import { useViewCamera } from "./cad";

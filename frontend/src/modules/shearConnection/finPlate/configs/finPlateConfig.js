@@ -1,5 +1,5 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
-import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../../../../constants/DesignKeys';
+import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../../../../constants/modules';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 export const finPlateConfig = {

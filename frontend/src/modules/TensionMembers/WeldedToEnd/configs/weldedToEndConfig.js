@@ -9,7 +9,7 @@ import {
     KEY_DP_DETAILING_GAP, KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
     KEY_DP_DESIGN_METHOD, KEY_PLATETHK, KEY_SEC_MATERIAL,
     KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O
-} from "../../../../constants/DesignKeys";
+} from "../../../../constants/generated/coreKeys";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 export const weldedToEndConfig = {
