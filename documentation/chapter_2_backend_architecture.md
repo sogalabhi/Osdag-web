@@ -89,6 +89,8 @@ Defines the required inputs schema. This is used by validation utilities to chec
 ### 2. `validate_input(input_values: Dict[str, Any]) -> None`
 Checks the existence and types of incoming values, raising `MissingKeyError` or `InvalidInputTypeError` on mismatch.
 
+**Input fixtures.** Every adapter has known-good request bodies in `backend/apps/core/tests/fixtures/design_inputs/<module>/`, generated from each frontend config's real `buildSubmissionParams` and from desktop `.osi` examples. `apps/core/tests/test_design_input_fixtures.py` checks that `validate_input()` accepts all of them (no database needed), so a change to validation or to a frontend config that alters what is accepted shows up as a test failure. Regenerate the fixtures after changing a config's `buildSubmissionParams` or `defaultInputs`, and add a fixture when adding a module; see the [fixtures README](../backend/apps/core/tests/fixtures/design_inputs/README.md) for the format and the generator.
+
 ### 3. `create_from_input(input_values: Dict[str, Any]) -> SolverInstance`
 Creates the native computational solver class (e.g., `FinPlateConnection`), links loggers, and populates properties.
 
