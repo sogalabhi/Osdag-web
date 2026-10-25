@@ -123,6 +123,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
+# Don't record the polled health endpoint as a profiled request on every probe
+SILKY_IGNORE_PATHS = ['/api/health/']
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

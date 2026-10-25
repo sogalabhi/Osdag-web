@@ -1,3 +1,16 @@
+# Images are selected by IMAGE_TAG (the commit SHA, set by the deploy workflow);
+# it falls back to :latest only for ad-hoc manual runs on the server.
+
+# `inspect ping` against this worker's own node name proves the worker is
+# connected to the broker and responding, not just that the process is alive.
+# Loading the Django/Celery app takes a few seconds, hence the generous timing.
+x-celery-healthcheck: &celery-healthcheck
+  test: ["CMD-SHELL", "/opt/conda/envs/osdag_env/bin/celery --workdir=/app -A config inspect ping -t 10 -d celery@$$HOSTNAME"]
+  interval: 30s
+  timeout: 30s
+  retries: 3
+  start_period: 90s
+
 services:
   db:
     image: postgres:14-alpine
@@ -26,7 +39,7 @@ services:
       retries: 5
 
   backend:
-    image: ghcr.io/sogalabhi/osdag-web/backend:latest
+    image: ghcr.io/sogalabhi/osdag-web/backend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       PYTHONPATH: /app:/app/backend
@@ -52,9 +65,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    # Migrations are NOT run here: the deploy workflow runs `migrate` once
+    # (docker compose run --rm backend ...) before containers are replaced.
     command: >
-      bash -c "/opt/conda/envs/osdag_env/bin/python manage.py migrate &&
-      /opt/conda/envs/osdag_env/bin/python manage.py collectstatic --noinput &&
+      bash -c "/opt/conda/envs/osdag_env/bin/python manage.py collectstatic --noinput &&
       exec /opt/conda/envs/osdag_env/bin/gunicorn config.asgi:application 
       --bind 0.0.0.0:8000 
       --workers 4 
@@ -62,9 +76,18 @@ services:
       --timeout 60"
     expose:
       - "8000"
+    # /api/health/ checks DB + Redis and returns 503 if either is down. Uses the
+    # conda python (no curl in the image); urlopen raises on non-2xx.
+    # start_period covers collectstatic at boot.
+    healthcheck:
+      test: ["CMD", "/opt/conda/envs/osdag_env/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health/', timeout=5)"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
 
   celery_worker_calc:
-    image: ghcr.io/sogalabhi/osdag-web/backend:latest
+    image: ghcr.io/sogalabhi/osdag-web/backend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       PYTHONPATH: /app:/app/backend
@@ -85,9 +108,10 @@ services:
       redis:
         condition: service_healthy
     command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery --workdir=/app -A config worker -Q calculations --loglevel=info --concurrency=18"
+    healthcheck: *celery-healthcheck
 
   celery_worker_cad:
-    image: ghcr.io/sogalabhi/osdag-web/backend:latest
+    image: ghcr.io/sogalabhi/osdag-web/backend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       PYTHONPATH: /app:/app/backend
@@ -112,9 +136,10 @@ services:
       redis:
         condition: service_healthy
     command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery --workdir=/app -A config worker -Q cad --loglevel=info --concurrency=8 --max-tasks-per-child=10"
+    healthcheck: *celery-healthcheck
 
   celery_worker_reports:
-    image: ghcr.io/sogalabhi/osdag-web/backend:latest
+    image: ghcr.io/sogalabhi/osdag-web/backend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       PYTHONPATH: /app:/app/backend
@@ -139,9 +164,10 @@ services:
       redis:
         condition: service_healthy
     command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery --workdir=/app -A config worker -Q reports --loglevel=info --concurrency=4"
+    healthcheck: *celery-healthcheck
 
   celery_beat:
-    image: ghcr.io/sogalabhi/osdag-web/backend:latest
+    image: ghcr.io/sogalabhi/osdag-web/backend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       PYTHONPATH: /app:/app/backend
@@ -161,13 +187,21 @@ services:
       redis:
         condition: service_healthy
     command: bash -c "exec /opt/conda/envs/osdag_env/bin/celery -A config beat --loglevel=info"
+    # beat has no remote-control channel to ping, so look for its process. The
+    # needle is built from two pieces so this probe's own cmdline can't match it.
+    healthcheck:
+      test: ["CMD", "/opt/conda/envs/osdag_env/bin/python", "-c", "import os,sys; n=b'be'+b'at'; sys.exit(0 if any(n in open('/proc/'+p+'/cmdline','rb').read() for p in os.listdir('/proc') if p.isdigit() and p!=str(os.getpid())) else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     volumes:
       - media_volume:/app/media
       - osifiles_volume:/app/osifiles
       - file_storage_volume:/app/file_storage
 
   frontend:
-    image: ghcr.io/sogalabhi/osdag-web/frontend:latest
+    image: ghcr.io/sogalabhi/osdag-web/frontend:${IMAGE_TAG:-latest}
     restart: unless-stopped
     ports:
       - "80:80"
@@ -176,10 +210,20 @@ services:
       - media_volume:/app/media
       - osifiles_volume:/app/osifiles
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    # Static index.html is enough to prove nginx is serving; the deploy smoke
+    # test separately checks the /api/ proxy path. 127.0.0.1 (not localhost)
+    # because nginx only listens on IPv4 and alpine may resolve localhost to ::1.
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   cloudflared:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:2026.10.3
     restart: unless-stopped
     command: tunnel --no-autoupdate --protocol http2 --url http://frontend:80
     depends_on:

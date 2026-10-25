@@ -13,6 +13,7 @@ backend/
 ├── apps/
 │   ├── core/                  # Base platform logic
 │   │   ├── api/               # Platform REST endpoints (projects, OSI, tasks)
+│   │   ├── health.py          # /api/health/ endpoint (PostgreSQL + Redis check)
 │   │   ├── models.py          # PostgreSQL core models (Project, UserAccount, OsiFile, CustomMaterials)
 │   │   ├── catalog.py         # Read-only steel-section/material catalog from osdag_core's SQLite
 │   │   ├── middleware.py      # Token auth parsing and user synchronization
@@ -28,6 +29,7 @@ backend/
 
 ### Core Separation
 * **`apps/core`:** Holds standard web platform tables, tasks, and middlewares. It has no structural engineering dependencies.
+* **`apps/core` health check:** `GET /api/health/` reports `200` when PostgreSQL and Redis are reachable and `503` otherwise. Docker healthchecks and the deploy smoke test use it (see 11.8).
 * **`apps/modules`:** Acts as the host for individual steel design modules. Every module contains submodules with specific `adapter.py` files to bridge web API requests to the `osdag_core` mathematical libraries.
 
 ---

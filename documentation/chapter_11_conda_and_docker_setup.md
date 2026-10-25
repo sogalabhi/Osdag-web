@@ -143,6 +143,9 @@ The production deployment in [docker-compose.prod.yml](../docker-compose.prod.ym
 
 ### 1. Process and Volume Isolation
 * **Nginx Reverse Proxy**: The frontend service serves compiled static HTML assets and acts as the entry gateway. It proxies API requests (`/api`) to the Django Gunicorn server.
+* **Image Selection**: `backend`, the three Celery workers, `celery_beat` and `frontend` use images from GHCR (`ghcr.io/sogalabhi/osdag-web/backend` and `.../frontend`). The tag comes from `IMAGE_TAG`, which the deploy workflow sets to the commit SHA (see 11.8); it falls back to `latest` only for ad-hoc manual runs on the server. The file contains no `build:` sections.
+* **Migrations**: The `backend` container does not run `migrate` on start. The deploy workflow runs it once before the containers are replaced (see 11.8). Its start command only runs `collectstatic` and then Gunicorn.
+* **Healthchecks**: Every service except `cloudflared` has a healthcheck, and `depends_on` waits for `db`, `redis` and `backend` to be healthy. `backend` calls `/api/health/`, the Celery workers use `celery inspect ping`, and `frontend` fetches `/` from Nginx.
 * **Static Asset Persistence**: Declares dedicated volume mounts (`static_volume`, `media_volume`, `osifiles_volume`) shared between the backend, frontend, and Celery workers to store user calculations, reports, and CAD drawings.
 
 ### 2. Specialized Celery Worker Splits
@@ -216,3 +219,52 @@ Earlier versions kept a second copy of the catalog in PostgreSQL, loaded by `pop
 
 Dropdown lists list each designation once, even where the catalog repeats it (such as `WB 200`), because `osdag_core` only ever uses the first matching row.
 
+---
+
+## 11.8 Continuous Deployment & Rollback
+
+### 1. How a Merge Reaches Production
+1. **CI** ([ci.yml](../.github/workflows/ci.yml)) runs on every push and pull request. A newer push to the same branch cancels the older run, except on `25april`.
+2. When CI succeeds on `25april` for a commit from this repository, **CD** ([cd.yml](../.github/workflows/cd.yml)) builds the backend and frontend images and pushes them to GHCR with two tags: `latest` and the full commit SHA. Both images are scanned with Trivy for HIGH/CRITICAL findings; the scan is report-only and does not block the deploy.
+3. CD then calls the reusable [deploy.yml](../.github/workflows/deploy.yml) with that SHA as `image_tag`. The job runs on a self-hosted runner on the production server and waits for approval on the GitHub `production` environment. Only one production deploy runs at a time; later ones queue.
+
+Deploys always use the SHA, never `latest`. The deploy job rejects any tag that is not a full 40-character SHA, checks that both images exist in GHCR, and checks out the compose file from the same commit, so the compose file and the images always match.
+
+### 2. Deploy Steps
+`deploy.yml` runs these steps in `/opt/osdag-web` on the server, with `COMPOSE_FILE=docker-compose.prod.yml` and `IMAGE_TAG` set to the SHA:
+1. `docker compose pull` fetches the images for that SHA.
+2. `docker compose up -d --wait db redis` starts the database and Redis and waits until they are healthy.
+3. `docker compose run --rm --no-deps backend ... manage.py migrate --noinput` applies migrations once, in a one-off container.
+4. `docker compose up -d --remove-orphans --wait` replaces the containers and blocks until every service with a healthcheck is healthy. The step fails on timeout or if a container exits.
+5. A smoke test requests `http://localhost/api/health/` through Nginx and expects `"status": "ok"`, then requests `/` to check the frontend is served.
+6. The SHA is written to `/opt/osdag-web/.deployed-tag` and dangling images are pruned. On failure, `docker compose ps -a` and the last 100 log lines are printed.
+
+Because the old containers keep serving while step 3 runs, **migrations must be backward compatible with the previous release**: add columns or tables first and remove old ones in a later release.
+
+### 3. Health Endpoint
+`GET /api/health/` ([health.py](../backend/apps/core/health.py)) runs `SELECT 1` against PostgreSQL and pings Redis. It returns `200` with `{"status": "ok", "checks": {...}}` when both succeed, or `503` with `"status": "unavailable"` when either fails. Error details are logged on the server, not returned. Django Silk ignores this path so probes are not profiled.
+
+### 4. Rolling Back
+Images stay in GHCR under their SHA tag, so any earlier build can be redeployed:
+1. Open **Actions -> Rollback -> Run workflow**, choose the branch `25april`, and enter the full 40-character SHA of a previously deployed commit.
+2. Approve the run on the `production` environment. It uses the same deploy steps as above (pull, migrate, wait for health, smoke test), with the compose file from the old commit.
+
+Limits:
+* Migrations are **not reversed**. The older code must work with the current schema, which is why migrations have to be backward compatible.
+* The next merge to `25april` deploys new code again, so revert or fix the offending commit as well.
+* A SHA built before `docker-compose.prod.yml` supported `IMAGE_TAG` is refused.
+
+### 5. Other Automation
+* **CodeQL** ([codeql.yml](../.github/workflows/codeql.yml)) scans pull requests and pushes to `25april`, and runs weekly.
+* **release-please** ([release-please.yml](../.github/workflows/release-please.yml)) keeps a release pull request open on `25april` with the next version and `CHANGELOG.md`, built from conventional commits (`feat:`, `fix:`, ...). Merging it creates the version tag and GitHub release.
+* **cloudflared** is pinned to a fixed version in both compose files instead of `latest`.
+
+### 6. One-Time Setup
+GitHub (repository settings):
+* **Environments -> `production`**: add required reviewers (and optionally restrict deployment branches). This gates every deploy, including rollbacks.
+* **Actions -> General -> "Allow GitHub Actions to create and approve pull requests"**: required for release-please.
+* Register a self-hosted runner on the production server.
+
+Server:
+* Docker with Compose v2.20 or newer (the deploy uses `up --wait`, `--wait-timeout` and `run --no-deps`), and `curl`.
+* `/opt/osdag-web` must exist and be writable by the runner. The deploy copies `docker-compose.prod.yml` there. Compose reads secrets from the environment or a `.env` file in that directory: `SECRET_KEY` and `DATABASE_PASSWORD` are required, and `ALLOWED_HOSTS` must include the host name used to reach the site, otherwise Django rejects requests (including the health check through Nginx). Never commit this file.
