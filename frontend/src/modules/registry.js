@@ -34,10 +34,6 @@ import {
   KEY_DISP_PLATE_GIRDER_WELDED,
 } from "../constants/generated/coreKeys";
 
-// The struts-in-trusses page has no osdag_core module name; this is the id its
-// config and the backend route already use.
-const STRUTS_IN_TRUSSES = "Compression-Member-Design";
-
 // Resolves a module's input config and output config from two lazy imports, so
 // each module stays in its own chunk.
 const loadConfigs = async (configImport, configName, outputImport, outputName) => {
@@ -76,7 +72,7 @@ export const MENU_GROUPS = {
   ],
 };
 
-export const MODULES = [
+const MODULE_ENTRIES = [
   // Plated connections
   {
     id: KEY_DISP_LAPJOINTBOLTED,
@@ -359,15 +355,6 @@ export const MODULES = [
       import("./compressionMember/configs/axiallyLoadedColumnOutputConfig"), "axiallyLoadedColumnOutputConfig",
     ),
   },
-  {
-    id: STRUTS_IN_TRUSSES,
-    path: "/design/compression-member/struts_in_trusses",
-    title: UI_STRINGS.COMPRESSION_MEMBER_STRUTS,
-    load: () => loadConfigs(
-      import("./compressionMember/configs/compressionMemberConfig"), "compressionMemberConfig",
-      import("./compressionMember/configs/compressionMemberOutputConfig"), "compressionMemberOutputConfig",
-    ),
-  },
 
   // Flexural members
   {
@@ -403,8 +390,13 @@ export const MODULES = [
       import("./flexuralMember/plateGirder/configs/plateGirderOutputConfig"), "plateGirderOutputConfig",
     ),
   },
+  // Purlin is under development and is not in the desktop app's menu either, so
+  // it is hidden: no route, no menu card, and findModule does not resolve it (an
+  // .osi file for it is rejected as unsupported). Its configs and backend
+  // adapter stay in place. Remove `hidden` to enable it.
   {
     id: KEY_DISP_FLEXURE4,
+    hidden: true,
     path: "/design/flexure/purlin",
     apiSlug: "flexure-member/purlin",
     title: UI_STRINGS.PURLIN,
@@ -414,6 +406,9 @@ export const MODULES = [
     ),
   },
 ];
+
+/** Modules users can open: every entry except those marked `hidden`. */
+export const MODULES = MODULE_ENTRIES.filter((module) => !module.hidden);
 
 const MODULES_BY_ID = new Map(MODULES.map((module) => [module.id, module]));
 
