@@ -210,18 +210,5 @@ export const compressionMemberConfig = {
       ]
     }
   ],
-
-  backendKeys: {
-    "Member.Profile": "Member.Profile",
-    "Member.Designation": "Member.Designation",
-    "Material": "Material",
-    "Member.Material": "Member.Material",
-    "Design.Design_Method": "Design.Design_Method",
-    "Member.Length": "Member.Length",
-    "Load.Axial": "Load.Axial",
-    "End_1": "End_1",
-    "End_2": "End_2",
-    "Conn_Location": "Conn_Location",
-  },
 };
 
