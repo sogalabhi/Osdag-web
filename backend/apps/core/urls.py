@@ -11,7 +11,7 @@ from apps.core.api import (
     ExportUserDataAPIView,
     MyDataAPIView,
     ProjectAPI, ProjectDetailAPI, ProjectByNameAPI,
-    SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload,
+    SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ProjectOsiDownload,
     ParseReportSections, CustomizeReport,
     DesignPreference, DesignPreferenceSync, DesignPreferenceDefaults, MaterialDetails, CompanyLogoView,
     CADGeneration, CADDownload, CADExport
@@ -58,7 +58,6 @@ urlpatterns = [
     path('api/save-osi-from-inputs/', SaveOsiFromInputs.as_view()),
     path('api/open-osi/', OpenOsiUpload.as_view()),
     path('api/open-osi/<int:osifile_id>/', OpenOsiById.as_view()),
-    path('api/module-routes/', ModuleRoutes.as_view()),
     path('api/projects/<int:project_id>/osi', ProjectOsiDownload.as_view()),
     
     # Report customization API endpoints

@@ -103,23 +103,6 @@ class OpenOsiById(APIView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ModuleRoutes(APIView):
-    def get(self, request):
-        # central mapping (backend source of truth) used by frontend to route modules
-        routes = {
-            'fp': '/design/connections/shear/fin_plate',
-            'ca': '/design/connections/shear/cleat_angle',
-            'ep': '/design/connections/shear/end_plate',
-            'sa': '/design/connections/shear/seatAngle',
-            'cpb': '/design/connections/beam-to-beam-splice/cover_plate_bolted',
-            'cpw': '/design/connections/beam-to-beam-splice/cover_plate_welded',
-            'boltedtoendplate': '/design/tension-member/bolted_to_end_gusset',
-            'ssb': '/design/FlexureMember/simply_supported_beam',
-        }
-        return JsonResponse({'success': True, 'routes': routes}, safe=False)
-
-
-@method_decorator(csrf_exempt, name='dispatch')
 class ProjectOsiDownload(APIView):
     permission_classes = [IsEmailVerified]
 

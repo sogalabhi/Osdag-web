@@ -75,11 +75,8 @@ When a user imports an `.osi` file via the UI:
 3. The parser detects if the file starts with a JSON brace (`{`) or a YAML dotted structure.
 4. It parses keys and maps them into a standard dictionary.
 
-### 2. Backend Routing Resolvers
-The backend provides a centralized route map via [ModuleRoutes](../backend/apps/core/api/projects/osi_api.py). When the parsed `.osi` identifies the module ID (e.g. `fp` or `ca`), the frontend queries this view to route the user automatically to the correct design page:
-* `fp` $\rightarrow$ `/design/connections/shear/fin_plate`
-* `ca` $\rightarrow$ `/design/connections/shear/cleat_angle`
-* `ssb` $\rightarrow$ `/design/FlexureMember/simply_supported_beam`
+### 2. Module Routing
+The parsed response carries the module name from the file's `Module:` line (`module_id`). The frontend resolves it with `findModule` from [registry.js](../frontend/src/modules/registry.js), which matches the module id or any alias (including the desktop module names), and navigates to that module's `path`. A name that matches no registry entry is rejected as an unsupported module.
 
 ---
 
