@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from apps.core.models import Material, Beams, Columns, Angles, Channels
-from apps.core.api.design.sync_merge import build_design_pref_defaults
+from apps.core.api.design.sync_merge import build_design_pref_defaults, lookup_sources
+from apps.core.osdag_overrides import user_id_from_request, user_rows
 
 
 class DesignPreferenceDefaults(APIView):
@@ -26,15 +26,13 @@ class DesignPreferenceDefaults(APIView):
             )
 
         try:
-            default_pref_inputs, metadata, material_details, section_details = build_design_pref_defaults(
-                module_session_name=module_session_name,
-                inputs=inputs,
-                material_model=Material.objects,
-                beams_model=Beams.objects,
-                columns_model=Columns.objects,
-                angles_model=Angles.objects,
-                channels_model=Channels.objects,
-            )
+            # osdag_core computes some defaults from the selected material, so it must see custom rows too.
+            with user_rows(user_id_from_request(request)):
+                default_pref_inputs, metadata, material_details, section_details = build_design_pref_defaults(
+                    module_session_name=module_session_name,
+                    inputs=inputs,
+                    **lookup_sources(request.user),
+                )
         except Exception as exc:
             return Response(
                 {"error": str(exc), "success": False},

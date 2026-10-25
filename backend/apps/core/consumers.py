@@ -20,6 +20,28 @@ INFLUXDB_ORG    = os.getenv("INFLUXDB_ORG",    "osdag")
 
 
 @database_sync_to_async
+def _user_id_from_token(token):
+    """Django user id for a Firebase ID token, or None for guests and invalid tokens."""
+    if not token:
+        return None
+    from types import SimpleNamespace
+    from apps.core.middleware.firebase_auth import FirebaseAuthentication
+    try:
+        result = FirebaseAuthentication().authenticate(
+            SimpleNamespace(META={"HTTP_AUTHORIZATION": f"Bearer {token}"})
+        )
+    except Exception:
+        return None
+    return result[0].id if result else None
+
+
+@database_sync_to_async
+def _unknown_material_error(input_data, user_id):
+    from apps.core.osdag_overrides import unknown_material_error
+    return unknown_material_error(input_data, user_id)
+
+
+@database_sync_to_async
 def _check_task_status_sync(task_id: str):
     """Query Celery result backend synchronously in a thread pool."""
     task_result = AsyncResult(task_id)
@@ -182,9 +204,15 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
 
         if message_type == 'start_optimization':
             input_data = content.get('data', {})
+            # The client sends its Firebase ID token in the message (not the URL, which gets logged).
+            user_id = await _user_id_from_token(content.get('token'))
+            material_error = await _unknown_material_error(input_data, user_id)
+            if material_error:
+                await self.send_json({'type': 'pso_error', 'data': {'message': material_error}})
+                return
             from apps.modules.flexure_member.submodules.plate_girder.tasks import run_pso_optimization
             try:
-                task_result = run_pso_optimization.delay(self.channel_name, input_data)
+                task_result = run_pso_optimization.delay(self.channel_name, input_data, user_id=user_id)
                 self.task_id = task_result.id
                 logger.info(f"PSO Celery task triggered: {self.task_id}")
                 await self.send_json({

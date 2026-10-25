@@ -29,6 +29,13 @@ TABLE_TO_CATALOG_MODEL: Dict[str, Type[models.Model]] = {
     "RHS": RHS,
 }
 
+# osdag_core looks I-sections up in Beams, then Columns (fetch_beam_or_column), so a
+# designation must be unique across both or one row silently shadows the other.
+_SHARED_DESIGNATION_TABLES: Dict[str, Tuple[str, ...]] = {
+    "Beams": ("Beams", "Columns"),
+    "Columns": ("Beams", "Columns"),
+}
+
 # Desktop `import_db_validation`: numeric keys must be int or float (openpyxl often uses float).
 # We also allow `Decimal` (DB / API paths).
 _NUMERIC_KEYS_BEAM_COLUMN: frozenset[str] = frozenset(
@@ -209,7 +216,7 @@ def can_insert_custom_section(
 ) -> Tuple[bool, str]:
     """
     Rule: block if designation exists in global catalog or in this
-    user's custom rows for that section family.
+    user's custom rows for that section family (Beams and Columns count as one).
 
     `exclude_user_section_pk`: when updating an existing `UserCustom*` row,
     exclude that PK from the per-user duplicate check.
@@ -221,16 +228,16 @@ def can_insert_custom_section(
     if not designation:
         return False, "missing_designation"
 
-    catalog = TABLE_TO_CATALOG_MODEL[table]
-    if catalog.objects.filter(Designation=designation).exists():
+    tables = _SHARED_DESIGNATION_TABLES.get(table, (table,))
+    if any(TABLE_TO_CATALOG_MODEL[t].objects.filter(Designation=designation).exists() for t in tables):
         return False, "catalog_duplicate"
 
-    UserModel = TABLE_TO_USER_MODEL[table]
-    qs = UserModel.objects.filter(user=user, Designation=designation)
-    if exclude_user_section_pk is not None:
-        qs = qs.exclude(pk=exclude_user_section_pk)
-    if qs.exists():
-        return False, "user_duplicate"
+    for t in tables:
+        qs = TABLE_TO_USER_MODEL[t].objects.filter(user=user, Designation=designation)
+        if exclude_user_section_pk is not None and t == table:
+            qs = qs.exclude(pk=exclude_user_section_pk)
+        if qs.exists():
+            return False, "user_duplicate"
 
     return True, ""
 

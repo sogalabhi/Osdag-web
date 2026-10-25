@@ -38,10 +38,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create dummy Firebase config
-        run: |
-          mkdir -p backend
-          echo '{}' > backend/firebase-service-account.json
+      # PySide6 (imported by osdag_core) needs these GL libraries; the Docker image gets them the same way.
+      - name: Install system libraries
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libegl1 libgl1 libglu1-mesa libxkbcommon0
 
       - name: Start DB and Redis
         run: docker compose up -d db redis

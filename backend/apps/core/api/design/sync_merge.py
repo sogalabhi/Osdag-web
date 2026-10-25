@@ -124,11 +124,51 @@ def _get_core_defaults(module_session_name: str, inputs: Dict[str, Any], grade: 
     return defaults
 
 
+def lookup_sources(user=None) -> Dict[str, List[Any]]:
+    """
+    Model kwargs for merge_design_pref_sync / build_design_pref_defaults.
+
+    Each value lists querysets searched in order. A signed-in user's custom rows come
+    before the catalog, the same precedence osdag_core uses (apps.core.osdag_overrides).
+    """
+    from apps.core.models import Angles, Beams, Channels, Columns, CustomMaterials, Material
+    from apps.sections.models import UserCustomAngle, UserCustomBeam, UserCustomChannel, UserCustomColumn
+
+    sources = {
+        "material_model": [Material.objects],
+        "beams_model": [Beams.objects],
+        "columns_model": [Columns.objects],
+        "angles_model": [Angles.objects],
+        "channels_model": [Channels.objects],
+    }
+    if user is not None and getattr(user, "is_authenticated", False):
+        sources["material_model"].insert(0, CustomMaterials.objects.filter(user=user))
+        for key, Model in (
+            ("beams_model", UserCustomBeam),
+            ("columns_model", UserCustomColumn),
+            ("angles_model", UserCustomAngle),
+            ("channels_model", UserCustomChannel),
+        ):
+            sources[key].insert(0, Model.objects.filter(user=user, is_active=True))
+    return sources
+
+
+def first_row(sources, **lookup) -> Optional[Dict[str, Any]]:
+    """First row matching `lookup` across `sources` (one queryset or a list searched in order)."""
+    if sources is None:
+        return None
+    for source in sources if isinstance(sources, (list, tuple)) else (sources,):
+        row = source.filter(**lookup).values().first()
+        if row:
+            return row
+    return None
+
+
 def _material_row_for_grade(material_models, grade: str) -> List[Dict[str, Any]]:
     if not grade:
         return []
-    qs = material_models.filter(Grade=grade)
-    return list(qs.values()[:1])
+    row = first_row(material_models, Grade=grade)
+    return [row] if row else []
 
 
 # (session_name) -> (supporting_key, supporting_source, supported_key, supported_source, connector_key, connector_source)
@@ -159,10 +199,9 @@ _SECTION_KEY_MAP: Dict[str, Tuple[Optional[str], Optional[str], Optional[str], O
 
 
 def _section_row_for_designation(section_model, designation: str) -> Dict[str, Any]:
-    if section_model is None or not designation:
+    if not designation:
         return {}
-    row = section_model.filter(Designation=designation).values().first()
-    return row or {}
+    return first_row(section_model, Designation=designation) or {}
 
 
 def _resolve_section_details(

@@ -5,6 +5,19 @@ from apps.core.models import Material, CustomMaterials
 from apps.core.serializers import CustomMaterials_Serializer
 
 
+def _grade_conflict(user, grade, exclude_pk=None):
+    """Message if `grade` clashes with the catalog or another of the user's materials, else None."""
+    # A custom row named like a catalog grade would silently replace it in this user's designs.
+    if Material.objects.filter(Grade=grade).exists():
+        return "This grade already exists in the standard catalog"
+    qs = CustomMaterials.objects.filter(user=user, Grade=grade)
+    if exclude_pk is not None:
+        qs = qs.exclude(pk=exclude_pk)
+    if qs.exists():
+        return "The material already exists"
+    return None
+
+
 class MaterialDetails(APIView):
 
     def get(self, request):
@@ -42,9 +55,9 @@ class MaterialDetails(APIView):
         if not (hasattr(request, "user") and request.user.is_authenticated):
             return Response({"message": "Authentication required", "success": False}, status=401)
 
-        alreadyExists = CustomMaterials.objects.filter(user=request.user, Grade=materialName).exists()
-        if alreadyExists:
-            return Response({"message": "The material already exists", "success": False}, status=403)
+        conflict = _grade_conflict(request.user, materialName)
+        if conflict:
+            return Response({"message": conflict, "success": False}, status=403)
 
         serializer = CustomMaterials_Serializer(data={
             "user": request.user.id,
@@ -93,7 +106,12 @@ class MaterialDetails(APIView):
             
         try:
             material = CustomMaterials.objects.get(id=material_id, user=request.user)
-            material.Grade = request.data.get("Grade", material.Grade)
+            new_grade = request.data.get("Grade", material.Grade)
+            if new_grade != material.Grade:
+                conflict = _grade_conflict(request.user, new_grade, exclude_pk=material.pk)
+                if conflict:
+                    return Response({"message": conflict, "success": False}, status=403)
+            material.Grade = new_grade
             material.Yield_Stress_less_than_20 = request.data.get("Yield_Stress_less_than_20", material.Yield_Stress_less_than_20)
             material.Yield_Stress_between_20_and_neg40 = request.data.get("Yield_Stress_between_20_and_neg40", material.Yield_Stress_between_20_and_neg40)
             material.Yield_Stress_greater_than_40 = request.data.get("Yield_Stress_greater_than_40", material.Yield_Stress_greater_than_40)

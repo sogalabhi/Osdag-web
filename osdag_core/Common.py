@@ -8,6 +8,8 @@ import sys
 import operator
 import math
 import logging
+import sqlite3
+from contextvars import ContextVar
 from importlib.resources import files
 from pathlib import Path
 import platform
@@ -142,6 +144,29 @@ class OurLog(logging.Handler):
             # QTextEdit C++ object has been deleted - skip appending
             pass
 
+# Optional per-run hook for host apps (e.g. a web backend) to supply section/material
+# rows that are not in the bundled SQLite. Set it to a callable
+# `override(table, value) -> row tuple or None`; None (default) means SQLite only.
+row_override = ContextVar("osdag_row_override", default=None)
+
+
+def fetch_row(table, value, key="Designation"):
+    """Return the row of `table` whose `key` column equals `value`, or None."""
+    override = row_override.get()
+    if override is not None:
+        row = override(table, value)
+        if row is not None:
+            return row
+    conn = sqlite3.connect(PATH_TO_DATABASE)
+    try:
+        return conn.execute(f'SELECT * FROM "{table}" WHERE "{key}" = ?', (value,)).fetchone()
+    finally:
+        conn.close()
+
+
+def fetch_beam_or_column(designation):
+    """Return the I-section row for `designation` from Beams, else Columns, or None."""
+    return fetch_row("Beams", designation) or fetch_row("Columns", designation)
 
 
 def connectdb1():
@@ -2699,20 +2724,17 @@ def get_leg_lengths(designation):
     """
         Function to fetch designation values from respective Tables.
     """
-    conn = sqlite3.connect(PATH_TO_DATABASE)
-    db_query = "SELECT a, b, t, R1 FROM Angles WHERE Designation = ?"
-    cur = conn.cursor()
-    cur.execute(db_query, (designation,))
-    row = cur.fetchone()
+    row = fetch_row("Angles", designation)
+    if row is None:
+        raise ValueError(f"Section '{designation}' not found in 'Angles' table of the database.")
 
-    a = row[0]
-    b = row[1]
-    t = row[2]
-    r_r = row[3]
+    a = row[4]
+    b = row[5]
+    t = row[6]
+    r_r = row[7]
     # axb = axb.lower()
     leg_a_length = float(a)
     leg_b_length = float(b)
-    conn.close()
     return leg_a_length,leg_b_length,t,r_r
 
 try:

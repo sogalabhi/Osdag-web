@@ -1,7 +1,7 @@
 import { apiBase } from "../api";
 import { auth } from "../Auth/firebase";
 
-const getAccessToken = async (forceRefresh = false) => {
+export const getAccessToken = async (forceRefresh = false) => {
   const user = auth.currentUser;
   if (!user) return null;
   try {
