@@ -2,12 +2,18 @@ import json
 import re
 from datetime import datetime
 from typing import Any, Dict, Tuple
-from tkinter import messagebox
 
+import yaml
 from django.core.files.base import ContentFile
+
+from osdag_core.Common import KEY_DISP_HEADERPLATE
 
 OSI_SCHEMA_VERSION = "1.0"
 SUPPORTED_VERSIONS = {"1.0"}
+
+# Desktop module names that differ from the web module id. The desktop calls the shear
+# header plate module "End Plate Connection".
+DESKTOP_MODULE_NAMES = {"End Plate Connection": KEY_DISP_HEADERPLATE}
 
 
 def validate_module_id(module_id: str) -> bool:
@@ -305,45 +311,38 @@ def serialize_osi(payload: Dict[str, Any]) -> str:
     return _to_flat_yaml(module_id, name, inputs)
 
 
-def _parse_flat_yaml(text: str) -> Dict[str, Any]:
-    """Very small YAML reader for the flat format we emit.
+class _StringSafeLoader(yaml.SafeLoader):
+    """SafeLoader that keeps every plain scalar a string.
 
-    Supports lines like:
-      Key: value\n
-      Key:\n
-      - 'item'\n
-    Returns a dict of key -> value (str or list[str]).
+    .osi values are strings (desktop quotes numbers, the web writes them bare), so
+    `No`, `08` or `1.0` must not become a bool, int or float. Only an empty plain
+    value (`Key:`) still resolves to null.
     """
+
+
+_StringSafeLoader.yaml_implicit_resolvers = {}
+_StringSafeLoader.add_implicit_resolver("tag:yaml.org,2002:null", re.compile(r"^$"), [""])
+
+
+def _parse_flat_yaml(text: str) -> Dict[str, Any]:
+    """Read the flat `.osi` YAML written by desktop Osdag and by the web app.
+
+    Keys stay flat and dotted (`Bolt.Diameter`). Values are strings or lists of
+    strings. Anchors and aliases (`&id001` / `*id001`, which PyYAML writes when the
+    same list occurs twice) are resolved, so each key gets its own copy of the list.
+    An empty value becomes an empty list.
+    """
+    data = yaml.load(text, Loader=_StringSafeLoader)
+    if not isinstance(data, dict):
+        raise ValueError("Malformed OSI file")
+
     flat_inputs: Dict[str, Any] = {}
-    lines = [ln.rstrip() for ln in text.splitlines() if ln.strip() != ""]
-    i = 0
-    while i < len(lines):
-        line = lines[i]
-        if ":" in line:
-            key, after = line.split(":", 1)
-            key = key.strip()
-            after = after.strip()
-            if after == "":
-                # list block
-                i += 1
-                items: list[str] = []
-                while i < len(lines) and lines[i].lstrip().startswith("-"):
-                    item = lines[i].lstrip()[1:].strip()
-                    # strip optional quotes
-                    if (item.startswith("'") and item.endswith("'")) or (item.startswith('"') and item.endswith('"')):
-                        item = item[1:-1]
-                    items.append(item)
-                    i += 1
-                flat_inputs[key] = items
-                continue  # already advanced i
-            else:
-                # scalar
-                val = after
-                # strip quotes
-                if (val.startswith("'") and val.endswith("'")) or (val.startswith('"') and val.endswith('"')):
-                    val = val[1:-1]
-                flat_inputs[key] = val
-        i += 1
+    for key, value in data.items():
+        if value is None:
+            value = []
+        elif isinstance(value, list):
+            value = ["" if item is None else str(item) for item in value]
+        flat_inputs[str(key)] = value
     return flat_inputs
 
 
@@ -367,9 +366,14 @@ def parse_osi(text: str) -> Tuple[str, str, Dict[str, Any]]:
 
         if not module_id:
             raise ValueError("Module missing in OSI")
+        module_id = DESKTOP_MODULE_NAMES.get(module_id, module_id)
 
         name = flat_inputs.get("name") or module_id
-        return module_id, name, normalize_osi_keys(flat_inputs)
+        inputs = normalize_osi_keys(flat_inputs)
+        # The keys exactly as written in the file. The web form maps them to its own
+        # fields (it knows each module's fields); dock/pref is a module-independent guess.
+        inputs["flat"] = flat_inputs
+        return module_id, name, inputs
 
 
 def make_osifile_contentfile(payload: Dict[str, Any]) -> ContentFile:

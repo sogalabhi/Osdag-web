@@ -54,7 +54,7 @@
     "Member.Supported_Section.Material": "E 165 (Fe 290)",
     "Member.Supporting_Section.Designation": "JB 200",
     "Member.Supporting_Section.Material": "E 165 (Fe 290)",
-    "Module": "FinPlateConnection",
+    "Module": "Fin Plate Connection",
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": "410",
     "Connector.Plate.Thickness_List": [

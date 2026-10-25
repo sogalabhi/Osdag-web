@@ -98,11 +98,11 @@
     "Detailing.Edge_type": "Sheared or hand flame cut",
     "Detailing.Gap": "10",
     "Load.Axial": "40",
-    "Load.Moment": "10",
+    "Load.Moment": "60",
     "Load.Shear": "40",
-    "Material": "E 250 (Fe 410 W)A",
+    "Material": "E 300 (Fe 440)",
     "Member.Designation": "UB 305 x 165 x 54",
     "Member.Material": "E 250 (Fe 410 W)A",
-    "Module": "Beam-to-Beam-Cover-Plate-Bolted-Connection"
+    "Module": "Beam-to-Beam Cover Plate Bolted Connection"
   }
 }

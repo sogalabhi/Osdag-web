@@ -2,7 +2,7 @@
   "source": "frontend-defaults:purlinConfig.js",
   "notes": "Run of purlinConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"section_designation\":[\"MB 300\",\"MB 350\"]}. Defaults left empty and filled with realistic catalog values: {\"effective_span\":\"6000\",\"bending_moment_yy\":\"2\",\"bending_moment_zz\":\"12\",\"shear_force_yy\":\"3\",\"shear_force_zz\":\"8\"}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "Purlin",
+    "Module": "Flexural Members - Purlins",
     "Member.Profile": "Channels",
     "Member.Designation": [
       "MB 300",

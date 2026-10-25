@@ -17,7 +17,7 @@
     "Bolt.TensionType": "Non Pre-tensioned",
     "Bolt.Type": "Bearing Bolt",
     "Connectivity": "Column Flange-Beam Web",
-    "EndPlateType": "Column Flange-Beam Web",
+    "EndPlateType": "Extended One Way - Irreversible Moment",
     "Connector.Plate.Thickness_List": [
       "16",
       "18",
@@ -30,16 +30,16 @@
     "Detailing.Edge_type": "Sheared or hand flame cut",
     "Detailing.Gap": "0",
     "Load.Axial": "15",
-    "Load.Moment": "2",
+    "Load.Moment": "210",
     "Load.Shear": "40",
     "Material": "E 250 (Fe 410 W)A",
     "Member.Supported_Section.Designation": "WB 450",
-    "Member.Supported_Section.Material": "E 165 (Fe 290)",
+    "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
     "Member.Supporting_Section.Designation": "HB 450",
-    "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+    "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": "410",
     "Weld.Type": "Groove Weld",
-    "Module": "Beam-to-Column-End-Plate-Connection"
+    "Module": "Beam-to-Column End Plate Connection"
   }
 }

@@ -2,7 +2,7 @@
   "source": "frontend-defaults:buttJointBoltedConfig.js",
   "notes": "Run of buttJointBoltedConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"bolt_diameter\":[\"16\",\"20\"],\"bolt_grade\":[\"8.8\",\"10.9\"]}. Defaults left empty and filled with realistic catalog values: {\"plate1_thickness\":\"10\",\"plate2_thickness\":\"12\"}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "ButtJointBolted",
+    "Module": "Butt Joint Bolted Connection",
     "Plate1Thickness": "10",
     "Plate2Thickness": "12",
     "PlateWidth": "200",

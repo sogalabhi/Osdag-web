@@ -1,6 +1,6 @@
 {
   "source": "frontend-defaults:cleatAngleConfig.js",
-  "notes": "Run of cleatAngleConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"bolt_diameter\":[\"16\",\"20\"],\"bolt_grade\":[\"8.8\",\"10.9\"],\"cleat_section\":[\"50 x 50 x 6\",\"60 x 60 x 6\"]}. Connectivity \"Column Flange-Beam-Web\" (extraState.selectedOption). Option lists come from osdag_core SQLite plus the constants in the backend options views.",
+  "notes": "Run of cleatAngleConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"bolt_diameter\":[\"16\",\"20\"],\"bolt_grade\":[\"8.8\",\"10.9\"],\"cleat_section\":[\"50 x 50 x 6\",\"60 x 60 x 6\"]}. Connectivity \"Column Flange-Beam Web\" (extraState.selectedOption). Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
     "Bolt.Bolt_Hole_Type": "Standard",
     "Bolt.Diameter": [
@@ -22,7 +22,7 @@
     "Detailing.Gap": "10",
     "Load.Shear": "20",
     "Material": "E 250 (Fe 410 W)A",
-    "Module": "CleatAngleConnection",
+    "Module": "Cleat Angle Connection",
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": "410",
     "Connector.Angle_List": [

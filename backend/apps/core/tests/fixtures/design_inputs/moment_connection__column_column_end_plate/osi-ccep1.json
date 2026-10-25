@@ -2,7 +2,7 @@
   "source": "osi:ccep1.osi",
   "notes": "Desktop example ccep1.osi (Module: \"Column-to-Column End Plate Connection\") parsed by parse_osi(), loaded by the frontend osiLoader into columnColumnEndPlateConfig's form state, then columnColumnEndPlateConfig.buildSubmissionParams (All-selected flags as the loader sets them).",
   "inputs": {
-    "Member.Designation": "WPB 900 X 300 X 291.46",
+    "Member.Designation": "UC 203 x 203 x 60",
     "Member.Material": "E 250 (Fe 410 W)A",
     "Bolt.Bolt_Hole_Type": "Standard",
     "Bolt.Diameter": [
@@ -43,7 +43,6 @@
     "Bolt.Slip_Factor": "0.3",
     "Bolt.TensionType": "Pre-tensioned",
     "Bolt.Type": "Bearing Bolt",
-    "Connectivity *": "Extended Both Ways",
     "Connectivity": "Extended Both Ways",
     "Connector.Plate.Thickness_List": [
       "8",
@@ -76,14 +75,14 @@
     "Detailing.Edge_type": "Sheared or hand flame cut",
     "Detailing.Gap": "0",
     "Load.Axial": "10",
-    "Load.Moment": "100",
+    "Load.Moment": "50",
     "Load.Shear": "20",
     "Material": "E 250 (Fe 410 W)A",
-    "Member.Supported_Section.Designation": "WPB 900 X 300 X 291.46",
+    "Member.Supported_Section.Designation": "UC 203 x 203 x 60",
     "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": "410",
     "Weld.Type": "Groove Weld",
-    "Module": "Column-to-Column-End-Plate-Connection"
+    "Module": "Column-to-Column End Plate Connection"
   }
 }

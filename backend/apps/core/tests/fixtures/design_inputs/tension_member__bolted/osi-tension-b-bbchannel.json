@@ -64,7 +64,9 @@
       "MC 225*",
       "MC 250",
       "MC 250*",
+      "MC 250*",
       "MC 300",
+      "MC 300*",
       "MC 300*",
       "MC 350",
       "MC 400",
@@ -102,7 +104,9 @@
       "MPC 225*",
       "MPC 250",
       "MPC 250*",
+      "MPC 250*",
       "MPC 300",
+      "MPC 300*",
       "MPC 300*",
       "MPC 350",
       "MPC 400"
@@ -110,7 +114,7 @@
     "Member.Length": "5000",
     "Member.Profile": "Back to Back Channels",
     "Conn_Location": "Web",
-    "Module": "Tension-Member-Bolted-Design",
+    "Module": "Tension Member Design - Bolted to End Gusset",
     "Connector.Plate.Thickness_List": [
       "8",
       "10",

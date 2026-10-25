@@ -17,9 +17,11 @@ Bolt.Diameter:
 - '24'
 Bolt.Grade:
 - '4.6'
-Module: FinPlateConnection
+Module: Fin Plate Connection
 ```
-* Osdag-Web implements a lightweight custom parser (`_parse_flat_yaml`) to read these files natively.
+* Osdag-Web reads these files with PyYAML (`_parse_flat_yaml`, a `SafeLoader` subclass), so everything YAML allows is handled: comments, quoting, and the anchors (`&id001`) and aliases (`*id001`) PyYAML writes when the same list occurs twice (for example the plate thickness lists of the cover plate modules). Each key gets its own copy of a shared list.
+* Keys stay flat and dotted. Every value stays a string (`No`, `08` and `1.0` are not converted to a bool or number); lists are lists of strings; an empty value becomes an empty list.
+* Text that is not a mapping, or a file without a `Module:` line, is rejected.
 
 ### 2. The Modern Nested Format (JSON)
 For complex web configurations (including split input docks and design preference overrides), Osdag-Web also parses and serializes payloads as standard JSON:
@@ -27,7 +29,7 @@ For complex web configurations (including split input docks and design preferenc
 {
   "version": "1.0",
   "name": "Fin Plate Join",
-  "module_id": "FinPlateConnection",
+  "module_id": "Fin Plate Connection",
   "inputs": {
     "dock": {
       "bolt_type": "Bearing Bolt",
@@ -73,10 +75,14 @@ When a user imports an `.osi` file via the UI:
 1. The frontend posts the file to the `/api/open-osi/` endpoint.
 2. The [OpenOsiUpload](../backend/apps/core/api/projects/osi_api.py) view intercepts the stream and reads it into memory.
 3. The parser detects if the file starts with a JSON brace (`{`) or a YAML dotted structure.
-4. It parses keys and maps them into a standard dictionary.
+4. It parses the file and returns `{ dock, pref, flat }`: `flat` holds the keys exactly as written in the file, `dock` and `pref` are a module-independent translation of them (section 5.4).
 
 ### 2. Module Routing
-The parsed response carries the module name from the file's `Module:` line (`module_id`). The frontend resolves it with `findModule` from [registry.js](../frontend/src/modules/registry.js), which matches the module id or any alias (including the desktop module names), and navigates to that module's `path`. A name that matches no registry entry is rejected as an unsupported module.
+The parsed response carries the module name from the file's `Module:` line (`module_id`). A module's id is its desktop module name (`KEY_DISP_*` in `osdag_core/Common.py`), so the frontend resolves it directly with `findModule` from [registry.js](../frontend/src/modules/registry.js) and navigates to that module's `path`. A name that matches no registry entry is rejected as an unsupported module.
+
+Desktop compatibility notes:
+* The desktop calls the shear header plate module `End Plate Connection`; the web module id is `Header Plate Connection`. `parse_osi` maps the desktop name (`DESKTOP_MODULE_NAMES` in `osi_files.py`), so those files open the header plate page.
+* Names that older desktop releases used and the desktop has since renamed (for example `Beam-Beam End Plate Splice`, `Beam Coverplate Connection`, `Struts in Trusses`) are not supported and are rejected as unsupported modules.
 
 ---
 
@@ -84,12 +90,21 @@ The parsed response carries the module name from the file's `Module:` line (`mod
 
 Because the Python desktop engine uses dotted PascalCase parameters (e.g. `Bolt.TensionType`, `Detailing.Gap`) while Osdag-Web uses snake_case keys (e.g. `bolt_tension_type`, `detailing_gap`), the frontend translates these configurations during import:
 
-1. **`normalizeOsiPayload`:** Translates desktop flat keys into the corresponding web snake_case configuration keys based on the active module's mapping config.
+1. **`normalizeOsiPayload`:** Translates the file's keys (`flat`) into the web form keys of the active module. [osiMapperTracer.js](../frontend/src/modules/shared/utils/osiMapperTracer.js) finds the mapping by running the module's `buildSubmissionParams` on sentinel values, so one `.osi` key can feed several fields (for example `Member.Supported_Section.Designation` fills `beam_section` and `secondary_beam`). A module config can add `osiKeyAliases` for keys the desktop writes under a different name than the web sends (the base plate config maps `Load.Axial_Compression` and `Anchor Bolt.OCF/ICF.*`). When several keys share one field the more specific key wins (`Material`, then `Connector.Material`, then the member and section materials). Desktop output-panel state (`out_titles_status`, `Label_*`) is ignored.
 2. **`loadStateFromOsi`:** An observer utility in [osiLoader.js](../frontend/src/modules/shared/utils/osiLoader.js) that hydrates the React states with the normalized payload.
    * Restores input form states (`setInputs`).
    * Configures customized selections (`setSelectionStates` and `setSelectedItems`).
    * Recovers design preference overrides (`setDesignPrefOverrides`).
    * Sanitizes case variances and string formatting (e.g., standardizing `"Standard"` or `"Over-Sized"` hole types).
+   * Selects the connectivity (or, for the end plate modules, the end plate type from `EndPlateType`) in the option dropdown.
+
+### Connectivity names
+
+The web forms use the desktop connectivity names throughout (`CONN_CFBW` = `Column Flange-Beam Web`, `CONN_CWBW` = `Column Web-Beam Web`, `Beam-Beam`; generated into `coreKeys.js` from `osdag_core/Common.py`). The backend options endpoints serve the same values (`VALUES_CONN`, `VALUES_CONN_1`), the form submits the selection unchanged, and an `.osi` file's `Connectivity` is loaded as is. No conversion table is needed in either direction.
+
+### Desktop keys the web has no field for
+
+The desktop saves design preferences the web forms do not expose; they are loaded under cleaned-up key names and not sent: `Bolt.Material_Grade_OverWrite`, and for the base plate `Base_Plate.*`, `Stiffener_Key.*`, `Member.Fu/Fy/Material` and `DesignPreferences.*`. Where the desktop keeps separate materials (`Material`, `Connector.Material`, `Member.*.Material`) and the web has one field, the member or section material is kept.
 
 ---
 
@@ -153,5 +168,5 @@ Since the serialization and parsing logic is centralized in the Python backend, 
 
 ### 4. Import OSI in Module Page (Key Mapping & Translation Drift) (Resolved)
 * **The Problem:** The module-level import uploaded the file to the stateless parser and received raw dotted PascalCase engineering keys, leaving the translation mapping logic to be hardcoded client-side in the frontend normalizers.
-* **Resolution:** Moved key normalization and translation mapping dictionary to the backend engine inside `osi_files.py`. The `parse_osi` utility now returns a fully translated `{ dock, pref }` dictionary directly inside `inputs`, reducing frontend translation configuration and maintenance overhead.
+* **Resolution:** Moved key normalization and translation mapping dictionary to the backend engine inside `osi_files.py`. The `parse_osi` utility returns a translated `{ dock, pref }` dictionary inside `inputs`, together with the file's own keys (`flat`). The module-independent `dock` translation cannot know each module's form fields, so the frontend maps `flat` with the module's own config (section 5.4) and uses `dock`/`pref` only for payloads that have no `flat`, such as saved projects.
 

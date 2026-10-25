@@ -48,22 +48,22 @@ form state; `buildSubmissionParams` builds the body. An example whose body today
 
 | Source | Modules |
 |---|---|
-| osi + frontend-defaults | fin plate (2 osi), cleat angle (1), beam-beam cover plate bolted (1) and welded (5), column-column cover plate bolted (4) and welded (2), beam-beam end plate (4), beam-column end plate (5), column-column end plate (1), tension bolted (5) and welded (5) |
-| frontend-defaults only, desktop example rejected | header plate, seated angle, base plate |
+| osi + frontend-defaults | fin plate (5 osi), cleat angle (4), header plate (5), seated angle (5), base plate (3), beam-beam cover plate bolted (2) and welded (5), column-column cover plate bolted (4) and welded (5), beam-beam end plate (2), beam-column end plate (5), column-column end plate (1), tension bolted (5) and welded (5) |
 | frontend-defaults only, no desktop example | compression parent, axially loaded column, struts bolted and welded, simply supported beam, on cantilever, purlin, plate girder, lap/butt joint bolted and welded |
 
-### Why desktop examples are rejected (31 of 66)
+`parse_osi()` also returns the keys as written in the file (`flat`); `loadStateFromOsi()`
+maps those to the module's own fields, so the generator passes `{dock, pref, flat}`.
 
-- **Blank loads** (`beam_bolted1-3`, `column_bolted1`, `ccep2`, `cleat_4`): the example
-  has `Load.Shear: ''`, which the validator reports as missing.
-- **Connectivity name mismatch** (`fin1-3`, `cleat_1-3`, `EP-1-3`, `SA-1-5`): the file says
-  `Column Flange-Beam Web`, the web config expects `Column Flange-Beam-Web`, so
-  `buildSubmissionParams` sends no `Connectivity`.
-- **Unmapped keys** (`EP-4-5`, `baseplate_1-5`): `parse_osi` leaves keys such as
-  `Load.Axial_Compression` and `Anchor Bolt.*` in a form the config does not read.
-- **YAML anchors** (`beam_bolted4`, `column_welded2/4/5`): the examples share a thickness
-  list with `&id001` / `*id001`; `_parse_flat_yaml` turns these into the literal strings
-  `'&id001'` and `'*id001'`.
+### Desktop examples without a fixture (10 of 66)
+
+- **Blank loads (8)**: `baseplate_1`, `baseplate_3`, `beam_bolted1-3`, `column_bolted1`,
+  `ccep2`, `cleat_4`. The desktop file itself has an empty required load
+  (`Load.Moment: ''`, `Load.Shear: ''`, `Load.Axial_Compression: ''` or
+  `Load.Shear.Major: ''`), which the validator reports as missing. They are listed in
+  `osi_rejected.json`.
+- **Older module name (2)**: `bb_ep_splice_1-2` say `Module: Beam-Beam End Plate Splice`,
+  a name the desktop no longer uses. The web does not open it; the generator skips it.
+
 
 ## Known bugs pinned as `xfail`
 

@@ -215,8 +215,8 @@
     ],
     "Member.Length": "5000",
     "Member.Profile": "Star Angles",
-    "Conn_Location": "Long Leg",
-    "Module": "Tension-Member-Welded-Design",
+    "Conn_Location": "Short Leg",
+    "Module": "Tension Member Design - Welded to End Gusset",
     "Connector.Plate.Thickness_List": [
       "8",
       "10",

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE } from "../../../constants/generated/coreKeys";
+import { KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, CONN_CFBW, CONN_CWBW } from "../../../constants/generated/coreKeys";
 
 /**
  * Handles side-effect data fetches that depend on form inputs.
@@ -60,23 +60,17 @@ export const useDependentData = (getDesignPreferences, moduleConfig, inputs, ext
     const handler = setTimeout(() => {
       const loadDesignPreferences = async () => {
         if (moduleConfig.cameraKey === KEY_DISP_FINPLATE || moduleConfig.cameraKey === KEY_DISP_CLEATANGLE) {
-          const conn_map = {
-            "Column Flange-Beam-Web": "Column Flange-Beam Web",
-            "Column Web-Beam-Web": "Column Web-Beam Web",
-            "Beam-Beam": "Beam-Beam",
-          };
-
           const connectivity = extraState?.selectedOption || inputs.connectivity;
 
           try {
             let params = null;
 
-            if (connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web") {
+            if (connectivity === CONN_CFBW || connectivity === CONN_CWBW) {
               if (inputs.column_section && inputs.beam_section) {
                 params = {
                   supported_section: inputs.beam_section,
                   supporting_section: inputs.column_section,
-                  connectivity: conn_map[connectivity].split(" ").join("-"),
+                  connectivity: connectivity.split(" ").join("-"),
                 };
               }
             } else if (connectivity === "Beam-Beam") {
@@ -84,7 +78,7 @@ export const useDependentData = (getDesignPreferences, moduleConfig, inputs, ext
                 params = {
                   supported_section: inputs.secondary_beam,
                   supporting_section: inputs.primary_beam,
-                  connectivity: conn_map[connectivity],
+                  connectivity,
                 };
               }
             }

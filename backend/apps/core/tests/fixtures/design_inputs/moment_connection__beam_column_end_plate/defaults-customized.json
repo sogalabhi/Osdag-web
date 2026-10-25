@@ -14,8 +14,8 @@
     "Bolt.Slip_Factor": "0.3",
     "Bolt.TensionType": "Pre-tensioned",
     "Bolt.Type": "Bearing Bolt",
-    "Connectivity": "Column-Flange-Beam-Web",
-    "EndPlateType": "Column Flange-Beam-Web",
+    "Connectivity": "Column Flange-Beam Web",
+    "EndPlateType": "Column Flange-Beam Web",
     "Connector.Plate.Thickness_List": [
       "10",
       "12",
@@ -37,6 +37,6 @@
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": "410",
     "Weld.Type": "Groove Weld",
-    "Module": "Beam-to-Column-End-Plate-Connection"
+    "Module": "Beam-to-Column End Plate Connection"
   }
 }

@@ -3,7 +3,12 @@ import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 
 /**
  * Hydrates React state hooks with normalized input/preference payload.
- * Supports both nested JSON format and older flat formats automatically.
+ *
+ * The payload is one of:
+ * - the parsed response of a YAML .osi file: `{ dock, pref, flat }`, where `flat` holds the
+ *   keys as written in the file and is mapped to this module's fields;
+ * - nested `{ dock, pref }` (or `{ inputs: { dock, pref } }`) as stored with a project;
+ * - a flat key/value object.
  */
 export function loadStateFromOsi(payload, {
   setInputs,
@@ -18,7 +23,9 @@ export function loadStateFromOsi(payload, {
   if (!payload || !moduleConfig) return;
 
   const isNested = (payload.dock || payload.pref) || (payload.inputs && (payload.inputs.dock || payload.inputs.pref));
-  const normalizedPayload = isNested
+  const normalizedPayload = payload.flat && typeof payload.flat === "object"
+    ? normalizeOsiPayload(payload.flat, moduleConfig)
+    : isNested
     ? {
         dock: payload.dock || payload.inputs?.dock || {},
         pref: payload.pref || payload.inputs?.pref || {}
@@ -198,10 +205,13 @@ export function loadStateFromOsi(payload, {
   }
 
   if (setExtraState) {
-    if (normalized.connectivity) {
+    // The option dropdown of the end plate modules is the end plate type; elsewhere it
+    // is the connectivity.
+    const selectedOption = normalized.end_plate_type || normalized.connectivity;
+    if (selectedOption) {
       setExtraState(prev => ({
         ...prev,
-        selectedOption: normalized.connectivity
+        selectedOption
       }));
     }
     if (normalized.section_profile) {

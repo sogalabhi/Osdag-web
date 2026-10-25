@@ -21,6 +21,7 @@ import ANGLE_SECTION from "../../../assets/TensionMember/com1_1.png";
 import BACK_TO_BACK_ANGLES_SAME_SIDE from "../../../assets/TensionMember/com1_2.png";
 import BACK_TO_BACK_ANGLES_OPPOSITE_SIDE from "../../../assets/TensionMember/com1_3.png";
 import ErrorImg from "../../../assets/notSelected.png";
+import { CONN_CFBW, CONN_CWBW } from "../../../constants/generated/coreKeys";
 
 const CustomOption = (props) => {
   return (
@@ -153,22 +154,25 @@ export const InputSection = ({
       if (conn && epType) {
         console.log(conn + "  " + epType);
       }
-      const imageMap = {
-        "Column-Flange-Beam-Web": {
+      // Beam-to-column end plate pictures, by connectivity then end plate type.
+      const endPlateImages = {
+        [CONN_CFBW]: {
           "Flushed - Reversible Moment": BC_CF_BW_FLUSH,
           "Extended One Way - Irreversible Moment": BC_CF_BW_EOW,
           "Extended Both Ways - Reversible Moment": BC_CF_BW_EBW,
         },
-        "Column-Web-Beam-Web": {
+        [CONN_CWBW]: {
           "Flushed - Reversible Moment": BC_CW_BW_FLUSH,
           "Extended One Way - Irreversible Moment": BC_CW_BW_EOW,
           "Extended Both Ways - Reversible Moment": BC_CW_BW_EBW,
         },
+      };
+      const imageMap = {
         "Flushed - Reversible Moment": FRM, "Extended One Way - Irreversible Moment": EOWIM, "Extended Both Ways - Reversible Moment": EBWRM,
-        "Column Flange-Beam-Web": CFBW, "Column Web-Beam-Web": CWBW, "Beam-Beam": BB,
+        [CONN_CFBW]: CFBW, [CONN_CWBW]: CWBW, "Beam-Beam": BB,
       };
 
-      const selectedImage = (conn ? imageMap[conn]?.[epType] : null) || imageMap[extraState.selectedOption] || ErrorImg;
+      const selectedImage = (conn ? endPlateImages[conn]?.[epType] : null) || imageMap[extraState.selectedOption] || ErrorImg;
       setImageSource(selectedImage);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

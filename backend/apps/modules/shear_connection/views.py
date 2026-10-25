@@ -11,6 +11,7 @@ from rest_framework import status
 import traceback
 from osdag_core.Common import (
     KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_HEADERPLATE, KEY_DISP_SEATED_ANGLE,
+    VALUES_CONN, VALUES_CONN_1,
 )
 from .registry import ShearConnectionRegistry
 from apps.core.utils.module_helpers import (
@@ -89,7 +90,7 @@ class ShearConnectionViewSet(viewsets.ViewSet):
             '8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50',
             '56', '63', '75', '80', '90', '100', '110', '120'
         ]
-        connectivity_common = ['Column Flange-Beam-Web', 'Column Web-Beam-Web', 'Beam-Beam']
+        connectivity_common = list(VALUES_CONN)
 
         try:
             if slug == 'fin-plate':
@@ -141,7 +142,7 @@ class ShearConnectionViewSet(viewsets.ViewSet):
 
             if slug == 'seated-angle':
                 data = {
-                    'connectivityList': ['Column Flange-Beam-Web', 'Column Web-Beam-Web'],
+                    'connectivityList': list(VALUES_CONN_1),
                     'columnList': catalog.designations("Columns"),
                     'beamList': catalog.designations("Beams"),
                     'materialList': material_list(),

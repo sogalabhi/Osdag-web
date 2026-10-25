@@ -1,6 +1,6 @@
 
 import { validateRequiredFields } from '../../shared/utils/validation';
-import { KEY_DISP_BCENDPLATE } from "../../../constants/generated/coreKeys";
+import { KEY_DISP_BCENDPLATE, CONN_CFBW, CONN_CWBW } from "../../../constants/generated/coreKeys";
 export const beamToColumnEndPlateConfig = {
   sessionName: "Beam to Column End Plate Connection",
   designType: KEY_DISP_BCENDPLATE,
@@ -14,7 +14,7 @@ export const beamToColumnEndPlateConfig = {
     bolt_slip_factor: "0.3",
     bolt_tension_type: "Pre-tensioned",
     bolt_type: "Bearing Bolt",
-    connectivity: "Column-Flange-Beam-Web",
+    connectivity: CONN_CFBW,
     plate_thickness: [],
     connector_material: "E 165 (Fe 290)",
     design_method: "Limit State Design",
@@ -97,8 +97,8 @@ export const beamToColumnEndPlateConfig = {
           label: "Connectivity",
           type: "select",
           options: [
-            { value: "Column-Flange-Beam-Web", label: "Column-Flange-Beam-Web" },
-            { value: "Column-Web-Beam-Web", label: "Column-Web-Beam-Web" }
+            { value: CONN_CFBW, label: CONN_CFBW },
+            { value: CONN_CWBW, label: CONN_CWBW }
           ]
         },
         {

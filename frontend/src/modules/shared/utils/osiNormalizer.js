@@ -1,5 +1,13 @@
 import { getModuleKeyMap } from "./osiMapperTracer";
 
+// Keys the desktop writes for its own output panel and widgets; they carry no design input.
+const DESKTOP_UI_STATE_KEY = /^(out_titles_status|Label_\d+)$/;
+
+// The desktop stores the overall material, the connector material and each member's
+// material under separate keys; a web form often has one field for several of them. When
+// keys share a field, the more specific key is read last and wins.
+const keyPriority = (key) => (key === "Material" ? 0 : key === "Connector.Material" ? 1 : 2);
+
 /**
  * Normalizes flat OSI key-value dictionary into nested JSON format
  * e.g. { inputs: { dock: {...}, pref: {...} } }
@@ -27,15 +35,20 @@ export function normalizeOsiPayload(flatObj, moduleConfig = null) {
   const dock = {};
   const pref = {};
 
-  Object.entries(flatObj).forEach(([key, value]) => {
+  Object.entries(flatObj).sort(([a], [b]) => keyPriority(a) - keyPriority(b)).forEach(([key, rawValue]) => {
+    if (DESKTOP_UI_STATE_KEY.test(key)) return;
+    const value = typeof rawValue === "string" ? rawValue.trim() : rawValue;
+
     // 1. Group Pref. fields
     if (key.startsWith("Pref.")) {
       const prefKey = key.substring(5);
       pref[prefKey] = value;
     }
-    // 2. Map via tracer keyMap
+    // 2. Map via the module's own key map (one .osi key can feed several fields)
     else if (keyMap[key]) {
-      dock[keyMap[key]] = value;
+      keyMap[key].forEach((formKey) => {
+        dock[formKey] = Array.isArray(value) ? [...value] : value;
+      });
     }
     // 3. Fallback: string clean mapping
     else {
@@ -46,13 +59,7 @@ export function normalizeOsiPayload(flatObj, moduleConfig = null) {
         .replace(/\./g, "_")
         .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
         .toLowerCase();
-      
-      // If moduleConfig.defaultInputs has it, map it
-      if (moduleConfig?.defaultInputs && cleanKey in moduleConfig.defaultInputs) {
-        dock[cleanKey] = value;
-      } else {
-        dock[cleanKey] = value;
-      }
+      dock[cleanKey] = value;
     }
   });
 

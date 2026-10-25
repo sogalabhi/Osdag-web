@@ -2,7 +2,7 @@
   "source": "frontend-defaults:strutsWeldedConfig.js",
   "notes": "Run of strutsWeldedConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"plate_thickness\":[\"10\",\"12\",\"16\"],\"section_designation\":[\"50 x 50 x 6\",\"60 x 60 x 6\"]}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "Struts-Welded-Design",
+    "Module": "Struts Welded to End Gusset",
     "Member.Profile": "Angles",
     "Member.Designation": [
       "50 x 50 x 6",

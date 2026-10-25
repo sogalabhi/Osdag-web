@@ -6,6 +6,7 @@ import { getPartColor, getRenderOrder } from "./config/partConfig";
 import { createViewMapper } from "./config/viewMappings";
 import { SceneManager } from "./SceneManager";
 import { useCadSceneContext } from "./context/CadSceneContext";
+import { CONN_CWBW } from "../../../../constants/generated/coreKeys";
 
 function CadScene({
   modelPaths,
@@ -33,7 +34,7 @@ function CadScene({
   const modelScale = cameraSettings?.modelScale || 0.008;
   const orthographicView = cameraSettings?.orthographicView || null;
   const connectivity = cameraSettings?.connectivity || null;
-  const isColumnWebBeamWeb = connectivity === "Column Web-Beam-Web";
+  const isColumnWebBeamWeb = connectivity === CONN_CWBW;
 
   // 3. Helpers (Memoized to prevent reload loops)
   const shouldShowPart = useMemo(() => {

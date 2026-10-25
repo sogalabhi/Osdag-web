@@ -1,6 +1,8 @@
 // Generated from osdag_core/Common.py by scripts/gen_core_keys.py.
 // Do not edit by hand; run `python scripts/gen_core_keys.py` to regenerate.
 
+export const CONN_CFBW = "Column Flange-Beam Web";
+export const CONN_CWBW = "Column Web-Beam Web";
 export const DISP_CS_GAUGE = "Cross-centre Gauge Distance (mm)";
 export const DISP_EFF = "Effective Length (mm)";
 export const DISP_FLANGE_TITLE_WELD = "Flange Weld";

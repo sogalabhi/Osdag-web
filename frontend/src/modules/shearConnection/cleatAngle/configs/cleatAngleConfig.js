@@ -1,7 +1,7 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
-import { KEY_DISP_CLEATANGLE } from "../../../../constants/generated/coreKeys";
+import { KEY_DISP_CLEATANGLE, CONN_CFBW, CONN_CWBW } from "../../../../constants/generated/coreKeys";
 export const cleatAngleConfig = {
   sessionName: KEY_DISP_CLEATANGLE,
   designType: KEY_DISP_CLEATANGLE,
@@ -12,7 +12,7 @@ export const cleatAngleConfig = {
     // See finPlateConfig.js's identical comment on why this stays hardcoded
     // (required-field validation checks raw inputs.connectivity) alongside
     // the array[0]-derived fallback in buildSubmissionParams below.
-    connectivity: "Column Flange-Beam-Web",
+    connectivity: CONN_CFBW,
     bolt_diameter: [],
     bolt_grade: [],
     bolt_type: "Bearing Bolt",
@@ -72,11 +72,6 @@ export const cleatAngleConfig = {
   },
 
   buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
-    const conn_map = {
-      "Column Flange-Beam-Web": "Column Flange-Beam Web",
-      "Column Web-Beam-Web": "Column Web-Beam Web", 
-      "Beam-Beam": "Beam-Beam",
-    };
     // Matches the connectivitySelect widget's own options[0] visual
     // fallback (InputSection.jsx), derived from the live list rather than
     // a hardcoded literal that could drift out of sync with the backend's
@@ -90,7 +85,7 @@ export const cleatAngleConfig = {
       "Bolt.Slip_Factor": inputs.bolt_slip_factor,
       "Bolt.TensionType": inputs.bolt_tension_type,
       "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-      "Connectivity": conn_map[connectivity],
+      "Connectivity": connectivity,
       "Connector.Material": inputs.connector_material,
       "Design.Design_Method": inputs.design_method,
       "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
@@ -143,7 +138,7 @@ export const cleatAngleConfig = {
           options: "columnList",
           conditionalDisplay: (extraState) => {
             const connectivity = extraState?.selectedOption;
-            return connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web";
+            return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
         {
@@ -153,7 +148,7 @@ export const cleatAngleConfig = {
           options: "beamList",
           conditionalDisplay: (extraState) => {
             const connectivity = extraState?.selectedOption;
-            return connectivity === "Column Flange-Beam-Web" || connectivity === "Column Web-Beam-Web";
+            return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
         {

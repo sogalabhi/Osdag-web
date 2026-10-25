@@ -2,7 +2,7 @@
   "source": "frontend-defaults:basePlateConfig.js",
   "notes": "Run of basePlateConfig.buildSubmissionParams on defaultInputs; every customizable list set to \"All\" (the UI default; full option lists sent). Connectivity \"Welded Column Base\" (extraState.selectedOption). Defaults left empty and filled with realistic catalog values: {\"member_designation\":\"HB 200\",\"load_axial\":\"200\",\"load_axial_tension\":\"50\",\"load_shear_major\":\"50\",\"load_shear_minor\":\"30\",\"load_moment_major\":\"40\",\"load_moment_minor\":\"20\"}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Module": "BasePlateConnection",
+    "Module": "Base Plate Connection",
     "Member.Designation": "HB 200",
     "Material": "E 250 (Fe 410 W)A",
     "Connectivity": "Welded Column Base",

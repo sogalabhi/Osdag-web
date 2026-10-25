@@ -33,10 +33,10 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **4.3 Find by Name APIs:** Details of `ProjectByNameAPI` for unique project identity search.
 
 ### 5. [Chapter 5: OSI File Specification & Exchange System](./chapter_5_osi_file_specification.md)
-* **5.1 The OSI Format Anatomy:** Syntax and layout of Osdag Input (`.osi`) files (flat dotted vs. nested JSON).
+* **5.1 The OSI Format Anatomy:** Syntax and layout of Osdag Input (`.osi`) files (flat dotted YAML read with PyYAML, including anchors, vs. nested JSON).
 * **5.2 Exporting OSI Files (`SaveOsiFromInputs`):** Base64 inline downloads for Guest users vs. DB-stored `OsiFile` records for authenticated users.
-* **5.3 Importing OSI Files (`OpenOsiUpload` & `OpenOsiById`):** Upload parsing, ID-based fetching, and module resolution through the frontend module registry.
-* **5.4 Key Translation & Frontend Prefill Normalizer:** Translating dotted PascalCase parameters into web snake_case states.
+* **5.3 Importing OSI Files (`OpenOsiUpload` & `OpenOsiById`):** Upload parsing, ID-based fetching, module resolution through the frontend module registry, and desktop module-name compatibility.
+* **5.4 Key Translation & Frontend Prefill Normalizer:** Mapping the file's keys to each module's form fields, desktop connectivity names, and desktop keys the web has no field for.
 * **5.5 Project-to-OSI Exporter Converter:** Flattening and mapping web preference overrides with `Pref.` prefixes for desktop compatibility.
 * **5.6 Stateless Backend-Assisted Import & Frontend Configs:** In-memory upload parsing without database modification, key translation, and form hydration.
 
