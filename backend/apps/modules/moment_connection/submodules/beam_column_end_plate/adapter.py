@@ -324,15 +324,16 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         module = create_from_input(input_values)
+        design_status = bool(getattr(module, "design_status", False))
 
         # Get raw output data
-        raw_output_text = module.output_values(True)
-        detailing = module.detailing(True)
-        continuity_plate_details = module.continuity_plate_details(True)
-        stiffener_plate_details = module.web_stiffener_plate_details(True)
-        stiffener_details = module.stiffener_details(True)
-        stiffener_detailing = module.stiffener_detailing(True)
-        weld_details = module.weld_details(True)
+        raw_output_text = module.output_values(design_status)
+        detailing = module.detailing(design_status)
+        continuity_plate_details = module.continuity_plate_details(design_status)
+        stiffener_plate_details = module.web_stiffener_plate_details(design_status)
+        stiffener_details = module.stiffener_details(design_status)
+        stiffener_detailing = module.stiffener_detailing(design_status)
+        weld_details = module.weld_details(design_status)
         
         from osdag_core.custom_logger import CustomLogger
         if hasattr(module, "logger") and isinstance(module.logger, CustomLogger):
@@ -347,7 +348,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             stiffener_plate_details + stiffener_details +
             stiffener_detailing + weld_details
         )
-        raw_csv = build_raw_output_dict(raw_output)
+        raw_csv = build_raw_output_dict(raw_output, design_status)
 
         # Format output
         for param in raw_output:

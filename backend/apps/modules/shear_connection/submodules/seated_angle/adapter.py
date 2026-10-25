@@ -229,6 +229,8 @@ def create_from_input(input_values: Dict[str, Any]) -> SeatedAngleConnection:
         traceback.print_exc()
         print('e in set_input_values : ' , e)
         print('error in setting the input values')
+        # Surface the reason in the design logs; the design stays unsafe.
+        module.logger.error(f" : {e}")
 
     return module
 
@@ -245,22 +247,28 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     """
     output = {}  # Dictionary for formatted values
     module = create_from_input(input_values)  # Create module from input.
+    design_status = bool(getattr(module, "design_status", False))
 
     # Generate output values in unformatted form.
-    raw_output_text = module.output_values(True)
-    raw_csv = build_raw_output_dict(raw_output_text)
-    raw_output_capacities = module.capacities(True)
-    raw_output_seated_spacing_beam = module.seated_spacing_beam(True)
-    raw_output_seated_spacing_col = module.seated_spacing_col(True)
-    raw_output_top_spacing_col = module.top_spacing_col(True)
-    raw_output_top_spacing_beam = module.top_spacing_beam(True)
-    
+    raw_output_text = module.output_values(design_status)
+    raw_csv = build_raw_output_dict(raw_output_text, design_status)
+
+    # The detail tables read geometry that only exists for a finished design.
+    def detail_table(method):
+        return method(design_status) if design_status else []
+
+    raw_output_capacities = detail_table(module.capacities)
+    raw_output_seated_spacing_beam = detail_table(module.seated_spacing_beam)
+    raw_output_seated_spacing_col = detail_table(module.seated_spacing_col)
+    raw_output_top_spacing_col = detail_table(module.top_spacing_col)
+    raw_output_top_spacing_beam = detail_table(module.top_spacing_beam)
+
     try:
-        raw_output_section_capacities = module.section_capacities(True)
+        raw_output_section_capacities = detail_table(module.section_capacities)
     except Exception as e:
         print("Error calling section_capacities:", e)
         raw_output_section_capacities = []
-    
+
     raw_seated_spacing_beam = [
         (f"{key}_seated_beam", label, typ, value, visible if len(item) == 5 else True)
         for item in raw_output_seated_spacing_beam

@@ -255,11 +255,12 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     output = {}  # Dictionary for formatted values
     raw_csv = {}
     module = create_from_input(input_values)  # Create module from input.
+    design_status = bool(getattr(module, "design_status", False))
     print('module : ******' , module)
     print('type of module : ******** ' , type(module))
     # Generate output values in unformatted form.
-    raw_output_text = module.output_values(True)
-    stiffener_output = module.stiffener_details(True)
+    raw_output_text = module.output_values(design_status)
+    stiffener_output = module.stiffener_details(design_status)
     
     from osdag_core.custom_logger import CustomLogger
     if hasattr(module, "logger") and isinstance(module.logger, CustomLogger):
@@ -267,7 +268,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     else:
         logs = getattr(module, "logs", []) or []
     raw_output = raw_output_text + stiffener_output
-    raw_csv = build_raw_output_dict(raw_output)
+    raw_csv = build_raw_output_dict(raw_output, design_status)
 
     # os.system("clear")
     # Loop over all the text values and add them to ouptut dict.

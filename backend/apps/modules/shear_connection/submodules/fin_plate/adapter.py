@@ -346,6 +346,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     print("\n[Step 1] Creating module from input...")
     try:
         module = create_from_input(input_values)  # Create module from input.
+        design_status = bool(getattr(module, "design_status", False))
         print(f"Module created: {type(module).__name__}")
         print(f"Module object: {module}")
     except Exception as e:
@@ -356,11 +357,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     logs = []
     
     try:
-        print("\n[Step 2] Calling module.output_values(True)...")
+        print("\n[Step 2] Calling module.output_values(design_status)...")
         print(f"   Module type: {type(module)}")
         print(f"   Module has output_values method: {hasattr(module, 'output_values')}")
         try:
-            raw_output_text = module.output_values(True)
+            raw_output_text = module.output_values(design_status)
             print(f"output_values() returned {len(raw_output_text)} parameters")
             if len(raw_output_text) > 0:
                 print(f"   First parameter sample: {raw_output_text[0] if isinstance(raw_output_text[0], (list, tuple)) else 'N/A'}")
@@ -369,12 +370,12 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             traceback.print_exc()
             raise
 
-        raw_csv = build_raw_output_dict(raw_output_text)
+        raw_csv = build_raw_output_dict(raw_output_text, design_status)
 
-        print("\n[Step 3] Calling module.spacing(True)...")
+        print("\n[Step 3] Calling module.spacing(design_status)...")
         print(f"   Module has spacing method: {hasattr(module, 'spacing')}")
         try:
-            raw_output_spacing = module.spacing(True)
+            raw_output_spacing = module.spacing(design_status)
             print(f"spacing() returned {len(raw_output_spacing)} parameters")
             if len(raw_output_spacing) > 0:
                 print(f"   First spacing parameter: {raw_output_spacing[0] if isinstance(raw_output_spacing[0], (list, tuple)) else 'N/A'}")
@@ -384,10 +385,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             traceback.print_exc()
             raise
         
-        print("\n[Step 4] Calling module.capacities(True)...")
+        print("\n[Step 4] Calling module.capacities(design_status)...")
         print(f"   Module has capacities method: {hasattr(module, 'capacities')}")
         try:
-            raw_output_capacities = module.capacities(True)
+            raw_output_capacities = module.capacities(design_status)
             print(f"capacities() returned {len(raw_output_capacities)} parameters")
             if len(raw_output_capacities) > 0:
                 print(f"   First capacity parameter: {raw_output_capacities[0] if isinstance(raw_output_capacities[0], (list, tuple)) else 'N/A'}")
@@ -396,10 +397,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             traceback.print_exc()
             raise
         
-        print("\n[Step 5] Calling module.section_capacities(True)...")
+        print("\n[Step 5] Calling module.section_capacities(design_status)...")
         print(f"   Module has section_capacities method: {hasattr(module, 'section_capacities')}")
         try:
-            raw_output_section_capacities = module.section_capacities(True)
+            raw_output_section_capacities = module.section_capacities(design_status)
             print(f"section_capacities() returned {len(raw_output_section_capacities)} parameters")
             if len(raw_output_section_capacities) > 0:
                 print(f"   First section_capacity parameter: {raw_output_section_capacities[0] if isinstance(raw_output_section_capacities[0], (list, tuple)) else 'N/A'}")

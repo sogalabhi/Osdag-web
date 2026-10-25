@@ -266,6 +266,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     
     output = {}  # Dictionary for formatted values
     module = create_from_input(input_values)  # Create module from input.
+    design_status = bool(getattr(module, "design_status", False))
     print('module : ' , module)
     print('type of module : ' , type(module))
 
@@ -304,7 +305,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             return {}, logs, {}
 
         # Generate output values in unformatted form.
-        raw_output_text = module.output_values(True)
+        raw_output_text = module.output_values(design_status)
         print('CleatAngle - raw_output_text:', raw_output_text)
         print(f'CleatAngle - raw_output_text length: {len(raw_output_text)}')
     except Exception as e:
@@ -312,67 +313,67 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         traceback.print_exc()
         raw_output_text = []
 
-    raw_csv = build_raw_output_dict(raw_output_text)
+    raw_csv = build_raw_output_dict(raw_output_text, design_status)
         
     try:
-        raw_output_spacing_supported = module.spacing(True)  # Generate output val (supported side)
+        raw_output_spacing_supported = module.spacing(design_status)  # Generate output val (supported side)
         print('CleatAngle - raw_output_spacing_supported:', raw_output_spacing_supported)
     except Exception as e:
         print('CleatAngle - Error calling spacing (supported):', e)
         raw_output_spacing_supported = []
 
     try:
-        raw_output_spacing_supporting = module.spting_spacing(True)  # supporting side spacing
+        raw_output_spacing_supporting = module.spting_spacing(design_status)  # supporting side spacing
         print('CleatAngle - raw_output_spacing_supporting:', raw_output_spacing_supporting)
     except Exception as e:
         print('CleatAngle - Error calling spting_spacing (supporting):', e)
         raw_output_spacing_supporting = []
         
     try:
-        # raw_output_capacities = module.capacities(True)
-        raw_bolt_capacity_supported = module.bolt_capacity_details_supported(True)
+        # raw_output_capacities = module.capacities(design_status)
+        raw_bolt_capacity_supported = module.bolt_capacity_details_supported(design_status)
         print('CleatAngle - raw_bolt_capacity_supported:', raw_bolt_capacity_supported)
     except Exception as e:
         print('CleatAngle - Error calling bolt_capacity_details_supported:', e)
         raw_bolt_capacity_supported = []
         
     try:
-        raw_bolt_capacity_suporting = module.bolt_capacity_details_suporting(True)
+        raw_bolt_capacity_suporting = module.bolt_capacity_details_suporting(design_status)
         print('CleatAngle - raw_bolt_capacity_suporting:', raw_bolt_capacity_suporting)
     except Exception as e:
         print('CleatAngle - Error calling bolt_capacity_details_suporting:', e)
         raw_bolt_capacity_suporting = []
 
     try:
-        raw_sptd_leg_capacities = module.sptd_leg_capacities(True)
+        raw_sptd_leg_capacities = module.sptd_leg_capacities(design_status)
         print('CleatAngle - raw_sptd_leg_capacities:', raw_sptd_leg_capacities)
     except Exception as e:
         print('CleatAngle - Error calling sptd_leg_capacities:', e)
         raw_sptd_leg_capacities = []
 
     try:
-        raw_spting_leg_capacities = module.spting_leg_capacities(True)
+        raw_spting_leg_capacities = module.spting_leg_capacities(design_status)
         print('CleatAngle - raw_spting_leg_capacities:', raw_spting_leg_capacities)
     except Exception as e:
         print('CleatAngle - Error calling spting_leg_capacities:', e)
         raw_spting_leg_capacities = []
 
     try:
-        raw_bolt_cap_sptd_simple = module.bolt_capacity_supported(True)
+        raw_bolt_cap_sptd_simple = module.bolt_capacity_supported(design_status)
         print('CleatAngle - raw_bolt_cap_sptd_simple:', raw_bolt_cap_sptd_simple)
     except Exception as e:
         print('CleatAngle - Error calling bolt_capacity_supported:', e)
         raw_bolt_cap_sptd_simple = []
 
     try:
-        raw_bolt_cap_spting_simple = module.bolt_capacity_supporting(True)
+        raw_bolt_cap_spting_simple = module.bolt_capacity_supporting(design_status)
         print('CleatAngle - raw_bolt_cap_spting_simple:', raw_bolt_cap_spting_simple)
     except Exception as e:
         print('CleatAngle - Error calling bolt_capacity_supporting:', e)
         raw_bolt_cap_spting_simple = []
 
     try:
-        raw_section_capacity = module.section_capacity_details(True)
+        raw_section_capacity = module.section_capacity_details(design_status)
         print('CleatAngle - raw_section_capacity:', raw_section_capacity)
     except Exception as e:
         print('CleatAngle - Error calling section_capacity_details:', e)

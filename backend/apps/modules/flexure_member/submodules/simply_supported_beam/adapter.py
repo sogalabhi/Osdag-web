@@ -124,21 +124,22 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         # Collect all output sections safely
         # ------------------------------------
         raw_output = []
+        design_status = bool(getattr(module, "design_status", False))
 
         if hasattr(module, "spacing"):
-            raw_output += module.spacing(True) or []
+            raw_output += module.spacing(design_status) or []
 
         if hasattr(module, "output_values"):
-            raw_output += module.output_values(True) or []
+            raw_output += module.output_values(design_status) or []
 
         # Optional sections (if exist)
         if hasattr(module, "detail"):
-            raw_output += module.detail(True) or []
+            raw_output += module.detail(design_status) or []
 
         if hasattr(module, "detailing"):
-            raw_output += module.detailing(True) or []
+            raw_output += module.detailing(design_status) or []
 
-        raw_csv = build_raw_output_dict(raw_output)
+        raw_csv = build_raw_output_dict(raw_output, design_status)
 
         # ------------------------------------
         # Collect logs properly

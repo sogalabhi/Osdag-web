@@ -121,10 +121,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 display_label = label_map.get(target_key, label or target_key)
                 mapped_output[target_key] = {"key": target_key, "label": display_label, "val": val}
 
+        design_status = bool(getattr(module, "design_status", False))
         if hasattr(module, "output_values"):
-            out_list = module.output_values(True)
+            out_list = module.output_values(design_status)
             map_tuple_list(out_list)
-            raw_csv = build_raw_output_dict(out_list)
+            raw_csv = build_raw_output_dict(out_list, design_status)
 
         # Spacing diagram expects PlateWidth; module has self.width from input
         if "PlateWidth" not in mapped_output:

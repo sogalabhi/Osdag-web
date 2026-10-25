@@ -218,15 +218,16 @@ def generate_cover_plate_bolted_output(module_class, input_values):
     """Generate, format and return the output values for a beam/column cover-plate bolted design."""
     output = {}
     module = create_cover_plate_bolted_from_input(module_class, input_values)
+    design_status = bool(getattr(module, "design_status", False))
 
-    raw_output_text = module.output_values(True)
-    raw_member_capacity = module.member_capacityoutput(True)
-    flange_bolt_capacity_raw = module.flange_bolt_capacity(True)
-    web_bolt_capacity_raw = module.web_bolt_capacity(True)
-    flange_capacity_raw = module.flangecapacity(True)
-    web_capacity_raw = module.webcapacity(True)
-    flange_spacing_raw = module.flangespacing(True)
-    web_spacing_raw = module.webspacing(True)
+    raw_output_text = module.output_values(design_status)
+    raw_member_capacity = module.member_capacityoutput(design_status)
+    flange_bolt_capacity_raw = module.flange_bolt_capacity(design_status)
+    web_bolt_capacity_raw = module.web_bolt_capacity(design_status)
+    flange_capacity_raw = module.flangecapacity(design_status)
+    web_capacity_raw = module.webcapacity(design_status)
+    flange_spacing_raw = module.flangespacing(design_status)
+    web_spacing_raw = module.webspacing(design_status)
 
     raw_flange_bolt_capacity = [
         (f"{key.strip()}_flange_bolt_capacity", label, typ, value, visible if len(item) == 5 else True)
@@ -279,7 +280,8 @@ def generate_cover_plate_bolted_output(module_class, input_values):
     raw_csv = build_raw_output_dict(
         raw_output_text + raw_member_capacity + flange_bolt_capacity_raw +
         web_bolt_capacity_raw + flange_capacity_raw + web_capacity_raw +
-        flange_spacing_raw + web_spacing_raw
+        flange_spacing_raw + web_spacing_raw,
+        design_status
     )
 
     from osdag_core.custom_logger import CustomLogger

@@ -321,12 +321,13 @@ def generate_output(input_values: Dict[str, Any]):
     """Run design and return output dict + logs. Output keys match desktop output_values keys."""
     output = {}
     module = create_from_input(input_values)
+    design_status = bool(getattr(module, "design_status", False))
     logs = []
     raw_csv = {}
 
     try:
-        raw_output = module.output_values(True)
-        raw_csv = build_raw_output_dict(raw_output)
+        raw_output = module.output_values(design_status)
+        raw_csv = build_raw_output_dict(raw_output, design_status)
         if hasattr(module, "logger") and isinstance(module.logger, CustomLogger):
             logs = module.logger.get_logs()
 
@@ -341,13 +342,13 @@ def generate_output(input_values: Dict[str, Any]):
 
         # Stiffener detail modals: merge flange, along web, across web details into output
         if hasattr(module, "stiffener_flange_details"):
-            _append_detail_list(output, module.stiffener_flange_details(True))
+            _append_detail_list(output, module.stiffener_flange_details(design_status))
         if hasattr(module, "stiffener_along_web_details"):
-            _append_detail_list(output, module.stiffener_along_web_details(True))
+            _append_detail_list(output, module.stiffener_along_web_details(design_status))
         if hasattr(module, "stiffener_across_web_details"):
-            _append_detail_list(output, module.stiffener_across_web_details(True))
+            _append_detail_list(output, module.stiffener_across_web_details(design_status))
         if hasattr(module, "stiffener_hollow_details"):
-            hollow_list = module.stiffener_hollow_details(True)
+            hollow_list = module.stiffener_hollow_details(design_status)
             _append_detail_list(output, hollow_list)
             # stiffener_hollow_details() returns 3 groups (D, B, OD/CHS) that
             # all reuse the same KEY_OUT_STIFFENER_THICKNESS / _CHS constants

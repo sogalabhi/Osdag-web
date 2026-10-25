@@ -153,19 +153,21 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     output = {}
     raw_csv = {}
     module = create_from_input(input_values)
+    design_status = bool(getattr(module, "design_status", False))
 
     # Get raw output data
-    raw_output_text = module.output_values(True)
-    raw_member_capacity = module.member_capacityoutput(True)
-    flange_weld_details = module.flange_weld_details(True)
-    web_weld_details = module.web_weld_details(True)
-    web_capacity = module.webcapacity(True)
-    flange_capacity = module.flangecapacity(True)
-    web_block_shear_pattern = module.web_pattern(True)
+    raw_output_text = module.output_values(design_status)
+    raw_member_capacity = module.member_capacityoutput(design_status)
+    flange_weld_details = module.flange_weld_details(design_status)
+    web_weld_details = module.web_weld_details(design_status)
+    web_capacity = module.webcapacity(design_status)
+    flange_capacity = module.flangecapacity(design_status)
+    web_block_shear_pattern = module.web_pattern(design_status)
 
     raw_csv = build_raw_output_dict(
         raw_output_text + raw_member_capacity + flange_weld_details + web_weld_details +
-        web_capacity + flange_capacity + web_block_shear_pattern
+        web_capacity + flange_capacity + web_block_shear_pattern,
+        design_status
     )
 
     from osdag_core.custom_logger import CustomLogger
