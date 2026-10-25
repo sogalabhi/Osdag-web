@@ -107,6 +107,8 @@ Rules once this is done:
 
 Phases 1 and 2 can run in parallel. Phase 3 needs Phases 0 and 2. Phase 4 needs Phase 3 for the module it touches. Phase 5 steps 1–3 can start at any time; its other steps need Phases 1 and 4 for the module they touch. Phase 6 can start at any time, and its step 1 is a bug fix worth doing straight away. Do Phase 5.1 (payload parity tests) before Phase 1.4 if possible, since it also protects the frontend codemod. Land each phase as several PRs, one per module family. Sizes are rough estimates for one developer.
 
+**Every PR updates the docs it affects** in the same PR: the matching `documentation/chapter_*.md` (keys and adapters in chapter 2, form engine and field types in chapter 6, `.osi` in chapter 5, setup and deploy in chapter 11), the `documentation/INDEX.md` entries, and the install guides in `documentation/general/` when setup changes. Fix text the change made wrong as well as adding new sections. Docs never mention issue numbers or phases; they describe the code as it is.
+
 ### Phase 0 — Safety net (~1–2 days)
 
 1. Build known-good input fixtures for every module under `backend/apps/core/tests/fixtures/design_inputs/`:
