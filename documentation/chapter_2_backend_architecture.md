@@ -69,6 +69,8 @@ def run_design_calculation_task(self, module_name, submodule_slug, inputs, proje
     }
 ```
 
+**Designs must not keep state between runs.** A worker process runs many designs one after another, so anything a design leaves behind (a logger that keeps its messages, a class attribute or module-level list that is mutated, a cache) leaks into the next design's result. Create state on the design instance, or reset it when the design is set up. `backend/apps/core/tests/test_design_state_isolation.py` enforces this: it runs every design-input fixture through its adapter in one process, in sorted and in reversed order, and fails if any result differs between the two passes.
+
 ### 3. Django Channels & WebSocket Event Broadcast
 To support real-time status updates without polling overhead, the backend integrates **Django Channels** for WebSocket routing:
 - **Protocol Router (`asgi.py`)**: Configured to wrap standard Django HTTP application with `ProtocolTypeRouter`, forwarding WebSocket connection requests (`ws/tasks/<task_id>/`) to channels consumers.
