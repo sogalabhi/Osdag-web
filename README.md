@@ -89,11 +89,15 @@ Ask abhijithsogal@gmail.com to add your email to users in the project.
 
 To run the entire stack (Postgres, Redis, Django, Celery Worker, React frontend) in containers:
 
-1. Build and run all services:
+1. Create your environment file and fill in the values (`SECRET_KEY`, `DATABASE_PASSWORD`, `INFLUXDB_TOKEN`, `INFLUXDB_ADMIN_PASSWORD` and `GRAFANA_ADMIN_PASSWORD` are required; see the [installation guides](documentation/general/installation_docs_linux.md)):
+   ```bash
+   cp .env.example .env
+   ```
+2. Build and run all services:
    ```bash
    docker compose up --build
    ```
-2. Navigate to `http://localhost:5173/` in your browser.
+3. Navigate to `http://localhost:5173/` in your browser.
 
 > [!TIP]
 > **Docker Development & Auto-Reloading:**
@@ -194,5 +198,13 @@ If you are on Linux or macOS, you can launch all three services (Celery worker, 
 
 Osdag-Web ships with a full observability stack (InfluxDB v2 time-series database & Grafana live dashboards) for stress-testing and monitoring concurrently running design calculations.
 
-For details on configuration, telemetry schemas, and running load tests, refer to [Chapter 12: Load Test Monitoring & Observability](documentation/chapter_12_load_testing_observability.md).
+For details on configuration, telemetry schemas, and running load tests, refer to [Chapter 12: Load Testing](documentation/chapter_12_load_testing.md).
+
+The InfluxDB token, InfluxDB admin password and Grafana admin password are read from `.env` (`INFLUXDB_TOKEN`, `INFLUXDB_ADMIN_PASSWORD`, `GRAFANA_ADMIN_PASSWORD`); see [Chapter 13](documentation/chapter_13_metrics_telemetry.md).
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow, linting and pre-commit checks.
 

@@ -149,7 +149,7 @@ WebSocket connection counts come from the Django process itself
 
 Environment variables:
   INFLUXDB_URL        - e.g. http://influxdb:8086
-  INFLUXDB_TOKEN      - all-access token
+  INFLUXDB_TOKEN      - all-access token (required, no default)
   INFLUXDB_ORG        - e.g. osdag
   INFLUXDB_BUCKET     - e.g. osdag_metrics
   REDIS_URL           - e.g. redis://redis:6379/0
@@ -176,7 +176,7 @@ log = logging.getLogger("metrics_collector")
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 INFLUXDB_URL    = os.getenv("INFLUXDB_URL",    "http://influxdb:8086")
-INFLUXDB_TOKEN  = os.getenv("INFLUXDB_TOKEN",  "osdag-super-secret-token")
+INFLUXDB_TOKEN  = os.environ["INFLUXDB_TOKEN"]
 INFLUXDB_ORG    = os.getenv("INFLUXDB_ORG",    "osdag")
 INFLUXDB_BUCKET = os.getenv("INFLUXDB_BUCKET", "osdag_metrics")
 REDIS_URL       = os.getenv("REDIS_URL",       "redis://redis:6379/0")
@@ -586,6 +586,17 @@ class TaskProgressConsumer(AsyncWebsocketConsumer):
 
 Osdag-Web uses Grafana provisioning files to automatically configure datasources and dashboards when containers start.
 
+### Credentials (`.env`)
+No credentials are hardcoded. Copy `.env.example` to `.env` (see the [installation guides](general/installation_docs_linux.md)) and set these before running `docker compose up`; Compose refuses to start if any is empty:
+
+| Variable | Used by |
+|----------|---------|
+| `INFLUXDB_TOKEN` | InfluxDB admin token (`DOCKER_INFLUXDB_INIT_ADMIN_TOKEN`), the metrics collector, the Django backend and Celery, and the Grafana datasource |
+| `INFLUXDB_ADMIN_PASSWORD` | InfluxDB `osdag_admin` user (`DOCKER_INFLUXDB_INIT_PASSWORD`) |
+| `GRAFANA_ADMIN_PASSWORD` | Grafana `admin` user (`GF_SECURITY_ADMIN_PASSWORD`) |
+
+> InfluxDB applies the token and admin password only on first initialization of its data volume. After changing them in `.env`, recreate the volume (`docker compose down -v`, which deletes stored metrics) or rotate the token inside InfluxDB.
+
 ### 1. The Sidecar Container Build Schema (`Dockerfile`)
 The collector is containerized using a multi-runtime Alpine stack:
 ```dockerfile
@@ -608,7 +619,7 @@ To bypass manual user configuration interfaces upon container deployment, the In
 ```bash
 #!/bin/bash
 # InfluxDB v2 first-boot initialisation script.
-# Sets up the org, bucket, and a token with known values
+# Sets up the org, bucket, and a token taken from the environment
 # so the rest of the stack can connect without manual steps.
 #
 # This is mounted into the influxdb container as an init script at
@@ -618,7 +629,8 @@ set -e
 
 INFLUX_ORG="${DOCKER_INFLUXDB_INIT_ORG:-osdag}"
 INFLUX_BUCKET="${DOCKER_INFLUXDB_INIT_BUCKET:-osdag_metrics}"
-INFLUX_TOKEN="${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN:-osdag-super-secret-token}"
+: "${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN:?DOCKER_INFLUXDB_INIT_ADMIN_TOKEN must be set}"
+INFLUX_TOKEN="$DOCKER_INFLUXDB_INIT_ADMIN_TOKEN"
 
 echo "[influxdb-init] Organisation : $INFLUX_ORG"
 echo "[influxdb-init] Bucket       : $INFLUX_BUCKET"
@@ -627,7 +639,7 @@ echo "[influxdb-init] InfluxDB ready."
 ```
 
 ### 3. Datasource Provisioning: `influxdb.yaml`
-Saved in `monitoring/grafana/provisioning/datasources/influxdb.yaml`:
+Saved in `monitoring/grafana/provisioning/datasources/influxdb.yaml`. The token is not stored in the file: Grafana expands `$INFLUXDB_TOKEN` from its own environment, which `docker-compose.yml` sets from the root `.env`:
 ```yaml
 apiVersion: 1
 
@@ -643,7 +655,7 @@ datasources:
       defaultBucket: osdag_metrics
       tlsSkipVerify: true
     secureJsonData:
-      token: osdag-super-secret-token
+      token: $INFLUXDB_TOKEN
     isDefault: true
     editable: true
 ```
@@ -697,7 +709,7 @@ from(bucket: "osdag_metrics")
    docker compose logs metrics-collector
    ```
 2. **Missing Redis Telemetry:** Verify that the `REDIS_URL` in the environment points to the correct Redis port. If connection timeouts occur, the sidecar will fail gracefully, sleep, and try again on the next tick.
-3. **Invalid Token Errors:** If InfluxDB returns unauthorized warnings, verify that the `INFLUXDB_TOKEN` in the sidecar config matches the token generated when initializing the database container.
+3. **Invalid Token Errors:** If InfluxDB returns unauthorized warnings, verify that `INFLUXDB_TOKEN` in `.env` matches the token the InfluxDB volume was initialized with (see the note in the Credentials section above).
 4. **WebSocket Counts Not Updating:** If WebSocket active connection gauges show 0 during a test run, ensure that Daphne is routing ASGI requests correctly, and that the consumer connection methods are firing without exception.
 
 ---

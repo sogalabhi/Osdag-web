@@ -174,7 +174,7 @@ redis-cli ping
 
 ## Step 10 — Configure Django Settings
 
-The backend reads settings from environment variables. For local development, export them in your shell or create a `.env` file at the project root:
+The backend reads settings from environment variables. For local development, export them in your shell or create a `.env` file at the project root. (`.env.example` is the template used for Docker; for native use, copy it and change `DATABASE_HOST`, `REDIS_URL`, `CELERY_BROKER_URL` and `CELERY_RESULT_BACKEND` to `localhost`/`127.0.0.1`. The InfluxDB and Grafana variables are only needed for the Docker monitoring stack.) A minimal file:
 
 ```bash
 cat > .env << 'EOF'

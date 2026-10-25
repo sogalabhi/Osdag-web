@@ -1,3 +1,5 @@
+> For the current workflow, linting and pre-commit checks, see [CONTRIBUTING.md](../../CONTRIBUTING.md) in the repository root.
+
 
 ## Contributing to Osdag
 

@@ -72,40 +72,28 @@ cd Osdag-web
 
 ### A.5 — Create the `.env` File
 
-Create a `.env` file in the project root folder. 
+The repository ships a template, `.env.example`, in the project root. Copy it and fill in the values (one-time setup):
 
-In **PowerShell**, you can run:
 ```powershell
-Set-Content -Path .env -Value @"
-DEBUG=True
-SECRET_KEY=dev-secret-key
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-DATABASE_NAME=postgres_Intg_osdag
-DATABASE_USER=osdagdeveloper
-DATABASE_PASSWORD=password
-DATABASE_HOST=db
-DATABASE_PORT=5432
-
-REDIS_URL=redis://redis:6379/0
-CELERY_BROKER_URL=redis://redis:6379/0
-CELERY_RESULT_BACKEND=redis://redis:6379/0
-USE_REDIS_CACHE=false
-
-VITE_API_URL=http://localhost:8000
-"@
+copy .env.example .env
+notepad .env
 ```
-Or, open **Notepad**, copy the values above, and save it as `.env` (make sure to choose "All Files (*.*)" in the Save dialog so it does not save as `.env.txt`).
 
----
+Replace every `change-me` value. If you create the file in Notepad instead, choose "All Files (*.*)" in the Save dialog so it does not save as `.env.txt`.
 
-> [!WARNING]
-> **Line Endings Gotcha on Windows**: Windows uses CRLF line endings (`\r\n`), but scripts run inside the Linux containers must use LF (`\n`). If you encounter errors like `\r: command not found` when starting containers, run the following command to configure git and re-clone the repository:
-> ```cmd
-> git config --global core.autocrlf input
-> ```
+Docker Compose refuses to start unless these variables are set (they are marked `change-me` in the template):
 
----
+| Variable | Purpose |
+|----------|---------|
+| `SECRET_KEY` | Django secret key; use a long random string |
+| `DATABASE_PASSWORD` | PostgreSQL password for the `osdagdeveloper` role |
+| `INFLUXDB_TOKEN` | InfluxDB admin API token (also used by the backend, the metrics collector and the Grafana datasource) |
+| `INFLUXDB_ADMIN_PASSWORD` | InfluxDB admin UI password |
+| `GRAFANA_ADMIN_PASSWORD` | Grafana `admin` password |
+
+The remaining values in `.env.example` have working defaults for Docker. `.env` is git-ignored; never commit it.
+
+The Vite dev server reads a separate `frontend/.env`; `frontend/.env.example` is its template (`VITE_BASE_URL`).
 
 ### A.5.1 — Add Firebase Service Account Key JSON
 
@@ -181,7 +169,7 @@ docker compose logs --tail=50 celery_worker
 
 Production is not started by hand from a checkout. Merges to `25april` build images tagged with the commit SHA and a GitHub Actions workflow deploys that SHA with `docker-compose.prod.yml` on the production server. It runs migrations once, waits for healthchecks and runs a smoke test. See [Chapter 11.8](../chapter_11_conda_and_docker_setup.md#118-continuous-deployment--rollback) for the pipeline, rollback and the one-time setup.
 
-On the production server, set `SECRET_KEY` and `DATABASE_PASSWORD` (both required) and `ALLOWED_HOSTS` in the environment or a `.env` file in the deploy directory (`/opt/osdag-web`).
+On the production server, set `SECRET_KEY` and `DATABASE_PASSWORD` (both required) and `ALLOWED_HOSTS` in the environment or a `.env` file (copied from `.env.example`) in the deploy directory (`/opt/osdag-web`).
 
 ---
 

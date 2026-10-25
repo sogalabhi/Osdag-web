@@ -12,6 +12,6 @@ datasources:
       defaultBucket: osdag_metrics
       tlsSkipVerify: true
     secureJsonData:
-      token: osdag-super-secret-token
+      token: $INFLUXDB_TOKEN
     isDefault: true
     editable: true
