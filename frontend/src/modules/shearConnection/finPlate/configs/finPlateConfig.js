@@ -1,12 +1,11 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
-import { MODULE_KEY_FIN_PLATE, MODULE_DISPLAY_FIN_PLATE } from '../../../../constants/modules';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { KEY_DISP_FINPLATE } from "../../../../constants/generated/coreKeys";
 export const finPlateConfig = {
-  sessionName: MODULE_DISPLAY_FIN_PLATE,
-  routePath: "/design/connections/shear/fin_plate",
-  designType: MODULE_KEY_FIN_PLATE,
-  cameraKey: MODULE_KEY_FIN_PLATE,
+  sessionName: KEY_DISP_FINPLATE,
+  designType: KEY_DISP_FINPLATE,
+  cameraKey: KEY_DISP_FINPLATE,
   cadOptions: ["Model", "Beam", "Column", "Plate"],
 
   defaultInputs: {
@@ -19,7 +18,7 @@ export const finPlateConfig = {
     material: "E 165 (Fe 290)",
     load_shear: "70",
     load_axial: "30",
-    module: MODULE_KEY_FIN_PLATE,
+    module: KEY_DISP_FINPLATE,
     plate_thickness: [],
     beam_section: "MB 300",
     column_section: "HB 150",
@@ -106,7 +105,7 @@ export const finPlateConfig = {
         "Member.Supported_Section.Material": inputs.supported_material,
         "Member.Supporting_Section.Designation": inputs.column_section,
         "Member.Supporting_Section.Material": inputs.supporting_material,
-        "Module": MODULE_KEY_FIN_PLATE,
+        "Module": KEY_DISP_FINPLATE,
         "Weld.Fab": inputs.weld_fab,
         "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
         "Connector.Plate.Thickness_List": allSelected.plate_thickness ? lists.thicknessList : inputs.plate_thickness,
@@ -132,7 +131,7 @@ export const finPlateConfig = {
         "Member.Supported_Section.Material": inputs.supported_material,
         "Member.Supporting_Section.Designation": inputs.primary_beam,
         "Member.Supporting_Section.Material": inputs.supporting_material,
-        "Module": MODULE_KEY_FIN_PLATE,
+        "Module": KEY_DISP_FINPLATE,
         "Weld.Fab": inputs.weld_fab,
         "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
         "Connector.Plate.Thickness_List": allSelected.plate_thickness ? lists.thicknessList : inputs.plate_thickness,

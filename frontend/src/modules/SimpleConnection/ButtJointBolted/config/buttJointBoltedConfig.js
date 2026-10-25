@@ -1,8 +1,8 @@
 import { makeSimpleConnectionBoltedConfig } from "../../shared/configFactory";
+import { KEY_DISP_BUTTJOINTBOLTED } from "../../../../constants/generated/coreKeys";
 
 export const buttJointBoltedConfig = makeSimpleConnectionBoltedConfig({
     sessionName: "Butt Joint Bolted",
-    routePath: "/design/connections/simple/butt_joint_bolted",
-    designType: "ButtJointBolted",
+    designType: KEY_DISP_BUTTJOINTBOLTED,
     hasCoverPlate: true,
 });

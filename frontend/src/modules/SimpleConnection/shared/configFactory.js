@@ -25,10 +25,9 @@ function getArrayParam(allSelectedFlag, fullList, selectedList) {
 // Butt joint adds a "Cover Plate" splice the lap joint doesn't have (a real
 // structural difference, not just a label) — captured with hasCoverPlate
 // rather than unified away.
-export function makeSimpleConnectionBoltedConfig({ sessionName, routePath, designType, hasCoverPlate }) {
+export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasCoverPlate }) {
     const config = {
         sessionName,
-        routePath,
         designType,
         cameraKey: "Connection",
         cadOptions: hasCoverPlate
@@ -37,7 +36,7 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, routePath, desig
 
         defaultInputs: {
             axial_force: "60",
-            module: sessionName,
+            module: designType,
             plate1_thickness: [],
             plate2_thickness: [],
             bolt_diameter: [],
@@ -171,10 +170,9 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, routePath, desig
 // detailing_packing_plate default alongside cover_plate (co-occurs in the
 // original butt config, so bundled under the same flag rather than split
 // into a second param).
-export function makeSimpleConnectionWeldedConfig({ sessionName, routePath, designType, hasCoverPlate }) {
+export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasCoverPlate }) {
     const config = {
         sessionName,
-        routePath,
         designType,
         cameraKey: "Connection",
         cadOptions: hasCoverPlate
@@ -183,7 +181,7 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, routePath, desig
 
         defaultInputs: {
             axial_force: "60",
-            module: sessionName,
+            module: designType,
             plate1_thickness: [],
             plate2_thickness: [],
             weld_size: [],

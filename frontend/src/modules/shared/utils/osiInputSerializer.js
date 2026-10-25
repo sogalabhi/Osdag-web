@@ -1,6 +1,25 @@
-import { MODULE_KEY_FIN_PLATE } from '../../../constants/modules';
+import { KEY_DISP_FINPLATE, KEY_DISP_BB_EP_SPLICE, KEY_DISP_BEAMCOVERPLATE } from '../../../constants/generated/coreKeys';
 import { INPUT_KEY_TO_LIST } from '../constants/moduleDataKeys';
-import { getModuleConfig, getFinPlateMemberData } from './moduleConfig';
+import { getModuleDesignPref } from '../../registry';
+
+// Fin plate member designations for the selected connectivity.
+const getFinPlateMemberData = (selectedOption, inputs) => {
+  const config = getModuleDesignPref(KEY_DISP_FINPLATE);
+  if (!config.connectivityMap?.[selectedOption]) return null;
+
+  const connectivity = config.connectivityMap[selectedOption];
+  if (connectivity === 'Column Flange-Beam Web' || connectivity === 'Column Web-Beam Web') {
+    return {
+      memberSupported: inputs.beam_section,
+      memberSupporting: inputs.column_section,
+    };
+  }
+
+  return {
+    memberSupported: inputs.secondary_beam,
+    memberSupporting: inputs.primary_beam,
+  };
+};
 
 const formatArrayForText = (arr) => {
   if (!arr || arr.length === 0) return '';
@@ -51,7 +70,7 @@ export const buildOsiContent = ({
   }
 
   let content = '';
-  const moduleConfig = getModuleConfig(inputs?.module);
+  const moduleConfig = getModuleDesignPref(inputs?.module);
   const moduleName = inputs?.module || '';
 
   // Basic bolt and connector fields with null checks
@@ -67,9 +86,9 @@ export const buildOsiContent = ({
   content += `Bolt.Type: ${inputs?.bolt_type?.replaceAll('_', ' ') || ''}\n`;
 
   // Module-specific connectivity handling
-  if (moduleName === MODULE_KEY_FIN_PLATE) {
+  if (moduleName === KEY_DISP_FINPLATE) {
     content += `Connectivity: ${moduleConfig.connectivityMap?.[selectedOption]}\n`;
-  } else if (moduleName === 'Beam-to-Beam End Plate Connection') {
+  } else if (moduleName === KEY_DISP_BB_EP_SPLICE) {
     content += `Connectivity *: ${inputs.connectivity}\n`;
     content += `EndPlateType: ${moduleConfig.connectivityMap?.[selectedOption]}\n`;
   }
@@ -90,7 +109,7 @@ export const buildOsiContent = ({
   content += `Module: ${inputs?.module || ''}\n`;
 
   // Module-specific member designation handling with null checks
-  if (moduleName === MODULE_KEY_FIN_PLATE) {
+  if (moduleName === KEY_DISP_FINPLATE) {
     try {
       const memberData = getFinPlateMemberData(selectedOption, inputs);
       if (memberData) {
@@ -102,17 +121,17 @@ export const buildOsiContent = ({
     } catch {
       // swallow, keep content best-effort
     }
-  } else if (moduleName === 'Beam-to-Beam End Plate Connection') {
+  } else if (moduleName === KEY_DISP_BB_EP_SPLICE) {
     content += `Member.Supported_Section.Designation: ${inputs?.supported_designation || ''}\n`;
     content += `Member.Supported_Section.Material: ${inputs?.supported_material || ''}\n`;
-  } else if (moduleName === 'Beam-to-Beam Cover Plate Bolted Connection') {
+  } else if (moduleName === KEY_DISP_BEAMCOVERPLATE) {
     content += `Member.Designation: ${inputs?.member_designation || ''}\n`;
     content += `Member.Material: ${inputs?.member_material || ''}\n`;
     content += `Connector.Flange_Plate.Preferences: ${inputs?.flange_plate_preferences || ''}\n`;
   }
 
   // Weld information (not for cover plate bolted)
-  if (moduleName !== 'Beam-to-Beam Cover Plate Bolted Connection') {
+  if (moduleName !== KEY_DISP_BEAMCOVERPLATE) {
     content += `Weld.Fab: ${inputs?.weld_fab || ''}\n`;
     content += `Weld.Material_Grade_OverWrite: ${inputs?.weld_material_grade || ''}\n`;
     if (inputs?.weld_type) {

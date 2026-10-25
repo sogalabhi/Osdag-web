@@ -1,8 +1,8 @@
 import { makeSimpleConnectionBoltedConfig } from "../../shared/configFactory";
+import { KEY_DISP_LAPJOINTBOLTED } from "../../../../constants/generated/coreKeys";
 
 export const lapJointBoltedConfig = makeSimpleConnectionBoltedConfig({
     sessionName: "Lap Joint Bolted",
-    routePath: "/design/connections/simple/lap_joint_bolted",
-    designType: "LapJointBolted",
+    designType: KEY_DISP_LAPJOINTBOLTED,
     hasCoverPlate: false,
 });

@@ -1,12 +1,12 @@
 import { useRef, useState, useEffect } from "react";
 import { useEngineeringService } from "../hooks/useEngineeringService";
-import { MODULE_KEY_FIN_PLATE } from '../../../constants/modules';
+import { KEY_DISP_FINPLATE, KEY_DISP_PLATE_GIRDER_WELDED } from '../../../constants/generated/coreKeys';
 import { message } from 'antd';
 import { apiBase } from "../../../api"; // eslint-disable-line no-unused-vars
 import { openOsiFile } from "../../../datasources/osiDataSource";
 import { loadStateFromOsi } from "./osiLoader";
 import { downloadSectionCatalog } from "../../../datasources/sectionsDataSource";
-import { getModuleConfig } from "./moduleConfig";
+import { getModuleDesignPref } from "../../registry";
 import { expandAllSelectedInputs } from "./osiInputSerializer";
 import { buildLogFileContent } from "./logExport";
 import { canOpenAdditionalInputs } from "./designPrefOpenGuard";
@@ -49,7 +49,7 @@ function UnifiedDropdownMenu({
 
   const getLocalModuleConfig = () => {
     const moduleName = inputs?.module;
-    return getModuleConfig(moduleName);
+    return getModuleDesignPref(moduleName);
   };
 
   const handleToggle = () => {
@@ -125,7 +125,7 @@ function UnifiedDropdownMenu({
     }
     const inputsForSave = expandAllSelectedInputs(inputs, allSelected, getContextData());
 
-    const module_id = inputs?.module || MODULE_KEY_FIN_PLATE;
+    const module_id = inputs?.module || KEY_DISP_FINPLATE;
     const projectName = inputs?.project_name || inputs?.name || 'project';
 
     try {
@@ -346,10 +346,8 @@ function UnifiedDropdownMenu({
             const isSave3dModel = option.name === "Save 3D Model";
             const isSaveCadImage = option.name === "Save Cad Image";
             const isPlateGirder =
-              moduleConfig?.designType === "Plate-Girder" ||
-              moduleConfig?.sessionName === "Plate Girder Design" ||
-              moduleConfig?.routePath?.includes("plate_girder") ||
-              inputs?.module === "Plate-Girder";
+              moduleConfig?.designType === KEY_DISP_PLATE_GIRDER_WELDED ||
+              inputs?.module === KEY_DISP_PLATE_GIRDER_WELDED;
             const isOptimizationGraph = option.name === "Show Optimization Graph";
             const isSaveOutputsCsv = option.name === "Download Outputs CSV" || option.name === "Save Outputs (.csv)";
 

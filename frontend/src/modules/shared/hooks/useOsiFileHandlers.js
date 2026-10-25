@@ -1,7 +1,7 @@
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 import { openOsiFile } from "../../../datasources/osiDataSource";
 import { loadStateFromOsi } from "../utils/osiLoader";
-import { MODULE_KEY_SEAT_ANGLE } from "../../../constants/modules";
+import { KEY_DISP_SEATED_ANGLE } from "../../../constants/generated/coreKeys";
 import { message } from "antd";
 
 export const useOsiFileHandlers = ({ form, moduleData, actions }, moduleConfig) => {
@@ -21,7 +21,7 @@ export const useOsiFileHandlers = ({ form, moduleData, actions }, moduleConfig) 
   const { service } = actions;
 
   const handleSaveInputs = async () => {
-    const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || MODULE_KEY_SEAT_ANGLE;
+    const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || KEY_DISP_SEATED_ANGLE;
     const projectName = inputs?.project_name || inputs?.name || moduleConfig?.sessionName || 'project';
 
     try {

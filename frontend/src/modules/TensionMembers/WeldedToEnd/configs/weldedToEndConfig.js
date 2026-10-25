@@ -8,14 +8,14 @@ import {
     KEY_LENGTH, KEY_AXIAL, KEY_CONNECTOR_MATERIAL, KEY_DP_DETAILING_EDGE_TYPE,
     KEY_DP_DETAILING_GAP, KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
     KEY_DP_DESIGN_METHOD, KEY_PLATETHK, KEY_SEC_MATERIAL,
-    KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O
+    KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O,
+  KEY_DISP_TENSION_WELDED,
 } from "../../../../constants/generated/coreKeys";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 export const weldedToEndConfig = {
     sessionName: "Tension Member Welded Design",
-    routePath: "/design/tension-member/welded_to_end_gusset",
-    designType: "Tension-Member-Welded-Design",
+    designType: KEY_DISP_TENSION_WELDED,
     cameraKey: "TensionMember",
     cadOptions: ["Model", "Member", "Plate"],
 
@@ -25,7 +25,7 @@ export const weldedToEndConfig = {
         location: "Long Leg",
         length: "1250",
         axial_force: "60",
-        module: "Tension Member Bolted Design",
+        module: KEY_DISP_TENSION_WELDED,
         plate_thickness: [],
         section_designation: [],
         material: "E 250 (Fe 410 W)A",
@@ -128,7 +128,7 @@ export const weldedToEndConfig = {
             [KEY_LENGTH]: String(inputs.length),
             [KEY_SEC_PROFILE]: String(inputs.section_profile),
             [KEY_LOCATION]: String(inputs.location),
-            [KEY_MODULE]: "Tension-Member-Welded-Design",
+            [KEY_MODULE]: KEY_DISP_TENSION_WELDED,
             [KEY_PLATETHK]: getArrayParam(allSelected.plate_thickness, lists.thicknessList, inputs.plate_thickness),
         };
     },

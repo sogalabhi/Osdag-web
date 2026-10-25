@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
  * Navigation guard for unsaved work/back button handling.
  * Keeps UI state for confirmation modal and pending navigation.
  */
-export const useNavigationGuard = (hasUnsavedWork, routePath) => {
+export const useNavigationGuard = (hasUnsavedWork, moduleId) => {
   const navigate = useNavigate();
 
   // Modal State
@@ -53,7 +53,7 @@ export const useNavigationGuard = (hasUnsavedWork, routePath) => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [hasUnsaved, routePath]);
+  }, [hasUnsaved, moduleId]);
 
   // Ensure there's a history entry to trap back navigation when work is unsaved
   useEffect(() => {

@@ -1,11 +1,10 @@
-import { MODULE_KEY_BEAM_COLUMN_END_PLATE, MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT } from "../../../constants/modules";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { KEY_DISP_BCENDPLATE } from "../../../constants/generated/coreKeys";
 export const beamToColumnEndPlateConfig = {
   sessionName: "Beam to Column End Plate Connection",
-  routePath: "/design/connections/column-beam/end_plate",
-  designType: MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
-  cameraKey: MODULE_KEY_BEAM_COLUMN_END_PLATE,
+  designType: KEY_DISP_BCENDPLATE,
+  cameraKey: KEY_DISP_BCENDPLATE,
   cadOptions: ["Model", "Beam", "Column", "EndPlate"],
   
   defaultInputs: {
@@ -30,7 +29,7 @@ export const beamToColumnEndPlateConfig = {
     column_section: "HB 150",
     supported_material: "E 165 (Fe 290)",
     supporting_material: "E 165 (Fe 290)",
-    module: MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
+    module: KEY_DISP_BCENDPLATE,
     weld_fab: "Shop Weld",
     weld_material_grade: "410",
     weld_type: "Groove Weld",
@@ -86,7 +85,7 @@ export const beamToColumnEndPlateConfig = {
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
       "Weld.Type": inputs.weld_type,
-      Module: MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
+      Module: KEY_DISP_BCENDPLATE,
     };
   },
   inputSections: [

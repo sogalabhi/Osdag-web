@@ -7,19 +7,19 @@ import {
   KEY_MODULE, KEY_SEC_PROFILE, KEY_SECSIZE, KEY_MATERIAL, KEY_SEC_MATERIAL,
   KEY_DP_DESIGN_METHOD, KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, 
   KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH, KEY_SHEAR, KEY_MOMENT,
-  KEY_LENGTH, KEY_SUPPORT, KEY_TORSIONAL_RES, KEY_WARPING_RES
+  KEY_LENGTH, KEY_SUPPORT, KEY_TORSIONAL_RES, KEY_WARPING_RES,
+  KEY_DISP_FLEXURE,
 } from "../../../../constants/generated/coreKeys";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 export const simplySupportedBeamConfig = {
   sessionName: "Simply Supported Beam Design",
-  routePath: "/design/flexure/simply_supported_beam",
-  designType: "Simply-Supported-Beam",
+  designType: KEY_DISP_FLEXURE,
   cameraKey: "FlexuralMember", 
   cadOptions: ["Model"],
 
   defaultInputs: {
-    module: "Simply-Supported-Beam",
+    module: KEY_DISP_FLEXURE,
     section_profile: "Beams and Columns",
     section_designation: ["MB 400"],
     material: "E 250 (Fe 410 W)A",
@@ -112,7 +112,7 @@ export const simplySupportedBeamConfig = {
     );
 
     return {
-      [KEY_MODULE]: "Simply-Supported-Beam",
+      [KEY_MODULE]: KEY_DISP_FLEXURE,
       [KEY_SEC_PROFILE]: String(inputs.section_profile),
       [KEY_SECSIZE]: allSelected.section_designation
         ? dynamicSectionList

@@ -1,11 +1,10 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
-import { MODULE_KEY_SEAT_ANGLE, MODULE_DISPLAY_SEAT_ANGLE } from '../../../../constants/modules';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { KEY_DISP_SEATED_ANGLE } from "../../../../constants/generated/coreKeys";
 export const seatedAngleConfig = {
-  sessionName: MODULE_DISPLAY_SEAT_ANGLE,
-  routePath: "/design/connections/shear/seatAngle",
-  designType: MODULE_KEY_SEAT_ANGLE,
+  sessionName: KEY_DISP_SEATED_ANGLE,
+  designType: KEY_DISP_SEATED_ANGLE,
   cameraKey: "SeatedAngle",
   cadOptions: ["Model", "Beam", "Column", "SeatedAngle"],
   
@@ -21,7 +20,7 @@ export const seatedAngleConfig = {
     connector_material: "E 250 (Fe 410 W)A",
     load_shear: "70",
     load_axial: "30",
-    module: MODULE_KEY_SEAT_ANGLE,
+    module: KEY_DISP_SEATED_ANGLE,
     beam_section: "MB 300",
     column_section: "HB 150",
     primary_beam: "JB 200",
@@ -113,7 +112,7 @@ export const seatedAngleConfig = {
         "Member.Supported_Section.Material": inputs.supported_material,
         "Member.Supporting_Section.Designation": inputs.column_section,
         "Member.Supporting_Section.Material": inputs.supporting_material,
-        "Module": MODULE_KEY_SEAT_ANGLE,
+        "Module": KEY_DISP_SEATED_ANGLE,
         "Weld.Fab": inputs.weld_fab,
         "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
         "Connector.Angle_List": allSelected.angle_list ? lists.angleList : inputs.angle_list,
@@ -140,7 +139,7 @@ export const seatedAngleConfig = {
         "Member.Supported_Section.Material": inputs.supported_material,
         "Member.Supporting_Section.Designation": inputs.primary_beam,
         "Member.Supporting_Section.Material": inputs.supporting_material,
-        "Module": MODULE_KEY_SEAT_ANGLE,
+        "Module": KEY_DISP_SEATED_ANGLE,
         "Weld.Fab": inputs.weld_fab,
         "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
         "Connector.Angle_List": allSelected.angle_list ? lists.angleList : inputs.angle_list,

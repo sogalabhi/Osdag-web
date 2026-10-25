@@ -1,20 +1,14 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router";
-import {
-  MODULE_SUBMODULES,
-  CONNECTIONS_TAB_CONTENT,
-  GENERIC_SUBMODULE_CONTENT,
-  MODULE_ROUTES,
-} from "../../constants/modules";
+import { MENU_GROUPS, getMenuSections, getModuleRoute } from "../../modules/registry";
 
 import SectionCards from "./SectionCards";
-import { toast } from "react-toastify";
 
 const TabbedModulePage = () => {
   const moduleName = window.location.pathname.split("/")[1] || "";
   const navigate = useNavigate();
 
-  const submodules = useMemo(() => MODULE_SUBMODULES[moduleName] || [], [moduleName]);
+  const submodules = useMemo(() => MENU_GROUPS[moduleName] || [], [moduleName]);
   const [activeSubmodule, setActiveSubmodule] = useState(submodules[0]?.key);
   const [activeSubSubmodule, setActiveSubSubmodule] = useState("");
   const submoduleTabRefs = useRef({});
@@ -25,11 +19,7 @@ const TabbedModulePage = () => {
   }, [moduleName, submodules]);
 
   // Derive content based on activeSubmodule
-  const content = useMemo(() => {
-    return moduleName === "Connections"
-      ? CONNECTIONS_TAB_CONTENT[activeSubmodule] || []
-      : GENERIC_SUBMODULE_CONTENT[activeSubmodule] || [];
-  }, [moduleName, activeSubmodule]);
+  const content = useMemo(() => getMenuSections(activeSubmodule), [activeSubmodule]);
 
   // Sync activeSubSubmodule to first section label when activeSubmodule or content changes
   useEffect(() => {
@@ -38,26 +28,8 @@ const TabbedModulePage = () => {
   }, [activeSubmodule, content]);
 
   const handleModuleClick = (optionKey) => {
-    const route = MODULE_ROUTES[optionKey] || "";
-
-    if (route) {
-      navigate(route);
-    } else {
-      let optionLabel = "";
-      const allContents = [
-        ...Object.values(CONNECTIONS_TAB_CONTENT).flat(),
-        ...Object.values(GENERIC_SUBMODULE_CONTENT).flat(),
-      ];
-      for (const section of allContents) {
-        const option = section.options?.find((o) => o.key === optionKey);
-        if (option) {
-          optionLabel = option.label;
-          break;
-        }
-      }
-      const labelToShow = optionLabel || optionKey;
-      toast.info(`${labelToShow} module is under development.`);
-    }
+    const route = getModuleRoute(optionKey);
+    if (route) navigate(route);
   };
 
   const toDomId = (value) =>
@@ -118,7 +90,7 @@ const TabbedModulePage = () => {
     });
   };
 
-  if (!moduleName || !MODULE_SUBMODULES[moduleName]) {
+  if (!moduleName || !MENU_GROUPS[moduleName]) {
     return <div className="p-8">Module not found</div>;
   }
 

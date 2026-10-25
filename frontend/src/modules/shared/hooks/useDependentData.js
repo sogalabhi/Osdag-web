@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { MODULE_KEY_FIN_PLATE, MODULE_KEY_CLEAT_ANGLE } from "../../../constants/modules";
+import { KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE } from "../../../constants/generated/coreKeys";
 
 /**
  * Handles side-effect data fetches that depend on form inputs.
@@ -14,8 +14,8 @@ export const useDependentData = (getDesignPreferences, moduleConfig, inputs, ext
         const designationVal = inputs.section_designation || inputs.member_designation;
         if (
           designationVal &&
-          moduleConfig.cameraKey !== MODULE_KEY_FIN_PLATE &&
-          moduleConfig.cameraKey !== MODULE_KEY_CLEAT_ANGLE
+          moduleConfig.cameraKey !== KEY_DISP_FINPLATE &&
+          moduleConfig.cameraKey !== KEY_DISP_CLEATANGLE
         ) {
           let resolvedDesignation = designationVal;
           if (Array.isArray(designationVal)) {
@@ -59,7 +59,7 @@ export const useDependentData = (getDesignPreferences, moduleConfig, inputs, ext
   useEffect(() => {
     const handler = setTimeout(() => {
       const loadDesignPreferences = async () => {
-        if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE || moduleConfig.cameraKey === MODULE_KEY_CLEAT_ANGLE) {
+        if (moduleConfig.cameraKey === KEY_DISP_FINPLATE || moduleConfig.cameraKey === KEY_DISP_CLEATANGLE) {
           const conn_map = {
             "Column Flange-Beam-Web": "Column Flange-Beam Web",
             "Column Web-Beam-Web": "Column Web-Beam Web",

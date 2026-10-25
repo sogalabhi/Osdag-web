@@ -1,6 +1,6 @@
 import { apiClient, subscribeToTask } from "../utils/apiClient";
 import { MODULES, CAD, MATERIALS, DESIGN_PREFERENCES } from "./endpoints";
-import { getModuleSlug } from "../constants/apiRoutes";
+import { getModuleSlug } from "../modules/registry";
 import { getErrorMessage } from "../utils/apiError";
 
 /**

@@ -1,4 +1,3 @@
-import { MODULE_KEY_AXIALLY_LOADED_COLUMN } from "../../../constants/modules";
 import img_1_RRFF from "../../../assets/CompressionMember/1.RRFF.PNG";
 import img_1_RRFF_rotated from "../../../assets/CompressionMember/1.RRFF_rotated.PNG";
 import img_2_FRFR from "../../../assets/CompressionMember/2.FRFR.PNG";
@@ -11,15 +10,15 @@ import img_5_RRRF_rotated from "../../../assets/CompressionMember/5.RRRF_rotated
 import img_6_RRRR from "../../../assets/CompressionMember/6.RRRR.PNG";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { KEY_DISP_COMPRESSION_COLUMN } from "../../../constants/generated/coreKeys";
 export const axiallyLoadedColumnConfig = {
   sessionName: "Axially Loaded Column",
-  routePath: "/design/compression-member/axially_loaded_column",
-  designType: MODULE_KEY_AXIALLY_LOADED_COLUMN,
+  designType: KEY_DISP_COMPRESSION_COLUMN,
   cameraKey: "AxiallyLoadedColumn",
   cadOptions: ["Model"],
 
   defaultInputs: {
-    module: MODULE_KEY_AXIALLY_LOADED_COLUMN,
+    module: KEY_DISP_COMPRESSION_COLUMN,
     section_profile: "Beams and Columns",
     section_designation: [],
     material: "E 250 (Fe 410 W)A",
@@ -138,7 +137,7 @@ export const axiallyLoadedColumnConfig = {
     };
 
     return {
-      Module: MODULE_KEY_AXIALLY_LOADED_COLUMN,
+      Module: KEY_DISP_COMPRESSION_COLUMN,
       "Member.Profile": String(inputs.section_profile),
       "Member.Designation": getSectionDesignations(),
       Material: String(inputs.material),

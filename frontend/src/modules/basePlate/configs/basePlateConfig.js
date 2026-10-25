@@ -1,15 +1,15 @@
 import { UI_STRINGS } from '../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { KEY_DISP_BASE_PLATE } from "../../../constants/generated/coreKeys";
 export const basePlateConfig = {
   sessionName: "Base Plate",
-  routePath: "/design/connections/base_plate",
-  designType: "BasePlateConnection",
+  designType: KEY_DISP_BASE_PLATE,
   cameraKey: "BasePlateConnection",
   cadOptions: ["Model", "Column", "Plate", "Welds", "Bolts", "Concrete", "Grout"],
 
   defaultInputs: {
-    module: "BasePlateConnection",
+    module: KEY_DISP_BASE_PLATE,
     member_designation: "",
     material: "E 250 (Fe 410 W)A",
     connectivity: "Welded Column Base",
@@ -76,7 +76,7 @@ export const basePlateConfig = {
     const diameterIcf = allSelected?.anchor_diameter_icf ? (lists.anchorDiameterList || []) : toArr(inputs.anchor_diameter_icf);
     const gradeIcf = allSelected?.anchor_grade_icf ? (lists.anchorGradeList || []) : toArr(inputs.anchor_grade_icf);
     return {
-      Module: "BasePlateConnection",
+      Module: KEY_DISP_BASE_PLATE,
       "Member.Designation": memberDesignation,
       Material: inputs.material || "E 250 (Fe 410 W)A",
       Connectivity: inputs.connectivity || "Welded Column Base",

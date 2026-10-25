@@ -6,8 +6,7 @@ import Header from "../components/Header";
 import { useAuth } from "../../context/AuthContext";
 import { apiClient } from "../../utils/apiClient";
 import { AUTH, PROJECTS, MATERIALS, SECTIONS } from "../../datasources/endpoints";
-import { MODULE_ROUTES } from "../../constants/modules";
-import { getModuleRoute } from "../../constants/moduleRoutes";
+import { getModuleRoute } from "../../modules/registry";
 import { getErrorMessage } from "../../utils/apiError";
 
 /** ── DEBUG: catches render crashes in each section and logs which one ── */
@@ -353,7 +352,7 @@ const MyDataPage = () => {
 
   // Route to design page to open project
   const handleOpenProject = (project) => {
-    const route = MODULE_ROUTES[project.routeKey] || getModuleRoute(project.submodule);
+    const route = getModuleRoute(project.submodule);
     if (route) {
       navigate(`${route}/${project.id}`);
     } else {

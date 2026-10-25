@@ -1,11 +1,10 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
-import { MODULE_KEY_CLEAT_ANGLE, MODULE_DISPLAY_CLEAT_ANGLE } from '../../../../constants/modules';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { KEY_DISP_CLEATANGLE } from "../../../../constants/generated/coreKeys";
 export const cleatAngleConfig = {
-  sessionName: MODULE_DISPLAY_CLEAT_ANGLE,
-  routePath: "/design/connections/shear/cleatAngle",
-  designType: MODULE_KEY_CLEAT_ANGLE, 
+  sessionName: KEY_DISP_CLEATANGLE,
+  designType: KEY_DISP_CLEATANGLE,
   cameraKey: "CleatAngle",
   cadOptions: ["Model", "Beam", "Column", "CleatAngle"],
 
@@ -35,7 +34,7 @@ export const cleatAngleConfig = {
     detailing_corr_status: "No",
     design_method: "Limit State Design",
     cleat_section: [],
-    module: MODULE_KEY_CLEAT_ANGLE,
+    module: KEY_DISP_CLEATANGLE,
   },
 
   modalConfig: [
@@ -99,7 +98,7 @@ export const cleatAngleConfig = {
       "Detailing.Gap": inputs.detailing_gap,
       "Load.Shear": inputs.load_shear || "",
       "Material": inputs.connector_material,
-      "Module": MODULE_KEY_CLEAT_ANGLE,
+      "Module": KEY_DISP_CLEATANGLE,
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
       "Connector.Angle_List": allSelected.cleat_section ? lists.angleList : inputs.cleat_section,

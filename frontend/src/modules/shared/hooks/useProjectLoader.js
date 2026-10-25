@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { message } from "antd";
 import { useAuth } from "../../../context/AuthContext";
 import { loadStateFromOsi } from "../utils/osiLoader";
+import { getModuleRoute } from "../../registry";
 
 export const useProjectLoader = ({
   projectIdFromUrl,
@@ -185,8 +186,8 @@ export const useProjectLoader = ({
         const currentPathname = callbacksRef.current.location.pathname;
         const pathEndsWithId = currentPathname.endsWith(`/${projectId}`);
         const hasQueryProjectId = new URLSearchParams(callbacksRef.current.location.search).get('projectId') != null;
-        if (!pathEndsWithId && hasQueryProjectId && callbacksRef.current.moduleConfig.routePath) {
-          const basePath = callbacksRef.current.moduleConfig.routePath.replace(/\/$/, '');
+        const basePath = getModuleRoute(callbacksRef.current.moduleConfig.designType);
+        if (!pathEndsWithId && hasQueryProjectId && basePath) {
           callbacksRef.current.navigate(`${basePath}/${projectId}`, { replace: true });
         }
       } catch (_e) {
@@ -195,7 +196,7 @@ export const useProjectLoader = ({
         console.error('[EngineeringModule] Error loading project:', _e);
         message.warning('Cannot load project. Redirecting to module base.');
 
-        const basePath = callbacksRef.current.moduleConfig.routePath || '/home';
+        const basePath = getModuleRoute(callbacksRef.current.moduleConfig.designType) || '/home';
         callbacksRef.current.navigate(basePath, { replace: true });
       }
     };

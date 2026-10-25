@@ -2,7 +2,6 @@ import { validateRequiredFields } from '../../shared/utils/validation';
 
 export const compressionMemberConfig = {
   sessionName: "Compression Member Design",
-  routePath: "/design/compression-member/struts_in_trusses",
   designType: "Compression-Member-Design",
   cameraKey: "CompressionMember", 
   cadOptions: ["Model", "Member"],
