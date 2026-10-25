@@ -198,7 +198,7 @@ If you are on Linux or macOS, you can launch all three services (Celery worker, 
 
 Osdag-Web ships with a full observability stack (InfluxDB v2 time-series database & Grafana live dashboards) for stress-testing and monitoring concurrently running design calculations.
 
-For details on configuration, telemetry schemas, and running load tests, refer to [Chapter 12: Load Test Monitoring & Observability](documentation/chapter_12_load_testing_observability.md).
+For details on configuration, telemetry schemas, and running load tests, refer to [Chapter 12: Load Testing](documentation/chapter_12_load_testing.md).
 
 The InfluxDB token, InfluxDB admin password and Grafana admin password are read from `.env` (`INFLUXDB_TOKEN`, `INFLUXDB_ADMIN_PASSWORD`, `GRAFANA_ADMIN_PASSWORD`); see [Chapter 13](documentation/chapter_13_metrics_telemetry.md).
 
