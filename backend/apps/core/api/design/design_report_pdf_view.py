@@ -26,16 +26,27 @@ def _company_logo_dir():
     return os.path.realpath(os.path.join(os.getcwd(), "file_storage", "company_logo"))
 
 
+_COMPANY_LOGO_NAME = re.compile(r"[0-9a-f]{32}\.(png|jpg|jpeg)")
+
+
 def _safe_company_logo_path(path):
-    """Only allow logos previously stored by CompanyLogoView; anything else is dropped."""
+    """Only allow logos previously stored by CompanyLogoView; anything else is dropped.
+
+    CompanyLogoView names files <uuid hex><ext>, so only that file name is taken
+    from the client value and it is always looked up inside the logo directory.
+    """
     if not path or not isinstance(path, str):
         return ""
-    resolved = os.path.realpath(path)
-    logo_dir = _company_logo_dir()
-    if os.path.dirname(resolved) != logo_dir or not os.path.isfile(resolved):
-        logger.warning("[Report] rejected CompanyLogo path outside logo storage: %r", path)
+    name = path.replace("\\", "/").rsplit("/", 1)[-1]
+    if not _COMPANY_LOGO_NAME.fullmatch(name):
+        logger.warning("[Report] rejected CompanyLogo path: %r", path)
         return ""
-    return resolved.replace("\\", "/")
+    logo_dir = _company_logo_dir()
+    candidate = os.path.normpath(os.path.join(logo_dir, name))
+    if not candidate.startswith(logo_dir + os.sep) or not os.path.isfile(candidate):
+        logger.warning("[Report] CompanyLogo not found in logo storage: %r", path)
+        return ""
+    return candidate.replace("\\", "/")
 
 
 def filter_latex_content(latex_content: str, selected_sections):
