@@ -280,6 +280,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     print("\n[EndPlateAdapter.generate_output] called")
     output = {}  # Dictionary for formatted values
     module = create_from_input(input_values)  # Create module from input.
+    design_status = bool(getattr(module, "design_status", False))
     if module is None:
         raise RuntimeError("create_from_input returned None module")
 
@@ -287,20 +288,20 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     print(f"[EndPlateAdapter.generate_output] has logger={hasattr(module, 'logger')}")
     # Generate output values in unformatted form.
     try:
-        raw_output_text = module.output_values(True)
+        raw_output_text = module.output_values(design_status)
         print(f"[EndPlateAdapter.generate_output] raw_output_text={len(raw_output_text)}")
-        raw_output_spacing = module.spacing(True)  # Generate output val
+        raw_output_spacing = module.spacing(design_status)  # Generate output val
         print(f"[EndPlateAdapter.generate_output] raw_output_spacing={len(raw_output_spacing)}")
-        raw_output_capacities = module.capacities(True)
+        raw_output_capacities = module.capacities(design_status)
         print(f"[EndPlateAdapter.generate_output] raw_output_capacities={len(raw_output_capacities)}")
-        raw_output_bolt_capacity = module.bolt_capacity_details(True)
+        raw_output_bolt_capacity = module.bolt_capacity_details(design_status)
         print(f"[EndPlateAdapter.generate_output] raw_output_bolt_capacity={len(raw_output_bolt_capacity)}")
     except Exception as e:
         print(f"[EndPlateAdapter.generate_output] error while collecting raw outputs: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise
 
-    raw_csv = build_raw_output_dict(raw_output_text)
+    raw_csv = build_raw_output_dict(raw_output_text, design_status)
 
     # Prefer CustomLogger if attached
     if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):

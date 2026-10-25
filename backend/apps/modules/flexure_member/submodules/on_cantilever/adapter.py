@@ -185,14 +185,15 @@ def generate_output(input_values: Dict[str, Any]):
         module = create_from_input(input_values)
 
         raw_output = []
+        design_status = bool(getattr(module, "design_status", False))
 
         for method_name in ['spacing', 'output_values', 'detail', 'detailing']:
             if hasattr(module, method_name):
-                result = getattr(module, method_name)(True)
+                result = getattr(module, method_name)(design_status)
                 if result:
                     raw_output += result
 
-        raw_csv = build_raw_output_dict(raw_output)
+        raw_csv = build_raw_output_dict(raw_output, design_status)
 
         # Collect logs
         if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):

@@ -285,7 +285,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         raw_output_text +
         raw_output_flange + raw_output_web
     )
-    raw_csv = build_raw_output_dict(raw_output)
+    raw_csv = build_raw_output_dict(raw_output, design_ok)
 
     # Format output
     for param in raw_output:

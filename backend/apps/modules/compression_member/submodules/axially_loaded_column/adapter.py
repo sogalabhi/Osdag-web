@@ -316,7 +316,7 @@ def generate_output(
         return {}, logs, {}
 
     raw_output = module.output_values(True)
-    raw_csv = build_raw_output_dict(raw_output)
+    raw_csv = build_raw_output_dict(raw_output, design_status)
 
     for param in raw_output:
         if not isinstance(param, (list, tuple)) or len(param) < 4:

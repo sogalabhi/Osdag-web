@@ -142,10 +142,11 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     output = {}
     raw_csv = {}
     module = create_from_input(input_values)
+    design_status = bool(getattr(module, "design_status", False))
 
     # Get raw output data
-    raw_output_text = module.output_values(True)
-    raw_output_spacing = module.spacing(True)
+    raw_output_text = module.output_values(design_status)
+    raw_output_spacing = module.spacing(design_status)
 
     from osdag_core.custom_logger import CustomLogger
 
@@ -155,7 +156,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         logs = getattr(module, "logs", []) or []
 
     raw_output = raw_output_spacing + raw_output_text
-    raw_csv = build_raw_output_dict(raw_output)
+    raw_csv = build_raw_output_dict(raw_output, design_status)
 
     for param in raw_output:
         if param[2] == "TextBox":

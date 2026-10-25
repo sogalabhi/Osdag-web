@@ -218,7 +218,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         logs = getattr(module, "logs", []) or []
 
     raw_output = raw_output_spacing + raw_output_text
-    raw_csv = build_raw_output_dict(raw_output)
+    raw_csv = build_raw_output_dict(raw_output, design_status)
     for param in raw_output:
         if param[2] == "TextBox":
             key = param[0]

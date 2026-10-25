@@ -332,6 +332,7 @@ def generate_output(input_values: Dict[str, Any]):
         module = create_from_input(input_values)
 
         raw_output = []
+        design_status = bool(getattr(module, "design_status", False))
 
         # Collect available output sections
         for method_name in [
@@ -342,11 +343,11 @@ def generate_output(input_values: Dict[str, Any]):
         ]:
             if hasattr(module, method_name):
                 method = getattr(module, method_name)
-                result = method(True)
+                result = method(design_status)
                 if result:
                     raw_output += result
 
-        raw_csv = build_raw_output_dict(raw_output)
+        raw_csv = build_raw_output_dict(raw_output, design_status)
 
         # -----------------------------
         # Collect Logs

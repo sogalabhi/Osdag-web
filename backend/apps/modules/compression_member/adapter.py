@@ -141,19 +141,20 @@ def generate_output(input_values: Dict[str, Any]):
     """
     output = {}
     module = create_from_input(input_values)
+    design_status = bool(getattr(module, "design_status", False))
     logs = []
     raw_csv = {}
 
     try:
         # Generate output values
-        raw_output_text = module.output_values(True)
+        raw_output_text = module.output_values(design_status)
 
         # Get logs from the custom logger
         if hasattr(module, 'logger') and isinstance(module.logger, CustomLogger):
             logs = module.logger.get_logs()
 
         raw_output = raw_output_text
-        raw_csv = build_raw_output_dict(raw_output)
+        raw_csv = build_raw_output_dict(raw_output, design_status)
 
         # Process each parameter
         for i, param in enumerate(raw_output):

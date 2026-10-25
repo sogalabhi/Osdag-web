@@ -99,6 +99,10 @@ Creates the native computational solver class (e.g., `FinPlateConnection`), link
 ### 4. `generate_output(input_values: Dict[str, Any]) -> Tuple[Dict, List]`
 Executes calculations on the solver instance and extracts output arrays (including spacings, capacities, and logging steps) into a unified JSON-serializable dictionary format.
 
+**Safe and unsafe designs.** The solver's `output_values(flag)` and the detail-table methods it links to (`spacing`, `capacities`, ...) take the design status as `flag`, as the desktop app does: with `True` they read the computed results, with `False` they return every field empty. Many of those results only exist when a design was found, so reading them for a design that failed raises `AttributeError`. Each adapter therefore reads `design_status = bool(getattr(module, "design_status", False))` once after the module has run and passes it to every output method, and to `build_raw_output_dict(rows, design_status)`, which only follows the detail-table buttons for a finished design.
+
+An unsafe design is a normal result, not an error. When no combination of the selected sections, bolts or plates passes, `generate_output` returns the output dictionary with empty values, the logs that explain the failure, and the calculation task reports `design_status: False` (taken from the solver instance). The frontend (`useDesignSubmission`) shows the logs together with "Design is unsafe / failed" instead of an error message, and does not save the project outputs or request a CAD model. `apps/core/tests/test_unsafe_design_output.py` runs the customized-list fixtures of the affected modules through the design task to keep this behaviour.
+
 ### 5. `create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str`
 Creates the CAD geometry objects using `CommonDesignLogic` (from `osdag_core.cad`). When the requested section is `"Model"`, it merges shapes of components (Beams, Columns, Plates, Bolts, Welds) into a single TopoDS compound, writing a merged `.brep` and `.stl` file.
 
