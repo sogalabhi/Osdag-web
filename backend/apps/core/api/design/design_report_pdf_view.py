@@ -49,6 +49,26 @@ def _safe_company_logo_path(path):
     return candidate.replace("\\", "/")
 
 
+def format_report_logs(logs):
+    """Render design log entries as the "timestamp - LEVEL - message" lines the report expects.
+
+    The LaTeX report only prints lines that contain INFO, WARNING or ERROR, while
+    CustomLogger stores the level in lower case, so the level is upper-cased here.
+    """
+    if not isinstance(logs, list):
+        return ""
+    lines = []
+    for log in logs:
+        if isinstance(log, dict):
+            level = str(log.get('type') or 'INFO').upper()
+            if level == 'CRITICAL':
+                level = 'ERROR'
+            lines.append(f"{log.get('timestamp', '')} - {level} - {log.get('message', '')}")
+        else:
+            lines.append(str(log))
+    return "\n".join(lines)
+
+
 def filter_latex_content(latex_content: str, selected_sections):
     if not selected_sections or not isinstance(selected_sections, (list, tuple)):
         return latex_content
@@ -162,11 +182,7 @@ class CreateDesignReport(APIView):
                 profile['CompanyLogo'] = _safe_company_logo_path(profile.get('CompanyLogo'))
 
         metadata_final['does_design_exist'] = design_status
-        if logs and isinstance(logs, list):
-            logger_string = '\n'.join([f"{log.get('timestamp', '')} - {log.get('type', 'INFO')} - {log.get('message', '')}" for log in logs])
-        else:
-            logger_string = "No logs available"
-        metadata_final['logger_messages'] = logger_string
+        metadata_final['logger_messages'] = format_report_logs(logs) or "No logs available"
 
         if sections:
             metadata_final['selected_sections'] = sections
@@ -185,16 +201,7 @@ class CreateDesignReport(APIView):
         try:
             raw_logs = metadata_final.get('logs')
             if isinstance(raw_logs, list):
-                normalized_lines = []
-                for log in raw_logs:
-                    if isinstance(log, dict):
-                        ts = log.get('timestamp', '')
-                        lvl = log.get('type', 'INFO')
-                        msg = log.get('message', '')
-                        normalized_lines.append(f"{ts} - {lvl} - {msg}")
-                    else:
-                        normalized_lines.append(str(log))
-                metadata_final['logs'] = "\n".join(normalized_lines)
+                metadata_final['logs'] = format_report_logs(raw_logs)
 
             if isinstance(metadata_final.get('logger_messages'), list):
                 metadata_final['logger_messages'] = "\n".join(

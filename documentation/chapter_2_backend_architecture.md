@@ -166,6 +166,7 @@ Extensions for Firebase identity mapping.
 When a design calculation is completed, users can generate:
 1. **CAD Geometries:** Formatted as `.brep`, `.stl`, and optionally `.step` or `.iges` formats.
 2. **Design Reports:** Formatted as compiled PDF documents.
+   The design log shown in the report comes from the `logs` the frontend sends with the report request. `format_report_logs()` in `design_report_pdf_view.py` turns them into `timestamp - LEVEL - message` lines with the level in upper case, because the LaTeX report generator only prints lines containing `INFO`, `WARNING` or `ERROR`.
 
 ### Storage Directory Structure
 In the backend root directory, the system utilizes the following storage hierarchy:
