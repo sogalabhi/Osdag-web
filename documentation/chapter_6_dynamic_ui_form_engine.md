@@ -178,7 +178,7 @@ The input form engine supports several custom declarative field types defined in
    * **`Customized`**: Displays a button that opens a transfer modal (Ant Design Transfer) where the user can pick multiple custom sizes (e.g. iterating through Bolt Diameters `[16, 20, 24]` or Plate Thicknesses `[8, 10, 12]`).
 5. **`dynamicSelect`**: Options lists populated dynamically based on calculations or other selected variables.
 6. **`number` / `text`**: Standard text input fields. They intercept key strokes to block letters, allow only positive or negative decimal numbers, and sanitize formats in real time.
-7. **`image`**: Displays contextual diagram shapes dynamically.
+7. **`image`**: Displays a diagram. Its `imageSource(extraState, inputs)` callback returns the image URL and is called on every render, so the picture can follow any input (for example the strut end conditions `end_condition_1` / `end_condition_2`) as well as `extraState`. Note the argument order: `extraState` comes first, as in `conditionalDisplay`.
 
 ---
 
