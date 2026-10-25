@@ -9,6 +9,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 import traceback
+from osdag_core.Common import (
+    KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_HEADERPLATE, KEY_DISP_SEATED_ANGLE,
+)
 from .registry import ShearConnectionRegistry
 from apps.core.utils.module_helpers import (
     handle_design_request,
@@ -25,11 +28,10 @@ from apps.core.utils.api_errors import error_response
 
 
 SHEAR_REPORT_MODULE_ID_MAP = {
-    "fin-plate": "FinPlateConnection",
-    "cleat-angle": "CleatAngleConnection",
-    # "end-plate": "EndPlateConnection",
-    "header-plate": "HeaderPlateConnection",
-    "seated-angle": "Seated-Angle-Connection",
+    "fin-plate": KEY_DISP_FINPLATE,
+    "cleat-angle": KEY_DISP_CLEATANGLE,
+    "header-plate": KEY_DISP_HEADERPLATE,
+    "seated-angle": KEY_DISP_SEATED_ANGLE,
 }
 
 # design/cad accept any registry-resolvable slug unless restricted — this is the

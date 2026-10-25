@@ -22,8 +22,15 @@ from io import BytesIO
 # rest_framework
 from rest_framework import status
 from rest_framework.response import Response
-from .cad_module_aliases import resolve_module_id
 from apps.core.utils.api_errors import error_json_response
+from osdag_core.Common import (
+    KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_HEADERPLATE, KEY_DISP_SEATED_ANGLE,
+    KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BB_EP_SPLICE,
+    KEY_DISP_BCENDPLATE, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
+    KEY_DISP_COLUMNENDPLATE, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
+    KEY_DISP_BUTTJOINTWELDED, KEY_DISP_BUTTJOINTBOLTED,
+    KEY_DISP_LAPJOINTWELDED, KEY_DISP_LAPJOINTBOLTED,
+)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CADGeneration(View):
@@ -54,35 +61,32 @@ class CADGeneration(View):
             if not input_values:
                 return error_json_response('missing_field', "input_values are required", 400)
             
-            # Normalize hyphenated ids to backend ids
-            resolved_module_id = resolve_module_id(module_id)
-
             # Get module API
-            module_api = get_module_api(resolved_module_id)
+            module_api = get_module_api(module_id)
             
-            # Determine session type from resolved module id
+            # Determine session type from module id
             module_type_mapping = {
-                "FinPlateConnection": "FinPlateConnection",
-                "CleatAngleConnection": "CleatAngle", 
-                "HeaderPlateConnection": "HeaderPlate",
-                "SeatedAngleConnection": "SeatedAngleConnection",
-                "Cover-Plate-Bolted-Connection": "CoverPlateBolted",
-                "Beam-Beam-End-Plate-Connection": "BeamBeamEndPlate",
-                "Cover-Plate-Welded-Connection": "CoverPlateWelded",
-                "Beam-to-Column-End-Plate-Connection": "BeamToColumnEndPlate",
-                "ColumnCoverPlateBolted": "ColumnCoverPlateBolted",
-                "Column-to-Column-Cover-Plate-Welded-Connection": "ColumnCoverPlateWelded",
-                "Column-to-Column-End-Plate-Connection": "ColumnEndPlate",
-                "Tension-Member-Bolted-Design": "TensionMember",
-                "Tension-Member-Welded-Design": "TensionMember",
-                "ButtJointWelded": "ButtJointWelded",
-                "ButtJointBolted": "ButtJointBolted",
-                "LapJointWelded": "LapJointWelded",
-                "LapJointBolted": "LapJointBolted",
+                KEY_DISP_FINPLATE: "FinPlateConnection",
+                KEY_DISP_CLEATANGLE: "CleatAngle",
+                KEY_DISP_HEADERPLATE: "HeaderPlate",
+                KEY_DISP_SEATED_ANGLE: "SeatedAngleConnection",
+                KEY_DISP_BEAMCOVERPLATE: "CoverPlateBolted",
+                KEY_DISP_BB_EP_SPLICE: "BeamBeamEndPlate",
+                KEY_DISP_BEAMCOVERPLATEWELD: "CoverPlateWelded",
+                KEY_DISP_BCENDPLATE: "BeamToColumnEndPlate",
+                KEY_DISP_COLUMNCOVERPLATE: "ColumnCoverPlateBolted",
+                KEY_DISP_COLUMNCOVERPLATEWELD: "ColumnCoverPlateWelded",
+                KEY_DISP_COLUMNENDPLATE: "ColumnEndPlate",
+                KEY_DISP_TENSION_BOLTED: "TensionMember",
+                KEY_DISP_TENSION_WELDED: "TensionMember",
+                KEY_DISP_BUTTJOINTWELDED: "ButtJointWelded",
+                KEY_DISP_BUTTJOINTBOLTED: "ButtJointBolted",
+                KEY_DISP_LAPJOINTWELDED: "LapJointWelded",
+                KEY_DISP_LAPJOINTBOLTED: "LapJointBolted",
             }
             print("module_type_mapping: ", module_type_mapping)
-            print("resolved_module_id: ", resolved_module_id)
-            session_type = module_type_mapping.get(resolved_module_id)
+            print("module_id: ", module_id)
+            session_type = module_type_mapping.get(module_id)
             if not session_type:
                 return error_json_response('unknown_module', f"Unknown module type: {module_id}", 400)
                 

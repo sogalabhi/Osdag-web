@@ -7,6 +7,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from osdag_core.Common import (
+    KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_FLEXURE4, KEY_DISP_PLATE_GIRDER_WELDED,
+)
 from .registry import FlexureMemberRegistry
 from apps.core.utils.module_helpers import (
     handle_design_request,
@@ -22,12 +25,12 @@ from apps.sections.options_merge import merge_user_sections_into_options
 from apps.core.utils.api_errors import error_response
 
 
-# Mapping from flexure-member submodule slug to legacy report module_id
+# Mapping from flexure-member submodule slug to report module_id
 FLEXURE_REPORT_MODULE_ID_MAP = {
-    "simply-supported-beam": "Simply-Supported-Beam",
-    "purlin": "Purlin",
-    "on-cantilever": "On-Cantilever-Beam",
-    "plate-girder": "Plate-Girder",
+    "simply-supported-beam": KEY_DISP_FLEXURE,
+    "purlin": KEY_DISP_FLEXURE4,
+    "on-cantilever": KEY_DISP_FLEXURE2,
+    "plate-girder": KEY_DISP_PLATE_GIRDER_WELDED,
 }
 
 # design/cad accept any registry-resolvable slug unless restricted — reuse the

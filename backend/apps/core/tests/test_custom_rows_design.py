@@ -18,7 +18,7 @@ CATALOG_GRADE = "E 250 (Fe 410 W)A"
 CUSTOM_GRADE = "Cus_300_290_280_450"  # fy 300 / fu 450 (catalog grade is 250 / 410)
 
 BEAM_INPUTS = {
-    "Module": "Simply-Supported-Beam", "Member.Profile": "Beams and Columns",
+    "Module": "Flexural Members - Simply Supported", "Member.Profile": "Beams and Columns",
     "Member.Designation": ["MB 400"], "Material": CATALOG_GRADE, "Member.Material": CATALOG_GRADE,
     "Design.Design_Method": "Limit State Design", "Optimum.Class": "Yes",
     "Effective.Area_Para": "1.0", "Length.Overwrite": "NA", "Bearing.Length": "NA",

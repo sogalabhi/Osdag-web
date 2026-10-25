@@ -13,13 +13,16 @@ VALID_OPERATIONS = frozenset({"open", "refresh", "save", "reset"})
 
 import importlib
 
+from osdag_core.Common import (
+    KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE,
+)
+
 from apps.core import catalog
 
 _CORE_CLASS_MAP = {
-    "FinPlateConnection": ("osdag_core.design_type.connection.fin_plate_connection", "FinPlateConnection"),
-    "EndPlateConnection": ("osdag_core.design_type.connection.end_plate_connection", "EndPlateConnection"),
-    "CleatAngleConnection": ("osdag_core.design_type.connection.cleat_angle_connection", "CleatAngleConnection"),
-    "SeatedAngleConnection": ("osdag_core.design_type.connection.seated_angle_connection", "SeatedAngleConnection"),
+    KEY_DISP_FINPLATE: ("osdag_core.design_type.connection.fin_plate_connection", "FinPlateConnection"),
+    KEY_DISP_CLEATANGLE: ("osdag_core.design_type.connection.cleat_angle_connection", "CleatAngleConnection"),
+    KEY_DISP_SEATED_ANGLE: ("osdag_core.design_type.connection.seated_angle_connection", "SeatedAngleConnection"),
     "Beam to Column End Plate Connection": ("osdag_core.design_type.connection.beam_column_end_plate", "BeamColumnEndPlate"),
     "Beam Beam End Plate Connection": ("osdag_core.design_type.connection.beam_beam_end_plate_splice", "BeamBeamEndPlateSplice"),
     "Column Cover Plate Bolted Connection": ("osdag_core.design_type.connection.column_cover_plate", "ColumnCoverPlate"),
@@ -185,10 +188,10 @@ def _material_row_for_grade(material_models, grade: str) -> List[Dict[str, Any]]
 # (session_name) -> (supporting_key, supporting_source, supported_key, supported_source, connector_key, connector_source)
 # source is one of: "columns", "beams", "angles"
 _SECTION_KEY_MAP: Dict[str, Tuple[Optional[str], Optional[str], Optional[str], Optional[str], Optional[str], Optional[str]]] = {
-    "FinPlateConnection": ("column_section", "columns", "beam_section", "beams", None, None),
-    "HeaderPlateConnection": ("column_section", "columns", "beam_section", "beams", None, None),
-    "CleatAngleConnection": ("column_section", "columns", "beam_section", "beams", "cleat_section", "angles"),
-    "SeatedAngleConnection": ("column_section", "columns", "beam_section", "beams", "seated_section", "angles"),
+    KEY_DISP_FINPLATE: ("column_section", "columns", "beam_section", "beams", None, None),
+    KEY_DISP_HEADERPLATE: ("column_section", "columns", "beam_section", "beams", None, None),
+    KEY_DISP_CLEATANGLE: ("column_section", "columns", "beam_section", "beams", "cleat_section", "angles"),
+    KEY_DISP_SEATED_ANGLE: ("column_section", "columns", "beam_section", "beams", "seated_section", "angles"),
     "Beam to Column End Plate Connection": ("column_section", "columns", "beam_section", "beams", None, None),
     "Beam Beam End Plate Connection": ("primary_beam", "beams", "secondary_beam", "beams", None, None),
     "Column Cover Plate Bolted Connection": ("member_designation", "columns", None, None, None, None),
@@ -308,10 +311,10 @@ def _resolve_section_details(
 # (session_name) -> driver field -> list of target pref keys to sync when driver changes / refresh / reset
 # Aligns with osdag_core input_dictionary_without_design_pref "Input Dock" rows where applicable.
 _MATERIAL_SYNC_RULES: Dict[str, Dict[str, List[str]]] = {
-    "FinPlateConnection": {"connector_material": ["supporting_material", "supported_material"]},
-    "HeaderPlateConnection": {"connector_material": ["supporting_material", "supported_material"]},
-    "CleatAngleConnection": {"connector_material": ["supporting_material", "supported_material"]},
-    "SeatedAngleConnection": {"connector_material": ["supporting_material", "supported_material"]},
+    KEY_DISP_FINPLATE: {"connector_material": ["supporting_material", "supported_material"]},
+    KEY_DISP_HEADERPLATE: {"connector_material": ["supporting_material", "supported_material"]},
+    KEY_DISP_CLEATANGLE: {"connector_material": ["supporting_material", "supported_material"]},
+    KEY_DISP_SEATED_ANGLE: {"connector_material": ["supporting_material", "supported_material"]},
     "Beam to Column End Plate Connection": {
         "connector_material": ["supporting_material", "supported_material"],
     },

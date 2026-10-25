@@ -29,7 +29,7 @@ class GDPRComplianceTests(TestCase):
         Project.objects.create(
             name="Project Alpha",
             module="Shear Connection",
-            submodule="FinPlateConnection",
+            submodule="Fin Plate Connection",
             inputs_json={"material": "Fe 410"},
             outputs_json={"status": "pass"},
             user_email="test@example.com"
@@ -63,7 +63,7 @@ class GDPRComplianceTests(TestCase):
         Project.objects.create(
             name="Project Alpha",
             module="Shear Connection",
-            submodule="FinPlateConnection",
+            submodule="Fin Plate Connection",
             inputs_json={"material": "Fe 410"},
             outputs_json={"status": "pass"},
             user_email="test@example.com"

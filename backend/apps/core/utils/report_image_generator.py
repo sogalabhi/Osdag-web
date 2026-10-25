@@ -13,6 +13,13 @@ import shutil
 from pathlib import Path
 from typing import Dict, Optional, Tuple, Any
 
+from osdag_core.Common import (
+    KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE,
+    KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BB_EP_SPLICE,
+    KEY_DISP_BCENDPLATE, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
+    KEY_DISP_COLUMNENDPLATE,
+)
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -548,7 +555,7 @@ def generate_with_opencascade_display(brep_path: str, output_dir: str, module=No
             
             # Get module attributes needed for CAD generation
             mainmodule = getattr(module, 'mainmodule', 'Shear Connection')
-            connection = getattr(module, 'module', 'FinPlateConnection')
+            connection = getattr(module, 'module', KEY_DISP_FINPLATE)
             folder = None  # Not needed for headless
             
             logger.info(f"[REPORT_IMG] Module attributes:")
@@ -650,7 +657,7 @@ def find_existing_cad_files(module_id: str, input_values: dict,
     the session_id or module_id pattern.
     
     Args:
-        module_id: Module identifier (e.g., 'FinPlateConnection')
+        module_id: Module identifier (e.g., 'Fin Plate Connection')
         input_values: Design input values (for future use)
         session_id: Optional session ID to search for
         
@@ -725,18 +732,17 @@ def generate_cad_files_for_report(module: Any, input_values: dict,
     
     # Map module_id to adapter function
     module_adapter_map = {
-        'FinPlateConnection': 'apps.modules.shear_connection.submodules.fin_plate.adapter',
-        # 'EndPlateConnection': 'apps.modules.shear_connection.submodules.end_plate.adapter',
-        'HeaderPlateConnection': 'apps.modules.shear_connection.submodules.header_plate.adapter',
-        'CleatAngleConnection': 'apps.modules.shear_connection.submodules.cleat_angle.adapter',
-        'Seated-Angle-Connection': 'apps.modules.shear_connection.submodules.seated_angle.adapter',
-        'Cover-Plate-Bolted-Connection': 'apps.modules.moment_connection.submodules.beam_beam_cover_plate_bolted.adapter',
-        'Beam-Beam-End-Plate-Connection': 'apps.modules.moment_connection.submodules.beam_beam_end_plate.adapter',
-        'Cover-Plate-Welded-Connection': 'apps.modules.moment_connection.submodules.beam_beam_cover_plate_welded.adapter',
-        'Beam-to-Column-End-Plate-Connection': 'apps.modules.moment_connection.submodules.beam_column_end_plate.adapter',
-        'ColumnCoverPlateBolted': 'apps.modules.moment_connection.submodules.column_column_cover_plate_bolted.adapter',
-        'Column-to-Column-Cover-Plate-Welded-Connection': 'apps.modules.moment_connection.submodules.column_column_cover_plate_welded.adapter',
-        'Column-to-Column-End-Plate-Connection': 'apps.modules.moment_connection.submodules.column_column_end_plate.adapter',
+        KEY_DISP_FINPLATE: 'apps.modules.shear_connection.submodules.fin_plate.adapter',
+        KEY_DISP_HEADERPLATE: 'apps.modules.shear_connection.submodules.header_plate.adapter',
+        KEY_DISP_CLEATANGLE: 'apps.modules.shear_connection.submodules.cleat_angle.adapter',
+        KEY_DISP_SEATED_ANGLE: 'apps.modules.shear_connection.submodules.seated_angle.adapter',
+        KEY_DISP_BEAMCOVERPLATE: 'apps.modules.moment_connection.submodules.beam_beam_cover_plate_bolted.adapter',
+        KEY_DISP_BB_EP_SPLICE: 'apps.modules.moment_connection.submodules.beam_beam_end_plate.adapter',
+        KEY_DISP_BEAMCOVERPLATEWELD: 'apps.modules.moment_connection.submodules.beam_beam_cover_plate_welded.adapter',
+        KEY_DISP_BCENDPLATE: 'apps.modules.moment_connection.submodules.beam_column_end_plate.adapter',
+        KEY_DISP_COLUMNCOVERPLATE: 'apps.modules.moment_connection.submodules.column_column_cover_plate_bolted.adapter',
+        KEY_DISP_COLUMNCOVERPLATEWELD: 'apps.modules.moment_connection.submodules.column_column_cover_plate_welded.adapter',
+        KEY_DISP_COLUMNENDPLATE: 'apps.modules.moment_connection.submodules.column_column_end_plate.adapter',
     }
     
     if module_id not in module_adapter_map:

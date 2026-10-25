@@ -1,11 +1,12 @@
 """
 Service for Lap Joint Bolted
 """
+from osdag_core.Common import KEY_DISP_LAPJOINTBOLTED
 from .adapter import validate_input, generate_output, create_cad_model
 import traceback
 
 
-MODULE_ID = "LapJointBolted"
+MODULE_ID = KEY_DISP_LAPJOINTBOLTED
 
 
 class Service:

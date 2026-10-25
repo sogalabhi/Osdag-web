@@ -78,7 +78,7 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure:
     
     # Map input_values to exact keys expected by Flexure.set_input_values
     design_dict = {
-        'Module': input_values.get('Module', 'Simply-Supported-Beam'),
+        'Module': input_values.get('Module', KEY_DISP_FLEXURE),
         'Member.Profile': input_values.get('Member.Profile', ''),
         'Member.Designation': member_designation,  # Use processed array
         'Material': input_values.get('Material', ''),

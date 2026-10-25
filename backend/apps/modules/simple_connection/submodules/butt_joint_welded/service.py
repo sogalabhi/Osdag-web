@@ -1,11 +1,12 @@
 """
 Service for Butt Joint Welded
 """
+from osdag_core.Common import KEY_DISP_BUTTJOINTWELDED
 from .adapter import validate_input, generate_output, create_cad_model
 import traceback
 
 
-MODULE_ID = "ButtJointWelded"
+MODULE_ID = KEY_DISP_BUTTJOINTWELDED
 
 
 class Service:

@@ -18,7 +18,7 @@ class DesignPrefSyncMergeTests(TestCase):
             "bolt_diameter": "12",
         }
         resolved, meta, _md, _sd = merge_design_pref_sync(
-            "FinPlateConnection",
+            "Fin Plate Connection",
             inputs,
             "open",
             design_pref_draft=None,
@@ -38,7 +38,7 @@ class DesignPrefSyncMergeTests(TestCase):
         }
         draft = {"connector_material": "E 350 (Fe 490)"}
         resolved, _meta, _md, _sd = merge_design_pref_sync(
-            "FinPlateConnection",
+            "Fin Plate Connection",
             inputs,
             "save",
             design_pref_draft=draft,
@@ -49,7 +49,7 @@ class DesignPrefSyncMergeTests(TestCase):
     def test_reset_applies_driver_sync(self):
         inputs = {"material": "E 165 (Fe 290)"}
         resolved, _meta, _md, _sd = merge_design_pref_sync(
-            "FinPlateConnection",
+            "Fin Plate Connection",
             inputs,
             "reset",
             design_pref_draft=None,
@@ -61,14 +61,14 @@ class DesignPrefSyncMergeTests(TestCase):
 
     def test_mapping_covers_all_registered_names(self):
         names = list_registered_session_names()
-        self.assertIn("FinPlateConnection", names)
+        self.assertIn("Fin Plate Connection", names)
         self.assertIn("Purlin Design", names)
 
 
 class DesignPrefSyncAPITests(TestCase):
     def test_defaults_post_returns_default_payload(self):
         body = {
-            "module_session_name": "FinPlateConnection",
+            "module_session_name": "Fin Plate Connection",
             "inputs": {"material": "E 250 (Fe 410 W)A"},
         }
         r = self.client.post(
@@ -85,7 +85,7 @@ class DesignPrefSyncAPITests(TestCase):
 
     def test_sync_post_returns_resolved_payload(self):
         body = {
-            "module_session_name": "FinPlateConnection",
+            "module_session_name": "Fin Plate Connection",
             "inputs": {"material": "E 250 (Fe 410 W)A"},
             "operation": "open",
         }
@@ -107,7 +107,7 @@ class DesignPrefSyncAPITests(TestCase):
         r = self.client.post(
             "/api/design-preferences/sync/",
             data={
-                "module_session_name": "FinPlateConnection",
+                "module_session_name": "Fin Plate Connection",
                 "inputs": {},
                 "operation": "not-an-operation",
             },

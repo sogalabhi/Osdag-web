@@ -23,7 +23,7 @@ def setup_for_cad(cdl: CommonDesignLogic, module_class):
     cdl.module_object = module_class  # Set the module object (required by common_logic.py)
     module_object = module_class
     print(module_object.module)
-    if module_object.module == "Tension-Member-Bolted-Design" or module_object.module == "Tension-Member-Welded-Design":
+    if module_object.module in (KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED):
         cdl.TObj = cdl.createTensionCAD()
 
 

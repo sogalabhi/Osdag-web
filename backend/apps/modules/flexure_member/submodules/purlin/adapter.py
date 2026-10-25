@@ -291,7 +291,7 @@ def create_from_input(input_values: dict):
     # All keys use the exact constant values from osdag_core.Common
     # -------------------------------
     design_dict = {
-        KEY_MODULE: "Purlin",
+        KEY_MODULE: KEY_DISP_FLEXURE4,
         KEY_SEC_PROFILE: sec_profile,
         KEY_SECSIZE: sec_size,
         KEY_LENGTH: float(length),

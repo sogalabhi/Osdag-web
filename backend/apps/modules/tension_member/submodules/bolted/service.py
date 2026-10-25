@@ -7,7 +7,7 @@ import traceback
 
 
 class BoltedTensionMemberService:
-    """Service class for Tension-Member-Bolted-Design module"""
+    """Service class for the bolted tension member module"""
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:

@@ -7,6 +7,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from osdag_core.Common import KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED
 from .registry import TensionMemberRegistry
 from apps.core.utils.module_helpers import (
     handle_design_request,
@@ -22,10 +23,10 @@ from apps.sections.options_merge import merge_user_sections_into_options
 from apps.core.utils.api_errors import error_response
 
 
-# Mapping from tension-member slug to legacy report module_id
+# Mapping from tension-member slug to report module_id
 TENSION_REPORT_MODULE_ID_MAP = {
-    "bolted": "Tension-Member-Bolted-Design",
-    "welded": "Tension-Member-Welded-Design",
+    "bolted": KEY_DISP_TENSION_BOLTED,
+    "welded": KEY_DISP_TENSION_WELDED,
 }
 
 # design/cad accept any registry-resolvable slug unless restricted — reuse the
@@ -40,32 +41,14 @@ class TensionMemberViewSet(viewsets.ViewSet):
     """
     permission_classes = [AllowAny]  # Allow both authenticated and guest users
 
-    @staticmethod
-    def _normalize_slug(raw_slug: str) -> str:
-        """
-        Accept both URL slugs and MODULE_ID values from legacy/frontend calls.
-        Example inputs:
-          - 'bolted', 'welded' (preferred)
-          - 'Tension-Member-Bolted-Design', 'Tension-Member-Welded-Design' (legacy)
-        """
-        if not raw_slug:
-            return raw_slug
-        slug_lower = raw_slug.lower()
-        module_id_map = {
-            'tension-member-bolted-design': 'bolted',
-            'tension-member-welded-design': 'welded',
-        }
-        return module_id_map.get(slug_lower, raw_slug)
-    
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/design')
     def design(self, request, submodule_slug=None):
         """
         POST /api/modules/tension-member/{submodule_slug}/design/
         Asynchronously runs calculation task.
         """
-        normalized_slug = self._normalize_slug(submodule_slug)
-        ServiceClass = TensionMemberRegistry.get_service_by_slug_or_404(normalized_slug, TENSION_MEMBER_ALLOWED_SLUGS)
-        return trigger_async_design('tension-member', normalized_slug, ServiceClass, request)
+        ServiceClass = TensionMemberRegistry.get_service_by_slug_or_404(submodule_slug, TENSION_MEMBER_ALLOWED_SLUGS)
+        return trigger_async_design('tension-member', submodule_slug, ServiceClass, request)
 
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
     def report_generate_initial(self, request, submodule_slug=None):
@@ -73,10 +56,9 @@ class TensionMemberViewSet(viewsets.ViewSet):
         POST /api/modules/tension-member/{submodule_slug}/report/generate-initial/
         Asynchronously runs LaTeX report generation task.
         """
-        normalized_slug = self._normalize_slug(submodule_slug)
         # Note: trigger_async_report takes mapped data. We pass the slug normalization.
         # Since trigger_async_report checks the map, we should pass the normalized slug.
-        return trigger_async_report('tension-member', normalized_slug, TENSION_REPORT_MODULE_ID_MAP, request)
+        return trigger_async_report('tension-member', submodule_slug, TENSION_REPORT_MODULE_ID_MAP, request)
     
     @action(detail=False, methods=['get'], url_path='(?P<submodule_slug>[^/.]+)/options')
     def options(self, request, submodule_slug=None):
@@ -85,7 +67,7 @@ class TensionMemberViewSet(viewsets.ViewSet):
         
         Returns input options for the sub-module (e.g., section lists, materials)
         """
-        slug = self._normalize_slug(submodule_slug)
+        slug = submodule_slug
 
         # Shared helpers
         def material_list():
@@ -161,6 +143,5 @@ class TensionMemberViewSet(viewsets.ViewSet):
         POST /api/modules/tension-member/{submodule_slug}/cad/
         Asynchronously runs CAD generation task.
         """
-        normalized_slug = self._normalize_slug(submodule_slug)
-        ServiceClass = TensionMemberRegistry.get_service_by_slug_or_404(normalized_slug, TENSION_MEMBER_ALLOWED_SLUGS)
-        return trigger_async_cad('tension-member', normalized_slug, ServiceClass, request)
+        ServiceClass = TensionMemberRegistry.get_service_by_slug_or_404(submodule_slug, TENSION_MEMBER_ALLOWED_SLUGS)
+        return trigger_async_cad('tension-member', submodule_slug, ServiceClass, request)

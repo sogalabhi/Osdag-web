@@ -1,6 +1,8 @@
 """
 Column Cover Plate Welded Connection Sub-module
 """
-MODULE_ID = 'Column-to-Column-Cover-Plate-Welded-Connection'
+from osdag_core.Common import KEY_DISP_COLUMNCOVERPLATEWELD
+
+MODULE_ID = KEY_DISP_COLUMNCOVERPLATEWELD
 from .service import ColumnCoverPlateWeldedService as Service
 

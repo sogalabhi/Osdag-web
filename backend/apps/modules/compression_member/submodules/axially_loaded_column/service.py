@@ -8,7 +8,7 @@ import traceback
 
 
 class AxiallyLoadedColumnService:
-    """Service class for Axially-Loaded-Column module."""
+    """Service class for the axially loaded column module."""
 
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:

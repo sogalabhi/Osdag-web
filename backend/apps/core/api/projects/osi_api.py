@@ -14,6 +14,7 @@ from apps.core.serializers import OsiFileSerializer
 from apps.core.utils.osi_files import build_osi_payload, make_osifile_contentfile, parse_osi
 from apps.core.models import Project
 from apps.core.utils.api_errors import error_json_response
+from osdag_core.Common import KEY_DISP_FINPLATE
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -116,7 +117,7 @@ class ProjectOsiDownload(APIView):
             project = Project.objects.get(id=project_id, user_email=requester_email)
 
             inputs = getattr(project, 'inputs_json', None) or {}
-            module_id = getattr(project, 'submodule', None) or getattr(project, 'module', None) or 'FinPlateConnection'
+            module_id = getattr(project, 'submodule', None) or getattr(project, 'module', None) or KEY_DISP_FINPLATE
 
             payload = build_osi_payload(name=project.name or 'project', module_id=module_id, inputs=inputs)
             content_file = make_osifile_contentfile(payload)

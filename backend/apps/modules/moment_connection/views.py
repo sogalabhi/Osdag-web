@@ -8,6 +8,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
+from osdag_core.Common import (
+    KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BB_EP_SPLICE,
+    KEY_DISP_BCENDPLATE, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
+    KEY_DISP_COLUMNENDPLATE,
+)
 from .registry import MomentConnectionRegistry
 from apps.core.utils.module_helpers import (
     handle_design_request,
@@ -23,15 +28,15 @@ from apps.sections.options_merge import merge_user_sections_into_options
 from apps.core.utils.api_errors import error_response
 
 
-# Mapping from moment-connection submodule slug to legacy report module_id
+# Mapping from moment-connection submodule slug to report module_id
 MOMENT_REPORT_MODULE_ID_MAP = {
-    "beam-beam-cover-plate-bolted": "Beam-to-Beam-Cover-Plate-Bolted-Connection",
-    "beam-beam-cover-plate-welded": "Beam-to-Beam-Cover-Plate-Welded-Connection",
-    "beam-beam-end-plate": "Beam-Beam-End-Plate-Connection",
-    "beam-column-end-plate": "Beam-to-Column-End-Plate-Connection",
-    "column-column-cover-plate-bolted": "Column-to-Column-Cover-Plate-Bolted-Connection",
-    "column-column-cover-plate-welded": "Column-to-Column-Cover-Plate-Welded-Connection",
-    "column-column-end-plate": "Column-to-Column-End-Plate-Connection",
+    "beam-beam-cover-plate-bolted": KEY_DISP_BEAMCOVERPLATE,
+    "beam-beam-cover-plate-welded": KEY_DISP_BEAMCOVERPLATEWELD,
+    "beam-beam-end-plate": KEY_DISP_BB_EP_SPLICE,
+    "beam-column-end-plate": KEY_DISP_BCENDPLATE,
+    "column-column-cover-plate-bolted": KEY_DISP_COLUMNCOVERPLATE,
+    "column-column-cover-plate-welded": KEY_DISP_COLUMNCOVERPLATEWELD,
+    "column-column-end-plate": KEY_DISP_COLUMNENDPLATE,
 }
 
 # design/cad accept any registry-resolvable slug unless restricted — reuse the

@@ -30,38 +30,27 @@ def setup_for_cad(cdl: CommonDesignLogic, module_class):
         cdl.mainmodule = getattr(module_object, "mainmodule", None)
 
     # Column cover plate (bolted / welded) and column end plate support
-    if module_object.module in (
-        "ColumnCoverPlateBolted",
-        "Column-to-Column Cover Plate Bolted Connection",
-        "Column-to-Column-Cover-Plate-Bolted-Connection",
-    ):
+    if module_object.module == KEY_DISP_COLUMNCOVERPLATE:
         cdl.C = module_object
         cdl.CPObj = cdl.createCCCoverPlateCAD()
-    if module_object.module in (
-        "Column-to-Column Cover Plate Welded Connection",
-        "Column-to-Column-Cover-Plate-Welded-Connection",
-    ):
+    if module_object.module == KEY_DISP_COLUMNCOVERPLATEWELD:
         cdl.C = module_object
         cdl.CPObj = cdl.createCCCoverPlateCAD()
-    if module_object.module in (
-        "Column-to-Column-End-Plate-Connection",
-        "Column-to-Column End Plate Connection",
-        KEY_DISP_COLUMNENDPLATE,
-    ):
+    if module_object.module == KEY_DISP_COLUMNENDPLATE:
         cdl.CEP = module_object
         cdl.CEPObj = cdl.createCCEndPlateCAD()
 
     # Beam-side moment modules
-    if module_object.module == "Beam-to-Beam Cover Plate Bolted Connection":
+    if module_object.module == KEY_DISP_BEAMCOVERPLATE:
         # Required for createBBCoverPlateCAD which expects self.B to exist
         cdl.B = module_object
         cdl.CPObj = cdl.createBBCoverPlateCAD()
-    if module_object.module == "Beam-to-Beam End Plate Connection":
+    if module_object.module == KEY_DISP_BB_EP_SPLICE:
         cdl.CPObj = cdl.createBBEndPlateCAD()
-    if module_object.module == "Beam-to-Beam Cover Plate Welded Connection":
+    if module_object.module == KEY_DISP_BEAMCOVERPLATEWELD:
         cdl.B = module_object
         cdl.CPObj = cdl.createBBCoverPlateCAD()
-    if module_object.module == "Beam-to-Column End Plate Connection":
+    if module_object.module == KEY_DISP_BCENDPLATE:
         cdl.CPObj = cdl.createBCEndPlateCAD()  # Initialize the CAD object for beam-column end plate
 
 

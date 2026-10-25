@@ -36,6 +36,7 @@ from apps.core.utils import (
 )
 from osdag_core.design_type.compression_member.compression_column import ColumnDesign
 from osdag_core.custom_logger import CustomLogger
+from osdag_core.Common import KEY_DISP_COMPRESSION_COLUMN
 
 try:
     from OCC.Core import BRepTools
@@ -53,8 +54,6 @@ try:
 except ImportError:
     _CDL_AVAILABLE = False
 
-# Module display name — must match CommonDesignLogic expectations
-KEY_DISP_COMPRESSION_COLUMN = "Columns with known support conditions"
 
 
 def get_required_keys() -> List[str]:
@@ -249,7 +248,7 @@ def create_from_input(input_values: Dict[str, Any]) -> ColumnDesign:
         input_values["Load.Axial"] = input_values["axial_load"]
 
     design_dict: Dict[str, Any] = {
-        "Module":                    str(input_values.get("Module", "Axially-Loaded-Column")),
+        "Module":                    str(input_values.get("Module", KEY_DISP_COMPRESSION_COLUMN)),
         "Member.Profile":            str(input_values.get("Member.Profile", "Beams and Columns")),
         "Member.Designation":        member_designation,
         "Material":                  material,
@@ -272,7 +271,7 @@ def create_from_input(input_values: Dict[str, Any]) -> ColumnDesign:
     module = create_module()
     module.set_input_values(design_dict)
     # Restore the display name for reports (set_input_values overrides self.module with the raw KEY_MODULE value)
-    module.module = "Columns with known support conditions"
+    module.module = KEY_DISP_COMPRESSION_COLUMN
     return module
 
 

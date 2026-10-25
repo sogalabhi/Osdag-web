@@ -18,6 +18,10 @@ from apps.core.utils.module_helpers import (
 )
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from apps.core.api.design.report_customization_api import generate_initial_report_core
+from osdag_core.Common import (
+    KEY_DISP_BUTTJOINTBOLTED, KEY_DISP_BUTTJOINTWELDED,
+    KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED,
+)
 from .registry import SimpleConnectionRegistry
 from apps.core.utils.api_errors import error_response
 
@@ -26,10 +30,10 @@ logger = logging.getLogger(__name__)
 
 # Mapping from simple-connection slug to module_id used by CreateDesignReport
 SIMPLE_CONNECTION_REPORT_MODULE_ID_MAP = {
-    "butt-joint-bolted": "ButtJointBolted",
-    "butt-joint-welded": "ButtJointWelded",
-    "lap-joint-bolted": "LapJointBolted",
-    "lap-joint-welded": "LapJointWelded",
+    "butt-joint-bolted": KEY_DISP_BUTTJOINTBOLTED,
+    "butt-joint-welded": KEY_DISP_BUTTJOINTWELDED,
+    "lap-joint-bolted": KEY_DISP_LAPJOINTBOLTED,
+    "lap-joint-welded": KEY_DISP_LAPJOINTWELDED,
 }
 
 # design/cad accept any registry-resolvable slug unless restricted — reuse the
