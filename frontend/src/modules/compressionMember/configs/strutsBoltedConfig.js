@@ -9,10 +9,10 @@ import FIXED_HINGED from "../../../assets/CompressionMember/RFRFstrut.png";
 import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { KEY_DISP_STRUT_BOLTED_END_GUSSET } from "../../../constants/generated/coreKeys";
 export const strutsBoltedConfig = {
   sessionName: "Struts Bolted to End Gusset",
-  routePath: "/design/compression-member/struts_bolted_to_end_gusset",
-  designType: "Struts-Bolted-Design",
+  designType: KEY_DISP_STRUT_BOLTED_END_GUSSET,
   cameraKey: "CompressionMember",
   cadOptions: ["Model", "Member", "Plate"],
 
@@ -26,7 +26,7 @@ export const strutsBoltedConfig = {
     is_leg_loaded: "Yes",
     length: "3000",
     axial_force: "100",
-    module: "Struts-Bolted-Design",
+    module: KEY_DISP_STRUT_BOLTED_END_GUSSET,
     plate_thickness: [],
     section_designation: [],
     material: "E 250 (Fe 410 W)A",
@@ -147,7 +147,7 @@ export const strutsBoltedConfig = {
         );
 
     return {
-      "Module": "Struts-Bolted-Design",
+      "Module": KEY_DISP_STRUT_BOLTED_END_GUSSET,
       "Member.Profile": inputs.section_profile,
       "Member.Designation": memberDesignation,
 

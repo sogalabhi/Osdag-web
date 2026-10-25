@@ -7,6 +7,9 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from osdag_core.Common import (
+    KEY_DISP_STRUT_BOLTED_END_GUSSET, KEY_DISP_STRUT_WELDED_END_GUSSET, KEY_DISP_COMPRESSION_COLUMN,
+)
 from .registry import CompressionMemberRegistry
 from apps.core.utils.module_helpers import (
     handle_design_request,
@@ -16,7 +19,6 @@ from apps.core.utils.module_helpers import (
 )
 from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
 from apps.core.api.design.report_customization_api import generate_initial_report_core
-from apps.core.constants import get_report_module_id
 from apps.core import catalog
 from apps.core.models import CustomMaterials
 from apps.core.osdag_overrides import unknown_material_error, user_id_from_request, user_rows
@@ -24,11 +26,11 @@ from apps.sections.options_merge import merge_user_sections_into_options
 from apps.core.utils.api_errors import error_response
 
 
-# Mapping from compression-member submodule slug to legacy report module_id
+# Mapping from compression-member submodule slug to report module_id
 COMPRESSION_REPORT_MODULE_ID_MAP = {
-    "axially-loaded-column": "AxiallyLoadedColumn",
-    "struts-bolted": "Struts-Bolted-Design",
-    "struts-welded": "Struts-Welded-Design",
+    "axially-loaded-column": KEY_DISP_COMPRESSION_COLUMN,
+    "struts-bolted": KEY_DISP_STRUT_BOLTED_END_GUSSET,
+    "struts-welded": KEY_DISP_STRUT_WELDED_END_GUSSET,
 }
 
 # design/cad accept any registry-resolvable slug unless restricted — reuse the
@@ -46,22 +48,17 @@ class CompressionMemberViewSet(viewsets.ViewSet):
     @staticmethod
     def _normalize_slug(raw_slug: str) -> str:
         """
-        Accept both URL slugs and MODULE_ID values from legacy/frontend calls.
+        Accept URL slugs written with underscores.
         Example inputs:
-          - 'struts_bolted' -> 'struts-bolted' (preferred)
-          - 'Struts-Bolted-Design' (legacy)
+          - 'struts_bolted' -> 'struts-bolted'
+          - 'Compression-Member-Design' -> 'struts-bolted' (the struts in trusses page)
         """
         if not raw_slug:
             return raw_slug
         # Convert underscores to hyphens (URL format to registry format)
         normalized = raw_slug.replace('_', '-').lower()
         module_id_map = {
-            'struts-bolted-design': 'struts-bolted',
-            'struts-welded-design': 'struts-welded',
-            'compression-member-design': 'struts-bolted',  # Legacy support for old compression-member
-            'axially-loaded-column': 'axially-loaded-column',
-            'axially_loaded_column': 'axially-loaded-column',
-            'axiallyloadedcolumn': 'axially-loaded-column',
+            'compression-member-design': 'struts-bolted',
         }
         return module_id_map.get(normalized, normalized)
     
@@ -303,7 +300,7 @@ class CompressionMemberViewSet(viewsets.ViewSet):
         }
         """
         normalized_slug = self._normalize_slug(submodule_slug)
-        module_id = get_report_module_id(normalized_slug)
+        module_id = COMPRESSION_REPORT_MODULE_ID_MAP.get(normalized_slug)
         if not module_id:
             return error_response('unsupported_report', f"Report generation is not supported for compression-member sub-module '{normalized_slug}'", status.HTTP_400_BAD_REQUEST, success=False)
 

@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import { toast } from 'react-toastify';
-import { MODULE_ROUTES, MODULE_NAME_TO_KEY, CONNECTIONS_TAB_CONTENT, GENERIC_SUBMODULE_CONTENT, normalizeModuleKey } from '../../constants/modules';
+import { findModule, getModuleRoute, loadModuleConfigs, MENU_GROUPS, getMenuSections } from '../../modules/registry';
+import { KEY_DISP_FINPLATE } from '../../constants/generated/coreKeys';
 import { isGuestUser } from '../../utils/auth';
 import { useAuth } from '../../context/AuthContext';
 import { searchProjects, getProjectById, deleteProject } from '../../datasources/projectsDataSource';
@@ -10,40 +11,6 @@ import { apiClient } from '../../utils/apiClient';
 import { AUTH } from '../../datasources/endpoints';
 import ProjectActionButtons from './ProjectActionButtons';
 import { DesignReportModal } from '../../modules/shared/components/DesignReportModal';
-import { finPlateConfig } from '../../modules/shearConnection/finPlate/configs/finPlateConfig';
-import { endPlateConfig } from '../../modules/shearConnection/endPlate/configs/endPlateConfig';
-import { cleatAngleConfig } from '../../modules/shearConnection/cleatAngle/configs/cleatAngleConfig';
-import { seatedAngleConfig } from '../../modules/shearConnection/seatAngle/configs/seatedAngleConfig';
-import { coverPlateBoltedConfig } from '../../modules/coverPlateBolted/configs/coverPlateBoltedConfig';
-import { coverPlateWeldedConfig } from '../../modules/coverPlateWelded/configs/coverPlateWeldedConfig';
-import { beamBeamEndPlateConfig } from '../../modules/beamBeamEndPlate/configs/beamBeamEndPlateConfig';
-import { beamToColumnEndPlateConfig } from '../../modules/beamToColumnEndPlate/configs/beamToColumnEndPlateConfig';
-import { boltedToEndConfig } from '../../modules/TensionMembers/BoltedToEnd/configs/boltedToEndConfig';
-import { simplySupportedBeamConfig } from '../../modules/flexuralMember/simplySupportedBeam/configs/simplySupportedBeamConfig';
-import { purlinConfig } from '../../modules/flexuralMember/purlin/configs/purlinConfig';
-import { onCantileverConfig } from '../../modules/flexuralMember/onCantilever/configs/onCantileverConfig';
-import { lapJointWeldedConfig } from '../../modules/SimpleConnection/LapJointWelded/config/lapJointWeldedConfig';
-import { lapJointBoltedConfig } from '../../modules/SimpleConnection/LapJointBolted/config/lapJointBoltedConfig';
-import { buttJointWeldedConfig } from '../../modules/SimpleConnection/ButtJointWelded/config/buttJointWeldedConfig';
-import { buttJointBoltedConfig } from '../../modules/SimpleConnection/ButtJointBolted/config/buttJointBoltedConfig';
-import {
-  MODULE_KEY_FIN_PLATE,
-  MODULE_KEY_CLEAT_ANGLE,
-  MODULE_KEY_END_PLATE,
-  MODULE_KEY_SEAT_ANGLE,
-  MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED,
-  MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED,
-  MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
-  MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
-  MODULE_KEY_TENSION_BOLTED,
-  MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
-  MODULE_KEY_PURLIN,
-  MODULE_KEY_ON_CANTILEVER_BEAM,
-  MODULE_KEY_LAP_JOINT_WELDED,
-  MODULE_KEY_LAP_JOINT_BOLTED,
-  MODULE_KEY_BUTT_JOINT_WELDED,
-  MODULE_KEY_BUTT_JOINT_BOLTED,
-} from '../../constants/modules';
 import dayButton from '../../assets/homepage/day_button.svg';
 import infoDefault from '../../assets/homepage/info_default.svg';
 import infoHover from '../../assets/homepage/info_hover.svg';
@@ -126,28 +93,10 @@ const Header = ({ setshowSideBar, active }) => {
       if (!data.success) throw new Error(data.error || 'Failed to load project');
       const detail = data.project;
       setReportInputValues(detail?.inputs_json || {});
-      const rawModId = detail?.submodule || detail?.module || MODULE_KEY_FIN_PLATE;
-      const modId = normalizeModuleKey(rawModId);
+      const modId = detail?.submodule || detail?.module || KEY_DISP_FINPLATE;
       setReportModuleId(modId);
-      const resolver = {
-        [MODULE_KEY_FIN_PLATE]: finPlateConfig,
-        [MODULE_KEY_END_PLATE]: endPlateConfig,
-        [MODULE_KEY_CLEAT_ANGLE]: cleatAngleConfig,
-        [MODULE_KEY_SEAT_ANGLE]: seatedAngleConfig,
-        [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED]: coverPlateBoltedConfig,
-        [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED]: coverPlateWeldedConfig,
-        [MODULE_KEY_BEAM_BEAM_END_PLATE_ALT]: beamBeamEndPlateConfig,
-        [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: beamToColumnEndPlateConfig,
-        [MODULE_KEY_TENSION_BOLTED]: boltedToEndConfig,
-        [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: simplySupportedBeamConfig,
-        [MODULE_KEY_PURLIN]: purlinConfig,
-        [MODULE_KEY_ON_CANTILEVER_BEAM]: onCantileverConfig,
-        [MODULE_KEY_LAP_JOINT_WELDED]: lapJointWeldedConfig,
-        [MODULE_KEY_LAP_JOINT_BOLTED]: lapJointBoltedConfig,
-        [MODULE_KEY_BUTT_JOINT_WELDED]: buttJointWeldedConfig,
-        [MODULE_KEY_BUTT_JOINT_BOLTED]: buttJointBoltedConfig,
-      };
-      const cfg = resolver[modId] || null;
+      const loaded = await loadModuleConfigs(modId);
+      const cfg = loaded?.moduleConfig || null;
       setReportModuleConfig(cfg);
       if (cfg && Array.isArray(cfg.selectionConfig)) {
         const initSel = cfg.selectionConfig.reduce((acc, s) => { acc[s.inputKey] = false; return acc; }, {});
@@ -233,22 +182,18 @@ const Header = ({ setshowSideBar, active }) => {
 
   useEffect(() => {
     const dynamicModules = [];
-    const extractModules = (contentObj, categoryName) => {
-      Object.entries(contentObj).forEach(([, sections]) => {
-        sections.forEach(section => {
-          section.options.forEach(opt => {
-            dynamicModules.push({
-              name: section.label || categoryName,
-              type: opt.label,
-              routeKey: opt.key,
-              date: ''
-            });
+    Object.values(MENU_GROUPS).flat().forEach((tab) => {
+      getMenuSections(tab.key).forEach((section) => {
+        section.options.forEach((opt) => {
+          dynamicModules.push({
+            name: section.label,
+            type: opt.label,
+            routeKey: opt.key,
+            date: ''
           });
         });
       });
-    };
-    extractModules(CONNECTIONS_TAB_CONTENT, 'Connection');
-    extractModules(GENERIC_SUBMODULE_CONTENT, 'Generic Member');
+    });
     setModulesList(dynamicModules);
   }, []);
 
@@ -262,22 +207,14 @@ const Header = ({ setshowSideBar, active }) => {
       try {
         const data = await searchProjects(searchQuery);
         if (data.success) {
-          const formatted = data.projects.map(p => {
-            const moduleName = p.submodule || p.module;
-            let routeKey = moduleName;
-            if (!MODULE_ROUTES[routeKey]) {
-              routeKey = MODULE_NAME_TO_KEY[moduleName] || moduleName;
-            }
-            return {
-              id: p.id,
-              name: p.name,
-              type: p.module || p.submodule || 'Project',
-              submodule: p.submodule || p.module,
-              module_id: p.submodule || p.module,
-              routeKey: routeKey,
-              date: new Date(p.updated_at).toLocaleDateString()
-            };
-          });
+          const formatted = data.projects.map(p => ({
+            id: p.id,
+            name: p.name,
+            type: p.module || p.submodule || 'Project',
+            submodule: p.submodule || p.module,
+            module_id: p.submodule || p.module,
+            date: new Date(p.updated_at).toLocaleDateString()
+          }));
           setProjects(formatted);
         }
       } catch (error) {
@@ -443,27 +380,17 @@ const Header = ({ setshowSideBar, active }) => {
               return;
             }
             const normalizedModule = moduleField.trim();
-            // Resolve moduleKey and route
-            let moduleKey = null;
-            let route = MODULE_ROUTES[normalizedModule] || null;
-            if (route) {
-              moduleKey = normalizedModule;
-            } else {
-              moduleKey = MODULE_NAME_TO_KEY[normalizedModule] || null;
-              route = moduleKey ? MODULE_ROUTES[moduleKey] : null;
-            }
-            if (!route) {
+            const entry = findModule(normalizedModule);
+            if (!entry) {
               alert(`Unsupported module in OSI: ${normalizedModule}`);
               e.target.value = '';
               return;
             }
-            // Store raw inputs for Phase 2 prefill
+            // Store raw inputs for prefill by the module page
             try {
-              if (moduleKey) {
-                sessionStorage.setItem(`prefill:${moduleKey}`, JSON.stringify(data.inputs));
-              }
+              sessionStorage.setItem(`prefill:${entry.id}`, JSON.stringify(data.inputs));
             } catch { /* ignore */ }
-            navigate(route);
+            navigate(entry.path);
           } catch (err) {
             console.error('Failed to import OSI:', err);
             alert('Failed to import OSI. Please ensure the file is valid.');
@@ -1247,7 +1174,7 @@ const Header = ({ setshowSideBar, active }) => {
                           {searchResults.modules.map((item, index) => (
                             <div key={index}
                               onClick={() => {
-                                const route = MODULE_ROUTES[item.routeKey];
+                                const route = getModuleRoute(item.routeKey);
                                 if (route) {
                                   navigate(route);
                                   setIsSearchFocused(false);

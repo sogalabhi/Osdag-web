@@ -1,6 +1,6 @@
 import { apiClient, subscribeToTask } from "../utils/apiClient";
 import { REPORTS, MODULES } from "./endpoints";
-import { getModuleSlug } from "../constants/apiRoutes";
+import { getModuleSlug } from "../modules/registry";
 
 /**
  * Generate initial report with metadata, module info and inputs.

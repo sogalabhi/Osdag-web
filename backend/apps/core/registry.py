@@ -54,49 +54,17 @@ class BaseModuleRegistry:
 
     @classmethod
     def get_service_by_module_id(cls, module_id: str):
-        """Get service class by MODULE_ID (e.g., 'FinPlateConnection')"""
+        """Get service class by MODULE_ID (e.g., 'Fin Plate Connection')"""
         slug = cls._module_id_map.get(module_id)
         return cls._registry.get(slug) if slug else None
 
     @classmethod
     def get_metadata_by_module_id(cls, module_id: str):
-        """Get metadata (slug, parent_module, service_class, adapter_func) by MODULE_ID (supports aliases)"""
+        """Get metadata (slug, parent_module, service_class, adapter_func) by MODULE_ID"""
         if not module_id:
             return None
-        clean_id = module_id.strip()
-        
-        if clean_id in cls._global_metadata:
-            return cls._global_metadata[clean_id]
-            
-        def simplify(s: str) -> str:
-            return s.lower().replace('-', '').replace('_', '')
-            
-        target = simplify(clean_id)
-        for registered_id, meta in cls._global_metadata.items():
-            if simplify(registered_id) == target:
-                return meta
-                
-        aliases = {
-            'Beam-to-Beam-Cover-Plate-Bolted-Connection': 'Cover-Plate-Bolted-Connection',
-            'Beam-to-Beam-Cover-Plate-Welded-Connection': 'Cover-Plate-Welded-Connection',
-            'Column-to-Column-Cover-Plate-Bolted-Connection': 'ColumnCoverPlateBolted',
-            'Column-to-Column-Cover-Plate-Welded-Connection': 'Column-to-Column-Cover-Plate-Welded-Connection',
-            'ColumnCoverPlateWelded': 'Column-to-Column-Cover-Plate-Welded-Connection',
-            'AxiallyLoadedColumn': 'Axially-Loaded-Column',
-            'Seated-Angle-Connection': 'SeatedAngleConnection',
-        }
-        normalized_id = aliases.get(clean_id)
-        if normalized_id and normalized_id in cls._global_metadata:
-            return cls._global_metadata[normalized_id]
-            
-        if normalized_id:
-            target_alias = simplify(normalized_id)
-            for registered_id, meta in cls._global_metadata.items():
-                if simplify(registered_id) == target_alias:
-                    return meta
-                    
-        return None
-    
+        return cls._global_metadata.get(module_id.strip())
+
     @classmethod
     def auto_discover(cls, package_name: str, package_path: str):
         """Auto-discover sub-modules in a package"""
@@ -130,10 +98,11 @@ class BaseModuleRegistry:
 
 try:
     from apps.modules.base_plate.adapter import create_from_input as base_plate_create_from_input
+    from apps.modules.base_plate import MODULE_ID as BASE_PLATE_MODULE_ID
     from apps.modules.base_plate.service import BasePlateService
     BaseModuleRegistry._global_registry['base-plate'] = BasePlateService
-    BaseModuleRegistry._global_module_id_map['Base-Plate'] = 'base-plate'
-    BaseModuleRegistry._global_metadata['Base-Plate'] = {
+    BaseModuleRegistry._global_module_id_map[BASE_PLATE_MODULE_ID] = 'base-plate'
+    BaseModuleRegistry._global_metadata[BASE_PLATE_MODULE_ID] = {
         'slug': 'base-plate',
         'parent_module': 'base-plate',
         'service_class': BasePlateService,

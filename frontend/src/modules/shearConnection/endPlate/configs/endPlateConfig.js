@@ -1,11 +1,10 @@
-import { MODULE_KEY_END_PLATE, MODULE_DISPLAY_END_PLATE } from "../../../../constants/modules";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { KEY_DISP_HEADERPLATE } from "../../../../constants/generated/coreKeys";
 export const endPlateConfig = {
-  sessionName: MODULE_DISPLAY_END_PLATE,
-  routePath: "/design/connections/shear/end_plate",
-  designType: MODULE_KEY_END_PLATE,
-  cameraKey: MODULE_KEY_END_PLATE,
+  sessionName: KEY_DISP_HEADERPLATE,
+  designType: KEY_DISP_HEADERPLATE,
+  cameraKey: KEY_DISP_HEADERPLATE,
   cadOptions: ["Model", "Beam", "Column", "Plate"],
 
   // IMPROVEMENT: Removed hardcoded defaults for API-driven lists (e.g., beam_section).
@@ -39,7 +38,7 @@ export const endPlateConfig = {
     design_method: "Limit State Design",
     
     bolt_tension_type: "Pre-tensioned",
-    module: MODULE_KEY_END_PLATE,
+    module: KEY_DISP_HEADERPLATE,
   },
 
   modalConfig: [
@@ -105,7 +104,7 @@ export const endPlateConfig = {
       "Member.Supported_Section.Material": inputs.supported_material,
       "Member.Supporting_Section.Designation": connectivity === "Beam-Beam" ? inputs.primary_beam : inputs.column_section,
       "Member.Supporting_Section.Material": inputs.supporting_material,
-      "Module": MODULE_KEY_END_PLATE,
+      "Module": KEY_DISP_HEADERPLATE,
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
       "Connector.Plate.Thickness_List": plateList,

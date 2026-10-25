@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { getModuleRoute } from "../../constants/moduleRoutes";
+import { getModuleRoute } from "../../modules/registry";
 
 const ModulesListCard = ({ items = [], loading = false }) => {
   const navigate = useNavigate();

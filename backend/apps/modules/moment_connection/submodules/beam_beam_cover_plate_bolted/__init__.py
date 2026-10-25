@@ -1,6 +1,8 @@
 """
 Cover Plate Bolted Connection Sub-module
 """
-MODULE_ID = 'Cover-Plate-Bolted-Connection'
+from osdag_core.Common import KEY_DISP_BEAMCOVERPLATE
+
+MODULE_ID = KEY_DISP_BEAMCOVERPLATE
 from .service import CoverPlateBoltedService as Service
 

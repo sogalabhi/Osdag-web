@@ -27,7 +27,7 @@ from osdag_core.Common import (
     KEY_ShearBucklingOption, KEY_DP_DESIGN_METHOD,
     KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE,
     KEY_T_constatnt, KEY_W_constatnt, KEY_Elastic_CM,
-    KEY_OPTIMUM_UR_COMPRESSION
+    KEY_OPTIMUM_UR_COMPRESSION, KEY_DISP_PLATE_GIRDER_WELDED
 )
 import sys
 import os
@@ -221,7 +221,7 @@ def create_from_input(input_values: Dict[str, Any]):
             return val if isinstance(val, list) else [str(val)]
 
     design_dict = {
-        KEY_MODULE: input_values.get('Module', 'Plate Girder'),
+        KEY_MODULE: input_values.get('Module', KEY_DISP_PLATE_GIRDER_WELDED),
         KEY_MATERIAL: input_values.get('Material', 'E 250 (Fe 410 W)A'),
         KEY_LENGTH: input_values.get('Member.Length', '5000'),
         KEY_LOAD: input_values.get('Loading.Condition', ''),
@@ -460,7 +460,7 @@ def create_optimization_input(input_values: Dict[str, Any]) -> Dict[str, Any]:
     # Use the same create_from_input logic but ensure Optimized flag is set
     # The design dictionary format is the same as normal design
     design_dict = {
-        KEY_MODULE: optimization_input.get('Module', 'Plate-Girder'),
+        KEY_MODULE: optimization_input.get('Module', KEY_DISP_PLATE_GIRDER_WELDED),
         KEY_MATERIAL: optimization_input.get('Material', 'E 250 (Fe 410 W)A'),
         KEY_LENGTH: optimization_input.get('Member.Length', '5000'),
         KEY_LOAD: optimization_input.get('Loading.Condition', 'Normal'),

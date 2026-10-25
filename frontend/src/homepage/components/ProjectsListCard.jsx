@@ -1,46 +1,11 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import { DesignReportModal } from '../../modules/shared/components/DesignReportModal';
-import { finPlateConfig } from '../../modules/shearConnection/finPlate/configs/finPlateConfig';
-import { endPlateConfig } from '../../modules/shearConnection/endPlate/configs/endPlateConfig';
-import { cleatAngleConfig } from '../../modules/shearConnection/cleatAngle/configs/cleatAngleConfig';
-import { seatedAngleConfig } from '../../modules/shearConnection/seatAngle/configs/seatedAngleConfig';
-import { coverPlateBoltedConfig } from '../../modules/coverPlateBolted/configs/coverPlateBoltedConfig';
-import { coverPlateWeldedConfig } from '../../modules/coverPlateWelded/configs/coverPlateWeldedConfig';
-import { beamBeamEndPlateConfig } from '../../modules/beamBeamEndPlate/configs/beamBeamEndPlateConfig';
-import { beamToColumnEndPlateConfig } from '../../modules/beamToColumnEndPlate/configs/beamToColumnEndPlateConfig';
-import { boltedToEndConfig } from '../../modules/TensionMembers/BoltedToEnd/configs/boltedToEndConfig';
-import { simplySupportedBeamConfig } from '../../modules/flexuralMember/simplySupportedBeam/configs/simplySupportedBeamConfig';
-import { purlinConfig } from '../../modules/flexuralMember/purlin/configs/purlinConfig';
-import { onCantileverConfig } from '../../modules/flexuralMember/onCantilever/configs/onCantileverConfig';
-import { lapJointWeldedConfig } from '../../modules/SimpleConnection/LapJointWelded/config/lapJointWeldedConfig';
-import { lapJointBoltedConfig } from '../../modules/SimpleConnection/LapJointBolted/config/lapJointBoltedConfig';
-import { buttJointWeldedConfig } from '../../modules/SimpleConnection/ButtJointWelded/config/buttJointWeldedConfig';
-import { buttJointBoltedConfig } from '../../modules/SimpleConnection/ButtJointBolted/config/buttJointBoltedConfig';
 import { isGuestUser } from '../../utils/auth';
-import {
-  MODULE_KEY_FIN_PLATE,
-  MODULE_KEY_CLEAT_ANGLE,
-  MODULE_KEY_END_PLATE,
-  MODULE_KEY_SEAT_ANGLE,
-  MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED,
-  MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED,
-  MODULE_KEY_BEAM_BEAM_END_PLATE_ALT,
-  MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT,
-  MODULE_KEY_TENSION_BOLTED,
-  MODULE_KEY_SIMPLY_SUPPORTED_BEAM,
-  MODULE_KEY_PURLIN,
-  MODULE_KEY_ON_CANTILEVER_BEAM,
-  MODULE_KEY_LAP_JOINT_WELDED,
-  MODULE_KEY_LAP_JOINT_BOLTED,
-  MODULE_KEY_BUTT_JOINT_WELDED,
-  MODULE_KEY_BUTT_JOINT_BOLTED,
-} from '../../constants/modules';
 import { getProjectById } from "../../datasources/projectsDataSource";
 import ProjectActionButtons from './ProjectActionButtons';
-import { normalizeModuleKey } from '../../constants/modules';
-
-const normalizeModuleId = normalizeModuleKey;
+import { loadModuleConfigs } from '../../modules/registry';
+import { KEY_DISP_FINPLATE } from '../../constants/generated/coreKeys';
 
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
   const [projects, setProjects] = React.useState(projectsProp);
@@ -92,29 +57,11 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
     try {
       const detail = await fetchProjectDetail(project.id);
       setReportInputValues(detail?.inputs_json || {});
-      const rawModId = detail?.submodule || detail?.module || MODULE_KEY_FIN_PLATE;
-      const modId = normalizeModuleId(rawModId);
+      const modId = detail?.submodule || detail?.module || KEY_DISP_FINPLATE;
       setReportModuleId(modId);
       // Resolve moduleConfig to reuse DesignReportModal logic
-      const resolver = {
-        [MODULE_KEY_FIN_PLATE]: finPlateConfig,
-        [MODULE_KEY_END_PLATE]: endPlateConfig,
-        [MODULE_KEY_CLEAT_ANGLE]: cleatAngleConfig,
-        [MODULE_KEY_SEAT_ANGLE]: seatedAngleConfig,
-        [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_BOLTED]: coverPlateBoltedConfig,
-        [MODULE_KEY_BEAM_TO_BEAM_COVER_PLATE_WELDED]: coverPlateWeldedConfig,
-        [MODULE_KEY_BEAM_BEAM_END_PLATE_ALT]: beamBeamEndPlateConfig,
-        [MODULE_KEY_BEAM_COLUMN_END_PLATE_ALT]: beamToColumnEndPlateConfig,
-        [MODULE_KEY_TENSION_BOLTED]: boltedToEndConfig,
-        [MODULE_KEY_SIMPLY_SUPPORTED_BEAM]: simplySupportedBeamConfig,
-        [MODULE_KEY_PURLIN]: purlinConfig,
-        [MODULE_KEY_ON_CANTILEVER_BEAM]: onCantileverConfig,
-        [MODULE_KEY_LAP_JOINT_WELDED]: lapJointWeldedConfig,
-        [MODULE_KEY_LAP_JOINT_BOLTED]: lapJointBoltedConfig,
-        [MODULE_KEY_BUTT_JOINT_WELDED]: buttJointWeldedConfig,
-        [MODULE_KEY_BUTT_JOINT_BOLTED]: buttJointBoltedConfig,
-      };
-      const cfg = resolver[modId] || null;
+      const loaded = await loadModuleConfigs(modId);
+      const cfg = loaded?.moduleConfig || null;
       setReportModuleConfig(cfg);
       // allSelected: set all to false so saved arrays are used as-is
       if (cfg && Array.isArray(cfg.selectionConfig)) {

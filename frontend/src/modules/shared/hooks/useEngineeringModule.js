@@ -25,14 +25,13 @@ import { useDesignReport } from "./useDesignReport";
  * - Modal and selection state management
  * 
  * @param {Object} moduleConfig - Module configuration object
- * @param {string} moduleConfig.designType - Module identifier (e.g., 'FinPlateConnection')
+ * @param {string} moduleConfig.designType - Module identifier (desktop module name, e.g. 'Fin Plate Connection')
  * @param {string} moduleConfig.cameraKey - Camera/view key for module
  * @param {Object} moduleConfig.defaultInputs - Default input values
  * @param {Array} moduleConfig.modalConfig - Modal configuration array
  * @param {Array} moduleConfig.selectionConfig - Selection configuration array
  * @param {Function} moduleConfig.validateInputs - Input validation function
  * @param {Function} moduleConfig.buildSubmissionParams - Parameter building function
- * @param {string} moduleConfig.routePath - Route path for navigation
  * @param {number|null} projectId - Current project ID (optional)
  * 
  * @returns {Object} State and action functions
@@ -139,7 +138,7 @@ export const useEngineeringModule = (moduleConfig) => {
     setConfirmationType,
     confirmNavigation,
     performNavigation,
-  } = useNavigationGuard(hasUnsavedWork(), moduleConfig.routePath);
+  } = useNavigationGuard(hasUnsavedWork(), moduleConfig.designType);
 
   const report = useDesignReport(
     service,

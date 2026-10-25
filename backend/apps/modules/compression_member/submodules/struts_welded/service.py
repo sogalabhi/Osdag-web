@@ -7,7 +7,7 @@ import traceback
 
 
 class StrutsWeldedService:
-    """Service class for Struts-Welded-Design module"""
+    """Service class for the struts welded to end gusset module"""
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:

@@ -18,7 +18,7 @@ class EmailVerificationTests(TestCase):
         # 2. Save OSI as guest (no auth header, inline=True) -> should succeed
         osi_data = {
             "name": "Test Project",
-            "module_id": "FinPlateConnection",
+            "module_id": "Fin Plate Connection",
             "inputs": {"material": "E 250 (Fe 410 W)A"},
             "inline": True
         }
@@ -46,7 +46,7 @@ class EmailVerificationTests(TestCase):
         # 2. Save OSI even with inline=True -> should return 403 Forbidden
         osi_data = {
             "name": "Test Project",
-            "module_id": "FinPlateConnection",
+            "module_id": "Fin Plate Connection",
             "inputs": {"material": "E 250 (Fe 410 W)A"},
             "inline": True
         }
@@ -56,7 +56,7 @@ class EmailVerificationTests(TestCase):
 
         # 3. Design Preference Sync -> should return 403 Forbidden
         sync_data = {
-            "module_session_name": "FinPlateConnection",
+            "module_session_name": "Fin Plate Connection",
             "inputs": {"material": "E 250 (Fe 410 W)A"},
             "operation": "open"
         }
@@ -84,7 +84,7 @@ class EmailVerificationTests(TestCase):
         # 2. Save OSI -> should succeed with 201 Created
         osi_data = {
             "name": "Test Project",
-            "module_id": "FinPlateConnection",
+            "module_id": "Fin Plate Connection",
             "inputs": {"material": "E 250 (Fe 410 W)A"}
         }
         r = self.client.post("/api/save-osi-from-inputs/", data=osi_data, content_type="application/json", **headers)

@@ -21,7 +21,6 @@ from django.utils.decorators import method_decorator
 
 from apps.core.module_finder import get_module_api
 from apps.core.osdag_overrides import unknown_material_error, user_id_from_request, user_rows
-from .cad_module_aliases import resolve_module_id
 from apps.core.utils.api_errors import error_json_response
 
 
@@ -83,8 +82,6 @@ class CADExport(View):
         if material_error:
             return error_json_response('bad_request', material_error, 400)
 
-        resolved_module_id = resolve_module_id(module_id)
-
         # Resolve repo/back roots for file path handling
         current_dir = os.path.dirname(os.path.abspath(__file__))
         repo_root = os.path.abspath(os.path.join(current_dir, "../../../../../"))
@@ -92,7 +89,7 @@ class CADExport(View):
 
         session_id = str(uuid.uuid4())
 
-        module_api = get_module_api(resolved_module_id)
+        module_api = get_module_api(module_id)
 
         export_formats = [format_type]
 

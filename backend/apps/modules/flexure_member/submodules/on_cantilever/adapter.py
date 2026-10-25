@@ -142,7 +142,7 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure_Cantilever:
     design_method = input_values.get('Design.Design_Method', 'Limit State Design')
 
     design_dict = {
-        KEY_MODULE: 'On-Cantilever-Beam',
+        KEY_MODULE: KEY_DISP_FLEXURE2,
         KEY_SEC_PROFILE: sec_profile,
         KEY_SECSIZE: member_designation,
         KEY_MATERIAL: material,

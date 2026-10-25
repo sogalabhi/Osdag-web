@@ -27,10 +27,10 @@ import { menuItems } from "../utils/moduleUtils";
 import { downloadGroupedInputsCsv, downloadRawOutputsCsv } from "../utils/groupedCsvExport";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 import { loadStateFromOsi } from "../utils/osiLoader";
-import { getModuleConfig as getDesignPrefModuleConfig } from "../utils/moduleConfig";
+import { getModuleDesignPref } from "../../registry";
 import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
 import { downloadCachedModelByFormat, downloadExportCadResponse, downloadCadSectionsAsStl } from "../utils/cadExport";
-import { MODULE_KEY_SEAT_ANGLE, MODULE_KEY_FIN_PLATE, MODULE_KEY_CLEAT_ANGLE, MODULE_KEY_END_PLATE, MODULE_KEY_BEAM_COLUMN_END_PLATE } from "../../../constants/modules";
+import { KEY_DISP_SEATED_ANGLE, KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_HEADERPLATE, KEY_DISP_BCENDPLATE } from "../../../constants/generated/coreKeys";
 import { deleteAllCustomSections } from "../../../datasources/sectionsDataSource";
 import { openOsiFile } from "../../../datasources/osiDataSource";
 import { useViewCamera } from "./cad";
@@ -542,7 +542,7 @@ export const EngineeringModule = ({
   };
   const handleSaveInputs = async () => {
     // Determine module_id - use designType from moduleConfig, or fallback to inputs.module
-    const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || MODULE_KEY_SEAT_ANGLE;
+    const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || KEY_DISP_SEATED_ANGLE;
     const projectName = inputs?.project_name || inputs?.name || moduleConfig?.sessionName || 'project';
 
     try {
@@ -600,9 +600,9 @@ export const EngineeringModule = ({
     }
   };
 
-  // Get connectivity for FinPlateConnection module
+  // Get connectivity for the fin plate module
   const getConnectivity = () => {
-    if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
+    if (moduleConfig.cameraKey === KEY_DISP_FINPLATE) {
       return extraState?.selectedOption || inputs?.connectivity;
     }
     return null;
@@ -624,19 +624,19 @@ export const EngineeringModule = ({
       return moduleConfig.cadOptions || ["Model", "Beam", "Connector"];
     }
 
-    if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
+    if (moduleConfig.cameraKey === KEY_DISP_FINPLATE) {
       return ["Model", "Beam", "Column", "Plate"];
     }
-    else if (moduleConfig.cameraKey === MODULE_KEY_CLEAT_ANGLE) {
+    else if (moduleConfig.cameraKey === KEY_DISP_CLEATANGLE) {
       return ["Model", "Beam", "Column", "CleatAngle"]; // FIXED: Use CleatAngle instead of Connector
     }
-    else if (moduleConfig.cameraKey === MODULE_KEY_END_PLATE) {
+    else if (moduleConfig.cameraKey === KEY_DISP_HEADERPLATE) {
       return ["Model", "Beam", "Column", "Plate"];
     }
-    else if (moduleConfig.cameraKey === MODULE_KEY_SEAT_ANGLE) {
+    else if (moduleConfig.cameraKey === KEY_DISP_SEATED_ANGLE) {
       return ["Model", "Beam", "Column", "SeatedAngle"]; // FIXED: Use SeatedAngle instead of Connector
     }
-    else if (moduleConfig.cameraKey === MODULE_KEY_BEAM_COLUMN_END_PLATE) {
+    else if (moduleConfig.cameraKey === KEY_DISP_BCENDPLATE) {
       return ["Model", "Beam", "Column", "End Plate"];
     }
 
@@ -693,7 +693,7 @@ export const EngineeringModule = ({
   };
 
   const handleOpenDesignPrefFromShortcut = () => {
-    const mod = getDesignPrefModuleConfig(inputs?.module);
+    const mod = getModuleDesignPref(inputs?.module);
     const guard = canOpenAdditionalInputs(
       mod,
       inputs,
@@ -829,7 +829,7 @@ export const EngineeringModule = ({
     if (name === "Download Inputs CSV" || name === "Save Inputs (.csv)") {
       const inputsExpanded = expandAllSelectedInputs(inputs, allSelected, contextData);
       const effectiveInputs = { ...inputsExpanded, ...(designPrefOverrides || {}) };
-      const moduleId = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || MODULE_KEY_SEAT_ANGLE;
+      const moduleId = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || KEY_DISP_SEATED_ANGLE;
       return downloadGroupedInputsCsv({
         moduleConfig,
         inputs: inputsExpanded,
@@ -840,7 +840,7 @@ export const EngineeringModule = ({
       });
     }
     if (name === "Download Outputs CSV" || name === "Save Outputs (.csv)") {
-      const moduleId = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || MODULE_KEY_SEAT_ANGLE;
+      const moduleId = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || KEY_DISP_SEATED_ANGLE;
       const inputsDict = moduleConfig.buildSubmissionParams(inputs, allSelected, contextData || {}, extraState || {});
       return downloadRawOutputsCsv({
         inputsDict,

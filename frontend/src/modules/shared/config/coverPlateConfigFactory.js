@@ -1,11 +1,10 @@
 import { validateRequiredFields } from '../utils/validation';
 
 // Shared shape for coverPlateBolted / columnColumnCoverPlateBolted, which were
-// identical except for ~8 values (session/route/designType strings, cadOptions'
+// identical except for ~8 values (session/designType strings, cadOptions'
 // member label, default loads, and the section-options list key).
 export function makeCoverPlateBoltedConfig({
   sessionName,
-  routePath,
   designType,
   cadOptions,
   sectionOptionsKey,
@@ -13,7 +12,6 @@ export function makeCoverPlateBoltedConfig({
 }) {
   const config = {
     sessionName,
-    routePath,
     designType,
     cameraKey: "CoverPlateBolted",
     cadOptions,
@@ -213,7 +211,6 @@ export function makeCoverPlateBoltedConfig({
 // since this refactor is a pure dedup, not a behavior fix.
 export function makeCoverPlateWeldedConfig({
   sessionName,
-  routePath,
   designType,
   cadOptions,
   sectionOptionsKey,
@@ -223,7 +220,6 @@ export function makeCoverPlateWeldedConfig({
 }) {
   const config = {
     sessionName,
-    routePath,
     designType,
     cameraKey: "CoverPlateWelded",
     cadOptions,

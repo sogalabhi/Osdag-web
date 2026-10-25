@@ -3,7 +3,6 @@ Dynamic Module Finder - Auto-discovers modules from parent module registries
 Replaces the old osdag_api/module_finder.py with registry-based discovery
 """
 import importlib
-import pkgutil
 from typing import Dict, Any, List, Protocol, Optional
 from types import ModuleType
 
@@ -107,86 +106,51 @@ _module_dict: Dict[str, ModuleApiType] = {}
 def _discover_modules():
     """
     Auto-discover all modules from parent module registries
-    Scans apps.modules.*.submodules.* for MODULE_ID and creates adapter wrappers
-    Uses file reading to avoid import-time dependency issues
+    Scans apps.modules.*.submodules.* and registers each adapter under the
+    MODULE_ID exported by its package
     """
-    import os
-    import re
     from pathlib import Path
-    
+
     # Get the apps/modules directory
     backend_path = Path(__file__).resolve().parent.parent.parent
     modules_path = backend_path / 'apps' / 'modules'
-    
+
     if not modules_path.exists():
         print("Warning: modules path does not exist:", modules_path)
         return
-    
+
     # Iterate through all parent module directories
     for parent_module_dir in modules_path.iterdir():
         if not parent_module_dir.is_dir() or parent_module_dir.name.startswith('_'):
             continue
-        
+
         submodules_path = parent_module_dir / 'submodules'
         if not submodules_path.exists():
             continue
-        
-        parent_module_name = parent_module_dir.name
-        package_base = f'apps.modules.{parent_module_name}.submodules'
-        
+
+        package_base = f'apps.modules.{parent_module_dir.name}.submodules'
+
         # Iterate through all sub-module directories
         for submodule_dir in submodules_path.iterdir():
             if not submodule_dir.is_dir() or submodule_dir.name.startswith('_'):
                 continue
-            
-            submodule_name = submodule_dir.name
-            init_file = submodule_dir / '__init__.py'
-            adapter_file = submodule_dir / 'adapter.py'
-            
-            # Skip if adapter doesn't exist
-            if not adapter_file.exists():
+
+            if not (submodule_dir / 'adapter.py').exists():
                 continue
-            
-            # Read MODULE_ID from __init__.py without importing
-            module_id = None
-            if init_file.exists():
-                try:
-                    content = init_file.read_text(encoding='utf-8')
-                    # Look for MODULE_ID = '...' pattern
-                    match = re.search(r"MODULE_ID\s*=\s*['\"]([^'\"]+)['\"]", content)
-                    if match:
-                        module_id = match.group(1)
-                except Exception as e:
-                    # If file reading fails, try importing (may fail due to dependencies)
-                    try:
-                        init_module_path = f'{package_base}.{submodule_name}'
-                        init_module = importlib.import_module(init_module_path)
-                        if hasattr(init_module, 'MODULE_ID'):
-                            module_id = init_module.MODULE_ID
-                    except:
-                        pass
-            
+
+            package_path = f'{package_base}.{submodule_dir.name}'
+            try:
+                package = importlib.import_module(package_path)
+                adapter_module = importlib.import_module(f'{package_path}.adapter')
+            except Exception:
+                # Import failed - skip, falls back to the old system
+                continue
+
+            module_id = getattr(package, 'MODULE_ID', None)
             if not module_id:
                 continue
-            
-            # Import the adapter module (lazy - only when needed)
-            adapter_module_path = f'{package_base}.{submodule_name}.adapter'
-            try:
-                adapter_module = importlib.import_module(adapter_module_path)
-            except ImportError as e:
-                # Adapter import failed - skip for now, will fall back to old system
-                continue
-            except Exception as e:
-                # Other errors - skip
-                continue
-            
-            # Create adapter wrapper
-            try:
-                adapter = ModuleApiAdapter(adapter_module)
-                _module_dict[module_id] = adapter
-            except Exception as e:
-                print(f"Module finder adapter error for {module_id}: {e}")
-                continue
+
+            _module_dict[module_id] = ModuleApiAdapter(adapter_module)
 
 
 # Auto-discover modules on import
@@ -199,7 +163,7 @@ def get_module_api(module_id: str) -> ModuleApiType:
     Falls back to old osdag_api for modules not yet migrated
     
     Args:
-        module_id: The MODULE_ID (e.g., 'FinPlateConnection', 'Beam-Beam-End-Plate-Connection')
+        module_id: The MODULE_ID (e.g., 'Fin Plate Connection', 'Beam-to-Beam End Plate Connection')
     
     Returns:
         ModuleApiType adapter instance

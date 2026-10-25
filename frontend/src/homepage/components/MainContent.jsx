@@ -3,7 +3,6 @@ import DashboardSectionCard from './DashboardSectionCard';
 import ProjectsListCard from './ProjectsListCard';
 import ModulesListCard from './ModulesListCard';
 import { isGuestUser } from '../../utils/auth';
-import { getModuleDisplayName } from '../../constants/moduleNames';
 import { listProjects, deleteProject as deleteProjectApi } from "../../datasources/projectsDataSource";
 
 const MainContent = () => {
@@ -60,7 +59,7 @@ const MainContent = () => {
     }
   });
   const recentModules = Object.values(uniqueModulesMap).map(project => ({
-    name: getModuleDisplayName(project.submodule),
+    name: project.submodule,
     description: project.name,
     date: project.updated_at ? new Date(project.updated_at).toLocaleDateString() : '',
     submodule: project.submodule,

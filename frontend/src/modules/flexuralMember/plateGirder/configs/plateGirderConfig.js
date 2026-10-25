@@ -2,6 +2,7 @@
 import ISECTION from "../../../../assets/ISection.png";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { KEY_DISP_PLATE_GIRDER_WELDED } from "../../../../constants/generated/coreKeys";
 // Plate Girder uses backend key strings directly (matching backend Common.py)
 
 /**
@@ -144,13 +145,12 @@ const calculateMaxDeflection = (structureType, designLoad, memberOption, support
 
 export const plateGirderConfig = {
   sessionName: "Plate Girder Design",
-  routePath: "/design/flexure/plate_girder",
-  designType: "Plate-Girder",
+  designType: KEY_DISP_PLATE_GIRDER_WELDED,
   cameraKey: "FlexuralMember",
   cadOptions: ["Model", "Web", "Top Flange", "Bottom Flange", "Stiffeners"],
 
   defaultInputs: {
-    module: "Plate-Girder",
+    module: KEY_DISP_PLATE_GIRDER_WELDED,
     material: "E 250 (Fe 410 W)A",
     design_type: "Customized", // "Customized" or "Optimized"
     total_depth: "1300", // Required for Customized
@@ -336,7 +336,7 @@ export const plateGirderConfig = {
 
     const params = {
         // --- Basic Module Info ---
-        "Module": "Plate-Girder",
+        "Module": KEY_DISP_PLATE_GIRDER_WELDED,
         "Material": String(inputs.material || "E 250 (Fe 410 W)A"),
         "Member.Length": memberLength,
         
@@ -450,7 +450,7 @@ export const plateGirderConfig = {
           key: "module",
           label: "Module",
           type: "text",
-          defaultValue: "Plate-Girder",
+          defaultValue: KEY_DISP_PLATE_GIRDER_WELDED,
           disabled: true
         },
         {

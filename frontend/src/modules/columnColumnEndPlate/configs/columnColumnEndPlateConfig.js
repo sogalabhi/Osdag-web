@@ -1,9 +1,9 @@
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { KEY_DISP_COLUMNENDPLATE } from "../../../constants/generated/coreKeys";
 
 export const columnColumnEndPlateConfig = {
   sessionName: "Column Column End Plate Connection",
-  routePath: "/design/connections/column-to-column-splice/end_plate",
-  designType: "Column-to-Column-End-Plate-Connection",
+  designType: KEY_DISP_COLUMNENDPLATE,
   cameraKey: "ColumnColumnEndPlate",
   cadOptions: ["Model", "Column", "EndPlate"],
   
@@ -27,7 +27,7 @@ export const columnColumnEndPlateConfig = {
     material: "E 250 (Fe 410 W)A",
     supported_designation: "WPB 900 X 300 X 291.46",
     supported_material: "E 250 (Fe 410 W)A",
-    module: "Column-to-Column-End-Plate-Connection",
+    module: KEY_DISP_COLUMNENDPLATE,
     weld_fab: "Shop Weld",
     weld_material_grade: "410",
     weld_type: "Groove Weld",
@@ -86,7 +86,7 @@ export const columnColumnEndPlateConfig = {
       "Weld.Fab": inputs.weld_fab,
       "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
       "Weld.Type": inputs.weld_type,
-      Module: "Column-to-Column-End-Plate-Connection",
+      Module: KEY_DISP_COLUMNENDPLATE,
     };
   },
 

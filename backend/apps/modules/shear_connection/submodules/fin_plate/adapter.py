@@ -542,9 +542,7 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
         module.module = KEY_DISP_FINPLATE
     # Object that will create the CAD model.
     # CommonDesignLogic signature: (display, cad_widget, folder, connection, mainmodule)
-    # connection should be KEY_DISP_FINPLATE ('FinPlateConnection') for proper CAD generation
-    # Force use of KEY_DISP_FINPLATE since module.module might be set to input value (e.g., "FinPlateConnection")
-    # instead of the display constant ("FinPlateConnection")
+    # connection should be KEY_DISP_FINPLATE for proper CAD generation
     connection_key = KEY_DISP_FINPLATE
     print('Using connection key:', repr(connection_key))
     print('KEY_DISP_FINPLATE value:', repr(KEY_DISP_FINPLATE))

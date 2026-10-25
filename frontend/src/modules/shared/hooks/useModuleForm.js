@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import {
-  MODULE_KEY_FIN_PLATE,
-  MODULE_KEY_CLEAT_ANGLE,
-  MODULE_KEY_SEAT_ANGLE,
-  MODULE_KEY_END_PLATE,
-  MODULE_KEY_BEAM_BEAM_END_PLATE,
-  MODULE_KEY_BEAM_COLUMN_END_PLATE,
-} from "../../../constants/modules";
+  KEY_DISP_FINPLATE,
+  KEY_DISP_CLEATANGLE,
+  KEY_DISP_SEATED_ANGLE,
+  KEY_DISP_HEADERPLATE,
+  KEY_DISP_BB_EP_SPLICE,
+  KEY_DISP_BCENDPLATE,
+} from "../../../constants/generated/coreKeys";
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { loadStateFromOsi } from "../utils/osiLoader";
 
@@ -53,17 +53,17 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     if (typeof moduleConfig.getInitialExtraState === "function") {
       return moduleConfig.getInitialExtraState();
     }
-    if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
+    if (moduleConfig.cameraKey === KEY_DISP_FINPLATE) {
       return { selectedOption: "Column Flange-Beam-Web" };
-    } else if (moduleConfig.cameraKey === MODULE_KEY_CLEAT_ANGLE) {
+    } else if (moduleConfig.cameraKey === KEY_DISP_CLEATANGLE) {
       return { selectedOption: "Column Flange-Beam-Web" };
-    } else if (moduleConfig.cameraKey === MODULE_KEY_SEAT_ANGLE) {
+    } else if (moduleConfig.cameraKey === KEY_DISP_SEATED_ANGLE) {
       return { selectedOption: "Column Flange-Beam-Web" };
-    } else if (moduleConfig.cameraKey === MODULE_KEY_END_PLATE) {
+    } else if (moduleConfig.cameraKey === KEY_DISP_HEADERPLATE) {
       return { selectedOption: "Column Flange-Beam-Web" };
-    } else if (moduleConfig.cameraKey === MODULE_KEY_BEAM_BEAM_END_PLATE) {
+    } else if (moduleConfig.cameraKey === KEY_DISP_BB_EP_SPLICE) {
       return { selectedOption: "Flushed - Reversible Moment" };
-    } else if (moduleConfig.cameraKey === MODULE_KEY_BEAM_COLUMN_END_PLATE) {
+    } else if (moduleConfig.cameraKey === KEY_DISP_BCENDPLATE) {
       return { selectedOption: "Flushed - Reversible Moment" };
     }
     return { selectedOption: "Column Flange-Beam-Web" };

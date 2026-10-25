@@ -13,7 +13,7 @@ from .auth.my_data_api import MyDataAPIView
 
 # Project exports
 from .projects.project_api import ProjectAPI, ProjectDetailAPI, ProjectByNameAPI
-from .projects.osi_api import SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ModuleRoutes, ProjectOsiDownload
+from .projects.osi_api import SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ProjectOsiDownload
 
 # Design exports
 from .design.design_pref_api import DesignPreference
@@ -40,7 +40,7 @@ __all__ = [
     'MyDataAPIView',
     # Projects
     'ProjectAPI', 'ProjectDetailAPI', 'ProjectByNameAPI',
-    'SaveOsiFromInputs', 'OpenOsiUpload', 'OpenOsiById', 'ModuleRoutes', 'ProjectOsiDownload',
+    'SaveOsiFromInputs', 'OpenOsiUpload', 'OpenOsiById', 'ProjectOsiDownload',
     # Design
     'DesignPreference', 'DesignPreferenceSync', 'DesignPreferenceDefaults', 'MaterialDetails', 'CompanyLogoView',
     'CreateDesignReport',

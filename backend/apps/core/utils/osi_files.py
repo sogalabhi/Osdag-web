@@ -13,8 +13,8 @@ SUPPORTED_VERSIONS = {"1.0"}
 def validate_module_id(module_id: str) -> bool:
     if not isinstance(module_id, str):
         return False
-    # allow letters, numbers, dashes and underscores
-    return bool(re.fullmatch(r"[A-Za-z0-9_-]{2,64}", module_id))
+    # allow letters, numbers, spaces, dashes and underscores
+    return bool(re.fullmatch(r"[A-Za-z0-9 _-]{2,64}", module_id))
 
 
 def flatten_and_translate_keys(inputs: Dict[str, Any]) -> Dict[str, Any]:

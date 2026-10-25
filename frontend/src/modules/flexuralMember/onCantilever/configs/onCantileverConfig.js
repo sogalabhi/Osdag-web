@@ -1,16 +1,16 @@
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { KEY_DISP_FLEXURE2 } from "../../../../constants/generated/coreKeys";
 
 
 export const onCantileverConfig = {
   sessionName: "On Cantilever Beam Design",
-  routePath: "/design/flexure/on_cantilever",
-  designType: "On-Cantilever-Beam",
+  designType: KEY_DISP_FLEXURE2,
   cameraKey: "FlexuralMember",
 
   cadOptions: ["Model"],
 
   defaultInputs: {
-    module: "On-Cantilever-Beam",
+    module: KEY_DISP_FLEXURE2,
 
     section_profile: "Beams and Columns",
     section_designation: ["MB 400"],
@@ -101,7 +101,7 @@ export const onCantileverConfig = {
 
     return {
       // Module identification
-      "Module": "On-Cantilever-Beam",
+      "Module": KEY_DISP_FLEXURE2,
 
       // Section
       "Member.Profile": inputs.section_profile || "Beams and Columns",

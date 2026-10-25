@@ -8,19 +8,19 @@ import {
   KEY_SEC_MATERIAL,
   KEY_TORSIONAL_RES,
   KEY_WARPING_RES,
+  KEY_DISP_FLEXURE4,
 } from "../../../../constants/generated/coreKeys";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 export const purlinConfig = {
   sessionName: "Purlin Design",
-  routePath: "/design/flexure/purlin",
-  designType: "Purlin",
+  designType: KEY_DISP_FLEXURE4,
   cameraKey: "FlexuralMember",
   cadOptions: ["Model", "Beam"],
 
   // ------------------ DEFAULT INPUTS ------------------
   defaultInputs: {
-    module: "Purlin",
+    module: KEY_DISP_FLEXURE4,
     section_profile: "Channels",
     section_designation: ["All"],
     material: "E 165 (Fe 290)",
@@ -83,7 +83,7 @@ export const purlinConfig = {
       lists.beamList || [];
 
     return {
-      [KEY_MODULE]: "Purlin",
+      [KEY_MODULE]: KEY_DISP_FLEXURE4,
 
       [KEY_SEC_PROFILE]: String(inputs.section_profile),
 

@@ -1,9 +1,8 @@
 import { useNavigate } from "react-router";
 import { toast } from 'react-toastify';
-import { MODULE_ROUTES } from '../../constants/modules';
 import { getProjectById } from "../../datasources/projectsDataSource";
 import { saveOsiFromInputs } from "../../datasources/osiDataSource";
-import { getModuleRoute } from "../../constants/moduleRoutes";
+import { getModuleRoute } from "../../modules/registry";
 
 const btnBase =
   "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-osdag-green hover:text-osdag-green transition-all active:scale-95";
@@ -18,7 +17,7 @@ const ProjectActionButtons = ({
   const handleOpenProject = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const route = MODULE_ROUTES[project.routeKey] || getModuleRoute(project.submodule);
+    const route = getModuleRoute(project.submodule);
     if (route) {
       navigate(`${route}/${project.id}`);
       if (onActionComplete) onActionComplete();
@@ -34,7 +33,7 @@ const ProjectActionButtons = ({
       onGenerateReport(project);
       return;
     }
-    const route = MODULE_ROUTES[project.routeKey] || getModuleRoute(project.submodule);
+    const route = getModuleRoute(project.submodule);
     if (route) {
       navigate(`${route}/${project.id}?action=report`);
       if (onActionComplete) onActionComplete();

@@ -8,15 +8,15 @@ import { useEngineeringShortcuts } from "../hooks/useEngineeringShortcuts";
 import { useNavigate, useLocation, useParams } from "react-router";
 import { useEngineeringModule } from "../hooks/useEngineeringModule";
 import {
-  MODULE_KEY_FIN_PLATE,
-  MODULE_KEY_SEAT_ANGLE,
-} from "../../../constants/modules";
+  KEY_DISP_FINPLATE,
+  KEY_DISP_SEATED_ANGLE,
+} from "../../../constants/generated/coreKeys";
 import { DESIGN_STATUS } from "../hooks/useDesignSubmission";
 import { useViewCamera } from "../components/cad";
 import { message } from "antd";
 import { useProjectCreation } from "../hooks/useProjectCreation";
 import { deleteAllCustomSections } from "../../../datasources/sectionsDataSource";
-import { getModuleConfig as getDesignPrefModuleConfig } from "../utils/moduleConfig";
+import { getModuleDesignPref } from "../../registry";
 import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
 import { useOsiFileHandlers } from "../hooks/useOsiFileHandlers";
 import { useCadExport } from "../hooks/useCadExport";
@@ -44,7 +44,7 @@ const EngineeringShortcutsRunner = () => {
   const { form, uiContext, designStatus, docks, navigate } = context;
 
   const handleOpenDesignPrefFromShortcut = () => {
-    const mod = getDesignPrefModuleConfig(form.inputs?.module);
+    const mod = getModuleDesignPref(form.inputs?.module);
     const guard = canOpenAdditionalInputs(
       mod,
       form.inputs,
@@ -479,7 +479,7 @@ export const EngineeringProvider = ({ moduleConfig, outputConfig, title, childre
   };
 
   const getConnectivity = () => {
-    if (moduleConfig.cameraKey === MODULE_KEY_FIN_PLATE) {
+    if (moduleConfig.cameraKey === KEY_DISP_FINPLATE) {
       return form.extraState?.selectedOption || form.inputs?.connectivity;
     }
     return null;
@@ -531,7 +531,7 @@ export const EngineeringProvider = ({ moduleConfig, outputConfig, title, childre
     if (name === "Download Inputs CSV" || name === "Save Inputs (.csv)") {
       const inputsExpanded = expandAllSelectedInputs(form.inputs, form.allSelected, moduleData.contextData);
       const effectiveInputs = { ...inputsExpanded, ...(form.designPrefOverrides || {}) };
-      const moduleId = moduleConfig?.designType || form.inputs?.module || moduleConfig?.cameraKey || MODULE_KEY_SEAT_ANGLE;
+      const moduleId = moduleConfig?.designType || form.inputs?.module || moduleConfig?.cameraKey || KEY_DISP_SEATED_ANGLE;
       return downloadGroupedInputsCsv({
         moduleConfig,
         inputs: inputsExpanded,
@@ -542,7 +542,7 @@ export const EngineeringProvider = ({ moduleConfig, outputConfig, title, childre
       });
     }
     if (name === "Download Outputs CSV" || name === "Save Outputs (.csv)") {
-      const moduleId = moduleConfig?.designType || form.inputs?.module || moduleConfig?.cameraKey || MODULE_KEY_SEAT_ANGLE;
+      const moduleId = moduleConfig?.designType || form.inputs?.module || moduleConfig?.cameraKey || KEY_DISP_SEATED_ANGLE;
       return downloadGroupedOutputsCsv({
         output: designStatus.output,
         outputConfig,

@@ -8,14 +8,14 @@ import {
   KEY_LENGTH, KEY_AXIAL, KEY_D, KEY_TYP, KEY_GRD, KEY_DP_BOLT_HOLE_TYPE,
   KEY_DP_BOLT_SLIP_FACTOR, KEY_CONNECTOR_MATERIAL, KEY_DP_DETAILING_EDGE_TYPE,
   KEY_DP_DETAILING_GAP, KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-  KEY_DP_DESIGN_METHOD, KEY_PLATETHK, KEY_SEC_MATERIAL, KEY_DP_BOLT_TYPE
+  KEY_DP_DESIGN_METHOD, KEY_PLATETHK, KEY_SEC_MATERIAL, KEY_DP_BOLT_TYPE,
+  KEY_DISP_TENSION_BOLTED,
 } from "../../../../constants/generated/coreKeys";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 export const boltedToEndConfig = {
   sessionName: "Tension Member Bolted Design",
-  routePath: "/design/tension-member/bolted_to_end_gusset",
-  designType: "Tension-Member-Bolted-Design",
+  designType: KEY_DISP_TENSION_BOLTED,
   cameraKey: "TensionMember",
   cadOptions: ["Model", "Member", "Plate"],
 
@@ -28,7 +28,7 @@ export const boltedToEndConfig = {
     location: "Long Leg",
     length: "1250",
     axial_force: "60",
-    module: "Tension Member Bolted Design",
+    module: KEY_DISP_TENSION_BOLTED,
     plate_thickness: [],
     section_designation: [],
     material: "E 250 (Fe 410 W)A",
@@ -146,7 +146,7 @@ export const boltedToEndConfig = {
       [KEY_LENGTH]: String(inputs.length),
       [KEY_SEC_PROFILE]: String(inputs.section_profile),
       [KEY_LOCATION]: String(inputs.location),
-      [KEY_MODULE]: "Tension-Member-Bolted-Design",
+      [KEY_MODULE]: KEY_DISP_TENSION_BOLTED,
       [KEY_PLATETHK]: getArrayParam(allSelected.plate_thickness, lists.thicknessList, inputs.plate_thickness),
     };
   },

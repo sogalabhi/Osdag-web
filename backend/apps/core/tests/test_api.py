@@ -249,7 +249,7 @@ class ProjectAPISerializationTests(TestCase):
         post_data = {
             "name": "Test Project",
             "module": "Shear Connection",
-            "submodule": "FinPlateConnection"
+            "submodule": "Fin Plate Connection"
         }
         r = self.client.post("/api/projects/", data=post_data, content_type="application/json", **headers)
         self.assertEqual(r.status_code, 201)
@@ -263,11 +263,11 @@ class ProjectAPISerializationTests(TestCase):
         self.assertTrue(len(projects) > 0)
         proj_data = projects[0]
         self.assertNotIn("module_id", proj_data)
-        self.assertEqual(proj_data.get("submodule"), "FinPlateConnection")
+        self.assertEqual(proj_data.get("submodule"), "Fin Plate Connection")
 
         # 3. Get project details and assert module_id is not in response, but submodule is
         r = self.client.get(f"/api/projects/{project_id}/", **headers)
         self.assertEqual(r.status_code, 200)
         detail_data = r.json().get("project")
         self.assertNotIn("module_id", detail_data)
-        self.assertEqual(detail_data.get("submodule"), "FinPlateConnection")
+        self.assertEqual(detail_data.get("submodule"), "Fin Plate Connection")

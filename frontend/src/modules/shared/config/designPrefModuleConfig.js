@@ -1,8 +1,10 @@
 /**
  * Per-module config for Design Prefs (Additional Inputs) modal: tabs, initial tab, initial prefs, default prefs.
- * Keyed by module session name (e.g. "Butt Joint Bolted", "Fin Plate Connection").
+ * Keyed by module session name (e.g. "Butt Joint Bolted") or, for the shear connections, the module id.
  * Tab ids: 0 Column Section*, 1 Beam Section*, 2 Connector, 3 Bolt, 4 Weld, 5 Detailing, 6 Design.
  */
+
+import { KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE } from "../../../constants/generated/coreKeys";
 
 const ALL_TABS = [
   { id: 0, name: "Column Section*" },
@@ -317,7 +319,7 @@ const DESIGN_PREF_CONFIG = {
       "DesignPreferences.Design.Base_Plate": "Effective Area Method",
     }),
   },
-  "CleatAngleConnection":{
+  [KEY_DISP_CLEATANGLE]: {
     tabIds: [0, 1, 4, 6, 11, 13],
     initialTabIndex: 0,
     getInitialPrefs: (inputs) => ({
@@ -475,7 +477,7 @@ const DESIGN_PREF_CONFIG = {
       design_method: "Limited State Design",
     }),
   },
-  "SeatedAngleConnection": {
+  [KEY_DISP_SEATED_ANGLE]: {
     tabIds: [0, 1, 5, 6, 11, 13],
     initialTabIndex: 0,
   

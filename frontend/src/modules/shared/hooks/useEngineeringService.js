@@ -25,7 +25,7 @@ import {
 import { generateInitialReport as dsGenerateInitialReport, customizeReport as dsCustomizeReport } from '../../../datasources/reportsDataSource';
 import { saveOsiFromInputs as dsSaveOsiFromInputs } from '../../../datasources/osiDataSource';
 import { apiClient } from '../../../utils/apiClient';
-import { getModuleSlug } from '../../../constants/apiRoutes';
+import { getModuleSlug } from '../../registry';
 
 // ===================================================================
 // MAIN HOOK

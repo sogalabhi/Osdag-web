@@ -1,6 +1,8 @@
 """
 Tension Member - Bolted Design Sub-module
 """
-MODULE_ID = "Tension-Member-Bolted-Design"
+from osdag_core.Common import KEY_DISP_TENSION_BOLTED
+
+MODULE_ID = KEY_DISP_TENSION_BOLTED
 from .service import BoltedTensionMemberService as Service
 
