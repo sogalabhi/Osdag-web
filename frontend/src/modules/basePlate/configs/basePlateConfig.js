@@ -8,6 +8,15 @@ export const basePlateConfig = {
   cameraKey: "BasePlateConnection",
   cadOptions: ["Model", "Column", "Plate", "Welds", "Bolts", "Concrete", "Grout"],
 
+  // Keys the desktop writes under a different name than buildSubmissionParams sends.
+  osiKeyAliases: {
+    "Load.Axial_Compression": "load_axial",
+    "Anchor Bolt.OCF.Diameter": "anchor_diameter_ocf",
+    "Anchor Bolt.OCF.Grade": "anchor_grade_ocf",
+    "Anchor Bolt.ICF.Diameter": "anchor_diameter_icf",
+    "Anchor Bolt.ICF.Grade": "anchor_grade_icf",
+  },
+
   defaultInputs: {
     module: KEY_DISP_BASE_PLATE,
     member_designation: "",

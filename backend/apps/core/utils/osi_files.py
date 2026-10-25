@@ -6,8 +6,14 @@ from typing import Any, Dict, Tuple
 import yaml
 from django.core.files.base import ContentFile
 
+from osdag_core.Common import KEY_DISP_HEADERPLATE
+
 OSI_SCHEMA_VERSION = "1.0"
 SUPPORTED_VERSIONS = {"1.0"}
+
+# Desktop module names that differ from the web module id. The desktop calls the shear
+# header plate module "End Plate Connection".
+DESKTOP_MODULE_NAMES = {"End Plate Connection": KEY_DISP_HEADERPLATE}
 
 
 def validate_module_id(module_id: str) -> bool:
@@ -360,9 +366,14 @@ def parse_osi(text: str) -> Tuple[str, str, Dict[str, Any]]:
 
         if not module_id:
             raise ValueError("Module missing in OSI")
+        module_id = DESKTOP_MODULE_NAMES.get(module_id, module_id)
 
         name = flat_inputs.get("name") or module_id
-        return module_id, name, normalize_osi_keys(flat_inputs)
+        inputs = normalize_osi_keys(flat_inputs)
+        # The keys exactly as written in the file. The web form maps them to its own
+        # fields (it knows each module's fields); dock/pref is a module-independent guess.
+        inputs["flat"] = flat_inputs
+        return module_id, name, inputs
 
 
 def make_osifile_contentfile(payload: Dict[str, Any]) -> ContentFile:

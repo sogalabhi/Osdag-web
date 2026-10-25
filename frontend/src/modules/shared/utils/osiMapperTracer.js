@@ -1,21 +1,36 @@
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
+import { CONN_CFBW, CONN_CWBW } from "../../../constants/generated/coreKeys";
+
+const addTarget = (map, osiKey, reactKey) => {
+  const targets = map[osiKey] || (map[osiKey] = []);
+  if (!targets.includes(reactKey)) targets.push(reactKey);
+};
 
 /**
- * Utility to extract bidirectional key mappings dynamically for any engineering module config
- * by dry-running buildSubmissionParams with sentinel values.
+ * Maps the key names of a module's .osi file to its form field keys by dry-running
+ * buildSubmissionParams with sentinel values. Returns { osiKey: [formKey, ...] }: one
+ * .osi key can feed several fields when the module builds its submission differently per
+ * connectivity (e.g. the supported section is `beam_section` for column-to-beam and
+ * `secondary_beam` for beam-to-beam).
+ *
+ * moduleConfig.osiKeyAliases ({ osiKey: formKey }) adds keys the desktop writes under a
+ * different name than the one buildSubmissionParams sends.
  */
 export function getModuleKeyMap(moduleConfig) {
   if (!moduleConfig || typeof moduleConfig.buildSubmissionParams !== "function") {
     return {};
   }
-  const keyMap = {};
+  // Targets read straight from an input, and targets guessed from the full option list of
+  // an "All" selection (the list name may belong to several fields).
+  const exactMap = {};
+  const guessedMap = {};
   const defaultInputs = moduleConfig.defaultInputs || {};
   const standardInputs = Object.keys(defaultInputs);
 
   // We run multiple mock sweeps to hit conditional branches and selections across all 22+ modules
   const sweeps = [
-    { allSelected: false, boltType: "Bearing_Bolt", weldType: "Fillet", connectivity: "Column Flange-Beam Web" },
-    { allSelected: true, boltType: "Friction_Grip_Bolt", weldType: "Groove", connectivity: "Column Web-Beam Web" },
+    { allSelected: false, boltType: "Bearing_Bolt", weldType: "Fillet", connectivity: CONN_CFBW },
+    { allSelected: true, boltType: "Friction_Grip_Bolt", weldType: "Groove", connectivity: CONN_CWBW },
     { allSelected: false, boltType: "Friction_Grip_Bolt", weldType: "Fillet", connectivity: "Beam-Beam" },
     { allSelected: true, boltType: "Bearing_Bolt", weldType: "Groove", connectivity: "Beam-Column" },
   ];
@@ -57,11 +72,9 @@ export function getModuleKeyMap(moduleConfig) {
 
       Object.entries(result).forEach(([osiKey, val]) => {
         if (typeof val === "string" && val.startsWith("__TRACER_VAL__:")) {
-          const reactKey = val.split(":")[1];
-          keyMap[osiKey] = reactKey;
+          addTarget(allSelected ? guessedMap : exactMap, osiKey, val.split(":")[1]);
         } else if (Array.isArray(val) && val.length > 0 && typeof val[0] === "string" && val[0].startsWith("__TRACER_VAL__:")) {
-          const reactKey = val[0].split(":")[1];
-          keyMap[osiKey] = reactKey;
+          addTarget(allSelected ? guessedMap : exactMap, osiKey, val[0].split(":")[1]);
         }
       });
     } catch {
@@ -115,6 +128,7 @@ export function getModuleKeyMap(moduleConfig) {
     "Load.Axial.Force": "axial_force",
     "Load.Shear.Force": "shear_force",
     "Load.Shear": "load_shear",
+    "Load.Moment": "load_moment",
     "Material": "material",
     "Plate1Thickness": "plate1_thickness",
     "Plate2Thickness": "plate2_thickness",
@@ -125,5 +139,21 @@ export function getModuleKeyMap(moduleConfig) {
     "Weld.Type": "weld_type"
   };
 
-  return { ...baselineAliases, ...keyMap };
+  // The sweeps can also reach list keys the form does not own (an "All" selection reads
+  // the full list); keep only real form fields when there are any.
+  const formKeys = new Set([
+    ...standardInputs,
+    ...(moduleConfig.inputSections || []).flatMap((section) => (section.fields || []).map((field) => field.key)),
+  ]);
+  const keyMap = { ...guessedMap, ...exactMap };
+  Object.entries(keyMap).forEach(([osiKey, targets]) => {
+    const real = targets.filter((target) => formKeys.has(target));
+    if (real.length > 0) keyMap[osiKey] = real;
+  });
+
+  const aliases = {};
+  Object.entries({ ...baselineAliases, ...(moduleConfig.osiKeyAliases || {}) }).forEach(([osiKey, formKey]) => {
+    aliases[osiKey] = [formKey];
+  });
+  return { ...aliases, ...keyMap };
 }
