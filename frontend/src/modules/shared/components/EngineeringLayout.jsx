@@ -7,6 +7,7 @@ import { DESIGN_STATUS } from "../hooks/useDesignSubmission";
 import { useEngineeringContext } from "../context/EngineeringContext";
 import OptimizationGraph from "./OptimizationGraph";
 import { EngineeringModals } from "./EngineeringModals";
+import LabelText from "./outputDock/LabelText";
 
 export const EngineeringLayout = () => {
   const {
@@ -389,7 +390,7 @@ export const EngineeringLayout = () => {
             zIndex: 1000,
           }}
         >
-          {hoverText}
+          <LabelText>{hoverText}</LabelText>
         </div>
       )}
       <EngineeringModals />

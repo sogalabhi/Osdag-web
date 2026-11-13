@@ -35,6 +35,7 @@ import { openOsiFile } from "../../../datasources/osiDataSource";
 import { useViewCamera } from "./cad";
 import { usePlateGirderOptimization } from "../hooks/usePlateGirderOptimization";
 import { isGuestUser } from "../../../utils/auth";
+import LabelText from "./outputDock/LabelText";
 
 // Plotly is large; load the graph only when an optimization runs
 const OptimizationGraph = lazy(() => import("./OptimizationGraph"));
@@ -1622,7 +1623,7 @@ ${!isMobile ? (docks.output ? 'pr-0' : 'pr-[40px]') : ''}
             boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
           }}
         >
-          {hoverText}
+          <LabelText>{hoverText}</LabelText>
         </div>
       )}
       {projectCreationModal}

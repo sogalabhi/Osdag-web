@@ -205,7 +205,7 @@ The visibility rules are the desktop app's (`output_dock.py`, `template_page.py`
 
 Popup images are the engine's own files in `osdag_core/data/ResourceFiles/images`. `GET /api/core-images/<name>` ([core_images_api.py](../backend/apps/core/api/design/core_images_api.py)) serves only files directly inside that folder: the name must match letters, digits, `_`, `-`, `.` and space and end in `png`, `jpg`, `jpeg` or `svg`; the resolved path's parent must be the folder; anything else is a 404. A popup image outside the folder gets `src: null` and shows an empty box.
 
-Labels may contain `<sub>`, `<sup>` and `<br />`; `outputDock/LabelText.jsx` renders them as elements and shows any other text as plain text.
+Engine text may contain `<sub>`, `<sup>`, `<b>`, `<i>` and `<br />`; `outputDock/LabelText.jsx` renders them as elements and shows any other text as plain text. It is used for output labels, popup rows and the hover text of the 3D model (the engine's `hover_dict`, e.g. `<b>Bolt</b><br>Grade: 4.6`).
 
 ---
 
