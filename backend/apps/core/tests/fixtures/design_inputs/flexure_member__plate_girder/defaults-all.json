@@ -6,8 +6,8 @@
     "Material": "E 250 (Fe 410 W)A",
     "Member.Length": "20000",
     "Loading.Condition": "Normal",
-    "Load.Shear": "877.5",
-    "Load.Moment": "4275",
+    "Load.Shear": "400",
+    "Load.Moment": "2000",
     "Loading.Bending_Moment_Shape": "Uniform Loading with pinned-pinned support",
     "Total.Design_Type": "Customized",
     "Web.Thickness": [

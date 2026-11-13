@@ -25,7 +25,7 @@ export const columnColumnEndPlateConfig = {
     load_moment: "100",
     load_shear: "100",
     material: "E 250 (Fe 410 W)A",
-    supported_designation: "WPB 900 X 300 X 291.46",
+    supported_designation: "UC 305 x 305 x 118",
     supported_material: "E 250 (Fe 410 W)A",
     module: KEY_DISP_COLUMNENDPLATE,
     weld_fab: "Shop Weld",
