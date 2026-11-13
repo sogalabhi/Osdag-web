@@ -142,7 +142,7 @@ const CleatBoltCapacityDiagram = ({
   const dimYBot = START_Y + PLATE_H + 34;
 
   return (
-    <svg viewBox={`0 0 ${VB_W} ${VB_H}`} width="100%" height="100%" style={{ maxHeight: 420 }} xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox={`0 -24 ${VB_W} ${VB_H + 24}`} width="100%" height="100%" style={{ maxHeight: 420 }} xmlns="http://www.w3.org/2000/svg">
       <PlatePair leftStripRight={leg === "supported"} />
       <BlueBolt cx={boltXLeft} cy={topBoltY} />
       <BlueBolt cx={boltXLeft} cy={botBoltY} />

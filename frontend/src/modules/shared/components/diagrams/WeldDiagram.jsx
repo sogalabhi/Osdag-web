@@ -19,7 +19,7 @@ import { useMemo } from "react";
 
 const VIEWBOX_W = 500;
 const VIEWBOX_H = 340;
-const MARGIN = 60;
+const MARGIN = 80;
 
 const toNum = (v, fallback = 0) => {
   if (v === null || v === undefined || v === "") return fallback;

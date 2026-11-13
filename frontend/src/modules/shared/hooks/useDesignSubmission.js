@@ -43,6 +43,9 @@ export const useDesignSubmission = (service, moduleConfig) => {
   const [displayPDF, setDisplayPDF] = useState(false);
 
   const [output, setOutput] = useState(null);
+  // The output dock as the engine lists it for the latest design, and whether that design is safe.
+  const [outputLayout, setOutputLayout] = useState(null);
+  const [designSafe, setDesignSafe] = useState(null);
   const [logs, setLogs] = useState(null);
   const [rawCsvData, setRawCsvData] = useState({});
   const [displayOutput, setDisplayOutput] = useState(false);
@@ -220,6 +223,8 @@ export const useDesignSubmission = (service, moduleConfig) => {
       setDesignLogs(nextLogs);
       setLogs(nextLogs);
       setOutput(formattedOutput);
+      setOutputLayout(Array.isArray(designBody.output_layout) ? designBody.output_layout : null);
+      setDesignSafe(designBody.design_status !== false);
       setRawCsvData(designBody.raw_csv || {});
       outputWasSet = true;
       setDisplayOutput(true);
@@ -382,6 +387,8 @@ export const useDesignSubmission = (service, moduleConfig) => {
     setRenderBoolean(false);
     setModelKey(0);
     setOutput(null);
+    setOutputLayout(null);
+    setDesignSafe(null);
     setLogs(null);
     setRawCsvData({});
     setDisplayOutput(false);
@@ -396,6 +403,8 @@ export const useDesignSubmission = (service, moduleConfig) => {
   const clearDesignResults = () => {
     setDisplayOutput(false);
     setOutput(null);
+    setOutputLayout(null);
+    setDesignSafe(null);
     setLogs(null);
     setRawCsvData({});
     setRenderBoolean(false);
@@ -418,11 +427,17 @@ export const useDesignSubmission = (service, moduleConfig) => {
       formattedOutput[key] = { label, val: val !== undefined && val !== null ? val : "" };
     }
 
+    // A saved project keeps only the flat outputs, not the dock layout, so the dock
+    // shows the module's empty layout with its buttons disabled.
     setOutput(formattedOutput);
+    setOutputLayout(null);
+    setDesignSafe(null);
     setDisplayOutput(true);
   };
 
-  const loadOutputs = (outputsData) => {
+  // Outputs from a finished design that did not come through submitDesign (the plate girder
+  // optimisation). `layout` is the engine's output list for it.
+  const loadOutputs = (outputsData, layout = null) => {
     if (!outputsData) return;
 
     const formattedOutput = {};
@@ -434,6 +449,8 @@ export const useDesignSubmission = (service, moduleConfig) => {
 
     setDesignData(outputsData);
     setOutput(formattedOutput);
+    setOutputLayout(Array.isArray(layout) ? layout : null);
+    setDesignSafe(true);
     setDisplayOutput(true);
   };
 
@@ -475,6 +492,8 @@ export const useDesignSubmission = (service, moduleConfig) => {
     setDisplayPDF,
     // derived/output
     output,
+    outputLayout,
+    designSafe,
     logs,
     rawCsvData,
     displayOutput,

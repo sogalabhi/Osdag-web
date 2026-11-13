@@ -4,7 +4,6 @@ import { CadViewer } from "./CadViewer";
 import FloatingNavBar from "./FloatingNavBar";
 import Logs from "./Logs";
 import { DESIGN_STATUS } from "../hooks/useDesignSubmission";
-import { UI_STRINGS } from "../../../constants/UIStrings";
 import { useEngineeringContext } from "../context/EngineeringContext";
 import OptimizationGraph from "./OptimizationGraph";
 import { EngineeringModals } from "./EngineeringModals";
@@ -20,7 +19,6 @@ export const EngineeringLayout = () => {
     toggleInputDock,
     toggleOutputDock,
     setDocks,
-    title,
     isInputLocked,
     lockBtnRef,
     lockZoom,
@@ -48,7 +46,6 @@ export const EngineeringLayout = () => {
     handleHoverEnd,
     moduleConfig,
     docks,
-    outputConfig,
     hoverText,
     hoverPos,
     showOptimizationGraph,
@@ -76,6 +73,8 @@ export const EngineeringLayout = () => {
 
   const {
     output,
+    outputLayout,
+    designSafe,
     logs,
     loading,
     status,
@@ -83,8 +82,10 @@ export const EngineeringLayout = () => {
     modelKey,
     screenshotTrigger,
     setScreenshotTrigger,
-    cadModelPaths,
   } = designStatus;
+
+  const outputDockLayout = outputLayout || moduleData.emptyOutputLayout || null;
+  const showOutputDock = docks.output && !!outputDockLayout && (status.step !== DESIGN_STATUS.ERROR || !!output);
 
   const {
     refetchModuleOptions,
@@ -182,7 +183,7 @@ export const EngineeringLayout = () => {
       <div className={`
         flex-1 flex flex-col relative min-w-0
         ${isMobile && (docks.input || docks.output) ? 'hidden' : 'flex'}
-        ${!isMobile && !(docks.output && outputConfig && status.step !== DESIGN_STATUS.ERROR) ? 'xl:pr-[40px]' : ''}
+        ${!isMobile && !showOutputDock ? 'xl:pr-[40px]' : ''}
       `}>
         {showOptionsContainer && output && (isMobile ? docks.cad : true) && (
           <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 max-w-[95%] w-fit overflow-x-auto overflow-y-hidden flex flex-row items-center gap-2 p-1 bg-white/90 dark:bg-osdag-dark-color/90 rounded-md border border-gray-200 dark:border-gray-700 shadow-md">
@@ -287,7 +288,7 @@ export const EngineeringLayout = () => {
         )}
       </div>
 
-      {docks.output && outputConfig && status.step !== DESIGN_STATUS.ERROR ? (
+      {showOutputDock ? (
         <div
           className={`
             fixed inset-0 z-50 h-full pt-[52px] pb-14
@@ -297,18 +298,8 @@ export const EngineeringLayout = () => {
           `}
         >
           <BaseOutputDock
-            output={output}
-            outputConfig={outputConfig}
-            title={title || UI_STRINGS.OUTPUT_DOCK}
-            extraState={{
-              ...form.extraState,
-              cadModelPaths,
-              renderCadModel: renderBoolean,
-              connectivity: inputs?.connectivity,
-              member_designation: inputs?.member_designation,
-              designation: inputs?.member_designation,
-              weld_type: inputs?.weld_type
-            }}
+            layout={outputDockLayout}
+            buttonsEnabled={!!outputLayout && designSafe === true}
             handleCreateDesignReport={handleCreateDesignReport}
             saveOutput={saveOutput}
           />

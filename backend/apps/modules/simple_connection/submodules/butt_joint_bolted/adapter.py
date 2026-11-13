@@ -318,10 +318,16 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
     print(f"[ButtJointBolted CAD] CAD generation completed successfully. Returning path: {file_path}")
     return file_path
 
-def create_from_input(input_values: Dict[str, Any]) -> Any:
-    """Create module instance from input"""
+def create_module() -> ButtJointBolted:
+    """Create an instance of the ButtJointBolted module design class and set it up for use"""
     module = ButtJointBolted()
     module.set_osdaglogger(None, id="web")
+    return module
+
+
+def create_from_input(input_values: Dict[str, Any]) -> Any:
+    """Create module instance from input"""
+    module = create_module()
     validate_input(input_values)
     module.set_input_values(input_values)
     return module

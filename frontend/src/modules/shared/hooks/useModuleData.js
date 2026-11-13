@@ -35,11 +35,12 @@ const mergeLocalCustomSections = (data, localCustomSections) => {
  * Data layer for engineering modules.
  * Fetches dropdown/static lists for the given design type.
  */
-export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) => {
+export const useModuleData = (getModuleData, getOutputLayout, designType, optionsRefetchKey = 0) => {
   const initialState = MODULE_DATA_LIST_KEYS.reduce((acc, k) => ({ ...acc, [k]: [] }), {});
   const [baseModuleData, setBaseModuleData] = useState(initialState);
   const [localCustomSections, setLocalCustomSections] = useState({});
   const [loadingOptions, setLoadingOptions] = useState(true);
+  const [emptyOutputLayout, setEmptyOutputLayout] = useState(null);
 
   useEffect(() => {
     const handleCustomSectionAdded = (event) => {
@@ -80,9 +81,28 @@ export const useModuleData = (getModuleData, designType, optionsRefetchKey = 0) 
     loadModuleData();
   }, [designType, getModuleData, optionsRefetchKey]);
 
+  // The output dock as it stands before a design. It does not change with the options.
+  useEffect(() => {
+    if (!designType) return undefined;
+    let cancelled = false;
+    setEmptyOutputLayout(null);
+    getOutputLayout(designType)
+      .then((result) => {
+        if (!cancelled && result?.success) setEmptyOutputLayout(result.data);
+      })
+      .catch((error) => console.error("Failed to load the output layout:", error));
+    return () => {
+      cancelled = true;
+    };
+  }, [designType, getOutputLayout]);
+
   const mergedOptions = useMemo(() => {
-    return { ...mergeLocalCustomSections(baseModuleData, localCustomSections), loadingOptions };
-  }, [baseModuleData, localCustomSections, loadingOptions]);
+    return {
+      ...mergeLocalCustomSections(baseModuleData, localCustomSections),
+      loadingOptions,
+      emptyOutputLayout,
+    };
+  }, [baseModuleData, localCustomSections, loadingOptions, emptyOutputLayout]);
 
   return mergedOptions;
 };

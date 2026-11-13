@@ -11,7 +11,7 @@ const PSO_PARTICLES_PER_TICK = 50;
  *  - Aggregated optimizationData for OptimizationGraph
  *
  * @param {Object} params
- * @param {Function} params.onComplete - called with (formattedOutput, rawLogs, cadPaths) on pso_complete
+ * @param {Function} params.onComplete - called with (formattedOutput, rawLogs, cadPaths, outputLayout) on pso_complete
  * @param {Function} params.onError - called with (message) on pso_error
  */
 export const usePlateGirderOptimization = ({ onComplete, onError } = {}) => {
@@ -142,7 +142,9 @@ export const usePlateGirderOptimization = ({ onComplete, onError } = {}) => {
           finalResult: result.design,
           finalLogs: result.raw || [],
         }));
-        if (onComplete) onComplete(formattedOutput, result.raw || [], messageData?.cad_paths || {});
+        if (onComplete) {
+          onComplete(formattedOutput, result.raw || [], messageData?.cad_paths || {}, result.output_layout || null);
+        }
       }
     },
     [onComplete]

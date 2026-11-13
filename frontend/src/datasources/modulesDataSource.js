@@ -26,6 +26,18 @@ export async function fetchModuleOptions(moduleKey, { connectivity } = {}) {
 }
 
 /**
+ * Fetch the module's output dock as the desktop app builds it when the module opens:
+ * the sections and fields, with empty values and no popups.
+ */
+export async function fetchOutputLayout(moduleKey) {
+  if (!moduleKey) return { success: false, error: "Module name is required" };
+
+  const res = await apiClient(MODULES.outputLayout(getModuleSlug(moduleKey)), { method: "GET" });
+  if (!res.ok) return { success: false, error: `Output layout request failed (${res.status})` };
+  return { success: true, data: await res.json() };
+}
+
+/**
  * Create design calculation for a module. The result also carries the 3D model
  * (`files`, `hover_dict`, `warnings`, or `cad_error` when it could not be built).
  *

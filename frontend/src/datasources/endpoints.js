@@ -33,6 +33,8 @@ export const REPORTS = {
 // ----------------------
 export const MODULES = {
   options: (slug) => `${API_PREFIX}modules/${slug}/options/`, // GET
+  // GET - the output dock before any design has run
+  outputLayout: (slug) => `${API_PREFIX}modules/${slug}/output-layout/`,
   design: (slug) => `${API_PREFIX}modules/${slug}/design/`, // POST
   reportGenerateInitial: (slug) =>
     `${API_PREFIX}modules/${slug}/report/generate-initial/`, // POST
