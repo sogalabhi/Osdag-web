@@ -1,11 +1,11 @@
 import { Fragment } from "react";
 
-const TOKEN = /<(sub|sup)>(.*?)<\/\1>|<br\s*\/?>/gi;
+const TOKEN = /<(sub|sup|b|i)>(.*?)<\/\1>|<br\s*\/?>/gi;
 
 /**
- * Renders config-defined labels that may contain <sub>, <sup> and <br> markup
- * as real React elements. Any other text (including other tags) is rendered
- * as plain text, so no HTML is ever injected.
+ * Renders engine-supplied text that may contain <sub>, <sup>, <b>, <i> and <br> markup
+ * (output labels, popup rows, the 3D model's hover text) as real React elements. Any other
+ * text (including other tags) is rendered as plain text, so no HTML is ever injected.
  */
 export function LabelText({ children }) {
   const text = typeof children === "string" ? children : "";
