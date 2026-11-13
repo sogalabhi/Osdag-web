@@ -2,7 +2,7 @@
   "source": "frontend-defaults:columnColumnEndPlateConfig.js",
   "notes": "Run of columnColumnEndPlateConfig.buildSubmissionParams on defaultInputs; every customizable list set to \"All\" (the UI default; full option lists sent). Connectivity \"Extended Both Ways\" (extraState.selectedOption). Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Member.Designation": "WPB 900 X 300 X 291.46",
+    "Member.Designation": "UC 305 x 305 x 118",
     "Member.Material": "E 250 (Fe 410 W)A",
     "Bolt.Bolt_Hole_Type": "Standard",
     "Bolt.Diameter": [
@@ -78,7 +78,7 @@
     "Load.Moment": "100",
     "Load.Shear": "100",
     "Material": "E 250 (Fe 410 W)A",
-    "Member.Supported_Section.Designation": "WPB 900 X 300 X 291.46",
+    "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
     "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": "410",

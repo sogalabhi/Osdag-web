@@ -161,8 +161,8 @@ export const plateGirderConfig = {
     bottom_flange_thickness: ["40"], // List
     // Length in mm, matching desktop KEY_DISP_LENGTH = 'Length (mm) *'
     member_length: "20000", // in mm, sent to backend as-is (no conversion)
-    bending_moment: "4275",
-    shear_force: "877.5",
+    bending_moment: "2000",
+    shear_force: "400",
     bending_moment_shape: "Uniform Loading with pinned-pinned support",
     support_type: "Major Laterally Supported",
     support_width: "300",
