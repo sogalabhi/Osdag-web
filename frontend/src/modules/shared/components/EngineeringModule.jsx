@@ -13,7 +13,6 @@ import { DesignStatusModal } from "./DesignStatusModal";
 import HelpLinkModal from "./help/HelpLinkModal";
 import AboutOsdagModal from "./help/AboutOsdagModal";
 import { DESIGN_STATUS } from "../hooks/useDesignSubmission";
-import { UI_STRINGS } from "../../../constants/UIStrings";
 import { DESIGN_EXAMPLES_URL, ASK_QUESTION_LINK } from "./help/helpContent";
 import { useViewport } from "../hooks/useViewport";
 import { useEngineeringShortcuts } from "../hooks/useEngineeringShortcuts";
@@ -36,13 +35,13 @@ import { openOsiFile } from "../../../datasources/osiDataSource";
 import { useViewCamera } from "./cad";
 import { usePlateGirderOptimization } from "../hooks/usePlateGirderOptimization";
 import { isGuestUser } from "../../../utils/auth";
+import LabelText from "./outputDock/LabelText";
 
 // Plotly is large; load the graph only when an optimization runs
 const OptimizationGraph = lazy(() => import("./OptimizationGraph"));
 
 export const EngineeringModule = ({
   moduleConfig,
-  outputConfig,
   title,
 }) => {
   const isGuest = isGuestUser();
@@ -72,13 +71,19 @@ export const EngineeringModule = ({
 
   const {
     materialList, boltDiameterList, thicknessList,
-    propertyClassList, angleList, loadingOptions, contextData
+    propertyClassList, angleList, loadingOptions, contextData, emptyOutputLayout
   } = moduleData;
 
   const {
-    output, logs, rawCsvData, loading, renderBoolean, modelKey, status, setStatus,
+    output, outputLayout, designSafe, logs, rawCsvData, loading, renderBoolean, modelKey, status, setStatus,
     screenshotTrigger, setScreenshotTrigger, cadModelPaths, hoverDict: ctxHoverDict
   } = designStatus;
+
+  // The output dock lists the engine's outputs: the latest design's layout, or the module's
+  // empty layout before a design. Its popup buttons work only after a safe design.
+  const outputDockLayout = outputLayout || emptyOutputLayout || null;
+  const outputButtonsEnabled = !!outputLayout && designSafe === true;
+  const showOutputDock = docks.output && !!outputDockLayout && (status.step !== DESIGN_STATUS.ERROR || !!output);
 
   const {
     inputs, setInputs, extraState, setExtraState, selectionStates, setSelectionStates, allSelected, setAllSelected,
@@ -367,6 +372,14 @@ export const EngineeringModule = ({
     }
   }, [status.step, output, isRedesigning, isMobile, setDocks]);
 
+  // An unsafe design leaves the dock empty, as the desktop app does; show it with the logs.
+  useEffect(() => {
+    if (designSafe === false && !isMobile) {
+      setDocks({ output: true });
+      setDocks({ logs: true });
+    }
+  }, [designSafe, isMobile, setDocks]);
+
 
   // PSO optimization (plate girder Optimized design type). Idle for other modules.
   const {
@@ -376,9 +389,9 @@ export const EngineeringModule = ({
     setShowOptimizationGraph,
     startPsoOptimization,
   } = usePlateGirderOptimization({
-    onComplete: (formattedOutput, _rawLogs, cadPaths) => {
+    onComplete: (formattedOutput, _rawLogs, cadPaths, layout) => {
       if (formattedOutput && Object.keys(formattedOutput).length > 0) {
-        loadOutputs(formattedOutput);
+        loadOutputs(formattedOutput, layout);
       }
       if (cadPaths && Object.keys(cadPaths).length > 0) {
         loadCadModel(cadPaths);
@@ -1229,7 +1242,7 @@ export const EngineeringModule = ({
         <div className={`
           flex-1 flex flex-col relative min-w-0
           ${isMobile && (docks.input || docks.output) ? 'hidden' : 'flex'}
-          ${!isMobile && !(docks.output && outputConfig && status.step !== DESIGN_STATUS.ERROR) ? 'xl:pr-[40px]' : ''}
+          ${!isMobile && !showOutputDock ? 'xl:pr-[40px]' : ''}
         `}>
           {/* Options Container - Show after design is complete. On desktop, show even when docks are open. On mobile, only show when CAD is visible */}
           {showOptionsContainer && output && (isMobile ? docks.cad : true) && (
@@ -1353,7 +1366,7 @@ ${!isMobile ? (docks.output ? 'pr-0' : 'pr-[40px]') : ''}
         </div>
 
         {/* Right - Output Dock */}
-        {docks.output && outputConfig && status.step !== DESIGN_STATUS.ERROR ? (
+        {showOutputDock ? (
           <div
             className={`
               fixed inset-0 z-50 h-full pt-[100px] pb-14
@@ -1363,18 +1376,8 @@ ${!isMobile ? (docks.output ? 'pr-0' : 'pr-[40px]') : ''}
             `}
           >
             <BaseOutputDock
-              output={output}
-              outputConfig={outputConfig}
-              title={title || UI_STRINGS.OUTPUT_DOCK}
-              extraState={{
-                ...extraState,
-                cadModelPaths,
-                renderCadModel: renderBoolean,
-                connectivity: inputs?.connectivity,
-                member_designation: inputs?.member_designation,
-                designation: inputs?.member_designation,
-                weld_type: inputs?.weld_type
-              }}
+              layout={outputDockLayout}
+              buttonsEnabled={outputButtonsEnabled}
               handleCreateDesignReport={handleCreateDesignReport}
               saveOutput={saveOutput}
             />
@@ -1620,7 +1623,7 @@ ${!isMobile ? (docks.output ? 'pr-0' : 'pr-[40px]') : ''}
             boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
           }}
         >
-          {hoverText}
+          <LabelText>{hoverText}</LabelText>
         </div>
       )}
       {projectCreationModal}

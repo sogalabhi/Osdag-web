@@ -7,4 +7,5 @@ export const coverPlateBoltedConfig = makeCoverPlateBoltedConfig({
   cadOptions: ["Model", "Column", "CoverPlate"],
   sectionOptionsKey: "columnList",
   defaultLoads: { axial: "100", moment: "70", shear: "50" },
+  defaultDesignation: "UC 305 x 305 x 118",
 });

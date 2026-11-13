@@ -69,6 +69,7 @@ const ColumnEndPlateBoltDiagram = ({
   holeDia = 22,
   pitch = 60,
   midPitch = 60,
+  pitches, // the four pitches as the server sends them; replaces `pitch` and `midPitch`
   endDist = 40,
   numBoltsWeb = 2,
   nbfTotal = 4,
@@ -77,7 +78,7 @@ const ColumnEndPlateBoltDiagram = ({
   const VB_H = 460;
   const margin = 110;
 
-  const pitchList = buildPitchList(numBoltsWeb, pitch, midPitch);
+  const pitchList = pitches || buildPitchList(numBoltsWeb, pitch, midPitch);
 
   // Real (mm) drawing extents, matching createDrawing's per-view formulas.
   const W = plateLength;

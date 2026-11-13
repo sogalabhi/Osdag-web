@@ -57,7 +57,7 @@ graph TD
 ```
 
 ### 1. React Frontend (Vite)
-* Renders the dynamic input/output docks, forms, and custom preferences.
+* Renders the dynamic input/output docks, forms, and custom preferences. The output dock comes from the engine's output list: the empty dock from `GET /api/modules/<module>/output-layout/` before a design, and `output_layout` in the design result after it, with the drawing dialogs the desktop app opens (chapter 6, section 6.5.2).
 * Manages local UI states via React Context (`ModuleState`, `GlobalState`).
 * Integrates React Three Fiber (R3F) and Three.js to render interactive 3D CAD scenes.
 * Manages client-side WebSocket connections to monitor task lifecycle and handles local file downloads (`.osi`, `.pdf`, `.dxf`, `.stp`).
@@ -104,7 +104,7 @@ sequenceDiagram
     
     Redis->>Worker: Consume design task
     Note over Worker: Runs Osdag-core solver once
-    Worker->>Redis: group_send DESIGN_READY (outputs, logs, design_status)
+    Worker->>Redis: group_send DESIGN_READY (outputs, output_layout, logs, design_status)
     Redis->>BE: Route group event
     BE->>FE: Push outputs via WebSocket
     Note over FE: Render Output Dock, status "Building 3D model..."

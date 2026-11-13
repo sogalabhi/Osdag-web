@@ -1,6 +1,6 @@
 # Chapter 6: Dynamic UI Form Engine
 
-Osdag-Web implements a declarative, configuration-driven UI form engine. Rather than hardcoding forms, the interface dynamically renders inputs, binds validation rules, fetches options, visualizes output docks, and updates contextual drawings based on module-specific schemas.
+Osdag-Web implements a declarative, configuration-driven UI form engine. Rather than hardcoding forms, the interface dynamically renders inputs, binds validation rules, fetches options, builds the output docks from the engine's own output lists, and updates contextual drawings based on module-specific schemas.
 
 ---
 
@@ -182,26 +182,30 @@ The input form engine supports several custom declarative field types defined in
 
 ---
 
-### 6.5.2 Output Dock Field & Layout Types (`BaseOutputDock.jsx` & `OutputModalLayouts.jsx`)
-The output dock displays solver results. If a calculation fails (`Design.status: false`), the dock highlights warning logs in red. The outputs are categorized into two main field styles:
+### 6.5.2 The Output Dock Is Built From the Engine's Output List (`BaseOutputDock.jsx`)
+The output dock has no per-module configuration. It shows what the desktop app shows, built from the same list: a module's `output_values(flag)` returns tuples `(key, label, type, value, visible[, show_callable])`, and the dock follows that list in order.
 
-1. **Standard Value Boxes**: Read-only, grey-bordered boxes displaying final computed parameters (e.g., `Weld.Size` or `Bolt.Capacity`).
-2. **Modal Trigger Inputs**: Renders a button instead of a value box. Clicking this button triggers a pop-up modal showing detailed output calculations mapped to one of these dynamic layout components:
-   * **`single-column` / `two-column`**: A plain vertical tabular list of labels and calculated values (e.g., listing bolt grade, shear, and bearing capacities) paired with a static diagram.
-   * **`capacity-complex`**: Lists yielding, rupture, and block shear capacities grouped by failure mode alongside visual block-shear pattern images.
-   * **`spacing-diagram`**: Renders a dynamic, SVG-based detailed engineering sketch.
+* `TYPE_TITLE` starts a group box. `TYPE_TEXTBOX` is a read-only label and value. `TYPE_OUT_BUTTON` is a label and a button whose value is `[popup_title, function]`.
+* [output_layout.py](../backend/apps/core/utils/output_layout.py) turns the list into JSON: `build_output_layout(module, design_status, design_inputs)` returns sections in order, each `{title, visible, items}`, where an item is a `field` (`key`, `label`, `value` as `str(value)`, `visible`) or a `button` (`key`, `label`, `button_text`, `popup_title`, `visible`, `popup`, `dialog`).
+* `run_design_calculation_task` stores it as `result["output_layout"]` before it sends the early `DESIGN_READY` message, so the early message and the final result both carry it. If building it fails, the failure is logged and the key is left out; the design itself is unaffected. The flat `data` dict stays as it was, because the CSV export and reports read it. (A key that appears in both a dock field and a popup is a single entry in `data`, so `data` can differ from the dock; the dock is the engine's own value.) The plate girder optimisation run sends the same `output_layout` in its `pso_complete` message.
+* The frontend keeps `output_layout` with the design result (`useDesignSubmission`) and passes it to `BaseOutputDock`.
 
----
+The visibility rules are the desktop app's (`output_dock.py`, `template_page.py`):
 
-### 6.5.3 The Dynamic Spacing Diagram SVG Canvas (`SpacingDiagram.jsx`)
-When a user opens Spacing Details, Osdag-Web does not display a static image. Instead, it renders **[SpacingDiagram.jsx](../frontend/src/modules/shared/components/SpacingDiagram.jsx)**, which draws an SVG layout dynamically:
+1. After a safe design every field shows `str(value)`, and a field whose value is `None` is hidden.
+2. A group is hidden when none of its fields or buttons are visible. A title with no fields at all (a header) is shown only while a visible group follows it, before the next header.
+3. A button with a sixth, callable element is shown only if the callable returns true for the design inputs (the cleat angle, header plate and seated angle hide `Section Details > Capacity` for a column flange to beam web connection). As on the desktop, such a button still counts as visible when deciding whether its group is shown.
+4. The buttons work only after a safe design. An unsafe design leaves the dock as it was built: every group and field visible, values empty, buttons disabled.
 
-* **Dynamic Scaling:** Calculates a scaling factor to fit the plate's dimensions (`plateWidth` $\times$ `plateHeight` in mm) into a standard $600 \times 400$ SVG view box.
-* **Component Drawing:**
-  * Draws the main connecting steel plate as a scaled gray `<rect>`.
-  * Draws the weld line as a crimson `<rect>` if `weldSize > 0`.
-  * Distributes and draws bolt holes as `<circle>` coordinates calculated from the number of columns (`cols`), rows (`rows`), gauge spacings, and pitch distances.
-* **Dynamic Dimension Labels:** Computes offsets and draws SVG dimension lines, arrow heads, and text labels depicting the exact calculated Pitch (`pitch`), End distance (`end`), Edge distance (`edge`), and Gauge (`gauge`) computed by the backend. This provides a real-time scaled engineering schematic of the bolt pattern.
+**Before a design**, and for a saved project, which stores only the flat outputs, the dock shows the module's empty layout: the desktop dock at module open, with empty values, every field visible and no popups. `GET /api/modules/<family>/<slug>/output-layout/` ([output_layout_api.py](../backend/apps/core/api/modules/output_layout_api.py); `/api/modules/base-plate/output-layout/` for the base plate) builds it from a fresh module, `create_module()` in the module's `adapter.py`, with `build_output_layout(module, False, {})`. `useModuleData` fetches it with the module's options and returns it as `emptyOutputLayout`; `EngineeringModule` shows it until a design result brings its own layout.
+
+**Popups.** A button's popup is built on the server from its `function(design_status)`, only when the design is safe and the button is shown. A popup is a list of rows: `note` (shown as "Note: text"), `section` (a title with an optional image `{src, width, height, caption}`), `field` (label and value), `label` (a combo box row: label only) and `image` (an extra image). [OutputPopup.jsx](../frontend/src/modules/shared/components/outputDock/OutputPopup.jsx) lays them out as [spacing_dialog.py](../../Osdag/src/osdag_gui/ui/components/dialogs/spacing_dialog.py) does: notes first, then each section's title with its fields on the left and its image and caption on the right, sized from the width and height and scaled down on narrow screens. A popup function that raises gives that popup an empty row list and `error: true`; the design and the other popups are unaffected.
+
+**Drawing dialogs.** The desktop opens a drawing dialog for most buttons that show spacing, capacity or detailing, and the popup rows only when it has none. `output_dialogs.dialog_for` ([output_dialogs.py](../backend/apps/core/utils/output_dialogs.py)) repeats that choice from the same conditions as `output_button_connect` in the desktop `output_dock.py` (module name, button key and title, the connectivity, the base plate type) and puts the result in the button's `dialog`: `{id, note, footnote, sections, values}`. `sections` is the dialog's left panel, `values` are the numbers the drawing reads, named after the props of the drawings in `shared/components/diagrams`. A button the desktop sends to its plain list gets `dialog: null`, and so does a button whose dialog cannot be built from the module (logged); `OutputPopup.jsx` then shows the rows. [dialogDrawings.jsx](../frontend/src/modules/shared/components/outputDock/dialogDrawings.jsx) maps each dialog id to its drawings and titles, and [OutputDialog.jsx](../frontend/src/modules/shared/components/outputDock/OutputDialog.jsx) lays out the panel, the drawings or the fracture cards. The Header Plate module is the desktop End Plate module under another name; only its spacing has a dialog, because its capacity popups list other fields than the desktop dialog reads.
+
+Popup images are the engine's own files in `osdag_core/data/ResourceFiles/images`. `GET /api/core-images/<name>` ([core_images_api.py](../backend/apps/core/api/design/core_images_api.py)) serves only files directly inside that folder: the name must match letters, digits, `_`, `-`, `.` and space and end in `png`, `jpg`, `jpeg` or `svg`; the resolved path's parent must be the folder; anything else is a 404. A popup image outside the folder gets `src: null` and shows an empty box.
+
+Engine text may contain `<sub>`, `<sup>`, `<b>`, `<i>` and `<br />`; `outputDock/LabelText.jsx` renders them as elements and shows any other text as plain text. It is used for output labels, popup rows and the hover text of the 3D model (the engine's `hover_dict`, e.g. `<b>Bolt</b><br>Grade: 4.6`).
 
 ---
 
@@ -217,9 +221,9 @@ The component [EngineeringModule.jsx](../frontend/src/modules/shared/components/
 
 ---
 
-## 6.7 Module Input & Output Configurations (`*Config.js`, `*OutputConfig.js`)
+## 6.7 Module Configurations (`*Config.js`)
 
-Each engineering module defines its interface declaratively:
+Each engineering module defines its input form declaratively:
 
 ### 1. `*Config.js` (e.g., [finPlateConfig.js](../frontend/src/modules/shearConnection/finPlate/configs/finPlateConfig.js))
 * **`defaultInputs`:** Defines default key-value pairs for the module forms.
@@ -227,10 +231,8 @@ Each engineering module defines its interface declaratively:
 * **`buildSubmissionParams`:** Converts flat snake_case frontend inputs back into PascalCase dotted parameters expected by the Python desktop engine.
 * **`inputSections`:** Declares form sections, groups, field types (select, customizable, number), and display visibility conditions.
 
-### 2. `*OutputConfig.js` (e.g., [finPlateOutputConfig.js](../frontend/src/modules/shearConnection/finPlate/configs/finPlateOutputConfig.js))
-* **`sections`:** Lists the output groups (e.g. Bolt, Plate, Weld) and fields to show.
-* **`modals` & `modalTypes`:** Configures output sub-modals (spacing calculations, yielding capacities) and their visual layout classes.
-* **`modalData`:** Declares lists of properties to display within each capacity detail sub-modal.
+### 2. The output dock has no config file
+A module has only its `*Config.js`. Its output dock comes from the engine's output list (see 6.5.2), so there is no `*OutputConfig.js`.
 
 ### 3. Key Constants (`generated/coreKeys.js` and `UIStrings.js`)
 The frontend takes key strings from exactly two files under `frontend/src/constants/`:
@@ -256,7 +258,7 @@ The script imports `osdag_core.Common`, so run it in the backend environment (se
 | `id` | The module's desktop name, imported from `generated/coreKeys.js` (`KEY_DISP_*`). It is also the backend `MODULE_ID`, the `designType` of the module's config, and the value stored in a project's `submodule` and in the `Module:` line of an `.osi` file. |
 | `path` | The design page URL. `App.jsx` registers `${path}/:projectId?` for every entry under `ProjectAuthGuard`. |
 | `title` | Page title passed to `EngineeringModule`. |
-| `load` | Lazy imports of the module's input config and output config, so each module is its own chunk. [ModulePage.jsx](../frontend/src/modules/ModulePage.jsx) renders `EngineeringModule` from the result. |
+| `load` | Lazy import of the module's input config, so each module is its own chunk. [ModulePage.jsx](../frontend/src/modules/ModulePage.jsx) renders `EngineeringModule` from the result. |
 | `apiSlug` | Backend URL slug for options, design, CAD and report calls (omitted when the module id is the slug). |
 | `menu` | Optional `{ tab, section, label, img }` placing the module on a selection page. Entries without `menu` have a route but no card. |
 | `hidden` | Optional. `true` leaves the entry out of `MODULES` and `findModule`, so it has no route or card (Purlin, which the desktop menu does not offer either). |
@@ -266,17 +268,17 @@ The script imports `osdag_core.Common`, so run it in the backend environment (se
 
 **Adding a module**
 1. Backend: add the submodule with `MODULE_ID = KEY_DISP_...` from `osdag_core.Common` (see [ADDING_MODULES_AND_SUBMODULES_BACKEND.md](./general/ADDING_MODULES_AND_SUBMODULES_BACKEND.md)). If the desktop module has a new constant, run `python scripts/gen_core_keys.py` to add it to `coreKeys.js`.
-2. Frontend: create the `*Config.js` and `*OutputConfig.js` files with `designType` set to the same constant.
+2. Frontend: create the `*Config.js` file with `designType` set to the same constant.
 3. Add one entry to `MODULES` in `registry.js`. The route, menu card, API slug and report/open-project navigation follow from it; no other file lists the module.
+4. Give the module's `adapter.py` a `create_module()` that returns a new, unsolved instance. The empty output dock endpoint builds the dock from it.
 
 ---
 
-## 6.8 Shared Display Configurations (`sectionDisplayConfig.js` & `outputImageMap.js`)
+## 6.8 Shared Display Configurations (`sectionDisplayConfig.js`)
 
-To keep visual layouts consistent across all modules, helper files map section profiles and calculate outputs to dynamic display configurations:
+To keep visual layouts consistent across all modules, a helper file maps section profiles to dynamic display configurations:
 
 * **[sectionDisplayConfig.js](../frontend/src/modules/shared/config/sectionDisplayConfig.js):** Defines dimension configurations (e.g., Flange Width $B$, Web Thickness $t$, Root Radius $R_1$) and properties (Mass, Elastic Moduli, Section Areas) for Columns, Beams, Angles, and Channels to display on profile selection cards.
-* **[outputImageMap.js](../frontend/src/modules/shared/config/outputImageMap.js):** Resolves which sketch diagram or detailing overlay image to load inside output docks or capacity modals based on selected choices (e.g., checking if column sections include "SHS" or "RHS" and returning corresponding weld schemas).
 
 ---
 

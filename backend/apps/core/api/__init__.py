@@ -21,6 +21,7 @@ from .design.material_api import MaterialDetails
 from .design.design_pref_sync_api import DesignPreferenceSync
 from .design.design_pref_defaults_api import DesignPreferenceDefaults
 from .design.design_report_pdf_view import CompanyLogoView, CreateDesignReport
+from .design.core_images_api import CoreImageView
 from .design.report_customization_api import ParseReportSections, CustomizeReport
 
 # CAD exports
@@ -43,7 +44,7 @@ __all__ = [
     'SaveOsiFromInputs', 'OpenOsiUpload', 'OpenOsiById', 'ProjectOsiDownload',
     # Design
     'DesignPreference', 'DesignPreferenceSync', 'DesignPreferenceDefaults', 'MaterialDetails', 'CompanyLogoView',
-    'CreateDesignReport',
+    'CreateDesignReport', 'CoreImageView',
     'ParseReportSections', 'CustomizeReport',
     # CAD
     'CADGeneration', 'CADDownload', 'CADExport',

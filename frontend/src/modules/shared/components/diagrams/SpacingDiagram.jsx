@@ -18,7 +18,7 @@ import { useMemo } from "react";
  */
 const VIEWBOX_WIDTH = 600;
 const VIEWBOX_HEIGHT = 400;
-const MARGIN = 70;
+const MARGIN = 95;
 
 const toNumber = (value, fallback = 0) => {
   if (value === null || value === undefined || value === "") {
@@ -145,8 +145,9 @@ const renderDetailedDimensions = (
 
   // Horizontal dimensions (top of plate)
   if (boltColsPositions.length > 0) {
-    const firstBoltX = boltColsPositions[0];
-    const lastBoltX = boltColsPositions[boltColsPositions.length - 1];
+    // Leftmost and rightmost bolt column, whichever side the pattern is measured from.
+    const firstBoltX = Math.min(...boltColsPositions);
+    const lastBoltX = Math.max(...boltColsPositions);
     const dimY = offsetY - hOffset;
 
     // Edge distances
@@ -162,7 +163,7 @@ const renderDetailedDimensions = (
       <line key="h-edge-left" x1={leftEdgeStart} y1={dimY} x2={leftEdgeEnd} y2={dimY} stroke={dimColor} strokeWidth="1" markerEnd="url(#spacing-arrow-end)" markerStart="url(#spacing-arrow-start)" />
     );
     elements.push(
-      <DimensionText key="h-edge-left-text" x={(leftEdgeStart + leftEdgeEnd) / 2} y={dimY - textOffset} text={`${(params.edgeDist || 0).toFixed(0)}`} />
+      <DimensionText key="h-edge-left-text" x={(leftEdgeStart + leftEdgeEnd) / 2} y={dimY - textOffset} text={`${firstBoltX.toFixed(0)}`} />
     );
 
     const rightEdgeStart = offsetX + lastBoltX * scale;
@@ -177,7 +178,7 @@ const renderDetailedDimensions = (
       <line key="h-edge-right" x1={rightEdgeStart} y1={dimY} x2={rightEdgeEnd} y2={dimY} stroke={dimColor} strokeWidth="1" markerEnd="url(#spacing-arrow-end)" markerStart="url(#spacing-arrow-start)" />
     );
     elements.push(
-      <DimensionText key="h-edge-right-text" x={(rightEdgeStart + rightEdgeEnd) / 2} y={dimY - textOffset} text={`${(params.edgeDist || 0).toFixed(0)}`} />
+      <DimensionText key="h-edge-right-text" x={(rightEdgeStart + rightEdgeEnd) / 2} y={dimY - textOffset} text={`${(params.width - lastBoltX).toFixed(0)}`} />
     );
 
     // Gauge distances between bolts (only if multiple columns)

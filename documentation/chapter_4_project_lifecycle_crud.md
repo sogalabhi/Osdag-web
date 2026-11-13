@@ -14,7 +14,7 @@ Instead of storing form inputs as flat fields, Osdag-Web encapsulates them insid
 * **`pref`:** Stores the design preference overrides configured inside the **Additional Inputs** tabs (e.g. connector details, detailing gaps, safety factors).
 
 ### The `outputs_json` Schema
-Stores the raw calculated outputs returned by the Celery calculation solver. This JSON payload is loaded back into the Output Dock upon opening a saved project, avoiding the need to re-run calculations.
+Stores the raw calculated outputs returned by the Celery calculation solver. This JSON payload is loaded back as the project's outputs upon opening a saved project, avoiding the need to re-run calculations. It is the flat `data` dict only: it does not hold the dock layout (`output_layout`, see chapter 6, section 6.5.2), so an opened project shows the module's empty output dock (fetched from `/api/modules/<module>/output-layout/`, section 6.5.2) with its popup buttons disabled until the design is run again.
 
 ---
 

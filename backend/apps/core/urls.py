@@ -14,7 +14,8 @@ from apps.core.api import (
     SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ProjectOsiDownload,
     ParseReportSections, CustomizeReport,
     DesignPreference, DesignPreferenceSync, DesignPreferenceDefaults, MaterialDetails, CompanyLogoView,
-    CADGeneration, CADDownload, CADExport
+    CADGeneration, CADDownload, CADExport,
+    CoreImageView
 )
 from apps.core import views
 from apps.core.health import health_view
@@ -32,6 +33,7 @@ urlpatterns = [
     path('api/materialDetails/', MaterialDetails.as_view()),
     path('api/materialDetails/<int:material_id>/', MaterialDetails.as_view()),
     path('api/company-logo/', CompanyLogoView.as_view()),
+    path('api/core-images/<str:name>', CoreImageView.as_view(), name='core-image'),
     
     # Authentication and authorization
     path('jwt/home', JWTHomeView.as_view()),  # view for testing purpose

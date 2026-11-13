@@ -180,7 +180,7 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
             : ["Model", "Plate 1", "Plate 2", "Welds"],
 
         defaultInputs: {
-            axial_force: "60",
+            axial_force: "40",
             module: designType,
             plate1_thickness: [],
             plate2_thickness: [],

@@ -51,7 +51,7 @@ import { useDesignReport } from "./useDesignReport";
 export const useEngineeringModule = (moduleConfig) => {
   const navigate = useNavigate();
   const service = useEngineeringService();
-  const { getModuleData, getDesignPreferences } = service;
+  const { getModuleData, getOutputLayout, getDesignPreferences } = service;
 
   const {
     resetModuleState,
@@ -62,6 +62,7 @@ export const useEngineeringModule = (moduleConfig) => {
   const [optionsRefetchKey, setOptionsRefetchKey] = useState(0);
   const moduleData = useModuleData(
     getModuleData,
+    getOutputLayout,
     moduleConfig.designType,
     optionsRefetchKey
   );
@@ -73,6 +74,8 @@ export const useEngineeringModule = (moduleConfig) => {
     submitDesign,
     cadData,
     output,
+    outputLayout,
+    designSafe,
     logs,
     rawCsvData,
     loading,
@@ -265,6 +268,8 @@ export const useEngineeringModule = (moduleConfig) => {
 
     designStatus: {
       output,
+      outputLayout,
+      designSafe,
       logs,
       rawCsvData,
       loading,

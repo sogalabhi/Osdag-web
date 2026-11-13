@@ -47,6 +47,11 @@ def _create_cantilever_module() -> Flexure_Cantilever:
     return module
 
 
+def create_module() -> Flexure_Cantilever:
+    """Create an instance of the Flexure_Cantilever module design class and set it up for use"""
+    return _create_cantilever_module()
+
+
 def create_from_input(input_values: Dict[str, Any]) -> Flexure_Cantilever:
     """
     Create an instance of Flexure_Cantilever from web input values.
