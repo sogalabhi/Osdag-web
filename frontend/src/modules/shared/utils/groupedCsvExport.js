@@ -110,7 +110,7 @@ export function downloadGroupedInputsCsv({
  */
 export function downloadGroupedOutputsCsv({
   output,
-  outputConfig,
+  outputLayout,
   logs,
   filename = "outputs.csv",
 }) {
@@ -121,23 +121,19 @@ export function downloadGroupedOutputsCsv({
   const out = output && output.data ? output.data : (output || {});
   const processedKeys = new Set();
 
-  if (outputConfig?.sections && Object.keys(outputConfig.sections).length > 0) {
-    for (const [sectionName, fields] of Object.entries(outputConfig.sections)) {
-      for (const field of fields || []) {
-        const key = field?.key;
-        if (!key) continue;
-        processedKeys.add(key);
-        const outItem = out?.[key];
-        const label = extractOutputLabel(field, outItem);
-        const value = extractOutputValue(outItem);
-        if (label || value !== "") {
-          rows.push([sectionName, label, value]);
-        }
+  // The dock's own sections and fields come first, in the engine's order.
+  for (const section of outputLayout || []) {
+    if (section.visible === false) continue;
+    for (const item of section.items || []) {
+      if (item.type !== "field" || item.visible === false) continue;
+      processedKeys.add(item.key);
+      if (item.label || item.value !== "") {
+        rows.push([section.title, item.label, item.value]);
       }
     }
   }
 
-  // Include any remaining keys from `out` that were not defined in `outputConfig.sections`
+  // Include any remaining keys from `out` that are not in the dock layout
   if (out && typeof out === "object") {
     for (const [key, item] of Object.entries(out)) {
       if (processedKeys.has(key)) continue;

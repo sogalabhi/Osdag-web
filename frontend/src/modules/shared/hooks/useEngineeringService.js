@@ -15,6 +15,7 @@ import { useCallback } from 'react';
 import { exportToCSV as exportToCSVUtil } from '../../../utils/csvUtils';
 import {
   fetchModuleOptions,
+  fetchOutputLayout,
   createDesign as dsCreateDesign,
   downloadCad as dsDownloadCad,
   exportCad as dsExportCad,
@@ -49,6 +50,19 @@ export const useEngineeringService = () => {
       return await fetchModuleOptions(moduleKey, {
         connectivity: options.connectivity,
       });
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }, []);
+
+  /**
+   * Get the module's output dock before a design has run
+   * @param {string} moduleKey - Module identifier
+   * @returns {Promise<{success: boolean, data?: Array, error?: string}>}
+   */
+  const getOutputLayout = useCallback(async (moduleKey) => {
+    try {
+      return await fetchOutputLayout(moduleKey);
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -278,6 +292,7 @@ export const useEngineeringService = () => {
   return {
     // Module Data
     getModuleData,
+    getOutputLayout,
 
     // Design
     createDesign,

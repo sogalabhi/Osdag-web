@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Modal } from 'antd';
-import { getOutputImage } from "../config/outputImageMap";
-import { OUTPUT_LAYOUTS } from "./outputDock/OutputModalLayouts";
 import LabelText from "./outputDock/LabelText";
+import { OutputPopup } from "./outputDock/OutputPopup";
+import { dialogWidth, hasDialog } from "./outputDock/dialogDrawings";
+import { widestPopupImage } from "./outputDock/popupLayout";
 import { useViewport } from "../hooks/useViewport";
 
 // Read-only value box styled like input (transparent bg, grey border).
@@ -22,236 +23,56 @@ const ValueBox = ({ value }) => {
   );
 };
 
+const POPUP_MIN_WIDTH = 480;
+
+/**
+ * The output dock, drawn from the engine's output list (see `output_layout` in the design
+ * result). `layout` is the list of sections: [{ title, visible, items }], where an item is a
+ * read-only field or a button that opens a popup. The buttons work only when `buttonsEnabled`.
+ */
 export const BaseOutputDock = React.memo(({
-  output,
-  outputConfig,
-  extraState = {},
+  layout,
+  buttonsEnabled = false,
   handleCreateDesignReport,
   saveOutput,
 }) => {
   const { isMobile } = useViewport();
+  const [openButton, setOpenButton] = useState(null);
 
-  // Shared state management
-  const [activeModals, setActiveModals] = useState({});
-  const [activeSections, setActiveSections] = useState({});
-
-  // Shared modal management
-  const openModal = (modalType, sectionKey = null) => {
-    setActiveModals(prev => ({ ...prev, [modalType]: true }));
-    if (sectionKey) {
-      setActiveSections(prev => ({ ...prev, [modalType]: sectionKey }));
-    }
-  };
-
-  const closeModal = (modalType) => {
-    setActiveModals(prev => ({ ...prev, [modalType]: false }));
-    setActiveSections(prev => ({ ...prev, [modalType]: null }));
-  };
-
-  // Shared dialog handler
-  const handleDialog = (key) => {
-    const modalConfig = outputConfig.modals?.[key];
-    if (modalConfig) {
-      openModal(modalConfig.type, key);
-    }
-  };
-
-  const getImageForModal = (imageType, selectedOption, basePlateState = {}) =>
-    getOutputImage(imageType, selectedOption, basePlateState);
-
-  // Helper function to get output value - Works for both module formats
-  const getOutputValue = (key, rawOutput) => {
-    const out = rawOutput && rawOutput.data ? rawOutput.data : rawOutput;
-    if (!out) {
-      return " ";
-    }
-
-    // Both modules now use flat structure: { "Bolt.Diameter": { label, val } }
-    if (out[key]?.val !== undefined) {
-      return out[key].val;
-    }
-
-    // Try alternative structures
-    if (out[key] !== undefined) {
-      return out[key];
-    }
-    return " ";
-  };
-
-  // JSX Rendering Functions
-  const resolveModalEntry = (modalType, activeSection) => {
-    const modalEntries = outputConfig.modalData?.[modalType] || {};
-    const entry = modalEntries[activeSection];
-
-    if (!entry) {
-      return { fields: [], diagram: null };
-    }
-
-    if (Array.isArray(entry)) {
-      return { fields: entry, diagram: null };
-    }
-
-    return {
-      fields: entry.fields || [],
-      diagram: entry.diagram || null,
-    };
-  };
-
-  const getNumeric = (key, rawOutput) => {
-    const raw = getOutputValue(key, rawOutput);
-    if (raw === undefined || raw === null || raw === " ") {
-      return undefined;
-    }
-    const numeric = Number(raw);
-    return Number.isFinite(numeric) ? numeric : undefined;
-  };
-
-  const resolveDiagramProps = (diagramConfig, rawOutput) => {
-    if (!diagramConfig) {
-      return null;
-    }
-
-    const mapValue = (descriptor) => {
-      if (descriptor === undefined || descriptor === null) {
-        return undefined;
-      }
-      if (Array.isArray(descriptor)) {
-        return descriptor
-          .map((item) => mapValue(item))
-          .filter((value) => value !== undefined);
-      }
-
-      if (typeof descriptor === "number") {
-        return descriptor;
-      }
-
-      if (typeof descriptor === "boolean") {
-        return descriptor;
-      }
-
-      if (typeof descriptor === "string") {
-        if (["supported", "supporting", "left", "right"].includes(descriptor)) {
-          return descriptor;
-        }
-      }
-
-      return getNumeric(descriptor, rawOutput);
-    };
-
-    // Props that should be resolved as raw strings rather than numbers
-    const STRING_PROPS = new Set(["angleDesignation", "endplateType", "memberDesignation"]);
-
-    const resolved = Object.entries(diagramConfig.props || {}).reduce(
-      (acc, [key, descriptor]) => {
-        if (STRING_PROPS.has(key)) {
-          const rawVal = getOutputValue(descriptor, rawOutput);
-          if (rawVal !== undefined && rawVal !== null && rawVal !== " ") {
-            acc[key] = rawVal;
-          }
-        } else {
-          const value = mapValue(descriptor);
-          if (value !== undefined && value !== null && value !== "") {
-            acc[key] = value;
-          } else if (typeof descriptor === "boolean") {
-            acc[key] = descriptor;
-          }
-        }
-        return acc;
-      },
-      {}
-    );
-
-    if (Object.keys(resolved).length === 0) {
-      return null;
-    }
-
-    if (diagramConfig.origin) {
-      resolved.origin = diagramConfig.origin;
-    }
-
-    if (diagramConfig.layout) {
-      resolved.layout = diagramConfig.layout;
-    }
-
-    if (diagramConfig.props?.drawAngleThickness) {
-      resolved.drawAngleThickness = diagramConfig.props.drawAngleThickness;
-    }
-
-    if (diagramConfig.props?.weldPattern) {
-      resolved.weldPattern = diagramConfig.props.weldPattern;
-    }
-
-    if (diagramConfig.props?.thicknessBand) {
-      resolved.thicknessBand = diagramConfig.props.thicknessBand;
-    }
-
-    if (diagramConfig.props?.view) {
-      resolved.view = diagramConfig.props.view;
-    }
-
-    if (diagramConfig.props?.variant) {
-      resolved.variant = diagramConfig.props.variant;
-    }
-
-    if (diagramConfig.props?.orientation) {
-      resolved.orientation = diagramConfig.props.orientation;
-    }
-
-    return resolved;
-  };
-
-  const renderModalContent = (modalType, activeSection, output) => {
-    const config = outputConfig.modalTypes[modalType];
-    const finalConfig = {
-      ...config,
-      note: (config.layout === 'spacing-diagram' || config.layout === 'capacity-diagram' || config.layout === 'capacity-complex') ? null : config.note
-    };
-    const { fields, diagram } = resolveModalEntry(modalType, activeSection);
-    const LayoutComponent = OUTPUT_LAYOUTS[config.layout] || OUTPUT_LAYOUTS["single-column"];
-    const getImage = (imageType, selectedOption, basePlateState) =>
-      getImageForModal(imageType, selectedOption, basePlateState);
-
-    const layoutProps = {
-      config: finalConfig,
-      fields,
-      diagram,
-      output,
-      getOutputValue,
-      resolveDiagramProps,
-      ValueBox,
-      getImage,
-      extraState,
-    };
-
-    return <LayoutComponent {...layoutProps} />;
-  };
-
-  // Shared field renderer
-  const renderField = (field, index) => {
-    const isModalTrigger = outputConfig.modals && (field.key in outputConfig.modals);
-    const fieldValue = getOutputValue(field.key, output);
-
+  const renderItem = (item) => {
+    if (!item.visible) return null;
     return (
-      <div key={index} className="flex w-full justify-between items-center mb-3">
+      <div
+        key={item.key}
+        data-output-key={item.key}
+        className="flex w-full justify-between items-center mb-3"
+      >
         <h4 className="w-[55%] text-sm font-medium text-osdag-text-primary dark:text-white">
-          <LabelText>{field.label}</LabelText>
+          <LabelText>{item.label}</LabelText>
         </h4>
-        {isModalTrigger ? (
+        {item.type === "button" ? (
           <div className="w-[45%]">
             <input
               type="button"
               className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-500 cursor-pointer text-gray-800 dark:text-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              value={outputConfig.modals[field.key].buttonText || field.label}
-              disabled={!output}
-              onClick={() => handleDialog(field.key)}
+              value={item.button_text}
+              disabled={!buttonsEnabled}
+              onClick={() => setOpenButton(item)}
             />
           </div>
         ) : (
-          <ValueBox value={fieldValue} />
+          <ValueBox value={item.value} />
         )}
       </div>
     );
   };
+
+  const popupWidth = isMobile
+    ? "95%"
+    : hasDialog(openButton?.dialog)
+      ? dialogWidth(openButton.dialog)
+      : Math.max(POPUP_MIN_WIDTH, 380 + widestPopupImage(openButton?.popup));
+
   return (
     <>
       <div className="flex flex-col h-full min-h-0">
@@ -259,14 +80,25 @@ export const BaseOutputDock = React.memo(({
           <p className="ml-2 p-1 inline-block bg-osdag-green text-white rounded">Output Dock</p>
         </div>
         <div className="flex-1 overflow-y-auto subMainBody scroll-data min-h-0 pb-20">
-          {Object.entries(outputConfig.sections).map(([sectionName, fields]) => (
-            <div key={sectionName} className='cards'>
-              <h3 className='text-black dark:text-white'>{sectionName}</h3>
-              <div className="component-grid">
-                {fields.map((field, index) => renderField(field, index))}
+          {(layout || []).map((section, index) => {
+            if (!section.visible) return null;
+            // A title with no fields is only a heading for the groups after it.
+            if (section.items.length === 0) {
+              return (
+                <h3 key={index} data-output-section={section.title} className="mx-4 mb-5 text-base font-bold text-black dark:text-white">
+                  <LabelText>{section.title}</LabelText>
+                </h3>
+              );
+            }
+            return (
+              <div key={index} className="cards" data-output-section={section.title}>
+                <h3 className="text-black dark:text-white"><LabelText>{section.title}</LabelText></h3>
+                <div className="component-grid">
+                  {section.items.map(renderItem)}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Footer Actions - sticky at bottom; scroll area has padding so last content is not hidden */}
@@ -300,20 +132,19 @@ export const BaseOutputDock = React.memo(({
         )}
       </div>
 
-      {/* Dynamic Modal Rendering */}
-      {Object.entries(outputConfig.modalTypes || {}).map(([modalType, config]) => (
-        <Modal
-          key={modalType}
-          open={activeModals[modalType]}
-          onCancel={() => closeModal(modalType)}
-          footer={null}
-          width={isMobile ? "95%" : (config.width || "50%")}
-          title={config.title}
-          className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
-        >
-          {renderModalContent(modalType, activeSections[modalType], output)}
-        </Modal>
-      ))}
+      {/* Popup of the pressed button */}
+      <Modal
+        open={!!openButton}
+        onCancel={() => setOpenButton(null)}
+        footer={null}
+        width={popupWidth}
+        style={{ maxWidth: "calc(100vw - 16px)" }}
+        title={openButton?.popup_title}
+        className="[&_.ant-modal-header]:bg-transparent [&_.ant-modal-close]:right-4"
+        destroyOnHidden
+      >
+        {openButton && <OutputPopup rows={openButton.popup} error={openButton.error} dialog={openButton.dialog} />}
+      </Modal>
     </>
   );
 });
