@@ -1,7 +1,7 @@
 import { lazy } from "react";
 
 // One lazy page per registry entry, created on first use. The shared module
-// UI and the module's configs load together in the module's own chunk.
+// UI and the module's config load together in the module's own chunk.
 const pages = new Map();
 
 const pageFor = (module) => {
@@ -9,13 +9,11 @@ const pageFor = (module) => {
     pages.set(
       module.id,
       lazy(async () => {
-        const [{ EngineeringModule }, { moduleConfig, outputConfig }] = await Promise.all([
+        const [{ EngineeringModule }, { moduleConfig }] = await Promise.all([
           import("./shared/components/EngineeringModule"),
           module.load(),
         ]);
-        const Page = () => (
-          <EngineeringModule moduleConfig={moduleConfig} outputConfig={outputConfig} title={module.title} />
-        );
+        const Page = () => <EngineeringModule moduleConfig={moduleConfig} title={module.title} />;
         return { default: Page };
       })
     );

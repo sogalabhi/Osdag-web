@@ -345,6 +345,15 @@ def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
             raw_output = module.output_values(True)
         output = _to_output_dict(raw_output)
 
+        # The output dock is drawn from the module's own output list, as in the other modules.
+        try:
+            from apps.core.utils.output_layout import build_output_layout
+            with _suppress_core_stdout():
+                output_layout = build_output_layout(module, True, design_dict)
+        except Exception:
+            logger.exception("Could not build the output dock layout")
+            output_layout = None
+
         logger.info(f"  Output parameters: {len(output)}")
         logger.info("  Key outputs:")
         for key in list(output.keys())[:5]:  # Log first 5 output keys
@@ -390,6 +399,7 @@ def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
                     "result": _sanitize_for_channels(
                         {
                             "design": output,
+                            "output_layout": output_layout,
                             "raw": raw_output,
                             "pso_result": result,
                         }

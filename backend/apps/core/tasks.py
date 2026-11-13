@@ -153,6 +153,15 @@ def run_design_calculation_task(self, module_name: str, submodule_slug: str, inp
         result['hover_dict'] = {}
         result['warnings'] = []
 
+        # The output dock is built from the solved module's own output list. Without a layout
+        # the page falls back to the module's empty dock.
+        if solver is not None and result.get('success') is not False:
+            try:
+                from apps.core.utils.output_layout import build_output_layout
+                result['output_layout'] = build_output_layout(solver, design_status, inputs)
+            except Exception:
+                logger.exception(f"Could not build the output dock layout for task {self.request.id}")
+
         # Same condition the frontend applied before it asked for a 3D model.
         build_cad = (
             result.get('success') is not False

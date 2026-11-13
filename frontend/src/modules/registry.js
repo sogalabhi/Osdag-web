@@ -34,11 +34,11 @@ import {
   KEY_DISP_PLATE_GIRDER_WELDED,
 } from "../constants/generated/coreKeys";
 
-// Resolves a module's input config and output config from two lazy imports, so
-// each module stays in its own chunk.
-const loadConfigs = async (configImport, configName, outputImport, outputName) => {
-  const [config, output] = await Promise.all([configImport, outputImport]);
-  return { moduleConfig: config[configName], outputConfig: output[outputName] };
+// Resolves a module's input config from a lazy import, so each module stays in its own chunk.
+// The output dock needs no per-module config: it is built from the engine's output list.
+const loadConfigs = async (configImport, configName) => {
+  const config = await configImport;
+  return { moduleConfig: config[configName] };
 };
 
 // Menu tabs shown on the module selection pages, keyed by the first URL segment.
@@ -82,7 +82,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Plated", section: UI_STRINGS.PLATED_CONNECTION, label: "Lap Joint — Bolted", img: "lap_joint_bolted_simple_connec.png" },
     load: () => loadConfigs(
       import("./SimpleConnection/LapJointBolted/config/lapJointBoltedConfig"), "lapJointBoltedConfig",
-      import("./SimpleConnection/LapJointBolted/config/lapJointBoltedOutputConfig"), "lapJointBoltedOutputConfig",
     ),
   },
   {
@@ -93,7 +92,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Plated", section: UI_STRINGS.PLATED_CONNECTION, label: "Lap Joint — Welded", img: "lap_joint_welded_simple_connec.png" },
     load: () => loadConfigs(
       import("./SimpleConnection/LapJointWelded/config/lapJointWeldedConfig"), "lapJointWeldedConfig",
-      import("./SimpleConnection/LapJointWelded/config/lapJointWeldedOutputConfig"), "lapJointWeldedOutputConfig",
     ),
   },
   {
@@ -104,7 +102,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Plated", section: UI_STRINGS.PLATED_CONNECTION, label: "Butt Joint — Bolted", img: "butt_joint_bolted_simple_connec.png" },
     load: () => loadConfigs(
       import("./SimpleConnection/ButtJointBolted/config/buttJointBoltedConfig"), "buttJointBoltedConfig",
-      import("./SimpleConnection/ButtJointBolted/config/buttJointBoltedOutputConfig"), "buttJointBoltedOutputConfig",
     ),
   },
   {
@@ -115,7 +112,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Plated", section: UI_STRINGS.PLATED_CONNECTION, label: "Butt Joint — Welded", img: "butt_joint_welded_simple_connec.png" },
     load: () => loadConfigs(
       import("./SimpleConnection/ButtJointWelded/config/buttJointWeldedConfig"), "buttJointWeldedConfig",
-      import("./SimpleConnection/ButtJointWelded/config/buttJointWeldedOutputConfig"), "buttJointWeldedOutputConfig",
     ),
   },
 
@@ -128,7 +124,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Shear", section: UI_STRINGS.SHEAR_CONNECTIONS, label: UI_STRINGS.FIN_PLATE, img: "shear_fin_plate_connec.png" },
     load: () => loadConfigs(
       import("./shearConnection/finPlate/configs/finPlateConfig"), "finPlateConfig",
-      import("./shearConnection/finPlate/configs/finPlateOutputConfig"), "finPlateOutputConfig",
     ),
     designPref: {
       connectivityField: "Connectivity",
@@ -149,7 +144,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Shear", section: UI_STRINGS.SHEAR_CONNECTIONS, label: UI_STRINGS.CLEAT_ANGLE, img: "shear_cleat_angle_connec.png" },
     load: () => loadConfigs(
       import("./shearConnection/cleatAngle/configs/cleatAngleConfig"), "cleatAngleConfig",
-      import("./shearConnection/cleatAngle/configs/cleatAngleOutputConfig"), "cleatAngleOutputConfig",
     ),
   },
   {
@@ -160,7 +154,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Shear", section: UI_STRINGS.SHEAR_CONNECTIONS, label: UI_STRINGS.HEADER_PLATE, img: "header_plate_connec.png" },
     load: () => loadConfigs(
       import("./shearConnection/endPlate/configs/endPlateConfig"), "endPlateConfig",
-      import("./shearConnection/endPlate/configs/endPlateOutputConfig"), "endPlateOutputConfig",
     ),
   },
   {
@@ -171,7 +164,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Shear", section: UI_STRINGS.SHEAR_CONNECTIONS, label: UI_STRINGS.SEATED_ANGLE, img: "seated_angle_connec.png" },
     load: () => loadConfigs(
       import("./shearConnection/seatAngle/configs/seatedAngleConfig"), "seatedAngleConfig",
-      import("./shearConnection/seatAngle/configs/seatedAngleOutputConfig"), "seatedAngleOutputConfig",
     ),
   },
 
@@ -184,7 +176,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Moment", section: "Column Splices", label: "Cover Plate — Bolted", img: "cover_plate_bolted_ctc_moment_connec.png" },
     load: () => loadConfigs(
       import("./columnColumnCoverPlateBolted/configs/coverPlateBoltedConfig"), "coverPlateBoltedConfig",
-      import("./columnColumnCoverPlateBolted/configs/coverPlateBoltedOutputConfig"), "coverPlateBoltedOutputConfig",
     ),
   },
   {
@@ -195,7 +186,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Moment", section: "Column Splices", label: "Cover Plate — Welded", img: "cover_plate_welded_ctc_moment_connec.png" },
     load: () => loadConfigs(
       import("./columnColumnCoverPlateWelded/configs/coverPlateWeldedConfig"), "coverPlateWeldedConfig",
-      import("./columnColumnCoverPlateWelded/configs/coverPlateWeldedOutputConfig"), "coverPlateWeldedOutputConfig",
     ),
   },
   {
@@ -206,7 +196,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Moment", section: "Column Splices", label: UI_STRINGS.END_PLATE, img: "end_plate_ctc_moment_connec.png" },
     load: () => loadConfigs(
       import("./columnColumnEndPlate/configs/columnColumnEndPlateConfig"), "columnColumnEndPlateConfig",
-      import("./columnColumnEndPlate/configs/columnColumnEndPlateOutputConfig"), "columnColumnEndPlateOutputConfig",
     ),
   },
 
@@ -219,7 +208,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Moment", section: "Beam Splices", label: "Cover Plate — Bolted", img: "cover_plate_bolted_btb_moment_connec.png" },
     load: () => loadConfigs(
       import("./coverPlateBolted/configs/coverPlateBoltedConfig"), "coverPlateBoltedConfig",
-      import("./coverPlateBolted/configs/coverPlateBoltedOutputConfig"), "coverPlateBoltedOutputConfig",
     ),
     designPref: {
       fields: {
@@ -239,7 +227,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Moment", section: "Beam Splices", label: "Cover Plate — Welded", img: "cover_plate_welded_btb_moment_connec.png" },
     load: () => loadConfigs(
       import("./coverPlateWelded/configs/coverPlateWeldedConfig"), "coverPlateWeldedConfig",
-      import("./coverPlateWelded/configs/coverPlateWeldedOutputConfig"), "coverPlateWeldedOutputConfig",
     ),
   },
   {
@@ -250,7 +237,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Moment", section: "Beam Splices", label: UI_STRINGS.END_PLATE, img: "end_plate_btb_moment_connec.png" },
     load: () => loadConfigs(
       import("./beamBeamEndPlate/configs/beamBeamEndPlateConfig"), "beamBeamEndPlateConfig",
-      import("./beamBeamEndPlate/configs/beamBeamEndPlateOutputConfig"), "beamBeamEndPlateOutputConfig",
     ),
     designPref: {
       connectivityField: "Connectivity",
@@ -280,7 +266,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Moment", section: "Beam to Column", label: UI_STRINGS.END_PLATE, img: "end_plate_btc_moment_connec.png" },
     load: () => loadConfigs(
       import("./beamToColumnEndPlate/configs/beamToColumnEndPlateConfig"), "beamToColumnEndPlateConfig",
-      import("./beamToColumnEndPlate/configs/beamToColumnEndPlateOutputConfig"), "beamToColumnEndPlateOutputConfig",
     ),
   },
 
@@ -293,7 +278,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "BasePlate", section: "Base Plates", label: UI_STRINGS.SLAB_AND_GUSSETED_BASES, img: "base_plate_connec.png" },
     load: () => loadConfigs(
       import("./basePlate/configs/basePlateConfig"), "basePlateConfig",
-      import("./basePlate/configs/basePlateOutputConfig"), "basePlateOutputConfig",
     ),
   },
 
@@ -306,7 +290,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Tension", section: UI_STRINGS.TENSION_MEMBER, label: UI_STRINGS.BOLTED_TO_END_GUSSET, img: "bolted_tension_member.png" },
     load: () => loadConfigs(
       import("./TensionMembers/BoltedToEnd/configs/boltedToEndConfig"), "boltedToEndConfig",
-      import("./TensionMembers/BoltedToEnd/configs/boltedToEndOutputConfig"), "boltedToEndOutputConfig",
     ),
   },
   {
@@ -317,7 +300,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Tension", section: UI_STRINGS.TENSION_MEMBER, label: UI_STRINGS.WELDED_TO_END_GUSSET, img: "welded_tension_member.png" },
     load: () => loadConfigs(
       import("./TensionMembers/WeldedToEnd/configs/weldedToEndConfig"), "weldedToEndConfig",
-      import("./TensionMembers/WeldedToEnd/configs/weldedToEndOutputConfig"), "weldedToEndOutputConfig",
     ),
   },
 
@@ -330,7 +312,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Compression", section: UI_STRINGS.COMPRESSION_MEMBER, label: "Struts Bolted to End Gusset", img: "struts_bolt_end_gusset.png" },
     load: () => loadConfigs(
       import("./compressionMember/configs/strutsBoltedConfig"), "strutsBoltedConfig",
-      import("./compressionMember/configs/strutsBoltedOutputConfig"), "strutsBoltedOutputConfig",
     ),
   },
   {
@@ -341,7 +322,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Compression", section: UI_STRINGS.COMPRESSION_MEMBER, label: "Struts Welded to End Gusset", img: "struts_weld_end_gusset.png" },
     load: () => loadConfigs(
       import("./compressionMember/configs/strutsWeldedConfig"), "strutsWeldedConfig",
-      import("./compressionMember/configs/strutsWeldedOutputConfig"), "strutsWeldedOutputConfig",
     ),
   },
   {
@@ -352,7 +332,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Compression", section: UI_STRINGS.COMPRESSION_MEMBER, label: "Axially Loaded Column", img: "axially_loaded_column.png" },
     load: () => loadConfigs(
       import("./compressionMember/configs/axiallyLoadedColumnConfig"), "axiallyLoadedColumnConfig",
-      import("./compressionMember/configs/axiallyLoadedColumnOutputConfig"), "axiallyLoadedColumnOutputConfig",
     ),
   },
 
@@ -365,7 +344,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Flexure", section: UI_STRINGS.FLEXURE_MEMBER, label: "Simply Supported Beam", img: "ss_beam_flexural_mem.png" },
     load: () => loadConfigs(
       import("./flexuralMember/simplySupportedBeam/configs/simplySupportedBeamConfig"), "simplySupportedBeamConfig",
-      import("./flexuralMember/simplySupportedBeam/configs/simplySupportedBeamOutputConfig"), "simplySupportedBeamOutputConfig",
     ),
   },
   {
@@ -376,7 +354,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Flexure", section: UI_STRINGS.FLEXURE_MEMBER, label: "Cantilever Beam", img: "cantilever_beam_flexural_mem.png" },
     load: () => loadConfigs(
       import("./flexuralMember/onCantilever/configs/onCantileverConfig"), "onCantileverConfig",
-      import("./flexuralMember/onCantilever/configs/onCantileverOutputConfig"), "onCantileverOutputConfig",
     ),
   },
   {
@@ -387,7 +364,6 @@ const MODULE_ENTRIES = [
     menu: { tab: "Flexure", section: UI_STRINGS.FLEXURE_MEMBER, label: "Plate Girder", img: "plate_girder_flexural_mem.png" },
     load: () => loadConfigs(
       import("./flexuralMember/plateGirder/configs/plateGirderConfig"), "plateGirderConfig",
-      import("./flexuralMember/plateGirder/configs/plateGirderOutputConfig"), "plateGirderOutputConfig",
     ),
   },
   // Purlin is under development and is not in the desktop app's menu either, so
@@ -402,7 +378,6 @@ const MODULE_ENTRIES = [
     title: UI_STRINGS.PURLIN,
     load: () => loadConfigs(
       import("./flexuralMember/purlin/configs/purlinConfig"), "purlinConfig",
-      import("./flexuralMember/purlin/configs/purlinOutputConfig"), "purlinOutputConfig",
     ),
   },
 ];
@@ -424,7 +399,7 @@ export const getModuleSlug = (id) => findModule(id)?.apiSlug ?? id;
 /** Design preference data (connectivity names, .osi field names) for a module id. */
 export const getModuleDesignPref = (id) => findModule(id)?.designPref ?? {};
 
-/** Loads a module's input and output configs: { moduleConfig, outputConfig }. */
+/** Loads a module's input config: { moduleConfig }. */
 export const loadModuleConfigs = (id) => findModule(id)?.load();
 
 /**

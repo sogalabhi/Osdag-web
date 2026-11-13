@@ -4,7 +4,13 @@ Aggregates all parent module URLs into a single include point
 """
 from django.urls import path, include
 
+from apps.core.api.modules import OutputLayoutView
+
 urlpatterns = [
+    # The output dock before a design has run, for every module
+    path('base-plate/output-layout/', OutputLayoutView.as_view(), {'family': 'base-plate'}),
+    path('<str:family>/<str:slug>/output-layout/', OutputLayoutView.as_view()),
+
     # Shear Connection module
     path('shear-connection/', include('apps.modules.shear_connection.urls')),
     
