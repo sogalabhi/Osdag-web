@@ -62,7 +62,7 @@
     "Load.Moment": "100",
     "Load.Shear": "100",
     "Material": "E 165 (Fe 290)",
-    "Member.Designation": "MB 600",
+    "Member.Designation": "UC 305 x 305 x 118",
     "Member.Material": "E 165 (Fe 290)",
     "Module": "Column-to-Column Cover Plate Welded Connection",
     "Weld.Fab": "Shop Weld",

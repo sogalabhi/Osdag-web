@@ -9,6 +9,7 @@ export function makeCoverPlateBoltedConfig({
   cadOptions,
   sectionOptionsKey,
   defaultLoads,
+  defaultDesignation = "MB 300",
 }) {
   const config = {
     sessionName,
@@ -35,7 +36,7 @@ export function makeCoverPlateBoltedConfig({
       load_moment: defaultLoads.moment,
       load_shear: defaultLoads.shear,
       material: "E 250 (Fe 410 W)A",
-      member_designation: "MB 300",
+      member_designation: defaultDesignation,
       member_material: "E 250 (Fe 410 W)A",
       module: designType,
     },
@@ -215,6 +216,7 @@ export function makeCoverPlateWeldedConfig({
   cadOptions,
   sectionOptionsKey,
   defaultLoads,
+  defaultDesignation = "MB 600",
   memberMaterialField,
   extraSubmissionParams = {},
 }) {
@@ -237,7 +239,7 @@ export function makeCoverPlateWeldedConfig({
       load_moment: defaultLoads.moment,
       load_shear: defaultLoads.shear,
       material: "E 165 (Fe 290)",
-      member_designation: "MB 600",
+      member_designation: defaultDesignation,
       member_material: "E 165 (Fe 290)",
       module: designType,
       weld_fab: "Shop Weld",

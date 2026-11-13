@@ -7,6 +7,7 @@ export const coverPlateWeldedConfig = makeCoverPlateWeldedConfig({
   cadOptions: ["Model", "Column", "CoverPlate"],
   sectionOptionsKey: "columnList",
   defaultLoads: { axial: "100", moment: "100", shear: "100" },
+  defaultDesignation: "UC 305 x 305 x 118",
   memberMaterialField: "material",
   extraSubmissionParams: { flangespace: "0", type: "Fillet Weld" },
 });
