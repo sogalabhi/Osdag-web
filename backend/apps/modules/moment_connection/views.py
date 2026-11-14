@@ -15,13 +15,11 @@ from osdag_core.Common import (
 )
 from .registry import MomentConnectionRegistry
 from apps.core.utils.module_helpers import (
-    handle_design_request,
     trigger_async_design,
     trigger_async_report
 )
 from apps.core import catalog
 from apps.core.models import CustomMaterials
-from apps.core.api.design.report_customization_api import generate_initial_report_core
 from apps.sections.options_merge import merge_user_sections_into_options
 from apps.core.utils.api_errors import error_response
 
