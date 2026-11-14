@@ -1,6 +1,6 @@
 # Keys & Schemas — Single-Source Plan
 
-**Date:** 2026-10-24 | **Scope:** design-input keys and request/response schemas across `osdag_core/`, `backend/`, `frontend/` | **Status:** Proposed — nothing implemented yet
+**Date:** 2026-10-24 | **Scope:** design-input keys and request/response schemas across `osdag_core/`, `backend/`, `frontend/` | **Status:** In progress (updated 2026-11-15). Done: Phase 0 fixtures, Phase 1.1–1.2 (generated key file, `DesignKeys.js` removed), Phase 2 (one error format, guard test), Phase 5.1 (Vitest payload parity tests) and Phase 6.1 (struts image). Phases 4.4 and 5.6 are replaced by the output dock being built from the engine's output list. Open: Phase 1.3–1.6, Phases 3, 4, 5.2–5.8 and 6.2–6.7. The counts below are from Oct 24; see `21-handoff.md` for current ones
 
 ## Summary
 
