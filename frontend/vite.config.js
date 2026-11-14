@@ -5,6 +5,10 @@ const backendTarget = process.env.VITE_PROXY_BACKEND_URL || 'http://127.0.0.1:80
 
 export default defineConfig({
   plugins: [react()],
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.js'],
+  },
   server: {
     host: true,
     port: 5173,

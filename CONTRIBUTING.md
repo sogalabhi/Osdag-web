@@ -50,8 +50,11 @@ These are the same checks that the CI workflow in `.github/workflows/ci.yml` run
 cd frontend
 npm ci
 npm run lint
+npm test
 npm run build
 ```
+
+`npm test` runs Vitest. The payload parity tests (`frontend/src/test/payloadParity.test.js`) snapshot what each module's `buildSubmissionParams` sends for its default inputs. If you change a module config on purpose and a snapshot fails, read the diff to confirm the request body changed the way you meant, then update the snapshot with `npm test -- -u` and commit it.
 
 **Backend tests** (pytest with pytest-django, using the `config.settings` module). CI runs them against Postgres and Redis from Docker Compose:
 
