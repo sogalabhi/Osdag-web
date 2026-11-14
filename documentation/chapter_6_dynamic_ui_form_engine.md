@@ -271,6 +271,10 @@ The script imports `osdag_core.Common`, so run it in the backend environment (se
 2. Frontend: create the `*Config.js` file with `designType` set to the same constant.
 3. Add one entry to `MODULES` in `registry.js`. The route, menu card, API slug and report/open-project navigation follow from it; no other file lists the module.
 4. Give the module's `adapter.py` a `create_module()` that returns a new, unsolved instance. The empty output dock endpoint builds the dock from it.
+5. Add the module's config to the `MODULES` table in `frontend/src/test/payloadParity.test.js`, run `npm test`, and commit the snapshots it writes.
+
+### 5. Payload Parity Tests
+`frontend/src/test/payloadParity.test.js` runs every module's `buildSubmissionParams` on its `defaultInputs`: once per connectivity choice with every customizable list on "All" (so the builder sends the whole option list), and once with explicit selections. The option lists are small fixed samples, so no backend is needed. Each result is snapshotted in `frontend/src/test/__snapshots__/`, so a config change that alters a request body shows up as a diff. Run them with `npm test`; update a snapshot on purpose with `npm test -- -u`.
 
 ---
 
