@@ -20,7 +20,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.core.permissions import IsEmailVerifiedIfAuthenticated
 from django.http import FileResponse
-from django.core.files.storage import default_storage
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from osdag_core.Common import PDFLATEX
@@ -154,7 +153,7 @@ class ParseReportSections(APIView):
             print('[report_customization_api] ParseReportSections:request', request.data)
             report_id = request.data.get('report_id')
             if report_id and not _is_valid_report_id(report_id):
-                return Response({"error": "Invalid report_id"}, status=status.HTTP_400_BAD_REQUEST)
+                return error_response('invalid_report_id', "Invalid report_id", status.HTTP_400_BAD_REQUEST)
             if not report_id:
                 return error_response('missing_field', "report_id is required", status.HTTP_400_BAD_REQUEST)
             
@@ -205,7 +204,7 @@ class CustomizeReport(APIView):
             print('[report_customization_api] CustomizeReport:request', request.data)
             report_id = request.data.get('report_id')
             if report_id and not _is_valid_report_id(report_id):
-                return Response({"error": "Invalid report_id"}, status=status.HTTP_400_BAD_REQUEST)
+                return error_response('invalid_report_id', "Invalid report_id", status.HTTP_400_BAD_REQUEST)
             selected_sections = request.data.get('selected_sections', [])
             print('[report_customization_api] CustomizeReport:parsed', {'report_id': report_id, 'selected_count': len(selected_sections)})
             

@@ -5,8 +5,9 @@
  *   { error: { code, message, fields?: { <key>: <message> } } }
  * (see documentation: backend architecture, "API error format").
  *
- * The legacy shapes ({ error: "text" }, { message }, { detail }, or a DRF field
- * dict) are still understood until every backend response is converted.
+ * A body in any other shape gives `message: null`, and the caller falls back to the HTTP
+ * status. Celery task results (`{ success: false, error: "text" }`) are a separate channel
+ * and are not read here.
  *
  * @param {unknown} body - parsed JSON body of an error response
  * @returns {{ message: string|null, code: string|null, fields: Record<string, string>|null }}
@@ -22,27 +23,8 @@ export function parseApiError(body) {
     if (error.fields && typeof error.fields === "object") {
       result.fields = error.fields;
     }
-    return result;
   }
 
-  // Legacy shapes
-  if (typeof error === "string" && error) {
-    result.message = error;
-  } else if (typeof body.message === "string" && body.message) {
-    result.message = body.message;
-  } else if (typeof body.detail === "string" && body.detail) {
-    result.message = body.detail;
-  } else {
-    const fieldErrors = [];
-    for (const [key, value] of Object.entries(body)) {
-      if (Array.isArray(value)) {
-        fieldErrors.push(`${key}: ${value.join(", ")}`);
-      } else if (typeof value === "string") {
-        fieldErrors.push(`${key}: ${value}`);
-      }
-    }
-    if (fieldErrors.length > 0) result.message = fieldErrors.join(" | ");
-  }
   return result;
 }
 

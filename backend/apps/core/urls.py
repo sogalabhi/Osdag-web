@@ -6,7 +6,7 @@ from django.urls import path
 # Import from new api structure (using re-exports from __init__.py)
 from apps.core.api import (
     SaveInputFileView,
-    JWTHomeView, GoogleSSOView,
+    JWTHomeView,
     DeleteAccountAPIView,
     ExportUserDataAPIView,
     MyDataAPIView,
@@ -37,7 +37,6 @@ urlpatterns = [
     
     # Authentication and authorization
     path('jwt/home', JWTHomeView.as_view()),  # view for testing purpose
-    path('googlesso/', GoogleSSOView.as_view()),
     path('api/auth/firebase-login/', views.FirebaseAuthView.as_view(), name="firebase_auth"),
     path('api/auth/delete-account/', DeleteAccountAPIView.as_view(), name="delete_account"),
     path('api/auth/export-data/', ExportUserDataAPIView.as_view(), name="export_data"),

@@ -178,10 +178,7 @@ class SectionImportView(APIView):
             return error_response('missing_field', "Form file field `file` is required.", status.HTTP_400_BAD_REQUEST)
 
         if upload.size > SECTION_IMPORT_MAX_BYTES:
-            return Response(
-                {"detail": "File too large; maximum is 5 MB."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return error_response('file_too_large', "File too large; maximum is 5 MB.", status.HTTP_400_BAD_REQUEST)
 
         try:
             wb = load_workbook(upload, data_only=True)
@@ -368,7 +365,7 @@ class SectionCustomView(APIView):
         qs = Model.objects.filter(user=request.user, Designation=designation)
         total_deleted, _ = qs.delete()
         if total_deleted == 0:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return error_response('not_found', "No custom section with that designation.", status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def put(self, request):
@@ -382,7 +379,7 @@ class SectionCustomView(APIView):
         try:
             instance = Model.objects.get(id=id, user=request.user)
         except Model.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return error_response('not_found', "No custom section with that id.", status.HTTP_404_NOT_FOUND)
             
         Ser = get_user_section_serializer(table)
         ser = Ser(instance, data=request.data, partial=True, context={"request": request})

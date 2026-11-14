@@ -72,9 +72,8 @@ export const syncUserToBackend = async (firebaseUser) => {
         console.error("Error syncing user to backend:", error);
         console.error("Error details:", {
             message: error.message,
-            response: error.response?.data,
-            status: error.response?.status,
-            statusText: error.response?.statusText,
+            status: error.status,
+            data: error.data,
         });
         
         // Re-throw the error so the caller can handle it

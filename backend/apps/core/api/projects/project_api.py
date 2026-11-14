@@ -1,13 +1,9 @@
 from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from apps.core.models import Project
 from apps.core.permissions import IsEmailVerified
-import json
 from django.db.models import Q
 from apps.core.utils.api_errors import error_json_response
 
@@ -116,8 +112,6 @@ class ProjectDetailAPI(APIView):
     def get(self, request, project_id):
         """Get a specific project"""
         try:
-            # if not request.user or not request.user.is_authenticated:
-            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from reading projects (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
                 return error_json_response('guest_not_allowed', 'Guest users cannot access projects', 403, success=False)
@@ -200,8 +194,6 @@ class ProjectDetailAPI(APIView):
     def delete(self, request, project_id):
         """Delete a project"""
         try:
-            # if not request.user or not request.user.is_authenticated:
-            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from deleting projects (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
                 return error_json_response('guest_not_allowed', 'Guest users cannot delete projects', 403, success=False)
@@ -232,8 +224,6 @@ class ProjectByNameAPI(APIView):
     def get(self, request, project_name):
         """Get a specific project by name"""
         try:
-            # if not request.user or not request.user.is_authenticated:
-            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from reading projects by name (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
                 return error_json_response('guest_not_allowed', 'Guest users cannot access projects', 403, success=False)
@@ -265,8 +255,6 @@ class ProjectByNameAPI(APIView):
     def put(self, request, project_name):
         """Update project data (name, osi_file_path) by name"""
         try:
-            # if not request.user or not request.user.is_authenticated:
-            #     return JsonResponse({'success': False, 'error': 'Authentication required'}, safe=False, status=401)
             # Disallow guest users from updating projects by name (guests don't send authentication tokens)
             if not (hasattr(request, 'user') and request.user.is_authenticated):
                 return error_json_response('guest_not_allowed', 'Guest users cannot update projects', 403, success=False)

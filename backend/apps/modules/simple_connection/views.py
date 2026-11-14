@@ -11,11 +11,9 @@ from rest_framework.response import Response
 from apps.core import catalog
 from apps.core.models import CustomMaterials
 from apps.core.utils.module_helpers import (
-    handle_design_request,
     trigger_async_design,
     trigger_async_report
 )
-from apps.core.api.design.report_customization_api import generate_initial_report_core
 from osdag_core.Common import (
     KEY_DISP_BUTTJOINTBOLTED, KEY_DISP_BUTTJOINTWELDED,
     KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED,

@@ -174,7 +174,7 @@ class CreateDesignReport(APIView):
                 metadata_final[key] = metadata_other[key]
         else:
             if not isinstance(metadata, dict):
-                return Response({"error": "metadata must be an object"}, status=status.HTTP_400_BAD_REQUEST)
+                return error_response('invalid_metadata', "metadata must be an object", status.HTTP_400_BAD_REQUEST)
             metadata_final = metadata
             metadata_final['filename'] = file_path
             profile = metadata_final.get('ProfileSummary')
@@ -324,13 +324,13 @@ class CompanyLogoView(APIView):
     def post(self, request):
         file = request.data.get('file')
         if not file:
-            return Response({'message': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('missing_field', 'No file provided', status.HTTP_400_BAD_REQUEST)
 
         original_ext = os.path.splitext(file.name)[1].lower()
         if original_ext not in COMPANY_LOGO_EXTENSIONS:
-            return Response({'message': 'Logo must be a PNG or JPEG image'}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('invalid_file_type', 'Logo must be a PNG or JPEG image', status.HTTP_400_BAD_REQUEST)
         if file.size > COMPANY_LOGO_MAX_BYTES:
-            return Response({'message': 'Logo must be 2 MB or smaller'}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('file_too_large', 'Logo must be 2 MB or smaller', status.HTTP_400_BAD_REQUEST)
         try:
             from PIL import Image
             with Image.open(file) as img:
@@ -339,7 +339,7 @@ class CompanyLogoView(APIView):
                     raise ValueError(img.format)
             file.seek(0)
         except Exception:
-            return Response({'message': 'Logo is not a valid PNG or JPEG image'}, status=status.HTTP_400_BAD_REQUEST)
+            return error_response('invalid_image', 'Logo is not a valid PNG or JPEG image', status.HTTP_400_BAD_REQUEST)
 
         fileName = uuid.uuid4().hex + original_ext
         logo_dir = _company_logo_dir()
