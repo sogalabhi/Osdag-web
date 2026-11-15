@@ -81,6 +81,34 @@ pip install pre-commit
 pre-commit install
 ```
 
+## Design-input keys
+
+A design-input key such as `Bolt.Diameter` is written once, in `osdag_core/Common.py` (`KEY_D`). Everything else imports the constant; never type the string. Keys the core does not have are `WEB_` constants in `backend/apps/core/web_keys.py`, copied to `frontend/src/constants/generated/webKeys.js` by `scripts/gen_core_keys.py`. Backend: `from osdag_core.Common import KEY_D`. Frontend: `import { KEY_D } from ".../constants/generated/coreKeys"`.
+
+Two guards enforce this. `backend/apps/core/tests/test_no_inline_keys.py` and the `no-restricted-syntax` block in `frontend/eslint.config.js` fail on a key written as a string. Files that have not been converted yet are listed in `NOT_CONVERTED` (backend, with counts) and `KEYS_NOT_CONVERTED` (frontend); when you convert a file, remove it from the list, and never add to the lists.
+
+Two scripts convert files for you and check that the result is the same program (the names are swapped in, the imports are added, nothing else changes):
+
+```bash
+# backend (needs the backend environment; QT_QPA_PLATFORM=offscreen on a machine without a display)
+conda run -n osdag-web python scripts/codemod_keys.py report [paths]
+conda run -n osdag-web python scripts/codemod_keys.py apply backend/apps/modules/tension_member --dry-run   # prints the diff
+conda run -n osdag-web python scripts/codemod_keys.py apply backend/apps/modules/tension_member
+conda run -n osdag-web python scripts/codemod_keys.py verify backend/apps/modules/tension_member --base origin/25april
+
+# frontend (needs frontend/node_modules)
+node scripts/codemod_keys.mjs report [paths]
+node scripts/codemod_keys.mjs apply frontend/src/modules/basePlate --dry-run
+node scripts/codemod_keys.mjs verify frontend/src/modules/basePlate --base origin/25april
+```
+
+`report` counts the key strings per file, `apply` rewrites them (a file that fails a check is left untouched and reported), and `verify` checks a working tree against a git revision. Both refuse purlin and never touch tests, migrations, fixtures, snapshots or generated files. Where a string has several constants, `scripts/codemod_key_choices.json` says which one to use. If a script aborts on a file, do not edit the file by hand to get past it; report the output. Their own tests run with:
+
+```bash
+QT_QPA_PLATFORM=offscreen conda run -n osdag-web python -m pytest scripts/test_codemod_keys.py -q -p no:cacheprovider
+node --test scripts/codemod_keys.test.mjs
+```
+
 ## Commit messages
 
 - Use an imperative subject line: "Add cover plate weld check", not "Added" or "Adds". Keep it under about 72 characters.

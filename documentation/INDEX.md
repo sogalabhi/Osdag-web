@@ -16,6 +16,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **2.1 Django Application Structure (`apps/core` vs `apps/modules`):** Core database models and settings vs individual design module logic.
 * **2.2 Celery & Redis Integration:** Configuration details (`CELERY_BROKER_URL`, queues: `calculations`, `reports`, `celery`), concurrency tuning, task scheduling, and signal handling (`exec` wrappers), and the one design task that calculates once and builds CAD from the same solver (`DESIGN_READY` early message, final result).
 * **2.3 The Adapter Pattern for Osdag Desktop Modules:** How backend adapters bridge Django web requests to the underlying Osdag desktop computational engine, and the input fixtures that test every adapter's `validate_input()`.
+* **2.3b Key Constants:** Design-input keys are `osdag_core.Common` constants imported by name; `web_keys.py` for keys the core lacks, the `test_no_inline_keys.py` guard, and the `codemod_keys.py` converter.
 * **2.4 DB Schema & Models:** Detail `Project`, `Design`, `UserAccount`, and `OsiFile` fields and constraints.
 * **2.5 Asset Storage Lifecycle (CAD Models & Reports):** Filesystem storage structure of generated component geometries (BREP, STL) and PDF reports.
 
@@ -49,7 +50,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **6.5 The Input Dock Form Engine vs. Output Dock Display:** The input field types, and the output dock built from the engine's `output_values` list (`output_layout`, visibility rules, popups, drawing dialogs, the empty dock endpoint, `/api/core-images/`).
 * **6.6 `EngineeringModule` Orchestration Controller:** The core shared frontend shell component managing module rendering, docks, validation states, API submission loops, and 3D CAD canvas integration.
 * **6.7 Module Configurations (`*Config.js`):** Declarative schemas defining field metadata, units, validation criteria, and grouped structures for each connection type. The output dock needs no config file.
-* **6.7.3 Key Constants (`generated/coreKeys.js`, `UIStrings.js`):** Where frontend key strings come from, how to regenerate them, and the CI check that fails on a stale file.
+* **6.7.3 Key Constants (`generated/coreKeys.js`, `generated/webKeys.js`, `UIStrings.js`):** Where frontend key strings come from (`KEY_*`, `DISP_*`, `CONN_*` from the core, `WEB_*` from `web_keys.py`), how to regenerate them, the CI check that fails on a stale file, and the ESLint rule that rejects inline key strings.
 * **6.7.4 Module Registry (`registry.js`):** The single module list that drives routes, menus, API slugs and module lookup, and how to add a module with one entry.
 * **6.8 Shared Display Configurations (`sectionDisplayConfig.js`):** Mapping structural section details to the profile selection cards.
 

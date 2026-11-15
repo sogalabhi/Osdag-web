@@ -175,6 +175,7 @@ function stringifyRawCsvValue(value) {
 export function downloadRawOutputsCsv({
   inputsDict,
   rawCsvData,
+  // eslint-disable-next-line no-restricted-syntax -- file name, not a key
   filename = "Outputs.csv",
 }) {
   const inputEntries = Object.entries(inputsDict || {});
