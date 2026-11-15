@@ -79,8 +79,6 @@ NOT_CONVERTED = {
     "apps/modules/simple_connection/submodules/butt_joint_welded/adapter.py": 35,
     "apps/modules/simple_connection/submodules/lap_joint_bolted/adapter.py": 70,
     "apps/modules/simple_connection/submodules/lap_joint_welded/adapter.py": 34,
-    "apps/modules/tension_member/submodules/bolted/adapter.py": 64,
-    "apps/modules/tension_member/submodules/welded/adapter.py": 53,
 }
 
 # (file, value) -> why the string is not a key
