@@ -100,7 +100,7 @@ A typical `adapter.py` implements the following key interfaces:
 ### 1. `get_required_keys() -> List[str]`
 Defines the required inputs schema. This is used by validation utilities to check incoming payloads.
 
-Every key it returns should be a value of a string constant in `osdag_core/Common.py`; `backend/apps/core/tests/test_required_keys_in_core.py` checks this for all adapters. The few keys that are web request names mapped to core keys inside the adapter (the strut `Member.End_1`/`Member.End_2` and several plate girder inputs) are listed as explicit exceptions in that test. The frontend gets its copy of the core keys from `frontend/src/constants/generated/coreKeys.js`, generated from `Common.py` (see [Chapter 6, section 6.7](./chapter_6_dynamic_ui_form_engine.md)).
+Every key it returns should be a value of a string constant in `osdag_core/Common.py`; `backend/apps/core/tests/test_required_keys_in_core.py` checks this for all adapters. The few keys that are web request names mapped to core keys inside the adapter (the strut `Member.End_1`/`Member.End_2` and several plate girder inputs) are listed as explicit exceptions in that test. The frontend gets its copy of the core keys from `frontend/src/constants/generated/coreKeys.js`, generated from `Common.py` (see [Chapter 6, section 6.7](./chapter_6_dynamic_ui_form_engine.md)). See [2.3b Key constants](#23b-key-constants) for how adapters write keys.
 
 ### 2. `validate_input(input_values: Dict[str, Any]) -> None`
 Checks the existence and types of incoming values, raising `MissingKeyError` or `InvalidInputTypeError` on mismatch.
@@ -145,6 +145,21 @@ Views should raise or return through these helpers instead of building `{'error'
 **Not covered.** Celery task results (`{'success': False, 'error': msg}`, delivered over the task WebSocket or `GET /api/tasks/<id>/`) are a separate channel with their own shape and are unchanged. Input errors found while a task runs are reported through that channel, not in the HTTP response.
 
 ---
+
+## 2.3b Key Constants
+
+A design-input key such as `Bolt.Diameter` is defined once, as a string constant in `osdag_core/Common.py` (`KEY_D`). Adapters and the other backend modules import the constant instead of typing the string:
+
+```python
+from osdag_core.Common import KEY_D, KEY_GRD
+
+bolt_diameter = input_values[KEY_D]
+```
+
+* **Core keys.** Constants named `KEY_*`, `DISP_*` and `CONN_*` in `Common.py`. Some strings have several names (`Bolt.Diameter` is `KEY_D` and `KEY_OUT_D_PROVIDED`); use the one that names the same thing. `Common.py` also assigns a few names twice, so always read the value from the imported module, never from the file text.
+* **Web keys.** A key the core does not have (request names the web layer defines, and output keys that only the web uses) goes in `backend/apps/core/web_keys.py` as a `WEB_<NAME>` constant, grouped by module family. The file imports nothing. `scripts/gen_core_keys.py` copies it to `frontend/src/constants/generated/webKeys.js`, so both sides use the same names. `backend/apps/core/tests/test_no_inline_keys.py` fails if a `WEB_` value equals a `Common.py` value, if two names share a value, or if a name does not match `WEB_[A-Z0-9_]+`.
+* **The guard.** `test_no_inline_keys.py` reads every module under `apps/modules` and `apps/core` and fails when a dotted key (a string matching `^[A-Z][A-Za-z0-9_]*( [A-Z][A-Za-z0-9_]*)?(\.[A-Za-z0-9_]+)+$`) or one of the undotted keys (`Module`, `Material`, `Connectivity`, `Conn_Location`, `End_1`, `End_2`, `End_1_Y`, `End_2_Y`, `PlateWidth`, `Plate1Thickness`, `Plate2Thickness`, `EndPlateType`, `End Condition`, `" Out_of_Plane"`, `" In_Plane"`) in a key position is written as a string. Docstrings, the literal parts of f-strings and annotations are not checked, and purlin is skipped. Files that have not been converted yet are listed in `NOT_CONVERTED` with their remaining counts; a count may only go down, and the test fails when a listed file reaches zero so the entry gets removed. `ALLOWED` holds reviewed strings that only look like keys.
+* **Converting a file.** `scripts/codemod_keys.py` rewrites the strings in a file or directory and checks that the result is the same program: `python scripts/codemod_keys.py report [paths]` counts what is left, `apply paths [--dry-run]` rewrites (with `--dry-run` it prints the diff), and `verify paths --base <rev>` checks a working tree against a git revision. Run it with `QT_QPA_PLATFORM=offscreen conda run -n osdag-web python`. See [CONTRIBUTING.md](../CONTRIBUTING.md#design-input-keys) for the workflow.
 
 ## 2.4 Database Schema & Models
 

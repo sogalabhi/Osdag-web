@@ -281,6 +281,8 @@ The adapter handles:
 - CAD model generation
 - Integration with osdag_core design engines
 
+Write every design-input key as the constant from `osdag_core.Common` (`KEY_D`, not `"Bolt.Diameter"`). Some strings have more than one constant (`Bolt.Diameter` is both `KEY_D` and `KEY_OUT_D_PROVIDED`); pick the one that names the same thing. A key the core does not have goes in `backend/apps/core/web_keys.py` as a `WEB_` constant. `backend/apps/core/tests/test_no_inline_keys.py` fails when a key is written as a string. The JSON request and response bodies below show the wire format, which is the constants' string values.
+
 ```python
 """
 API adapter for NewConnection module
@@ -311,6 +313,7 @@ from apps.core.utils import (
     MissingKeyError, InvalidInputTypeError,
     contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type
 )
+from osdag_core.Common import KEY_MODULE, KEY_SEC_PROFILE, KEY_SECSIZE
 from osdag_core.design_type.connection.new_connection import NewConnection
 from osdag_core.custom_logger import CustomLogger
 from typing import Dict, Any, List, Tuple
@@ -323,10 +326,10 @@ def get_required_keys() -> List[str]:
     These keys must be present in the input dictionary.
     """
     return [
-        "Member.Profile",
-        "Member.Designation",
+        KEY_SEC_PROFILE,
+        KEY_SECSIZE,
         # ... add all required keys
-        "Module"
+        KEY_MODULE,
     ]
 
 
@@ -343,8 +346,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
         raise MissingKeyError(f"Missing required keys: {missing}")
     
     # Validate data types
-    # Example: validate_num(input_values.get("Bolt.Pitch"), "Bolt.Pitch")
-    # Example: validate_string(input_values.get("Member.Profile"), "Member.Profile")
+    # Example: validate_string(input_values.get(KEY_SEC_PROFILE), KEY_SEC_PROFILE)
     
     # Add your specific validation logic here
     pass
@@ -369,8 +371,8 @@ def create_from_input(input_values: Dict[str, Any]) -> NewConnection:
     # Map input_values to the format expected by osdag_core
     # Example:
     # module.set_input_values({
-    #     "Member.Profile": input_values.get("Member.Profile"),
-    #     "Member.Designation": input_values.get("Member.Designation"),
+    #     KEY_SEC_PROFILE: input_values.get(KEY_SEC_PROFILE),
+    #     KEY_SECSIZE: input_values.get(KEY_SECSIZE),
     #     # ... map all inputs
     # })
     

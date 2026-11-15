@@ -234,21 +234,24 @@ Each engineering module defines its input form declaratively:
 ### 2. The output dock has no config file
 A module has only its `*Config.js`. Its output dock comes from the engine's output list (see 6.5.2), so there is no `*OutputConfig.js`.
 
-### 3. Key Constants (`generated/coreKeys.js` and `UIStrings.js`)
-The frontend takes key strings from exactly two files under `frontend/src/constants/`:
+### 3. Key Constants (`generated/coreKeys.js`, `generated/webKeys.js` and `UIStrings.js`)
+The frontend takes key strings from three files under `frontend/src/constants/`:
 
-* **[generated/coreKeys.js](../frontend/src/constants/generated/coreKeys.js):** One `export const NAME = "value";` for every string constant named `KEY_*` or `DISP_*` in `osdag_core/Common.py`, sorted by name. Configs import from here instead of typing a key such as `"Bolt.Diameter"` by hand. The values are exactly the core's, including the trailing `*` that many core display labels carry; `stripRequiredMark()` in `validation.js` removes it and the renderer adds the required marker from `field.required`. Never change a key's string: it is sent to the backend and stored in `.osi` files and saved projects.
+* **[generated/coreKeys.js](../frontend/src/constants/generated/coreKeys.js):** One `export const NAME = "value";` for every string constant named `KEY_*`, `DISP_*` or `CONN_*` in `osdag_core/Common.py`, sorted by name (`CONN_*` are the connectivity names such as `CONN_CFBW`). Configs import from here instead of typing a key such as `"Bolt.Diameter"` by hand. The values are exactly the core's, including the trailing `*` that many core display labels carry; `stripRequiredMark()` in `validation.js` removes it and the renderer adds the required marker from `field.required`. Never change a key's string: it is sent to the backend and stored in `.osi` files and saved projects.
+* **[generated/webKeys.js](../frontend/src/constants/generated/webKeys.js):** The same for the `WEB_*` constants in `backend/apps/core/web_keys.py`: keys the web layer defines because `Common.py` has none. It holds only its header comment while that file defines nothing.
 * **[UIStrings.js](../frontend/src/constants/UIStrings.js):** Labels that exist only in the UI (section titles, buttons, reworded field labels). A UI label that should differ from the core's display string is added here under its own name rather than redefining a core constant.
 
 A module's id is also a `Common.py` constant: its desktop module name (for example `KEY_DISP_FINPLATE`, `'Fin Plate Connection'`). See the module registry below.
 
-**Do not edit `coreKeys.js` by hand.** After `Common.py` changes, regenerate it from the repository root:
+**Do not edit `coreKeys.js` or `webKeys.js` by hand.** After `Common.py` or `web_keys.py` changes, regenerate them from the repository root:
 
 ```bash
 python scripts/gen_core_keys.py
 ```
 
-The script imports `osdag_core.Common`, so run it in the backend environment (set `QT_QPA_PLATFORM=offscreen` on a machine without a display; the script does this by default). The `backend-qa` CI job runs the generator and then `git diff --exit-code frontend/src/constants/generated/`, so a stale file fails the build.
+The script imports `osdag_core.Common` and `apps.core.web_keys`, so run it in the backend environment (set `QT_QPA_PLATFORM=offscreen` on a machine without a display; the script does this by default). The `backend-qa` CI job runs the generator and then `git diff --exit-code frontend/src/constants/generated/`, so a stale file fails the build.
+
+**The lint rule.** `frontend/eslint.config.js` has a `no-restricted-syntax` block for `src/**/*.{js,jsx}` that reports a string literal (or a template literal without expressions) matching the dotted-key pattern `^[A-Z][A-Za-z0-9_]*( [A-Z][A-Za-z0-9_]*)?(\.[A-Za-z0-9_]+)+$`, and the undotted keys `Module`, `Material`, `Connectivity`, `Conn_Location`, `End_1`, `End_2`, `End_1_Y`, `End_2_Y`, `EndPlateType`, `PlateWidth`, `Plate1Thickness`, `Plate2Thickness` when they are an object key or `obj["..."]`. Import the constant instead. The rule does not apply to `src/constants/generated`, tests and purlin. Files that still hold inline keys are listed in `KEYS_NOT_CONVERTED` in the same file; remove a file from the list when it is converted. A string that only looks like a key is silenced with `// eslint-disable-next-line no-restricted-syntax -- <why>` (the `"Outputs.csv"` file name in `groupedCsvExport.js` is the one case today).
 
 ### 4. Module Registry (`registry.js`)
 [registry.js](../frontend/src/modules/registry.js) holds one entry per design module in the `MODULES` array. The router in [App.jsx](../frontend/src/App.jsx), the module selection menu, the API slugs and the design-preference data all read from it, so a module is described in one place.

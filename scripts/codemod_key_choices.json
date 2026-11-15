@@ -1,0 +1,48 @@
+{
+  "undotted": [
+    "Module",
+    "Material",
+    "Connectivity",
+    "Conn_Location",
+    "End_1",
+    "End_2",
+    "End_1_Y",
+    "End_2_Y",
+    "PlateWidth",
+    "Plate1Thickness",
+    "Plate2Thickness",
+    "EndPlateType",
+    "End Condition",
+    " Out_of_Plane",
+    " In_Plane"
+  ],
+  "ambiguous": {
+    "Bolt.Diameter": {
+      "rules": [
+        { "path": "backend/apps/core/utils/output_dialogs.py", "name": "KEY_OUT_D_PROVIDED" },
+        { "function": "^map_tuple_list$", "name": "KEY_OUT_D_PROVIDED" }
+      ],
+      "default": "KEY_D"
+    },
+    "Weld.Type": {
+      "rules": [
+        { "function": "^(map_tuple_list|generate_output)$", "name": "KEY_OUT_WELD_TYPE" },
+        { "path": "backend/apps/modules/simple_connection/**", "name": "KEY_DP_WELD_TYPE" }
+      ],
+      "default": "KEY_WELD_TYPE"
+    },
+    "Weld.Size": {
+      "rules": [
+        { "path": "backend/apps/core/utils/output_dialogs.py", "name": "KEY_OUT_WELD_SIZE" },
+        { "function": "^(generate_output|map_tuple_list)$", "name": "KEY_OUT_WELD_SIZE" }
+      ],
+      "default": "KEY_WELD_SIZE"
+    },
+    "Plate.Thickness": { "rules": [], "default": "KEY_OUT_PLATETHK" },
+    "Stiffener.Height": { "rules": [], "default": "KEY_OUT_STIFFENER_HEIGHT" },
+    "Stiffener.Thickness": { "rules": [], "default": "KEY_OUT_STIFFENER_THICKNESS" },
+    "Plate.Height": { "rules": [], "default": "KEY_OUT_PLATE_HEIGHT" },
+    "ColumnEndPlate.p2_flange": { "rules": [], "default": "KEY_PITCH_2_FLANGE1" },
+    "Material": { "rules": [], "default": "KEY_MATERIAL" }
+  }
+}
