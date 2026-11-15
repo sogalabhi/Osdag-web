@@ -11,9 +11,9 @@ Produced by an Opus planning pass that re-ran the audit. Counts below replace th
 | D4 | Named imports (`KEY_D`), not `Common.KEY_D` | assumed |
 | D5 | Codemods are committed during the migration and deleted in the last phase | assumed |
 | D7 | Undotted keys (`Module`, `Material`, `End_1`, …) are in scope, from a curated list only | assumed |
-| D1 | Plate girder `Design.*`, base plate `Anchor.*` and cantilever `Flexure.*` web aliases become core keys | **ask before Phase 3** |
-| D2 | Delete the `.osi` spelling variants (also fixes the export, see Findings) | **ask before Phase 3** |
-| D6 | `sync_merge.py:60` maps to `Design.Design_For`; the core key is `Design.For`. Separate small PR after a browser check | **ask later** |
+| D1 | Plate girder `Design.*`, base plate `Anchor.*` and cantilever `Flexure.*` web aliases become core keys | approved 2026-11-15 |
+| D2 | Delete the `.osi` spelling variants (also fixes the export, see Findings) | approved 2026-11-15 |
+| D6 | `sync_merge.py:60` maps to `Design.Design_For`; the core key is `Design.For`. Separate small PR after a browser check | approved 2026-11-15 |
 
 ## Phases
 | Phase | Work | PRs | Behaviour change | Run by | Checkpoint for the user |
