@@ -1,4 +1,17 @@
 import { getModuleKeyMap } from "./osiMapperTracer";
+import {
+  KEY_CONN,
+  KEY_CONNECTOR_MATERIAL,
+  KEY_END1,
+  KEY_END1_Y,
+  KEY_END2,
+  KEY_END2_Y,
+  KEY_SECSIZE,
+  KEY_SECTION_PROFILE,
+  KEY_SEC_PROFILE,
+  KEY_SUPTDSEC,
+  KEY_SUPTNGSEC,
+} from "../../../constants/generated/coreKeys";
 
 // Keys the desktop writes for its own output panel and widgets; they carry no design input.
 const DESKTOP_UI_STATE_KEY = /^(out_titles_status|Label_\d+)$/;
@@ -6,7 +19,7 @@ const DESKTOP_UI_STATE_KEY = /^(out_titles_status|Label_\d+)$/;
 // The desktop stores the overall material, the connector material and each member's
 // material under separate keys; a web form often has one field for several of them. When
 // keys share a field, the more specific key is read last and wins.
-const keyPriority = (key) => (key === "Material" ? 0 : key === "Connector.Material" ? 1 : 2);
+const keyPriority = (key) => (key === "Material" ? 0 : key === KEY_CONNECTOR_MATERIAL ? 1 : 2);
 
 /**
  * Normalizes flat OSI key-value dictionary into nested JSON format
@@ -64,20 +77,20 @@ export function normalizeOsiPayload(flatObj, moduleConfig = null) {
   });
 
   // Handle Connectivity wildcard mapping
-  const connectivity = flatObj["Connectivity *"] || flatObj["Connectivity"];
+  const connectivity = flatObj["Connectivity *"] || flatObj[KEY_CONN];
   if (connectivity) {
     dock.connectivity = String(connectivity).trim();
   }
 
   // Handle common designation sectional aliases
-  const supportingDesc = flatObj["Member.Supporting_Section.Designation"] || flatObj["Supporting_Section.Designation"];
+  const supportingDesc = flatObj[KEY_SUPTNGSEC];
   if (supportingDesc) {
     dock.supporting_designation = supportingDesc;
     dock.column_section = supportingDesc;
     dock.member_designation = supportingDesc;
   }
 
-  const supportedDesc = flatObj["Member.Supported_Section.Designation"] || flatObj["Supported_Section.Designation"];
+  const supportedDesc = flatObj[KEY_SUPTDSEC];
   if (supportedDesc) {
     dock.supported_designation = supportedDesc;
     dock.beam_section = supportedDesc;
@@ -87,7 +100,7 @@ export function normalizeOsiPayload(flatObj, moduleConfig = null) {
   }
 
   // Baseline fallbacks if designation is mapped directly to Designation
-  const directDesc = flatObj["Member.Designation"] || flatObj["Designation"];
+  const directDesc = flatObj[KEY_SECSIZE] || flatObj["Designation"];
   if (directDesc) {
     dock.member_designation = directDesc;
   }
@@ -114,16 +127,16 @@ export function normalizeOsiPayload(flatObj, moduleConfig = null) {
     if (!dock.axial_force) dock.axial_force = dock.load_axial;
   }
 
-  const e1 = flatObj["End_1"];
+  const e1 = flatObj[KEY_END1];
   if (e1) dock.end_condition_1 = String(e1).trim();
-  const e2 = flatObj["End_2"];
+  const e2 = flatObj[KEY_END2];
   if (e2) dock.end_condition_2 = String(e2).trim();
-  const e1y = flatObj["End_1_Y"];
+  const e1y = flatObj[KEY_END1_Y];
   if (e1y) dock.end_condition_1_y = String(e1y).trim();
-  const e2y = flatObj["End_2_Y"];
+  const e2y = flatObj[KEY_END2_Y];
   if (e2y) dock.end_condition_2_y = String(e2y).trim();
 
-  const memberProfile = flatObj["Member.Profile"] || flatObj["Section Profile"] || flatObj["Section.Profile"];
+  const memberProfile = flatObj[KEY_SEC_PROFILE] || flatObj["Section Profile"] || flatObj[KEY_SECTION_PROFILE];
   if (memberProfile) {
     dock.section_profile = String(memberProfile).trim();
   }

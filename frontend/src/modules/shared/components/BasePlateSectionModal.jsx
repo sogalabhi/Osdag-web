@@ -2,6 +2,7 @@ import { useContext, useState, useEffect, useMemo } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
 import CustomMaterialModal from "./CustomMaterialModal";
+import { KEY_BASE_PLATE_MATERIAL } from "../../../constants/generated/coreKeys";
 
 const { Option } = Select;
 
@@ -38,7 +39,7 @@ const BasePlateSectionModal = ({
     }
   }, [suppressInitialMaterialDispatch, designPrefInputs.supporting_material, materials, manageDesignPreferences]);
 
-  const selectedMaterialGrade = designPrefInputs["Base_Plate.Material"] || designPrefInputs.supporting_material || "";
+  const selectedMaterialGrade = designPrefInputs[KEY_BASE_PLATE_MATERIAL] || designPrefInputs.supporting_material || "";
   const selectedMaterialDetails = materials.find((item) => item.Grade === selectedMaterialGrade) || (supporting_material_details && supporting_material_details[0]);
 
   return (
@@ -65,7 +66,7 @@ const BasePlateSectionModal = ({
                     if (!material) return;
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "Base_Plate.Material": material.Grade,
+                      [KEY_BASE_PLATE_MATERIAL]: material.Grade,
                     });
                   }}
                 >
@@ -132,14 +133,14 @@ const BasePlateSectionModal = ({
               const updated = newValues(prev);
               return {
                 ...updated,
-                "Base_Plate.Material": updated.supporting_material,
+                [KEY_BASE_PLATE_MATERIAL]: updated.supporting_material,
               };
             });
           } else {
             setDesignPrefInputs({
               ...designPrefInputs,
               ...newValues,
-              "Base_Plate.Material": newValues.supporting_material,
+              [KEY_BASE_PLATE_MATERIAL]: newValues.supporting_material,
             });
           }
         }}

@@ -18,6 +18,13 @@ import {
   fetchDesignPrefDefaults,
   fetchDesignPrefSync,
 } from "../../../datasources/modulesDataSource";
+import {
+  KEY_DP_DESIGN_METHOD,
+  KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+  KEY_DP_DETAILING_EDGE_TYPE,
+  KEY_DP_WELD_FAB,
+  KEY_DP_WELD_MATERIAL_G_O,
+} from "../../../constants/generated/coreKeys";
 
 const DesignPrefSections = ({
   module,
@@ -320,11 +327,11 @@ const DesignPrefSections = ({
   const saveCoreInputs = async () => {
     const draft = { ...designPrefInputs };
     if (module === "Base Plate") {
-      draft["Weld.Fab"] = draft.weld_fab;
-      draft["Weld.Material_Grade_OverWrite"] = draft.weld_material_grade;
-      draft["Detailing.Edge_type"] = draft.detailing_edge_type;
-      draft["Detailing.Corrosive_Influences"] = draft.detailing_corr_status;
-      draft["Design.Design_Method"] = draft.design_method;
+      draft[KEY_DP_WELD_FAB] = draft.weld_fab;
+      draft[KEY_DP_WELD_MATERIAL_G_O] = draft.weld_material_grade;
+      draft[KEY_DP_DETAILING_EDGE_TYPE] = draft.detailing_edge_type;
+      draft[KEY_DP_DETAILING_CORROSIVE_INFLUENCES] = draft.detailing_corr_status;
+      draft[KEY_DP_DESIGN_METHOD] = draft.design_method;
     }
 
     for (const [key, value] of Object.entries(draft)) {

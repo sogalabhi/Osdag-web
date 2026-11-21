@@ -13,17 +13,7 @@ const KEY_MESSAGE =
   'Import design-input keys from src/constants/generated/coreKeys.js (or webKeys.js) instead of writing the string.'
 
 // Files that still hold inline keys. Remove a file from this list when it is converted.
-const KEYS_NOT_CONVERTED = [
-  'src/modules/registry.js',
-  'src/modules/shared/components/AnchorBoltSectionModal.jsx',
-  'src/modules/shared/components/BasePlateSectionModal.jsx',
-  'src/modules/shared/components/DesignPrefSections.jsx',
-  'src/modules/shared/components/DesignReportModal.jsx',
-  'src/modules/shared/components/StiffenerSectionModal.jsx',
-  'src/modules/shared/config/designPrefModuleConfig.js',
-  'src/modules/shared/utils/osiMapperTracer.js',
-  'src/modules/shared/utils/osiNormalizer.js',
-]
+const KEYS_NOT_CONVERTED = []
 
 export default defineConfig([
   globalIgnores(['dist']),
