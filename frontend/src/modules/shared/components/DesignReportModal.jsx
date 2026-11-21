@@ -167,9 +167,8 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
       // Dynamically ensure array parameters expected by backend adapters are lists of strings
       const LIST_TYPED_KEYS = new Set([
         'Bolt.Diameter', 'Bolt.Grade',
-        'Anchor.Diameter', 'Anchor.Grade',
-        'Anchor.Diameter.ICF', 'Anchor.Diameter.OCF',
-        'Anchor.Grade.ICF', 'Anchor.Grade.OCF',
+        'Anchor Bolt.OCF.Diameter', 'Anchor Bolt.OCF.Grade',
+        'Anchor Bolt.ICF.Diameter', 'Anchor Bolt.ICF.Grade',
       ]);
       if (transformedInputValues) {
         transformedInputValues = { ...transformedInputValues };

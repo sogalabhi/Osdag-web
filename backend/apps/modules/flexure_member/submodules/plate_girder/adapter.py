@@ -53,19 +53,19 @@ def get_required_keys() -> List[str]:
         "Web.Thickness",                    # KEY_WEB_THICKNESS_PG (list)
         "TopFlange.Thickness",               # KEY_TOP_FLANGE_THICKNESS_PG (list)
         "BottomFlange.Thickness",           # KEY_BOTTOM_FLANGE_THICKNESS_PG (list)
-        "Design.Design_Type_Flexure",        # KEY_DESIGN_TYPE_FLEXURE
-        "Loading.Bending_Moment_Shape",      # KEY_BENDING_MOMENT_SHAPE
-        "Design.Torsional_Restraint",       # KEY_TORSIONAL_RES
-        "Design.Warping_Restraint",         # KEY_WARPING_RES
-        "Design.Max_Deflection",            # KEY_MAX_DEFL
-        "Design.Allow_Class",               # KEY_ALLOW_CLASS
-        "Design.Web_Philosophy",            # KEY_WEB_PHILOSOPHY
-        "Design.Support_Width",              # KEY_SUPPORT_WIDTH
-        "Design.IntermediateStiffener",      # KEY_IntermediateStiffener
-        "Design.IntermediateStiffener.Spacing",  # KEY_IntermediateStiffener_spacing
-        "Design.IntermediateStiffener.Thickness", # KEY_IntermediateStiffener_thickness
-        "Design.LongitudnalStiffener",      # KEY_LongitudnalStiffener
-        "Design.LongitudnalStiffener.Thickness", # KEY_LongitudnalStiffener_thickness
+        KEY_DESIGN_TYPE_FLEXURE,
+        KEY_BENDING_MOMENT_SHAPE,
+        KEY_TORSIONAL_RES,
+        KEY_WARPING_RES,
+        KEY_MAX_DEFL,
+        KEY_ALLOW_CLASS,
+        KEY_WEB_PHILOSOPHY,
+        KEY_SUPPORT_WIDTH,
+        KEY_IntermediateStiffener,
+        KEY_IntermediateStiffener_spacing,
+        KEY_IntermediateStiffener_thickness,
+        KEY_LongitudnalStiffener,
+        KEY_LongitudnalStiffener_thickness,
     ]
 
 
@@ -87,19 +87,19 @@ def get_optimization_required_keys() -> List[str]:
         "Web.Thickness",  # List of available thicknesses for discrete snapping
         "TopFlange.Thickness",  # List of available thicknesses
         "BottomFlange.Thickness",  # List of available thicknesses
-        "Design.Design_Type_Flexure",
-        "Loading.Bending_Moment_Shape",
-        "Design.Torsional_Restraint",
-        "Design.Warping_Restraint",
-        "Design.Max_Deflection",
-        "Design.Allow_Class",
-        "Design.Web_Philosophy",  # Used to determine is_thick_web
-        "Design.Support_Width",
-        "Design.IntermediateStiffener",
-        "Design.IntermediateStiffener.Spacing",
-        "Design.IntermediateStiffener.Thickness",
-        "Design.LongitudnalStiffener",
-        "Design.LongitudnalStiffener.Thickness",
+        KEY_DESIGN_TYPE_FLEXURE,
+        KEY_BENDING_MOMENT_SHAPE,
+        KEY_TORSIONAL_RES,
+        KEY_WARPING_RES,
+        KEY_MAX_DEFL,
+        KEY_ALLOW_CLASS,
+        KEY_WEB_PHILOSOPHY,  # Used to determine is_thick_web
+        KEY_SUPPORT_WIDTH,
+        KEY_IntermediateStiffener,
+        KEY_IntermediateStiffener_spacing,
+        KEY_IntermediateStiffener_thickness,
+        KEY_LongitudnalStiffener,
+        KEY_LongitudnalStiffener_thickness,
         # Optional but recommended:
         # "Symmetry",  # Used to determine is_symmetric (defaults to "Symmetrical")
     ]
@@ -118,17 +118,17 @@ def validate_input(input_values: Dict[str, Any]) -> None:
         "Material",
         "Loading.Condition",
         "Total.Design_Type",
-        "Design.Design_Type_Flexure",
-        "Loading.Bending_Moment_Shape",
-        "Design.Torsional_Restraint",
-        "Design.Warping_Restraint",
-        "Design.Max_Deflection",
-        "Design.Allow_Class",
-        "Design.Web_Philosophy",
-        "Design.IntermediateStiffener",
-        "Design.IntermediateStiffener.Thickness",
-        "Design.LongitudnalStiffener",
-        "Design.LongitudnalStiffener.Thickness",
+        KEY_DESIGN_TYPE_FLEXURE,
+        KEY_BENDING_MOMENT_SHAPE,
+        KEY_TORSIONAL_RES,
+        KEY_WARPING_RES,
+        KEY_MAX_DEFL,
+        KEY_ALLOW_CLASS,
+        KEY_WEB_PHILOSOPHY,
+        KEY_IntermediateStiffener,
+        KEY_IntermediateStiffener_thickness,
+        KEY_LongitudnalStiffener,
+        KEY_LongitudnalStiffener_thickness,
     ]
     for key in str_keys:
         if not isinstance(input_values.get(key), str):
@@ -140,7 +140,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
         "Member.Length",
         "Load.Shear",
         "Load.Moment",
-        "Design.Support_Width",
+        KEY_SUPPORT_WIDTH,
     ]
     for key in num_keys_required:
         if not isinstance(input_values.get(key), str) or not float_able(input_values.get(key)):
@@ -148,7 +148,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     
     # Optional numeric keys that can be "NA"
     num_keys_optional = [
-        "Design.IntermediateStiffener.Spacing",
+        KEY_IntermediateStiffener_spacing,
     ]
     for key in num_keys_optional:
         value = input_values.get(key)
@@ -231,27 +231,27 @@ def create_from_input(input_values: Dict[str, Any]):
         KEY_WEB_THICKNESS_PG: _thickness_val('Web.Thickness'),
         KEY_TOP_FLANGE_THICKNESS_PG: _thickness_val('TopFlange.Thickness'),
         KEY_BOTTOM_FLANGE_THICKNESS_PG: _thickness_val('BottomFlange.Thickness'),
-        KEY_DESIGN_TYPE_FLEXURE: input_values.get('Design.Design_Type_Flexure', 'Major Laterally Supported'),
-        KEY_BENDING_MOMENT_SHAPE: input_values.get('Loading.Bending_Moment_Shape', ''),
-        KEY_TORSIONAL_RES: input_values.get('Design.Torsional_Restraint', 'No'),
-        KEY_WARPING_RES: input_values.get('Design.Warping_Restraint', 'Warping not restrained in both flanges'),
-        KEY_MAX_DEFL: input_values.get('Design.Max_Deflection', 'L/250'),
-        KEY_ALLOW_CLASS: input_values.get('Design.Allow_Class', 'Plastic'),
-        KEY_WEB_PHILOSOPHY: input_values.get('Design.Web_Philosophy', 'Thick Web'),
-        KEY_SUPPORT_WIDTH: input_values.get('Design.Support_Width', '100'),
-        KEY_IntermediateStiffener: input_values.get('Design.IntermediateStiffener', 'No'),
-        KEY_IntermediateStiffener_spacing: input_values.get('Design.IntermediateStiffener.Spacing', ''),
-        KEY_IntermediateStiffener_thickness: input_values.get('Design.IntermediateStiffener.Thickness', 'Standard'),
-        KEY_LongitudnalStiffener: input_values.get('Design.LongitudnalStiffener', 'No'),
-        KEY_LongitudnalStiffener_thickness: input_values.get('Design.LongitudnalStiffener.Thickness', 'Standard'),
+        KEY_DESIGN_TYPE_FLEXURE: input_values.get(KEY_DESIGN_TYPE_FLEXURE, 'Major Laterally Supported'),
+        KEY_BENDING_MOMENT_SHAPE: input_values.get(KEY_BENDING_MOMENT_SHAPE, ''),
+        KEY_TORSIONAL_RES: input_values.get(KEY_TORSIONAL_RES, 'No'),
+        KEY_WARPING_RES: input_values.get(KEY_WARPING_RES, 'Warping not restrained in both flanges'),
+        KEY_MAX_DEFL: input_values.get(KEY_MAX_DEFL, 'L/250'),
+        KEY_ALLOW_CLASS: input_values.get(KEY_ALLOW_CLASS, 'Plastic'),
+        KEY_WEB_PHILOSOPHY: input_values.get(KEY_WEB_PHILOSOPHY, 'Thick Web'),
+        KEY_SUPPORT_WIDTH: input_values.get(KEY_SUPPORT_WIDTH, '100'),
+        KEY_IntermediateStiffener: input_values.get(KEY_IntermediateStiffener, 'No'),
+        KEY_IntermediateStiffener_spacing: input_values.get(KEY_IntermediateStiffener_spacing, ''),
+        KEY_IntermediateStiffener_thickness: input_values.get(KEY_IntermediateStiffener_thickness, 'Standard'),
+        KEY_LongitudnalStiffener: input_values.get(KEY_LongitudnalStiffener, 'No'),
+        KEY_LongitudnalStiffener_thickness: input_values.get(KEY_LongitudnalStiffener_thickness, 'Standard'),
         # Additional design parameters
         KEY_DESIGN_LOAD: input_values.get('Design.Load', 'Live load'),
         KEY_MEMBER_OPTIONS: input_values.get('Member.Options', 'Simple Span'),
         KEY_SUPPORTING_OPTIONS: input_values.get('Supporting.Options', 'NA'),
-        KEY_ShearBucklingOption: input_values.get('Design.ShearBucklingOption', 'Simple Post Critical'),
+        KEY_ShearBucklingOption: input_values.get(KEY_ShearBucklingOption, 'Simple Post Critical'),
         KEY_DP_DESIGN_METHOD: input_values.get('Design.Design_Method', 'Limit State Design'),
-        KEY_EFFECTIVE_AREA_PARA: input_values.get('Design.Effective_Area_Parameter', '1.0'),
-        KEY_LENGTH_OVERWRITE: input_values.get('Design.Length_Overwrite', 'NA'),
+        KEY_EFFECTIVE_AREA_PARA: input_values.get(KEY_EFFECTIVE_AREA_PARA, '1.0'),
+        KEY_LENGTH_OVERWRITE: input_values.get(KEY_LENGTH_OVERWRITE, 'NA'),
     }
     
     # Handle symmetry (for both Customized and Optimized design types)
@@ -329,8 +329,8 @@ def generate_output(input_values: Dict[str, Any]):
         raw_csv = build_raw_output_dict(raw_output, design_status)
 
         # Get design preferences for conditional outputs
-        web_philosophy = input_values.get('Design.Web_Philosophy', 'Thick Web without ITS')
-        support_type = input_values.get('Design.Design_Type_Flexure', 'Major Laterally Supported')
+        web_philosophy = input_values.get(KEY_WEB_PHILOSOPHY, 'Thick Web without ITS')
+        support_type = input_values.get(KEY_DESIGN_TYPE_FLEXURE, 'Major Laterally Supported')
         is_thick_web = 'Thick Web' in web_philosophy
         is_laterally_supported = 'Laterally Supported' in support_type
         
@@ -405,8 +405,6 @@ def get_optimization_bounds(input_values: Dict[str, Any]) -> Dict[str, tuple]:
         'Total.Depth': 'D',
         'Topflange.Width': 'bf_top',
         'Bottomflange.Width': 'bf_bot',
-        'TopFlange.Width': 'bf_top',  # Alternative naming
-        'BottomFlange.Width': 'bf_bot',  # Alternative naming
     }
     
     for frontend_key, backend_var in variable_mapping.items():
@@ -471,27 +469,27 @@ def create_optimization_input(input_values: Dict[str, Any]) -> Dict[str, Any]:
         KEY_WEB_THICKNESS_PG: optimization_input.get('Web.Thickness', ['6', '8', '10', '12', '16', '20', '25', '32', '40']),
         KEY_TOP_FLANGE_THICKNESS_PG: optimization_input.get('TopFlange.Thickness', ['6', '8', '10', '12', '16', '20', '25', '32', '40']),
         KEY_BOTTOM_FLANGE_THICKNESS_PG: optimization_input.get('BottomFlange.Thickness', ['6', '8', '10', '12', '16', '20', '25', '32', '40']),
-        KEY_DESIGN_TYPE_FLEXURE: optimization_input.get('Design.Design_Type_Flexure', 'Major Laterally Supported'),
-        KEY_BENDING_MOMENT_SHAPE: optimization_input.get('Loading.Bending_Moment_Shape', 'Uniform Loading with pinned-pinned support'),
-        KEY_TORSIONAL_RES: optimization_input.get('Design.Torsional_Restraint', 'Fully Restrained'),
-        KEY_WARPING_RES: optimization_input.get('Design.Warping_Restraint', 'Both flanges fully restrained'),
-        KEY_MAX_DEFL: optimization_input.get('Design.Max_Deflection', 'L/250'),
-        KEY_ALLOW_CLASS: optimization_input.get('Design.Allow_Class', 'Plastic'),
-        KEY_WEB_PHILOSOPHY: optimization_input.get('Design.Web_Philosophy', 'Thick Web without ITS'),
-        KEY_SUPPORT_WIDTH: optimization_input.get('Design.Support_Width', '100'),
-        KEY_IntermediateStiffener: optimization_input.get('Design.IntermediateStiffener', 'No'),
-        KEY_IntermediateStiffener_spacing: optimization_input.get('Design.IntermediateStiffener.Spacing', 'NA'),
-        KEY_IntermediateStiffener_thickness: optimization_input.get('Design.IntermediateStiffener.Thickness', 'Standard'),
-        KEY_LongitudnalStiffener: optimization_input.get('Design.LongitudnalStiffener', 'No'),
-        KEY_LongitudnalStiffener_thickness: optimization_input.get('Design.LongitudnalStiffener.Thickness', 'Standard'),
+        KEY_DESIGN_TYPE_FLEXURE: optimization_input.get(KEY_DESIGN_TYPE_FLEXURE, 'Major Laterally Supported'),
+        KEY_BENDING_MOMENT_SHAPE: optimization_input.get(KEY_BENDING_MOMENT_SHAPE, 'Uniform Loading with pinned-pinned support'),
+        KEY_TORSIONAL_RES: optimization_input.get(KEY_TORSIONAL_RES, 'Fully Restrained'),
+        KEY_WARPING_RES: optimization_input.get(KEY_WARPING_RES, 'Both flanges fully restrained'),
+        KEY_MAX_DEFL: optimization_input.get(KEY_MAX_DEFL, 'L/250'),
+        KEY_ALLOW_CLASS: optimization_input.get(KEY_ALLOW_CLASS, 'Plastic'),
+        KEY_WEB_PHILOSOPHY: optimization_input.get(KEY_WEB_PHILOSOPHY, 'Thick Web without ITS'),
+        KEY_SUPPORT_WIDTH: optimization_input.get(KEY_SUPPORT_WIDTH, '100'),
+        KEY_IntermediateStiffener: optimization_input.get(KEY_IntermediateStiffener, 'No'),
+        KEY_IntermediateStiffener_spacing: optimization_input.get(KEY_IntermediateStiffener_spacing, 'NA'),
+        KEY_IntermediateStiffener_thickness: optimization_input.get(KEY_IntermediateStiffener_thickness, 'Standard'),
+        KEY_LongitudnalStiffener: optimization_input.get(KEY_LongitudnalStiffener, 'No'),
+        KEY_LongitudnalStiffener_thickness: optimization_input.get(KEY_LongitudnalStiffener_thickness, 'Standard'),
         # Additional design parameters (matching create_from_input)
         KEY_DESIGN_LOAD: optimization_input.get('Design.Load', 'Live load'),
         KEY_MEMBER_OPTIONS: optimization_input.get('Member.Options', 'Simple Span'),
         KEY_SUPPORTING_OPTIONS: optimization_input.get('Supporting.Options', 'NA'),
-        KEY_ShearBucklingOption: optimization_input.get('Design.ShearBucklingOption', 'Simple Post Critical'),
+        KEY_ShearBucklingOption: optimization_input.get(KEY_ShearBucklingOption, 'Simple Post Critical'),
         KEY_DP_DESIGN_METHOD: optimization_input.get('Design.Design_Method', 'Limit State Design'),
-        KEY_EFFECTIVE_AREA_PARA: optimization_input.get('Design.Effective_Area_Parameter', '1.0'),
-        KEY_LENGTH_OVERWRITE: optimization_input.get('Design.Length_Overwrite', 'NA'),
+        KEY_EFFECTIVE_AREA_PARA: optimization_input.get(KEY_EFFECTIVE_AREA_PARA, '1.0'),
+        KEY_LENGTH_OVERWRITE: optimization_input.get(KEY_LENGTH_OVERWRITE, 'NA'),
     }
     
     # Handle symmetry (for optimization)
@@ -575,8 +573,8 @@ def determine_optimization_flags(input_values: Dict[str, Any]) -> Tuple[bool, bo
         Tuple of (is_thick_web, is_symmetric) booleans
         
     is_thick_web:
-        - True if "Design.Web_Philosophy" == "Thick Web without ITS"
-        - False if "Design.Web_Philosophy" == "Thin Web with ITS"
+        - True if KEY_WEB_PHILOSOPHY == "Thick Web without ITS"
+        - False if KEY_WEB_PHILOSOPHY == "Thin Web with ITS"
         
     is_symmetric:
         - True if "Symmetry" == "Symmetrical" OR "Girder.Symmetry" == "Symmetric Girder"
@@ -584,7 +582,7 @@ def determine_optimization_flags(input_values: Dict[str, Any]) -> Tuple[bool, bo
         - Defaults to True (symmetric) if not specified
     """
     # Check web philosophy (can be in either format)
-    web_philosophy = input_values.get('Design.Web_Philosophy') or input_values.get(KEY_WEB_PHILOSOPHY, 'Thick Web without ITS')
+    web_philosophy = input_values.get(KEY_WEB_PHILOSOPHY) or input_values.get(KEY_WEB_PHILOSOPHY, 'Thick Web without ITS')
     is_thick_web = (web_philosophy == 'Thick Web without ITS')
     
     # Check symmetry (can be in either format)

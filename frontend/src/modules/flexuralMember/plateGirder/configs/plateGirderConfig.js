@@ -2,7 +2,25 @@
 import ISECTION from "../../../../assets/ISection.png";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
-import { KEY_DISP_PLATE_GIRDER_WELDED } from "../../../../constants/generated/coreKeys";
+import {
+  KEY_DISP_PLATE_GIRDER_WELDED,
+  KEY_ALLOW_CLASS,
+  KEY_BENDING_MOMENT_SHAPE,
+  KEY_DESIGN_TYPE_FLEXURE,
+  KEY_EFFECTIVE_AREA_PARA,
+  KEY_IntermediateStiffener,
+  KEY_IntermediateStiffener_spacing,
+  KEY_IntermediateStiffener_thickness,
+  KEY_LENGTH_OVERWRITE,
+  KEY_LongitudnalStiffener,
+  KEY_LongitudnalStiffener_thickness,
+  KEY_MAX_DEFL,
+  KEY_SUPPORT_WIDTH,
+  KEY_ShearBucklingOption,
+  KEY_TORSIONAL_RES,
+  KEY_WARPING_RES,
+  KEY_WEB_PHILOSOPHY,
+} from "../../../../constants/generated/coreKeys";
 // Plate Girder uses backend key strings directly (matching backend Common.py)
 
 /**
@@ -344,7 +362,7 @@ export const plateGirderConfig = {
         "Loading.Condition": String(inputs.loading_condition || "Normal"),
         "Load.Shear": String(inputs.shear_force || "0"),
         "Load.Moment": String(inputs.bending_moment || "0"),
-        "Loading.Bending_Moment_Shape": String(inputs.bending_moment_shape || "Uniform Loading with pinned-pinned support"),
+        [KEY_BENDING_MOMENT_SHAPE]: String(inputs.bending_moment_shape || "Uniform Loading with pinned-pinned support"),
       
         // --- Design Type ---
         "Total.Design_Type": String(inputs.design_type || "Customized"),
@@ -355,16 +373,16 @@ export const plateGirderConfig = {
         "BottomFlange.Thickness": bottomFlangeThickness,
       
         // --- Design Preferences ---
-        "Design.Design_Type_Flexure": String(inputs.support_type || "Major Laterally Supported"),
-        "Design.Torsional_Restraint": String(inputs.torsional_restraint || "Fully Restrained"),
-        "Design.Warping_Restraint": String(inputs.warping_restraint || "Both flanges fully restrained"),
+        [KEY_DESIGN_TYPE_FLEXURE]: String(inputs.support_type || "Major Laterally Supported"),
+        [KEY_TORSIONAL_RES]: String(inputs.torsional_restraint || "Fully Restrained"),
+        [KEY_WARPING_RES]: String(inputs.warping_restraint || "Both flanges fully restrained"),
         // Deflection.Max is a desktop-side auto-computed (not directly
         // user-editable) field, derived from Structure Type/Design Load/
         // Member Options/Supporting Options (plate_girder.py:max_defl_change).
         // Compute it fresh here rather than trusting a possibly-stale
         // inputs.max_deflection so it always matches the user's actual
         // Deflection Criteria selections.
-        "Design.Max_Deflection": calculateMaxDeflection(
+        [KEY_MAX_DEFL]: calculateMaxDeflection(
           inputs.structure_type || "Highway Bridge",
           inputs.design_load || "Live load",
           inputs.member_options || "Simple Span",
@@ -373,20 +391,20 @@ export const plateGirderConfig = {
         "Design.Load": String(inputs.design_load || "Live load"),
         "Member.Options": String(inputs.member_options || "Simple Span"),
         "Supporting.Options": String(inputs.supporting_options || "NA"),
-        "Design.Allow_Class": String(inputs.allowable_class || "Plastic"),
-        "Design.Web_Philosophy": String(inputs.web_philosophy || "Thick Web without ITS"),
-        "Design.Support_Width": String(inputs.support_width || "100"),
+        [KEY_ALLOW_CLASS]: String(inputs.allowable_class || "Plastic"),
+        [KEY_WEB_PHILOSOPHY]: String(inputs.web_philosophy || "Thick Web without ITS"),
+        [KEY_SUPPORT_WIDTH]: String(inputs.support_width || "100"),
         "Design.Design_Method": String(inputs.design_method || "Limit State Design"),
-        "Design.Effective_Area_Parameter": String(inputs.effective_area_parameter || "1.0"),
-        "Design.Length_Overwrite": String(inputs.length_overwrite || "NA"),
-        "Design.ShearBucklingOption": String(inputs.shear_buckling_option || "Simple Post Critical"),
+        [KEY_EFFECTIVE_AREA_PARA]: String(inputs.effective_area_parameter || "1.0"),
+        [KEY_LENGTH_OVERWRITE]: String(inputs.length_overwrite || "NA"),
+        [KEY_ShearBucklingOption]: String(inputs.shear_buckling_option || "Simple Post Critical"),
       
         // --- Stiffener Settings ---
-        "Design.IntermediateStiffener": String(inputs.intermediate_stiffener || "No"),
-        "Design.IntermediateStiffener.Spacing": String(inputs.intermediate_stiffener_spacing || "NA"),
-        "Design.IntermediateStiffener.Thickness": String(inputs.intermediate_stiffener_thickness || "Standard"),
-        "Design.LongitudnalStiffener": String(inputs.longitudinal_stiffener || "No"),
-        "Design.LongitudnalStiffener.Thickness": String(inputs.longitudinal_stiffener_thickness || "Standard"),
+        [KEY_IntermediateStiffener]: String(inputs.intermediate_stiffener || "No"),
+        [KEY_IntermediateStiffener_spacing]: String(inputs.intermediate_stiffener_spacing || "NA"),
+        [KEY_IntermediateStiffener_thickness]: String(inputs.intermediate_stiffener_thickness || "Standard"),
+        [KEY_LongitudnalStiffener]: String(inputs.longitudinal_stiffener || "No"),
+        [KEY_LongitudnalStiffener_thickness]: String(inputs.longitudinal_stiffener_thickness || "Standard"),
         
         // --- Additional Girder Data ---
         "Symmetry": String(inputs.symmetry || "Symmetrical")

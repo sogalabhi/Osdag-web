@@ -100,7 +100,7 @@ A typical `adapter.py` implements the following key interfaces:
 ### 1. `get_required_keys() -> List[str]`
 Defines the required inputs schema. This is used by validation utilities to check incoming payloads.
 
-Every key it returns should be a value of a string constant in `osdag_core/Common.py`; `backend/apps/core/tests/test_required_keys_in_core.py` checks this for all adapters. The few keys that are web request names mapped to core keys inside the adapter (several plate girder, base plate and cantilever inputs) are listed as explicit exceptions in that test. The frontend gets its copy of the core keys from `frontend/src/constants/generated/coreKeys.js`, generated from `Common.py` (see [Chapter 6, section 6.7](./chapter_6_dynamic_ui_form_engine.md)). See [2.3b Key constants](#23b-key-constants) for how adapters write keys.
+Every key it returns should be a value of a string constant in `osdag_core/Common.py`; `backend/apps/core/tests/test_required_keys_in_core.py` checks this for all adapters. Every adapter takes the core keys directly: no request name is mapped to a core key inside an adapter, and the test has no exceptions. The frontend gets its copy of the core keys from `frontend/src/constants/generated/coreKeys.js`, generated from `Common.py` (see [Chapter 6, section 6.7](./chapter_6_dynamic_ui_form_engine.md)). See [2.3b Key constants](#23b-key-constants) for how adapters write keys.
 
 ### 2. `validate_input(input_values: Dict[str, Any]) -> None`
 Checks the existence and types of incoming values, raising `MissingKeyError` or `InvalidInputTypeError` on mismatch.

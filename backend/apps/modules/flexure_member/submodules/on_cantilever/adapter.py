@@ -100,8 +100,6 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure_Cantilever:
     #   'Restrained laterally, torsionally and against rotation on flange'
     # We map frontend values (which may have "Continuous") to core values ("Continous")
     raw_support = input_values.get('Cantilever.Support', '')
-    if not raw_support:
-        raw_support = input_values.get('Flexure.Support_Restraint', '')
     # Map frontend display values to core values (core has typo "Continous" not "Continuous")
     support_map = {
         'Continuous, with lateral restraint to top flange': 'Continous, with lateral restraint to top flange',
@@ -119,8 +117,6 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure_Cantilever:
     # Frontend sends values from Top_Restraint_list:
     #   'Free', 'Lateral restraint to top flange', 'Torsional restraint', 'Lateral and Torsional restraint'
     raw_top = input_values.get('Cantilever.Top', '')
-    if not raw_top:
-        raw_top = input_values.get('Flexure.Top_Restraint', '')
     # Note: core has typo "Torsional rwstraint" (Top3)
     top_map = {
         'Free': 'Free',

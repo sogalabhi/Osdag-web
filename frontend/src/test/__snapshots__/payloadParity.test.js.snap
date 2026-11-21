@@ -50,23 +50,23 @@ exports[`payload parity: buildSubmissionParams on the default inputs > axially l
 
 exports[`payload parity: buildSubmissionParams on the default inputs > base plate > all / Hollow/Tubular Column Base 1`] = `
 {
+  "Anchor Bolt.ICF.Diameter": [
+    "M20",
+    "M24",
+  ],
+  "Anchor Bolt.ICF.Grade": [
+    "4.6",
+    "8.8",
+  ],
+  "Anchor Bolt.OCF.Diameter": [
+    "M20",
+    "M24",
+  ],
+  "Anchor Bolt.OCF.Grade": [
+    "4.6",
+    "8.8",
+  ],
   "Anchor Bolt.Type": "End Plate Type",
-  "Anchor.Diameter": [
-    "M20",
-    "M24",
-  ],
-  "Anchor.Diameter.ICF": [
-    "M20",
-    "M24",
-  ],
-  "Anchor.Grade": [
-    "4.6",
-    "8.8",
-  ],
-  "Anchor.Grade.ICF": [
-    "4.6",
-    "8.8",
-  ],
   "Connectivity": "Hollow/Tubular Column Base",
   "End Condition": "Pinned",
   "Footing.Grade": "M25",
@@ -85,23 +85,23 @@ exports[`payload parity: buildSubmissionParams on the default inputs > base plat
 
 exports[`payload parity: buildSubmissionParams on the default inputs > base plate > all / Moment Base Plate 1`] = `
 {
+  "Anchor Bolt.ICF.Diameter": [
+    "M20",
+    "M24",
+  ],
+  "Anchor Bolt.ICF.Grade": [
+    "4.6",
+    "8.8",
+  ],
+  "Anchor Bolt.OCF.Diameter": [
+    "M20",
+    "M24",
+  ],
+  "Anchor Bolt.OCF.Grade": [
+    "4.6",
+    "8.8",
+  ],
   "Anchor Bolt.Type": "End Plate Type",
-  "Anchor.Diameter": [
-    "M20",
-    "M24",
-  ],
-  "Anchor.Diameter.ICF": [
-    "M20",
-    "M24",
-  ],
-  "Anchor.Grade": [
-    "4.6",
-    "8.8",
-  ],
-  "Anchor.Grade.ICF": [
-    "4.6",
-    "8.8",
-  ],
   "Connectivity": "Moment Base Plate",
   "End Condition": "Pinned",
   "Footing.Grade": "M25",
@@ -120,23 +120,23 @@ exports[`payload parity: buildSubmissionParams on the default inputs > base plat
 
 exports[`payload parity: buildSubmissionParams on the default inputs > base plate > all / Welded Column Base 1`] = `
 {
+  "Anchor Bolt.ICF.Diameter": [
+    "M20",
+    "M24",
+  ],
+  "Anchor Bolt.ICF.Grade": [
+    "4.6",
+    "8.8",
+  ],
+  "Anchor Bolt.OCF.Diameter": [
+    "M20",
+    "M24",
+  ],
+  "Anchor Bolt.OCF.Grade": [
+    "4.6",
+    "8.8",
+  ],
   "Anchor Bolt.Type": "End Plate Type",
-  "Anchor.Diameter": [
-    "M20",
-    "M24",
-  ],
-  "Anchor.Diameter.ICF": [
-    "M20",
-    "M24",
-  ],
-  "Anchor.Grade": [
-    "4.6",
-    "8.8",
-  ],
-  "Anchor.Grade.ICF": [
-    "4.6",
-    "8.8",
-  ],
   "Connectivity": "Welded Column Base",
   "End Condition": "Pinned",
   "Footing.Grade": "M25",
@@ -155,20 +155,20 @@ exports[`payload parity: buildSubmissionParams on the default inputs > base plat
 
 exports[`payload parity: buildSubmissionParams on the default inputs > base plate > customized / Welded Column Base 1`] = `
 {
-  "Anchor Bolt.Type": "End Plate Type",
-  "Anchor.Diameter": [
+  "Anchor Bolt.ICF.Diameter": [
+    "M20",
+  ],
+  "Anchor Bolt.ICF.Grade": [
+    "8.8",
+  ],
+  "Anchor Bolt.OCF.Diameter": [
     "M20",
     "M24",
   ],
-  "Anchor.Diameter.ICF": [
-    "M20",
-  ],
-  "Anchor.Grade": [
+  "Anchor Bolt.OCF.Grade": [
     "8.8",
   ],
-  "Anchor.Grade.ICF": [
-    "8.8",
-  ],
+  "Anchor Bolt.Type": "End Plate Type",
   "Connectivity": "Welded Column Base",
   "End Condition": "Pinned",
   "Footing.Grade": "M25",
@@ -1491,43 +1491,43 @@ exports[`payload parity: buildSubmissionParams on the default inputs > on cantil
 
 exports[`payload parity: buildSubmissionParams on the default inputs > plate girder > all 1`] = `
 {
+  "Bendingmoment.shape": "Uniform Loading with pinned-pinned support",
   "BottomFlange.Thickness": [
     "40",
   ],
   "Bottomflange.Width": "350",
-  "Design.Allow_Class": "Plastic",
+  "Deflection.Max": "Span/600",
   "Design.Design_Method": "Limit State Design",
-  "Design.Design_Type_Flexure": "Major Laterally Supported",
-  "Design.Effective_Area_Parameter": "1.0",
-  "Design.IntermediateStiffener": "No",
-  "Design.IntermediateStiffener.Spacing": "NA",
-  "Design.IntermediateStiffener.Thickness": "Standard",
-  "Design.Length_Overwrite": "NA",
   "Design.Load": "Live load",
-  "Design.LongitudnalStiffener": "No",
-  "Design.LongitudnalStiffener.Thickness": "Standard",
-  "Design.Max_Deflection": "Span/600",
-  "Design.ShearBucklingOption": "Simple Post Critical",
-  "Design.Support_Width": "300",
-  "Design.Torsional_Restraint": "Fully Restrained",
-  "Design.Warping_Restraint": "Both flanges fully restrained",
-  "Design.Web_Philosophy": "Thick Web without ITS",
+  "Effective.Area_Para": "1.0",
+  "Flexure.Type": "Major Laterally Supported",
+  "IntermediateStiffener.Data": "No",
+  "IntermediateStiffener.Spacing": "NA",
+  "IntermediateStiffener.Thickness": "Standard",
+  "Length.Overwrite": "NA",
   "Load.Moment": "2000",
   "Load.Shear": "400",
-  "Loading.Bending_Moment_Shape": "Uniform Loading with pinned-pinned support",
   "Loading.Condition": "Normal",
+  "LongitudnalStiffener.Data": "No",
+  "LongitudnalStiffner.Thickness": "Standard",
   "Material": "E 250 (Fe 410 W)A",
   "Member.Length": "20000",
   "Member.Options": "Simple Span",
   "Module": "PLATE GIRDER",
+  "Optimum.Class": "Plastic",
+  "S.B.Methods": "Simple Post Critical",
+  "Support.Width": "300",
   "Supporting.Options": "Not Applicable",
   "Symmetry": "Symmetrical",
   "TopFlange.Thickness": [
     "40",
   ],
   "Topflange.Width": "350",
+  "Torsion.restraint": "Fully Restrained",
   "Total.Depth": "1300",
   "Total.Design_Type": "Customized",
+  "Warping.restraint": "Both flanges fully restrained",
+  "Web.Philosophy": "Thick Web without ITS",
   "Web.Thickness": [
     "20",
   ],
@@ -1536,43 +1536,43 @@ exports[`payload parity: buildSubmissionParams on the default inputs > plate gir
 
 exports[`payload parity: buildSubmissionParams on the default inputs > plate girder > customized 1`] = `
 {
+  "Bendingmoment.shape": "Uniform Loading with pinned-pinned support",
   "BottomFlange.Thickness": [
     "12",
   ],
   "Bottomflange.Width": "350",
-  "Design.Allow_Class": "Plastic",
+  "Deflection.Max": "Span/600",
   "Design.Design_Method": "Limit State Design",
-  "Design.Design_Type_Flexure": "Major Laterally Supported",
-  "Design.Effective_Area_Parameter": "1.0",
-  "Design.IntermediateStiffener": "No",
-  "Design.IntermediateStiffener.Spacing": "NA",
-  "Design.IntermediateStiffener.Thickness": "Standard",
-  "Design.Length_Overwrite": "NA",
   "Design.Load": "Live load",
-  "Design.LongitudnalStiffener": "No",
-  "Design.LongitudnalStiffener.Thickness": "Standard",
-  "Design.Max_Deflection": "Span/600",
-  "Design.ShearBucklingOption": "Simple Post Critical",
-  "Design.Support_Width": "300",
-  "Design.Torsional_Restraint": "Fully Restrained",
-  "Design.Warping_Restraint": "Both flanges fully restrained",
-  "Design.Web_Philosophy": "Thick Web without ITS",
+  "Effective.Area_Para": "1.0",
+  "Flexure.Type": "Major Laterally Supported",
+  "IntermediateStiffener.Data": "No",
+  "IntermediateStiffener.Spacing": "NA",
+  "IntermediateStiffener.Thickness": "Standard",
+  "Length.Overwrite": "NA",
   "Load.Moment": "2000",
   "Load.Shear": "400",
-  "Loading.Bending_Moment_Shape": "Uniform Loading with pinned-pinned support",
   "Loading.Condition": "Normal",
+  "LongitudnalStiffener.Data": "No",
+  "LongitudnalStiffner.Thickness": "Standard",
   "Material": "E 250 (Fe 410 W)A",
   "Member.Length": "20000",
   "Member.Options": "Simple Span",
   "Module": "PLATE GIRDER",
+  "Optimum.Class": "Plastic",
+  "S.B.Methods": "Simple Post Critical",
+  "Support.Width": "300",
   "Supporting.Options": "Not Applicable",
   "Symmetry": "Symmetrical",
   "TopFlange.Thickness": [
     "12",
   ],
   "Topflange.Width": "350",
+  "Torsion.restraint": "Fully Restrained",
   "Total.Depth": "1300",
   "Total.Design_Type": "Customized",
+  "Warping.restraint": "Both flanges fully restrained",
+  "Web.Philosophy": "Thick Web without ITS",
   "Web.Thickness": [
     "10",
   ],

@@ -16,7 +16,7 @@
     "Anchor Bolt.Type": "End Plate Type",
     "Footing.Grade": "M20",
     "Weld.Type": "Fillet Weld",
-    "Anchor.Diameter": [
+    "Anchor Bolt.OCF.Diameter": [
       "M8",
       "M10",
       "M12",
@@ -31,7 +31,7 @@
       "M64",
       "M72"
     ],
-    "Anchor.Grade": [
+    "Anchor Bolt.OCF.Grade": [
       "3.6",
       "4.6",
       "4.8",
@@ -43,7 +43,7 @@
       "10.9",
       "12.9"
     ],
-    "Anchor.Diameter.ICF": [
+    "Anchor Bolt.ICF.Diameter": [
       "M8",
       "M10",
       "M12",
@@ -58,7 +58,7 @@
       "M64",
       "M72"
     ],
-    "Anchor.Grade.ICF": [
+    "Anchor Bolt.ICF.Grade": [
       "3.6",
       "4.6",
       "4.8",

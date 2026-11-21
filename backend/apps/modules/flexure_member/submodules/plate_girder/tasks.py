@@ -188,7 +188,7 @@ def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
         logger.info(f"  Load - Moment: {input_data.get('Load.Moment', 'N/A')} kNm")
         logger.info(f"  Load - Shear: {input_data.get('Load.Shear', 'N/A')} kN")
         logger.info(f"  Material: {input_data.get('Material', 'N/A')}")
-        logger.info(f"  Web Philosophy: {input_data.get('Design.Web_Philosophy', 'N/A')}")
+        logger.info(f"  Web Philosophy: {input_data.get(KEY_WEB_PHILOSOPHY, 'N/A')}")
         logger.info(f"  Is Thick Web: {is_thick_web}")
         logger.info(f"  Is Symmetric: {is_symmetric}")
 
