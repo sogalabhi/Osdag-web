@@ -14,7 +14,38 @@ VALID_OPERATIONS = frozenset({"open", "refresh", "save", "reset"})
 import importlib
 
 from osdag_core.Common import (
-    KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE,
+    KEY_DIA_ANCHOR_ICF,
+    KEY_DIA_ANCHOR_OCF,
+    KEY_DISP_CLEATANGLE,
+    KEY_DISP_FINPLATE,
+    KEY_DISP_HEADERPLATE,
+    KEY_DISP_SEATED_ANGLE,
+    KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
+    KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
+    KEY_DP_ANCHOR_BOLT_FRICTION,
+    KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF,
+    KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF,
+    KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF,
+    KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
+    KEY_DP_ANCHOR_BOLT_LENGTH_ICF,
+    KEY_DP_ANCHOR_BOLT_LENGTH_OCF,
+    KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
+    KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
+    KEY_DP_ANCHOR_BOLT_TYPE_ICF,
+    KEY_DP_ANCHOR_BOLT_TYPE_OCF,
+    KEY_DP_BOLT_HOLE_TYPE,
+    KEY_DP_BOLT_SLIP_FACTOR,
+    KEY_DP_BOLT_TYPE,
+    KEY_DP_DESIGN_BASE_PLATE,
+    KEY_DP_DESIGN_METHOD,
+    KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+    KEY_DP_DETAILING_EDGE_TYPE,
+    KEY_DP_DETAILING_GAP,
+    KEY_DP_DETAILING_PACKING_PLATE,
+    KEY_DP_WELD_FAB,
+    KEY_DP_WELD_MATERIAL_G_O,
+    KEY_MATERIAL,
+    KEY_ST_KEY_MATERIAL,
 )
 
 from apps.core import catalog
@@ -47,33 +78,33 @@ _CORE_CLASS_MAP = {
 }
 
 _FRONTEND_TO_CORE_KEY_MAP = {
-    "bolt_tension_type": "Bolt.TensionType",
-    "bolt_hole_type": "Bolt.Bolt_Hole_Type",
-    "bolt_slip_factor": "Bolt.Slip_Factor",
-    "weld_fab": "Weld.Fab",
-    "weld_material_grade": "Weld.Material_Grade_OverWrite",
-    "detailing_edge_type": "Detailing.Edge_type",
-    "detailing_gap": "Detailing.Gap",
-    "detailing_corr_status": "Detailing.Corrosive_Influences",
-    "detailing_packing_plate": "Detailing.Packing_Plate",
-    "design_method": "Design.Design_Method",
+    "bolt_tension_type": KEY_DP_BOLT_TYPE,
+    "bolt_hole_type": KEY_DP_BOLT_HOLE_TYPE,
+    "bolt_slip_factor": KEY_DP_BOLT_SLIP_FACTOR,
+    "weld_fab": KEY_DP_WELD_FAB,
+    "weld_material_grade": KEY_DP_WELD_MATERIAL_G_O,
+    "detailing_edge_type": KEY_DP_DETAILING_EDGE_TYPE,
+    "detailing_gap": KEY_DP_DETAILING_GAP,
+    "detailing_corr_status": KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+    "detailing_packing_plate": KEY_DP_DETAILING_PACKING_PLATE,
+    "design_method": KEY_DP_DESIGN_METHOD,
     "design_for": "Design.Design_For",
     
     # Base Plate specific:
-    "DesignPreferences.Anchor_Bolt.OCF.Designation": "DesignPreferences.Anchor_Bolt.OCF.Designation",
-    "DesignPreferences.Anchor_Bolt.OCF.Type": "DesignPreferences.Anchor_Bolt.OCF.Type",
-    "DesignPreferences.Anchor_Bolt.OCF.Galvanized": "DesignPreferences.Anchor_Bolt.OCF.Galvanized",
-    "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type": "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type",
-    "DesignPreferences.Anchor_Bolt.OCF.Length": "DesignPreferences.Anchor_Bolt.OCF.Length",
-    "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite",
-    "DesignPreferences.Anchor_Bolt.ICF.Designation": "DesignPreferences.Anchor_Bolt.ICF.Designation",
-    "DesignPreferences.Anchor_Bolt.ICF.Type": "DesignPreferences.Anchor_Bolt.ICF.Type",
-    "DesignPreferences.Anchor_Bolt.ICF.Galvanized": "DesignPreferences.Anchor_Bolt.ICF.Galvanized",
-    "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type",
-    "DesignPreferences.Anchor_Bolt.ICF.Length": "DesignPreferences.Anchor_Bolt.ICF.Length",
-    "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite",
-    "DesignPreferences.Anchor_Bolt.Friction_coefficient": "DesignPreferences.Anchor_Bolt.Friction_coefficient",
-    "DesignPreferences.Design.Base_Plate": "DesignPreferences.Design.Base_Plate",
+    KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF: KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
+    KEY_DP_ANCHOR_BOLT_TYPE_OCF: KEY_DP_ANCHOR_BOLT_TYPE_OCF,
+    KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF: KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF,
+    KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF: KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
+    KEY_DP_ANCHOR_BOLT_LENGTH_OCF: KEY_DP_ANCHOR_BOLT_LENGTH_OCF,
+    KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF: KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
+    KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF: KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
+    KEY_DP_ANCHOR_BOLT_TYPE_ICF: KEY_DP_ANCHOR_BOLT_TYPE_ICF,
+    KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF: KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF,
+    KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF: KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF,
+    KEY_DP_ANCHOR_BOLT_LENGTH_ICF: KEY_DP_ANCHOR_BOLT_LENGTH_ICF,
+    KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF: KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
+    KEY_DP_ANCHOR_BOLT_FRICTION: KEY_DP_ANCHOR_BOLT_FRICTION,
+    KEY_DP_DESIGN_BASE_PLATE: KEY_DP_DESIGN_BASE_PLATE,
 }
 
 def _get_core_defaults(module_session_name: str, inputs: Dict[str, Any], grade: str) -> Dict[str, Any]:
@@ -87,10 +118,10 @@ def _get_core_defaults(module_session_name: str, inputs: Dict[str, Any], grade: 
             material_grade = "E 250 (Fe 410 W)A"
             
         core_inputs = {
-            "Material": material_grade,
-            "Stiffener_Key.Material": material_grade,
-            "Anchor Bolt.OCF.Diameter": [20],
-            "Anchor Bolt.ICF.Diameter": [20],
+            KEY_MATERIAL: material_grade,
+            KEY_ST_KEY_MATERIAL: material_grade,
+            KEY_DIA_ANCHOR_OCF: [20],
+            KEY_DIA_ANCHOR_ICF: [20],
             "Base_Plate.Material_St_Sk": material_grade,
             "Material_St_Sk": material_grade,
         }
@@ -141,7 +172,7 @@ def lookup_sources(user=None) -> Dict[str, List[Any]]:
     from apps.sections.models import UserCustomAngle, UserCustomBeam, UserCustomChannel, UserCustomColumn
 
     sources = {
-        "material_model": ["Material"],
+        "material_model": [KEY_MATERIAL],
         "beams_model": ["Beams"],
         "columns_model": ["Columns"],
         "angles_model": ["Angles"],

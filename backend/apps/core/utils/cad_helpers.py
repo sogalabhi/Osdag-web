@@ -7,6 +7,7 @@ import uuid
 import base64
 import json as json_module
 from typing import Dict, List, Any, Optional
+from osdag_core.Common import KEY_D, KEY_GRD
 
 
 # Sections to build for each module/submodule. Every name here must be one the module's
@@ -123,8 +124,8 @@ def _build_hover_dict(module, inputs: Dict[str, Any]) -> Dict[str, Any]:
             bolt_grade = None
             bolt_dia = None
             try:
-                grades = inputs.get('Bolt.Grade') or []
-                dias = inputs.get('Bolt.Diameter') or []
+                grades = inputs.get(KEY_GRD) or []
+                dias = inputs.get(KEY_D) or []
                 if isinstance(grades, list) and grades:
                     bolt_grade = grades[-1]
                 if isinstance(dias, list) and dias:

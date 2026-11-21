@@ -46,3 +46,6 @@ WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES = "Design.LongitudnalStiffener.
 WEB_STIFFENERHOLLOW_B_THICKNESS = "StiffenerHollow.B.Thickness"
 WEB_STIFFENERHOLLOW_D_THICKNESS = "StiffenerHollow.D.Thickness"
 WEB_STIFFENERHOLLOW_OD_THICKNESS = "StiffenerHollow.OD.Thickness"
+
+# .osi file metadata
+WEB_OSDAGWEB_VERSION = "OsdagWeb.Version"
