@@ -136,21 +136,21 @@ def evaluate_deflection_kNm_mm(M_kNm, L, E, case, criteria, total_depth, top_fla
     if debug:
         print(f"\n========== DEFLECTION CHECK (IS 800:2007 Table 6) ==========")
         print(f"  --- Input Parameters ---")
-        print(f"  Bending Moment (M): {M_kNm:.2f} kN·m")
+        print(f"  Bending Moment (M): {M_kNm:.2f} kN*m")
         print(f"  Span Length (L): {L:.2f} mm")
         print(f"  Modulus of Elasticity (E): {E:.2f} MPa")
-        print(f"  Moment of Inertia (I): {I:.2f} mm⁴ ({I/1e8:.4f} cm⁴)")
+        print(f"  Moment of Inertia (I): {I:.2f} mm^4 ({I/1e8:.4f} cm^4)")
         print(f"  Loading Case: {case}")
         print(f"  --- Deflection Calculation ---")
-        print(f"  Calculated Deflection (δ): {delta:.4f} mm")
+        print(f"  Calculated Deflection (delta): {delta:.4f} mm")
         print(f"  Deflection Limit Criteria: L/{n:.0f}")
         print(f"  Allowable Deflection: {allowable:.4f} mm")
-        print(f"  Deflection Ratio (δ/allowable): {deflection_ratio:.4f}")
+        print(f"  Deflection Ratio (delta/allowable): {deflection_ratio:.4f}")
         if is_safe:
-            print(f"  >>> DEFLECTION CHECK PASSED (δ ≤ L/{n:.0f}) <<<")
+            print(f"  >>> DEFLECTION CHECK PASSED (delta <= L/{n:.0f}) <<<")
         else:
-            print(f"  >>> DEFLECTION CHECK FAILED (δ > L/{n:.0f}) <<<")
-            print(f"  Required Moment of Inertia for L/{n:.0f}: {I * deflection_ratio:.2f} mm⁴")
+            print(f"  >>> DEFLECTION CHECK FAILED (delta > L/{n:.0f}) <<<")
+            print(f"  Required Moment of Inertia for L/{n:.0f}: {I * deflection_ratio:.2f} mm^4")
         print(f"=============================================================\n")
     
     return is_safe, deflection_ratio, delta, allowable
