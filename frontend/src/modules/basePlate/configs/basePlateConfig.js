@@ -2,12 +2,26 @@ import { UI_STRINGS } from '../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../shared/utils/validation';
 import {
+  KEY_AXIAL,
+  KEY_AXIAL_BP,
+  KEY_AXIAL_TENSION_BP,
+  KEY_CONN,
   KEY_DIA_ANCHOR_ICF,
   KEY_DIA_ANCHOR_OCF,
   KEY_DISP_BASE_PLATE,
+  KEY_END_CONDITION,
   KEY_GRD_ANCHOR_ICF,
   KEY_GRD_ANCHOR_OCF,
+  KEY_GRD_FOOTING,
+  KEY_MATERIAL,
+  KEY_MODULE,
+  KEY_MOMENT_MAJOR,
+  KEY_MOMENT_MINOR,
+  KEY_SECSIZE,
+  KEY_SHEAR_MAJOR,
+  KEY_SHEAR_MINOR,
   KEY_TYP_ANCHOR,
+  KEY_WELD_TYPE,
 } from "../../../constants/generated/coreKeys";
 export const basePlateConfig = {
   sessionName: "Base Plate",
@@ -17,7 +31,7 @@ export const basePlateConfig = {
 
   // Keys the desktop writes under a different name than buildSubmissionParams sends.
   osiKeyAliases: {
-    "Load.Axial_Compression": "load_axial",
+    [KEY_AXIAL_BP]: "load_axial",
   },
 
   defaultInputs: {
@@ -88,20 +102,20 @@ export const basePlateConfig = {
     const diameterIcf = allSelected?.anchor_diameter_icf ? (lists.anchorDiameterList || []) : toArr(inputs.anchor_diameter_icf);
     const gradeIcf = allSelected?.anchor_grade_icf ? (lists.anchorGradeList || []) : toArr(inputs.anchor_grade_icf);
     return {
-      Module: KEY_DISP_BASE_PLATE,
-      "Member.Designation": memberDesignation,
-      Material: inputs.material || "E 250 (Fe 410 W)A",
-      Connectivity: inputs.connectivity || "Welded Column Base",
-      "End Condition": inputs.end_condition || "Pinned",
-      "Load.Axial": inputs.load_axial ?? "",
-      "Load.Axial_Tension": inputs.load_axial_tension || "0",
-      "Load.Shear.Major": inputs.load_shear_major ?? "",
-      "Load.Shear.Minor": inputs.load_shear_minor ?? "",
-      "Load.Moment.Major": inputs.load_moment_major || "0",
-      "Load.Moment.Minor": inputs.load_moment_minor || "0",
+      [KEY_MODULE]: KEY_DISP_BASE_PLATE,
+      [KEY_SECSIZE]: memberDesignation,
+      [KEY_MATERIAL]: inputs.material || "E 250 (Fe 410 W)A",
+      [KEY_CONN]: inputs.connectivity || "Welded Column Base",
+      [KEY_END_CONDITION]: inputs.end_condition || "Pinned",
+      [KEY_AXIAL]: inputs.load_axial ?? "",
+      [KEY_AXIAL_TENSION_BP]: inputs.load_axial_tension || "0",
+      [KEY_SHEAR_MAJOR]: inputs.load_shear_major ?? "",
+      [KEY_SHEAR_MINOR]: inputs.load_shear_minor ?? "",
+      [KEY_MOMENT_MAJOR]: inputs.load_moment_major || "0",
+      [KEY_MOMENT_MINOR]: inputs.load_moment_minor || "0",
       [KEY_TYP_ANCHOR]: inputs.anchor_type || "End Plate Type",
-      "Footing.Grade": (inputs.footing_grade && inputs.footing_grade !== "Select Grade") ? inputs.footing_grade : "M20",
-      "Weld.Type": inputs.weld_type || "Fillet Weld",
+      [KEY_GRD_FOOTING]: (inputs.footing_grade && inputs.footing_grade !== "Select Grade") ? inputs.footing_grade : "M20",
+      [KEY_WELD_TYPE]: inputs.weld_type || "Fillet Weld",
       [KEY_DIA_ANCHOR_OCF]: diameterOcf.length ? diameterOcf : ["M20"],
       [KEY_GRD_ANCHOR_OCF]: gradeOcf.length ? gradeOcf : ["8.8"],
       [KEY_DIA_ANCHOR_ICF]: diameterIcf.length ? diameterIcf : diameterOcf.length ? diameterOcf : ["M20"],

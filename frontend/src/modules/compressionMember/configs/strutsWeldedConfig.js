@@ -9,7 +9,26 @@ import FIXED_HINGED from "../../../assets/CompressionMember/RFRFstrut.png";
 import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
-import { KEY_DISP_STRUT_WELDED_END_GUSSET, KEY_END1, KEY_END2 } from "../../../constants/generated/coreKeys";
+import {
+  KEY_ALLOW_UR,
+  KEY_AXIAL,
+  KEY_CONNECTOR_MATERIAL,
+  KEY_DISP_STRUT_WELDED_END_GUSSET,
+  KEY_DP_DESIGN_METHOD,
+  KEY_DP_WELD_FAB,
+  KEY_DP_WELD_MATERIAL_G_O,
+  KEY_EFFECTIVE_AREA_PARA,
+  KEY_END1,
+  KEY_END2,
+  KEY_LENGTH,
+  KEY_LOCATION,
+  KEY_MATERIAL,
+  KEY_MODULE,
+  KEY_PLATETHK,
+  KEY_SECSIZE,
+  KEY_SEC_MATERIAL,
+  KEY_SEC_PROFILE,
+} from "../../../constants/generated/coreKeys";
 export const strutsWeldedConfig = {
   sessionName: "Struts Welded to End Gusset",
   designType: KEY_DISP_STRUT_WELDED_END_GUSSET,
@@ -132,28 +151,28 @@ export const strutsWeldedConfig = {
         );
 
     return {
-      "Module": KEY_DISP_STRUT_WELDED_END_GUSSET,
-      "Member.Profile": inputs.section_profile,
-      "Member.Designation": memberDesignation,
+      [KEY_MODULE]: KEY_DISP_STRUT_WELDED_END_GUSSET,
+      [KEY_SEC_PROFILE]: inputs.section_profile,
+      [KEY_SECSIZE]: memberDesignation,
 
-      "Material": inputs.material,
-      "Member.Material": inputs.material,
+      [KEY_MATERIAL]: inputs.material,
+      [KEY_SEC_MATERIAL]: inputs.material,
 
-      "Member.Length": String(inputs.length),
-      "Load.Axial": String(inputs.axial_force),
+      [KEY_LENGTH]: String(inputs.length),
+      [KEY_AXIAL]: String(inputs.axial_force),
 
-      "Conn_Location": inputs.location,
+      [KEY_LOCATION]: inputs.location,
       [KEY_END1]: inputs.end_condition_1,
       [KEY_END2]: inputs.end_condition_2,
 
-      "Connector.Material": inputs.connector_material,
-      "Connector.Plate.Thickness_List": getList("plate_thickness", "thicknessList"),
+      [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
+      [KEY_PLATETHK]: getList("plate_thickness", "thicknessList"),
 
-      "Design.Design_Method": inputs.design_method,
-      "Weld.Fab": inputs.weld_fab || "Shop Weld",
-      "Weld.Material_Grade_OverWrite": String(inputs.weld_material_grade || ""),
-      "Optimum.AllowUR": String(inputs.allow_ur || "1.0"),
-      "Effective.Area_Para": String(inputs.effective_area_parameter || "1.0"),
+      [KEY_DP_DESIGN_METHOD]: inputs.design_method,
+      [KEY_DP_WELD_FAB]: inputs.weld_fab || "Shop Weld",
+      [KEY_DP_WELD_MATERIAL_G_O]: String(inputs.weld_material_grade || ""),
+      [KEY_ALLOW_UR]: String(inputs.allow_ur || "1.0"),
+      [KEY_EFFECTIVE_AREA_PARA]: String(inputs.effective_area_parameter || "1.0"),
     };
   },
 

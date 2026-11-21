@@ -4,11 +4,25 @@
 import ISECTION from "../../../../assets/ISection.png";
 import ErrorImg from "../../../../assets/notSelected.png";
 import {
-  KEY_MODULE, KEY_SEC_PROFILE, KEY_SECSIZE, KEY_MATERIAL, KEY_SEC_MATERIAL,
-  KEY_DP_DESIGN_METHOD, KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, 
-  KEY_LENGTH_OVERWRITE, KEY_BEARING_LENGTH, KEY_SHEAR, KEY_MOMENT,
-  KEY_LENGTH, KEY_TORSIONAL_RES, KEY_WARPING_RES,
+  KEY_ALLOW_CLASS,
+  KEY_BEARING_LENGTH,
+  KEY_DESIGN_TYPE_FLEXURE,
   KEY_DISP_FLEXURE,
+  KEY_DP_DESIGN_METHOD,
+  KEY_EFFECTIVE_AREA_PARA,
+  KEY_LENGTH,
+  KEY_LENGTH_OVERWRITE,
+  KEY_LOAD,
+  KEY_MATERIAL,
+  KEY_MODULE,
+  KEY_MOMENT,
+  KEY_SECSIZE,
+  KEY_SEC_MATERIAL,
+  KEY_SEC_PROFILE,
+  KEY_SHEAR,
+  KEY_SUPPORT,
+  KEY_TORSIONAL_RES,
+  KEY_WARPING_RES,
 } from "../../../../constants/generated/coreKeys";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
@@ -129,11 +143,11 @@ export const simplySupportedBeamConfig = {
       [KEY_SHEAR]: String(inputs.shear_force),
       [KEY_MOMENT]: String(inputs.bending_moment),
       [KEY_LENGTH]: String(inputs.member_length),
-      "Flexure.Type": String(inputs.beam_support_type),
-      "Flexure.Support": "Simply Supported", // Fixed value for simply supported beams
+      [KEY_DESIGN_TYPE_FLEXURE]: String(inputs.beam_support_type),
+      [KEY_SUPPORT]: "Simply Supported", // Fixed value for simply supported beams
       [KEY_TORSIONAL_RES]: String(inputs.torsional_restraint),
       [KEY_WARPING_RES]: String(inputs.warping_restraint),
-      "Loading.Condition": String(inputs.loading_condition || "Normal"),
+      [KEY_LOAD]: String(inputs.loading_condition || "Normal"),
     };
   },
 
