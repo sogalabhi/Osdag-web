@@ -63,12 +63,6 @@ NOT_CONVERTED = {
     "apps/modules/flexure_member/submodules/plate_girder/adapter.py": 160,
     "apps/modules/flexure_member/submodules/plate_girder/tasks.py": 5,
     "apps/modules/flexure_member/submodules/simply_supported_beam/adapter.py": 50,
-    "apps/modules/moment_connection/shared.py": 63,
-    "apps/modules/moment_connection/submodules/beam_beam_cover_plate_welded/adapter.py": 39,
-    "apps/modules/moment_connection/submodules/beam_beam_end_plate/adapter.py": 76,
-    "apps/modules/moment_connection/submodules/beam_column_end_plate/adapter.py": 82,
-    "apps/modules/moment_connection/submodules/column_column_cover_plate_welded/adapter.py": 39,
-    "apps/modules/moment_connection/submodules/column_column_end_plate/adapter.py": 73,
 }
 
 # (file, value) -> why the string is not a key
