@@ -3,24 +3,54 @@ import ISECTION from "../../../../assets/ISection.png";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import {
-  KEY_DISP_PLATE_GIRDER_WELDED,
   KEY_ALLOW_CLASS,
   KEY_BENDING_MOMENT_SHAPE,
+  KEY_BOTTOM_Bflange_PG,
+  KEY_BOTTOM_FLANGE_THICKNESS_PG,
+  KEY_DESIGN_LOAD,
   KEY_DESIGN_TYPE_FLEXURE,
+  KEY_DISP_PLATE_GIRDER_WELDED,
+  KEY_DP_DESIGN_METHOD,
   KEY_EFFECTIVE_AREA_PARA,
   KEY_IntermediateStiffener,
   KEY_IntermediateStiffener_spacing,
   KEY_IntermediateStiffener_thickness,
+  KEY_LENGTH,
   KEY_LENGTH_OVERWRITE,
+  KEY_LOAD,
   KEY_LongitudnalStiffener,
   KEY_LongitudnalStiffener_thickness,
+  KEY_MATERIAL,
   KEY_MAX_DEFL,
+  KEY_MEMBER_OPTIONS,
+  KEY_MODULE,
+  KEY_MOMENT,
+  KEY_OVERALL_DEPTH_PG,
+  KEY_OVERALL_DEPTH_PG_TYPE,
+  KEY_SHEAR,
+  KEY_SUPPORTING_OPTIONS,
   KEY_SUPPORT_WIDTH,
   KEY_ShearBucklingOption,
+  KEY_TOP_Bflange_PG,
+  KEY_TOP_FLANGE_THICKNESS_PG,
   KEY_TORSIONAL_RES,
   KEY_WARPING_RES,
   KEY_WEB_PHILOSOPHY,
+  KEY_WEB_THICKNESS_PG,
 } from "../../../../constants/generated/coreKeys";
+import {
+  WEB_BOTTOMFLANGE_WIDTH_INC,
+  WEB_BOTTOMFLANGE_WIDTH_LB,
+  WEB_BOTTOMFLANGE_WIDTH_UB,
+  WEB_DESIGN_INTERMEDIATESTIFFENER_THICKNESS_VALUES,
+  WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES,
+  WEB_TOPFLANGE_WIDTH_INC,
+  WEB_TOPFLANGE_WIDTH_LB,
+  WEB_TOPFLANGE_WIDTH_UB,
+  WEB_TOTAL_DEPTH_INC,
+  WEB_TOTAL_DEPTH_LB,
+  WEB_TOTAL_DEPTH_UB,
+} from "../../../../constants/generated/webKeys";
 // Plate Girder uses backend key strings directly (matching backend Common.py)
 
 /**
@@ -354,23 +384,23 @@ export const plateGirderConfig = {
 
     const params = {
         // --- Basic Module Info ---
-        "Module": KEY_DISP_PLATE_GIRDER_WELDED,
-        "Material": String(inputs.material || "E 250 (Fe 410 W)A"),
-        "Member.Length": memberLength,
+        [KEY_MODULE]: KEY_DISP_PLATE_GIRDER_WELDED,
+        [KEY_MATERIAL]: String(inputs.material || "E 250 (Fe 410 W)A"),
+        [KEY_LENGTH]: memberLength,
         
         // --- Loads ---
-        "Loading.Condition": String(inputs.loading_condition || "Normal"),
-        "Load.Shear": String(inputs.shear_force || "0"),
-        "Load.Moment": String(inputs.bending_moment || "0"),
+        [KEY_LOAD]: String(inputs.loading_condition || "Normal"),
+        [KEY_SHEAR]: String(inputs.shear_force || "0"),
+        [KEY_MOMENT]: String(inputs.bending_moment || "0"),
         [KEY_BENDING_MOMENT_SHAPE]: String(inputs.bending_moment_shape || "Uniform Loading with pinned-pinned support"),
       
         // --- Design Type ---
-        "Total.Design_Type": String(inputs.design_type || "Customized"),
+        [KEY_OVERALL_DEPTH_PG_TYPE]: String(inputs.design_type || "Customized"),
       
         // --- Thicknesses (String for Customized, Array for Optimized) ---
-        "Web.Thickness": webThickness,
-        "TopFlange.Thickness": topFlangeThickness,
-        "BottomFlange.Thickness": bottomFlangeThickness,
+        [KEY_WEB_THICKNESS_PG]: webThickness,
+        [KEY_TOP_FLANGE_THICKNESS_PG]: topFlangeThickness,
+        [KEY_BOTTOM_FLANGE_THICKNESS_PG]: bottomFlangeThickness,
       
         // --- Design Preferences ---
         [KEY_DESIGN_TYPE_FLEXURE]: String(inputs.support_type || "Major Laterally Supported"),
@@ -388,13 +418,13 @@ export const plateGirderConfig = {
           inputs.member_options || "Simple Span",
           inputs.supporting_options || "Not Applicable"
         ),
-        "Design.Load": String(inputs.design_load || "Live load"),
-        "Member.Options": String(inputs.member_options || "Simple Span"),
-        "Supporting.Options": String(inputs.supporting_options || "NA"),
+        [KEY_DESIGN_LOAD]: String(inputs.design_load || "Live load"),
+        [KEY_MEMBER_OPTIONS]: String(inputs.member_options || "Simple Span"),
+        [KEY_SUPPORTING_OPTIONS]: String(inputs.supporting_options || "NA"),
         [KEY_ALLOW_CLASS]: String(inputs.allowable_class || "Plastic"),
         [KEY_WEB_PHILOSOPHY]: String(inputs.web_philosophy || "Thick Web without ITS"),
         [KEY_SUPPORT_WIDTH]: String(inputs.support_width || "100"),
-        "Design.Design_Method": String(inputs.design_method || "Limit State Design"),
+        [KEY_DP_DESIGN_METHOD]: String(inputs.design_method || "Limit State Design"),
         [KEY_EFFECTIVE_AREA_PARA]: String(inputs.effective_area_parameter || "1.0"),
         [KEY_LENGTH_OVERWRITE]: String(inputs.length_overwrite || "NA"),
         [KEY_ShearBucklingOption]: String(inputs.shear_buckling_option || "Simple Post Critical"),
@@ -412,35 +442,35 @@ export const plateGirderConfig = {
 
     // Add design type specific params
     if (inputs.design_type === "Customized") {
-      params["Total.Depth"] = String(inputs.total_depth || "500");
-      params["Topflange.Width"] = String(inputs.top_flange_width || "200");
-      params["Bottomflange.Width"] = String(inputs.bottom_flange_width || "200");
+      params[KEY_OVERALL_DEPTH_PG] = String(inputs.total_depth || "500");
+      params[KEY_TOP_Bflange_PG] = String(inputs.top_flange_width || "200");
+      params[KEY_BOTTOM_Bflange_PG] = String(inputs.bottom_flange_width || "200");
     } else if (inputs.design_type === "Optimized") {
       // For optimized, these are not required in set_input_values but we set defaults
-      params["Total.Depth"] = "1";
-      params["Topflange.Width"] = "1";
-      params["Bottomflange.Width"] = "1";
+      params[KEY_OVERALL_DEPTH_PG] = "1";
+      params[KEY_TOP_Bflange_PG] = "1";
+      params[KEY_BOTTOM_Bflange_PG] = "1";
       
       // Add optimization bounds if provided
       if (inputs.total_depth_lb && inputs.total_depth_ub) {
-        params["Total.Depth_lb"] = String(inputs.total_depth_lb);
-        params["Total.Depth_ub"] = String(inputs.total_depth_ub);
+        params[WEB_TOTAL_DEPTH_LB] = String(inputs.total_depth_lb);
+        params[WEB_TOTAL_DEPTH_UB] = String(inputs.total_depth_ub);
         if (inputs.total_depth_inc) {
-          params["Total.Depth_inc"] = String(inputs.total_depth_inc);
+          params[WEB_TOTAL_DEPTH_INC] = String(inputs.total_depth_inc);
         }
       }
       if (inputs.top_flange_width_lb && inputs.top_flange_width_ub) {
-        params["Topflange.Width_lb"] = String(inputs.top_flange_width_lb);
-        params["Topflange.Width_ub"] = String(inputs.top_flange_width_ub);
+        params[WEB_TOPFLANGE_WIDTH_LB] = String(inputs.top_flange_width_lb);
+        params[WEB_TOPFLANGE_WIDTH_UB] = String(inputs.top_flange_width_ub);
         if (inputs.top_flange_width_inc) {
-          params["Topflange.Width_inc"] = String(inputs.top_flange_width_inc);
+          params[WEB_TOPFLANGE_WIDTH_INC] = String(inputs.top_flange_width_inc);
         }
       }
       if (inputs.bottom_flange_width_lb && inputs.bottom_flange_width_ub) {
-        params["Bottomflange.Width_lb"] = String(inputs.bottom_flange_width_lb);
-        params["Bottomflange.Width_ub"] = String(inputs.bottom_flange_width_ub);
+        params[WEB_BOTTOMFLANGE_WIDTH_LB] = String(inputs.bottom_flange_width_lb);
+        params[WEB_BOTTOMFLANGE_WIDTH_UB] = String(inputs.bottom_flange_width_ub);
         if (inputs.bottom_flange_width_inc) {
-          params["Bottomflange.Width_inc"] = String(inputs.bottom_flange_width_inc);
+          params[WEB_BOTTOMFLANGE_WIDTH_INC] = String(inputs.bottom_flange_width_inc);
         }
       }
     }
@@ -449,12 +479,12 @@ export const plateGirderConfig = {
     if (inputs.intermediate_stiffener_thickness === "Customized" && 
         Array.isArray(inputs.intermediate_stiffener_thickness_val) && 
         inputs.intermediate_stiffener_thickness_val.length > 0) {
-      params["Design.IntermediateStiffener.Thickness_Values"] = inputs.intermediate_stiffener_thickness_val;
+      params[WEB_DESIGN_INTERMEDIATESTIFFENER_THICKNESS_VALUES] = inputs.intermediate_stiffener_thickness_val;
     }
     if (inputs.longitudinal_stiffener_thickness === "Customized" && 
         Array.isArray(inputs.longitudinal_stiffener_thickness_val) && 
         inputs.longitudinal_stiffener_thickness_val.length > 0) {
-      params["Design.LongitudnalStiffener.Thickness_Values"] = inputs.longitudinal_stiffener_thickness_val;
+      params[WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES] = inputs.longitudinal_stiffener_thickness_val;
     }
 
     return params;

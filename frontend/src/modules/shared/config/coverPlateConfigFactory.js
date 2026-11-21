@@ -1,4 +1,30 @@
 import { validateRequiredFields } from '../utils/validation';
+import {
+  KEY_AXIAL,
+  KEY_CONNECTOR_MATERIAL,
+  KEY_D,
+  KEY_DP_BOLT_HOLE_TYPE,
+  KEY_DP_BOLT_SLIP_FACTOR,
+  KEY_DP_BOLT_TYPE,
+  KEY_DP_DESIGN_METHOD,
+  KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+  KEY_DP_DETAILING_EDGE_TYPE,
+  KEY_DP_DETAILING_GAP,
+  KEY_DP_WELD_FAB,
+  KEY_DP_WELD_MATERIAL_G_O,
+  KEY_FLANGEPLATE_PREFERENCES,
+  KEY_FLANGEPLATE_THICKNESS,
+  KEY_GRD,
+  KEY_MATERIAL,
+  KEY_MODULE,
+  KEY_MOMENT,
+  KEY_SECSIZE,
+  KEY_SEC_MATERIAL,
+  KEY_SHEAR,
+  KEY_TYP,
+  KEY_WEBPLATE_THICKNESS,
+  KEY_WELD_TYPE,
+} from "../../../constants/generated/coreKeys";
 
 // Shared shape for coverPlateBolted / columnColumnCoverPlateBolted, which were
 // identical except for ~8 values (session/designType strings, cadOptions'
@@ -56,31 +82,31 @@ export function makeCoverPlateBoltedConfig({
     ],
 
     buildSubmissionParams: (inputs, allSelected, lists) => ({
-      "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
-      "Bolt.Diameter": allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
-      "Bolt.Grade": allSelected.bolt_grade ? lists.propertyClassList : inputs.bolt_grade,
-      "Bolt.Slip_Factor": inputs.bolt_slip_factor,
-      "Bolt.TensionType": inputs.bolt_tension_type,
-      "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-      "Connector.Flange_Plate.Preferences": inputs.flange_plate_preferences,
-      "Connector.Flange_Plate.Thickness_list": allSelected.flange_plate_thickness
+      [KEY_DP_BOLT_HOLE_TYPE]: inputs.bolt_hole_type,
+      [KEY_D]: allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
+      [KEY_GRD]: allSelected.bolt_grade ? lists.propertyClassList : inputs.bolt_grade,
+      [KEY_DP_BOLT_SLIP_FACTOR]: inputs.bolt_slip_factor,
+      [KEY_DP_BOLT_TYPE]: inputs.bolt_tension_type,
+      [KEY_TYP]: inputs.bolt_type.replaceAll("_", " "),
+      [KEY_FLANGEPLATE_PREFERENCES]: inputs.flange_plate_preferences,
+      [KEY_FLANGEPLATE_THICKNESS]: allSelected.flange_plate_thickness
         ? lists.thicknessList
         : inputs.flange_plate_thickness,
-      "Connector.Material": inputs.connector_material,
-      "Connector.Web_Plate.Thickness_List": allSelected.web_plate_thickness
+      [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
+      [KEY_WEBPLATE_THICKNESS]: allSelected.web_plate_thickness
         ? lists.thicknessList
         : inputs.web_plate_thickness,
-      "Design.Design_Method": inputs.design_method,
-      "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
-      "Detailing.Edge_type": inputs.detailing_edge_type,
-      "Detailing.Gap": inputs.detailing_gap,
-      "Load.Axial": inputs.load_axial || "0",
-      "Load.Moment": inputs.load_moment || "",
-      "Load.Shear": inputs.load_shear || "",
-      Material: inputs.material,
-      "Member.Designation": inputs.member_designation,
-      "Member.Material": inputs.member_material,
-      Module: designType,
+      [KEY_DP_DESIGN_METHOD]: inputs.design_method,
+      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: inputs.detailing_corr_status,
+      [KEY_DP_DETAILING_EDGE_TYPE]: inputs.detailing_edge_type,
+      [KEY_DP_DETAILING_GAP]: inputs.detailing_gap,
+      [KEY_AXIAL]: inputs.load_axial || "0",
+      [KEY_MOMENT]: inputs.load_moment || "",
+      [KEY_SHEAR]: inputs.load_shear || "",
+      [KEY_MATERIAL]: inputs.material,
+      [KEY_SECSIZE]: inputs.member_designation,
+      [KEY_SEC_MATERIAL]: inputs.member_material,
+      [KEY_MODULE]: designType,
     }),
 
     inputSections: [
@@ -258,26 +284,26 @@ export function makeCoverPlateWeldedConfig({
     ],
 
     buildSubmissionParams: (inputs, allSelected, lists) => ({
-      "Connector.Flange_Plate.Preferences": inputs.flange_plate_preferences,
-      "Connector.Flange_Plate.Thickness_list": allSelected.flange_plate_thickness
+      [KEY_FLANGEPLATE_PREFERENCES]: inputs.flange_plate_preferences,
+      [KEY_FLANGEPLATE_THICKNESS]: allSelected.flange_plate_thickness
         ? lists.thicknessList : inputs.flange_plate_thickness,
-      "Connector.Material": inputs.connector_material,
-      "Connector.Web_Plate.Thickness_List": allSelected.web_plate_thickness
+      [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
+      [KEY_WEBPLATE_THICKNESS]: allSelected.web_plate_thickness
         ? lists.thicknessList : inputs.web_plate_thickness,
-      "Design.Design_Method": inputs.design_method,
-      "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
-      "Detailing.Edge_type": inputs.detailing_edge_type,
-      "Detailing.Gap": inputs.detailing_gap,
-      "Load.Axial": inputs.load_axial || "0",
-      "Load.Moment": inputs.load_moment || "0",
-      "Load.Shear": inputs.load_shear || "0",
-      "Material": inputs.material,
-      "Member.Designation": inputs.member_designation,
-      "Member.Material": inputs[memberMaterialField],
-      "Module": designType,
-      "Weld.Fab": inputs.weld_fab,
-      "Weld.Material_Grade_OverWrite": inputs.weld_material_grade || "290",
-      "Weld.Type": inputs.weld_type,
+      [KEY_DP_DESIGN_METHOD]: inputs.design_method,
+      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: inputs.detailing_corr_status,
+      [KEY_DP_DETAILING_EDGE_TYPE]: inputs.detailing_edge_type,
+      [KEY_DP_DETAILING_GAP]: inputs.detailing_gap,
+      [KEY_AXIAL]: inputs.load_axial || "0",
+      [KEY_MOMENT]: inputs.load_moment || "0",
+      [KEY_SHEAR]: inputs.load_shear || "0",
+      [KEY_MATERIAL]: inputs.material,
+      [KEY_SECSIZE]: inputs.member_designation,
+      [KEY_SEC_MATERIAL]: inputs[memberMaterialField],
+      [KEY_MODULE]: designType,
+      [KEY_DP_WELD_FAB]: inputs.weld_fab,
+      [KEY_DP_WELD_MATERIAL_G_O]: inputs.weld_material_grade || "290",
+      [KEY_WELD_TYPE]: inputs.weld_type,
       "out_titles_status": [1, 1, 1, 1, 0],
       ...extraSubmissionParams,
     }),

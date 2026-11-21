@@ -1,5 +1,24 @@
 import { validateRequiredFields } from '../../../shared/utils/validation';
-import { KEY_DISP_FLEXURE2 } from "../../../../constants/generated/coreKeys";
+import {
+  KEY_ALLOW_CLASS,
+  KEY_BEARING_LENGTH,
+  KEY_DESIGN_TYPE_FLEXURE,
+  KEY_DISP_FLEXURE2,
+  KEY_DP_DESIGN_METHOD,
+  KEY_EFFECTIVE_AREA_PARA,
+  KEY_LENGTH,
+  KEY_LENGTH_OVERWRITE,
+  KEY_LOAD,
+  KEY_MATERIAL,
+  KEY_MODULE,
+  KEY_MOMENT,
+  KEY_SECSIZE,
+  KEY_SEC_MATERIAL,
+  KEY_SEC_PROFILE,
+  KEY_SHEAR,
+  KEY_SUPPORT_TYPE,
+  KEY_SUPPORT_TYPE2,
+} from "../../../../constants/generated/coreKeys";
 
 
 export const onCantileverConfig = {
@@ -101,35 +120,35 @@ export const onCantileverConfig = {
 
     return {
       // Module identification
-      "Module": KEY_DISP_FLEXURE2,
+      [KEY_MODULE]: KEY_DISP_FLEXURE2,
 
       // Section
-      "Member.Profile": inputs.section_profile || "Beams and Columns",
-      "Member.Designation": sectionList,
+      [KEY_SEC_PROFILE]: inputs.section_profile || "Beams and Columns",
+      [KEY_SECSIZE]: sectionList,
 
       // Material
-      "Material": inputs.material || "",
-      "Member.Material": inputs.section_material || inputs.material || "",
+      [KEY_MATERIAL]: inputs.material || "",
+      [KEY_SEC_MATERIAL]: inputs.section_material || inputs.material || "",
 
       // Cantilever-specific restraints
-      "Flexure.Type": inputs.support_type || "Major Laterally Supported",
-      "Cantilever.Support": inputs.support_restraint || "Continuous, with lateral restraint to top flange",
-      "Cantilever.Top": inputs.top_restraint || "Free",
+      [KEY_DESIGN_TYPE_FLEXURE]: inputs.support_type || "Major Laterally Supported",
+      [KEY_SUPPORT_TYPE]: inputs.support_restraint || "Continuous, with lateral restraint to top flange",
+      [KEY_SUPPORT_TYPE2]: inputs.top_restraint || "Free",
 
       // Geometry
-      "Member.Length": inputs.member_length,
+      [KEY_LENGTH]: inputs.member_length,
 
       // Loads
-      "Load.Shear": inputs.shear_force,
-      "Load.Moment": inputs.bending_moment,
+      [KEY_SHEAR]: inputs.shear_force,
+      [KEY_MOMENT]: inputs.bending_moment,
 
       // Design preferences
-      "Design.Design_Method": inputs.design_method || "Limit State Design",
-      "Optimum.Class": inputs.allowable_class || "Yes",
-      "Effective.Area_Para": inputs.effective_area_parameter || "1.0",
-      "Length.Overwrite": inputs.length_overwrite || "NA",
-      "Bearing.Length": inputs.bearing_length || "NA",
-      "Loading.Condition": inputs.loading_condition || "Normal",
+      [KEY_DP_DESIGN_METHOD]: inputs.design_method || "Limit State Design",
+      [KEY_ALLOW_CLASS]: inputs.allowable_class || "Yes",
+      [KEY_EFFECTIVE_AREA_PARA]: inputs.effective_area_parameter || "1.0",
+      [KEY_LENGTH_OVERWRITE]: inputs.length_overwrite || "NA",
+      [KEY_BEARING_LENGTH]: inputs.bearing_length || "NA",
+      [KEY_LOAD]: inputs.loading_condition || "Normal",
     };
   },
 

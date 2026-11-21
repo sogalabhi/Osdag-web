@@ -9,7 +9,31 @@ import FIXED_HINGED from "../../../assets/CompressionMember/RFRFstrut.png";
 import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
-import { KEY_DISP_STRUT_BOLTED_END_GUSSET, KEY_END1, KEY_END2 } from "../../../constants/generated/coreKeys";
+import {
+  KEY_AXIAL,
+  KEY_CONNECTOR_MATERIAL,
+  KEY_D,
+  KEY_DISP_STRUT_BOLTED_END_GUSSET,
+  KEY_DP_BOLT_HOLE_TYPE,
+  KEY_DP_BOLT_SLIP_FACTOR,
+  KEY_DP_BOLT_TYPE,
+  KEY_DP_DESIGN_METHOD,
+  KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+  KEY_DP_DETAILING_EDGE_TYPE,
+  KEY_DP_DETAILING_GAP,
+  KEY_END1,
+  KEY_END2,
+  KEY_GRD,
+  KEY_LENGTH,
+  KEY_LOCATION,
+  KEY_MATERIAL,
+  KEY_MODULE,
+  KEY_PLATETHK,
+  KEY_SECSIZE,
+  KEY_SEC_MATERIAL,
+  KEY_SEC_PROFILE,
+  KEY_TYP,
+} from "../../../constants/generated/coreKeys";
 export const strutsBoltedConfig = {
   sessionName: "Struts Bolted to End Gusset",
   designType: KEY_DISP_STRUT_BOLTED_END_GUSSET,
@@ -147,35 +171,35 @@ export const strutsBoltedConfig = {
         );
 
     return {
-      "Module": KEY_DISP_STRUT_BOLTED_END_GUSSET,
-      "Member.Profile": inputs.section_profile,
-      "Member.Designation": memberDesignation,
+      [KEY_MODULE]: KEY_DISP_STRUT_BOLTED_END_GUSSET,
+      [KEY_SEC_PROFILE]: inputs.section_profile,
+      [KEY_SECSIZE]: memberDesignation,
 
-      "Material": inputs.material,
-      "Member.Material": inputs.material,
+      [KEY_MATERIAL]: inputs.material,
+      [KEY_SEC_MATERIAL]: inputs.material,
 
-      "Member.Length": String(inputs.length),
-      "Load.Axial": String(inputs.axial_force),
+      [KEY_LENGTH]: String(inputs.length),
+      [KEY_AXIAL]: String(inputs.axial_force),
 
-      "Conn_Location": inputs.location,
+      [KEY_LOCATION]: inputs.location,
       [KEY_END1]: inputs.end_condition_1,
       [KEY_END2]: inputs.end_condition_2,
       "is_leg_loaded": inputs.is_leg_loaded,
 
-      "Bolt.Diameter": getList("bolt_diameter", "boltDiameterList"),
-      "Bolt.Grade": getList("bolt_grade", "propertyClassList"),
-      "Bolt.Type": inputs.bolt_type,
-      "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
-      "Bolt.Slip_Factor": String(inputs.bolt_slip_factor),
-      "Bolt.TensionType": inputs.bolt_tension_type,
+      [KEY_D]: getList("bolt_diameter", "boltDiameterList"),
+      [KEY_GRD]: getList("bolt_grade", "propertyClassList"),
+      [KEY_TYP]: inputs.bolt_type,
+      [KEY_DP_BOLT_HOLE_TYPE]: inputs.bolt_hole_type,
+      [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
+      [KEY_DP_BOLT_TYPE]: inputs.bolt_tension_type,
 
-      "Connector.Material": inputs.connector_material,
-      "Connector.Plate.Thickness_List": getList("plate_thickness", "thicknessList"),
+      [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
+      [KEY_PLATETHK]: getList("plate_thickness", "thicknessList"),
 
-      "Design.Design_Method": inputs.design_method,
-      "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
-      "Detailing.Edge_type": inputs.detailing_edge_type,
-      "Detailing.Gap": String(inputs.detailing_gap),
+      [KEY_DP_DESIGN_METHOD]: inputs.design_method,
+      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: inputs.detailing_corr_status,
+      [KEY_DP_DETAILING_EDGE_TYPE]: inputs.detailing_edge_type,
+      [KEY_DP_DETAILING_GAP]: String(inputs.detailing_gap),
     };
   },
 

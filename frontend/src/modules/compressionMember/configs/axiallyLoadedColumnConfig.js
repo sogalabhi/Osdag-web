@@ -10,7 +10,24 @@ import img_5_RRRF_rotated from "../../../assets/CompressionMember/5.RRRF_rotated
 import img_6_RRRR from "../../../assets/CompressionMember/6.RRRR.PNG";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
-import { KEY_DISP_COMPRESSION_COLUMN } from "../../../constants/generated/coreKeys";
+import {
+  KEY_ACTUAL_LEN_YY,
+  KEY_ACTUAL_LEN_ZZ,
+  KEY_ALLOW_UR,
+  KEY_AXIAL,
+  KEY_DISP_COMPRESSION_COLUMN,
+  KEY_DP_DESIGN_METHOD,
+  KEY_EFFECTIVE_AREA_PARA,
+  KEY_END1,
+  KEY_END1_Y,
+  KEY_END2,
+  KEY_END2_Y,
+  KEY_MATERIAL,
+  KEY_MODULE,
+  KEY_OPTIMIZATION_PARA,
+  KEY_SECSIZE,
+  KEY_SEC_PROFILE,
+} from "../../../constants/generated/coreKeys";
 export const axiallyLoadedColumnConfig = {
   sessionName: "Axially Loaded Column",
   designType: KEY_DISP_COMPRESSION_COLUMN,
@@ -137,21 +154,21 @@ export const axiallyLoadedColumnConfig = {
     };
 
     return {
-      Module: KEY_DISP_COMPRESSION_COLUMN,
-      "Member.Profile": String(inputs.section_profile),
-      "Member.Designation": getSectionDesignations(),
-      Material: String(inputs.material),
-      "Actual.Length_zz": String(inputs.actual_length_zz),
-      "Actual.Length_yy": String(inputs.actual_length_yy),
-      End_1: String(inputs.end_condition_1),
-      End_2: String(inputs.end_condition_2),
-      End_1_Y: String(inputs.end_condition_1_y),
-      End_2_Y: String(inputs.end_condition_2_y),
-      "Load.Axial": String(inputs.axial_load),
-      "Design.Design_Method": String(inputs.design_method || "Limit State Design"),
-      "Optimum.AllowUR": String(inputs.allow_ur || "1.0"),
-      "Effective.Area_Para": String(inputs.effective_area_parameter || "1.0"),
-      "Optimum.Para": String(inputs.optimum_para || "Utilization Ratio"),
+      [KEY_MODULE]: KEY_DISP_COMPRESSION_COLUMN,
+      [KEY_SEC_PROFILE]: String(inputs.section_profile),
+      [KEY_SECSIZE]: getSectionDesignations(),
+      [KEY_MATERIAL]: String(inputs.material),
+      [KEY_ACTUAL_LEN_ZZ]: String(inputs.actual_length_zz),
+      [KEY_ACTUAL_LEN_YY]: String(inputs.actual_length_yy),
+      [KEY_END1]: String(inputs.end_condition_1),
+      [KEY_END2]: String(inputs.end_condition_2),
+      [KEY_END1_Y]: String(inputs.end_condition_1_y),
+      [KEY_END2_Y]: String(inputs.end_condition_2_y),
+      [KEY_AXIAL]: String(inputs.axial_load),
+      [KEY_DP_DESIGN_METHOD]: String(inputs.design_method || "Limit State Design"),
+      [KEY_ALLOW_UR]: String(inputs.allow_ur || "1.0"),
+      [KEY_EFFECTIVE_AREA_PARA]: String(inputs.effective_area_parameter || "1.0"),
+      [KEY_OPTIMIZATION_PARA]: String(inputs.optimum_para || "Utilization Ratio"),
     };
   },
 

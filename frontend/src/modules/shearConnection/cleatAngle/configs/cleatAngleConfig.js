@@ -1,7 +1,33 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
-import { KEY_DISP_CLEATANGLE, CONN_CFBW, CONN_CWBW } from "../../../../constants/generated/coreKeys";
+import {
+  CONN_CFBW,
+  CONN_CWBW,
+  KEY_ANGLE_LIST,
+  KEY_CONN,
+  KEY_CONNECTOR_MATERIAL,
+  KEY_D,
+  KEY_DISP_CLEATANGLE,
+  KEY_DP_BOLT_HOLE_TYPE,
+  KEY_DP_BOLT_SLIP_FACTOR,
+  KEY_DP_BOLT_TYPE,
+  KEY_DP_DESIGN_METHOD,
+  KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+  KEY_DP_DETAILING_EDGE_TYPE,
+  KEY_DP_DETAILING_GAP,
+  KEY_DP_WELD_FAB,
+  KEY_DP_WELD_MATERIAL_G_O,
+  KEY_GRD,
+  KEY_MATERIAL,
+  KEY_MODULE,
+  KEY_SHEAR,
+  KEY_SUPTDSEC,
+  KEY_SUPTDSEC_MATERIAL,
+  KEY_SUPTNGSEC,
+  KEY_SUPTNGSEC_MATERIAL,
+  KEY_TYP,
+} from "../../../../constants/generated/coreKeys";
 export const cleatAngleConfig = {
   sessionName: KEY_DISP_CLEATANGLE,
   designType: KEY_DISP_CLEATANGLE,
@@ -79,41 +105,41 @@ export const cleatAngleConfig = {
     const connectivity = extraState?.selectedOption || inputs.connectivity || lists?.connectivityList?.[0];
     // Common parameters
     const baseParams = {
-      "Bolt.Bolt_Hole_Type": inputs.bolt_hole_type,
-      "Bolt.Diameter": allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
-      "Bolt.Grade": allSelected.bolt_grade ? lists.propertyClassList : inputs.bolt_grade,
-      "Bolt.Slip_Factor": inputs.bolt_slip_factor,
-      "Bolt.TensionType": inputs.bolt_tension_type,
-      "Bolt.Type": inputs.bolt_type.replaceAll("_", " "),
-      "Connectivity": connectivity,
-      "Connector.Material": inputs.connector_material,
-      "Design.Design_Method": inputs.design_method,
-      "Detailing.Corrosive_Influences": inputs.detailing_corr_status,
-      "Detailing.Edge_type": inputs.detailing_edge_type,
-      "Detailing.Gap": inputs.detailing_gap,
-      "Load.Shear": inputs.load_shear || "",
-      "Material": inputs.connector_material,
-      "Module": KEY_DISP_CLEATANGLE,
-      "Weld.Fab": inputs.weld_fab,
-      "Weld.Material_Grade_OverWrite": inputs.weld_material_grade,
-      "Connector.Angle_List": allSelected.cleat_section ? lists.angleList : inputs.cleat_section,
+      [KEY_DP_BOLT_HOLE_TYPE]: inputs.bolt_hole_type,
+      [KEY_D]: allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
+      [KEY_GRD]: allSelected.bolt_grade ? lists.propertyClassList : inputs.bolt_grade,
+      [KEY_DP_BOLT_SLIP_FACTOR]: inputs.bolt_slip_factor,
+      [KEY_DP_BOLT_TYPE]: inputs.bolt_tension_type,
+      [KEY_TYP]: inputs.bolt_type.replaceAll("_", " "),
+      [KEY_CONN]: connectivity,
+      [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
+      [KEY_DP_DESIGN_METHOD]: inputs.design_method,
+      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: inputs.detailing_corr_status,
+      [KEY_DP_DETAILING_EDGE_TYPE]: inputs.detailing_edge_type,
+      [KEY_DP_DETAILING_GAP]: inputs.detailing_gap,
+      [KEY_SHEAR]: inputs.load_shear || "",
+      [KEY_MATERIAL]: inputs.connector_material,
+      [KEY_MODULE]: KEY_DISP_CLEATANGLE,
+      [KEY_DP_WELD_FAB]: inputs.weld_fab,
+      [KEY_DP_WELD_MATERIAL_G_O]: inputs.weld_material_grade,
+      [KEY_ANGLE_LIST]: allSelected.cleat_section ? lists.angleList : inputs.cleat_section,
     };
     // Connectivity-specific member assignments
     if (connectivity === "Beam-Beam") {
       return {
         ...baseParams,
-        "Member.Supported_Section.Designation": inputs.secondary_beam,
-        "Member.Supporting_Section.Designation": inputs.primary_beam,
-        "Member.Supported_Section.Material": inputs.supported_material,
-        "Member.Supporting_Section.Material": inputs.supporting_material,
+        [KEY_SUPTDSEC]: inputs.secondary_beam,
+        [KEY_SUPTNGSEC]: inputs.primary_beam,
+        [KEY_SUPTDSEC_MATERIAL]: inputs.supported_material,
+        [KEY_SUPTNGSEC_MATERIAL]: inputs.supporting_material,
       };
     } else {
       return {
         ...baseParams,
-        "Member.Supported_Section.Designation": inputs.beam_section,
-        "Member.Supporting_Section.Designation": inputs.column_section,
-        "Member.Supported_Section.Material": inputs.supported_material,
-        "Member.Supporting_Section.Material": inputs.supporting_material,
+        [KEY_SUPTDSEC]: inputs.beam_section,
+        [KEY_SUPTNGSEC]: inputs.column_section,
+        [KEY_SUPTDSEC_MATERIAL]: inputs.supported_material,
+        [KEY_SUPTNGSEC_MATERIAL]: inputs.supporting_material,
       };
     }
   },

@@ -49,3 +49,14 @@ WEB_STIFFENERHOLLOW_OD_THICKNESS = "StiffenerHollow.OD.Thickness"
 
 # .osi file metadata
 WEB_OSDAGWEB_VERSION = "OsdagWeb.Version"
+
+# Plate girder optimisation bounds (the backend builds these from the base key and a suffix)
+WEB_TOTAL_DEPTH_LB = "Total.Depth_lb"
+WEB_TOTAL_DEPTH_UB = "Total.Depth_ub"
+WEB_TOTAL_DEPTH_INC = "Total.Depth_inc"
+WEB_TOPFLANGE_WIDTH_LB = "Topflange.Width_lb"
+WEB_TOPFLANGE_WIDTH_UB = "Topflange.Width_ub"
+WEB_TOPFLANGE_WIDTH_INC = "Topflange.Width_inc"
+WEB_BOTTOMFLANGE_WIDTH_LB = "Bottomflange.Width_lb"
+WEB_BOTTOMFLANGE_WIDTH_UB = "Bottomflange.Width_ub"
+WEB_BOTTOMFLANGE_WIDTH_INC = "Bottomflange.Width_inc"
