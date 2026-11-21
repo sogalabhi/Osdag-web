@@ -4,9 +4,54 @@ from datetime import datetime
 from typing import Any, Dict, Tuple
 
 import yaml
+from apps.core.web_keys import WEB_OSDAGWEB_VERSION
 from django.core.files.base import ContentFile
 
-from osdag_core.Common import KEY_DISP_HEADERPLATE
+from osdag_core.Common import (
+    KEY_ACTUAL_LEN_YY,
+    KEY_ACTUAL_LEN_ZZ,
+    KEY_ANGLE_LIST,
+    KEY_AXIAL,
+    KEY_AXIAL_FORCE,
+    KEY_CONN,
+    KEY_CONNECTOR_MATERIAL,
+    KEY_D,
+    KEY_DESIGN_FOR,
+    KEY_DISP_HEADERPLATE,
+    KEY_DP_BOLT_HOLE_TYPE,
+    KEY_DP_BOLT_SLIP_FACTOR,
+    KEY_DP_BOLT_TYPE,
+    KEY_DP_DESIGN_METHOD,
+    KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+    KEY_DP_DETAILING_EDGE_TYPE,
+    KEY_DP_DETAILING_GAP,
+    KEY_DP_WELD_FAB,
+    KEY_DP_WELD_MATERIAL_G_O,
+    KEY_END1,
+    KEY_END1_Y,
+    KEY_END2,
+    KEY_END2_Y,
+    KEY_FLANGEPLATE_THICKNESS,
+    KEY_GRD,
+    KEY_LENYY,
+    KEY_LENZZ,
+    KEY_MATERIAL,
+    KEY_MODULE,
+    KEY_PLATE1_THICKNESS,
+    KEY_PLATE2_THICKNESS,
+    KEY_PLATE_WIDTH,
+    KEY_PLATETHK,
+    KEY_SEC_PROFILE,
+    KEY_SECSIZE,
+    KEY_SECTION_PROFILE,
+    KEY_SHEAR,
+    KEY_SUPTDSEC,
+    KEY_SUPTNGSEC,
+    KEY_TYP,
+    KEY_WEBPLATE_THICKNESS,
+    KEY_WELD_SIZE,
+    KEY_WELD_TYPE,
+)
 
 OSI_SCHEMA_VERSION = "1.0"
 SUPPORTED_VERSIONS = {"1.0"}
@@ -26,44 +71,44 @@ def validate_module_id(module_id: str) -> bool:
 # OSI key -> frontend field name. Every key is a core key (a value in osdag_core.Common). The first
 # key listed for a field is the one an export writes, so list the core spelling first.
 OSI_KEY_TO_FIELD = {
-    "Bolt.Bolt_Hole_Type": "bolt_hole_type",
-    "Bolt.Diameter": "bolt_diameter",
-    "Bolt.Grade": "bolt_grade",
-    "Bolt.Slip_Factor": "bolt_slip_factor",
-    "Bolt.TensionType": "bolt_tension_type",
-    "Bolt.Type": "bolt_type",
-    "Connector.Material": "connector_material",
-    "Connector.Plate.Thickness_List": "plate_thickness",
-    "Connector.Flange_Plate.Thickness_list": "flange_plate_thickness",
-    "Connector.Web_Plate.Thickness_List": "web_plate_thickness",
-    "Connector.Angle_List": "angle_list",
-    "Member.Profile": "section_profile",
-    "Section.Profile": "section_profile",
+    KEY_DP_BOLT_HOLE_TYPE: "bolt_hole_type",
+    KEY_D: "bolt_diameter",
+    KEY_GRD: "bolt_grade",
+    KEY_DP_BOLT_SLIP_FACTOR: "bolt_slip_factor",
+    KEY_DP_BOLT_TYPE: "bolt_tension_type",
+    KEY_TYP: "bolt_type",
+    KEY_CONNECTOR_MATERIAL: "connector_material",
+    KEY_PLATETHK: "plate_thickness",
+    KEY_FLANGEPLATE_THICKNESS: "flange_plate_thickness",
+    KEY_WEBPLATE_THICKNESS: "web_plate_thickness",
+    KEY_ANGLE_LIST: "angle_list",
+    KEY_SEC_PROFILE: "section_profile",
+    KEY_SECTION_PROFILE: "section_profile",
     "Section Profile": "section_profile",
-    "End_1": "end_condition_1",
-    "End_2": "end_condition_2",
-    "End_1_Y": "end_condition_1_y",
-    "End_2_Y": "end_condition_2_y",
-    "Actual.Length_zz": "actual_length_zz",
-    "Actual.Length_yy": "actual_length_yy",
-    "Member.Length_zz": "actual_length_zz",
-    "Member.Length_yy": "actual_length_yy",
-    "Design.Design_Method": "design_method",
-    "Detailing.Corrosive_Influences": "detailing_corr_status",
-    "Detailing.Edge_type": "detailing_edge_type",
-    "Detailing.Gap": "detailing_gap",
-    "Design.For": "design_for",
-    "Load.Axial": "load_axial",
-    "Load.Axial.Force": "axial_force",
-    "Load.Shear": "load_shear",
-    "Material": "material",
-    "Plate1Thickness": "plate1_thickness",
-    "Plate2Thickness": "plate2_thickness",
-    "PlateWidth": "plate_width",
-    "Weld.Fab": "weld_fab",
-    "Weld.Material_Grade_OverWrite": "weld_material_grade",
-    "Weld.Size": "weld_size",
-    "Weld.Type": "weld_type",
+    KEY_END1: "end_condition_1",
+    KEY_END2: "end_condition_2",
+    KEY_END1_Y: "end_condition_1_y",
+    KEY_END2_Y: "end_condition_2_y",
+    KEY_ACTUAL_LEN_ZZ: "actual_length_zz",
+    KEY_ACTUAL_LEN_YY: "actual_length_yy",
+    KEY_LENZZ: "actual_length_zz",
+    KEY_LENYY: "actual_length_yy",
+    KEY_DP_DESIGN_METHOD: "design_method",
+    KEY_DP_DETAILING_CORROSIVE_INFLUENCES: "detailing_corr_status",
+    KEY_DP_DETAILING_EDGE_TYPE: "detailing_edge_type",
+    KEY_DP_DETAILING_GAP: "detailing_gap",
+    KEY_DESIGN_FOR: "design_for",
+    KEY_AXIAL: "load_axial",
+    KEY_AXIAL_FORCE: "axial_force",
+    KEY_SHEAR: "load_shear",
+    KEY_MATERIAL: "material",
+    KEY_PLATE1_THICKNESS: "plate1_thickness",
+    KEY_PLATE2_THICKNESS: "plate2_thickness",
+    KEY_PLATE_WIDTH: "plate_width",
+    KEY_DP_WELD_FAB: "weld_fab",
+    KEY_DP_WELD_MATERIAL_G_O: "weld_material_grade",
+    KEY_WELD_SIZE: "weld_size",
+    KEY_WELD_TYPE: "weld_type",
 }
 
 # field name -> OSI key, for export (the first key listed for a field wins)
@@ -162,30 +207,30 @@ def normalize_osi_keys(flat_inputs: Dict[str, Any]) -> Dict[str, Any]:
         if "axial_force" not in dock:
             dock["axial_force"] = dock["load_axial"]
 
-    sec_prof = dock.get("section_profile") or flat_inputs.get("Member.Profile") or flat_inputs.get("Section Profile")
+    sec_prof = dock.get("section_profile") or flat_inputs.get(KEY_SEC_PROFILE) or flat_inputs.get("Section Profile")
     if sec_prof in ["Channels", "Back to Back Channels"]:
         dock["location"] = "Web"
     elif sec_prof in ["Angles", "Back to Back Angles", "Star Angles"] and dock.get("location") not in ["Long Leg", "Short Leg"]:
         dock["location"] = "Long Leg"
 
-    connectivity = flat_inputs.get("Connectivity *") or flat_inputs.get("Connectivity")
+    connectivity = flat_inputs.get("Connectivity *") or flat_inputs.get(KEY_CONN)
     if connectivity:
         dock["connectivity"] = str(connectivity).strip()
 
-    supporting_desc = flat_inputs.get("Member.Supporting_Section.Designation") or flat_inputs.get("Supporting_Section.Designation")
+    supporting_desc = flat_inputs.get(KEY_SUPTNGSEC)
     if supporting_desc:
         dock["supporting_designation"] = supporting_desc
         dock["column_section"] = supporting_desc
         dock["member_designation"] = supporting_desc
 
-    supported_desc = flat_inputs.get("Member.Supported_Section.Designation") or flat_inputs.get("Supported_Section.Designation")
+    supported_desc = flat_inputs.get(KEY_SUPTDSEC)
     if supported_desc:
         dock["supported_designation"] = supported_desc
         dock["beam_section"] = supported_desc
         if "member_designation" not in dock:
             dock["member_designation"] = supported_desc
 
-    direct_desc = flat_inputs.get("Member.Designation") or flat_inputs.get("Designation")
+    direct_desc = flat_inputs.get(KEY_SECSIZE) or flat_inputs.get("Designation")
     if direct_desc:
         dock["member_designation"] = direct_desc
 
@@ -219,10 +264,10 @@ def _to_flat_yaml(module_id: str, name: str, inputs: Dict[str, Any]) -> str:
     flat_inputs = {**inputs}
     
     # Guarantee Module and Version are set
-    if "Module" not in flat_inputs and "module" not in flat_inputs:
-        flat_inputs["Module"] = module_id
-    if "OsdagWeb.Version" not in flat_inputs:
-        flat_inputs["OsdagWeb.Version"] = "1.0"
+    if KEY_MODULE not in flat_inputs and "module" not in flat_inputs:
+        flat_inputs[KEY_MODULE] = module_id
+    if WEB_OSDAGWEB_VERSION not in flat_inputs:
+        flat_inputs[WEB_OSDAGWEB_VERSION] = "1.0"
 
     # Build YAML string manually
     lines: list[str] = []
@@ -312,7 +357,7 @@ def parse_osi(text: str) -> Tuple[str, str, Dict[str, Any]]:
     except Exception:
         # Fallback to flat YAML
         flat_inputs = _parse_flat_yaml(text)
-        module_id = flat_inputs.get("Module") or flat_inputs.get("module") or ""
+        module_id = flat_inputs.get(KEY_MODULE) or flat_inputs.get("module") or ""
 
         if not module_id:
             raise ValueError("Module missing in OSI")

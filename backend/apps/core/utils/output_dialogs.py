@@ -24,7 +24,38 @@ popups list other fields than the desktop dialog reads, so only its spacing open
 import logging
 import re
 
+from apps.core.web_keys import WEB_MEMBER_DEPTH
+
 from osdag_core import Common as C
+from osdag_core.Common import (
+    KEY_BOLT_CAPACITIES,
+    KEY_BOLT_CAPACITIES_WEB,
+    KEY_FLANGE_SPACING,
+    KEY_FLANGEPLATE_THICKNESS,
+    KEY_OUT_BOLT_LINE,
+    KEY_OUT_BOLTS_ONE_LINE,
+    KEY_OUT_COL_PROVIDED,
+    KEY_OUT_D_PROVIDED,
+    KEY_OUT_EDGE_DIST,
+    KEY_OUT_END_DIST,
+    KEY_OUT_GAUGE,
+    KEY_OUT_GAUGE_CENTRAL,
+    KEY_OUT_NO_BOLTS_FLANGE,
+    KEY_OUT_NO_BOLTS_FLANGE_TOTAL,
+    KEY_OUT_PITCH,
+    KEY_OUT_PLATE_HEIGHT,
+    KEY_OUT_PLATE_LENGTH,
+    KEY_OUT_ROW_PROVIDED,
+    KEY_OUT_SPTING_BOLT_LINE,
+    KEY_OUT_SPTING_BOLTS_ONE_LINE,
+    KEY_OUT_STIFFENER_THICKNESS,
+    KEY_OUT_STIFFENER_WIDTH,
+    KEY_OUT_WELD_SIZE,
+    KEY_PITCH_2_FLANGE1,
+    KEY_WEB_PLATE_LENGTH,
+    KEY_WEB_SPACING,
+    KEY_WEBPLATE_THICKNESS,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +126,7 @@ def _spacing_params(rows):
         C.KEY_OUT_GAUGE2: "gauge2",
         C.KEY_OUT_GAUGE: "gauge",
         C.KEY_OUT_EDGE_DIST: "edge",
-        "Member.Depth": "Member.Depth",
+        WEB_MEMBER_DEPTH: WEB_MEMBER_DEPTH,
     }
     params = {}
     for row in rows:
@@ -148,8 +179,8 @@ def _bolt_pattern(module, rows, cols):
         member = _member_height(outputs.get("section_size.designation", "")) if "section_size.designation" in outputs else None
         if is_strut and member is not None:
             height = member
-        elif "Member.Depth" in params:
-            height = params["Member.Depth"]
+        elif WEB_MEMBER_DEPTH in params:
+            height = params[WEB_MEMBER_DEPTH]
         # The bolts run along the plate: `end` and `pitch` are across the drawing.
         drawing = {"end": params["edge"], "pitch": params.get("gauge1", params.get("gauge", 0)),
                    "gauge": params["pitch"], "edge": params["end"]}
@@ -165,7 +196,7 @@ def _bolt_pattern(module, rows, cols):
         "rows": rows,
         "cols": cols,
         "holeDiameter": hole,
-        "weldSize": 0 if is_strut or is_lap else (_num(outputs.get("Weld.Size"), 0)),
+        "weldSize": 0 if is_strut or is_lap else (_num(outputs.get(KEY_OUT_WELD_SIZE), 0)),
         "origin": origin,
         **drawing,
     }
@@ -191,7 +222,7 @@ def _fin_plate_capacity(module, function, section, show_third=False):
         "rows": int(module.plate.bolts_one_line),
         "cols": int(module.plate.bolt_line),
         "holeDiameter": float(module.bolt.bolt_diameter_provided),
-        "weldSize": _num(outputs.get("Weld.Size"), 0),
+        "weldSize": _num(outputs.get(KEY_OUT_WELD_SIZE), 0),
         "end": params["end"],
         "pitch": params["pitch"],
         "gauge": _gauge(params),
@@ -218,12 +249,12 @@ def _end_plate_spacing(module):
     params = _spacing_params(module.spacing(status=True))
     params["hole"] = module.bolt.bolt_diameter_provided
     values = {
-        "plateWidth": _num(outputs["Plate.Length"]),
-        "plateHeight": _num(outputs["Plate.Height"]),
-        "rows": int(outputs["Bolt.Rows"]),
+        "plateWidth": _num(outputs[KEY_OUT_PLATE_LENGTH]),
+        "plateHeight": _num(outputs[KEY_OUT_PLATE_HEIGHT]),
+        "rows": int(outputs[KEY_OUT_ROW_PROVIDED]),
         "cols": int(module.plate.bolt_line),
-        "holeDiameter": float(outputs["Bolt.Diameter"]),
-        "weldSize": _num(outputs.get("Weld.Size"), 0),
+        "holeDiameter": float(outputs[KEY_OUT_D_PROVIDED]),
+        "weldSize": _num(outputs.get(KEY_OUT_WELD_SIZE), 0),
         "weldGap": float(module.supported_section.web_thickness),
         "end": params["end"],
         "pitch": params["pitch"],
@@ -250,7 +281,7 @@ def _cleat_params(module, flag):
                 return int(outputs[name])
         return 0
 
-    key_rows, key_cols = ("Bolt.OneLine", "Bolt.Line") if flag == 0 else ("Cleat.Spting_leg.OneLine", "Cleat.Spting_leg.Line")
+    key_rows, key_cols = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_BOLT_LINE) if flag == 0 else (KEY_OUT_SPTING_BOLTS_ONE_LINE, KEY_OUT_SPTING_BOLT_LINE)
     params = {
         "width": int(outputs["Height (mm) + Plate.Height"]),
         "hole": int(outputs["Diameter (mm) + Bolt.Diameter"]),
@@ -346,25 +377,25 @@ def _seated_spacing(module, which):
     lists = [module.top_spacing_col(True), module.top_spacing_beam(True),
              module.seated_spacing_col(True), module.seated_spacing_beam(True)]
     data = {row[0]: row[3] for row in lists[which - 1] if row[0]}
-    gauge = data["Bolt.Gauge"]
-    if gauge == 0 and "Bolt.GaugeCentral" in data:
-        gauge = data["Bolt.GaugeCentral"]
+    gauge = data[KEY_OUT_GAUGE]
+    if gauge == 0 and KEY_OUT_GAUGE_CENTRAL in data:
+        gauge = data[KEY_OUT_GAUGE_CENTRAL]
     hole = module.bolt.bolt_diameter_provided
     values = {
         "plateWidth": float(angle.width),
         "plateHeight": float(angle.leg_a_length),
-        "rows": int(data["Bolt.Rows"]),
-        "cols": int(data["Bolt.Cols"]),
+        "rows": int(data[KEY_OUT_ROW_PROVIDED]),
+        "cols": int(data[KEY_OUT_COL_PROVIDED]),
         "holeDiameter": float(hole),
-        "end": data["Bolt.EndDist"],
+        "end": data[KEY_OUT_END_DIST],
         "gauge": gauge,
-        "edge": data["Bolt.EdgeDist"],
-        "pitch": data.get("Bolt.Pitch", 0),
+        "edge": data[KEY_OUT_EDGE_DIST],
+        "pitch": data.get(KEY_OUT_PITCH, 0),
         "angleDesignation": str(angle.designation),
         "thicknessBand": "top" if which in (2, 4) else "bottom",
     }
-    shown = [("End Distance (mm):", data["Bolt.EndDist"]), ("Gauge Distance (mm):", gauge),
-             ("Edge Distance (mm):", data["Bolt.EdgeDist"]), ("Hole Distance (mm):", hole)]
+    shown = [("End Distance (mm):", data[KEY_OUT_END_DIST]), ("Gauge Distance (mm):", gauge),
+             ("Edge Distance (mm):", data[KEY_OUT_EDGE_DIST]), ("Hole Distance (mm):", hole)]
     return _dialog("seated_angle_spacing", values, [_section(None, shown)])
 
 
@@ -561,17 +592,17 @@ def _cover_plate_spacing(module, is_web):
     """`B2BCoverPlateDetails`: bolts on the web or flange cover plate."""
     outputs = _output_dict(module)
     if is_web:
-        length, width = outputs["Web_Plate.Height (mm)"], outputs["Web_Plate.Width"]
-        spacing = outputs["Web_plate.spacing"][1](True)
-        bolts = outputs["Web Bolt.Capacities"][1](True)
+        length, width = outputs["Web_Plate.Height (mm)"], outputs[KEY_WEB_PLATE_LENGTH]
+        spacing = outputs[KEY_WEB_SPACING][1](True)
+        bolts = outputs[KEY_BOLT_CAPACITIES_WEB][1](True)
     else:
         length, width = outputs["Flange_Plate.Width (mm)"], outputs["flange_plate.Length"]
-        spacing = outputs["Flange_plate.spacing"][1](True)
-        bolts = outputs["Bolt.Capacities"][1](True)
+        spacing = outputs[KEY_FLANGE_SPACING][1](True)
+        bolts = outputs[KEY_BOLT_CAPACITIES][1](True)
     cols = bolts[1][3]
     rows = bolts[2][3] / cols
     pitch, end, gauge, edge = spacing[2][3], spacing[3][3], spacing[4][3], spacing[5][3]
-    hole = outputs["Bolt.Diameter"]
+    hole = outputs[KEY_OUT_D_PROVIDED]
     values = {
         "plateWidth": _num(length),
         "plateHeight": _num(width),
@@ -595,10 +626,10 @@ def _cover_plate_weld(module, is_web):
     outputs = _output_dict(module)
     if is_web:
         plate, weld = module.web_plate, module.web_weld
-        thickness = outputs["Connector.Web_Plate.Thickness_List"]
+        thickness = outputs[KEY_WEBPLATE_THICKNESS]
     else:
         plate, weld = module.flange_plate, module.flange_weld
-        thickness = outputs["Connector.Flange_Plate.Thickness_list"]
+        thickness = outputs[KEY_FLANGEPLATE_THICKNESS]
     values = {
         "plateWidth": float(plate.height),
         "plateHeight": float(plate.length),
@@ -633,24 +664,24 @@ def _c2c_end_plate(module, flag):
     web = {row[1]: row[3] for row in outputs[C.KEY_BOLT_WEB_SPACING][1](True)}
     flange = {row[0]: row[3] for row in outputs[C.KEY_BOLT_FLANGE_SPACING][1](True)}
     pitches = [web.get(name, 0) for name in ("Pitch 1-2", "Pitch 2-3", "Pitch 3-4", "Pitch 4-5")]
-    plate_width = outputs["Plate.Height"]
-    plate_length = outputs["Plate.Length"]
+    plate_width = outputs[KEY_OUT_PLATE_HEIGHT]
+    plate_length = outputs[KEY_OUT_PLATE_LENGTH]
     values = {
         "view": "web" if flag == 0 else "flange",
         "plateLength": _num(plate_length),
         "plateHeight": _num(plate_width),
-        "stiffenerWidth": _num(outputs["Stiffener.Width"]),
-        "stiffenerThickness": _num(outputs["Stiffener.Thickness"]),
+        "stiffenerWidth": _num(outputs[KEY_OUT_STIFFENER_WIDTH]),
+        "stiffenerThickness": _num(outputs[KEY_OUT_STIFFENER_THICKNESS]),
         "webThickness": _num(module.section.web_thickness),
         "flangeThickness": _num(module.section.flange_thickness),
-        "holeDia": _num(outputs["Bolt.Diameter"]),
+        "holeDia": _num(outputs[KEY_OUT_D_PROVIDED]),
         "pitches": pitches,
         "numBoltsWeb": web["No. of Bolts (along web)"],
         "webEnd": web["End Distance (mm)"],
-        "flangeEnd": flange.get("Bolt.EndDist", 0),
-        "boltsOneSide": flange.get("ColumnEndPlate.nbf", 0),
-        "nbfTotal": flange.get("ColumnEndPlate.nbftotal", 0),
-        "flangePitch": flange.get("ColumnEndPlate.p2_flange", 0),
+        "flangeEnd": flange.get(KEY_OUT_END_DIST, 0),
+        "boltsOneSide": flange.get(KEY_OUT_NO_BOLTS_FLANGE, 0),
+        "nbfTotal": flange.get(KEY_OUT_NO_BOLTS_FLANGE_TOTAL, 0),
+        "flangePitch": flange.get(KEY_PITCH_2_FLANGE1, 0),
     }
     shown = [("Plate Length:", plate_length), ("Plate Width:", plate_width)]
     return _dialog("c2c_end_plate", values, [_section(None, shown)])

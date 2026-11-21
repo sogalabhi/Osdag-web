@@ -27,6 +27,7 @@ export const WEB_ENDPLATE_SUPPORTINGTENSIONYIELD = "EndPlate.SupportingTensionYi
 export const WEB_FLANGE_WELD_REDUCTION = "Flange_Weld.Reduction";
 export const WEB_FLANGE_WELD_STRENGTH_RED = "Flange_Weld.Strength_red";
 export const WEB_MEMBER_DEPTH = "Member.Depth";
+export const WEB_OSDAGWEB_VERSION = "OsdagWeb.Version";
 export const WEB_PACKINGPLATE_THICKNESS = "PackingPlate.Thickness";
 export const WEB_STIFFENERHOLLOW_B_THICKNESS = "StiffenerHollow.B.Thickness";
 export const WEB_STIFFENERHOLLOW_D_THICKNESS = "StiffenerHollow.D.Thickness";

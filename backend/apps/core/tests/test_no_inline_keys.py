@@ -50,11 +50,7 @@ STRING_NODES = tuple(t for t in (ast.JoinedStr, getattr(ast, "TemplateStr", None
 
 # file (relative to backend/) -> number of inline keys it still holds
 NOT_CONVERTED = {
-    "apps/core/api/cad/cad_model_api.py": 2,
-    "apps/core/api/design/sync_merge.py": 45,
-    "apps/core/utils/cad_helpers.py": 2,
-    "apps/core/utils/osi_files.py": 94,
-    "apps/core/utils/output_dialogs.py": 42,
+    "apps/core/api/design/sync_merge.py": 2,
 }
 
 # (file, value) -> why the string is not a key

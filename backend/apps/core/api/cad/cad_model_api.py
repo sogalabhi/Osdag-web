@@ -24,12 +24,25 @@ from rest_framework import status
 from rest_framework.response import Response
 from apps.core.utils.api_errors import error_json_response
 from osdag_core.Common import (
-    KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_HEADERPLATE, KEY_DISP_SEATED_ANGLE,
-    KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BB_EP_SPLICE,
-    KEY_DISP_BCENDPLATE, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
-    KEY_DISP_COLUMNENDPLATE, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
-    KEY_DISP_BUTTJOINTWELDED, KEY_DISP_BUTTJOINTBOLTED,
-    KEY_DISP_LAPJOINTWELDED, KEY_DISP_LAPJOINTBOLTED,
+    KEY_D,
+    KEY_DISP_BB_EP_SPLICE,
+    KEY_DISP_BCENDPLATE,
+    KEY_DISP_BEAMCOVERPLATE,
+    KEY_DISP_BEAMCOVERPLATEWELD,
+    KEY_DISP_BUTTJOINTBOLTED,
+    KEY_DISP_BUTTJOINTWELDED,
+    KEY_DISP_CLEATANGLE,
+    KEY_DISP_COLUMNCOVERPLATE,
+    KEY_DISP_COLUMNCOVERPLATEWELD,
+    KEY_DISP_COLUMNENDPLATE,
+    KEY_DISP_FINPLATE,
+    KEY_DISP_HEADERPLATE,
+    KEY_DISP_LAPJOINTBOLTED,
+    KEY_DISP_LAPJOINTWELDED,
+    KEY_DISP_SEATED_ANGLE,
+    KEY_DISP_TENSION_BOLTED,
+    KEY_DISP_TENSION_WELDED,
+    KEY_GRD,
 )
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -289,8 +302,8 @@ class CADGeneration(View):
                     bolt_grade = None
                     bolt_dia = None
                     try:
-                        grades = input_values.get('Bolt.Grade') or []
-                        dias = input_values.get('Bolt.Diameter') or []
+                        grades = input_values.get(KEY_GRD) or []
+                        dias = input_values.get(KEY_D) or []
                         if isinstance(grades, list) and grades:
                             bolt_grade = grades[-1]
                         if isinstance(dias, list) and dias:
