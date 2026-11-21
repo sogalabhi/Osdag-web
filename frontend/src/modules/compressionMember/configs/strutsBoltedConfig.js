@@ -9,7 +9,7 @@ import FIXED_HINGED from "../../../assets/CompressionMember/RFRFstrut.png";
 import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
-import { KEY_DISP_STRUT_BOLTED_END_GUSSET } from "../../../constants/generated/coreKeys";
+import { KEY_DISP_STRUT_BOLTED_END_GUSSET, KEY_END1, KEY_END2 } from "../../../constants/generated/coreKeys";
 export const strutsBoltedConfig = {
   sessionName: "Struts Bolted to End Gusset",
   designType: KEY_DISP_STRUT_BOLTED_END_GUSSET,
@@ -158,8 +158,8 @@ export const strutsBoltedConfig = {
       "Load.Axial": String(inputs.axial_force),
 
       "Conn_Location": inputs.location,
-      "Member.End_1": inputs.end_condition_1,
-      "Member.End_2": inputs.end_condition_2,
+      [KEY_END1]: inputs.end_condition_1,
+      [KEY_END2]: inputs.end_condition_2,
       "is_leg_loaded": inputs.is_leg_loaded,
 
       "Bolt.Diameter": getList("bolt_diameter", "boltDiameterList"),

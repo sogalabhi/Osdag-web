@@ -9,7 +9,7 @@ import FIXED_HINGED from "../../../assets/CompressionMember/RFRFstrut.png";
 import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
-import { KEY_DISP_STRUT_WELDED_END_GUSSET } from "../../../constants/generated/coreKeys";
+import { KEY_DISP_STRUT_WELDED_END_GUSSET, KEY_END1, KEY_END2 } from "../../../constants/generated/coreKeys";
 export const strutsWeldedConfig = {
   sessionName: "Struts Welded to End Gusset",
   designType: KEY_DISP_STRUT_WELDED_END_GUSSET,
@@ -143,8 +143,8 @@ export const strutsWeldedConfig = {
       "Load.Axial": String(inputs.axial_force),
 
       "Conn_Location": inputs.location,
-      "Member.End_1": inputs.end_condition_1,
-      "Member.End_2": inputs.end_condition_2,
+      [KEY_END1]: inputs.end_condition_1,
+      [KEY_END2]: inputs.end_condition_2,
 
       "Connector.Material": inputs.connector_material,
       "Connector.Plate.Thickness_List": getList("plate_thickness", "thicknessList"),

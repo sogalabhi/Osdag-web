@@ -13,8 +13,8 @@
     "Member.Length": "3000",
     "Load.Axial": "100",
     "Conn_Location": "Long Leg",
-    "Member.End_1": "Hinged",
-    "Member.End_2": "Hinged",
+    "End_1": "Hinged",
+    "End_2": "Hinged",
     "Connector.Material": "E 250 (Fe 410 W)A",
     "Connector.Plate.Thickness_List": [
       "10",
