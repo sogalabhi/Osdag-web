@@ -55,14 +55,6 @@ NOT_CONVERTED = {
     "apps/core/utils/cad_helpers.py": 2,
     "apps/core/utils/osi_files.py": 94,
     "apps/core/utils/output_dialogs.py": 42,
-    "apps/modules/base_plate/adapter.py": 123,
-    "apps/modules/compression_member/submodules/axially_loaded_column/adapter.py": 121,
-    "apps/modules/compression_member/submodules/struts_bolted/adapter.py": 76,
-    "apps/modules/compression_member/submodules/struts_welded/adapter.py": 71,
-    "apps/modules/flexure_member/submodules/on_cantilever/adapter.py": 29,
-    "apps/modules/flexure_member/submodules/plate_girder/adapter.py": 160,
-    "apps/modules/flexure_member/submodules/plate_girder/tasks.py": 5,
-    "apps/modules/flexure_member/submodules/simply_supported_beam/adapter.py": 50,
 }
 
 # (file, value) -> why the string is not a key

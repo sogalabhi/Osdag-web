@@ -12,7 +12,53 @@ from apps.core.utils import (
 from osdag_core.design_type.connection.base_plate_connection import BasePlateConnection
 from osdag_core.custom_logger import CustomLogger
 from osdag_core.cad.common_logic import CommonDesignLogic
-from osdag_core.Common import KEY_DISP_BASE_PLATE
+from osdag_core.Common import (
+    KEY_AXIAL,
+    KEY_AXIAL_BP,
+    KEY_AXIAL_TENSION_BP,
+    KEY_BASE_PLATE_MATERIAL,
+    KEY_CONN,
+    KEY_DIA_ANCHOR_ICF,
+    KEY_DIA_ANCHOR_OCF,
+    KEY_DISP_BASE_PLATE,
+    KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
+    KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
+    KEY_DP_ANCHOR_BOLT_FRICTION,
+    KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF,
+    KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF,
+    KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF,
+    KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
+    KEY_DP_ANCHOR_BOLT_LENGTH_ICF,
+    KEY_DP_ANCHOR_BOLT_LENGTH_OCF,
+    KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
+    KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
+    KEY_DP_ANCHOR_BOLT_TYPE_ICF,
+    KEY_DP_ANCHOR_BOLT_TYPE_OCF,
+    KEY_DP_DESIGN_BASE_PLATE,
+    KEY_DP_DESIGN_METHOD,
+    KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+    KEY_DP_DETAILING_EDGE_TYPE,
+    KEY_DP_WELD_FAB,
+    KEY_DP_WELD_MATERIAL_G_O,
+    KEY_DP_WELD_TYPE,
+    KEY_END_CONDITION,
+    KEY_GRD_ANCHOR_ICF,
+    KEY_GRD_ANCHOR_OCF,
+    KEY_GRD_FOOTING,
+    KEY_MATERIAL,
+    KEY_MODULE,
+    KEY_MOMENT,
+    KEY_MOMENT_MAJOR,
+    KEY_MOMENT_MINOR,
+    KEY_SECSIZE,
+    KEY_SEC_MATERIAL,
+    KEY_SHEAR,
+    KEY_SHEAR_MAJOR,
+    KEY_SHEAR_MINOR,
+    KEY_ST_KEY_MATERIAL,
+    KEY_TYP_ANCHOR,
+    KEY_WELD_TYPE,
+)
 from OCC.Core import BRepTools
 from OCC.Core.Message import Message_ProgressRange
 import sys
@@ -20,70 +66,36 @@ import os
 from typing import Dict, Any, List
 import traceback
 import json
+from apps.core.web_keys import (
+    WEB_COLUMN_DEPTH,
+    WEB_COLUMN_TF,
+    WEB_COLUMN_TW,
+    WEB_COLUMN_WIDTH,
+    WEB_STIFFENERHOLLOW_B_THICKNESS,
+    WEB_STIFFENERHOLLOW_D_THICKNESS,
+    WEB_STIFFENERHOLLOW_OD_THICKNESS,
+)
 
 HOLLOW_CONNECTIVITY = 'Hollow/Tubular Column Base'
 HOLLOW_SECTION_TABLES = ('RHS', 'SHS', 'CHS')
 
 # Core expects these key names (from osdag_core.Common / base_plate_connection.set_input_values)
-KEY_CONN = 'Connectivity'
-KEY_END_CONDITION = 'End Condition'
-KEY_SECSIZE = 'Member.Designation'
-KEY_MATERIAL = 'Material'
-KEY_SEC_MATERIAL = 'Member.Material'
-KEY_AXIAL = 'Load.Axial'
-KEY_AXIAL_BP = 'Load.Axial_Compression'
-KEY_AXIAL_TENSION_BP = 'Load.Axial_Tension'
-KEY_SHEAR = 'Load.Shear'
-KEY_MOMENT = 'Load.Moment'
-KEY_SHEAR_MAJOR = 'Load.Shear.Major'
-KEY_SHEAR_MINOR = 'Load.Shear.Minor'
-KEY_MOMENT_MAJOR = 'Load.Moment.Major'
-KEY_MOMENT_MINOR = 'Load.Moment.Minor'
-KEY_DIA_ANCHOR_OCF = 'Anchor Bolt.OCF.Diameter'
-KEY_GRD_ANCHOR_OCF = 'Anchor Bolt.OCF.Grade'
-KEY_DIA_ANCHOR_ICF = 'Anchor Bolt.ICF.Diameter'
-KEY_GRD_ANCHOR_ICF = 'Anchor Bolt.ICF.Grade'
-KEY_TYP_ANCHOR = 'Anchor Bolt.Type'
-KEY_GRD_FOOTING = 'Footing.Grade'
-KEY_WELD_TYPE = 'Weld.Type'
-KEY_BASE_PLATE_MATERIAL = 'Base_Plate.Material'
-KEY_ST_KEY_MATERIAL = 'Stiffener_Key.Material'
-KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Designation'
-KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Designation'
-KEY_DP_ANCHOR_BOLT_TYPE_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Type'
-KEY_DP_ANCHOR_BOLT_TYPE_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Type'
-KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Galvanized'
-KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Galvanized'
-KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type'
-KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type'
-KEY_DP_ANCHOR_BOLT_LENGTH_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Length'
-KEY_DP_ANCHOR_BOLT_LENGTH_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Length'
-KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF = 'DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite'
-KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF = 'DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite'
-KEY_DP_ANCHOR_BOLT_FRICTION = 'DesignPreferences.Anchor_Bolt.Friction_coefficient'
-KEY_DP_WELD_FAB = 'Weld.Fab'
-KEY_DP_WELD_MATERIAL_G_O = 'Weld.Material_Grade_OverWrite'
-KEY_DP_WELD_TYPE = 'Weld.Type'
-KEY_DP_DETAILING_EDGE_TYPE = 'Detailing.Edge_type'
-KEY_DP_DETAILING_CORROSIVE_INFLUENCES = 'Detailing.Corrosive_Influences'
-KEY_DP_DESIGN_METHOD = 'Design.Design_Method'
-KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
 
 
 def get_required_keys() -> List[str]:
     """Return required input parameters matching desktop Base Plate input dock only."""
     return [
-        "Module",
-        "Connectivity",
-        "End Condition",
-        "Member.Designation",
-        "Material",
-        "Load.Axial",
-        "Load.Axial_Tension",
-        "Load.Shear.Major",
-        "Load.Shear.Minor",
-        "Load.Moment.Major",
-        "Load.Moment.Minor",
+        KEY_MODULE,
+        KEY_CONN,
+        KEY_END_CONDITION,
+        KEY_SECSIZE,
+        KEY_MATERIAL,
+        KEY_AXIAL,
+        KEY_AXIAL_TENSION_BP,
+        KEY_SHEAR_MAJOR,
+        KEY_SHEAR_MINOR,
+        KEY_MOMENT_MAJOR,
+        KEY_MOMENT_MINOR,
     ]
 
 
@@ -94,15 +106,15 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     if missing_keys is not None:
         raise MissingKeyError(missing_keys[0])
 
-    str_keys = ["Module", "Material", "Connectivity", "End Condition"]
+    str_keys = [KEY_MODULE, KEY_MATERIAL, KEY_CONN, KEY_END_CONDITION]
     for key in str_keys:
         if not isinstance(input_values.get(key), str):
             raise InvalidInputTypeError(key, "str")
 
     load_keys = [
-        "Load.Axial", "Load.Axial_Tension",
-        "Load.Shear.Major", "Load.Shear.Minor",
-        "Load.Moment.Major", "Load.Moment.Minor",
+        KEY_AXIAL, KEY_AXIAL_TENSION_BP,
+        KEY_SHEAR_MAJOR, KEY_SHEAR_MINOR,
+        KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR,
     ]
     for key in load_keys:
         val = input_values.get(key)
@@ -110,12 +122,12 @@ def validate_input(input_values: Dict[str, Any]) -> None:
             if not isinstance(val, str) or not float_able(val):
                 raise InvalidInputTypeError(key, "str (number)")
 
-    member_designation = input_values.get("Member.Designation")
+    member_designation = input_values.get(KEY_SECSIZE)
     if isinstance(member_designation, list):
         if not validate_list_type(member_designation, str):
-            raise InvalidInputTypeError("Member.Designation", "List[str]")
+            raise InvalidInputTypeError(KEY_SECSIZE, "List[str]")
     elif not isinstance(member_designation, str):
-        raise InvalidInputTypeError("Member.Designation", "str or List[str]")
+        raise InvalidInputTypeError(KEY_SECSIZE, "str or List[str]")
 
 
 def create_module() -> BasePlateConnection:
@@ -187,7 +199,7 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
     """Create BasePlateConnection from web input and run set_input_values with full design_dict."""
     module = create_module()
 
-    member_designation = input_values.get("Member.Designation", "")
+    member_designation = input_values.get(KEY_SECSIZE, "")
     if isinstance(member_designation, str):
         if member_designation in ("[]", "All", ""):
             member_designation = []
@@ -203,13 +215,13 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
 
     # Single section string for core (core expects one section per design run)
     section_str = _first_or_str(member_designation) if member_designation else "Select Section"
-    if input_values.get("Connectivity") == HOLLOW_CONNECTIVITY:
+    if input_values.get(KEY_CONN) == HOLLOW_CONNECTIVITY:
         section_str = _catalog_hollow_designation(section_str)
 
-    material = input_values.get("Material", "E 250 (Fe 410 W)A")
+    material = input_values.get(KEY_MATERIAL, "E 250 (Fe 410 W)A")
     if isinstance(material, dict):
         material = material.get("Grade", material.get("grade", str(material)))
-    member_material = input_values.get("Member.Material", material)
+    member_material = input_values.get(KEY_SEC_MATERIAL, material)
     if isinstance(member_material, dict):
         member_material = member_material.get("Grade", member_material.get("grade", str(member_material)))
 
@@ -223,15 +235,15 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
     anchor_dia_icf = _normalize_anchor_diameter_list(anchor_dia_icf, "M20")
     anchor_grd_icf = _ensure_list(anchor_grd_icf, anchor_grd_ocf)
 
-    connectivity = input_values.get("Connectivity", input_values.get("Connectivity *", "Welded Column Base"))
-    axial = input_values.get("Load.Axial", "100")
-    shear = input_values.get("Load.Shear", "50")
-    shear_major = input_values.get("Load.Shear.Major", shear)
-    shear_minor = input_values.get("Load.Shear.Minor", "0")
-    moment = input_values.get("Load.Moment", "20")
-    moment_major = input_values.get("Load.Moment.Major", moment)
-    moment_minor = input_values.get("Load.Moment.Minor", "0")
-    axial_tension = input_values.get("Load.Axial_Tension", "0")
+    connectivity = input_values.get(KEY_CONN, input_values.get("Connectivity *", "Welded Column Base"))
+    axial = input_values.get(KEY_AXIAL, "100")
+    shear = input_values.get(KEY_SHEAR, "50")
+    shear_major = input_values.get(KEY_SHEAR_MAJOR, shear)
+    shear_minor = input_values.get(KEY_SHEAR_MINOR, "0")
+    moment = input_values.get(KEY_MOMENT, "20")
+    moment_major = input_values.get(KEY_MOMENT_MAJOR, moment)
+    moment_minor = input_values.get(KEY_MOMENT_MINOR, "0")
+    axial_tension = input_values.get(KEY_AXIAL_TENSION_BP, "0")
     # Only a moment base plate takes moments; the form can still hold a value typed before
     # the connectivity changed.
     if connectivity != "Moment Base Plate":
@@ -240,25 +252,25 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
     if connectivity != "Moment Base Plate" or axial_tension == "":
         axial_tension = "Disabled"
 
-    footing_grade = input_values.get("Footing.Grade", "M20")
+    footing_grade = input_values.get(KEY_GRD_FOOTING, "M20")
     if footing_grade == "" or footing_grade is None:
         footing_grade = "M20"
-    weld_type = input_values.get("Weld.Type", "Fillet Weld")
+    weld_type = input_values.get(KEY_WELD_TYPE, "Fillet Weld")
     anchor_type = input_values.get(KEY_TYP_ANCHOR, "End Plate Type")
 
     # Design preferences defaults (desktop get_values_for_design_pref / init)
-    bp_material = input_values.get("Base_Plate.Material", member_material)
-    st_key_material = input_values.get("Stiffener_Key.Material", member_material)
-    length_ocf = input_values.get("DesignPreferences.Anchor_Bolt.OCF.Length", "0")
-    length_icf = input_values.get("DesignPreferences.Anchor_Bolt.ICF.Length", "0")
-    designation_ocf = input_values.get("DesignPreferences.Anchor_Bolt.OCF.Designation", "")
-    designation_icf = input_values.get("DesignPreferences.Anchor_Bolt.ICF.Designation", "")
+    bp_material = input_values.get(KEY_BASE_PLATE_MATERIAL, member_material)
+    st_key_material = input_values.get(KEY_ST_KEY_MATERIAL, member_material)
+    length_ocf = input_values.get(KEY_DP_ANCHOR_BOLT_LENGTH_OCF, "0")
+    length_icf = input_values.get(KEY_DP_ANCHOR_BOLT_LENGTH_ICF, "0")
+    designation_ocf = input_values.get(KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF, "")
+    designation_icf = input_values.get(KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF, "")
     if not designation_ocf and anchor_dia_ocf:
         designation_ocf = f"{anchor_dia_ocf[0]}X{length_ocf} IS5624 GALV"
     if not designation_icf and anchor_dia_icf:
         designation_icf = f"{anchor_dia_icf[0]}X{length_icf} IS5624 GALV"
 
-    weld_fu_overwrite = float(input_values.get("Weld.Material_Grade_OverWrite", 0) or 0)
+    weld_fu_overwrite = float(input_values.get(KEY_DP_WELD_MATERIAL_G_O, 0) or 0)
     if weld_fu_overwrite <= 0:
         from osdag_core.utils.common.material import Material
         try:
@@ -271,7 +283,6 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
     moment_for_load = "0" if moment_major == "Disabled" else str(moment_major)
     design_dict = {
         KEY_CONN: connectivity,
-        'Connectivity': connectivity,      # web Common.py KEY_CONN value
         'Connectivity *': connectivity,    # desktop Common.py KEY_CONN value (Celery worker may resolve this)
         KEY_END_CONDITION: "Pinned",
         KEY_SECSIZE: section_str,
@@ -299,22 +310,22 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
         KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF: designation_icf or f"{anchor_dia_icf[0] if anchor_dia_icf else 20}X{length_icf} IS5624 GALV",
         KEY_DP_ANCHOR_BOLT_TYPE_OCF: anchor_type,
         KEY_DP_ANCHOR_BOLT_TYPE_ICF: anchor_type,
-        KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF: input_values.get("DesignPreferences.Anchor_Bolt.OCF.Galvanized", "Yes"),
-        KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF: input_values.get("DesignPreferences.Anchor_Bolt.ICF.Galvanized", "Yes"),
-        KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF: input_values.get("DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type", "Over-sized"),
-        KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF: input_values.get("DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type", "Over-sized"),
+        KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF: input_values.get(KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF, "Yes"),
+        KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF: input_values.get(KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF, "Yes"),
+        KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF: input_values.get(KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF, "Over-sized"),
+        KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF: input_values.get(KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF, "Over-sized"),
         KEY_DP_ANCHOR_BOLT_LENGTH_OCF: str(length_ocf),
         KEY_DP_ANCHOR_BOLT_LENGTH_ICF: str(length_icf),
-        KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF: float(input_values.get("DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite", 0) or 0),
-        KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF: float(input_values.get("DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite", 0) or 0),
-        KEY_DP_ANCHOR_BOLT_FRICTION: input_values.get("DesignPreferences.Anchor_Bolt.Friction_coefficient", "0.30"),
-        KEY_DP_WELD_FAB: input_values.get("Weld.Fab", "Shop Weld"),
+        KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF: float(input_values.get(KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF, 0) or 0),
+        KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF: float(input_values.get(KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF, 0) or 0),
+        KEY_DP_ANCHOR_BOLT_FRICTION: input_values.get(KEY_DP_ANCHOR_BOLT_FRICTION, "0.30"),
+        KEY_DP_WELD_FAB: input_values.get(KEY_DP_WELD_FAB, "Shop Weld"),
         KEY_DP_WELD_MATERIAL_G_O: weld_fu_overwrite,
         KEY_DP_WELD_TYPE: weld_type,
-        KEY_DP_DETAILING_EDGE_TYPE: input_values.get("Detailing.Edge_type", "b - Machine flame cut"),
-        KEY_DP_DETAILING_CORROSIVE_INFLUENCES: input_values.get("Detailing.Corrosive_Influences", "No"),
-        KEY_DP_DESIGN_METHOD: input_values.get("Design.Design_Method", "Limit State Design"),
-        KEY_DP_DESIGN_BASE_PLATE: input_values.get("DesignPreferences.Design.Base_Plate", "Effective Area Method"),
+        KEY_DP_DETAILING_EDGE_TYPE: input_values.get(KEY_DP_DETAILING_EDGE_TYPE, "b - Machine flame cut"),
+        KEY_DP_DETAILING_CORROSIVE_INFLUENCES: input_values.get(KEY_DP_DETAILING_CORROSIVE_INFLUENCES, "No"),
+        KEY_DP_DESIGN_METHOD: input_values.get(KEY_DP_DESIGN_METHOD, "Limit State Design"),
+        KEY_DP_DESIGN_BASE_PLATE: input_values.get(KEY_DP_DESIGN_BASE_PLATE, "Effective Area Method"),
     }
 
     try:
@@ -386,9 +397,9 @@ def generate_output(input_values: Dict[str, Any]):
             # base_plate_hollow.py.
             try:
                 hollow_thickness_indices = {
-                    "StiffenerHollow.D.Thickness": 3,
-                    "StiffenerHollow.B.Thickness": 11,
-                    "StiffenerHollow.OD.Thickness": 19,
+                    WEB_STIFFENERHOLLOW_D_THICKNESS: 3,
+                    WEB_STIFFENERHOLLOW_B_THICKNESS: 11,
+                    WEB_STIFFENERHOLLOW_OD_THICKNESS: 19,
                 }
                 for out_key, idx in hollow_thickness_indices.items():
                     if idx < len(hollow_list) and len(hollow_list[idx]) >= 4:
@@ -401,17 +412,17 @@ def generate_output(input_values: Dict[str, Any]):
 
         # Add column dimensions to output for dynamic sketch drawing
         if hasattr(module, "column_properties") and module.column_properties:
-            output["Column.Depth"] = {"key": "Column.Depth", "label": "Column Depth", "val": module.column_properties.depth}
-            output["Column.Width"] = {"key": "Column.Width", "label": "Column Flange Width", "val": module.column_properties.flange_width}
-            output["Column.Tf"] = {"key": "Column.Tf", "label": "Column Flange Thickness", "val": module.column_properties.flange_thickness}
-            output["Column.Tw"] = {"key": "Column.Tw", "label": "Column Web/Hollow Thickness", "val": module.column_properties.web_thickness}
+            output[WEB_COLUMN_DEPTH] = {"key": WEB_COLUMN_DEPTH, "label": "Column Depth", "val": module.column_properties.depth}
+            output[WEB_COLUMN_WIDTH] = {"key": WEB_COLUMN_WIDTH, "label": "Column Flange Width", "val": module.column_properties.flange_width}
+            output[WEB_COLUMN_TF] = {"key": WEB_COLUMN_TF, "label": "Column Flange Thickness", "val": module.column_properties.flange_thickness}
+            output[WEB_COLUMN_TW] = {"key": WEB_COLUMN_TW, "label": "Column Web/Hollow Thickness", "val": module.column_properties.web_thickness}
 
-        member_designation = input_values.get("Member.Designation", "")
+        member_designation = input_values.get(KEY_SECSIZE, "")
         if isinstance(member_designation, list) and member_designation:
             section_str = member_designation[0]
         else:
             section_str = str(member_designation)
-        output["Member.Designation"] = {"key": "Member.Designation", "label": "Section Designation", "val": section_str}
+        output[KEY_SECSIZE] = {"key": KEY_SECSIZE, "label": "Section Designation", "val": section_str}
     except Exception as e:
         traceback.print_exc()
         raise
