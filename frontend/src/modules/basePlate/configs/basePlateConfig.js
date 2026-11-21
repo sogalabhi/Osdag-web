@@ -1,7 +1,14 @@
 import { UI_STRINGS } from '../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../shared/utils/validation';
-import { KEY_DISP_BASE_PLATE } from "../../../constants/generated/coreKeys";
+import {
+  KEY_DIA_ANCHOR_ICF,
+  KEY_DIA_ANCHOR_OCF,
+  KEY_DISP_BASE_PLATE,
+  KEY_GRD_ANCHOR_ICF,
+  KEY_GRD_ANCHOR_OCF,
+  KEY_TYP_ANCHOR,
+} from "../../../constants/generated/coreKeys";
 export const basePlateConfig = {
   sessionName: "Base Plate",
   designType: KEY_DISP_BASE_PLATE,
@@ -11,10 +18,6 @@ export const basePlateConfig = {
   // Keys the desktop writes under a different name than buildSubmissionParams sends.
   osiKeyAliases: {
     "Load.Axial_Compression": "load_axial",
-    "Anchor Bolt.OCF.Diameter": "anchor_diameter_ocf",
-    "Anchor Bolt.OCF.Grade": "anchor_grade_ocf",
-    "Anchor Bolt.ICF.Diameter": "anchor_diameter_icf",
-    "Anchor Bolt.ICF.Grade": "anchor_grade_icf",
   },
 
   defaultInputs: {
@@ -96,13 +99,13 @@ export const basePlateConfig = {
       "Load.Shear.Minor": inputs.load_shear_minor ?? "",
       "Load.Moment.Major": inputs.load_moment_major || "0",
       "Load.Moment.Minor": inputs.load_moment_minor || "0",
-      "Anchor Bolt.Type": inputs.anchor_type || "End Plate Type",
+      [KEY_TYP_ANCHOR]: inputs.anchor_type || "End Plate Type",
       "Footing.Grade": (inputs.footing_grade && inputs.footing_grade !== "Select Grade") ? inputs.footing_grade : "M20",
       "Weld.Type": inputs.weld_type || "Fillet Weld",
-      "Anchor.Diameter": diameterOcf.length ? diameterOcf : ["M20"],
-      "Anchor.Grade": gradeOcf.length ? gradeOcf : ["8.8"],
-      "Anchor.Diameter.ICF": diameterIcf.length ? diameterIcf : diameterOcf.length ? diameterOcf : ["M20"],
-      "Anchor.Grade.ICF": gradeIcf.length ? gradeIcf : gradeOcf.length ? gradeOcf : ["8.8"],
+      [KEY_DIA_ANCHOR_OCF]: diameterOcf.length ? diameterOcf : ["M20"],
+      [KEY_GRD_ANCHOR_OCF]: gradeOcf.length ? gradeOcf : ["8.8"],
+      [KEY_DIA_ANCHOR_ICF]: diameterIcf.length ? diameterIcf : diameterOcf.length ? diameterOcf : ["M20"],
+      [KEY_GRD_ANCHOR_ICF]: gradeIcf.length ? gradeIcf : gradeOcf.length ? gradeOcf : ["8.8"],
     };
   },
 

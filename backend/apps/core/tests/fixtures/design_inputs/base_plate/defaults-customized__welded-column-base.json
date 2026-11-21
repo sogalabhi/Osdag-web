@@ -16,17 +16,17 @@
     "Anchor Bolt.Type": "End Plate Type",
     "Footing.Grade": "M20",
     "Weld.Type": "Fillet Weld",
-    "Anchor.Diameter": [
+    "Anchor Bolt.OCF.Diameter": [
       "M20",
       "M24"
     ],
-    "Anchor.Grade": [
+    "Anchor Bolt.OCF.Grade": [
       "8.8"
     ],
-    "Anchor.Diameter.ICF": [
+    "Anchor Bolt.ICF.Diameter": [
       "M20"
     ],
-    "Anchor.Grade.ICF": [
+    "Anchor Bolt.ICF.Grade": [
       "8.8"
     ]
   }

@@ -22,26 +22,6 @@ REQUIRED_KEYS_FUNCTION = {
     "shear_connection__seated_angle": "get_required_keys_seated_angle",
 }
 
-# adapter slug -> {required key: why it is not a Common.py value}
-KNOWN_EXCEPTIONS = {
-    "flexure_member__plate_girder": {
-        "Design.Allow_Class": "web request name; the adapter maps it to KEY_ALLOW_CLASS",
-        "Design.Design_Type_Flexure": "web request name; the adapter maps it to KEY_DESIGN_TYPE_FLEXURE",
-        "Design.IntermediateStiffener": "web request name; the adapter maps it to KEY_IntermediateStiffener",
-        "Design.IntermediateStiffener.Spacing": "web request name; the adapter maps it to KEY_IntermediateStiffener_spacing",
-        "Design.IntermediateStiffener.Thickness": "web request name; the adapter maps it to KEY_IntermediateStiffener_thickness",
-        "Design.LongitudnalStiffener": "web request name; the adapter maps it to KEY_LongitudnalStiffener",
-        "Design.LongitudnalStiffener.Thickness": "web request name; the adapter maps it to KEY_LongitudnalStiffener_thickness",
-        "Design.Max_Deflection": "web request name; the adapter maps it to KEY_MAX_DEFL",
-        "Design.Support_Width": "web request name; the adapter maps it to KEY_SUPPORT_WIDTH",
-        "Design.Torsional_Restraint": "web request name; the adapter maps it to KEY_TORSIONAL_RES",
-        "Design.Warping_Restraint": "web request name; the adapter maps it to KEY_WARPING_RES",
-        "Design.Web_Philosophy": "web request name; the adapter maps it to KEY_WEB_PHILOSOPHY",
-        "Loading.Bending_Moment_Shape": "web request name; the adapter maps it to KEY_BENDING_MOMENT_SHAPE",
-    },
-}
-
-
 def adapter_slug(adapter_file: Path) -> str:
     """apps/modules/<family>/submodules/<sub>/adapter.py -> '<family>__<sub>';
     apps/modules/<family>/adapter.py -> '<family>'."""
@@ -64,18 +44,10 @@ def test_core_constants_were_collected():
     assert len(CORE_VALUES) > 1000
 
 
-def test_exceptions_name_real_adapters():
-    assert set(KNOWN_EXCEPTIONS) <= set(ADAPTER_SLUGS)
-
-
 @pytest.mark.parametrize("slug", ADAPTER_SLUGS)
 def test_required_keys_are_core_keys(slug):
     adapter = importlib.import_module(adapter_import_path(slug))
     required = getattr(adapter, REQUIRED_KEYS_FUNCTION.get(slug, "get_required_keys"))()
-    allowed = KNOWN_EXCEPTIONS.get(slug, {})
 
-    missing = sorted(k for k in required if k not in CORE_VALUES and k not in allowed)
+    missing = sorted(k for k in required if k not in CORE_VALUES)
     assert not missing, f"{slug}: required keys that are not Common.py values: {missing}"
-
-    stale = sorted(k for k in allowed if k in CORE_VALUES or k not in required)
-    assert not stale, f"{slug}: remove from KNOWN_EXCEPTIONS (now core keys or no longer required): {stale}"

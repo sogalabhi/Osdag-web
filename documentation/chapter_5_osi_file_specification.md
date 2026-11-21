@@ -160,7 +160,7 @@ Since the serialization and parsing logic is centralized in the Python backend, 
 
 ### 2. Download OSI in Project / Dashboard List Page (Key Flattening Drift) (Resolved)
 * **The Problem:** When downloading an existing project as an `.osi` file from the dashboard, the backend endpoint `ProjectOsiDownload` reads the stored nested JSON, flattens it by prefixing overrides with `Pref.`, and streams the flat text file. This flattening logic was duplicated separately in Python, leading to a sync drift risk.
-* **Resolution:** Centralized the key translation mappings (`baseline_aliases` and their reverse mapping) in `osi_files.py`. Refactored `build_osi_payload` to automatically flatten and translate the input keys on the backend before serialization, ensuring that any download from `ProjectOsiDownload` or `SaveOsiFromInputs` outputs consistent, Osdag-desktop-compatible flat files.
+* **Resolution:** Centralized the key translation in `osi_files.py`: one table, `OSI_KEY_TO_FIELD`, holds only core keys, and the reverse map used by an export takes the first key listed for a field, which is the core spelling (`test_osi_key_table.py` checks both). Refactored `build_osi_payload` to automatically flatten and translate the input keys on the backend before serialization, ensuring that any download from `ProjectOsiDownload` or `SaveOsiFromInputs` outputs consistent, Osdag-desktop-compatible flat files.
 
 ### 3. Import OSI from Homepage / Dashboard (Inconsistent Parsing Engine) (Resolved)
 * **The Problem:** The homepage import flow (in `Header.jsx`) parsed the `.osi` file using client-side JavaScript (`yaml-js`), which could fail or diverge from Python's parsing behaviors on complex YAML flat structures.

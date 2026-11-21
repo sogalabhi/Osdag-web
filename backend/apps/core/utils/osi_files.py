@@ -23,6 +23,55 @@ def validate_module_id(module_id: str) -> bool:
     return bool(re.fullmatch(r"[A-Za-z0-9 _-]{2,64}", module_id))
 
 
+# OSI key -> frontend field name. Every key is a core key (a value in osdag_core.Common). The first
+# key listed for a field is the one an export writes, so list the core spelling first.
+OSI_KEY_TO_FIELD = {
+    "Bolt.Bolt_Hole_Type": "bolt_hole_type",
+    "Bolt.Diameter": "bolt_diameter",
+    "Bolt.Grade": "bolt_grade",
+    "Bolt.Slip_Factor": "bolt_slip_factor",
+    "Bolt.TensionType": "bolt_tension_type",
+    "Bolt.Type": "bolt_type",
+    "Connector.Material": "connector_material",
+    "Connector.Plate.Thickness_List": "plate_thickness",
+    "Connector.Flange_Plate.Thickness_list": "flange_plate_thickness",
+    "Connector.Web_Plate.Thickness_List": "web_plate_thickness",
+    "Connector.Angle_List": "angle_list",
+    "Member.Profile": "section_profile",
+    "Section.Profile": "section_profile",
+    "Section Profile": "section_profile",
+    "End_1": "end_condition_1",
+    "End_2": "end_condition_2",
+    "End_1_Y": "end_condition_1_y",
+    "End_2_Y": "end_condition_2_y",
+    "Actual.Length_zz": "actual_length_zz",
+    "Actual.Length_yy": "actual_length_yy",
+    "Member.Length_zz": "actual_length_zz",
+    "Member.Length_yy": "actual_length_yy",
+    "Design.Design_Method": "design_method",
+    "Detailing.Corrosive_Influences": "detailing_corr_status",
+    "Detailing.Edge_type": "detailing_edge_type",
+    "Detailing.Gap": "detailing_gap",
+    "Design.For": "design_for",
+    "Load.Axial": "load_axial",
+    "Load.Axial.Force": "axial_force",
+    "Load.Shear": "load_shear",
+    "Material": "material",
+    "Plate1Thickness": "plate1_thickness",
+    "Plate2Thickness": "plate2_thickness",
+    "PlateWidth": "plate_width",
+    "Weld.Fab": "weld_fab",
+    "Weld.Material_Grade_OverWrite": "weld_material_grade",
+    "Weld.Size": "weld_size",
+    "Weld.Type": "weld_type",
+}
+
+# field name -> OSI key, for export (the first key listed for a field wins)
+FIELD_TO_OSI_KEY: Dict[str, str] = {}
+for _key, _field in OSI_KEY_TO_FIELD.items():
+    FIELD_TO_OSI_KEY.setdefault(_field, _key)
+
+
 def flatten_and_translate_keys(inputs: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(inputs, dict):
         return {}
@@ -41,54 +90,10 @@ def flatten_and_translate_keys(inputs: Dict[str, Any]) -> Dict[str, Any]:
 
     combined = {}
 
-    baseline_aliases = {
-        "Bolt.Bolt_Hole_Type": "bolt_hole_type",
-        "Bolt.Diameter": "bolt_diameter",
-        "Bolt.Grade": "bolt_grade",
-        "Bolt.Slip_Factor": "bolt_slip_factor",
-        "Bolt.TensionType": "bolt_tension_type",
-        "Bolt.Type": "bolt_type",
-        "Connector.Material": "connector_material",
-        "Connector.Plate.Thickness_List": "plate_thickness",
-        "Connector.Plate.Thickness_list": "plate_thickness",
-        "Connector.Flange_Plate.Thickness_list": "flange_plate_thickness",
-        "Connector.Flange_Plate.Thickness_List": "flange_plate_thickness",
-        "Connector.Web_Plate.Thickness_List": "web_plate_thickness",
-        "Connector.Web_Plate.Thickness_list": "web_plate_thickness",
-        "Connector.Angle_List": "angle_list",
-        "Connector.Top_Angle_List": "topangle_list",
-        "Member.Profile": "section_profile",
-        "Member.Profile *": "section_profile",
-        "Member.Section_Profile": "section_profile",
-        "Section.Profile": "section_profile",
-        "Section Profile": "section_profile",
-        "Section Profile *": "section_profile",
-        "Design.Design_Method": "design_method",
-        "Detailing.Corrosive_Influences": "detailing_corr_status",
-        "Detailing.Edge_type": "detailing_edge_type",
-        "Detailing.Gap": "detailing_gap",
-        "Design.For": "design_for",
-        "Load.Axial": "load_axial",
-        "Load.Axial.Force": "axial_force",
-        "Load.Shear.Force": "shear_force",
-        "Load.Shear": "load_shear",
-        "Material": "material",
-        "Plate1Thickness": "plate1_thickness",
-        "Plate2Thickness": "plate2_thickness",
-        "PlateWidth": "plate_width",
-        "Weld.Fab": "weld_fab",
-        "Weld.Material_Grade_OverWrite": "weld_material_grade",
-        "Weld.Size": "weld_size",
-        "Weld.Type": "weld_type"
-    }
-
-    # Reverse aliases mapping: snake_case -> PascalCase
-    reverse_aliases = {v: k for k, v in baseline_aliases.items()}
-
     # 1. Translate and flatten dock keys
     for k, v in dock.items():
-        if k in reverse_aliases:
-            combined[reverse_aliases[k]] = v
+        if k in FIELD_TO_OSI_KEY:
+            combined[FIELD_TO_OSI_KEY[k]] = v
         else:
             # Fallback: convert snake_case to PascalCase (best effort)
             pascal_key = ''.join(word.capitalize() for word in k.split('_'))
@@ -122,64 +127,13 @@ def normalize_osi_keys(flat_inputs: Dict[str, Any]) -> Dict[str, Any]:
     dock = {}
     pref = {}
 
-    baseline_aliases = {
-        "Bolt.Bolt_Hole_Type": "bolt_hole_type",
-        "Bolt.Diameter": "bolt_diameter",
-        "Bolt.Grade": "bolt_grade",
-        "Bolt.Slip_Factor": "bolt_slip_factor",
-        "Bolt.TensionType": "bolt_tension_type",
-        "Bolt.Type": "bolt_type",
-        "Connector.Material": "connector_material",
-        "Connector.Plate.Thickness_List": "plate_thickness",
-        "Connector.Plate.Thickness_list": "plate_thickness",
-        "Connector.Flange_Plate.Thickness_list": "flange_plate_thickness",
-        "Connector.Flange_Plate.Thickness_List": "flange_plate_thickness",
-        "Connector.Web_Plate.Thickness_List": "web_plate_thickness",
-        "Connector.Web_Plate.Thickness_list": "web_plate_thickness",
-        "Connector.Angle_List": "angle_list",
-        "Connector.Top_Angle_List": "topangle_list",
-        "Member.Profile": "section_profile",
-        "Member.Profile *": "section_profile",
-        "Member.Section_Profile": "section_profile",
-        "Section.Profile": "section_profile",
-        "Section Profile": "section_profile",
-        "Section Profile *": "section_profile",
-        "End_1": "end_condition_1",
-        "End_2": "end_condition_2",
-        "End_1_Y": "end_condition_1_y",
-        "End_2_Y": "end_condition_2_y",
-        "Actual.Length_zz": "actual_length_zz",
-        "Actual.Length_yy": "actual_length_yy",
-        "Member.Length_zz": "actual_length_zz",
-        "Member.Length_yy": "actual_length_yy",
-        "Length_zz": "actual_length_zz",
-        "Length_yy": "actual_length_yy",
-        "Design.Design_Method": "design_method",
-        "Detailing.Corrosive_Influences": "detailing_corr_status",
-        "Detailing.Edge_type": "detailing_edge_type",
-        "Detailing.Gap": "detailing_gap",
-        "Design.For": "design_for",
-        "Load.Axial": "load_axial",
-        "Load.Axial.Force": "axial_force",
-        "Load.Shear.Force": "shear_force",
-        "Load.Shear": "load_shear",
-        "Material": "material",
-        "Plate1Thickness": "plate1_thickness",
-        "Plate2Thickness": "plate2_thickness",
-        "PlateWidth": "plate_width",
-        "Weld.Fab": "weld_fab",
-        "Weld.Material_Grade_OverWrite": "weld_material_grade",
-        "Weld.Size": "weld_size",
-        "Weld.Type": "weld_type"
-    }
-
     for key, value in flat_inputs.items():
         if key.startswith("Pref."):
             pref_key = key[5:]
             clean_pref_key = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', pref_key).replace('.', '_').lower()
             pref[clean_pref_key] = value
-        elif key in baseline_aliases:
-            dock[baseline_aliases[key]] = value
+        elif key in OSI_KEY_TO_FIELD:
+            dock[OSI_KEY_TO_FIELD[key]] = value
         else:
             clean_key = re.sub(r'^(Bolt|Connector|Design|Detailing|Load|Member|Weld)\.', '', key)
             clean_key = clean_key.replace('.', '_')

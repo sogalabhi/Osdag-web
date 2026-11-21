@@ -132,7 +132,6 @@ const MODULE_ENTRIES = [
         memberSupporting: "Member.Supporting_Section.Designation",
         plateThickness: "Connector.Plate.Thickness_List",
         angleList: "Connector.Angle_List",
-        topAngleList: "Connector.Top_Angle_List",
       },
     },
   },

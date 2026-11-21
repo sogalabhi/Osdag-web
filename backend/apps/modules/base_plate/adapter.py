@@ -214,10 +214,10 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
         member_material = member_material.get("Grade", member_material.get("grade", str(member_material)))
 
     # Anchor: core expects list of strings like ['M20'], ['8.8'] (IS 5624 format)
-    anchor_dia_ocf = input_values.get("Anchor.Diameter", input_values.get("Anchor.Diameter.OCF", input_values.get("Bolt.Diameter", [])))
-    anchor_grd_ocf = input_values.get("Anchor.Grade", input_values.get("Anchor.Grade.OCF", input_values.get("Bolt.Grade", [])))
-    anchor_dia_icf = input_values.get("Anchor.Diameter.ICF", anchor_dia_ocf)
-    anchor_grd_icf = input_values.get("Anchor.Grade.ICF", anchor_grd_ocf)
+    anchor_dia_ocf = input_values.get(KEY_DIA_ANCHOR_OCF, [])
+    anchor_grd_ocf = input_values.get(KEY_GRD_ANCHOR_OCF, [])
+    anchor_dia_icf = input_values.get(KEY_DIA_ANCHOR_ICF, anchor_dia_ocf)
+    anchor_grd_icf = input_values.get(KEY_GRD_ANCHOR_ICF, anchor_grd_ocf)
     anchor_dia_ocf = _normalize_anchor_diameter_list(anchor_dia_ocf, "M20")
     anchor_grd_ocf = _ensure_list(anchor_grd_ocf, ["8.8"])
     anchor_dia_icf = _normalize_anchor_diameter_list(anchor_dia_icf, "M20")
@@ -244,7 +244,7 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
     if footing_grade == "" or footing_grade is None:
         footing_grade = "M20"
     weld_type = input_values.get("Weld.Type", "Fillet Weld")
-    anchor_type = input_values.get("Anchor Bolt.Type", input_values.get("Anchor.Type", "End Plate Type"))
+    anchor_type = input_values.get(KEY_TYP_ANCHOR, "End Plate Type")
 
     # Design preferences defaults (desktop get_values_for_design_pref / init)
     bp_material = input_values.get("Base_Plate.Material", member_material)
