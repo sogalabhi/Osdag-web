@@ -4,7 +4,31 @@
  * Tab ids: 0 Column Section*, 1 Beam Section*, 2 Connector, 3 Bolt, 4 Weld, 5 Detailing, 6 Design.
  */
 
-import { KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE } from "../../../constants/generated/coreKeys";
+import {
+  KEY_BASE_PLATE_MATERIAL,
+  KEY_DISP_CLEATANGLE,
+  KEY_DISP_SEATED_ANGLE,
+  KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
+  KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
+  KEY_DP_ANCHOR_BOLT_FRICTION,
+  KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF,
+  KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF,
+  KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF,
+  KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
+  KEY_DP_ANCHOR_BOLT_LENGTH_ICF,
+  KEY_DP_ANCHOR_BOLT_LENGTH_OCF,
+  KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
+  KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
+  KEY_DP_ANCHOR_BOLT_TYPE_ICF,
+  KEY_DP_ANCHOR_BOLT_TYPE_OCF,
+  KEY_DP_DESIGN_BASE_PLATE,
+  KEY_DP_DESIGN_METHOD,
+  KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+  KEY_DP_DETAILING_EDGE_TYPE,
+  KEY_DP_WELD_FAB,
+  KEY_DP_WELD_MATERIAL_G_O,
+  KEY_ST_KEY_MATERIAL,
+} from "../../../constants/generated/coreKeys";
 
 const ALL_TABS = [
   { id: 0, name: "Column Section*" },
@@ -245,38 +269,38 @@ const DESIGN_PREF_CONFIG = {
       bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
       bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
       bolt_slip_factor: inputs.bolt_slip_factor ?? "0.3",
-      weld_fab: inputs["Weld.Fab"] ?? inputs.weld_fab ?? "Shop Weld",
-      weld_material_grade: inputs["Weld.Material_Grade_OverWrite"] || inputs.weld_material_grade || "290",
-      detailing_edge_type: inputs["Detailing.Edge_type"] ?? inputs.detailing_edge_type ?? "Sheared or hand flame cut",
+      weld_fab: inputs[KEY_DP_WELD_FAB] ?? inputs.weld_fab ?? "Shop Weld",
+      weld_material_grade: inputs[KEY_DP_WELD_MATERIAL_G_O] || inputs.weld_material_grade || "290",
+      detailing_edge_type: inputs[KEY_DP_DETAILING_EDGE_TYPE] ?? inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_gap: inputs.detailing_gap ?? "10",
-      detailing_corr_status: inputs["Detailing.Corrosive_Influences"] ?? inputs.detailing_corr_status ?? "No",
-      design_method: inputs["Design.Design_Method"] ?? inputs.design_method ?? "Limit State Design",
+      detailing_corr_status: inputs[KEY_DP_DETAILING_CORROSIVE_INFLUENCES] ?? inputs.detailing_corr_status ?? "No",
+      design_method: inputs[KEY_DP_DESIGN_METHOD] ?? inputs.design_method ?? "Limit State Design",
 
       // Anchor Bolt OCF
-      "DesignPreferences.Anchor_Bolt.OCF.Designation": inputs["DesignPreferences.Anchor_Bolt.OCF.Designation"] ?? "",
-      "DesignPreferences.Anchor_Bolt.OCF.Type": inputs["DesignPreferences.Anchor_Bolt.OCF.Type"] ?? "End Plate Type",
-      "DesignPreferences.Anchor_Bolt.OCF.Galvanized": inputs["DesignPreferences.Anchor_Bolt.OCF.Galvanized"] ?? "Yes",
-      "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type": inputs["DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type"] ?? "Over-sized",
-      "DesignPreferences.Anchor_Bolt.OCF.Length": inputs["DesignPreferences.Anchor_Bolt.OCF.Length"] ?? "300",
-      "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": inputs["DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite"] ?? "0",
+      [KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF]: inputs[KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF] ?? "",
+      [KEY_DP_ANCHOR_BOLT_TYPE_OCF]: inputs[KEY_DP_ANCHOR_BOLT_TYPE_OCF] ?? "End Plate Type",
+      [KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF]: inputs[KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF] ?? "Yes",
+      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF]: inputs[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF] ?? "Over-sized",
+      [KEY_DP_ANCHOR_BOLT_LENGTH_OCF]: inputs[KEY_DP_ANCHOR_BOLT_LENGTH_OCF] ?? "300",
+      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF]: inputs[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF] ?? "0",
 
       // Anchor Bolt ICF
-      "DesignPreferences.Anchor_Bolt.ICF.Designation": inputs["DesignPreferences.Anchor_Bolt.ICF.Designation"] ?? "",
-      "DesignPreferences.Anchor_Bolt.ICF.Type": inputs["DesignPreferences.Anchor_Bolt.ICF.Type"] ?? "End Plate Type",
-      "DesignPreferences.Anchor_Bolt.ICF.Galvanized": inputs["DesignPreferences.Anchor_Bolt.ICF.Galvanized"] ?? "Yes",
-      "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": inputs["DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type"] ?? "Over-sized",
-      "DesignPreferences.Anchor_Bolt.ICF.Length": inputs["DesignPreferences.Anchor_Bolt.ICF.Length"] ?? "300",
-      "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": inputs["DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite"] ?? "0",
+      [KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF]: inputs[KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF] ?? "",
+      [KEY_DP_ANCHOR_BOLT_TYPE_ICF]: inputs[KEY_DP_ANCHOR_BOLT_TYPE_ICF] ?? "End Plate Type",
+      [KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF]: inputs[KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF] ?? "Yes",
+      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF]: inputs[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF] ?? "Over-sized",
+      [KEY_DP_ANCHOR_BOLT_LENGTH_ICF]: inputs[KEY_DP_ANCHOR_BOLT_LENGTH_ICF] ?? "300",
+      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF]: inputs[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF] ?? "0",
 
       // Anchor General
-      "DesignPreferences.Anchor_Bolt.Friction_coefficient": inputs["DesignPreferences.Anchor_Bolt.Friction_coefficient"] ?? "0.30",
+      [KEY_DP_ANCHOR_BOLT_FRICTION]: inputs[KEY_DP_ANCHOR_BOLT_FRICTION] ?? "0.30",
 
       // Base Plate & Stiffener materials
-      "Base_Plate.Material": inputs["Base_Plate.Material"] ?? inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
-      "Stiffener_Key.Material": inputs["Stiffener_Key.Material"] ?? inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      [KEY_BASE_PLATE_MATERIAL]: inputs[KEY_BASE_PLATE_MATERIAL] ?? inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      [KEY_ST_KEY_MATERIAL]: inputs[KEY_ST_KEY_MATERIAL] ?? inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
 
       // Other design keys
-      "DesignPreferences.Design.Base_Plate": inputs["DesignPreferences.Design.Base_Plate"] ?? "Effective Area Method",
+      [KEY_DP_DESIGN_BASE_PLATE]: inputs[KEY_DP_DESIGN_BASE_PLATE] ?? "Effective Area Method",
     }),
     getDefaultPrefs: (inputs) => ({
       supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
@@ -291,32 +315,32 @@ const DESIGN_PREF_CONFIG = {
       detailing_corr_status: "No",
       design_method: "Limit State Design",
 
-      "Weld.Fab": "Shop Weld",
-      "Weld.Material_Grade_OverWrite": "290",
-      "Detailing.Edge_type": "Sheared or hand flame cut",
-      "Detailing.Corrosive_Influences": "No",
-      "Design.Design_Method": "Limit State Design",
+      [KEY_DP_WELD_FAB]: "Shop Weld",
+      [KEY_DP_WELD_MATERIAL_G_O]: "290",
+      [KEY_DP_DETAILING_EDGE_TYPE]: "Sheared or hand flame cut",
+      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: "No",
+      [KEY_DP_DESIGN_METHOD]: "Limit State Design",
 
-      "DesignPreferences.Anchor_Bolt.OCF.Designation": "",
-      "DesignPreferences.Anchor_Bolt.OCF.Type": "End Plate Type",
-      "DesignPreferences.Anchor_Bolt.OCF.Galvanized": "Yes",
-      "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type": "Over-sized",
-      "DesignPreferences.Anchor_Bolt.OCF.Length": "300",
-      "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": "0",
+      [KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF]: "",
+      [KEY_DP_ANCHOR_BOLT_TYPE_OCF]: "End Plate Type",
+      [KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF]: "Yes",
+      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF]: "Over-sized",
+      [KEY_DP_ANCHOR_BOLT_LENGTH_OCF]: "300",
+      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF]: "0",
 
-      "DesignPreferences.Anchor_Bolt.ICF.Designation": "",
-      "DesignPreferences.Anchor_Bolt.ICF.Type": "End Plate Type",
-      "DesignPreferences.Anchor_Bolt.ICF.Galvanized": "Yes",
-      "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "Over-sized",
-      "DesignPreferences.Anchor_Bolt.ICF.Length": "300",
-      "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": "0",
+      [KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF]: "",
+      [KEY_DP_ANCHOR_BOLT_TYPE_ICF]: "End Plate Type",
+      [KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF]: "Yes",
+      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF]: "Over-sized",
+      [KEY_DP_ANCHOR_BOLT_LENGTH_ICF]: "300",
+      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF]: "0",
 
-      "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.30",
+      [KEY_DP_ANCHOR_BOLT_FRICTION]: "0.30",
 
-      "Base_Plate.Material": inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
-      "Stiffener_Key.Material": inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      [KEY_BASE_PLATE_MATERIAL]: inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      [KEY_ST_KEY_MATERIAL]: inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
 
-      "DesignPreferences.Design.Base_Plate": "Effective Area Method",
+      [KEY_DP_DESIGN_BASE_PLATE]: "Effective Area Method",
     }),
   },
   [KEY_DISP_CLEATANGLE]: {

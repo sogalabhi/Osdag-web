@@ -2,6 +2,7 @@ import { useContext, useState, useEffect } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
 import CustomMaterialModal from "./CustomMaterialModal";
+import { KEY_ST_KEY_MATERIAL } from "../../../constants/generated/coreKeys";
 
 const { Option } = Select;
 
@@ -39,7 +40,7 @@ const StiffenerSectionModal = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suppressInitialMaterialDispatch]);
 
-  const selectedMaterialGrade = designPrefInputs["Stiffener_Key.Material"] || designPrefInputs.supporting_material || "";
+  const selectedMaterialGrade = designPrefInputs[KEY_ST_KEY_MATERIAL] || designPrefInputs.supporting_material || "";
   const selectedMaterialDetails = materials.find((item) => item.Grade === selectedMaterialGrade) || (supporting_material_details && supporting_material_details[0]);
 
   return (
@@ -66,7 +67,7 @@ const StiffenerSectionModal = ({
                     if (!material) return;
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "Stiffener_Key.Material": material.Grade,
+                      [KEY_ST_KEY_MATERIAL]: material.Grade,
                     });
                   }}
                 >
@@ -133,14 +134,14 @@ const StiffenerSectionModal = ({
               const updated = newValues(prev);
               return {
                 ...updated,
-                "Stiffener_Key.Material": updated.supporting_material,
+                [KEY_ST_KEY_MATERIAL]: updated.supporting_material,
               };
             });
           } else {
             setDesignPrefInputs({
               ...designPrefInputs,
               ...newValues,
-              "Stiffener_Key.Material": newValues.supporting_material,
+              [KEY_ST_KEY_MATERIAL]: newValues.supporting_material,
             });
           }
         }}

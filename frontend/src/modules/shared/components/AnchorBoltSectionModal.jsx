@@ -2,6 +2,21 @@ import { useContext, useState, useEffect, useMemo } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { Input, Select } from "antd";
 import CustomMaterialModal from "./CustomMaterialModal";
+import {
+  KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
+  KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
+  KEY_DP_ANCHOR_BOLT_FRICTION,
+  KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF,
+  KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF,
+  KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF,
+  KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
+  KEY_DP_ANCHOR_BOLT_LENGTH_ICF,
+  KEY_DP_ANCHOR_BOLT_LENGTH_OCF,
+  KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
+  KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
+  KEY_DP_ANCHOR_BOLT_TYPE_ICF,
+  KEY_DP_ANCHOR_BOLT_TYPE_OCF,
+} from "../../../constants/generated/coreKeys";
 
 const { Option } = Select;
 
@@ -56,13 +71,13 @@ const AnchorBoltSectionModal = ({
                 <Input
                   type="text"
                   className="input-design-pref"
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.OCF.Designation"] || ""}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
                   onChange={(e) =>
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.OCF.Designation": e.target.value,
+                      [KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF]: e.target.value,
                     })
                   }
                 />
@@ -73,13 +88,13 @@ const AnchorBoltSectionModal = ({
                 <Input
                   type="text"
                   className="input-design-pref"
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.OCF.Type"] || ""}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_TYPE_OCF] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
                   onChange={(e) =>
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.OCF.Type": e.target.value,
+                      [KEY_DP_ANCHOR_BOLT_TYPE_OCF]: e.target.value,
                     })
                   }
                 />
@@ -90,11 +105,11 @@ const AnchorBoltSectionModal = ({
                 <Select
                   disabled={isInputLocked}
                   style={{ width: "200px", height: "25px", fontSize: "12px" }}
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.OCF.Galvanized"] || "Yes"}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF] || "Yes"}
                   onSelect={(value) =>
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.OCF.Galvanized": value,
+                      [KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF]: value,
                     })
                   }
                 >
@@ -108,11 +123,11 @@ const AnchorBoltSectionModal = ({
                 <Select
                   disabled={isInputLocked}
                   style={{ width: "200px", height: "25px", fontSize: "12px" }}
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type"] || "Over-sized"}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF] || "Over-sized"}
                   onSelect={(value) =>
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type": value,
+                      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF]: value,
                     })
                   }
                 >
@@ -126,7 +141,7 @@ const AnchorBoltSectionModal = ({
                 <Input
                   type="text"
                   className="input-design-pref"
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.OCF.Length"] || ""}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_LENGTH_OCF] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
                   onChange={(e) => {
@@ -143,7 +158,7 @@ const AnchorBoltSectionModal = ({
                     }
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.OCF.Length": val,
+                      [KEY_DP_ANCHOR_BOLT_LENGTH_OCF]: val,
                     });
                   }}
                   onKeyDown={(e) => {
@@ -168,7 +183,7 @@ const AnchorBoltSectionModal = ({
                 <Input
                   type="text"
                   className="input-design-pref"
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite"] || ""}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
                   onChange={(e) => {
@@ -185,7 +200,7 @@ const AnchorBoltSectionModal = ({
                     }
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": val,
+                      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF]: val,
                     });
                   }}
                   onKeyDown={(e) => {
@@ -217,13 +232,13 @@ const AnchorBoltSectionModal = ({
                 <Input
                   type="text"
                   className="input-design-pref"
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.ICF.Designation"] || ""}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
                   onChange={(e) =>
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.ICF.Designation": e.target.value,
+                      [KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF]: e.target.value,
                     })
                   }
                 />
@@ -234,13 +249,13 @@ const AnchorBoltSectionModal = ({
                 <Input
                   type="text"
                   className="input-design-pref"
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.ICF.Type"] || ""}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_TYPE_ICF] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
                   onChange={(e) =>
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.ICF.Type": e.target.value,
+                      [KEY_DP_ANCHOR_BOLT_TYPE_ICF]: e.target.value,
                     })
                   }
                 />
@@ -251,11 +266,11 @@ const AnchorBoltSectionModal = ({
                 <Select
                   disabled={isInputLocked}
                   style={{ width: "200px", height: "25px", fontSize: "12px" }}
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.ICF.Galvanized"] || "Yes"}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF] || "Yes"}
                   onSelect={(value) =>
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.ICF.Galvanized": value,
+                      [KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF]: value,
                     })
                   }
                 >
@@ -269,11 +284,11 @@ const AnchorBoltSectionModal = ({
                 <Select
                   disabled={isInputLocked}
                   style={{ width: "200px", height: "25px", fontSize: "12px" }}
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type"] || "Over-sized"}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF] || "Over-sized"}
                   onSelect={(value) =>
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": value,
+                      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF]: value,
                     })
                   }
                 >
@@ -287,7 +302,7 @@ const AnchorBoltSectionModal = ({
                 <Input
                   type="text"
                   className="input-design-pref"
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.ICF.Length"] || ""}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_LENGTH_ICF] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
                   onChange={(e) => {
@@ -304,7 +319,7 @@ const AnchorBoltSectionModal = ({
                     }
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.ICF.Length": val,
+                      [KEY_DP_ANCHOR_BOLT_LENGTH_ICF]: val,
                     });
                   }}
                   onKeyDown={(e) => {
@@ -329,7 +344,7 @@ const AnchorBoltSectionModal = ({
                 <Input
                   type="text"
                   className="input-design-pref"
-                  value={designPrefInputs["DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite"] || ""}
+                  value={designPrefInputs[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF] || ""}
                   disabled={isInputLocked}
                   style={readOnlyFontStyle}
                   onChange={(e) => {
@@ -346,7 +361,7 @@ const AnchorBoltSectionModal = ({
                     }
                     setDesignPrefInputs({
                       ...designPrefInputs,
-                      "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": val,
+                      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF]: val,
                     });
                   }}
                   onKeyDown={(e) => {
@@ -379,7 +394,7 @@ const AnchorBoltSectionModal = ({
               <Input
                 type="text"
                 className="input-design-pref"
-                value={designPrefInputs["DesignPreferences.Anchor_Bolt.Friction_coefficient"] || ""}
+                value={designPrefInputs[KEY_DP_ANCHOR_BOLT_FRICTION] || ""}
                 disabled={isInputLocked}
                 style={readOnlyFontStyle}
                 onChange={(e) => {
@@ -396,7 +411,7 @@ const AnchorBoltSectionModal = ({
                   }
                   setDesignPrefInputs({
                     ...designPrefInputs,
-                    "DesignPreferences.Anchor_Bolt.Friction_coefficient": val,
+                    [KEY_DP_ANCHOR_BOLT_FRICTION]: val,
                   });
                 }}
                 onKeyDown={(e) => {

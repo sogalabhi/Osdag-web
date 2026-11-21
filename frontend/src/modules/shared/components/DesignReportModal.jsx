@@ -4,6 +4,16 @@ import { ReportCustomizationModal } from './ReportCustomizationModal';
 import { useEngineeringService } from '../hooks/useEngineeringService';
 import { apiBase } from '../../../api';
 import { unwrapReportInputs } from '../utils/reportInputs';
+import {
+  KEY_D,
+  KEY_DIA_ANCHOR_ICF,
+  KEY_DIA_ANCHOR_OCF,
+  KEY_GRD,
+  KEY_GRD_ANCHOR_ICF,
+  KEY_GRD_ANCHOR_OCF,
+  KEY_MODULE,
+  KEY_SHEAR,
+} from "../../../constants/generated/coreKeys";
 
 export const DesignReportModal = ({
   isOpen,
@@ -144,9 +154,9 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
       
       // Check if effectiveInputValues is already a transformed backend dictionary (e.g. from saved DB projects)
       const isAlreadyTransformed = effectiveInputValues && (
-        effectiveInputValues["Bolt.Diameter"] !== undefined ||
-        effectiveInputValues["Load.Shear"] !== undefined ||
-        effectiveInputValues["Module"] !== undefined ||
+        effectiveInputValues[KEY_D] !== undefined ||
+        effectiveInputValues[KEY_SHEAR] !== undefined ||
+        effectiveInputValues[KEY_MODULE] !== undefined ||
         Object.keys(effectiveInputValues).some(k => k.includes('.'))
       );
 
@@ -166,9 +176,9 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
 
       // Dynamically ensure array parameters expected by backend adapters are lists of strings
       const LIST_TYPED_KEYS = new Set([
-        'Bolt.Diameter', 'Bolt.Grade',
-        'Anchor Bolt.OCF.Diameter', 'Anchor Bolt.OCF.Grade',
-        'Anchor Bolt.ICF.Diameter', 'Anchor Bolt.ICF.Grade',
+        KEY_D, KEY_GRD,
+        KEY_DIA_ANCHOR_OCF, KEY_GRD_ANCHOR_OCF,
+        KEY_DIA_ANCHOR_ICF, KEY_GRD_ANCHOR_ICF,
       ]);
       if (transformedInputValues) {
         transformedInputValues = { ...transformedInputValues };
