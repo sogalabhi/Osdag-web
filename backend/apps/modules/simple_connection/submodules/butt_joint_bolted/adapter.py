@@ -13,7 +13,36 @@ from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
-from osdag_core.Common import KEY_DISP_BUTTJOINTBOLTED
+from osdag_core.Common import (
+    KEY_AXIAL,
+    KEY_COVER_PLATE,
+    KEY_D,
+    KEY_DESIGN_FOR,
+    KEY_DISP_BUTTJOINTBOLTED,
+    KEY_DP_BOLT_HOLE_TYPE,
+    KEY_DP_BOLT_SLIP_FACTOR,
+    KEY_GRD,
+    KEY_MATERIAL,
+    KEY_MODULE,
+    KEY_OUT_BASE_METAL_CAPACITY,
+    KEY_OUT_BASE_METAL_UTILIZATION,
+    KEY_OUT_BOLT_BEARING,
+    KEY_OUT_BOLT_CAPACITY,
+    KEY_OUT_BOLT_CONN_LEN,
+    KEY_OUT_BOLT_SHEAR,
+    KEY_OUT_BOLT_UTILIZATION,
+    KEY_OUT_COL_PROVIDED,
+    KEY_OUT_D_PROVIDED,
+    KEY_OUT_GRD_PROVIDED,
+    KEY_OUT_ROW_PROVIDED,
+    KEY_OUT_TOT_NO_BOLTS,
+    KEY_OUT_TYP_PROVIDED,
+    KEY_PLATE1_THICKNESS,
+    KEY_PLATE2_THICKNESS,
+    KEY_PLATE_WIDTH,
+    KEY_TYP,
+    KEY_UTILIZATION_RATIO,
+)
 from osdag_core.custom_logger import CustomLogger
 from apps.core.utils import (
     MissingKeyError, InvalidInputTypeError,
@@ -22,22 +51,31 @@ from apps.core.utils import (
 )
 from ...shared import setup_for_cad
 from ...shared_validation import create_bolted_validator
+from apps.core.web_keys import (
+    WEB_BOLT_COLUMNS_PROVIDED,
+    WEB_BOLT_CONNECTION_LENGTH,
+    WEB_BOLT_DIAMETER_PROVIDED,
+    WEB_BOLT_ROWS_PROVIDED,
+    WEB_BOLT_TOTAL_NUMBER,
+    WEB_PACKINGPLATE_THICKNESS,
+    WEB_UTILIZATION_RATIO,
+)
 
 def get_required_keys() -> List[str]:
     return [
-        "Module",
-        "Material",
-        "Load.Axial",
-        "Plate1Thickness",
-        "Plate2Thickness",
-        "PlateWidth",
-        "ButtJoint.CoverPlate",
-        "Bolt.Diameter",
-        "Bolt.Grade",
-        "Bolt.Type",
-        "Bolt.Bolt_Hole_Type",
-        "Bolt.Slip_Factor",
-        "Design.For",
+        KEY_MODULE,
+        KEY_MATERIAL,
+        KEY_AXIAL,
+        KEY_PLATE1_THICKNESS,
+        KEY_PLATE2_THICKNESS,
+        KEY_PLATE_WIDTH,
+        KEY_COVER_PLATE,
+        KEY_D,
+        KEY_GRD,
+        KEY_TYP,
+        KEY_DP_BOLT_HOLE_TYPE,
+        KEY_DP_BOLT_SLIP_FACTOR,
+        KEY_DESIGN_FOR,
     ]
 
 # Create shared validator instance
@@ -71,41 +109,41 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         def map_tuple_list(tuple_list):
             key_map = {
                 # Bolt details
-                "Bolt.Diameter_Provided": "Bolt.Diameter",
-                "Bolt.Grade_Provided": "Bolt.Grade_Provided",
-                "Bolt.Type_Provided": "Bolt.Type_Provided",
-                "Bolt.Shear": "Bolt.Shear",
-                "Bolt.Bearing": "Bolt.Bearing",
-                "Bolt.Capacity": "Bolt.Capacity",
+                WEB_BOLT_DIAMETER_PROVIDED: KEY_OUT_D_PROVIDED,
+                KEY_OUT_GRD_PROVIDED: KEY_OUT_GRD_PROVIDED,
+                KEY_OUT_TYP_PROVIDED: KEY_OUT_TYP_PROVIDED,
+                KEY_OUT_BOLT_SHEAR: KEY_OUT_BOLT_SHEAR,
+                KEY_OUT_BOLT_BEARING: KEY_OUT_BOLT_BEARING,
+                KEY_OUT_BOLT_CAPACITY: KEY_OUT_BOLT_CAPACITY,
                 # Bolt design
-                "Bolt.Total_Number": "Bolt.number",
-                "PackingPlate.Thickness": "PackingPlate thk",
-                "Bolt.Rows_Provided": "Bolt.Rows",
-                "Bolt.Columns_Provided": "Bolt.Cols",
-                "Utilization.Ratio": "Bolt.UtilizationRatio",
-                "Design.For": "Design For",
-                "Plate.BaseCapacity": "Plate.BaseCapacity",
-                "Plate.BaseUtilization": "Plate.BaseUtilization",
-                "Bolt.Utilization": "Bolt.Utilization",
-                "Bolt.Connection_Length": "Bolt.ConnLength",
+                WEB_BOLT_TOTAL_NUMBER: KEY_OUT_TOT_NO_BOLTS,
+                WEB_PACKINGPLATE_THICKNESS: "PackingPlate thk",
+                WEB_BOLT_ROWS_PROVIDED: KEY_OUT_ROW_PROVIDED,
+                WEB_BOLT_COLUMNS_PROVIDED: KEY_OUT_COL_PROVIDED,
+                WEB_UTILIZATION_RATIO: KEY_UTILIZATION_RATIO,
+                KEY_DESIGN_FOR: "Design For",
+                KEY_OUT_BASE_METAL_CAPACITY: KEY_OUT_BASE_METAL_CAPACITY,
+                KEY_OUT_BASE_METAL_UTILIZATION: KEY_OUT_BASE_METAL_UTILIZATION,
+                KEY_OUT_BOLT_UTILIZATION: KEY_OUT_BOLT_UTILIZATION,
+                WEB_BOLT_CONNECTION_LENGTH: KEY_OUT_BOLT_CONN_LEN,
             }
             label_map = {
-                "Bolt.Diameter": "Diameter (mm)",
-                "Bolt.Grade_Provided": "Property Class",
-                "Bolt.Type_Provided": "Type",
-                "Bolt.Shear": "Shear Capacity (kN)",
-                "Bolt.Bearing": "Bearing Capacity (kN)",
-                "Bolt.Capacity": "Capacity (kN)",
-                "Bolt.number": "Number of Bolts",
+                KEY_OUT_D_PROVIDED: "Diameter (mm)",
+                KEY_OUT_GRD_PROVIDED: "Property Class",
+                KEY_OUT_TYP_PROVIDED: "Type",
+                KEY_OUT_BOLT_SHEAR: "Shear Capacity (kN)",
+                KEY_OUT_BOLT_BEARING: "Bearing Capacity (kN)",
+                KEY_OUT_BOLT_CAPACITY: "Capacity (kN)",
+                KEY_OUT_TOT_NO_BOLTS: "Number of Bolts",
                 "PackingPlate thk": "Packing Plate Thickness (mm)",
-                "Bolt.Rows": "Rows of Bolts",
-                "Bolt.Cols": "Columns of Bolts",
-                "Bolt.UtilizationRatio": "Utilisation Ratio",
+                KEY_OUT_ROW_PROVIDED: "Rows of Bolts",
+                KEY_OUT_COL_PROVIDED: "Columns of Bolts",
+                KEY_UTILIZATION_RATIO: "Utilisation Ratio",
                 "Design For": "Design For",
-                "Plate.BaseCapacity": "Connected Plate Capacity (kN)",
-                "Plate.BaseUtilization": "Connected Plate Utilization",
-                "Bolt.Utilization": "Bolt Utilization",
-                "Bolt.ConnLength": "Length of Connection (mm)",
+                KEY_OUT_BASE_METAL_CAPACITY: "Connected Plate Capacity (kN)",
+                KEY_OUT_BASE_METAL_UTILIZATION: "Connected Plate Utilization",
+                KEY_OUT_BOLT_UTILIZATION: "Bolt Utilization",
+                KEY_OUT_BOLT_CONN_LEN: "Length of Connection (mm)",
             }
             for tup in tuple_list or []:
                 if len(tup) < 4:
@@ -128,7 +166,7 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             raw_csv = build_raw_output_dict(out_list, design_status)
 
         # Spacing diagram expects PlateWidth; module has self.width from input
-        if "PlateWidth" not in mapped_output:
+        if KEY_PLATE_WIDTH not in mapped_output:
             plate_width = None
             if hasattr(module, "width") and module.width is not None:
                 try:
@@ -136,9 +174,9 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 except (TypeError, ValueError):
                     pass
             if plate_width is None:
-                plate_width = input_values.get("PlateWidth")
+                plate_width = input_values.get(KEY_PLATE_WIDTH)
             if plate_width is not None:
-                mapped_output["PlateWidth"] = {"key": "PlateWidth", "label": "Plate Width (mm)", "val": plate_width}
+                mapped_output[KEY_PLATE_WIDTH] = {"key": "PlateWidth", "label": "Plate Width (mm)", "val": plate_width}
 
         # If nothing mapped and module exposes a raw output dict, keep it
         if mapped_output:

@@ -5,6 +5,14 @@ End Plate Service - Business logic layer
 from osdag_core.design_type.connection.header_plate_connection import HeaderPlateConnection
 from .adapter import validate_input, generate_output, create_cad_model
 import traceback
+from osdag_core.Common import (
+    KEY_CONN,
+    KEY_MODULE,
+    KEY_PLATETHK,
+    KEY_SUPTDSEC,
+    KEY_SUPTNGSEC,
+    KEY_TYP,
+)
 
 
 class EndPlateService:
@@ -18,12 +26,12 @@ class EndPlateService:
         print(f"[EndPlateService.calculate] input keys={list(inputs.keys()) if isinstance(inputs, dict) else type(inputs)}")
         if isinstance(inputs, dict):
             for k in [
-                "Connectivity",
-                "Bolt.Type",
-                "Member.Supported_Section.Designation",
-                "Member.Supporting_Section.Designation",
-                "Connector.Plate.Thickness_List",
-                "Module",
+                KEY_CONN,
+                KEY_TYP,
+                KEY_SUPTDSEC,
+                KEY_SUPTNGSEC,
+                KEY_PLATETHK,
+                KEY_MODULE,
             ]:
                 if k in inputs:
                     print(f"[EndPlateService.calculate] {k}={inputs.get(k)!r}")

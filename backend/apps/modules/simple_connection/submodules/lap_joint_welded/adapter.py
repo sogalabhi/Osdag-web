@@ -13,7 +13,25 @@ from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
-from osdag_core.Common import KEY_DISP_LAPJOINTWELDED
+from osdag_core.Common import (
+    KEY_AXIAL,
+    KEY_DESIGN_FOR,
+    KEY_DISP_LAPJOINTWELDED,
+    KEY_DP_WELD_FAB,
+    KEY_DP_WELD_MATERIAL_G_O,
+    KEY_DP_WELD_TYPE,
+    KEY_MATERIAL,
+    KEY_MODULE,
+    KEY_OUT_BOLT_CONN_LEN,
+    KEY_OUT_WELD_LENGTH_EFF,
+    KEY_OUT_WELD_SIZE,
+    KEY_OUT_WELD_STRENGTH,
+    KEY_OUT_WELD_TYPE,
+    KEY_PLATE1_THICKNESS,
+    KEY_PLATE2_THICKNESS,
+    KEY_PLATE_WIDTH,
+    KEY_WELD_SIZE,
+)
 from osdag_core.custom_logger import CustomLogger
 from apps.core.utils import (
     MissingKeyError, InvalidInputTypeError,
@@ -25,16 +43,16 @@ from ...shared_validation import create_welded_validator
 
 def get_required_keys() -> List[str]:
     return [
-        "Module",
-        "Material",
-        "Load.Axial",
-        "Plate1Thickness",
-        "Plate2Thickness",
-        "PlateWidth",
-        "Weld.Size",
-        "Weld.Material_Grade_OverWrite",
-        "Weld.Fab",
-        "Design.For",
+        KEY_MODULE,
+        KEY_MATERIAL,
+        KEY_AXIAL,
+        KEY_PLATE1_THICKNESS,
+        KEY_PLATE2_THICKNESS,
+        KEY_PLATE_WIDTH,
+        KEY_WELD_SIZE,
+        KEY_DP_WELD_MATERIAL_G_O,
+        KEY_DP_WELD_FAB,
+        KEY_DESIGN_FOR,
     ]
 
 # Create shared validator instance
@@ -44,12 +62,12 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     """Validate input values using shared validator"""
     iv = dict(input_values or {})
     # Provide legacy defaults for weld metadata if omitted by caller or empty string
-    if not iv.get("Weld.Material_Grade_OverWrite") or iv.get("Weld.Material_Grade_OverWrite", "").strip() == "":
-        iv["Weld.Material_Grade_OverWrite"] = "410"
-    if not iv.get("Weld.Fab") or iv.get("Weld.Fab", "").strip() == "":
-        iv["Weld.Fab"] = "Shop Weld"
-    if not iv.get("Weld.Type") or iv.get("Weld.Type", "").strip() == "":
-        iv["Weld.Type"] = iv.get("Weld.Fab", "Shop Weld")
+    if not iv.get(KEY_DP_WELD_MATERIAL_G_O) or iv.get(KEY_DP_WELD_MATERIAL_G_O, "").strip() == "":
+        iv[KEY_DP_WELD_MATERIAL_G_O] = "410"
+    if not iv.get(KEY_DP_WELD_FAB) or iv.get(KEY_DP_WELD_FAB, "").strip() == "":
+        iv[KEY_DP_WELD_FAB] = "Shop Weld"
+    if not iv.get(KEY_DP_WELD_TYPE) or iv.get(KEY_DP_WELD_TYPE, "").strip() == "":
+        iv[KEY_DP_WELD_TYPE] = iv.get(KEY_DP_WELD_FAB, "Shop Weld")
     input_values.update(iv)
     # Use shared validator for validation
     _validator.validate(input_values)
@@ -75,9 +93,9 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         mapped_output = {}
         def map_tuple_list(tuple_list):
             key_map = {
-                "Weld.Type": "Weld.Type",
-                "Weld.Size": "Weld.Size",
-                "Weld.EffLength": "Weld.EffLength",
+                KEY_OUT_WELD_TYPE: KEY_OUT_WELD_TYPE,
+                KEY_OUT_WELD_SIZE: KEY_OUT_WELD_SIZE,
+                KEY_OUT_WELD_LENGTH_EFF: KEY_OUT_WELD_LENGTH_EFF,
                 "Utilisation Ratio": "Utilisation Ratio",
                 "No Cover Plate": "No Cover Plate",
                 "Width of Cover Plate": "Width of Cover Plate",
@@ -85,9 +103,9 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
                 "Thickness of Cover Plate": "Thickness of Cover Plate",
             }
             label_map = {
-                "Weld.Type": "Type",
-                "Weld.Size": "Size (mm)",
-                "Weld.EffLength": "Eff.Length (mm)",
+                KEY_OUT_WELD_TYPE: "Type",
+                KEY_OUT_WELD_SIZE: "Size (mm)",
+                KEY_OUT_WELD_LENGTH_EFF: "Eff.Length (mm)",
                 "Utilisation Ratio": "Utilisation Ratio",
                 "No Cover Plate": "No Cover Plate",
                 "Width of Cover Plate": "Width of Cover Plate",
@@ -122,14 +140,14 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
             if hasattr(module, src_attr):
                 mapped_output[target_key] = {"key": target_key, "label": label, "val": getattr(module, src_attr)}
 
-        add_scalar("weld_size", "Weld.Size", "Size (mm)")
+        add_scalar("weld_size", KEY_OUT_WELD_SIZE, "Size (mm)")
         # Weld strength in Osdag is in kN (converted from N in output_values)
         if hasattr(module, 'weld_strength') and module.weld_strength:
             weld_strength_kn = round(module.weld_strength / 1000, 2) if module.weld_strength > 1000 else module.weld_strength
-            mapped_output["Weld.Strength"] = {"key": "Weld.Strength", "label": "Strength (kN)", "val": weld_strength_kn}
-        add_scalar("weld_length_effective", "Weld.EffLength", "Eff.Length (mm)")
+            mapped_output[KEY_OUT_WELD_STRENGTH] = {"key": KEY_OUT_WELD_STRENGTH, "label": "Strength (kN)", "val": weld_strength_kn}
+        add_scalar("weld_length_effective", KEY_OUT_WELD_LENGTH_EFF, "Eff.Length (mm)")
         add_scalar("design_for", "Design For", "Design For")
-        add_scalar("connection_length", "Bolt.ConnLength", "Length of Connection (mm)")
+        add_scalar("connection_length", KEY_OUT_BOLT_CONN_LEN, "Length of Connection (mm)")
 
         if mapped_output:
             output = mapped_output
