@@ -36,25 +36,50 @@ import os
 import typing
 from typing import Dict, Any, List
 import traceback
+from osdag_core.Common import (
+    KEY_AXIAL,
+    KEY_CONNECTOR_MATERIAL,
+    KEY_DP_DESIGN_METHOD,
+    KEY_DP_DETAILING_GAP,
+    KEY_DP_WELD_FAB,
+    KEY_DP_WELD_MATERIAL_G_O,
+    KEY_FLANGEPLATE_PREFERENCES,
+    KEY_FLANGEPLATE_THICKNESS,
+    KEY_MATERIAL,
+    KEY_MODULE,
+    KEY_MOMENT,
+    KEY_OUT_WELD_STRENGTH_RED,
+    KEY_SECSIZE,
+    KEY_SEC_MATERIAL,
+    KEY_SHEAR,
+    KEY_WEBPLATE_THICKNESS,
+    KEY_WELD_TYPE,
+)
+from apps.core.web_keys import (
+    WEB_FLANGE_WELD_REDUCTION,
+    WEB_FLANGE_WELD_STRENGTH_RED,
+    WEB_WEB_WELD_REDUCTION,
+    WEB_WEB_WELD_STRENGTH_RED,
+)
 
 def get_required_keys() -> List[str]:
     return [
-        "Module",
-        "Member.Designation",  
-        "Member.Material",
-        "Material",
-        "Load.Moment",
-        "Load.Shear", 
-        "Load.Axial",
-        "Weld.Type",
-        "Weld.Fab",
-        "Weld.Material_Grade_OverWrite",
-        "Design.Design_Method",
-        "Detailing.Gap",
-        "Connector.Material",
-        "Connector.Flange_Plate.Preferences", 
-        "Connector.Flange_Plate.Thickness_list",
-        "Connector.Web_Plate.Thickness_List"
+        KEY_MODULE,
+        KEY_SECSIZE,  
+        KEY_SEC_MATERIAL,
+        KEY_MATERIAL,
+        KEY_MOMENT,
+        KEY_SHEAR, 
+        KEY_AXIAL,
+        KEY_WELD_TYPE,
+        KEY_DP_WELD_FAB,
+        KEY_DP_WELD_MATERIAL_G_O,
+        KEY_DP_DESIGN_METHOD,
+        KEY_DP_DETAILING_GAP,
+        KEY_CONNECTOR_MATERIAL,
+        KEY_FLANGEPLATE_PREFERENCES, 
+        KEY_FLANGEPLATE_THICKNESS,
+        KEY_WEBPLATE_THICKNESS
     ]
 
 
@@ -72,15 +97,15 @@ def validate_input(input_values: Dict[str, Any]) -> None:
 
         # Validate string fields
         string_fields = [
-            "Module",
-            "Member.Designation",
-            "Member.Material",
-            "Material",
-            "Weld.Type",
-            "Weld.Fab", 
-            "Design.Design_Method",
-            "Connector.Material",
-            "Connector.Flange_Plate.Preferences"
+            KEY_MODULE,
+            KEY_SECSIZE,
+            KEY_SEC_MATERIAL,
+            KEY_MATERIAL,
+            KEY_WELD_TYPE,
+            KEY_DP_WELD_FAB, 
+            KEY_DP_DESIGN_METHOD,
+            KEY_CONNECTOR_MATERIAL,
+            KEY_FLANGEPLATE_PREFERENCES
         ]
         for key in string_fields:
             if key in filtered_input and not isinstance(filtered_input[key], str):
@@ -90,11 +115,11 @@ def validate_input(input_values: Dict[str, Any]) -> None:
 
         # Validate numeric fields
         numeric_fields = [
-            "Load.Moment",
-            "Load.Shear",
-            "Load.Axial",
-            "Weld.Material_Grade_OverWrite",
-            "Detailing.Gap"
+            KEY_MOMENT,
+            KEY_SHEAR,
+            KEY_AXIAL,
+            KEY_DP_WELD_MATERIAL_G_O,
+            KEY_DP_DETAILING_GAP
         ]
         for key in numeric_fields:
             if key in filtered_input:
@@ -105,13 +130,13 @@ def validate_input(input_values: Dict[str, Any]) -> None:
                     )
                 # Additional numeric validation
                 float_val = float(value)
-                if key == "Detailing.Gap" and float_val < 0:
+                if key == KEY_DP_DETAILING_GAP and float_val < 0:
                     raise ValueError(f"Gap value must be non-negative, got {float_val}")
 
         # Validate plate thickness lists
         thickness_lists = [
-            "Connector.Flange_Plate.Thickness_list",
-            "Connector.Web_Plate.Thickness_List"
+            KEY_FLANGEPLATE_THICKNESS,
+            KEY_WEBPLATE_THICKNESS
         ]
         for key in thickness_lists:
             if key in filtered_input:
@@ -191,9 +216,9 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         if param[2] == "TextBox":
             key = param[0]
             if key == "bolt.long_joint":
-                key = "Flange_Weld.Reduction"
-            elif key == "Weld.Strength_red":
-                key = "Flange_Weld.Strength_red"
+                key = WEB_FLANGE_WELD_REDUCTION
+            elif key == KEY_OUT_WELD_STRENGTH_RED:
+                key = WEB_FLANGE_WELD_STRENGTH_RED
             output[key] = {
                 "key": key,
                 "label": param[1],
@@ -205,9 +230,9 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
         if param[2] == "TextBox":
             key = param[0]
             if key == "bolt.long_joint":
-                key = "Web_Weld.Reduction"
-            elif key == "Weld.Strength_red":
-                key = "Web_Weld.Strength_red"
+                key = WEB_WEB_WELD_REDUCTION
+            elif key == KEY_OUT_WELD_STRENGTH_RED:
+                key = WEB_WEB_WELD_STRENGTH_RED
             output[key] = {
                 "key": key,
                 "label": param[1],

@@ -21,6 +21,37 @@ import traceback
 import logging
 import json
 from typing import Dict, Any, List
+from osdag_core.Common import (
+    KEY_AXIAL,
+    KEY_CONN,
+    KEY_CONNECTOR_MATERIAL,
+    KEY_D,
+    KEY_DP_BOLT_HOLE_TYPE,
+    KEY_DP_BOLT_SLIP_FACTOR,
+    KEY_DP_BOLT_TYPE,
+    KEY_DP_DESIGN_METHOD,
+    KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+    KEY_DP_DETAILING_EDGE_TYPE,
+    KEY_DP_DETAILING_GAP,
+    KEY_DP_WELD_FAB,
+    KEY_DP_WELD_MATERIAL_G_O,
+    KEY_GRD,
+    KEY_MATERIAL,
+    KEY_MODULE,
+    KEY_MOMENT,
+    KEY_PLATETHK,
+    KEY_SECSIZE,
+    KEY_SEC_MATERIAL,
+    KEY_SHEAR,
+    KEY_TYP,
+    KEY_WELD_TYPE,
+)
+from apps.core.web_keys import (
+    WEB_COLUMNENDPLATE_FLANGETHICKNESS,
+    WEB_COLUMNENDPLATE_MIDPITCH,
+    WEB_COLUMNENDPLATE_PITCH,
+    WEB_COLUMNENDPLATE_WEBTHICKNESS,
+)
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -41,29 +72,29 @@ logger.addHandler(f_handler)
 # Suppress output when necessary
 def get_required_keys() -> List[str]:
     return [
-        "Bolt.Bolt_Hole_Type",
-        "Bolt.Diameter",
-        "Bolt.Grade",
-        "Bolt.Slip_Factor",
-        "Bolt.TensionType",
-        "Bolt.Type",
-        "Connectivity",
-        "Connector.Material",
-        "Design.Design_Method",
-        "Detailing.Corrosive_Influences",
-        "Detailing.Edge_type",
-        "Detailing.Gap",
-        "Load.Axial",
-        "Load.Shear",
-        "Load.Moment",
-        "Material",
-        "Member.Designation",
-        "Member.Material",
-        "Module",
-        "Weld.Fab",
-        "Weld.Material_Grade_OverWrite",
-        "Weld.Type",
-        "Connector.Plate.Thickness_List",
+        KEY_DP_BOLT_HOLE_TYPE,
+        KEY_D,
+        KEY_GRD,
+        KEY_DP_BOLT_SLIP_FACTOR,
+        KEY_DP_BOLT_TYPE,
+        KEY_TYP,
+        KEY_CONN,
+        KEY_CONNECTOR_MATERIAL,
+        KEY_DP_DESIGN_METHOD,
+        KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+        KEY_DP_DETAILING_EDGE_TYPE,
+        KEY_DP_DETAILING_GAP,
+        KEY_AXIAL,
+        KEY_SHEAR,
+        KEY_MOMENT,
+        KEY_MATERIAL,
+        KEY_SECSIZE,
+        KEY_SEC_MATERIAL,
+        KEY_MODULE,
+        KEY_DP_WELD_FAB,
+        KEY_DP_WELD_MATERIAL_G_O,
+        KEY_WELD_TYPE,
+        KEY_PLATETHK,
     ]
 
 
@@ -81,128 +112,128 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     # Validate key types one by one:
 
     # Validate Bolt.Bolt_Hole_Type.
-    if not isinstance(input_values["Bolt.Bolt_Hole_Type"], str):
-        raise InvalidInputTypeError("Bolt.Bolt_Hole_Type", "str")
+    if not isinstance(input_values[KEY_DP_BOLT_HOLE_TYPE], str):
+        raise InvalidInputTypeError(KEY_DP_BOLT_HOLE_TYPE, "str")
 
      # Validate Bolt.Diameter.
-    bolt_diameter = input_values["Bolt.Diameter"]
+    bolt_diameter = input_values[KEY_D]
     if (not isinstance(bolt_diameter, list)
             or not validate_list_type(bolt_diameter, str)
             or not custom_list_validation(bolt_diameter, int_able)):
         raise InvalidInputTypeError(
-            "Bolt.Diameter", "non empty List[str] where all items can be converted to int")
+            KEY_D, "non empty List[str] where all items can be converted to int")
 
     # Validate Bolt.Grade
-    bolt_grade = input_values["Bolt.Grade"]
+    bolt_grade = input_values[KEY_GRD]
     if (not isinstance(bolt_grade, list)
             or not validate_list_type(bolt_grade, str)
             or not custom_list_validation(bolt_grade, float_able)):
         raise InvalidInputTypeError(
-            "Bolt.Grade", "non empty List[str] where all items can be converted to float")
+            KEY_GRD, "non empty List[str] where all items can be converted to float")
 
     # Validate Bolt.Slip_Factor
-    bolt_slipfactor = input_values["Bolt.Slip_Factor"]
+    bolt_slipfactor = input_values[KEY_DP_BOLT_SLIP_FACTOR]
     if (not isinstance(bolt_slipfactor, str)
             or not float_able(bolt_slipfactor)):
         raise InvalidInputTypeError(
-            "Bolt.Slip_Factor", "str where str can be converted to float")
+            KEY_DP_BOLT_SLIP_FACTOR, "str where str can be converted to float")
 
     # Validate Bolt.TensionType
-    if not isinstance(input_values["Bolt.TensionType"], str):
-        raise InvalidInputTypeError("Bolt.TensionType", "str")
+    if not isinstance(input_values[KEY_DP_BOLT_TYPE], str):
+        raise InvalidInputTypeError(KEY_DP_BOLT_TYPE, "str")
 
     # Validate Bolt.Type
-    if not isinstance(input_values["Bolt.Type"], str):
-        raise InvalidInputTypeError("Bolt.Type", "str")
+    if not isinstance(input_values[KEY_TYP], str):
+        raise InvalidInputTypeError(KEY_TYP, "str")
 
     # Validate Connectivity
-    if not isinstance(input_values["Connectivity"], str):
-        raise InvalidInputTypeError("Connectivity", "str")
+    if not isinstance(input_values[KEY_CONN], str):
+        raise InvalidInputTypeError(KEY_CONN, "str")
 
 
     # Validate Connector.Material
-    if not isinstance(input_values["Connector.Material"], str):
-        raise InvalidInputTypeError("Connector.Material", "str")
+    if not isinstance(input_values[KEY_CONNECTOR_MATERIAL], str):
+        raise InvalidInputTypeError(KEY_CONNECTOR_MATERIAL, "str")
 
     # Validate Design.Design_Method
-    if not isinstance(input_values["Design.Design_Method"], str):
-        raise InvalidInputTypeError("Design.Design_Method", "str")
+    if not isinstance(input_values[KEY_DP_DESIGN_METHOD], str):
+        raise InvalidInputTypeError(KEY_DP_DESIGN_METHOD, "str")
 
     # Validate Detailing.Corrosive_Influences
-    if not is_yes_or_no(input_values["Detailing.Corrosive_Influences"]):
+    if not is_yes_or_no(input_values[KEY_DP_DETAILING_CORROSIVE_INFLUENCES]):
         raise InvalidInputTypeError(
-            "Detailing.Corrosive_Influences", "'Yes' or 'No'")
+            KEY_DP_DETAILING_CORROSIVE_INFLUENCES, "'Yes' or 'No'")
 
     # Validate Detailing.Edge_type
-    if not isinstance(input_values["Detailing.Edge_type"], str):
-        raise InvalidInputTypeError("Detailing.Edge_type", "str")
+    if not isinstance(input_values[KEY_DP_DETAILING_EDGE_TYPE], str):
+        raise InvalidInputTypeError(KEY_DP_DETAILING_EDGE_TYPE, "str")
 
     # Validate Detailing.Gap
-    detailing_gap = input_values["Detailing.Gap"]
+    detailing_gap = input_values[KEY_DP_DETAILING_GAP]
     if (not isinstance(detailing_gap, str)
             or not int_able(detailing_gap)):
         raise InvalidInputTypeError(
-            "Detailing.Gap", "str where str can be converted to int")
+            KEY_DP_DETAILING_GAP, "str where str can be converted to int")
 
     # Validate Load.Axial
-    load_axial = input_values["Load.Axial"]
+    load_axial = input_values[KEY_AXIAL]
     if (not isinstance(load_axial, str)
             or not int_able(load_axial)):
         raise InvalidInputTypeError(
-            "Load.Axial", "str where str can be converted to int")
+            KEY_AXIAL, "str where str can be converted to int")
 
     # Validate Load.Shear
-    load_shear = input_values["Load.Shear"]
+    load_shear = input_values[KEY_SHEAR]
     if (not isinstance(load_shear, str)
             or not int_able(load_shear)):
         raise InvalidInputTypeError(
-            "Load.Shear", "str where str can be converted to int")
+            KEY_SHEAR, "str where str can be converted to int")
 
     # Validate Load.Moment
-    load_moment = input_values["Load.Moment"]
+    load_moment = input_values[KEY_MOMENT]
     if (not isinstance(load_moment, str)
             or not int_able(load_moment)):
         raise InvalidInputTypeError(
-            "Load.Moment", "str where str can be converted to int")
+            KEY_MOMENT, "str where str can be converted to int")
 
     # Validate Material
-    if not isinstance(input_values["Material"], str):
-        raise InvalidInputTypeError("Material", "str")
+    if not isinstance(input_values[KEY_MATERIAL], str):
+        raise InvalidInputTypeError(KEY_MATERIAL, "str")
 
     # Validate Member.Designation
-    if not isinstance(input_values["Member.Designation"], str):
-        raise InvalidInputTypeError("Member.Designation", "str")
+    if not isinstance(input_values[KEY_SECSIZE], str):
+        raise InvalidInputTypeError(KEY_SECSIZE, "str")
 
     # Validate Member.Material
-    if not isinstance(input_values["Member.Material"], str):
-        raise InvalidInputTypeError("Member.Material", "str")
+    if not isinstance(input_values[KEY_SEC_MATERIAL], str):
+        raise InvalidInputTypeError(KEY_SEC_MATERIAL, "str")
 
     # Validate Module
-    if not isinstance(input_values["Module"], str):
-        raise InvalidInputTypeError("Module", "str")
+    if not isinstance(input_values[KEY_MODULE], str):
+        raise InvalidInputTypeError(KEY_MODULE, "str")
 
     # Validate Weld.Fab
-    if not isinstance(input_values["Weld.Fab"], str):
-        raise InvalidInputTypeError("Weld.Fab", "str")
+    if not isinstance(input_values[KEY_DP_WELD_FAB], str):
+        raise InvalidInputTypeError(KEY_DP_WELD_FAB, "str")
 
     # Validate Weld.Type
-    if not isinstance(input_values["Weld.Type"], str):
-        raise InvalidInputTypeError("Weld.Type", "str")
+    if not isinstance(input_values[KEY_WELD_TYPE], str):
+        raise InvalidInputTypeError(KEY_WELD_TYPE, "str")
 
     # Validate Weld.Material_Grade_OverWrite
-    weld_materialgradeoverwrite = input_values["Weld.Material_Grade_OverWrite"]
+    weld_materialgradeoverwrite = input_values[KEY_DP_WELD_MATERIAL_G_O]
     if (not isinstance(weld_materialgradeoverwrite, str)
             or not int_able(weld_materialgradeoverwrite)):
         raise InvalidInputTypeError(
-            "Weld.Material_Grade_OverWrite", "str where str can be converted to int.")
+            KEY_DP_WELD_MATERIAL_G_O, "str where str can be converted to int.")
 
     # Validate Connector.Plate.Thickness_List
-    connector_plate_thicknesslist = input_values["Connector.Plate.Thickness_List"]
+    connector_plate_thicknesslist = input_values[KEY_PLATETHK]
     if (not isinstance(connector_plate_thicknesslist, list)
             or not validate_list_type(connector_plate_thicknesslist, str)
             or not custom_list_validation(connector_plate_thicknesslist, int_able)):
         raise InvalidInputTypeError(
-            "Connector.Plate.Thickness_List", "List[str] where all items can be converted to int")
+            KEY_PLATETHK, "List[str] where all items can be converted to int")
 
 
 def create_module() -> ColumnEndPlate:
@@ -317,10 +348,10 @@ def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     # not a separate flange pitch.)
     try:
         extra_keys = {
-            "ColumnEndPlate.Pitch": ("Pitch (regular)", getattr(module, "pitch", None)),
-            "ColumnEndPlate.MidPitch": ("Pitch (center gap)", getattr(module, "p_2_web", None)),
-            "ColumnEndPlate.WebThickness": ("Web Thickness (mm)", getattr(getattr(module, "section", None), "web_thickness", None)),
-            "ColumnEndPlate.FlangeThickness": ("Flange Thickness (mm)", getattr(getattr(module, "section", None), "flange_thickness", None)),
+            WEB_COLUMNENDPLATE_PITCH: ("Pitch (regular)", getattr(module, "pitch", None)),
+            WEB_COLUMNENDPLATE_MIDPITCH: ("Pitch (center gap)", getattr(module, "p_2_web", None)),
+            WEB_COLUMNENDPLATE_WEBTHICKNESS: ("Web Thickness (mm)", getattr(getattr(module, "section", None), "web_thickness", None)),
+            WEB_COLUMNENDPLATE_FLANGETHICKNESS: ("Flange Thickness (mm)", getattr(getattr(module, "section", None), "flange_thickness", None)),
         }
         for key, (label, val) in extra_keys.items():
             if val is not None:
