@@ -9,6 +9,16 @@ from apps.core.utils import (
     custom_list_validation, float_able, int_able
 )
 from apps.core.utils.errors import RangeValidationError
+from osdag_core.Common import (
+    KEY_AXIAL,
+    KEY_D,
+    KEY_DP_BOLT_SLIP_FACTOR,
+    KEY_GRD,
+    KEY_PLATE1_THICKNESS,
+    KEY_PLATE2_THICKNESS,
+    KEY_PLATE_WIDTH,
+    KEY_WELD_SIZE,
+)
 
 
 class SimpleConnectionValidator:
@@ -54,47 +64,47 @@ class SimpleConnectionValidator:
     
     def _validate_bolt_fields(self, iv: Dict[str, Any]) -> None:
         """Validate bolt diameter and grade if present"""
-        if "Bolt.Diameter" in iv:
-            bolt_dia = iv.get("Bolt.Diameter")
+        if KEY_D in iv:
+            bolt_dia = iv.get(KEY_D)
             if (not isinstance(bolt_dia, list)
                     or not validate_list_type(bolt_dia, str)
                     or not custom_list_validation(bolt_dia, int_able)):
                 raise InvalidInputTypeError(
-                    "Bolt.Diameter", 
+                    KEY_D, 
                     "non empty List[str] convertible to int"
                 )
         
-        if "Bolt.Grade" in iv:
-            bolt_grade = iv.get("Bolt.Grade")
+        if KEY_GRD in iv:
+            bolt_grade = iv.get(KEY_GRD)
             if (not isinstance(bolt_grade, list)
                     or not validate_list_type(bolt_grade, str)
                     or not custom_list_validation(bolt_grade, float_able)):
                 raise InvalidInputTypeError(
-                    "Bolt.Grade", 
+                    KEY_GRD, 
                     "non empty List[str] convertible to float"
                 )
     
     def _validate_weld_fields(self, iv: Dict[str, Any]) -> None:
         """Validate weld size if present"""
-        if "Weld.Size" in iv:
-            weld_size = iv.get("Weld.Size")
+        if KEY_WELD_SIZE in iv:
+            weld_size = iv.get(KEY_WELD_SIZE)
             # Normalize single value to list
             if isinstance(weld_size, (int, float, str)):
-                iv["Weld.Size"] = [str(weld_size)]
+                iv[KEY_WELD_SIZE] = [str(weld_size)]
             
-            if (not isinstance(iv.get("Weld.Size"), list)
-                    or not validate_list_type(iv.get("Weld.Size"), str)
-                    or not custom_list_validation(iv.get("Weld.Size"), float_able)):
+            if (not isinstance(iv.get(KEY_WELD_SIZE), list)
+                    or not validate_list_type(iv.get(KEY_WELD_SIZE), str)
+                    or not custom_list_validation(iv.get(KEY_WELD_SIZE), float_able)):
                 raise InvalidInputTypeError(
-                    "Weld.Size", 
+                    KEY_WELD_SIZE, 
                     "non empty List[str] convertible to float"
                 )
     
     def _validate_numeric_fields(self, iv: Dict[str, Any], input_values: Dict[str, Any]) -> None:
         """Validate common numeric fields"""
         numeric_keys = [
-            "Plate1Thickness", "Plate2Thickness", 
-            "PlateWidth", "Load.Axial", "Bolt.Slip_Factor"
+            KEY_PLATE1_THICKNESS, KEY_PLATE2_THICKNESS, 
+            KEY_PLATE_WIDTH, KEY_AXIAL, KEY_DP_BOLT_SLIP_FACTOR
         ]
         
         for key in numeric_keys:
@@ -166,17 +176,17 @@ def create_bolted_validator(required_keys: List[str], module_name: str):
     """Create validator for bolted connections"""
     return (SimpleConnectionValidator(required_keys, module_name)
             .add_range_validation("PlateWidth", min_value=0.0, allow_zero=False)
-            .add_range_validation("Load.Axial", min_value=0.0, allow_zero=False)
+            .add_range_validation(KEY_AXIAL, min_value=0.0, allow_zero=False)
             .add_range_validation("Plate1Thickness", min_value=0.0, allow_zero=False)
             .add_range_validation("Plate2Thickness", min_value=0.0, allow_zero=False)
-            .add_range_validation("Bolt.Slip_Factor", min_value=0.0, max_value=1.0, allow_zero=False))
+            .add_range_validation(KEY_DP_BOLT_SLIP_FACTOR, min_value=0.0, max_value=1.0, allow_zero=False))
 
 
 def create_welded_validator(required_keys: List[str], module_name: str):
     """Create validator for welded connections"""
     return (SimpleConnectionValidator(required_keys, module_name)
             .add_range_validation("PlateWidth", min_value=0.0, allow_zero=False)
-            .add_range_validation("Load.Axial", min_value=0.0, allow_zero=False)
+            .add_range_validation(KEY_AXIAL, min_value=0.0, allow_zero=False)
             .add_range_validation("Plate1Thickness", min_value=0.0, allow_zero=False)
             .add_range_validation("Plate2Thickness", min_value=0.0, allow_zero=False))
 

@@ -69,16 +69,6 @@ NOT_CONVERTED = {
     "apps/modules/moment_connection/submodules/beam_column_end_plate/adapter.py": 82,
     "apps/modules/moment_connection/submodules/column_column_cover_plate_welded/adapter.py": 39,
     "apps/modules/moment_connection/submodules/column_column_end_plate/adapter.py": 73,
-    "apps/modules/shear_connection/submodules/cleat_angle/adapter.py": 68,
-    "apps/modules/shear_connection/submodules/fin_plate/adapter.py": 71,
-    "apps/modules/shear_connection/submodules/header_plate/adapter.py": 77,
-    "apps/modules/shear_connection/submodules/header_plate/service.py": 6,
-    "apps/modules/shear_connection/submodules/seated_angle/adapter.py": 67,
-    "apps/modules/simple_connection/shared_validation.py": 21,
-    "apps/modules/simple_connection/submodules/butt_joint_bolted/adapter.py": 60,
-    "apps/modules/simple_connection/submodules/butt_joint_welded/adapter.py": 35,
-    "apps/modules/simple_connection/submodules/lap_joint_bolted/adapter.py": 70,
-    "apps/modules/simple_connection/submodules/lap_joint_welded/adapter.py": 34,
 }
 
 # (file, value) -> why the string is not a key
