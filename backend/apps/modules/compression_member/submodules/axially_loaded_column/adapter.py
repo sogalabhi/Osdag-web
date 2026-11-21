@@ -36,7 +36,28 @@ from apps.core.utils import (
 )
 from osdag_core.design_type.compression_member.compression_column import ColumnDesign
 from osdag_core.custom_logger import CustomLogger
-from osdag_core.Common import KEY_DISP_COMPRESSION_COLUMN
+from osdag_core.Common import (
+    KEY_ACTUAL_LEN_YY,
+    KEY_ACTUAL_LEN_ZZ,
+    KEY_ALLOW_UR,
+    KEY_AXIAL,
+    KEY_DISP_COMPRESSION_COLUMN,
+    KEY_DP_DESIGN_METHOD,
+    KEY_EFFECTIVE_AREA_PARA,
+    KEY_END1,
+    KEY_END1_Y,
+    KEY_END2,
+    KEY_END2_Y,
+    KEY_MATERIAL,
+    KEY_MODULE,
+    KEY_OPTIMIZATION_PARA,
+    KEY_SECSIZE,
+    KEY_SEC_MATERIAL,
+    KEY_SEC_PROFILE,
+    KEY_STEEL_COST,
+    KEY_UNSUPPORTED_LEN_YY,
+    KEY_UNSUPPORTED_LEN_ZZ,
+)
 
 try:
     from OCC.Core import BRepTools
@@ -64,17 +85,17 @@ def get_required_keys() -> List[str]:
     The adapter maps these to the exact keys ColumnDesign.set_input_values() reads.
     """
     return [
-        "Module",
-        "Member.Profile",
-        "Member.Designation",
-        "Material",
-        "Actual.Length_zz",
-        "Actual.Length_yy",
-        "End_1",
-        "End_2",
-        "End_1_Y",
-        "End_2_Y",
-        "Load.Axial",
+        KEY_MODULE,
+        KEY_SEC_PROFILE,
+        KEY_SECSIZE,
+        KEY_MATERIAL,
+        KEY_ACTUAL_LEN_ZZ,
+        KEY_ACTUAL_LEN_YY,
+        KEY_END1,
+        KEY_END2,
+        KEY_END1_Y,
+        KEY_END2_Y,
+        KEY_AXIAL,
     ]
 
 
@@ -89,48 +110,48 @@ def validate_input(input_values: Dict[str, Any]) -> None:
 
     # --- String fields ---
     str_keys = [
-        "Module",
-        "Member.Profile",
-        "Material",
-        "End_1",
-        "End_2",
-        "End_1_Y",
-        "End_2_Y",
+        KEY_MODULE,
+        KEY_SEC_PROFILE,
+        KEY_MATERIAL,
+        KEY_END1,
+        KEY_END2,
+        KEY_END1_Y,
+        KEY_END2_Y,
     ]
     for key in str_keys:
         if not isinstance(input_values.get(key), str):
             raise InvalidInputTypeError(key, "str")
 
     # --- Member.Designation: must be a non-empty list of strings ---
-    md = input_values.get("Member.Designation")
+    md = input_values.get(KEY_SECSIZE)
     if not isinstance(md, list):
-        raise InvalidInputTypeError("Member.Designation", "List[str]")
+        raise InvalidInputTypeError(KEY_SECSIZE, "List[str]")
     if not validate_list_type(md, str):
-        raise InvalidInputTypeError("Member.Designation", "List[str] where each item is a string")
+        raise InvalidInputTypeError(KEY_SECSIZE, "List[str] where each item is a string")
     cleaned = [s.strip() for s in md if s.strip()]
     if not cleaned:
         raise InvalidInputTypeError(
-            "Member.Designation",
+            KEY_SECSIZE,
             "non-empty List[str] — at least one section must be selected",
         )
 
     # --- Numeric fields (frontend sends strings or numbers) ---
-    for key in ["Actual.Length_zz", "Actual.Length_yy"]:
+    for key in [KEY_ACTUAL_LEN_ZZ, KEY_ACTUAL_LEN_YY]:
         val = input_values.get(key)
         if not (isinstance(val, str) and float_able(val)) and not isinstance(val, (int, float)):
             raise InvalidInputTypeError(
                 key, "str convertible to float, or a numeric value"
             )
 
-    val_axial = input_values.get("Load.Axial")
+    val_axial = input_values.get(KEY_AXIAL)
     if not (isinstance(val_axial, str) and float_able(str(val_axial))) and not isinstance(val_axial, (int, float)):
         raise InvalidInputTypeError(
-            "Load.Axial", "str convertible to float, or a numeric value"
+            KEY_AXIAL, "str convertible to float, or a numeric value"
         )
 
     # --- Member.Profile must be non-empty ---
-    if not input_values.get("Member.Profile"):
-        raise InvalidInputTypeError("Member.Profile", "non-empty str")
+    if not input_values.get(KEY_SEC_PROFILE):
+        raise InvalidInputTypeError(KEY_SEC_PROFILE, "non-empty str")
 
 
 def create_module() -> ColumnDesign:
@@ -164,7 +185,7 @@ def create_from_input(input_values: Dict[str, Any]) -> ColumnDesign:
     validate_input(input_values)
 
     # Normalize Member.Designation to a clean list of stripped strings
-    md_raw = input_values.get("Member.Designation", [])
+    md_raw = input_values.get(KEY_SECSIZE, [])
     if isinstance(md_raw, str):
         # Should not normally happen given validate_input above, but guard it
         try:
@@ -189,27 +210,27 @@ def create_from_input(input_values: Dict[str, Any]) -> ColumnDesign:
     #   KEY_ALLOW_UR       = 'Optimum.AllowUR'
     #   KEY_EFFECTIVE_AREA_PARA = 'Effective.Area_Para'
     #   KEY_DP_DESIGN_METHOD    = 'Design.Design_Method'
-    material = str(input_values.get("Material", "E 250 (Fe 410 W)A"))
+    material = str(input_values.get(KEY_MATERIAL, "E 250 (Fe 410 W)A"))
 
     design_dict: Dict[str, Any] = {
-        "Module":                    str(input_values.get("Module", KEY_DISP_COMPRESSION_COLUMN)),
-        "Member.Profile":            str(input_values.get("Member.Profile", "Beams and Columns")),
-        "Member.Designation":        member_designation,
-        "Material":                  material,
-        "Member.Material":           material,                          # KEY_SEC_MATERIAL
-        "Unsupported.Length_zz":     _to_float(input_values.get("Actual.Length_zz", 3000)),
-        "Unsupported.Length_yy":     _to_float(input_values.get("Actual.Length_yy", 3000)),
-        "End_1":                     str(input_values.get("End_1", "Fixed")),
-        "End_2":                     str(input_values.get("End_2", "Fixed")),
-        "End_1_Y":                   str(input_values.get("End_1_Y", "Fixed")),
-        "End_2_Y":                   str(input_values.get("End_2_Y", "Fixed")),
-        "Load.Axial":                str(_to_float(input_values.get("Load.Axial", 100))),
+        KEY_MODULE:                    str(input_values.get(KEY_MODULE, KEY_DISP_COMPRESSION_COLUMN)),
+        KEY_SEC_PROFILE:            str(input_values.get(KEY_SEC_PROFILE, "Beams and Columns")),
+        KEY_SECSIZE:        member_designation,
+        KEY_MATERIAL:                  material,
+        KEY_SEC_MATERIAL:           material,                          # KEY_SEC_MATERIAL
+        KEY_UNSUPPORTED_LEN_ZZ:     _to_float(input_values.get(KEY_ACTUAL_LEN_ZZ, 3000)),
+        KEY_UNSUPPORTED_LEN_YY:     _to_float(input_values.get(KEY_ACTUAL_LEN_YY, 3000)),
+        KEY_END1:                     str(input_values.get(KEY_END1, "Fixed")),
+        KEY_END2:                     str(input_values.get(KEY_END2, "Fixed")),
+        KEY_END1_Y:                   str(input_values.get(KEY_END1_Y, "Fixed")),
+        KEY_END2_Y:                   str(input_values.get(KEY_END2_Y, "Fixed")),
+        KEY_AXIAL:                str(_to_float(input_values.get(KEY_AXIAL, 100))),
         # Design preference keys with sensible defaults (core reads in try/except)
-        "Optimum.AllowUR":           str(input_values.get("Optimum.AllowUR", "1.0")),
-        "Effective.Area_Para":       str(input_values.get("Effective.Area_Para", "1.0")),
-        "Optimum.Para":              str(input_values.get("Optimum.Para", "Utilization Ratio")),
-        "Steel.Cost":                str(input_values.get("Steel.Cost", "50")),
-        "Design.Design_Method":      str(input_values.get("Design.Design_Method", "Limit State Design")),
+        KEY_ALLOW_UR:           str(input_values.get(KEY_ALLOW_UR, "1.0")),
+        KEY_EFFECTIVE_AREA_PARA:       str(input_values.get(KEY_EFFECTIVE_AREA_PARA, "1.0")),
+        KEY_OPTIMIZATION_PARA:              str(input_values.get(KEY_OPTIMIZATION_PARA, "Utilization Ratio")),
+        KEY_STEEL_COST:                str(input_values.get(KEY_STEEL_COST, "50")),
+        KEY_DP_DESIGN_METHOD:      str(input_values.get(KEY_DP_DESIGN_METHOD, "Limit State Design")),
     }
 
     module = create_module()

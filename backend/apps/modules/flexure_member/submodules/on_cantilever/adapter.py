@@ -3,7 +3,26 @@ On Cantilever Beam Adapter
 Implements the business logic for the On-Cantilever-Beam flexure module.
 Uses Flexure_Cantilever from osdag_core.
 """
-from osdag_core.Common import KEY_DISP_FLEXURE2
+from osdag_core.Common import (
+    KEY_ALLOW_CLASS,
+    KEY_BEARING_LENGTH,
+    KEY_DESIGN_TYPE_FLEXURE,
+    KEY_DISP_FLEXURE2,
+    KEY_DP_DESIGN_METHOD,
+    KEY_EFFECTIVE_AREA_PARA,
+    KEY_LENGTH,
+    KEY_LENGTH_OVERWRITE,
+    KEY_LOAD,
+    KEY_MATERIAL,
+    KEY_MODULE,
+    KEY_MOMENT,
+    KEY_SECSIZE,
+    KEY_SEC_MATERIAL,
+    KEY_SEC_PROFILE,
+    KEY_SHEAR,
+    KEY_SUPPORT_TYPE,
+    KEY_SUPPORT_TYPE2,
+)
 from apps.core.utils import (
     MissingKeyError, InvalidInputTypeError,
     contains_keys, build_raw_output_dict,
@@ -18,17 +37,17 @@ from typing import Dict, Any, List
 def get_required_keys() -> List[str]:
     """Return all required input parameters for the module."""
     return [
-        "Module",                   # KEY_MODULE
-        "Member.Profile",           # KEY_SEC_PROFILE
-        "Member.Designation",       # KEY_SECSIZE
-        "Material",                 # KEY_MATERIAL
-        "Member.Material",          # KEY_SEC_MATERIAL
-        "Flexure.Type",             # KEY_DESIGN_TYPE_FLEXURE (support type)
-        "Cantilever.Support",       # KEY_SUPPORT_TYPE (support restraint)
-        "Cantilever.Top",           # KEY_SUPPORT_TYPE2 (top restraint)
-        "Member.Length",            # KEY_LENGTH
-        "Load.Shear",               # KEY_SHEAR
-        "Load.Moment",              # KEY_MOMENT
+        KEY_MODULE,
+        KEY_SEC_PROFILE,
+        KEY_SECSIZE,
+        KEY_MATERIAL,
+        KEY_SEC_MATERIAL,
+        KEY_DESIGN_TYPE_FLEXURE,  # support type
+        KEY_SUPPORT_TYPE,  # support restraint
+        KEY_SUPPORT_TYPE2,  # top restraint
+        KEY_LENGTH,
+        KEY_SHEAR,
+        KEY_MOMENT,
     ]
 
 
@@ -60,16 +79,14 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure_Cantilever:
     from osdag_core.Common import (
         KEY_MODULE, KEY_SEC_PROFILE, KEY_SECSIZE, KEY_MATERIAL, KEY_SEC_MATERIAL,
         KEY_DESIGN_TYPE_FLEXURE, KEY_LENGTH, KEY_SHEAR, KEY_MOMENT,
-        KEY_LENGTH_OVERWRITE, KEY_EFFECTIVE_AREA_PARA, KEY_ALLOW_CLASS,
-        KEY_BEARING_LENGTH, KEY_SUPPORT_TYPE, KEY_SUPPORT_TYPE2, KEY_LOAD,
-        KEY_DP_DESIGN_METHOD,
+        KEY_SUPPORT_TYPE, KEY_SUPPORT_TYPE2,
         VALUES_SUPP_TYPE_temp,
     )
 
     module = _create_cantilever_module()
 
     # ---- Section Designation ----
-    member_designation = input_values.get('Member.Designation', '')
+    member_designation = input_values.get(KEY_SECSIZE, '')
     if isinstance(member_designation, str):
         if member_designation in ('', '[]'):
             member_designation = []
@@ -90,7 +107,7 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure_Cantilever:
     #   [0] = 'Major Laterally Supported'
     #   [1] = 'Minor Laterally Unsupported'
     #   [2] = 'Major Laterally Unsupported'
-    flexure_type = input_values.get('Flexure.Type', VALUES_SUPP_TYPE_temp[0])
+    flexure_type = input_values.get(KEY_DESIGN_TYPE_FLEXURE, VALUES_SUPP_TYPE_temp[0])
 
     # ---- Support Restraint (Cantilever.Support) ----
     # Frontend sends values from Supprt_Restraint_list:
@@ -99,7 +116,7 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure_Cantilever:
     #   'Continous, with lateral and torsional restraint'
     #   'Restrained laterally, torsionally and against rotation on flange'
     # We map frontend values (which may have "Continuous") to core values ("Continous")
-    raw_support = input_values.get('Cantilever.Support', '')
+    raw_support = input_values.get(KEY_SUPPORT_TYPE, '')
     # Map frontend display values to core values (core has typo "Continous" not "Continuous")
     support_map = {
         'Continuous, with lateral restraint to top flange': 'Continous, with lateral restraint to top flange',
@@ -116,7 +133,7 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure_Cantilever:
     # ---- Top Restraint (Cantilever.Top) ----
     # Frontend sends values from Top_Restraint_list:
     #   'Free', 'Lateral restraint to top flange', 'Torsional restraint', 'Lateral and Torsional restraint'
-    raw_top = input_values.get('Cantilever.Top', '')
+    raw_top = input_values.get(KEY_SUPPORT_TYPE2, '')
     # Note: core has typo "Torsional rwstraint" (Top3)
     top_map = {
         'Free': 'Free',
@@ -129,18 +146,18 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure_Cantilever:
     cantilever_top = top_map.get(raw_top, raw_top) or 'Free'
 
     # ---- Other params ----
-    material = input_values.get('Material', 'E 250 (Fe 410 W)A')
-    sec_material = input_values.get('Member.Material', material)
-    sec_profile = input_values.get('Member.Profile', 'Beams and Columns')
-    length = float(input_values.get('Member.Length', 5000))
-    shear = input_values.get('Load.Shear', '50')
-    moment = input_values.get('Load.Moment', '100')
-    length_overwrite = input_values.get('Length.Overwrite', 'NA')
-    effective_area_para = float(input_values.get('Effective.Area_Para', 1.0))
-    allow_class = input_values.get('Optimum.Class', 'Yes')
-    bearing_length = input_values.get('Bearing.Length', 'NA')
-    loading_condition = input_values.get('Loading.Condition', 'Normal')
-    design_method = input_values.get('Design.Design_Method', 'Limit State Design')
+    material = input_values.get(KEY_MATERIAL, 'E 250 (Fe 410 W)A')
+    sec_material = input_values.get(KEY_SEC_MATERIAL, material)
+    sec_profile = input_values.get(KEY_SEC_PROFILE, 'Beams and Columns')
+    length = float(input_values.get(KEY_LENGTH, 5000))
+    shear = input_values.get(KEY_SHEAR, '50')
+    moment = input_values.get(KEY_MOMENT, '100')
+    length_overwrite = input_values.get(KEY_LENGTH_OVERWRITE, 'NA')
+    effective_area_para = float(input_values.get(KEY_EFFECTIVE_AREA_PARA, 1.0))
+    allow_class = input_values.get(KEY_ALLOW_CLASS, 'Yes')
+    bearing_length = input_values.get(KEY_BEARING_LENGTH, 'NA')
+    loading_condition = input_values.get(KEY_LOAD, 'Normal')
+    design_method = input_values.get(KEY_DP_DESIGN_METHOD, 'Limit State Design')
 
     design_dict = {
         KEY_MODULE: KEY_DISP_FLEXURE2,

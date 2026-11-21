@@ -2,7 +2,27 @@
 Simply Supported Beam Adapter
 Implements the business logic directly (not re-exporting from osdag_api)
 """
-from osdag_core.Common import KEY_DISP_FLEXURE
+from osdag_core.Common import (
+    KEY_ALLOW_CLASS,
+    KEY_BEARING_LENGTH,
+    KEY_DESIGN_TYPE_FLEXURE,
+    KEY_DISP_FLEXURE,
+    KEY_DP_DESIGN_METHOD,
+    KEY_EFFECTIVE_AREA_PARA,
+    KEY_LENGTH,
+    KEY_LENGTH_OVERWRITE,
+    KEY_LOAD,
+    KEY_MATERIAL,
+    KEY_MODULE,
+    KEY_MOMENT,
+    KEY_SECSIZE,
+    KEY_SEC_MATERIAL,
+    KEY_SEC_PROFILE,
+    KEY_SHEAR,
+    KEY_SUPPORT,
+    KEY_TORSIONAL_RES,
+    KEY_WARPING_RES,
+)
 from apps.core.utils import (
     validate_arr, validate_num, validate_string,
     MissingKeyError, InvalidInputTypeError,
@@ -19,22 +39,22 @@ import traceback
 def get_required_keys() -> List[str]:
     """Return all required input parameters for the module."""
     return [
-        "Module",                   # KEY_MODULE
-        "Member.Profile",           # KEY_SEC_PROFILE
-        "Member.Designation",       # KEY_SECSIZE
-        "Material",                 # KEY_MATERIAL
-        "Member.Material",          # KEY_SEC_MATERIAL
-        "Design.Design_Method",     # KEY_DESIGN_TYPE_FLEXURE
-        "Optimum.Class",   # KEY_ALLOW_CLASS
-        "Effective.Area_Para", # KEY_EFFECTIVE_AREA_PARA
-        "Length.Overwrite",         # KEY_LENGTH_OVERWRITE
-        "Bearing.Length",           # KEY_BEARING_LENGTH
-        "Load.Shear",               # KEY_SHEAR
-        "Load.Moment",              # KEY_MOMENT
-        "Member.Length",            # KEY_LENGTH
-        "Flexure.Type",             # KEY_SUPPORT
-        "Torsion.restraint",        # KEY_TORSIONAL_RES
-        "Warping.restraint",        # KEY_WARPING_RES
+        KEY_MODULE,
+        KEY_SEC_PROFILE,
+        KEY_SECSIZE,
+        KEY_MATERIAL,
+        KEY_SEC_MATERIAL,
+        KEY_DP_DESIGN_METHOD,
+        KEY_ALLOW_CLASS,
+        KEY_EFFECTIVE_AREA_PARA,
+        KEY_LENGTH_OVERWRITE,
+        KEY_BEARING_LENGTH,
+        KEY_SHEAR,
+        KEY_MOMENT,
+        KEY_LENGTH,
+        KEY_DESIGN_TYPE_FLEXURE,
+        KEY_TORSIONAL_RES,
+        KEY_WARPING_RES,
     ]
 
 
@@ -58,7 +78,7 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure:
     module = create_module()
     
     # Handle array conversion for Member.Designation
-    member_designation = input_values.get('Member.Designation', '')
+    member_designation = input_values.get(KEY_SECSIZE, '')
     if isinstance(member_designation, str):
         if member_designation == '[]':
             member_designation = []
@@ -78,23 +98,23 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure:
     
     # Map input_values to exact keys expected by Flexure.set_input_values
     design_dict = {
-        'Module': input_values.get('Module', KEY_DISP_FLEXURE),
-        'Member.Profile': input_values.get('Member.Profile', ''),
-        'Member.Designation': member_designation,  # Use processed array
-        'Material': input_values.get('Material', ''),
-        'Member.Material': input_values.get('Member.Material', ''),
-        'Flexure.Type': input_values.get('Flexure.Type', 'Major Laterally Supported'),
-        'Optimum.Class': input_values.get('Optimum.Class', ''),
-        'Effective.Area_Para': input_values.get('Effective.Area_Para', ''),
-        'Length.Overwrite': input_values.get('Length.Overwrite', ''),
-        'Bearing.Length': input_values.get('Bearing.Length', ''),
-        'Load.Shear': input_values.get('Load.Shear', ''),
-        'Load.Moment': input_values.get('Load.Moment', ''),
-        'Member.Length': input_values.get('Member.Length', ''),
-        'Flexure.Support': input_values.get('Flexure.Support', ''),
-        'Torsion.restraint': input_values.get('Torsion.restraint', ''),
-        'Warping.restraint': input_values.get('Warping.restraint', ''),
-        'Loading.Condition': input_values.get('Loading.Condition', 'Normal'),
+        KEY_MODULE: input_values.get(KEY_MODULE, KEY_DISP_FLEXURE),
+        KEY_SEC_PROFILE: input_values.get(KEY_SEC_PROFILE, ''),
+        KEY_SECSIZE: member_designation,  # Use processed array
+        KEY_MATERIAL: input_values.get(KEY_MATERIAL, ''),
+        KEY_SEC_MATERIAL: input_values.get(KEY_SEC_MATERIAL, ''),
+        KEY_DESIGN_TYPE_FLEXURE: input_values.get(KEY_DESIGN_TYPE_FLEXURE, 'Major Laterally Supported'),
+        KEY_ALLOW_CLASS: input_values.get(KEY_ALLOW_CLASS, ''),
+        KEY_EFFECTIVE_AREA_PARA: input_values.get(KEY_EFFECTIVE_AREA_PARA, ''),
+        KEY_LENGTH_OVERWRITE: input_values.get(KEY_LENGTH_OVERWRITE, ''),
+        KEY_BEARING_LENGTH: input_values.get(KEY_BEARING_LENGTH, ''),
+        KEY_SHEAR: input_values.get(KEY_SHEAR, ''),
+        KEY_MOMENT: input_values.get(KEY_MOMENT, ''),
+        KEY_LENGTH: input_values.get(KEY_LENGTH, ''),
+        KEY_SUPPORT: input_values.get(KEY_SUPPORT, ''),
+        KEY_TORSIONAL_RES: input_values.get(KEY_TORSIONAL_RES, ''),
+        KEY_WARPING_RES: input_values.get(KEY_WARPING_RES, ''),
+        KEY_LOAD: input_values.get(KEY_LOAD, 'Normal'),
     }
     
     module.set_input_values(design_dict)

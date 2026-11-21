@@ -34,6 +34,10 @@ import os
 from typing import Dict, Any, List, Tuple
 import traceback
 import json
+from apps.core.web_keys import (
+    WEB_DESIGN_INTERMEDIATESTIFFENER_THICKNESS_VALUES,
+    WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES,
+)
 
 old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
@@ -43,16 +47,16 @@ sys.stdout = old_stdout  # Reset log
 def get_required_keys() -> List[str]:
     """Return all required input parameters for the plate girder module."""
     return [
-        "Module",                           # KEY_MODULE
-        "Material",                         # KEY_MATERIAL
-        "Member.Length",                    # KEY_LENGTH
-        "Loading.Condition",                # KEY_LOAD
-        "Load.Shear",                       # KEY_SHEAR
-        "Load.Moment",                      # KEY_MOMENT
-        "Total.Design_Type",                # KEY_OVERALL_DEPTH_PG_TYPE ('Customized' or 'Optimized')
-        "Web.Thickness",                    # KEY_WEB_THICKNESS_PG (list)
-        "TopFlange.Thickness",               # KEY_TOP_FLANGE_THICKNESS_PG (list)
-        "BottomFlange.Thickness",           # KEY_BOTTOM_FLANGE_THICKNESS_PG (list)
+        KEY_MODULE,
+        KEY_MATERIAL,
+        KEY_LENGTH,
+        KEY_LOAD,
+        KEY_SHEAR,
+        KEY_MOMENT,
+        KEY_OVERALL_DEPTH_PG_TYPE,  # 'Customized' or 'Optimized'
+        KEY_WEB_THICKNESS_PG,  # list
+        KEY_TOP_FLANGE_THICKNESS_PG,  # list
+        KEY_BOTTOM_FLANGE_THICKNESS_PG,  # list
         KEY_DESIGN_TYPE_FLEXURE,
         KEY_BENDING_MOMENT_SHAPE,
         KEY_TORSIONAL_RES,
@@ -77,16 +81,16 @@ def get_optimization_required_keys() -> List[str]:
     as they will be optimized by PSO.
     """
     return [
-        "Module",
-        "Material",
-        "Member.Length",
-        "Loading.Condition",
-        "Load.Shear",
-        "Load.Moment",
-        "Total.Design_Type",  # Must be "Optimized"
-        "Web.Thickness",  # List of available thicknesses for discrete snapping
-        "TopFlange.Thickness",  # List of available thicknesses
-        "BottomFlange.Thickness",  # List of available thicknesses
+        KEY_MODULE,
+        KEY_MATERIAL,
+        KEY_LENGTH,
+        KEY_LOAD,
+        KEY_SHEAR,
+        KEY_MOMENT,
+        KEY_OVERALL_DEPTH_PG_TYPE,  # Must be "Optimized"
+        KEY_WEB_THICKNESS_PG,  # List of available thicknesses for discrete snapping
+        KEY_TOP_FLANGE_THICKNESS_PG,  # List of available thicknesses
+        KEY_BOTTOM_FLANGE_THICKNESS_PG,  # List of available thicknesses
         KEY_DESIGN_TYPE_FLEXURE,
         KEY_BENDING_MOMENT_SHAPE,
         KEY_TORSIONAL_RES,
@@ -114,10 +118,10 @@ def validate_input(input_values: Dict[str, Any]) -> None:
 
     # Validate string keys
     str_keys = [
-        "Module",
-        "Material",
-        "Loading.Condition",
-        "Total.Design_Type",
+        KEY_MODULE,
+        KEY_MATERIAL,
+        KEY_LOAD,
+        KEY_OVERALL_DEPTH_PG_TYPE,
         KEY_DESIGN_TYPE_FLEXURE,
         KEY_BENDING_MOMENT_SHAPE,
         KEY_TORSIONAL_RES,
@@ -137,9 +141,9 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     # Validate numeric keys (as strings that can be converted to float)
     # Some fields can be "NA" (optional fields)
     num_keys_required = [
-        "Member.Length",
-        "Load.Shear",
-        "Load.Moment",
+        KEY_LENGTH,
+        KEY_SHEAR,
+        KEY_MOMENT,
         KEY_SUPPORT_WIDTH,
     ]
     for key in num_keys_required:
@@ -160,29 +164,29 @@ def validate_input(input_values: Dict[str, Any]) -> None:
                 raise InvalidInputTypeError(key, "str where str can be converted to float or 'NA'")
 
     # Validate list keys (for Customized design type)
-    design_type = input_values.get("Total.Design_Type")
+    design_type = input_values.get(KEY_OVERALL_DEPTH_PG_TYPE)
     if design_type == "Customized":
         # For Customized, we need overall depth and flange widths
-        if "Total.Depth" not in input_values:
-            raise MissingKeyError("Total.Depth")
-        if not isinstance(input_values.get("Total.Depth"), str) or not float_able(input_values.get("Total.Depth")):
-            raise InvalidInputTypeError("Total.Depth", "str where str can be converted to float")
+        if KEY_OVERALL_DEPTH_PG not in input_values:
+            raise MissingKeyError(KEY_OVERALL_DEPTH_PG)
+        if not isinstance(input_values.get(KEY_OVERALL_DEPTH_PG), str) or not float_able(input_values.get(KEY_OVERALL_DEPTH_PG)):
+            raise InvalidInputTypeError(KEY_OVERALL_DEPTH_PG, "str where str can be converted to float")
         
-        if "Topflange.Width" not in input_values:
-            raise MissingKeyError("Topflange.Width")
-        if not isinstance(input_values.get("Topflange.Width"), str) or not float_able(input_values.get("Topflange.Width")):
-            raise InvalidInputTypeError("Topflange.Width", "str where str can be converted to float")
+        if KEY_TOP_Bflange_PG not in input_values:
+            raise MissingKeyError(KEY_TOP_Bflange_PG)
+        if not isinstance(input_values.get(KEY_TOP_Bflange_PG), str) or not float_able(input_values.get(KEY_TOP_Bflange_PG)):
+            raise InvalidInputTypeError(KEY_TOP_Bflange_PG, "str where str can be converted to float")
         
-        if "Bottomflange.Width" not in input_values:
-            raise MissingKeyError("Bottomflange.Width")
-        if not isinstance(input_values.get("Bottomflange.Width"), str) or not float_able(input_values.get("Bottomflange.Width")):
-            raise InvalidInputTypeError("Bottomflange.Width", "str where str can be converted to float")
+        if KEY_BOTTOM_Bflange_PG not in input_values:
+            raise MissingKeyError(KEY_BOTTOM_Bflange_PG)
+        if not isinstance(input_values.get(KEY_BOTTOM_Bflange_PG), str) or not float_able(input_values.get(KEY_BOTTOM_Bflange_PG)):
+            raise InvalidInputTypeError(KEY_BOTTOM_Bflange_PG, "str where str can be converted to float")
 
     # Validate list types for thickness lists
     list_keys = [
-        "Web.Thickness",
-        "TopFlange.Thickness",
-        "BottomFlange.Thickness",
+        KEY_WEB_THICKNESS_PG,
+        KEY_TOP_FLANGE_THICKNESS_PG,
+        KEY_BOTTOM_FLANGE_THICKNESS_PG,
     ]
     for key in list_keys:
         value = input_values.get(key)
@@ -209,7 +213,7 @@ def create_from_input(input_values: Dict[str, Any]):
     
     # For Customized design: osdag_core calls float() on thickness keys → must be a scalar string.
     # For Optimized design: osdag_core expects a list → PSO picks from list of available thicknesses.
-    design_type = input_values.get('Total.Design_Type', 'Customized')
+    design_type = input_values.get(KEY_OVERALL_DEPTH_PG_TYPE, 'Customized')
 
     def _thickness_val(key, default='6'):
         val = input_values.get(key, [default])
@@ -221,16 +225,16 @@ def create_from_input(input_values: Dict[str, Any]):
             return val if isinstance(val, list) else [str(val)]
 
     design_dict = {
-        KEY_MODULE: input_values.get('Module', KEY_DISP_PLATE_GIRDER_WELDED),
-        KEY_MATERIAL: input_values.get('Material', 'E 250 (Fe 410 W)A'),
-        KEY_LENGTH: input_values.get('Member.Length', '5000'),
-        KEY_LOAD: input_values.get('Loading.Condition', ''),
-        KEY_SHEAR: input_values.get('Load.Shear', '0'),
-        KEY_MOMENT: input_values.get('Load.Moment', '0'),
+        KEY_MODULE: input_values.get(KEY_MODULE, KEY_DISP_PLATE_GIRDER_WELDED),
+        KEY_MATERIAL: input_values.get(KEY_MATERIAL, 'E 250 (Fe 410 W)A'),
+        KEY_LENGTH: input_values.get(KEY_LENGTH, '5000'),
+        KEY_LOAD: input_values.get(KEY_LOAD, ''),
+        KEY_SHEAR: input_values.get(KEY_SHEAR, '0'),
+        KEY_MOMENT: input_values.get(KEY_MOMENT, '0'),
         KEY_OVERALL_DEPTH_PG_TYPE: design_type,
-        KEY_WEB_THICKNESS_PG: _thickness_val('Web.Thickness'),
-        KEY_TOP_FLANGE_THICKNESS_PG: _thickness_val('TopFlange.Thickness'),
-        KEY_BOTTOM_FLANGE_THICKNESS_PG: _thickness_val('BottomFlange.Thickness'),
+        KEY_WEB_THICKNESS_PG: _thickness_val(KEY_WEB_THICKNESS_PG),
+        KEY_TOP_FLANGE_THICKNESS_PG: _thickness_val(KEY_TOP_FLANGE_THICKNESS_PG),
+        KEY_BOTTOM_FLANGE_THICKNESS_PG: _thickness_val(KEY_BOTTOM_FLANGE_THICKNESS_PG),
         KEY_DESIGN_TYPE_FLEXURE: input_values.get(KEY_DESIGN_TYPE_FLEXURE, 'Major Laterally Supported'),
         KEY_BENDING_MOMENT_SHAPE: input_values.get(KEY_BENDING_MOMENT_SHAPE, ''),
         KEY_TORSIONAL_RES: input_values.get(KEY_TORSIONAL_RES, 'No'),
@@ -245,11 +249,11 @@ def create_from_input(input_values: Dict[str, Any]):
         KEY_LongitudnalStiffener: input_values.get(KEY_LongitudnalStiffener, 'No'),
         KEY_LongitudnalStiffener_thickness: input_values.get(KEY_LongitudnalStiffener_thickness, 'Standard'),
         # Additional design parameters
-        KEY_DESIGN_LOAD: input_values.get('Design.Load', 'Live load'),
-        KEY_MEMBER_OPTIONS: input_values.get('Member.Options', 'Simple Span'),
-        KEY_SUPPORTING_OPTIONS: input_values.get('Supporting.Options', 'NA'),
+        KEY_DESIGN_LOAD: input_values.get(KEY_DESIGN_LOAD, 'Live load'),
+        KEY_MEMBER_OPTIONS: input_values.get(KEY_MEMBER_OPTIONS, 'Simple Span'),
+        KEY_SUPPORTING_OPTIONS: input_values.get(KEY_SUPPORTING_OPTIONS, 'NA'),
         KEY_ShearBucklingOption: input_values.get(KEY_ShearBucklingOption, 'Simple Post Critical'),
-        KEY_DP_DESIGN_METHOD: input_values.get('Design.Design_Method', 'Limit State Design'),
+        KEY_DP_DESIGN_METHOD: input_values.get(KEY_DP_DESIGN_METHOD, 'Limit State Design'),
         KEY_EFFECTIVE_AREA_PARA: input_values.get(KEY_EFFECTIVE_AREA_PARA, '1.0'),
         KEY_LENGTH_OVERWRITE: input_values.get(KEY_LENGTH_OVERWRITE, 'NA'),
     }
@@ -264,9 +268,9 @@ def create_from_input(input_values: Dict[str, Any]):
     # Add design type specific keys
     design_type = design_dict[KEY_OVERALL_DEPTH_PG_TYPE]
     if design_type == 'Customized':
-        design_dict[KEY_OVERALL_DEPTH_PG] = input_values.get('Total.Depth', '500')
-        design_dict[KEY_TOP_Bflange_PG] = input_values.get('Topflange.Width', '200')
-        design_dict[KEY_BOTTOM_Bflange_PG] = input_values.get('Bottomflange.Width', '200')
+        design_dict[KEY_OVERALL_DEPTH_PG] = input_values.get(KEY_OVERALL_DEPTH_PG, '500')
+        design_dict[KEY_TOP_Bflange_PG] = input_values.get(KEY_TOP_Bflange_PG, '200')
+        design_dict[KEY_BOTTOM_Bflange_PG] = input_values.get(KEY_BOTTOM_Bflange_PG, '200')
     elif design_type == 'Optimized':
         # For optimized, these are not required in set_input_values
         # but we'll set defaults to avoid errors
@@ -279,7 +283,7 @@ def create_from_input(input_values: Dict[str, Any]):
     # Intermediate stiffener: populate the class-level customized list if provided,
     # matching set_input_values()'s handling of the "Customized" thickness option.
     if design_dict[KEY_IntermediateStiffener_thickness] == 'Customized':
-        custom_values = input_values.get('Design.IntermediateStiffener.Thickness_Values', None)
+        custom_values = input_values.get(WEB_DESIGN_INTERMEDIATESTIFFENER_THICKNESS_VALUES, None)
         if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
             PlateGirderWelded.int_thicklist = [str(v) for v in custom_values]
         design_dict[KEY_IntermediateStiffener_thickness_val] = PlateGirderWelded.int_thicklist
@@ -288,7 +292,7 @@ def create_from_input(input_values: Dict[str, Any]):
 
     # Longitudinal stiffener: same customized-list handling as above.
     if design_dict[KEY_LongitudnalStiffener_thickness] == 'Customized':
-        custom_values = input_values.get('Design.LongitudnalStiffener.Thickness_Values', None)
+        custom_values = input_values.get(WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES, None)
         if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
             PlateGirderWelded.long_thicklist = [str(v) for v in custom_values]
         design_dict[KEY_LongitudnalStiffener_thickness_val] = PlateGirderWelded.long_thicklist
@@ -402,9 +406,9 @@ def get_optimization_bounds(input_values: Dict[str, Any]) -> Dict[str, tuple]:
     
     # Map frontend keys to backend variable names
     variable_mapping = {
-        'Total.Depth': 'D',
-        'Topflange.Width': 'bf_top',
-        'Bottomflange.Width': 'bf_bot',
+        KEY_OVERALL_DEPTH_PG: 'D',
+        KEY_TOP_Bflange_PG: 'bf_top',
+        KEY_BOTTOM_Bflange_PG: 'bf_bot',
     }
     
     for frontend_key, backend_var in variable_mapping.items():
@@ -454,21 +458,21 @@ def create_optimization_input(input_values: Dict[str, Any]) -> Dict[str, Any]:
         Design dictionary ready for PlateGirderWelded.optimized_method()
     """
     optimization_input = input_values.copy()
-    optimization_input["Total.Design_Type"] = "Optimized"
+    optimization_input[KEY_OVERALL_DEPTH_PG_TYPE] = "Optimized"
     
     # Use the same create_from_input logic but ensure Optimized flag is set
     # The design dictionary format is the same as normal design
     design_dict = {
-        KEY_MODULE: optimization_input.get('Module', KEY_DISP_PLATE_GIRDER_WELDED),
-        KEY_MATERIAL: optimization_input.get('Material', 'E 250 (Fe 410 W)A'),
-        KEY_LENGTH: optimization_input.get('Member.Length', '5000'),
-        KEY_LOAD: optimization_input.get('Loading.Condition', 'Normal'),
-        KEY_SHEAR: optimization_input.get('Load.Shear', '0'),
-        KEY_MOMENT: optimization_input.get('Load.Moment', '0'),
+        KEY_MODULE: optimization_input.get(KEY_MODULE, KEY_DISP_PLATE_GIRDER_WELDED),
+        KEY_MATERIAL: optimization_input.get(KEY_MATERIAL, 'E 250 (Fe 410 W)A'),
+        KEY_LENGTH: optimization_input.get(KEY_LENGTH, '5000'),
+        KEY_LOAD: optimization_input.get(KEY_LOAD, 'Normal'),
+        KEY_SHEAR: optimization_input.get(KEY_SHEAR, '0'),
+        KEY_MOMENT: optimization_input.get(KEY_MOMENT, '0'),
         KEY_OVERALL_DEPTH_PG_TYPE: 'Optimized',  # Force Optimized
-        KEY_WEB_THICKNESS_PG: optimization_input.get('Web.Thickness', ['6', '8', '10', '12', '16', '20', '25', '32', '40']),
-        KEY_TOP_FLANGE_THICKNESS_PG: optimization_input.get('TopFlange.Thickness', ['6', '8', '10', '12', '16', '20', '25', '32', '40']),
-        KEY_BOTTOM_FLANGE_THICKNESS_PG: optimization_input.get('BottomFlange.Thickness', ['6', '8', '10', '12', '16', '20', '25', '32', '40']),
+        KEY_WEB_THICKNESS_PG: optimization_input.get(KEY_WEB_THICKNESS_PG, ['6', '8', '10', '12', '16', '20', '25', '32', '40']),
+        KEY_TOP_FLANGE_THICKNESS_PG: optimization_input.get(KEY_TOP_FLANGE_THICKNESS_PG, ['6', '8', '10', '12', '16', '20', '25', '32', '40']),
+        KEY_BOTTOM_FLANGE_THICKNESS_PG: optimization_input.get(KEY_BOTTOM_FLANGE_THICKNESS_PG, ['6', '8', '10', '12', '16', '20', '25', '32', '40']),
         KEY_DESIGN_TYPE_FLEXURE: optimization_input.get(KEY_DESIGN_TYPE_FLEXURE, 'Major Laterally Supported'),
         KEY_BENDING_MOMENT_SHAPE: optimization_input.get(KEY_BENDING_MOMENT_SHAPE, 'Uniform Loading with pinned-pinned support'),
         KEY_TORSIONAL_RES: optimization_input.get(KEY_TORSIONAL_RES, 'Fully Restrained'),
@@ -483,11 +487,11 @@ def create_optimization_input(input_values: Dict[str, Any]) -> Dict[str, Any]:
         KEY_LongitudnalStiffener: optimization_input.get(KEY_LongitudnalStiffener, 'No'),
         KEY_LongitudnalStiffener_thickness: optimization_input.get(KEY_LongitudnalStiffener_thickness, 'Standard'),
         # Additional design parameters (matching create_from_input)
-        KEY_DESIGN_LOAD: optimization_input.get('Design.Load', 'Live load'),
-        KEY_MEMBER_OPTIONS: optimization_input.get('Member.Options', 'Simple Span'),
-        KEY_SUPPORTING_OPTIONS: optimization_input.get('Supporting.Options', 'NA'),
+        KEY_DESIGN_LOAD: optimization_input.get(KEY_DESIGN_LOAD, 'Live load'),
+        KEY_MEMBER_OPTIONS: optimization_input.get(KEY_MEMBER_OPTIONS, 'Simple Span'),
+        KEY_SUPPORTING_OPTIONS: optimization_input.get(KEY_SUPPORTING_OPTIONS, 'NA'),
         KEY_ShearBucklingOption: optimization_input.get(KEY_ShearBucklingOption, 'Simple Post Critical'),
-        KEY_DP_DESIGN_METHOD: optimization_input.get('Design.Design_Method', 'Limit State Design'),
+        KEY_DP_DESIGN_METHOD: optimization_input.get(KEY_DP_DESIGN_METHOD, 'Limit State Design'),
         KEY_EFFECTIVE_AREA_PARA: optimization_input.get(KEY_EFFECTIVE_AREA_PARA, '1.0'),
         KEY_LENGTH_OVERWRITE: optimization_input.get(KEY_LENGTH_OVERWRITE, 'NA'),
     }
@@ -516,7 +520,7 @@ def create_optimization_input(input_values: Dict[str, Any]) -> Dict[str, Any]:
 
     # Same customized-list handling as create_from_input(), sourced from optimization_input.
     if design_dict[KEY_IntermediateStiffener_thickness] == 'Customized':
-        custom_values = optimization_input.get('Design.IntermediateStiffener.Thickness_Values', None)
+        custom_values = optimization_input.get(WEB_DESIGN_INTERMEDIATESTIFFENER_THICKNESS_VALUES, None)
         if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
             PlateGirderWelded.int_thicklist = [str(v) for v in custom_values]
         design_dict[KEY_IntermediateStiffener_thickness_val] = PlateGirderWelded.int_thicklist
@@ -524,7 +528,7 @@ def create_optimization_input(input_values: Dict[str, Any]) -> Dict[str, Any]:
         design_dict[KEY_IntermediateStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
 
     if design_dict[KEY_LongitudnalStiffener_thickness] == 'Customized':
-        custom_values = optimization_input.get('Design.LongitudnalStiffener.Thickness_Values', None)
+        custom_values = optimization_input.get(WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES, None)
         if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
             PlateGirderWelded.long_thicklist = [str(v) for v in custom_values]
         design_dict[KEY_LongitudnalStiffener_thickness_val] = PlateGirderWelded.long_thicklist

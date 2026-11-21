@@ -3,9 +3,31 @@ Struts Welded to End Gusset - Design Adapter
 Implements the business logic for compression member welded design
 """
 # Module identifier for CommonDesignLogic (used for CAD generation)
-KEY_DISP_STRUT_WELDED_END_GUSSET = "Struts Welded to End Gusset"
 
-from osdag_core.Common import KEY_END1, KEY_END2
+from osdag_core.Common import (
+    KEY_ALLOW_LOAD,
+    KEY_ALLOW_UR,
+    KEY_AXIAL,
+    KEY_BOLT_Number,
+    KEY_Buckling_In_plane,
+    KEY_Buckling_Out_plane,
+    KEY_CONNECTOR_MATERIAL,
+    KEY_DISP_STRUT_WELDED_END_GUSSET,
+    KEY_DP_DESIGN_METHOD,
+    KEY_DP_WELD_FAB,
+    KEY_DP_WELD_MATERIAL_G_O,
+    KEY_EFFECTIVE_AREA_PARA,
+    KEY_END1,
+    KEY_END2,
+    KEY_LENGTH,
+    KEY_LOCATION,
+    KEY_MATERIAL,
+    KEY_MODULE,
+    KEY_PLATETHK,
+    KEY_SECSIZE,
+    KEY_SEC_MATERIAL,
+    KEY_SEC_PROFILE,
+)
 from apps.core.utils import (
     validate_arr, validate_num, validate_string,
     MissingKeyError, InvalidInputTypeError,
@@ -30,19 +52,19 @@ import traceback
 def get_required_keys() -> List[str]:
     """Return all required input parameters for the module."""
     return [
-        "Member.Profile",           # KEY_SEC_PROFILE
-        "Member.Designation",       # KEY_SECSIZE
-        "Material",                 # KEY_MATERIAL
-        "Member.Material",          # KEY_SEC_MATERIAL
-        "Connector.Plate.Thickness_List",  # KEY_PLATETHK
-        "Connector.Material",       # KEY_CONNECTOR_MATERIAL
-        "Design.Design_Method",     # KEY_DP_DESIGN_METHOD
-        "Load.Axial",               # KEY_AXIAL
-        "Member.Length",            # KEY_LENGTH
-        "Conn_Location",            # KEY_LOCATION
+        KEY_SEC_PROFILE,
+        KEY_SECSIZE,
+        KEY_MATERIAL,
+        KEY_SEC_MATERIAL,
+        KEY_PLATETHK,
+        KEY_CONNECTOR_MATERIAL,
+        KEY_DP_DESIGN_METHOD,
+        KEY_AXIAL,
+        KEY_LENGTH,
+        KEY_LOCATION,
         KEY_END1,
         KEY_END2,
-        "Module"                    # KEY_MODULE
+        KEY_MODULE
     ]
 
 
@@ -54,52 +76,52 @@ def validate_input(input_values: Dict[str, Any]) -> None:
         raise MissingKeyError(missing_keys[0])
 
     # Validate Connector.Material
-    if not isinstance(input_values["Connector.Material"], str):
-        raise InvalidInputTypeError("Connector.Material", "str")
+    if not isinstance(input_values[KEY_CONNECTOR_MATERIAL], str):
+        raise InvalidInputTypeError(KEY_CONNECTOR_MATERIAL, "str")
 
     # Validate Design.Design_Method
-    if not isinstance(input_values["Design.Design_Method"], str):
-        raise InvalidInputTypeError("Design.Design_Method", "str")
+    if not isinstance(input_values[KEY_DP_DESIGN_METHOD], str):
+        raise InvalidInputTypeError(KEY_DP_DESIGN_METHOD, "str")
 
     # Validate Load.Axial
-    load_axial = input_values["Load.Axial"]
+    load_axial = input_values[KEY_AXIAL]
     if (not isinstance(load_axial, str)
             or not int_able(load_axial)):
-        raise InvalidInputTypeError("Load.Axial", "str where str can be converted to int")
+        raise InvalidInputTypeError(KEY_AXIAL, "str where str can be converted to int")
 
     # Validate Material
-    if not isinstance(input_values["Material"], str):
-        raise InvalidInputTypeError("Material", "str")
+    if not isinstance(input_values[KEY_MATERIAL], str):
+        raise InvalidInputTypeError(KEY_MATERIAL, "str")
 
     # Validate Member.Profile
-    if not isinstance(input_values["Member.Profile"], str):
-        raise InvalidInputTypeError("Member.Profile", "str")
+    if not isinstance(input_values[KEY_SEC_PROFILE], str):
+        raise InvalidInputTypeError(KEY_SEC_PROFILE, "str")
 
     # Validate Member.Designation
-    member_designation = input_values.get("Member.Designation")
+    member_designation = input_values.get(KEY_SECSIZE)
     if isinstance(member_designation, list):
         if not validate_list_type(member_designation, str):
-            raise InvalidInputTypeError("Member.Designation", "non-empty List[str]")
+            raise InvalidInputTypeError(KEY_SECSIZE, "non-empty List[str]")
         stripped = [str(x).strip() for x in member_designation if str(x).strip() != ""]
         if not stripped:
-            raise InvalidInputTypeError("Member.Designation", "non-empty List[str]")
+            raise InvalidInputTypeError(KEY_SECSIZE, "non-empty List[str]")
     elif isinstance(member_designation, str):
         s = member_designation.strip()
         if not s or s.lower() == "all":
             raise InvalidInputTypeError(
-                "Member.Designation",
+                KEY_SECSIZE,
                 "non-empty str (single section) or non-empty List[str]",
             )
     else:
-        raise InvalidInputTypeError("Member.Designation", "str or List[str]")
+        raise InvalidInputTypeError(KEY_SECSIZE, "str or List[str]")
 
     # Validate Member.Length
-    if not isinstance(input_values["Member.Length"], str):
-        raise InvalidInputTypeError("Member.Length", "str")
+    if not isinstance(input_values[KEY_LENGTH], str):
+        raise InvalidInputTypeError(KEY_LENGTH, "str")
 
     # Validate Conn_Location
-    if not isinstance(input_values["Conn_Location"], str):
-        raise InvalidInputTypeError("Conn_Location", "str")
+    if not isinstance(input_values[KEY_LOCATION], str):
+        raise InvalidInputTypeError(KEY_LOCATION, "str")
 
     # Validate End Conditions
     if not isinstance(input_values[KEY_END1], str):
@@ -108,15 +130,15 @@ def validate_input(input_values: Dict[str, Any]) -> None:
         raise InvalidInputTypeError(KEY_END2, "str")
 
     # Validate Module
-    if not isinstance(input_values["Module"], str):
-        raise InvalidInputTypeError("Module", "str")
+    if not isinstance(input_values[KEY_MODULE], str):
+        raise InvalidInputTypeError(KEY_MODULE, "str")
 
     # Validate Connector.Plate.Thickness_List
-    connector_plate_thicknesslist = input_values["Connector.Plate.Thickness_List"]
+    connector_plate_thicknesslist = input_values[KEY_PLATETHK]
     if (not isinstance(connector_plate_thicknesslist, list)
             or not validate_list_type(connector_plate_thicknesslist, str)
             or not custom_list_validation(connector_plate_thicknesslist, int_able)):
-        raise InvalidInputTypeError("Connector.Plate.Thickness_List", "List[str] where all items can be converted to int")
+        raise InvalidInputTypeError(KEY_PLATETHK, "List[str] where all items can be converted to int")
 
 
 def create_module() -> Compression_welded:
@@ -131,44 +153,44 @@ def create_from_input(input_values: Dict[str, Any]) -> Compression_welded:
     module = create_module()
     
     # Map 'Connector.Plate.Thickness_List' list to a single float-able thickness for set_input_values
-    if isinstance(input_values.get("Connector.Plate.Thickness_List", None), list) and input_values["Connector.Plate.Thickness_List"]:
-        input_values["Connector.Plate.Thickness_List"] = input_values["Connector.Plate.Thickness_List"][0]
-    elif isinstance(input_values.get("Connector.Plate.Thickness_List", None), str):
+    if isinstance(input_values.get(KEY_PLATETHK, None), list) and input_values[KEY_PLATETHK]:
+        input_values[KEY_PLATETHK] = input_values[KEY_PLATETHK][0]
+    elif isinstance(input_values.get(KEY_PLATETHK, None), str):
         pass
     else:
-        input_values["Connector.Plate.Thickness_List"] = "8.0"
+        input_values[KEY_PLATETHK] = "8.0"
 
     # Core assigns self.sizelist = design_dictionary[KEY_SECSIZE]; must be a list of designation strings
-    md = input_values.get("Member.Designation")
+    md = input_values.get(KEY_SECSIZE)
     if isinstance(md, str):
-        input_values["Member.Designation"] = [md.strip()]
+        input_values[KEY_SECSIZE] = [md.strip()]
     elif isinstance(md, list):
-        input_values["Member.Designation"] = [
+        input_values[KEY_SECSIZE] = [
             str(x).strip() for x in md if x is not None and str(x).strip() != ""
         ]
     
     
     # Set default values for design preferences if they are not already set
-    if "Optimum.AllowUR" not in input_values:
-        input_values["Optimum.AllowUR"] = "1.0"
-    if "Effective.Area_Para" not in input_values:
-        input_values["Effective.Area_Para"] = "1.0"
-    if " Out_of_Plane" not in input_values:
-        input_values[" Out_of_Plane"] = "1.0"
-    if " In_Plane" not in input_values:
-        input_values[" In_Plane"] = "1.0"
-    if "Load.Type" not in input_values:
-        input_values["Load.Type"] = "Concentric Load"
-    if "Bolt.Number" not in input_values:
-        input_values["Bolt.Number"] = "1.0"
-    if "Design.Design_Method" not in input_values:
-        input_values["Design.Design_Method"] = "Limit State Design"
+    if KEY_ALLOW_UR not in input_values:
+        input_values[KEY_ALLOW_UR] = "1.0"
+    if KEY_EFFECTIVE_AREA_PARA not in input_values:
+        input_values[KEY_EFFECTIVE_AREA_PARA] = "1.0"
+    if KEY_Buckling_Out_plane not in input_values:
+        input_values[KEY_Buckling_Out_plane] = "1.0"
+    if KEY_Buckling_In_plane not in input_values:
+        input_values[KEY_Buckling_In_plane] = "1.0"
+    if KEY_ALLOW_LOAD not in input_values:
+        input_values[KEY_ALLOW_LOAD] = "Concentric Load"
+    if KEY_BOLT_Number not in input_values:
+        input_values[KEY_BOLT_Number] = "1.0"
+    if KEY_DP_DESIGN_METHOD not in input_values:
+        input_values[KEY_DP_DESIGN_METHOD] = "Limit State Design"
     
     # Weld fabrication/grade defaults
-    if "Weld.Fab" not in input_values:
-        input_values["Weld.Fab"] = "Shop Weld"
-    if "Weld.Material_Grade_OverWrite" not in input_values:
-        input_values["Weld.Material_Grade_OverWrite"] = ""
+    if KEY_DP_WELD_FAB not in input_values:
+        input_values[KEY_DP_WELD_FAB] = "Shop Weld"
+    if KEY_DP_WELD_MATERIAL_G_O not in input_values:
+        input_values[KEY_DP_WELD_MATERIAL_G_O] = ""
 
     module.set_input_values(input_values)
     # Restore the display name for reports (set_input_values overrides self.module with the raw KEY_MODULE value)
