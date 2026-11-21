@@ -5,6 +5,7 @@ Implements the business logic for compression member welded design
 # Module identifier for CommonDesignLogic (used for CAD generation)
 KEY_DISP_STRUT_WELDED_END_GUSSET = "Struts Welded to End Gusset"
 
+from osdag_core.Common import KEY_END1, KEY_END2
 from apps.core.utils import (
     validate_arr, validate_num, validate_string,
     MissingKeyError, InvalidInputTypeError,
@@ -39,8 +40,8 @@ def get_required_keys() -> List[str]:
         "Load.Axial",               # KEY_AXIAL
         "Member.Length",            # KEY_LENGTH
         "Conn_Location",            # KEY_LOCATION
-        "Member.End_1",             # KEY_END1
-        "Member.End_2",             # KEY_END2
+        KEY_END1,
+        KEY_END2,
         "Module"                    # KEY_MODULE
     ]
 
@@ -101,10 +102,10 @@ def validate_input(input_values: Dict[str, Any]) -> None:
         raise InvalidInputTypeError("Conn_Location", "str")
 
     # Validate End Conditions
-    if not isinstance(input_values["Member.End_1"], str):
-        raise InvalidInputTypeError("Member.End_1", "str")
-    if not isinstance(input_values["Member.End_2"], str):
-        raise InvalidInputTypeError("Member.End_2", "str")
+    if not isinstance(input_values[KEY_END1], str):
+        raise InvalidInputTypeError(KEY_END1, "str")
+    if not isinstance(input_values[KEY_END2], str):
+        raise InvalidInputTypeError(KEY_END2, "str")
 
     # Validate Module
     if not isinstance(input_values["Module"], str):
@@ -146,9 +147,6 @@ def create_from_input(input_values: Dict[str, Any]) -> Compression_welded:
             str(x).strip() for x in md if x is not None and str(x).strip() != ""
         ]
     
-    # Map frontend/required keys to core expected keys (End_1 and End_2 are required by brackets)
-    input_values["End_1"] = input_values.get("Member.End_1", "Fixed")
-    input_values["End_2"] = input_values.get("Member.End_2", "Fixed")
     
     # Set default values for design preferences if they are not already set
     if "Optimum.AllowUR" not in input_values:

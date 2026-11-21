@@ -24,14 +24,6 @@ REQUIRED_KEYS_FUNCTION = {
 
 # adapter slug -> {required key: why it is not a Common.py value}
 KNOWN_EXCEPTIONS = {
-    "compression_member__struts_bolted": {
-        "Member.End_1": "web request name; the adapter copies it to the core key End_1",
-        "Member.End_2": "web request name; the adapter copies it to the core key End_2",
-    },
-    "compression_member__struts_welded": {
-        "Member.End_1": "web request name; the adapter copies it to the core key End_1",
-        "Member.End_2": "web request name; the adapter copies it to the core key End_2",
-    },
     "flexure_member__plate_girder": {
         "Design.Allow_Class": "web request name; the adapter maps it to KEY_ALLOW_CLASS",
         "Design.Design_Type_Flexure": "web request name; the adapter maps it to KEY_DESIGN_TYPE_FLEXURE",

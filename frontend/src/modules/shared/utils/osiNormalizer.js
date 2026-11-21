@@ -114,13 +114,13 @@ export function normalizeOsiPayload(flatObj, moduleConfig = null) {
     if (!dock.axial_force) dock.axial_force = dock.load_axial;
   }
 
-  const e1 = flatObj["Member.End_1"] || flatObj["End_1"] || flatObj["End 1"];
+  const e1 = flatObj["End_1"] || flatObj["End 1"];
   if (e1) dock.end_condition_1 = String(e1).trim();
-  const e2 = flatObj["Member.End_2"] || flatObj["End_2"] || flatObj["End 2"];
+  const e2 = flatObj["End_2"] || flatObj["End 2"];
   if (e2) dock.end_condition_2 = String(e2).trim();
-  const e1y = flatObj["Member.End_1_Y"] || flatObj["End_1_Y"] || flatObj["End 1 (y-y)"];
+  const e1y = flatObj["End_1_Y"] || flatObj["End 1 (y-y)"];
   if (e1y) dock.end_condition_1_y = String(e1y).trim();
-  const e2y = flatObj["Member.End_2_Y"] || flatObj["End_2_Y"] || flatObj["End 2 (y-y)"];
+  const e2y = flatObj["End_2_Y"] || flatObj["End 2 (y-y)"];
   if (e2y) dock.end_condition_2_y = String(e2y).trim();
 
   const memberProfile = flatObj["Member.Profile"] || flatObj["Member.Profile *"] || flatObj["Section Profile"] || flatObj["Section.Profile"];
