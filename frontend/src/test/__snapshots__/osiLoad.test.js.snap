@@ -719,9 +719,7 @@ exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plat
     "anchor_grade_icf": false,
     "anchor_grade_ocf": false,
   },
-  "designPrefOverrides": {
-    "Member.Material": "E 250 (Fe 410 W)A",
-  },
+  "designPrefOverrides": {},
   "extraState": {
     "selectedOption": "Moment Base Plate",
   },
@@ -804,6 +802,7 @@ exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plat
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "UC 254 x 254 x 167",
     "module": "Base Plate Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "weld_fab": "Shop Weld",
     "weld_material_grade": "410",
     "weld_type": "Groove Weld",
@@ -873,9 +872,7 @@ exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plat
     "anchor_grade_icf": false,
     "anchor_grade_ocf": false,
   },
-  "designPrefOverrides": {
-    "Member.Material": "E 250 (Fe 410 W)A",
-  },
+  "designPrefOverrides": {},
   "extraState": {
     "selectedOption": "Hollow/Tubular Column Base",
   },
@@ -958,6 +955,7 @@ exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plat
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "CHS 355.6 x 12",
     "module": "Base Plate Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "weld_fab": "Shop Weld",
     "weld_material_grade": "410",
     "weld_type": "Groove Weld",
@@ -1030,7 +1028,6 @@ exports[`loading a desktop .osi example into its module > baseplate_3 (Base Plat
   "designPrefOverrides": {
     "Member.Fu": "410",
     "Member.Fy": "250",
-    "Member.Material": "E 250 (Fe 410 W)A",
   },
   "extraState": {
     "selectedOption": "Welded Column Base",
@@ -1091,6 +1088,7 @@ exports[`loading a desktop .osi example into its module > baseplate_3 (Base Plat
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "HB 450",
     "module": "Base Plate Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "weld_fab": "Shop Weld",
     "weld_material_grade": "510",
     "weld_type": "Groove Weld",
@@ -1140,7 +1138,6 @@ exports[`loading a desktop .osi example into its module > baseplate_4 (Base Plat
   "designPrefOverrides": {
     "Member.Fu": "440",
     "Member.Fy": "300",
-    "Member.Material": "E 300 (Fe 440)",
   },
   "extraState": {
     "selectedOption": "Moment Base Plate",
@@ -1190,6 +1187,7 @@ exports[`loading a desktop .osi example into its module > baseplate_4 (Base Plat
     "material": "E 300 (Fe 440)",
     "member_designation": "HB 450",
     "module": "Base Plate Connection",
+    "supporting_material": "E 300 (Fe 440)",
     "weld_fab": "Shop Weld",
     "weld_material_grade": "600",
     "weld_type": "Groove Weld",
@@ -1228,7 +1226,6 @@ exports[`loading a desktop .osi example into its module > baseplate_5 (Base Plat
   "designPrefOverrides": {
     "Member.Fu": "440",
     "Member.Fy": "300",
-    "Member.Material": "E 300 (Fe 440)",
   },
   "extraState": {
     "selectedOption": "Hollow/Tubular Column Base",
@@ -1278,6 +1275,7 @@ exports[`loading a desktop .osi example into its module > baseplate_5 (Base Plat
     "material": "E 300 (Fe 440)",
     "member_designation": "CHS 355.6 x 10",
     "module": "Base Plate Connection",
+    "supporting_material": "E 300 (Fe 440)",
     "weld_fab": "Shop Weld",
     "weld_material_grade": "440",
     "weld_type": "Groove Weld",

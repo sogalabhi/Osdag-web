@@ -55,7 +55,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "open_saved_overrides": {
@@ -65,7 +65,7 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Base Plate Connection",
           "Member.Designation": "",
           "Connectivity": "Welded Column Base",
@@ -147,7 +147,7 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Base Plate Connection",
           "Member.Designation": "",
           "Connectivity": "Welded Column Base",
@@ -223,7 +223,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "save_saved_overrides_draft": {
@@ -233,7 +233,7 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Base Plate Connection",
           "Member.Designation": "",
           "Connectivity": "Welded Column Base",
@@ -257,7 +257,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "reset": {
@@ -319,7 +319,7 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Base Plate Connection",
           "Member.Designation": "",
           "Connectivity": "Welded Column Base",

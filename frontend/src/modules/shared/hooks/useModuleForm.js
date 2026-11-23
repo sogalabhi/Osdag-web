@@ -177,9 +177,11 @@ export const useModuleForm = (moduleConfig, moduleData) => {
       delete nextOverrides.supporting_material;
       delete nextOverrides.supported_material;
       delete nextOverrides.connector_material;
+      // Prefs the desktop derives from the dock material (its defaults follow a dock change).
+      (moduleConfig.prefsFollowingMaterial || []).forEach((key) => delete nextOverrides[key]);
       return nextOverrides;
     });
-  }, [dockDriverSnapshot, setDesignPrefOverrides]);
+  }, [dockDriverSnapshot, moduleConfig, setDesignPrefOverrides]);
 
   const updateModalState = (modalKey, isOpen) => {
     setModalStates((prev) => ({

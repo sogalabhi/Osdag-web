@@ -101,6 +101,8 @@ Osdag-Web resolves this through a bidirectional sync state machine using the [us
 
 The Design button sends the dock inputs with the saved Additional Inputs merged over them, so a material saved in Additional Inputs must not be read where the request expects the dock material. As in the desktop, `Material` is the dock Material, and each material of Additional Inputs goes out under its own key: `Connector.Material` from the Connector tab, and the section tabs under the section keys. In the shear connection modules (fin plate, cleat angle, header plate, seated angle) the dock field is `material`; it also sets `connector_material`, which stays the Connector tab's value until the dock changes. In the tension member and strut modules the section tab's material is `supported_material`, sent as `Member.Material`, and in the simply supported beam it is `supporting_material` (the Column Section tab); until it is saved it equals the dock material.
 
+The base plate sends the Additional Inputs that were saved (the column section material as `Member.Material`, the base plate and stiffener materials, the anchor bolt, weld, detailing and design settings) under their core keys, and nothing for a pref that was never saved, so the backend adapter keeps its own default for it. A saved weld fabrication is sent as `Shop Weld` or `Field weld`, the spellings the core knows. When the dock material changes, the saved prefs that the desktop derives from it (base plate and stiffener material, weld and anchor bolt strengths, listed in `prefsFollowingMaterial` of the config) are dropped, as the desktop drops all of its prefs when a dock input changes.
+
 ---
 
 ## 7.4 Sync Merge Utilities (`mergeDesignPrefSyncIntoInputs.js`)

@@ -11,8 +11,10 @@
  * - a key no field of the module declares (`coreKeys`): the desktop's material overwrite keys
  *   (`Bolt.Material_Grade_OverWrite`), output-panel state (`out_titles_status`, `Label_8`), the member
  *   `Fu`/`Fy` rows. The loader does not read them (they are not overrides yet, see designDictionary.js);
- * - base plate Additional Inputs: declared, so they load into the form, but the base plate builder
- *   does not send them (they never reach the design request, nor the file).
+ * - the base plate anchor bolt type (`Anchor Bolt.OCF.Type`, `...ICF.Type`) and the desktop's spelling of
+ *   the compression load (`Load.Axial_Compression`): declared, so they load into the form, but the builder
+ *   does not send them (the adapter takes the dock's anchor type for both; the load goes out as `Load.Axial`).
+ *   The rest of the base plate Additional Inputs are sent by the builder, so they round-trip.
  */
 import { describe, expect, it } from "vitest";
 
@@ -21,7 +23,10 @@ import { MODULES } from "./cases";
 import { LISTS, formRecorder } from "./cases/shared";
 import { loadStateFromOsi } from "../modules/shared/utils/osiLoader";
 import { toDesignDictionary } from "../modules/shared/utils/osiSave";
-import { KEY_DISP_BASE_PLATE } from "../constants/generated/coreKeys";
+import { KEY_AXIAL_BP, KEY_DISP_BASE_PLATE, KEY_DP_ANCHOR_BOLT_TYPE_ICF, KEY_DP_ANCHOR_BOLT_TYPE_OCF } from "../constants/generated/coreKeys";
+
+// Declared keys the builder does not send, so a save drops them.
+const NOT_SENT = { [KEY_DISP_BASE_PLATE]: [KEY_DP_ANCHOR_BOLT_TYPE_OCF, KEY_DP_ANCHOR_BOLT_TYPE_ICF, KEY_AXIAL_BP] };
 
 const BY_MODULE = new Map(MODULES.map((m) => [m.config.designType, m.config]));
 
@@ -64,7 +69,7 @@ describe("a desktop .osi example opened and saved again", () => {
       );
 
       const declared = declaredKeys(config);
-      const unexplained = dropped.filter((key) => declared.has(key) && config.designType !== KEY_DISP_BASE_PLATE);
+      const unexplained = dropped.filter((key) => declared.has(key) && !(NOT_SENT[config.designType] || []).includes(key));
       expect(unexplained, "a declared key was lost on the way through the form").toEqual([]);
       expect(saved).not.toHaveProperty("dock");
       expect(Object.keys(saved).filter((key) => key.startsWith("Pref."))).toEqual([]);
