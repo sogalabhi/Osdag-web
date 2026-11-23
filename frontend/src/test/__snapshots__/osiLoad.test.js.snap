@@ -7695,6 +7695,7 @@ exports[`loading a desktop .osi example into its module > tension_b_angle (Tensi
       "200 x 150 x 18",
     ],
     "section_profile": "Angles",
+    "supported_material": "E 250 (Fe 410 W)A",
   },
   "selectedItems": {
     "bolt_diameter": [
@@ -8259,6 +8260,7 @@ exports[`loading a desktop .osi example into its module > tension_b_bbangle (Ten
       "200 x 150 x 18",
     ],
     "section_profile": "Back to Back Angles",
+    "supported_material": "E 250 (Fe 410 W)A",
   },
   "selectedItems": {
     "bolt_diameter": [
@@ -8593,7 +8595,7 @@ exports[`loading a desktop .osi example into its module > tension_b_bbchannel (T
     "detailing_gap": "0",
     "length": "5000",
     "location": "Web",
-    "material": "E 165 (Fe 290)",
+    "material": "E 250 (Fe 410 W)A",
     "member_designation": "All",
     "module": "Tension Member Design - Bolted to End Gusset",
     "plate_thickness": [
@@ -8684,6 +8686,7 @@ exports[`loading a desktop .osi example into its module > tension_b_bbchannel (T
       "MPC 400",
     ],
     "section_profile": "Back to Back Channels",
+    "supported_material": "E 165 (Fe 290)",
   },
   "selectedItems": {
     "bolt_diameter": [
@@ -8879,7 +8882,7 @@ exports[`loading a desktop .osi example into its module > tension_b_channel (Ten
     "detailing_gap": "0",
     "length": "5000",
     "location": "Web",
-    "material": "E 165 (Fe 290)",
+    "material": "E 250 (Fe 410 W)A",
     "member_designation": "All",
     "module": "Tension Member Design - Bolted to End Gusset",
     "plate_thickness": [
@@ -8970,6 +8973,7 @@ exports[`loading a desktop .osi example into its module > tension_b_channel (Ten
       "MPC 400",
     ],
     "section_profile": "Channels",
+    "supported_material": "E 165 (Fe 290)",
   },
   "selectedItems": {
     "bolt_diameter": [
@@ -9395,6 +9399,7 @@ exports[`loading a desktop .osi example into its module > tension_b_starangle (T
       "200 x 150 x 18",
     ],
     "section_profile": "Star Angles",
+    "supported_material": "E 250 (Fe 410 W)A",
   },
   "selectedItems": {
     "bolt_diameter": [
@@ -9918,6 +9923,7 @@ exports[`loading a desktop .osi example into its module > tension_w_angle (Tensi
       "200 x 150 x 18",
     ],
     "section_profile": "Angles",
+    "supported_material": "E 250 (Fe 410 W)A",
     "weld_fab": "Shop Weld",
     "weld_material_grade": "410",
   },
@@ -10406,6 +10412,7 @@ exports[`loading a desktop .osi example into its module > tension_w_bbangle (Ten
       "200 x 150 x 18",
     ],
     "section_profile": "Back to Back Angles",
+    "supported_material": "E 300 (Fe 440)",
     "weld_fab": "Shop Weld",
     "weld_material_grade": "440",
   },
@@ -10755,6 +10762,7 @@ exports[`loading a desktop .osi example into its module > tension_w_bbchannels (
       "MPC 400",
     ],
     "section_profile": "Back to Back Channels",
+    "supported_material": "E 300 (Fe 440)",
     "weld_fab": "Shop Weld",
     "weld_material_grade": "440",
   },
@@ -10965,6 +10973,7 @@ exports[`loading a desktop .osi example into its module > tension_w_channels (Te
       "MPC 400",
     ],
     "section_profile": "Channels",
+    "supported_material": "E 300 (Fe 440)",
     "weld_fab": "Shop Weld",
     "weld_material_grade": "440",
   },
@@ -11314,6 +11323,7 @@ exports[`loading a desktop .osi example into its module > tension_w_starangle (T
       "200 x 150 x 18",
     ],
     "section_profile": "Star Angles",
+    "supported_material": "E 300 (Fe 440)",
     "weld_fab": "Shop Weld",
     "weld_material_grade": "440",
   },

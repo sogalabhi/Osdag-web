@@ -42,8 +42,8 @@ export const PREF_CORE_KEYS = {
 
 /**
  * The material rows (dock dropdown and Additional Inputs material rows) in their plain
- * one-to-one meaning. These differ by module (tension sends `material` as the section
- * material), so a module overrides the rows it handles differently, after the spread.
+ * one-to-one meaning. In tension and struts `supported_material` is the section tab and
+ * feeds the member material; a module overrides the rows it handles differently, after the spread.
  */
 export const MATERIAL_CORE_KEYS = {
   material: KEY_MATERIAL,

@@ -99,7 +99,7 @@ Osdag-Web resolves this through a bidirectional sync state machine using the [us
 
 ### What the design request carries
 
-The Design button sends the dock inputs with the saved Additional Inputs merged over them, so a material saved in Additional Inputs must not be read where the request expects the dock material. As in the desktop, `Material` is the dock Material, and each material of Additional Inputs goes out under its own key: `Connector.Material` from the Connector tab, and the section tabs under the section keys. In the shear connection modules (fin plate, cleat angle, header plate, seated angle) the dock field is `material`; it also sets `connector_material`, which stays the Connector tab's value until the dock changes.
+The Design button sends the dock inputs with the saved Additional Inputs merged over them, so a material saved in Additional Inputs must not be read where the request expects the dock material. As in the desktop, `Material` is the dock Material, and each material of Additional Inputs goes out under its own key: `Connector.Material` from the Connector tab, and the section tabs under the section keys. In the shear connection modules (fin plate, cleat angle, header plate, seated angle) the dock field is `material`; it also sets `connector_material`, which stays the Connector tab's value until the dock changes. In the tension member and strut modules the section tab's material is `supported_material`, sent as `Member.Material`; until it is saved it equals the dock material.
 
 ---
 

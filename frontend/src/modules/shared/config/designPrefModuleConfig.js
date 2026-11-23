@@ -385,7 +385,7 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [2, 3, 6, 11, 13],
     initialTabIndex: 2,
     getInitialPrefs: (inputs) => ({
-      supported_material: inputs.member_material ?? inputs.material,
+      supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
       connector_material: inputs.connector_material,
       bolt_tension_type: inputs.bolt_tension_type,
       bolt_hole_type: inputs.bolt_hole_type,
@@ -401,7 +401,7 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [2, 3, 10, 11, 13],
     initialTabIndex: 2,
     getInitialPrefs: (inputs) => ({
-      supported_material: inputs.member_material ?? inputs.material,
+      supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
       connector_material: inputs.connector_material,
       weld_fab: inputs.weld_fab,
       weld_material_grade: inputs.weld_material_grade || "290",
@@ -436,7 +436,7 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [2, 3, 6, 11, 13],
     initialTabIndex: 2,
     getInitialPrefs: (inputs) => ({
-      supported_material: inputs.member_material ?? inputs.material,
+      supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
       connector_material: inputs.connector_material,
       bolt_tension_type: inputs.bolt_tension_type,
       bolt_hole_type: inputs.bolt_hole_type,
@@ -452,7 +452,7 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [2, 3, 10, 11, 13],
     initialTabIndex: 2,
     getInitialPrefs: (inputs) => ({
-      supported_material: inputs.member_material ?? inputs.material,
+      supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
       connector_material: inputs.connector_material,
       weld_fab: inputs.weld_fab ?? "Shop weld",
       weld_material_grade: inputs.weld_material_grade || "290",
