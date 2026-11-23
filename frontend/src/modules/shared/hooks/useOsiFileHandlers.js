@@ -1,7 +1,6 @@
-import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
+import { buildOsiSaveContent, getOsiSaveIdentity } from "../utils/osiSave";
 import { openOsiFile } from "../../../datasources/osiDataSource";
 import { loadStateFromOsi } from "../utils/osiLoader";
-import { KEY_DISP_SEATED_ANGLE } from "../../../constants/generated/coreKeys";
 import { message } from "antd";
 
 export const useOsiFileHandlers = ({ form, moduleData, actions }, moduleConfig) => {
@@ -21,30 +20,11 @@ export const useOsiFileHandlers = ({ form, moduleData, actions }, moduleConfig) 
   const { service } = actions;
 
   const handleSaveInputs = async () => {
-    const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || KEY_DISP_SEATED_ANGLE;
-    const projectName = inputs?.project_name || inputs?.name || moduleConfig?.sessionName || 'project';
+    const { moduleId: module_id, projectName } = getOsiSaveIdentity({ moduleConfig, inputs });
 
     try {
-      const inputsForSave = expandAllSelectedInputs(inputs, allSelected, contextData);
-
-      let flatInputs = {};
-      if (moduleConfig && typeof moduleConfig.buildSubmissionParams === "function") {
-        try {
-          flatInputs = moduleConfig.buildSubmissionParams(
-            inputsForSave,
-            allSelected,
-            contextData,
-            extraState
-          ) || {};
-        } catch {
-          flatInputs = { ...inputsForSave };
-        }
-      } else {
-        flatInputs = { ...inputsForSave };
-      }
-
-      Object.entries(designPrefOverrides || {}).forEach(([key, val]) => {
-        flatInputs[`Pref.${key}`] = val;
+      const flatInputs = buildOsiSaveContent({
+        moduleConfig, inputs, allSelected, contextData, extraState, designPrefOverrides,
       });
 
       const result = await service.saveOSIFromInputs(projectName, module_id, flatInputs, true);

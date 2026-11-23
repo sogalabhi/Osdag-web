@@ -31,6 +31,7 @@ export const EngineeringHeader = () => {
     setSelectionStates,
     setSelectedItems,
     extraState,
+    designPrefOverrides,
     selectionStates,
     displaySaveInputPopup,
     saveInputFileName,
@@ -73,6 +74,7 @@ export const EngineeringHeader = () => {
             isExistingProject={!!projectIdFromUrl}
             moduleConfig={moduleConfig}
             extraState={extraState}
+            designPrefOverrides={designPrefOverrides}
           />
         ))}
 
