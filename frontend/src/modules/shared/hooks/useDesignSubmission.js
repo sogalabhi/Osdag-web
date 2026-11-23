@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router";
 import { message } from "antd";
+import { toDesignDictionary } from "../utils/osiSave";
 
 /**
  * Status state machine types
@@ -239,10 +240,14 @@ export const useDesignSubmission = (service, moduleConfig) => {
         }
 
         const savePayload = {
-          inputs_json: {
-            dock: dockInputs || { ...inputs, ...extraState },
-            pref: designPrefOverrides || {},
-          },
+          inputs_json: toDesignDictionary({
+            moduleConfig,
+            inputs: dockInputs || inputs,
+            allSelected,
+            contextData: lists,
+            extraState,
+            designPrefOverrides,
+          }),
           outputs_json: designBody.data,
         };
         pendingSaveRef.current = savePayload;

@@ -54,7 +54,7 @@ npm test
 npm run build
 ```
 
-`npm test` runs Vitest. The payload parity tests (`frontend/src/test/payloadParity.test.js`) snapshot what each module's `buildSubmissionParams` sends for its default inputs. If you change a module config on purpose and a snapshot fails, read the diff to confirm the request body changed the way you meant, then update the snapshot with `npm test -- -u` and commit it. `osiLoad.test.js` does the same for loading `.osi` files into a module; read its diff the same way.
+`npm test` runs Vitest. The payload parity tests (`frontend/src/test/payloadParity.test.js`) snapshot what each module's `buildSubmissionParams` sends for its default inputs. If you change a module config on purpose and a snapshot fails, read the diff to confirm the request body changed the way you meant, then update the snapshot with `npm test -- -u` and commit it. `osiLoad.test.js` does the same for loading `.osi` files into a module, `osiSave.test.js` for the design dictionary a module saves (the content of an `.osi` file and of a project's `inputs_json`), and `osiRoundTrip.test.js` for a desktop example opened and saved again; read their diffs the same way.
 
 **Backend tests** (pytest with pytest-django, using the `config.settings` module). CI runs them against Postgres and Redis from Docker Compose:
 

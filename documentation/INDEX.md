@@ -29,7 +29,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **3.5 OAuth & Email/Password Provider Merging & Conflict Resolution:** Firebase client-side provider linking vs. email-in-use rejection rules, and backend UID-based syncing.
 
 ### 4. [Chapter 4: Project Lifecycle & CRUD Operations](./chapter_4_project_lifecycle_crud.md)
-* **4.1 Project Model & Data Structs:** Structure of `inputs_json` (merged dock + pref states) and `outputs_json`.
+* **4.1 Project Model & Data Structs:** Structure of `inputs_json` (the design dictionary, core keys as in an `.osi` file) and `outputs_json`.
 * **4.2 CRUD REST Endpoints:** Detailed request/response specs for listing, creating, loading, updating, and deleting projects.
 * **4.3 Find by Name APIs:** Details of `ProjectByNameAPI` for unique project identity search.
 
@@ -38,7 +38,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **5.2 Exporting OSI Files (`SaveOsiFromInputs`):** Base64 inline downloads for Guest users vs. DB-stored `OsiFile` records for authenticated users.
 * **5.3 Importing OSI Files (`OpenOsiUpload` & `OpenOsiById`):** Upload parsing, ID-based fetching, module resolution through the frontend module registry, and desktop module-name compatibility.
 * **5.4 Key Translation & Frontend Prefill Normalizer:** Mapping the file's keys to each module's form fields, desktop connectivity names, and desktop keys the web has no field for.
-* **5.5 Project-to-OSI Exporter Converter:** Flattening and mapping web preference overrides with `Pref.` prefixes for desktop compatibility.
+* **5.5 Project-to-OSI Export:** A project's stored design dictionary written as the desktop's flat YAML, unchanged; the migration that cleared the old form-state rows.
 * **5.6 Stateless Backend-Assisted Import & Frontend Configs:** In-memory upload parsing without database modification, key translation, and form hydration.
 
 

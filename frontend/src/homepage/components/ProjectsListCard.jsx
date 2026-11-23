@@ -5,7 +5,6 @@ import { isGuestUser } from '../../utils/auth';
 import { getProjectById } from "../../datasources/projectsDataSource";
 import ProjectActionButtons from './ProjectActionButtons';
 import { loadModuleConfigs } from '../../modules/registry';
-import { loadProjectReportContext } from '../utils/projectReportContext';
 import { KEY_DISP_FINPLATE } from '../../constants/generated/coreKeys';
 
 const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = false, onDeleteProject }) => {
@@ -27,9 +26,6 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
   const [reportInputValues, setReportInputValues] = React.useState({});
   const [reportModuleId, setReportModuleId] = React.useState(null);
   const [reportModuleConfig, setReportModuleConfig] = React.useState(null);
-  const [reportAllSelected, setReportAllSelected] = React.useState({});
-  const [reportLists, setReportLists] = React.useState({});
-  const [reportExtraState, setReportExtraState] = React.useState({});
 
 
   const isGuest = isGuestUser();
@@ -65,11 +61,6 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
       const loaded = await loadModuleConfigs(modId);
       const cfg = loaded?.moduleConfig || null;
       setReportModuleConfig(cfg);
-      // allSelected: set all to false so saved arrays are used as-is
-      const context = await loadProjectReportContext(detail?.inputs_json, modId, cfg);
-      setReportAllSelected(context.allSelected);
-      setReportLists(context.lists);
-      setReportExtraState(context.extraState);
       setReportModalOpen(true);
     } catch (e) {
       toast.error(e.message || 'Failed to load project');
@@ -172,9 +163,7 @@ const ProjectsListCard = ({ projects: projectsProp = [], loading: loadingProp = 
         inputValues={reportInputValues}
         logs={[]}
         moduleConfig={reportModuleConfig}
-        allSelected={reportAllSelected}
-        lists={reportLists}
-        extraState={reportExtraState}
+        inputsAreDesignDictionary
       />
     </>
   );

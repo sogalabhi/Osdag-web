@@ -8,17 +8,20 @@ import { KEY_CONNECTOR_MATERIAL } from "../../../constants/generated/coreKeys";
  *
  * - A core key feeds every field that declares it (the supported section feeds both
  *   `beam_section` and `secondary_beam`; each module reads the one its connectivity uses).
- * - A key no field declares is dropped (desktop output-panel state, keys of other modules), and so
- *   is a key the module lists in `computedCoreKeys` (the builder derives it from several fields).
- * - `Pref.<core key>` entries are the Additional Inputs overrides.
+ * - A key no field declares is dropped (desktop output-panel state, keys of other modules, the
+ *   desktop's material overwrite keys), and so is a key the module lists in `computedCoreKeys` (the
+ *   builder derives it from several fields).
+ * - The Additional Inputs a project or file carries (bolt hole type, gap, weld fabrication, ...) are
+ *   core keys like any other: the module declares them for their fields, so they come back as
+ *   form values, which the design request reads with the same result as an override. The desktop
+ *   sends the keys no dock field declares to its design preferences; here they are dropped, so
+ *   `designPrefOverrides` is empty after a load.
  */
 
 // The desktop stores the overall material, the connector material and each member's
 // material under separate keys; a web form often has one field for several of them. When
 // keys share a field, the more specific key is read last and wins.
 const keyPriority = (key) => (key === "Material" ? 0 : key === KEY_CONNECTOR_MATERIAL ? 1 : 2);
-
-const PREF_PREFIX = "Pref.";
 
 const inverted = new WeakMap();
 
@@ -41,26 +44,21 @@ const fieldsByCoreKey = (config) => {
   return map;
 };
 
-/** Splits a design dictionary into the module's dock fields and its Additional Inputs overrides. */
+/** The form values a design dictionary sets: the module's field for each core key it declares. */
 const splitByField = (config, dict) => {
   const map = fieldsByCoreKey(config);
   const dock = {};
-  const pref = {};
 
   Object.entries(dict)
     .sort(([a], [b]) => keyPriority(a) - keyPriority(b))
     .forEach(([key, rawValue]) => {
       const value = typeof rawValue === "string" ? rawValue.trim() : rawValue;
-      if (key.startsWith(PREF_PREFIX)) {
-        pref[key.substring(PREF_PREFIX.length)] = value;
-        return;
-      }
       (map.get(key) || []).forEach((field) => {
         dock[field] = Array.isArray(value) ? [...value] : value;
       });
     });
 
-  return { dock, pref };
+  return dock;
 };
 
 // The `.osi` spellings of a few dropdown values differ from the web options.
@@ -189,18 +187,9 @@ const buildState = (config, dock, pref, lists) => {
  * Form state from a design dictionary (core keys, as in a desktop `.osi` file).
  *
  * @param {Object} config - the module config (`coreKeys`, `defaultInputs`, `selectionConfig`, ...)
- * @param {Object} dict - flat `{ "Bolt.Diameter": [...], "Material": "...", "Pref.Detailing.Gap": "5", ... }`
+ * @param {Object} dict - flat `{ "Bolt.Diameter": [...], "Material": "...", "Bolt.Material_Grade_OverWrite": "...", ... }`
  * @param {Object} lists - the module's option lists (`boltDiameterList`, `materialList`, ...)
  */
 export function fromDesignDictionary(config, dict, lists = {}) {
-  const { dock, pref } = splitByField(config, dict || {});
-  return buildState(config, dock, pref, lists);
-}
-
-/**
- * Form state from a stored project: `{ dock, pref }` keyed by the module's own field names,
- * as `useProjectCreation` and the design run save it.
- */
-export function fromFieldState(config, { dock, pref }, lists = {}) {
-  return buildState(config, { ...(dock || {}) }, pref || {}, lists);
+  return buildState(config, splitByField(config, dict || {}), {}, lists);
 }

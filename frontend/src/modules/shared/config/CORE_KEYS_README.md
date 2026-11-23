@@ -1,6 +1,6 @@
 # Declared core-key map
 
-Every module config lists, for each form field, the core key(s) it feeds. This is the single, tested place that says "this field is that core key". The `.osi` loader reads it backwards (`utils/designDictionary.js`, `fromDesignDictionary`): a core key in a design dictionary fills every field that declares it. Nothing else reads it at runtime yet, and declaring it changes no wire body.
+Every module config lists, for each form field, the core key(s) it feeds. This is the single, tested place that says "this field is that core key". The `.osi` loader reads it backwards (`utils/designDictionary.js`, `fromDesignDictionary`): a core key in a design dictionary fills every field that declares it. The save reads it forwards (`toDesignDictionary` in `utils/osiSave.js`): an Additional Inputs override the design request does not carry is written under the core key its field declares. Declaring it changes no wire body.
 
 ## Format
 
