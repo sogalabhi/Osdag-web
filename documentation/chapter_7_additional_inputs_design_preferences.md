@@ -38,7 +38,7 @@ The preferences modal panel [DesignPrefSections.jsx](../frontend/src/modules/sha
 * **Open Modal (`open`):** On mount, the modal dispatches a `POST` request to `/api/design-pref/sync/` with `operation: "open"` to retrieve the initial structural sections and material data.
 * **Defaults Button (`defaults`):** Fetches the default configuration parameters from `/api/design-pref/defaults/` and resets both the local draft inputs and active overrides.
 * **Discard/Cancel:** Closes the modal without applying modifications, discarding the local `designPrefInputs` draft.
-* **Save Button (`save`):** Triggers `saveCoreInputs()`. It checks if any required fields are blank, dispatches a sync query with `operation: "save"` to the backend, updates the parent context overrides, invalidates old design outputs (triggering a redesign requirement), and closes the modal.
+* **Save Button (`save`):** Triggers `saveCoreInputs()`. It checks that no value the dialog holds is blank (`findEmptyPrefField` in [designPrefValidation.js](../frontend/src/modules/shared/utils/designPrefValidation.js)), dispatches a sync query with `operation: "save"` to the backend, updates the parent context overrides, invalidates old design outputs (triggering a redesign requirement), and closes the modal.
 
 ---
 
@@ -166,6 +166,8 @@ When a user clicks the **Defaults** button, Osdag-Web executes a two-phase reset
 The tabs displayed inside the Additional Inputs panel are mapped dynamically based on the active module name. This is driven by [designPrefModuleConfig.js](../frontend/src/modules/shared/config/designPrefModuleConfig.js):
 
 The section tabs show the selected section's properties. If the module's list is on "All" or holds several sections, the tab previews the first one, and picking another only changes what the tab shows. The design's list changes only from the input dock. The backend's `_SECTION_KEY_MAP` in `sync_merge.py` must return each module's section under the role its tab reads: tab 2 and the beam sections read `supported`, tab 0 reads `supporting`, and the cleat and seated angle tabs read `connector`.
+
+Each module's `getInitialPrefs` lists only the values its dialog shows or the design uses, and gives every one a value (from the server, or a fallback), because Save refuses an empty value. A key a module never shows, such as the packing plate in the cleat angle, seated angle and lap joint welded modules, or the bolt and detailing values in the two flexure modules, stays out of its state. `src/test/designPrefSave.test.js` checks this for every module, on the state after opening and after Defaults.
 
 | Module Name | Tab IDs List | Displayed Tabs | Initial Tab |
 | :--- | :--- | :--- | :--- |

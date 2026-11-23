@@ -1,0 +1,97 @@
+{
+ "Axially Loaded Column": {
+  "connector_material": "E 250 (Fe 410 W)A",
+  "supported_material": "E 250 (Fe 410 W)A",
+  "supporting_material": "E 250 (Fe 410 W)A"
+ },
+ "Base Plate": {
+  "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
+  "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "Over-sized",
+  "DesignPreferences.Anchor_Bolt.ICF.Designation": "20X0 IS5624 GALV",
+  "DesignPreferences.Anchor_Bolt.ICF.Galvanized": "Yes",
+  "DesignPreferences.Anchor_Bolt.ICF.Length": "0",
+  "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": "410",
+  "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type": "Over-sized",
+  "DesignPreferences.Anchor_Bolt.OCF.Designation": "20X0 IS5624 GALV",
+  "DesignPreferences.Anchor_Bolt.OCF.Galvanized": "Yes",
+  "DesignPreferences.Anchor_Bolt.OCF.Length": "0",
+  "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": "410",
+  "DesignPreferences.Design.Base_Plate": "Effective Area Method",
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "Yes",
+  "detailing_edge_type": "a - Sheared or hand flame cut",
+  "supporting_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "410"
+ },
+ "Beam Beam End Plate Connection": {},
+ "Beam Cover Plate Bolted Connection": {
+  "supported_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld"
+ },
+ "Beam Cover Plate Welded Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "supported_material": "E 165 (Fe 290)"
+ },
+ "Beam to Column End Plate Connection": {},
+ "Butt Joint Bolted": {},
+ "Butt Joint Welded": {},
+ "Cleat Angle Connection": {},
+ "Column Column End Plate Connection": {
+  "supporting_material": "E 250 (Fe 410 W)A"
+ },
+ "Column Cover Plate Bolted Connection": {
+  "supported_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld"
+ },
+ "Column Cover Plate Welded Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "supported_material": "E 165 (Fe 290)"
+ },
+ "Fin Plate Connection": {},
+ "Header Plate Connection": {},
+ "Lap Joint Bolted": {},
+ "Lap Joint Welded": {},
+ "On Cantilever Beam Design": {
+  "connector_material": "E 250 (Fe 410 W)A",
+  "supported_material": "E 250 (Fe 410 W)A",
+  "supporting_material": "E 250 (Fe 410 W)A"
+ },
+ "Plate Girder Design": {
+  "connector_material": "E 250 (Fe 410 W)A",
+  "supported_material": "E 250 (Fe 410 W)A",
+  "supporting_material": "E 250 (Fe 410 W)A"
+ },
+ "Seated Angle Connection": {},
+ "Simply Supported Beam Design": {
+  "connector_material": "E 250 (Fe 410 W)A",
+  "supported_material": "E 250 (Fe 410 W)A",
+  "supporting_material": "E 250 (Fe 410 W)A"
+ },
+ "Struts Bolted to End Gusset": {
+  "supported_material": "E 250 (Fe 410 W)A",
+  "supporting_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "410"
+ },
+ "Struts Welded to End Gusset": {
+  "supported_material": "E 250 (Fe 410 W)A",
+  "supporting_material": "E 250 (Fe 410 W)A"
+ },
+ "Tension Member Bolted Design": {
+  "supported_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "410"
+ },
+ "Tension Member Welded Design": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "supported_material": "E 250 (Fe 410 W)A"
+ }
+}
