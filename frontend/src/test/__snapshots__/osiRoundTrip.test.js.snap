@@ -152,8 +152,6 @@ exports[`a desktop .osi example opened and saved again > baseplate_1 (Base Plate
     "Load.Axial",
   ],
   "changed": {
-    "Anchor Bolt.ICF.Diameter": "["M20","M24","M30","M36","M42","M48","M56","M64","M72"] -> ["M20","M24"]",
-    "Anchor Bolt.ICF.Grade": "["3.6","4.6","4.8","5.6","5.8","6.8","8.8","9.8","10.9","... -> ["4.6","8.8"]",
     "Load.Axial_Tension": """ -> "0"",
     "Load.Moment.Major": """ -> "0"",
     "Load.Moment.Minor": """ -> "0"",
@@ -196,8 +194,6 @@ exports[`a desktop .osi example opened and saved again > baseplate_2 (Base Plate
     "Load.Axial",
   ],
   "changed": {
-    "Anchor Bolt.ICF.Diameter": "["M20","M24","M30","M36","M42","M48","M56","M64","M72"] -> ["M20","M24"]",
-    "Anchor Bolt.ICF.Grade": "["3.6","4.6","4.8","5.6","5.8","6.8","8.8","9.8","10.9","... -> ["4.6","8.8"]",
     "Load.Axial_Tension": """ -> "0"",
     "Load.Moment.Major": """ -> "0"",
     "Load.Moment.Minor": """ -> "0"",
@@ -241,8 +237,6 @@ exports[`a desktop .osi example opened and saved again > baseplate_3 (Base Plate
     "Load.Axial",
   ],
   "changed": {
-    "Anchor Bolt.ICF.Diameter": "["M20","M24","M30","M36","M42","M48","M56","M64","M72"] -> ["M20","M24"]",
-    "Anchor Bolt.ICF.Grade": "["8.8"] -> ["4.6","8.8"]",
     "Load.Axial_Tension": """ -> "0"",
     "Load.Moment.Major": """ -> "0"",
     "Load.Moment.Minor": """ -> "0"",
@@ -285,8 +279,6 @@ exports[`a desktop .osi example opened and saved again > baseplate_4 (Base Plate
     "Load.Axial",
   ],
   "changed": {
-    "Anchor Bolt.ICF.Diameter": "["M20"] -> ["M20","M24"]",
-    "Anchor Bolt.ICF.Grade": "["8.8"] -> ["4.6","8.8"]",
     "Load.Axial_Tension": """ -> "0"",
   },
   "dropped": [
@@ -327,8 +319,6 @@ exports[`a desktop .osi example opened and saved again > baseplate_5 (Base Plate
     "Load.Axial",
   ],
   "changed": {
-    "Anchor Bolt.ICF.Diameter": "["M20"] -> ["M20","M24"]",
-    "Anchor Bolt.ICF.Grade": "["8.8"] -> ["4.6","8.8"]",
     "Load.Axial_Tension": """ -> "0"",
     "Load.Moment.Major": """ -> "0"",
     "Load.Moment.Minor": """ -> "0"",

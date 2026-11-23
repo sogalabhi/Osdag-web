@@ -6,6 +6,9 @@
 import { describe, expect, it } from "vitest";
 
 import { fromDesignDictionary } from "../modules/shared/utils/designDictionary";
+import { loadStateFromOsi } from "../modules/shared/utils/osiLoader";
+import { basePlateConfig } from "../modules/basePlate/configs/basePlateConfig";
+import { designRequest, formRecorder } from "./cases/shared";
 
 const config = {
   defaultInputs: { bolt_diameter: [], bolt_type: "Bearing_Bolt", bolt_tension_type: "Non Pre-tensioned", material: "E 250" },
@@ -94,5 +97,49 @@ describe("fromDesignDictionary", () => {
     const { extraState, inputs } = fromDesignDictionary(withImage, { Connectivity: "Beam-Beam", "Member.Profile": "Channels" }, LISTS);
     expect(extraState).toEqual({ selectedOption: "Beam-Beam", selectedProfile: "Channels", imageSource: "img:Channels" });
     expect(inputs.location).toBe("Web");
+  });
+});
+
+describe("base plate anchors: outside- and inside-flange lists are separate fields", () => {
+  const ocf = { "Anchor Bolt.OCF.Diameter": ["M30"], "Anchor Bolt.OCF.Grade": ["10.9"] };
+  const icf = { "Anchor Bolt.ICF.Diameter": ["M20"], "Anchor Bolt.ICF.Grade": ["8.8"] };
+  const load = (dict) => {
+    const { state, options } = formRecorder(basePlateConfig);
+    loadStateFromOsi(dict, options);
+    return state;
+  };
+
+  it("loads each list into its own field, whichever key comes first in the file", () => {
+    for (const dict of [{ ...icf, ...ocf }, { ...ocf, ...icf }]) {
+      const { inputs, selectionStates } = load(dict);
+      expect(inputs.anchor_diameter_ocf).toEqual(["M30"]);
+      expect(inputs.anchor_grade_ocf).toEqual(["10.9"]);
+      expect(inputs.anchor_diameter_icf).toEqual(["M20"]);
+      expect(inputs.anchor_grade_icf).toEqual(["8.8"]);
+      expect(selectionStates.anchorDiameterIcfSelect).toBe("Customized");
+      expect(selectionStates.anchorGradeIcfSelect).toBe("Customized");
+    }
+  });
+
+  it("sends the file's own inside-flange lists", () => {
+    const request = designRequest(basePlateConfig, load({ ...ocf, ...icf }));
+    expect(request["Anchor Bolt.OCF.Diameter"]).toEqual(["M30"]);
+    expect(request["Anchor Bolt.ICF.Diameter"]).toEqual(["M20"]);
+    expect(request["Anchor Bolt.ICF.Grade"]).toEqual(["8.8"]);
+  });
+
+  it("leaves the inside-flange fields alone when the file has only outside-flange lists", () => {
+    const state = load(ocf);
+    expect(state.inputs.anchor_diameter_icf).toEqual(basePlateConfig.defaultInputs.anchor_diameter_icf);
+    expect(state.inputs.anchor_grade_icf).toEqual(basePlateConfig.defaultInputs.anchor_grade_icf);
+    expect(state.selectionStates.anchorDiameterIcfSelect).toBe("All");
+  });
+
+  it("falls back to the outside-flange lists when the inside-flange selection is empty", () => {
+    const state = load(ocf);
+    state.allSelected = { ...state.allSelected, anchor_diameter_icf: false, anchor_grade_icf: false };
+    const request = designRequest(basePlateConfig, state);
+    expect(request["Anchor Bolt.ICF.Diameter"]).toEqual(["M30"]);
+    expect(request["Anchor Bolt.ICF.Grade"]).toEqual(["10.9"]);
   });
 });

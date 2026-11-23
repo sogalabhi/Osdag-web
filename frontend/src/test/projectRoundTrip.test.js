@@ -33,17 +33,9 @@ const reopen = (config, savedInputsJson) => {
   return state;
 };
 
-// Requests that change on the way through a saved project, and the keys that change. Each is a
-// bug to fix, not a behaviour to keep: when one is fixed its entry goes. The base plate one is confirmed in
-// a browser: customize the inside-flange anchor diameter and grade lists, download the .osi, open it, and the
-// lists are back on "All".
-// - Base plate: `notLoadedFromDictionary` keeps the two inside-flange anchor lists from being filled by
-//   a file (the old loader never filled them); their saved values are not read back.
-const BASE_PLATE_GAP = ["Anchor Bolt.ICF.Diameter", "Anchor Bolt.ICF.Grade"];
-const KNOWN_GAPS = {
-  "base plate | customized / Welded Column Base, saved": BASE_PLATE_GAP,
-  "base plate | customized / Welded Column Base, saved with overrides": BASE_PLATE_GAP,
-};
+// Requests that change on the way through a saved project, and the keys that change. Each is a bug to fix,
+// not a behaviour to keep: when one is fixed its entry goes. None is known at present.
+const KNOWN_GAPS = {};
 
 describe("project round trip: the design request after save and reopen", () => {
   for (const module of MODULES) {
