@@ -16,7 +16,7 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **2.1 Django Application Structure (`apps/core` vs `apps/modules`):** Core database models and settings vs individual design module logic.
 * **2.2 Celery & Redis Integration:** Configuration details (`CELERY_BROKER_URL`, queues: `calculations`, `reports`, `celery`), concurrency tuning, task scheduling, and signal handling (`exec` wrappers), and the one design task that calculates once and builds CAD from the same solver (`DESIGN_READY` early message, final result).
 * **2.3 The Adapter Pattern for Osdag Desktop Modules:** How backend adapters bridge Django web requests to the underlying Osdag desktop computational engine, and the input fixtures that test every adapter's `validate_input()`.
-* **2.3b Key Constants:** Design-input keys are `osdag_core.Common` constants imported by name; `web_keys.py` for keys the core lacks, the `test_no_inline_keys.py` guard, and the `codemod_keys.py` converter.
+* **2.3b Key Constants:** Design-input keys are `osdag_core.Common` constants imported by name; `web_keys.py` for keys the core lacks, the `test_no_inline_keys.py` guard.
 * **2.4 DB Schema & Models:** Detail `Project`, `Design`, `UserAccount`, and `OsiFile` fields and constraints.
 * **2.5 Asset Storage Lifecycle (CAD Models & Reports):** Filesystem storage structure of generated component geometries (BREP, STL) and PDF reports.
 

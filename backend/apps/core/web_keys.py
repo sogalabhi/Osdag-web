@@ -5,7 +5,7 @@ copies them into ``frontend/src/constants/generated/webKeys.js``, so the backend
 use the same names. A key that the core also has belongs in ``osdag_core.Common`` instead; the
 tests in ``apps/core/tests/test_no_inline_keys.py`` fail when a value here matches a core key.
 
-This module imports nothing, so the frontend generator and the key codemods can load it on its own.
+This module imports nothing, so the frontend generator can load it on its own.
 """
 
 # Output and diagram keys: shear and simple connections

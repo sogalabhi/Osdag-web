@@ -14,6 +14,7 @@ VALID_OPERATIONS = frozenset({"open", "refresh", "save", "reset"})
 import importlib
 
 from osdag_core.Common import (
+    KEY_DESIGN_FOR,
     KEY_DIA_ANCHOR_ICF,
     KEY_DIA_ANCHOR_OCF,
     KEY_DISP_CLEATANGLE,
@@ -88,7 +89,7 @@ _FRONTEND_TO_CORE_KEY_MAP = {
     "detailing_corr_status": KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
     "detailing_packing_plate": KEY_DP_DETAILING_PACKING_PLATE,
     "design_method": KEY_DP_DESIGN_METHOD,
-    "design_for": "Design.Design_For",
+    "design_for": KEY_DESIGN_FOR,
     
     # Base Plate specific:
     KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF: KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
@@ -122,8 +123,6 @@ def _get_core_defaults(module_session_name: str, inputs: Dict[str, Any], grade: 
             KEY_ST_KEY_MATERIAL: material_grade,
             KEY_DIA_ANCHOR_OCF: [20],
             KEY_DIA_ANCHOR_ICF: [20],
-            "Base_Plate.Material_St_Sk": material_grade,
-            "Material_St_Sk": material_grade,
         }
         for k, v in inputs.items():
             if k in _FRONTEND_TO_CORE_KEY_MAP:

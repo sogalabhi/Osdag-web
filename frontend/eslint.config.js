@@ -12,9 +12,6 @@ const UNDOTTED_KEY = String.raw`/^(Module|Material|Connectivity|Conn_Location|En
 const KEY_MESSAGE =
   'Import design-input keys from src/constants/generated/coreKeys.js (or webKeys.js) instead of writing the string.'
 
-// Files that still hold inline keys. Remove a file from this list when it is converted.
-const KEYS_NOT_CONVERTED = []
-
 export default defineConfig([
   globalIgnores(['dist']),
   {
@@ -61,7 +58,6 @@ export default defineConfig([
       'src/test/**',
       'src/**/*.test.js',
       'src/modules/flexuralMember/purlin/**',
-      ...KEYS_NOT_CONVERTED,
     ],
     rules: {
       'no-restricted-syntax': [
