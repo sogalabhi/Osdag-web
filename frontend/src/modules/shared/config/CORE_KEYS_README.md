@@ -16,7 +16,7 @@ export const finPlateConfig = {
     bolt_diameter: KEY_D,
     beam_section: KEY_SUPTDSEC,
     secondary_beam: KEY_SUPTDSEC,          // two fields, one core key (per connectivity)
-    connector_material: [KEY_CONNECTOR_MATERIAL, KEY_MATERIAL],  // one field, two core keys
+    load_axial: [KEY_AXIAL, KEY_AXIAL_BP],  // one field, two core keys
     material: null,                        // feeds no core key
   },
 };
@@ -27,7 +27,7 @@ export const finPlateConfig = {
 - `null` means the field feeds no core key: pure UI state (images, `module`-style constants, leftovers the builder never reads). Write a short comment saying why.
 - List every field of the form: each `defaultInputs` key, each `inputSections[].fields[].key`, each `selectionConfig`/`modalConfig` `inputKey`, and the Additional Inputs fields the module uses. A field you declare that the form does not have is reported as unknown (usually a typo).
 - Shared prefs live in `prefCoreKeys.js`: `PREF_CORE_KEYS` (bolt_tension_type, bolt_hole_type, bolt_slip_factor, weld_fab, weld_material_grade, detailing_*, design_method, design_for) and `MATERIAL_CORE_KEYS` (material, connector_material, supported_material, supporting_material in their one-to-one meaning). Spread them, then write the module's own entries after the spread so they win. Only add a row there if it means the same in every module.
-- Put the field's core key where the wire carries it, not where it "should" go: `connector_material` feeds `Material` in the shear modules because `buildSubmissionParams` sends it there. Keep such quirks and comment them. Do not fix them here.
+- Put the field's core key where the wire carries it, not where it "should" go, and comment any quirk. Do not fix a quirk while declaring keys.
 
 ## How to fill a module
 

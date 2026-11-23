@@ -33,6 +33,7 @@ exports[`loading a desktop .osi example into its module > EP-1 (Header Plate Con
     "detailing_gap": "10",
     "load_axial": "50",
     "load_shear": "200",
+    "material": "E 250 (Fe 410 W)A",
     "module": "End Plate Connection",
     "plate_thickness": [
       "10",
@@ -98,6 +99,7 @@ exports[`loading a desktop .osi example into its module > EP-2 (Header Plate Con
     "detailing_gap": "10",
     "load_axial": "100",
     "load_shear": "300",
+    "material": "E 250 (Fe 410 W)A",
     "module": "End Plate Connection",
     "plate_thickness": [
       "16",
@@ -160,6 +162,7 @@ exports[`loading a desktop .osi example into its module > EP-3 (Header Plate Con
     "detailing_gap": "10",
     "load_axial": "100",
     "load_shear": "200",
+    "material": "E 250 (Fe 410 W)A",
     "module": "End Plate Connection",
     "plate_thickness": [
       "10",
@@ -222,6 +225,7 @@ exports[`loading a desktop .osi example into its module > EP-4 (Header Plate Con
     "detailing_gap": "10",
     "load_axial": "50",
     "load_shear": "300",
+    "material": "E 250 (Fe 410 W)A",
     "module": "End Plate Connection",
     "plate_thickness": [
       "10",
@@ -284,6 +288,7 @@ exports[`loading a desktop .osi example into its module > EP-5 (Header Plate Con
     "detailing_gap": "10",
     "load_axial": "100",
     "load_shear": "150",
+    "material": "E 250 (Fe 410 W)A",
     "module": "End Plate Connection",
     "plate_thickness": [
       "12",
@@ -351,6 +356,7 @@ exports[`loading a desktop .osi example into its module > SA-1 (Seated Angle Con
     "detailing_gap": "10",
     "load_axial": "0",
     "load_shear": "120",
+    "material": "E 250 (Fe 410 W)A",
     "module": "Seated Angle Connection",
     "primary_beam": "PBP 400 X 230.9",
     "secondary_beam": [
@@ -428,6 +434,7 @@ exports[`loading a desktop .osi example into its module > SA-2 (Seated Angle Con
     "detailing_gap": "10",
     "load_axial": "0",
     "load_shear": "100",
+    "material": "E 250 (Fe 410 W)A",
     "module": "Seated Angle Connection",
     "primary_beam": "HB 150",
     "secondary_beam": [
@@ -505,6 +512,7 @@ exports[`loading a desktop .osi example into its module > SA-3 (Seated Angle Con
     "detailing_gap": "10",
     "load_axial": "0",
     "load_shear": "120",
+    "material": "E 250 (Fe 410 W)A",
     "module": "Seated Angle Connection",
     "primary_beam": "PBP 400 X 230.9",
     "secondary_beam": [
@@ -584,6 +592,7 @@ exports[`loading a desktop .osi example into its module > SA-4 (Seated Angle Con
     "detailing_gap": "10",
     "load_axial": "0",
     "load_shear": "100",
+    "material": "E 250 (Fe 410 W)A",
     "module": "Seated Angle Connection",
     "primary_beam": "PBP 300 X 180.12",
     "secondary_beam": [
@@ -662,6 +671,7 @@ exports[`loading a desktop .osi example into its module > SA-5 (Seated Angle Con
     "detailing_gap": "10",
     "load_axial": "0",
     "load_shear": "80",
+    "material": "E 350 (Fe 490)",
     "module": "Seated Angle Connection",
     "primary_beam": "UC 305 x 305 x 118",
     "secondary_beam": [
@@ -4109,6 +4119,7 @@ exports[`loading a desktop .osi example into its module > cleat_1 (Cleat Angle C
     "detailing_edge_type": "Rolled, machine-flame cut, sawn and planed",
     "detailing_gap": "0",
     "load_shear": "100",
+    "material": "E 250 (Fe 410 W)A",
     "module": "Cleat Angle Connection",
     "primary_beam": "UC 356 x 406 x 634",
     "secondary_beam": "WPB 280 X 280 X 188.54",
@@ -4328,6 +4339,7 @@ exports[`loading a desktop .osi example into its module > cleat_2 (Cleat Angle C
     "detailing_edge_type": "Rolled, machine-flame cut, sawn and planed",
     "detailing_gap": "0",
     "load_shear": "100",
+    "material": "E 250 (Fe 410 W)A",
     "module": "Cleat Angle Connection",
     "primary_beam": "PBP 300 X 88.46",
     "secondary_beam": "WPB 280 X 280 X 188.54",
@@ -4567,6 +4579,7 @@ exports[`loading a desktop .osi example into its module > cleat_3 (Cleat Angle C
     "detailing_edge_type": "Rolled, machine-flame cut, sawn and planed",
     "detailing_gap": "0",
     "load_shear": "100",
+    "material": "E 250 (Fe 410 W)A",
     "module": "Cleat Angle Connection",
     "primary_beam": "HB 350",
     "secondary_beam": "NPB 220 X 110 X 29.35",
@@ -4826,6 +4839,7 @@ exports[`loading a desktop .osi example into its module > cleat_4 (Cleat Angle C
     "detailing_edge_type": "Rolled, machine-flame cut, sawn and planed",
     "detailing_gap": "0",
     "load_shear": "",
+    "material": "E 250 (Fe 410 W)A",
     "module": "Cleat Angle Connection",
     "primary_beam": "NPB 240 X 120 X 34.32",
     "secondary_beam": "WPB 140 X 140 X 18.08",
@@ -5085,6 +5099,7 @@ exports[`loading a desktop .osi example into its module > cleat_5 (Cleat Angle C
     "detailing_edge_type": "Rolled, machine-flame cut, sawn and planed",
     "detailing_gap": "0",
     "load_shear": "90",
+    "material": "E 250 (Fe 410 W)A",
     "module": "Cleat Angle Connection",
     "primary_beam": "NPB 240 X 120 X 34.32",
     "secondary_beam": "WPB 200 X 200 X 83.52",
@@ -6865,7 +6880,7 @@ exports[`loading a desktop .osi example into its module > fin1 (Fin Plate Connec
     "detailing_gap": "10",
     "load_axial": "40",
     "load_shear": "60",
-    "material": "E 165 (Fe 290)",
+    "material": "E 250 (Fe 410 W)A",
     "module": "Fin Plate Connection",
     "plate_thickness": [
       "3",
@@ -6976,7 +6991,7 @@ exports[`loading a desktop .osi example into its module > fin2 (Fin Plate Connec
     "detailing_gap": "10",
     "load_axial": "60",
     "load_shear": "150",
-    "material": "E 165 (Fe 290)",
+    "material": "E 350 (Fe 490)",
     "module": "Fin Plate Connection",
     "plate_thickness": [
       "3",
@@ -7092,7 +7107,7 @@ exports[`loading a desktop .osi example into its module > fin3 (Fin Plate Connec
     "detailing_gap": "10",
     "load_axial": "65",
     "load_shear": "100",
-    "material": "E 165 (Fe 290)",
+    "material": "E 350 (Fe 490)",
     "module": "Fin Plate Connection",
     "plate_thickness": [
       "3",
@@ -7208,7 +7223,7 @@ exports[`loading a desktop .osi example into its module > fin4 (Fin Plate Connec
     "detailing_gap": "10",
     "load_axial": "45",
     "load_shear": "50",
-    "material": "E 165 (Fe 290)",
+    "material": "E 350 (Fe 490)",
     "module": "Fin Plate Connection",
     "plate_thickness": [
       "3",

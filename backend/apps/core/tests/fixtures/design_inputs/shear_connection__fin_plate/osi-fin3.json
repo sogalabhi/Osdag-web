@@ -34,7 +34,7 @@
     "Detailing.Gap": "10",
     "Load.Axial": "65",
     "Load.Shear": "100",
-    "Material": "E 250 (Fe 410 W)A",
+    "Material": "E 350 (Fe 490)",
     "Member.Supported_Section.Designation": "UB 406 x 140 x 39",
     "Member.Supported_Section.Material": "E 165 (Fe 290)",
     "Member.Supporting_Section.Designation": "UC 305 x 305 x 198",

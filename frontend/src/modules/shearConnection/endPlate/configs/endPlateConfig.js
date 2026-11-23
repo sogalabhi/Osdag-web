@@ -53,6 +53,7 @@ export const endPlateConfig = {
     // Static defaults
     load_shear: "20",
     load_axial: "10",
+    material: "E 250 (Fe 410 W)A",
     connector_material: "E 250 (Fe 410 W)A",
     supported_material: "E 165 (Fe 290)",
     supporting_material: "E 165 (Fe 290)",
@@ -87,10 +88,9 @@ export const endPlateConfig = {
     secondary_beam: KEY_SUPTDSEC,
     column_section: KEY_SUPTNGSEC,
     primary_beam: KEY_SUPTNGSEC,
-    // The dock material is sent twice, as the connector material and as Material.
-    connector_material: [KEY_CONNECTOR_MATERIAL, KEY_MATERIAL],
-    // Not a field of this form: Material comes from connector_material.
-    material: null,
+    // The dock material is Material; connector_material is the Connector tab of Additional Inputs.
+    material: KEY_MATERIAL,
+    connector_material: KEY_CONNECTOR_MATERIAL,
   },
 
   modalConfig: [
@@ -146,7 +146,7 @@ export const endPlateConfig = {
       [KEY_DP_DETAILING_GAP]: inputs.detailing_gap,
       [KEY_AXIAL]: inputs.load_axial || "0",
       [KEY_SHEAR]: inputs.load_shear || "",
-      [KEY_MATERIAL]: inputs.connector_material,
+      [KEY_MATERIAL]: inputs.material,
       [KEY_SUPTDSEC]: connectivity === "Beam-Beam" ? inputs.secondary_beam : inputs.beam_section,
       [KEY_SUPTDSEC_MATERIAL]: inputs.supported_material,
       [KEY_SUPTNGSEC]: connectivity === "Beam-Beam" ? inputs.primary_beam : inputs.column_section,
@@ -169,7 +169,7 @@ export const endPlateConfig = {
         { key: "column_section", label: "Column Section", type: "select", options: "columnList", conditionalDisplay: (extraState) => [CONN_CFBW, CONN_CWBW].includes(extraState?.selectedOption) },
         { key: "beam_section", label: "Beam Section", type: "select", options: "beamList", conditionalDisplay: (extraState) => [CONN_CFBW, CONN_CWBW].includes(extraState?.selectedOption) },
         {
-          key: "connector_material", label: "Material", type: "select", options: "materialList",
+          key: "material", label: "Material", type: "select", options: "materialList",
           onChange: (value, inputs, setInputs, materialList, setShowModal) => {
             if (value == -1) {
               setShowModal(true);
@@ -177,7 +177,7 @@ export const endPlateConfig = {
             }
             const material = materialList.find((item) => item.id === value);
             if (material) {
-              setInputs({ ...inputs, connector_material: material.Grade });
+              setInputs({ ...inputs, material: material.Grade, connector_material: material.Grade });
             }
           },
         },

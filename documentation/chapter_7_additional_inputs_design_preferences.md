@@ -97,6 +97,10 @@ Osdag-Web resolves this through a bidirectional sync state machine using the [us
 4. **No-Change Optimization:** When the modal closes, the hook compares the driver material with its state prior to the modal opening. If it is unchanged, the refresh call is skipped to protect manual overrides from being clobbered.
 5. **Writethrough Rollbacks:** If the sync request fails due to network issues, the system rolls back to the `lastKnownGoodDesignPrefSnapshot` to prevent corrupted states.
 
+### What the design request carries
+
+The Design button sends the dock inputs with the saved Additional Inputs merged over them, so a material saved in Additional Inputs must not be read where the request expects the dock material. As in the desktop, `Material` is the dock Material, and each material of Additional Inputs goes out under its own key: `Connector.Material` from the Connector tab, and the section tabs under the section keys. In the shear connection modules (fin plate, cleat angle, header plate, seated angle) the dock field is `material`; it also sets `connector_material`, which stays the Connector tab's value until the dock changes.
+
 ---
 
 ## 7.4 Sync Merge Utilities (`mergeDesignPrefSyncIntoInputs.js`)

@@ -43,6 +43,7 @@ export const cleatAngleConfig = {
     bolt_diameter: [],
     bolt_grade: [],
     bolt_type: "Bearing Bolt",
+    material: "E 250 (Fe 410 W)A",
     connector_material: "E 250 (Fe 410 W)A",
     load_shear: "20",
     beam_section: "MB 300",
@@ -82,10 +83,9 @@ export const cleatAngleConfig = {
     secondary_beam: KEY_SUPTDSEC,
     column_section: KEY_SUPTNGSEC,
     primary_beam: KEY_SUPTNGSEC,
-    // The dock material is sent twice, as the connector material and as Material.
-    connector_material: [KEY_CONNECTOR_MATERIAL, KEY_MATERIAL],
-    // Not a field of this form: Material comes from connector_material.
-    material: null,
+    // The dock material is Material; connector_material is the Connector tab of Additional Inputs.
+    material: KEY_MATERIAL,
+    connector_material: KEY_CONNECTOR_MATERIAL,
   },
 
   modalConfig: [
@@ -143,7 +143,7 @@ export const cleatAngleConfig = {
       [KEY_DP_DETAILING_EDGE_TYPE]: inputs.detailing_edge_type,
       [KEY_DP_DETAILING_GAP]: inputs.detailing_gap,
       [KEY_SHEAR]: inputs.load_shear || "",
-      [KEY_MATERIAL]: inputs.connector_material,
+      [KEY_MATERIAL]: inputs.material,
       [KEY_MODULE]: KEY_DISP_CLEATANGLE,
       [KEY_DP_WELD_FAB]: inputs.weld_fab,
       [KEY_DP_WELD_MATERIAL_G_O]: inputs.weld_material_grade,
@@ -223,7 +223,7 @@ export const cleatAngleConfig = {
           }
         },
         {
-          key: "connector_material",
+          key: "material",
           label: UI_STRINGS.MATERIAL,
           type: "select",
           options: "materialList",
@@ -231,6 +231,7 @@ export const cleatAngleConfig = {
             const material = materialList.find(item => item.id === value);
             setInputs({
               ...inputs,
+              material: material.Grade,
               connector_material: material.Grade,
             });
           }

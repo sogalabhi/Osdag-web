@@ -84,10 +84,9 @@ export const finPlateConfig = {
     secondary_beam: KEY_SUPTDSEC,
     column_section: KEY_SUPTNGSEC,
     primary_beam: KEY_SUPTNGSEC,
-    // The dock material is sent twice, as the connector material and as Material.
-    connector_material: [KEY_CONNECTOR_MATERIAL, KEY_MATERIAL],
-    // A leftover default: the builder never reads it (Material comes from connector_material).
-    material: null,
+    // The dock material is Material; connector_material is the Connector tab of Additional Inputs.
+    material: KEY_MATERIAL,
+    connector_material: KEY_CONNECTOR_MATERIAL,
   },
 
   modalConfig: [
@@ -147,7 +146,7 @@ export const finPlateConfig = {
         [KEY_DP_DETAILING_GAP]: inputs.detailing_gap,
         [KEY_AXIAL]: inputs.load_axial || "0",
         [KEY_SHEAR]: inputs.load_shear || "",
-        [KEY_MATERIAL]: inputs.connector_material,
+        [KEY_MATERIAL]: inputs.material,
         [KEY_SUPTDSEC]: inputs.beam_section,
         [KEY_SUPTDSEC_MATERIAL]: inputs.supported_material,
         [KEY_SUPTNGSEC]: inputs.column_section,
@@ -173,7 +172,7 @@ export const finPlateConfig = {
         [KEY_DP_DETAILING_GAP]: inputs.detailing_gap,
         [KEY_AXIAL]: inputs.load_axial || "0",
         [KEY_SHEAR]: inputs.load_shear || "",
-        [KEY_MATERIAL]: inputs.connector_material,
+        [KEY_MATERIAL]: inputs.material,
         [KEY_SUPTDSEC]: inputs.secondary_beam,
         [KEY_SUPTDSEC_MATERIAL]: inputs.supported_material,
         [KEY_SUPTNGSEC]: inputs.primary_beam,
@@ -230,7 +229,7 @@ export const finPlateConfig = {
           conditionalDisplay: (extraState) => extraState?.selectedOption === "Beam-Beam"
         },
         {
-          key: "connector_material",
+          key: "material",
           label: UI_STRINGS.MATERIAL,
           type: "select",
           options: "materialList",
@@ -238,6 +237,7 @@ export const finPlateConfig = {
             const material = materialList.find(item => item.id === value);
             setInputs({
               ...inputs,
+              material: material.Grade,
               connector_material: material.Grade,
             });
           }
