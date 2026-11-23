@@ -10,8 +10,6 @@ modules, ``osi_files.py`` and ``sync_merge.py``. Docstrings, the literal parts o
 annotations are not looked at. Import the constant instead (``from osdag_core.Common import KEY_D``);
 a key the core does not have goes in ``apps/core/web_keys.py``. Purlin is skipped.
 
-Files that have not been converted yet are listed in ``NOT_CONVERTED`` with the number of inline
-keys they still hold. A count may only go down; the entry goes away when the file reaches zero.
 ``ALLOWED`` lists reviewed strings that only look like keys. No database is used.
 """
 import ast
@@ -47,11 +45,6 @@ UNDOTTED_FILES = {"apps/core/utils/osi_files.py", "apps/core/api/design/sync_mer
 UNDOTTED_EXCLUDED = {"catalog.py", "osdag_overrides.py"}
 VALIDATOR_ERRORS = {"InvalidInputTypeError", "MissingKeyError"}
 STRING_NODES = tuple(t for t in (ast.JoinedStr, getattr(ast, "TemplateStr", None)) if t is not None)
-
-# file (relative to backend/) -> number of inline keys it still holds
-NOT_CONVERTED = {
-    "apps/core/api/design/sync_merge.py": 2,
-}
 
 # (file, value) -> why the string is not a key
 ALLOWED = {}
@@ -141,23 +134,10 @@ def test_no_new_inline_keys():
     found = _scan()
     problems = []
     for rel, keys in found.items():
-        allowed = NOT_CONVERTED.get(rel, 0)
-        if len(keys) > allowed:
-            label = "new file" if rel not in NOT_CONVERTED else f"{len(keys)} keys, {allowed} listed"
-            problems.append(f"{rel} ({label}):")
+        if keys:
+            problems.append(f"{rel}:")
             problems.extend("    " + _describe(rel, line, value) for line, value in keys)
     assert not problems, "Inline design-input keys; use the constants.\n" + "\n".join(problems)
-
-
-def test_not_converted_has_no_stale_entries():
-    found = _scan()
-    problems = []
-    for rel in NOT_CONVERTED:
-        if not (BACKEND_DIR / rel).is_file():
-            problems.append(f"{rel}: the file no longer exists; remove it from NOT_CONVERTED")
-        elif rel not in found:
-            problems.append(f"{rel}: no inline keys left; remove it from NOT_CONVERTED")
-    assert not problems, "\n".join(problems)
 
 
 def test_allowed_has_no_stale_entries():
