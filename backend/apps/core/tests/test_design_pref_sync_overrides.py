@@ -42,7 +42,7 @@ from osdag_core.Common import (
 RULE_OVERRIDES = {
     KEY_DISP_BCENDPLATE,
     KEY_DISP_BB_EP_SPLICE, KEY_DISP_COLUMNENDPLATE, KEY_DISP_BASE_PLATE,
-    KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_PLATE_GIRDER_WELDED, KEY_DISP_COMPRESSION_COLUMN,
+    KEY_DISP_FLEXURE2, KEY_DISP_PLATE_GIRDER_WELDED, KEY_DISP_COMPRESSION_COLUMN,
     KEY_DISP_STRUT_WELDED_END_GUSSET,
 }
 # Cover plates and the shear modules with a Connector tab: the dock Material copies to the member and
@@ -52,7 +52,10 @@ SHEAR_CORE_RULES = {KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE, KEY_DISP_CLEATANGLE
 # Tension members and the bolted strut: the dock Material copies to Member.Material (the section tab, which
 # the web form holds as supported_material) and Connector.Material.
 MEMBER_CORE_RULES = {KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_STRUT_BOLTED_END_GUSSET}
-CORE_RULES = COVER_PLATE_RULES | SHEAR_CORE_RULES | MEMBER_CORE_RULES
+# The simply supported beam: the dock Material copies to Member.Material, the Column Section tab
+# (supporting_material in the web form).
+BEAM_CORE_RULES = {KEY_DISP_FLEXURE}
+CORE_RULES = COVER_PLATE_RULES | SHEAR_CORE_RULES | MEMBER_CORE_RULES | BEAM_CORE_RULES
 # Modules where core and old agree on "no material sync": no copy rows.
 NO_RULES = {KEY_DISP_BUTTJOINTBOLTED, KEY_DISP_BUTTJOINTWELDED, KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED}
 
@@ -112,6 +115,21 @@ def test_a_changed_dock_material_replaces_the_section_tab_material(module_id):
     )
     assert resolved["Member.Material"] == "E 350 (Fe 490)"
     assert resolved["Connector.Material"] == "E 350 (Fe 490)"
+
+
+@pytest.mark.parametrize("module_id", sorted(BEAM_CORE_RULES))
+def test_a_beam_copies_the_dock_material_to_the_member_material(module_id):
+    assert sync_merge.sync_rules(module_id) == [("Material", ["Member.Material"])]
+
+
+@pytest.mark.parametrize("module_id", sorted(BEAM_CORE_RULES))
+def test_a_changed_dock_material_replaces_the_beam_section_tab_material(module_id):
+    resolved, _meta, _md, _sd = sync_merge.merge_design_pref_sync(
+        module_id,
+        {"Material": "E 350 (Fe 490)", "Member.Material": "E 250 (Fe 410 W)A"},
+        "refresh",
+    )
+    assert resolved["Member.Material"] == "E 350 (Fe 490)"
 
 
 @pytest.mark.parametrize("module_id", sorted(COVER_PLATE_RULES))

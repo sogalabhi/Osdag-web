@@ -38,7 +38,7 @@ export const simplySupportedBeamConfig = {
     section_profile: "Beams and Columns",
     section_designation: ["MB 400"],
     material: "E 250 (Fe 410 W)A",
-    section_material: "E 250 (Fe 410 W)A",
+    supporting_material: "E 250 (Fe 410 W)A",
     design_method: "Limit State Design",
     // KEY_ALLOW_CLASS ('Optimum.Class') is a Yes/No toggle for "allow
     // Semi-Compact sections in the optimization search" (flexure.py:869,
@@ -66,8 +66,9 @@ export const simplySupportedBeamConfig = {
     // The wire carries Member.Profile; the .osi loader also fills this field from the older Section.Profile / "Section Profile" names.
     section_profile: KEY_SEC_PROFILE,
     section_designation: KEY_SECSIZE,
+    // The dock material is Material; supporting_material is the section tab of Additional Inputs, sent as the member material.
     material: KEY_MATERIAL,
-    section_material: KEY_SEC_MATERIAL,
+    supporting_material: KEY_SEC_MATERIAL,
     design_method: KEY_DP_DESIGN_METHOD,
     allowable_class: KEY_ALLOW_CLASS,
     effective_area_parameter: KEY_EFFECTIVE_AREA_PARA,
@@ -160,7 +161,7 @@ export const simplySupportedBeamConfig = {
           ? inputs.section_designation
           : [inputs.section_designation || ""]),
       [KEY_MATERIAL]: String(inputs.material),
-      [KEY_SEC_MATERIAL]: String(inputs.section_material),
+      [KEY_SEC_MATERIAL]: String(inputs.supporting_material),
       [KEY_DP_DESIGN_METHOD]: String(inputs.design_method),
       [KEY_ALLOW_CLASS]: String(inputs.allowable_class),
       [KEY_EFFECTIVE_AREA_PARA]: String(inputs.effective_area_parameter),
@@ -226,7 +227,7 @@ export const simplySupportedBeamConfig = {
             setInputs({
               ...inputs,
               material: material.Grade,
-              section_material: material.Grade,
+              supporting_material: material.Grade,
             });
           }
         }
