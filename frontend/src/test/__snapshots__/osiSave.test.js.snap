@@ -1159,7 +1159,7 @@ exports[`toDesignDictionary > plate girder > all 1`] = `
 {
   "Bendingmoment.shape": "Uniform Loading with pinned-pinned support",
   "BottomFlange.Thickness": [
-    "8,10,12",
+    "40",
   ],
   "Bottomflange.Width": "350",
   "Deflection.Max": "Span/600",
@@ -1182,11 +1182,12 @@ exports[`toDesignDictionary > plate girder > all 1`] = `
   "Module": "PLATE GIRDER",
   "Optimum.Class": "Plastic",
   "S.B.Methods": "Simple Post Critical",
+  "Structure.Type": "Highway Bridge",
   "Support.Width": "300",
   "Supporting.Options": "Not Applicable",
   "Symmetry": "Symmetrical",
   "TopFlange.Thickness": [
-    "8,10,12",
+    "40",
   ],
   "Topflange.Width": "350",
   "Torsion.restraint": "Fully Restrained",
@@ -1195,7 +1196,7 @@ exports[`toDesignDictionary > plate girder > all 1`] = `
   "Warping.restraint": "Both flanges fully restrained",
   "Web.Philosophy": "Thick Web without ITS",
   "Web.Thickness": [
-    "8,10,12",
+    "20",
   ],
 }
 `;
@@ -1229,6 +1230,7 @@ exports[`toDesignDictionary > plate girder > customized, with Additional Inputs 
   "Module": "PLATE GIRDER",
   "Optimum.Class": "Plastic",
   "S.B.Methods": "Simple Post Critical",
+  "Structure.Type": "Highway Bridge",
   "Support.Width": "300",
   "Supporting.Options": "Not Applicable",
   "Symmetry": "Symmetrical",

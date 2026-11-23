@@ -23,6 +23,7 @@
     "Torsion.restraint": "Fully Restrained",
     "Warping.restraint": "Both flanges fully restrained",
     "Deflection.Max": "Span/600",
+    "Structure.Type": "Highway Bridge",
     "Design.Load": "Live load",
     "Member.Options": "Simple Span",
     "Supporting.Options": "Not Applicable",
