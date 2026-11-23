@@ -19,6 +19,7 @@ import {
   KEY_MOMENT_MAJOR,
   KEY_MOMENT_MINOR,
   KEY_SECSIZE,
+  KEY_SEC_MATERIAL,
   KEY_SHEAR_MAJOR,
   KEY_SHEAR_MINOR,
   KEY_TYP_ANCHOR,
@@ -39,12 +40,71 @@ import {
   KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF,
   KEY_DP_ANCHOR_BOLT_LENGTH_ICF,
   KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
+  KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+  KEY_DP_DETAILING_EDGE_TYPE,
+  KEY_DP_DESIGN_METHOD,
+  KEY_DP_FAB_FIELD,
+  KEY_DP_FAB_SHOP,
+  KEY_DP_WELD_FAB,
+  KEY_DP_WELD_MATERIAL_G_O,
 } from "../../../constants/generated/coreKeys";
+// The Additional Inputs the request carries: the request key, then the form fields that hold it
+// (the first one with a value wins). The Weld, Detailing and Design tabs save under both their
+// own field name and the core key. A pref that was never saved is not sent, so the backend
+// keeps its own default for it.
+const SAVED_PREFS = [
+  [KEY_SEC_MATERIAL, "supporting_material"],
+  [KEY_BASE_PLATE_MATERIAL, KEY_BASE_PLATE_MATERIAL],
+  [KEY_ST_KEY_MATERIAL, KEY_ST_KEY_MATERIAL],
+  [KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF, KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF],
+  [KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF, KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF],
+  [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF, KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF],
+  [KEY_DP_ANCHOR_BOLT_LENGTH_OCF, KEY_DP_ANCHOR_BOLT_LENGTH_OCF],
+  [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF],
+  [KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF, KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF],
+  [KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF, KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF],
+  [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF, KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF],
+  [KEY_DP_ANCHOR_BOLT_LENGTH_ICF, KEY_DP_ANCHOR_BOLT_LENGTH_ICF],
+  [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF],
+  [KEY_DP_ANCHOR_BOLT_FRICTION, KEY_DP_ANCHOR_BOLT_FRICTION],
+  [KEY_DP_WELD_FAB, KEY_DP_WELD_FAB, "weld_fab"],
+  [KEY_DP_WELD_MATERIAL_G_O, KEY_DP_WELD_MATERIAL_G_O, "weld_material_grade"],
+  [KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE, "detailing_edge_type"],
+  [KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DETAILING_CORROSIVE_INFLUENCES, "detailing_corr_status"],
+  [KEY_DP_DESIGN_METHOD, KEY_DP_DESIGN_METHOD, "design_method"],
+  [KEY_DP_DESIGN_BASE_PLATE, KEY_DP_DESIGN_BASE_PLATE],
+];
+
+const savedPrefs = (inputs) => {
+  const body = {};
+  for (const [requestKey, ...fields] of SAVED_PREFS) {
+    const value = fields.map((field) => inputs[field]).find((v) => v !== undefined && v !== null && v !== "");
+    if (value !== undefined) body[requestKey] = value;
+  }
+  // The weld tab offers "Shop weld"; the core only knows "Shop Weld" and "Field weld".
+  const fab = body[KEY_DP_WELD_FAB];
+  if (typeof fab === "string") {
+    body[KEY_DP_WELD_FAB] = /^field/i.test(fab) ? KEY_DP_FAB_FIELD : /^shop/i.test(fab) ? KEY_DP_FAB_SHOP : fab;
+  }
+  return body;
+};
+
 export const basePlateConfig = {
   sessionName: "Base Plate",
   designType: KEY_DISP_BASE_PLATE,
   cameraKey: "BasePlateConnection",
   cadOptions: ["Model", "Column", "Plate", "Welds", "Bolts", "Concrete", "Grout"],
+
+  // Saved Additional Inputs that are dropped when the dock material changes: the desktop takes their
+  // defaults from the material (base plate and stiffener material, the weld and anchor bolt strengths).
+  prefsFollowingMaterial: [
+    KEY_BASE_PLATE_MATERIAL,
+    KEY_ST_KEY_MATERIAL,
+    KEY_DP_WELD_MATERIAL_G_O,
+    "weld_material_grade",
+    KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
+    KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
+  ],
 
   defaultInputs: {
     module: KEY_DISP_BASE_PLATE,
@@ -132,6 +192,7 @@ export const basePlateConfig = {
       [KEY_GRD_ANCHOR_OCF]: gradeOcf.length ? gradeOcf : ["8.8"],
       [KEY_DIA_ANCHOR_ICF]: diameterIcf.length ? diameterIcf : diameterOcf.length ? diameterOcf : ["M20"],
       [KEY_GRD_ANCHOR_ICF]: gradeIcf.length ? gradeIcf : gradeOcf.length ? gradeOcf : ["8.8"],
+      ...savedPrefs(inputs),
     };
   },
 
@@ -160,6 +221,8 @@ export const basePlateConfig = {
     anchor_type: KEY_TYP_ANCHOR,
     footing_grade: KEY_GRD_FOOTING,
     weld_type: KEY_WELD_TYPE,
+    // The Column Section tab of Additional Inputs, sent as the member material.
+    supporting_material: KEY_SEC_MATERIAL,
     // Additional Inputs fields of this module are already keyed by core key.
     [KEY_BASE_PLATE_MATERIAL]: KEY_BASE_PLATE_MATERIAL,
     [KEY_ST_KEY_MATERIAL]: KEY_ST_KEY_MATERIAL,

@@ -17,8 +17,9 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Connector.Material"
+              "Member.Material",
+              "Base_Plate.Material",
+              "Stiffener_Key.Material"
             ]
           },
           "defaulted_keys": [
@@ -44,8 +45,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "open",
@@ -57,8 +59,8 @@
           "Anchor Bolt.OCF.Diameter": [],
           "Anchor Bolt.OCF.Grade": [],
           "Anchor Bolt.Type": "End Plate Type",
+          "Base_Plate.Material": "E 250 (Fe 410 W)A",
           "Connectivity": "Welded Column Base",
-          "Connector.Material": "E 250 (Fe 410 W)A",
           "Design.Design_Method": "Limit State Design",
           "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
           "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "Over-sized",
@@ -85,8 +87,9 @@
           "Load.Shear.Minor": "30",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Base Plate Connection",
+          "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
           "Weld.Type": "Fillet Weld"
@@ -112,8 +115,9 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Connector.Material"
+              "Member.Material",
+              "Base_Plate.Material",
+              "Stiffener_Key.Material"
             ]
           },
           "defaulted_keys": [
@@ -139,8 +143,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "open",
@@ -152,6 +157,7 @@
           "Anchor Bolt.OCF.Diameter": [],
           "Anchor Bolt.OCF.Grade": [],
           "Anchor Bolt.Type": "End Plate Type",
+          "Base_Plate.Material": "E 250 (Fe 410 W)A",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connectivity": "Welded Column Base",
           "Connector.Material": "E 350 (Fe 490)",
@@ -181,8 +187,9 @@
           "Load.Shear.Minor": "30",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 350 (Fe 490)",
           "Module": "Base Plate Connection",
+          "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
           "Weld.Type": "Fillet Weld"
@@ -200,7 +207,12 @@
           "supporting": []
         },
         "metadata": {
-          "copied_from_input_dock_keys": {},
+          "copied_from_input_dock_keys": {
+            "Material": [
+              "Base_Plate.Material",
+              "Stiffener_Key.Material"
+            ]
+          },
           "defaulted_keys": [
             "Weld.Fab",
             "Weld.Material_Grade_OverWrite",
@@ -224,8 +236,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "open",
@@ -237,6 +250,7 @@
           "Anchor Bolt.OCF.Diameter": [],
           "Anchor Bolt.OCF.Grade": [],
           "Anchor Bolt.Type": "End Plate Type",
+          "Base_Plate.Material": "E 250 (Fe 410 W)A",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connectivity": "Welded Column Base",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -266,9 +280,10 @@
           "Load.Shear.Minor": "30",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Base Plate Connection",
+          "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
           "Weld.Type": "Fillet Weld"
@@ -294,8 +309,9 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Connector.Material"
+              "Member.Material",
+              "Base_Plate.Material",
+              "Stiffener_Key.Material"
             ]
           },
           "defaulted_keys": [],
@@ -303,8 +319,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "refresh",
@@ -316,8 +333,8 @@
           "Anchor Bolt.OCF.Diameter": [],
           "Anchor Bolt.OCF.Grade": [],
           "Anchor Bolt.Type": "End Plate Type",
+          "Base_Plate.Material": "E 250 (Fe 410 W)A",
           "Connectivity": "Welded Column Base",
-          "Connector.Material": "E 250 (Fe 410 W)A",
           "End Condition": "Pinned",
           "Footing.Grade": "M25",
           "Load.Axial": "200",
@@ -329,8 +346,9 @@
           "Load.Shear.Minor": "30",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Base Plate Connection",
+          "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
           "Weld.Type": "Fillet Weld"
         },
         "section_designations": {
@@ -354,8 +372,9 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Connector.Material"
+              "Member.Material",
+              "Base_Plate.Material",
+              "Stiffener_Key.Material"
             ]
           },
           "defaulted_keys": [],
@@ -363,8 +382,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "refresh",
@@ -376,8 +396,8 @@
           "Anchor Bolt.OCF.Diameter": [],
           "Anchor Bolt.OCF.Grade": [],
           "Anchor Bolt.Type": "End Plate Type",
+          "Base_Plate.Material": "E 350 (Fe 490)",
           "Connectivity": "Welded Column Base",
-          "Connector.Material": "E 350 (Fe 490)",
           "End Condition": "Pinned",
           "Footing.Grade": "M25",
           "Load.Axial": "200",
@@ -389,8 +409,9 @@
           "Load.Shear.Minor": "30",
           "Material": "E 350 (Fe 490)",
           "Member.Designation": "",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 350 (Fe 490)",
           "Module": "Base Plate Connection",
+          "Stiffener_Key.Material": "E 350 (Fe 490)",
           "Weld.Type": "Fillet Weld"
         },
         "section_designations": {
@@ -401,9 +422,7 @@
       },
       "refresh_stale_prefs": {
         "material_grades": {
-          "connector": [
-            "E 250 (Fe 410 W)A"
-          ],
+          "connector": [],
           "supported": [],
           "supporting": [
             "E 250 (Fe 410 W)A"
@@ -412,8 +431,9 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Connector.Material"
+              "Member.Material",
+              "Base_Plate.Material",
+              "Stiffener_Key.Material"
             ]
           },
           "defaulted_keys": [],
@@ -421,8 +441,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "refresh",
@@ -434,9 +455,10 @@
           "Anchor Bolt.OCF.Diameter": [],
           "Anchor Bolt.OCF.Grade": [],
           "Anchor Bolt.Type": "End Plate Type",
+          "Base_Plate.Material": "E 250 (Fe 410 W)A",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connectivity": "Welded Column Base",
-          "Connector.Material": "E 250 (Fe 410 W)A",
+          "Connector.Material": "E 450 (Fe 570) D",
           "End Condition": "Pinned",
           "Footing.Grade": "M25",
           "Load.Axial": "200",
@@ -448,9 +470,10 @@
           "Load.Shear.Minor": "30",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Base Plate Connection",
+          "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
           "Weld.Type": "Fillet Weld"
         },
         "section_designations": {
@@ -474,8 +497,9 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Connector.Material"
+              "Member.Material",
+              "Base_Plate.Material",
+              "Stiffener_Key.Material"
             ]
           },
           "defaulted_keys": [
@@ -501,8 +525,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "reset",
@@ -514,8 +539,8 @@
           "Anchor Bolt.OCF.Diameter": [],
           "Anchor Bolt.OCF.Grade": [],
           "Anchor Bolt.Type": "End Plate Type",
+          "Base_Plate.Material": "E 250 (Fe 410 W)A",
           "Connectivity": "Welded Column Base",
-          "Connector.Material": "E 250 (Fe 410 W)A",
           "Design.Design_Method": "Limit State Design",
           "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
           "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "Over-sized",
@@ -542,8 +567,9 @@
           "Load.Shear.Minor": "30",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Base Plate Connection",
+          "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
           "Weld.Type": "Fillet Weld"
@@ -569,8 +595,9 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Connector.Material"
+              "Member.Material",
+              "Base_Plate.Material",
+              "Stiffener_Key.Material"
             ]
           },
           "defaulted_keys": [
@@ -596,8 +623,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "reset",
@@ -609,8 +637,8 @@
           "Anchor Bolt.OCF.Diameter": [],
           "Anchor Bolt.OCF.Grade": [],
           "Anchor Bolt.Type": "End Plate Type",
+          "Base_Plate.Material": "E 350 (Fe 490)",
           "Connectivity": "Welded Column Base",
-          "Connector.Material": "E 350 (Fe 490)",
           "Design.Design_Method": "Limit State Design",
           "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
           "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "Over-sized",
@@ -637,8 +665,9 @@
           "Load.Shear.Minor": "30",
           "Material": "E 350 (Fe 490)",
           "Member.Designation": "",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 350 (Fe 490)",
           "Module": "Base Plate Connection",
+          "Stiffener_Key.Material": "E 350 (Fe 490)",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "490",
           "Weld.Type": "Fillet Weld"
@@ -651,9 +680,7 @@
       },
       "reset_saved_overrides": {
         "material_grades": {
-          "connector": [
-            "E 250 (Fe 410 W)A"
-          ],
+          "connector": [],
           "supported": [],
           "supporting": [
             "E 250 (Fe 410 W)A"
@@ -662,8 +689,9 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Connector.Material"
+              "Member.Material",
+              "Base_Plate.Material",
+              "Stiffener_Key.Material"
             ]
           },
           "defaulted_keys": [
@@ -689,8 +717,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "reset",
@@ -702,9 +731,10 @@
           "Anchor Bolt.OCF.Diameter": [],
           "Anchor Bolt.OCF.Grade": [],
           "Anchor Bolt.Type": "End Plate Type",
+          "Base_Plate.Material": "E 250 (Fe 410 W)A",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connectivity": "Welded Column Base",
-          "Connector.Material": "E 250 (Fe 410 W)A",
+          "Connector.Material": "E 450 (Fe 570) D",
           "Design.Design_Method": "Limit State Design",
           "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
           "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "Over-sized",
@@ -731,9 +761,10 @@
           "Load.Shear.Minor": "30",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Base Plate Connection",
+          "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
           "Weld.Type": "Fillet Weld"
@@ -763,8 +794,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "save",
@@ -816,8 +848,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "save",
@@ -843,7 +876,7 @@
           "Load.Shear.Minor": "30",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 350 (Fe 490)",
           "Module": "Base Plate Connection",
           "Weld.Type": "Fillet Weld"
         },
@@ -870,8 +903,9 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Connector.Material"
+            "Member.Material",
+            "Base_Plate.Material",
+            "Stiffener_Key.Material"
           ],
           "module_id": "Base Plate Connection",
           "operation": "save",
@@ -897,8 +931,8 @@
           "Load.Shear.Minor": "30",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Base Plate Connection",
           "Weld.Type": "Fillet Weld"
         },
