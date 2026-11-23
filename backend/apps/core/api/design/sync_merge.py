@@ -97,6 +97,7 @@ MEMBER_MATERIAL_TAB = {
     KEY_DISP_TENSION_WELDED: "supported",
     KEY_DISP_STRUT_BOLTED_END_GUSSET: "supported",
     KEY_DISP_STRUT_WELDED_END_GUSSET: "supported",
+    KEY_DISP_FLEXURE: "supporting",
 }
 
 # A material grade the core can look up; used when the dock has none yet.
@@ -129,7 +130,6 @@ LEGACY_SYNC_RULES: Dict[str, List[Tuple[str, List[str]]]] = {
     KEY_DISP_BB_EP_SPLICE: [(_C, [_D])],
     KEY_DISP_COLUMNENDPLATE: [(_M, [_S, _R, _C, _D])],
     KEY_DISP_BASE_PLATE: [(_M, [_S, _C])],
-    KEY_DISP_FLEXURE: _MEMBER_RULES,
     KEY_DISP_FLEXURE2: _MEMBER_RULES,
     KEY_DISP_PLATE_GIRDER_WELDED: _MEMBER_RULES,
     KEY_DISP_COMPRESSION_COLUMN: _MEMBER_RULES,

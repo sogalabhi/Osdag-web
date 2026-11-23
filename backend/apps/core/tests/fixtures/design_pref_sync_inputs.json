@@ -4929,12 +4929,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -4955,12 +4955,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -4977,7 +4977,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "open_saved_overrides": {
@@ -4988,13 +4988,12 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -5015,12 +5014,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -5041,12 +5040,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -5070,13 +5069,12 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -5097,12 +5095,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -5123,12 +5121,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -5145,7 +5143,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "save_saved_overrides_draft": {
@@ -5156,13 +5154,12 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -5179,7 +5176,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "reset": {
@@ -5187,12 +5184,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -5213,12 +5210,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",
@@ -5242,13 +5239,12 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Optimum.Class": "Yes",
           "Effective.Area_Para": "1.0",
           "Length.Overwrite": "NA",

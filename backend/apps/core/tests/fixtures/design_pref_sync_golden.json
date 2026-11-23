@@ -10037,21 +10037,13 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "open",
@@ -10059,7 +10051,6 @@
         },
         "resolved_inputs": {
           "Bearing.Length": "NA",
-          "Connector.Material": "E 250 (Fe 410 W)A",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -10074,8 +10065,6 @@
           "Member.Length": "6000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",
@@ -10100,21 +10089,13 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "open",
@@ -10136,10 +10117,8 @@
             "MB 400"
           ],
           "Member.Length": "6000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",
@@ -10164,9 +10143,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "open",
@@ -10188,10 +10165,9 @@
             "MB 400"
           ],
           "Member.Length": "6000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Beams and Columns",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",
@@ -10218,9 +10194,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [],
@@ -10228,9 +10202,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "refresh",
@@ -10238,7 +10210,6 @@
         },
         "resolved_inputs": {
           "Bearing.Length": "NA",
-          "Connector.Material": "E 250 (Fe 410 W)A",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -10253,8 +10224,6 @@
           "Member.Length": "6000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",
@@ -10281,9 +10250,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [],
@@ -10291,9 +10258,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "refresh",
@@ -10301,7 +10266,6 @@
         },
         "resolved_inputs": {
           "Bearing.Length": "NA",
-          "Connector.Material": "E 350 (Fe 490)",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -10314,10 +10278,8 @@
             "MB 400"
           ],
           "Member.Length": "6000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",
@@ -10331,12 +10293,8 @@
       },
       "refresh_stale_prefs": {
         "material_grades": {
-          "connector": [
-            "E 250 (Fe 410 W)A"
-          ],
-          "supported": [
-            "E 250 (Fe 410 W)A"
-          ],
+          "connector": [],
+          "supported": [],
           "supporting": [
             "E 250 (Fe 410 W)A"
           ]
@@ -10344,9 +10302,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [],
@@ -10354,9 +10310,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "refresh",
@@ -10365,7 +10319,7 @@
         "resolved_inputs": {
           "Bearing.Length": "NA",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Connector.Material": "E 250 (Fe 410 W)A",
+          "Connector.Material": "E 450 (Fe 570) D",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -10380,8 +10334,7 @@
           "Member.Length": "6000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",
@@ -10408,9 +10361,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -10420,9 +10371,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "reset",
@@ -10430,7 +10379,6 @@
         },
         "resolved_inputs": {
           "Bearing.Length": "NA",
-          "Connector.Material": "E 250 (Fe 410 W)A",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -10445,8 +10393,6 @@
           "Member.Length": "6000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",
@@ -10473,9 +10419,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -10485,9 +10429,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "reset",
@@ -10495,7 +10437,6 @@
         },
         "resolved_inputs": {
           "Bearing.Length": "NA",
-          "Connector.Material": "E 350 (Fe 490)",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -10508,10 +10449,8 @@
             "MB 400"
           ],
           "Member.Length": "6000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",
@@ -10525,12 +10464,8 @@
       },
       "reset_saved_overrides": {
         "material_grades": {
-          "connector": [
-            "E 250 (Fe 410 W)A"
-          ],
-          "supported": [
-            "E 250 (Fe 410 W)A"
-          ],
+          "connector": [],
+          "supported": [],
           "supporting": [
             "E 250 (Fe 410 W)A"
           ]
@@ -10538,9 +10473,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -10550,9 +10483,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "reset",
@@ -10561,7 +10492,7 @@
         "resolved_inputs": {
           "Bearing.Length": "NA",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Connector.Material": "E 250 (Fe 410 W)A",
+          "Connector.Material": "E 450 (Fe 570) D",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -10576,8 +10507,7 @@
           "Member.Length": "6000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",
@@ -10608,9 +10538,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "save",
@@ -10662,9 +10590,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "save",
@@ -10686,9 +10612,8 @@
             "MB 400"
           ],
           "Member.Length": "6000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Beams and Columns",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",
@@ -10717,9 +10642,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Simply Supported",
           "operation": "save",
@@ -10741,10 +10664,9 @@
             "MB 400"
           ],
           "Member.Length": "6000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Beams and Columns",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Flexural Members - Simply Supported",
           "Optimum.Class": "Yes",
           "Torsion.restraint": "Fully Restrained",

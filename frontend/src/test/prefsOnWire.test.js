@@ -52,3 +52,19 @@ describe("tension members and struts: section tab material", () => {
     });
   }
 });
+
+describe("simply supported beam: section tab material", () => {
+  const name = "simply supported beam";
+
+  it("Member.Material is the section tab, Material the dock material", () => {
+    const body = request(name, { material: "E 250 (Fe 410 W)A" }, { supporting_material: "E 350 (Fe 490)" });
+    expect(body.Material).toBe("E 250 (Fe 410 W)A");
+    expect(body["Member.Material"]).toBe("E 350 (Fe 490)");
+  });
+
+  it("Member.Material follows the dock until the section tab is saved", () => {
+    const body = request(name, { material: "E 350 (Fe 490)", supporting_material: "E 350 (Fe 490)" }, {});
+    expect(body.Material).toBe("E 350 (Fe 490)");
+    expect(body["Member.Material"]).toBe("E 350 (Fe 490)");
+  });
+});
