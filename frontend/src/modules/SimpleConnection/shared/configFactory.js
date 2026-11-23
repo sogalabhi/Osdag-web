@@ -9,6 +9,7 @@ import {
 } from "../../../constants/generated/coreKeys";
 import { validateSimpleConnectionInputs } from "./validation";
 import { validateRequiredFields } from "../../shared/utils/validation";
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../shared/config/prefCoreKeys";
 
 function getArrayParam(allSelectedFlag, fullList, selectedList) {
     if (allSelectedFlag) {
@@ -50,6 +51,25 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
             ...(hasCoverPlate ? { cover_plate: "Single-Cover", detailing_packing_plate: "Yes" } : {}),
             bolt_tension_type: "Non Pre-tensioned",
             design_for: "Tension",
+        },
+
+        // Every form field and the core key(s) it feeds; null for a field that feeds none.
+        // The test in src/test/coreKeyMap.test.js checks this against buildSubmissionParams.
+        coreKeys: {
+            ...PREF_CORE_KEYS,
+            ...MATERIAL_CORE_KEYS,
+            module: KEY_MODULE,
+            // The desktop .osi writes the axial load as Load.Axial.Force.
+            axial_force: KEY_AXIAL,
+            plate1_thickness: KEY_PLATE1_THICKNESS,
+            plate2_thickness: KEY_PLATE2_THICKNESS,
+            plate_width: KEY_PLATE_WIDTH,
+            bolt_diameter: KEY_D,
+            bolt_grade: KEY_GRD,
+            bolt_type: KEY_TYP,
+            // Set next to material when the dock material changes, but the builder never sends it.
+            connector_material: null,
+            ...(hasCoverPlate ? { cover_plate: KEY_COVER_PLATE } : {}),
         },
 
         modalConfig: [
@@ -192,6 +212,25 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
             weld_fab: "Shop weld",
             weld_material_grade: "290",
             design_for: "Tension",
+        },
+
+        // Every form field and the core key(s) it feeds; null for a field that feeds none.
+        // The test in src/test/coreKeyMap.test.js checks this against buildSubmissionParams.
+        coreKeys: {
+            ...PREF_CORE_KEYS,
+            ...MATERIAL_CORE_KEYS,
+            module: KEY_MODULE,
+            // The desktop .osi writes the axial load as Load.Axial.Force.
+            axial_force: KEY_AXIAL,
+            plate1_thickness: KEY_PLATE1_THICKNESS,
+            plate2_thickness: KEY_PLATE2_THICKNESS,
+            plate_width: KEY_PLATE_WIDTH,
+            weld_size: KEY_WELD_SIZE,
+            // The builder sends the shop/field weld choice as Weld.Type; the desktop .osi calls it Weld.Fab.
+            weld_fab: KEY_DP_WELD_TYPE,
+            // Set next to material when the dock material changes, but the builder never sends it.
+            connector_material: null,
+            ...(hasCoverPlate ? { cover_plate: KEY_COVER_PLATE } : {}),
         },
 
         modalConfig: [

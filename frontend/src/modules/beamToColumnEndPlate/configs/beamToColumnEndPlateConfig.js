@@ -1,5 +1,6 @@
 
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../shared/config/prefCoreKeys';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -63,6 +64,27 @@ export const beamToColumnEndPlateConfig = {
     weld_fab: "Shop Weld",
     weld_material_grade: "410",
     weld_type: "Groove Weld",
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    module: KEY_MODULE,
+    connectivity: KEY_CONN,
+    bolt_diameter: KEY_D,
+    bolt_grade: KEY_GRD,
+    bolt_type: KEY_TYP,
+    plate_thickness: KEY_PLATETHK,
+    load_axial: KEY_AXIAL,
+    load_moment: KEY_MOMENT,
+    load_shear: KEY_SHEAR,
+    weld_type: KEY_WELD_TYPE,
+    // The end plate type is an option list read from extraState.selectedOption, not from inputs.
+    endPlateType: KEY_ENDPLATE_TYPE,
+    beam_section: KEY_SUPTDSEC,
+    column_section: KEY_SUPTNGSEC,
   },
 
   modalConfig: [

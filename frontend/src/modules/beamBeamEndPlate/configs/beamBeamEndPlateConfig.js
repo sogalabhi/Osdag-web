@@ -1,11 +1,13 @@
 
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../shared/config/prefCoreKeys';
 import {
   KEY_AXIAL,
   KEY_CONN,
   KEY_CONNECTOR_MATERIAL,
   KEY_D,
   KEY_DISP_BB_EP_SPLICE,
+  KEY_DISP_CONN,
   KEY_DP_BOLT_HOLE_TYPE,
   KEY_DP_BOLT_SLIP_FACTOR,
   KEY_DP_BOLT_TYPE,
@@ -57,6 +59,31 @@ export const beamBeamEndPlateConfig = {
     weld_fab: "Shop Weld",
     weld_material_grade: "410",
     weld_type: "Groove Weld",
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    module: KEY_MODULE,
+    // Sent twice: as Connectivity and under the display label "Connectivity *".
+    connectivity: [KEY_CONN, KEY_DISP_CONN],
+    bolt_diameter: KEY_D,
+    bolt_grade: KEY_GRD,
+    bolt_type: KEY_TYP,
+    plate_thickness: KEY_PLATETHK,
+    load_axial: KEY_AXIAL,
+    load_moment: KEY_MOMENT,
+    load_shear: KEY_SHEAR,
+    weld_type: KEY_WELD_TYPE,
+    // The end plate type is an option list read from extraState.selectedOption, not from inputs.
+    endPlateType: KEY_ENDPLATE_TYPE,
+    supported_designation: KEY_SUPTDSEC,
+    // The beam material is sent as the connector material too.
+    supported_material: [KEY_CONNECTOR_MATERIAL, KEY_SUPTDSEC_MATERIAL],
+    // A leftover default: the builder never reads it (Connector.Material comes from supported_material).
+    connector_material: null,
   },
 
   modalConfig: [

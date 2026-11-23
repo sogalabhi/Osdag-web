@@ -10,6 +10,7 @@ import img_5_RRRF_rotated from "../../../assets/CompressionMember/5.RRRF_rotated
 import img_6_RRRR from "../../../assets/CompressionMember/6.RRRR.PNG";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../shared/config/prefCoreKeys";
 import {
   KEY_ACTUAL_LEN_YY,
   KEY_ACTUAL_LEN_ZZ,
@@ -50,6 +51,32 @@ export const axiallyLoadedColumnConfig = {
     allow_ur: "1.0",
     effective_area_parameter: "1.0",
     optimum_para: "Utilization Ratio",
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    module: KEY_MODULE,
+    // The .osi loader also maps "Section.Profile" and "Section Profile" (the latter is the constant
+    // with the odd Plate Girder name) onto this field, so it declares them although the builder sends Member.Profile.
+    section_profile: KEY_SEC_PROFILE,
+    section_designation: KEY_SECSIZE,
+    material: KEY_MATERIAL,
+    actual_length_zz: KEY_ACTUAL_LEN_ZZ,
+    actual_length_yy: KEY_ACTUAL_LEN_YY,
+    end_condition_1: KEY_END1,
+    end_condition_2: KEY_END2,
+    end_condition_1_y: KEY_END1_Y,
+    end_condition_2_y: KEY_END2_Y,
+    axial_load: KEY_AXIAL,
+    allow_ur: KEY_ALLOW_UR,
+    effective_area_parameter: KEY_EFFECTIVE_AREA_PARA,
+    optimum_para: KEY_OPTIMIZATION_PARA,
+    // The two end condition pictures are only pictures.
+    end_condition_image_zz: null,
+    end_condition_image_yy: null,
   },
 
   modalConfig: [

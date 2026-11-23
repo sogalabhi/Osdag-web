@@ -9,6 +9,7 @@ import FIXED_HINGED from "../../../assets/CompressionMember/RFRFstrut.png";
 import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
 
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../shared/config/prefCoreKeys";
 import {
   KEY_AXIAL,
   KEY_CONNECTOR_MATERIAL,
@@ -34,6 +35,7 @@ import {
   KEY_SEC_PROFILE,
   KEY_TYP,
 } from "../../../constants/generated/coreKeys";
+import { WEB_IS_LEG_LOADED } from "../../../constants/generated/webKeys";
 export const strutsBoltedConfig = {
   sessionName: "Struts Bolted to End Gusset",
   designType: KEY_DISP_STRUT_BOLTED_END_GUSSET,
@@ -64,6 +66,35 @@ export const strutsBoltedConfig = {
     design_method: "Limit State Design",
     end_condition_1: "Hinged",
     end_condition_2: "Hinged",
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    module: KEY_MODULE,
+    bolt_diameter: KEY_D,
+    bolt_grade: KEY_GRD,
+    bolt_type: KEY_TYP,
+    plate_thickness: KEY_PLATETHK,
+    // The .osi loader also maps "Section.Profile" and "Section Profile" (the latter is the constant
+    // with the odd Plate Girder name) onto this field, so it declares them although the builder sends Member.Profile.
+    section_profile: KEY_SEC_PROFILE,
+    location: KEY_LOCATION,
+    section_designation: KEY_SECSIZE,
+    length: KEY_LENGTH,
+    axial_force: KEY_AXIAL,
+    end_condition_1: KEY_END1,
+    end_condition_2: KEY_END2,
+    // The dock material is sent twice, as Material and as the member material.
+    material: [KEY_MATERIAL, KEY_SEC_MATERIAL],
+    // Sent under the bare name "is_leg_loaded", which the core reads by literal name: a web key.
+    is_leg_loaded: WEB_IS_LEG_LOADED,
+    // member_designation is a leftover default; the images are only pictures.
+    member_designation: null,
+    profile_image: null,
+    end_condition_image: null,
   },
 
   modalConfig: [

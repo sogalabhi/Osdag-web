@@ -47,6 +47,9 @@ WEB_STIFFENERHOLLOW_B_THICKNESS = "StiffenerHollow.B.Thickness"
 WEB_STIFFENERHOLLOW_D_THICKNESS = "StiffenerHollow.D.Thickness"
 WEB_STIFFENERHOLLOW_OD_THICKNESS = "StiffenerHollow.OD.Thickness"
 
+# Request keys: compression members (the core reads this one by its literal name)
+WEB_IS_LEG_LOADED = "is_leg_loaded"
+
 # .osi file metadata
 WEB_OSDAGWEB_VERSION = "OsdagWeb.Version"
 

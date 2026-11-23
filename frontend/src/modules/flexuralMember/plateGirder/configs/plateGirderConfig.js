@@ -2,6 +2,7 @@
 import ISECTION from "../../../../assets/ISection.png";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../../shared/config/prefCoreKeys";
 import {
   KEY_ALLOW_CLASS,
   KEY_BENDING_MOMENT_SHAPE,
@@ -9,6 +10,7 @@ import {
   KEY_BOTTOM_FLANGE_THICKNESS_PG,
   KEY_DESIGN_LOAD,
   KEY_DESIGN_TYPE_FLEXURE,
+  KEY_DISP_IS_IT_SYMMETRIC,
   KEY_DISP_PLATE_GIRDER_WELDED,
   KEY_DP_DESIGN_METHOD,
   KEY_EFFECTIVE_AREA_PARA,
@@ -250,6 +252,64 @@ export const plateGirderConfig = {
     bottom_flange_width_lb: "100",
     bottom_flange_width_ub: "1000",
     bottom_flange_width_inc: "10",
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    module: KEY_MODULE,
+    material: KEY_MATERIAL,
+    design_type: KEY_OVERALL_DEPTH_PG_TYPE,
+    // Customized sends the typed value; Optimized sends "1" and the lb/ub/inc bounds below.
+    total_depth: KEY_OVERALL_DEPTH_PG,
+    top_flange_width: KEY_TOP_Bflange_PG,
+    bottom_flange_width: KEY_BOTTOM_Bflange_PG,
+    web_thickness: KEY_WEB_THICKNESS_PG,
+    top_flange_thickness: KEY_TOP_FLANGE_THICKNESS_PG,
+    bottom_flange_thickness: KEY_BOTTOM_FLANGE_THICKNESS_PG,
+    // Reshaped by parseFloat before sending, so the tracer cannot see it.
+    member_length: KEY_LENGTH,
+    bending_moment: KEY_MOMENT,
+    shear_force: KEY_SHEAR,
+    bending_moment_shape: KEY_BENDING_MOMENT_SHAPE,
+    support_type: KEY_DESIGN_TYPE_FLEXURE,
+    support_width: KEY_SUPPORT_WIDTH,
+    web_philosophy: KEY_WEB_PHILOSOPHY,
+    torsional_restraint: KEY_TORSIONAL_RES,
+    warping_restraint: KEY_WARPING_RES,
+    allowable_class: KEY_ALLOW_CLASS,
+    effective_area_parameter: KEY_EFFECTIVE_AREA_PARA,
+    length_overwrite: KEY_LENGTH_OVERWRITE,
+    loading_condition: KEY_LOAD,
+    shear_buckling_option: KEY_ShearBucklingOption,
+    // The builder sends this under the bare "Symmetry" name, which is KEY_DISP_IS_IT_SYMMETRIC.
+    symmetry: KEY_DISP_IS_IT_SYMMETRIC,
+    intermediate_stiffener: KEY_IntermediateStiffener,
+    intermediate_stiffener_spacing: KEY_IntermediateStiffener_spacing,
+    intermediate_stiffener_thickness: KEY_IntermediateStiffener_thickness,
+    intermediate_stiffener_thickness_val: WEB_DESIGN_INTERMEDIATESTIFFENER_THICKNESS_VALUES,
+    longitudinal_stiffener: KEY_LongitudnalStiffener,
+    longitudinal_stiffener_thickness: KEY_LongitudnalStiffener_thickness,
+    longitudinal_stiffener_thickness_val: WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES,
+    // Deflection criteria: the first three also feed the computed Deflection.Max (calculateMaxDeflection).
+    structure_type: KEY_MAX_DEFL,
+    design_load: [KEY_DESIGN_LOAD, KEY_MAX_DEFL],
+    member_options: [KEY_MEMBER_OPTIONS, KEY_MAX_DEFL],
+    supporting_options: [KEY_SUPPORTING_OPTIONS, KEY_MAX_DEFL],
+    // A leftover default: the builder recomputes Deflection.Max and never reads this value.
+    max_deflection: null,
+    // Optimized-only bounds, sent as strings.
+    total_depth_lb: WEB_TOTAL_DEPTH_LB,
+    total_depth_ub: WEB_TOTAL_DEPTH_UB,
+    total_depth_inc: WEB_TOTAL_DEPTH_INC,
+    top_flange_width_lb: WEB_TOPFLANGE_WIDTH_LB,
+    top_flange_width_ub: WEB_TOPFLANGE_WIDTH_UB,
+    top_flange_width_inc: WEB_TOPFLANGE_WIDTH_INC,
+    bottom_flange_width_lb: WEB_BOTTOMFLANGE_WIDTH_LB,
+    bottom_flange_width_ub: WEB_BOTTOMFLANGE_WIDTH_UB,
+    bottom_flange_width_inc: WEB_BOTTOMFLANGE_WIDTH_INC,
   },
 
   modalConfig: [
