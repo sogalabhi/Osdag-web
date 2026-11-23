@@ -1,5 +1,6 @@
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../../shared/config/prefCoreKeys';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -66,6 +67,28 @@ export const endPlateConfig = {
     
     bolt_tension_type: "Pre-tensioned",
     module: KEY_DISP_HEADERPLATE,
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    connectivity: KEY_CONN,
+    module: KEY_MODULE,
+    bolt_diameter: KEY_D,
+    bolt_grade: KEY_GRD,
+    bolt_type: KEY_TYP,
+    plate_thickness: KEY_PLATETHK,
+    load_shear: KEY_SHEAR,
+    load_axial: KEY_AXIAL,
+    // One section field per connectivity: the beam-to-column pair and the beam-to-beam pair.
+    beam_section: KEY_SUPTDSEC,
+    secondary_beam: KEY_SUPTDSEC,
+    column_section: KEY_SUPTNGSEC,
+    primary_beam: KEY_SUPTNGSEC,
+    // The dock material is sent twice, as the connector material and as Material.
+    connector_material: [KEY_CONNECTOR_MATERIAL, KEY_MATERIAL],
   },
 
   modalConfig: [

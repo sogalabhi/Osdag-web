@@ -1,4 +1,5 @@
 import { validateRequiredFields } from '../utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from './prefCoreKeys';
 import {
   KEY_AXIAL,
   KEY_CONNECTOR_MATERIAL,
@@ -65,6 +66,27 @@ export function makeCoverPlateBoltedConfig({
       member_designation: defaultDesignation,
       member_material: "E 250 (Fe 410 W)A",
       module: designType,
+    },
+
+    // Every form field and the core key(s) it feeds; null for a field that feeds none.
+    // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+    coreKeys: {
+      ...PREF_CORE_KEYS,
+      ...MATERIAL_CORE_KEYS,
+      module: KEY_MODULE,
+      bolt_diameter: KEY_D,
+      bolt_grade: KEY_GRD,
+      bolt_type: KEY_TYP,
+      flange_plate_preferences: KEY_FLANGEPLATE_PREFERENCES,
+      // Both plate thickness fields read the one shared thicknessList when "All" is selected,
+      // so each field's "All" reaches both thickness keys.
+      flange_plate_thickness: KEY_FLANGEPLATE_THICKNESS,
+      web_plate_thickness: KEY_WEBPLATE_THICKNESS,
+      load_axial: KEY_AXIAL,
+      load_moment: KEY_MOMENT,
+      load_shear: KEY_SHEAR,
+      member_designation: KEY_SECSIZE,
+      member_material: KEY_SEC_MATERIAL,
     },
 
     modalConfig: [
@@ -271,6 +293,28 @@ export function makeCoverPlateWeldedConfig({
       weld_fab: "Shop Weld",
       weld_material_grade: "290",
       weld_type: "Fillet Weld",
+    },
+
+    // Every form field and the core key(s) it feeds; null for a field that feeds none.
+    // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+    coreKeys: {
+      ...PREF_CORE_KEYS,
+      ...MATERIAL_CORE_KEYS,
+      module: KEY_MODULE,
+      flange_plate_preferences: KEY_FLANGEPLATE_PREFERENCES,
+      // Both plate thickness fields read the one shared thicknessList when "All" is selected,
+      // so each field's "All" reaches both thickness keys.
+      flange_plate_thickness: KEY_FLANGEPLATE_THICKNESS,
+      web_plate_thickness: KEY_WEBPLATE_THICKNESS,
+      load_axial: KEY_AXIAL,
+      load_moment: KEY_MOMENT,
+      load_shear: KEY_SHEAR,
+      member_designation: KEY_SECSIZE,
+      weld_type: KEY_WELD_TYPE,
+      // Member.Material comes from `memberMaterialField`: member_material in the beam variant,
+      // the dock material in the column variant (where member_material feeds nothing).
+      material: memberMaterialField === "material" ? [KEY_MATERIAL, KEY_SEC_MATERIAL] : KEY_MATERIAL,
+      member_material: memberMaterialField === "member_material" ? KEY_SEC_MATERIAL : null,
     },
 
     modalConfig: [

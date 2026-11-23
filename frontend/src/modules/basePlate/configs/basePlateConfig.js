@@ -1,6 +1,7 @@
 import { UI_STRINGS } from '../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../shared/config/prefCoreKeys';
 import {
   KEY_AXIAL,
   KEY_AXIAL_BP,
@@ -22,6 +23,22 @@ import {
   KEY_SHEAR_MINOR,
   KEY_TYP_ANCHOR,
   KEY_WELD_TYPE,
+  KEY_BASE_PLATE_MATERIAL,
+  KEY_ST_KEY_MATERIAL,
+  KEY_DP_DESIGN_BASE_PLATE,
+  KEY_DP_ANCHOR_BOLT_FRICTION,
+  KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
+  KEY_DP_ANCHOR_BOLT_TYPE_OCF,
+  KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF,
+  KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
+  KEY_DP_ANCHOR_BOLT_LENGTH_OCF,
+  KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
+  KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
+  KEY_DP_ANCHOR_BOLT_TYPE_ICF,
+  KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF,
+  KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF,
+  KEY_DP_ANCHOR_BOLT_LENGTH_ICF,
+  KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
 } from "../../../constants/generated/coreKeys";
 export const basePlateConfig = {
   sessionName: "Base Plate",
@@ -121,6 +138,50 @@ export const basePlateConfig = {
       [KEY_DIA_ANCHOR_ICF]: diameterIcf.length ? diameterIcf : diameterOcf.length ? diameterOcf : ["M20"],
       [KEY_GRD_ANCHOR_ICF]: gradeIcf.length ? gradeIcf : gradeOcf.length ? gradeOcf : ["8.8"],
     };
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    module: KEY_MODULE,
+    member_designation: KEY_SECSIZE,
+    material: KEY_MATERIAL,
+    connectivity: KEY_CONN,
+    end_condition: KEY_END_CONDITION,
+    // The builder sends the compression load as Load.Axial; the desktop .osi writes Load.Axial_Compression.
+    load_axial: KEY_AXIAL,
+    load_axial_tension: KEY_AXIAL_TENSION_BP,
+    load_shear_major: KEY_SHEAR_MAJOR,
+    load_shear_minor: KEY_SHEAR_MINOR,
+    load_moment_major: KEY_MOMENT_MAJOR,
+    load_moment_minor: KEY_MOMENT_MINOR,
+    // Outside- and inside-flange anchors share one option list; each field feeds only its own key.
+    anchor_diameter_ocf: KEY_DIA_ANCHOR_OCF,
+    anchor_grade_ocf: KEY_GRD_ANCHOR_OCF,
+    anchor_diameter_icf: KEY_DIA_ANCHOR_ICF,
+    anchor_grade_icf: KEY_GRD_ANCHOR_ICF,
+    anchor_type: KEY_TYP_ANCHOR,
+    footing_grade: KEY_GRD_FOOTING,
+    weld_type: KEY_WELD_TYPE,
+    // Additional Inputs fields of this module are already keyed by core key.
+    [KEY_BASE_PLATE_MATERIAL]: KEY_BASE_PLATE_MATERIAL,
+    [KEY_ST_KEY_MATERIAL]: KEY_ST_KEY_MATERIAL,
+    [KEY_DP_DESIGN_BASE_PLATE]: KEY_DP_DESIGN_BASE_PLATE,
+    [KEY_DP_ANCHOR_BOLT_FRICTION]: KEY_DP_ANCHOR_BOLT_FRICTION,
+    [KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF]: KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
+    [KEY_DP_ANCHOR_BOLT_TYPE_OCF]: KEY_DP_ANCHOR_BOLT_TYPE_OCF,
+    [KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF]: KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF,
+    [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF]: KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
+    [KEY_DP_ANCHOR_BOLT_LENGTH_OCF]: KEY_DP_ANCHOR_BOLT_LENGTH_OCF,
+    [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF]: KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
+    [KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF]: KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
+    [KEY_DP_ANCHOR_BOLT_TYPE_ICF]: KEY_DP_ANCHOR_BOLT_TYPE_ICF,
+    [KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF]: KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF,
+    [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF]: KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF,
+    [KEY_DP_ANCHOR_BOLT_LENGTH_ICF]: KEY_DP_ANCHOR_BOLT_LENGTH_ICF,
+    [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF]: KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
   },
 
   modalConfig: [

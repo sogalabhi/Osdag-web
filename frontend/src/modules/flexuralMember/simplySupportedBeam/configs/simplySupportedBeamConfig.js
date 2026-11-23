@@ -26,6 +26,7 @@ import {
 } from "../../../../constants/generated/coreKeys";
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../../shared/config/prefCoreKeys";
 export const simplySupportedBeamConfig = {
   sessionName: "Simply Supported Beam Design",
   designType: KEY_DISP_FLEXURE,
@@ -54,6 +55,31 @@ export const simplySupportedBeamConfig = {
     beam_support_type: "Major Laterally Supported",
     torsional_restraint: "Fully Restrained",
     warping_restraint: "Both flanges fully restrained",
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    module: KEY_MODULE,
+    // The wire carries Member.Profile; the .osi loader also fills this field from the older Section.Profile / "Section Profile" names.
+    section_profile: KEY_SEC_PROFILE,
+    section_designation: KEY_SECSIZE,
+    material: KEY_MATERIAL,
+    section_material: KEY_SEC_MATERIAL,
+    design_method: KEY_DP_DESIGN_METHOD,
+    allowable_class: KEY_ALLOW_CLASS,
+    effective_area_parameter: KEY_EFFECTIVE_AREA_PARA,
+    length_overwrite: KEY_LENGTH_OVERWRITE,
+    bearing_length: KEY_BEARING_LENGTH,
+    loading_condition: KEY_LOAD,
+    shear_force: KEY_SHEAR,
+    bending_moment: KEY_MOMENT,
+    member_length: KEY_LENGTH,
+    beam_support_type: KEY_DESIGN_TYPE_FLEXURE,
+    torsional_restraint: KEY_TORSIONAL_RES,
+    warping_restraint: KEY_WARPING_RES,
   },
 
   modalConfig: [

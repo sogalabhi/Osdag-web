@@ -29,6 +29,7 @@ export const WEB_ENDPLATE_SUPPORTEDSHEARYIELD = "EndPlate.SupportedShearYield";
 export const WEB_ENDPLATE_SUPPORTINGTENSIONYIELD = "EndPlate.SupportingTensionYield";
 export const WEB_FLANGE_WELD_REDUCTION = "Flange_Weld.Reduction";
 export const WEB_FLANGE_WELD_STRENGTH_RED = "Flange_Weld.Strength_red";
+export const WEB_IS_LEG_LOADED = "is_leg_loaded";
 export const WEB_MEMBER_DEPTH = "Member.Depth";
 export const WEB_OSDAGWEB_VERSION = "OsdagWeb.Version";
 export const WEB_PACKINGPLATE_THICKNESS = "PackingPlate.Thickness";

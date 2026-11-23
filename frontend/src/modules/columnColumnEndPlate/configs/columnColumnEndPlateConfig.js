@@ -1,4 +1,5 @@
 import { validateRequiredFields } from '../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../shared/config/prefCoreKeys';
 import {
   KEY_AXIAL,
   KEY_CONN,
@@ -58,6 +59,29 @@ export const columnColumnEndPlateConfig = {
     weld_fab: "Shop Weld",
     weld_material_grade: "410",
     weld_type: "Groove Weld",
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    module: KEY_MODULE,
+    connectivity: KEY_CONN,
+    bolt_diameter: KEY_D,
+    bolt_grade: KEY_GRD,
+    bolt_type: KEY_TYP,
+    plate_thickness: KEY_PLATETHK,
+    load_axial: KEY_AXIAL,
+    load_moment: KEY_MOMENT,
+    load_shear: KEY_SHEAR,
+    weld_type: KEY_WELD_TYPE,
+    // One column section is sent as both the section size and the supported section.
+    supported_designation: [KEY_SECSIZE, KEY_SUPTDSEC],
+    // The column material is sent as Member.Material, the connector material and the supported material.
+    supported_material: [KEY_SEC_MATERIAL, KEY_CONNECTOR_MATERIAL, KEY_SUPTDSEC_MATERIAL],
+    // A leftover default: the builder never reads it (Connector.Material comes from supported_material).
+    connector_material: null,
   },
 
   modalConfig: [

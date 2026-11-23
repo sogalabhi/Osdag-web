@@ -1,6 +1,7 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../../shared/config/prefCoreKeys';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -61,6 +62,28 @@ export const cleatAngleConfig = {
     design_method: "Limit State Design",
     cleat_section: [],
     module: KEY_DISP_CLEATANGLE,
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    connectivity: KEY_CONN,
+    module: KEY_MODULE,
+    bolt_diameter: KEY_D,
+    bolt_grade: KEY_GRD,
+    bolt_type: KEY_TYP,
+    load_shear: KEY_SHEAR,
+    // The cleat angle list goes out as the angle list.
+    cleat_section: KEY_ANGLE_LIST,
+    // One section field per connectivity: the beam-to-column pair and the beam-to-beam pair.
+    beam_section: KEY_SUPTDSEC,
+    secondary_beam: KEY_SUPTDSEC,
+    column_section: KEY_SUPTNGSEC,
+    primary_beam: KEY_SUPTNGSEC,
+    // The dock material is sent twice, as the connector material and as Material.
+    connector_material: [KEY_CONNECTOR_MATERIAL, KEY_MATERIAL],
   },
 
   modalConfig: [

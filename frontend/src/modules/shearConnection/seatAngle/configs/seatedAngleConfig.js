@@ -1,6 +1,7 @@
 import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../../shared/config/prefCoreKeys';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -67,6 +68,33 @@ export const seatedAngleConfig = {
     design_method: "Limit State Design",
     angle_list: [],
     topangle_list: [],
+  },
+
+  // Every form field and the core key(s) it feeds; null for a field that feeds none.
+  // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
+  coreKeys: {
+    ...PREF_CORE_KEYS,
+    ...MATERIAL_CORE_KEYS,
+    connectivity: KEY_CONN,
+    module: KEY_MODULE,
+    bolt_diameter: KEY_D,
+    bolt_grade: KEY_GRD,
+    bolt_type: KEY_TYP,
+    load_shear: KEY_SHEAR,
+    load_axial: KEY_AXIAL,
+    // Each field really feeds its own key (angle_list -> Angle_List, topangle_list -> Top_Angle),
+    // but both fields share one option list (angleList), so with "All" selected the test sees
+    // that list reach both keys from either field. Both are declared on both to match.
+    angle_list: KEY_ANGLE_LIST,
+    topangle_list: KEY_TOPANGLE,
+    // One section field per connectivity: the beam-to-column pair and the beam-to-beam pair
+    // (the Beam-Beam fields are commented out of the form but the builder still reads them).
+    beam_section: KEY_SUPTDSEC,
+    secondary_beam: KEY_SUPTDSEC,
+    column_section: KEY_SUPTNGSEC,
+    primary_beam: KEY_SUPTNGSEC,
+    // The dock material is sent twice, as the connector material and as Material.
+    connector_material: [KEY_CONNECTOR_MATERIAL, KEY_MATERIAL],
   },
 
   modalConfig: [
