@@ -1,15 +1,16 @@
 import { KEY_DISP_SEATED_ANGLE } from "../../../constants/generated/coreKeys";
-import { expandAllSelectedInputs } from "./osiInputSerializer";
 
 /**
  * The one place that turns form state into the design dictionary: the content of a saved
  * `.osi` file and the `inputs_json` of a saved project.
  *
  * The dictionary is a flat `{ core key: value }` object, as the desktop writes. It is the module's
- * design request (`buildSubmissionParams`, run on the dock inputs with the Additional Inputs
- * merged in, every "All" list expanded), plus the Additional Inputs the request does not carry,
- * written under the core keys their field declares in `config.coreKeys`. The backend writes it
- * out as YAML as it is. `fromDesignDictionary` reads it back.
+ * design request (`buildSubmissionParams`, run on the dock inputs with the Additional Inputs merged in,
+ * exactly as the Design button runs it), plus the Additional Inputs the request does not carry, written
+ * under the core keys their field declares in `config.coreKeys`. The inputs are not changed first: a field
+ * that holds a typed value while its "All" flag is set (the plate girder thicknesses in the "Customized"
+ * design type) is saved as typed. The backend writes it out as YAML as it is. `fromDesignDictionary`
+ * reads it back.
  */
 
 /** The module id and project name the save sends along with the content. */
@@ -42,20 +43,19 @@ export const toDesignDictionary = ({
   extraState,
   designPrefOverrides,
 }) => {
-  const inputsForSave = expandAllSelectedInputs(inputs, allSelected, contextData);
   const prefs = designPrefOverrides || {};
 
   let dictionary = {};
   if (moduleConfig && typeof moduleConfig.buildSubmissionParams === "function") {
     try {
       // The Design button merges the Additional Inputs into the dock inputs before it builds the request.
-      dictionary = moduleConfig.buildSubmissionParams({ ...inputsForSave, ...prefs }, allSelected, contextData, extraState) || {};
+      dictionary = moduleConfig.buildSubmissionParams({ ...inputs, ...prefs }, allSelected, contextData, extraState) || {};
     } catch (e) {
       console.warn("Failed to dynamically build flat parameters, falling back to raw inputs:", e);
-      dictionary = { ...inputsForSave };
+      dictionary = { ...inputs };
     }
   } else {
-    dictionary = { ...inputsForSave };
+    dictionary = { ...inputs };
   }
 
   // Additional Inputs the request does not carry (the desktop keeps every preference in the file).

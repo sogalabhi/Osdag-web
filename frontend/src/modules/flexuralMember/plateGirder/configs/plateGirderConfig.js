@@ -30,6 +30,7 @@ import {
   KEY_OVERALL_DEPTH_PG,
   KEY_OVERALL_DEPTH_PG_TYPE,
   KEY_SHEAR,
+  KEY_STR_TYPE,
   KEY_SUPPORTING_OPTIONS,
   KEY_SUPPORT_WIDTH,
   KEY_ShearBucklingOption,
@@ -296,8 +297,8 @@ export const plateGirderConfig = {
     longitudinal_stiffener: KEY_LongitudnalStiffener,
     longitudinal_stiffener_thickness: KEY_LongitudnalStiffener_thickness,
     longitudinal_stiffener_thickness_val: WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES,
-    // Deflection criteria: the first three also feed the computed Deflection.Max (calculateMaxDeflection).
-    structure_type: KEY_MAX_DEFL,
+    // Deflection criteria: the first four also feed the computed Deflection.Max (calculateMaxDeflection).
+    structure_type: [KEY_STR_TYPE, KEY_MAX_DEFL],
     design_load: [KEY_DESIGN_LOAD, KEY_MAX_DEFL],
     member_options: [KEY_MEMBER_OPTIONS, KEY_MAX_DEFL],
     supporting_options: [KEY_SUPPORTING_OPTIONS, KEY_MAX_DEFL],
@@ -481,6 +482,8 @@ export const plateGirderConfig = {
           inputs.member_options || "Simple Span",
           inputs.supporting_options || "Not Applicable"
         ),
+        // The desktop keeps the structure type in its file; Deflection.Max alone cannot give it back.
+        [KEY_STR_TYPE]: String(inputs.structure_type || "Highway Bridge"),
         [KEY_DESIGN_LOAD]: String(inputs.design_load || "Live load"),
         [KEY_MEMBER_OPTIONS]: String(inputs.member_options || "Simple Span"),
         [KEY_SUPPORTING_OPTIONS]: String(inputs.supporting_options || "NA"),

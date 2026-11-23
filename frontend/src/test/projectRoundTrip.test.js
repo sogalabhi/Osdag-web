@@ -34,20 +34,15 @@ const reopen = (config, savedInputsJson) => {
 };
 
 // Requests that change on the way through a saved project, and the keys that change. Each is a
-// bug to fix, not a behaviour to keep: when one is fixed its entry goes. Unconfirmed in a browser.
+// bug to fix, not a behaviour to keep: when one is fixed its entry goes. The base plate one is confirmed in
+// a browser: customize the inside-flange anchor diameter and grade lists, download the .osi, open it, and the
+// lists are back on "All".
 // - Base plate: `notLoadedFromDictionary` keeps the two inside-flange anchor lists from being filled by
 //   a file (the old loader never filled them); their saved values are not read back.
-// - Plate girder: with the thickness lists on "All" and the design type "Customized", the builder sends
-//   the dock's own value, but the save expands the "All" lists into the dock first, and the expanded
-//   list is what comes back. The case state here leaves the "All" lists unfilled, as `defaultInputs`
-//   does; the form fills them before Design, which would make the two agree (not checked).
 const BASE_PLATE_GAP = ["Anchor Bolt.ICF.Diameter", "Anchor Bolt.ICF.Grade"];
-const PLATE_GIRDER_GAP = ["Web.Thickness", "TopFlange.Thickness", "BottomFlange.Thickness"];
 const KNOWN_GAPS = {
   "base plate | customized / Welded Column Base, saved": BASE_PLATE_GAP,
   "base plate | customized / Welded Column Base, saved with overrides": BASE_PLATE_GAP,
-  "plate girder | all, saved": PLATE_GIRDER_GAP,
-  "plate girder | all, saved with overrides": PLATE_GIRDER_GAP,
 };
 
 describe("project round trip: the design request after save and reopen", () => {
@@ -92,4 +87,28 @@ describe("project round trip: the design request after save and reopen", () => {
       });
     });
   }
+
+  // The Deflection Criteria are four fields that only meet in Deflection.Max; the structure type has to be
+  // saved itself, or a reopened form falls back to "Highway Bridge" and sends another Deflection.Max.
+  it("plate girder: a changed structure type and a typed thickness reopen to the same request", () => {
+    const module = MODULES.find((m) => m.name === "plate girder");
+    const { config } = module;
+    for (const selection of ["all", "customized"]) {
+      const base = caseState(module, selection);
+      const before = {
+        ...base,
+        inputs: {
+          ...base.inputs,
+          structure_type: "Other Building",
+          member_options: "Floor and roof",
+          supporting_options: "Element susceptible to cracking",
+          web_thickness: "25",
+        },
+      };
+      const original = designRequest(config, before);
+      expect(original["Deflection.Max"]).toBe("Span/360");
+      const after = designRequest(config, reopen(config, saveProject({ config, ...before }, {})));
+      expect(after).toEqual(original);
+    }
+  });
 });
