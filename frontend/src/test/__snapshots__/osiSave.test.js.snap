@@ -1,0 +1,1685 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`buildOsiSaveContent > axially loaded column > all 1`] = `
+{
+  "Actual.Length_yy": "3000",
+  "Actual.Length_zz": "3000",
+  "Design.Design_Method": "Limit State Design",
+  "Effective.Area_Para": "1.0",
+  "End_1": "Fixed",
+  "End_1_Y": "Fixed",
+  "End_2": "Fixed",
+  "End_2_Y": "Fixed",
+  "Load.Axial": "100",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "MB 300",
+    "JB 200",
+    "HB 150",
+    "UC 305 x 305 x 118",
+  ],
+  "Member.Profile": "Beams and Columns",
+  "Module": "Columns with known support conditions",
+  "Optimum.AllowUR": "1.0",
+  "Optimum.Para": "Utilization Ratio",
+}
+`;
+
+exports[`buildOsiSaveContent > axially loaded column > customized, with Additional Inputs overrides 1`] = `
+{
+  "Actual.Length_yy": "3000",
+  "Actual.Length_zz": "3000",
+  "Design.Design_Method": "Limit State Design",
+  "Effective.Area_Para": "1.0",
+  "End_1": "Fixed",
+  "End_1_Y": "Fixed",
+  "End_2": "Fixed",
+  "End_2_Y": "Fixed",
+  "Load.Axial": "100",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "MB 300",
+    "JB 200",
+  ],
+  "Member.Profile": "Beams and Columns",
+  "Module": "Columns with known support conditions",
+  "Optimum.AllowUR": "1.0",
+  "Optimum.Para": "Utilization Ratio",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+}
+`;
+
+exports[`buildOsiSaveContent > base plate > all 1`] = `
+{
+  "Anchor Bolt.ICF.Diameter": [
+    "M20",
+    "M24",
+  ],
+  "Anchor Bolt.ICF.Grade": [
+    "4.6",
+    "8.8",
+  ],
+  "Anchor Bolt.OCF.Diameter": [
+    "M20",
+    "M24",
+  ],
+  "Anchor Bolt.OCF.Grade": [
+    "4.6",
+    "8.8",
+  ],
+  "Anchor Bolt.Type": "End Plate Type",
+  "Connectivity": "Welded Column Base",
+  "End Condition": "Pinned",
+  "Footing.Grade": "M25",
+  "Load.Axial": "200",
+  "Load.Axial_Tension": "50",
+  "Load.Moment.Major": "40",
+  "Load.Moment.Minor": "20",
+  "Load.Shear.Major": "50",
+  "Load.Shear.Minor": "30",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": "HB 200",
+  "Module": "Base Plate Connection",
+  "Weld.Type": "Fillet Weld",
+}
+`;
+
+exports[`buildOsiSaveContent > base plate > customized, with Additional Inputs overrides 1`] = `
+{
+  "Anchor Bolt.ICF.Diameter": [
+    "M20",
+  ],
+  "Anchor Bolt.ICF.Grade": [
+    "8.8",
+  ],
+  "Anchor Bolt.OCF.Diameter": [
+    "M20",
+    "M24",
+  ],
+  "Anchor Bolt.OCF.Grade": [
+    "8.8",
+  ],
+  "Anchor Bolt.Type": "End Plate Type",
+  "Connectivity": "Welded Column Base",
+  "End Condition": "Pinned",
+  "Footing.Grade": "M25",
+  "Load.Axial": "200",
+  "Load.Axial_Tension": "50",
+  "Load.Moment.Major": "40",
+  "Load.Moment.Minor": "20",
+  "Load.Shear.Major": "50",
+  "Load.Shear.Minor": "30",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": "HB 200",
+  "Module": "Base Plate Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Type": "Fillet Weld",
+}
+`;
+
+exports[`buildOsiSaveContent > beam-beam cover plate bolted > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connector.Flange_Plate.Preferences": "Outside",
+  "Connector.Flange_Plate.Thickness_list": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "3",
+  "Load.Axial": "10",
+  "Load.Moment": "10",
+  "Load.Shear": "10",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": "MB 300",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Module": "Beam-to-Beam Cover Plate Bolted Connection",
+}
+`;
+
+exports[`buildOsiSaveContent > beam-beam cover plate bolted > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connector.Flange_Plate.Preferences": "Outside",
+  "Connector.Flange_Plate.Thickness_list": [
+    "10",
+    "12",
+  ],
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "3",
+  "Load.Axial": "10",
+  "Load.Moment": "10",
+  "Load.Shear": "10",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": "MB 300",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Module": "Beam-to-Beam Cover Plate Bolted Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+}
+`;
+
+exports[`buildOsiSaveContent > beam-beam cover plate welded > all 1`] = `
+{
+  "Connector.Flange_Plate.Preferences": "Outside",
+  "Connector.Flange_Plate.Thickness_list": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Connector.Material": "E 165 (Fe 290)",
+  "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "3",
+  "Load.Axial": "10",
+  "Load.Moment": "10",
+  "Load.Shear": "10",
+  "Material": "E 165 (Fe 290)",
+  "Member.Designation": "MB 600",
+  "Member.Material": "E 165 (Fe 290)",
+  "Module": "Beam-to-Beam Cover Plate Welded Connection",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "290",
+  "Weld.Type": "Fillet Weld",
+  "out_titles_status": [
+    1,
+    1,
+    1,
+    1,
+    0,
+  ],
+}
+`;
+
+exports[`buildOsiSaveContent > beam-beam cover plate welded > customized, with Additional Inputs overrides 1`] = `
+{
+  "Connector.Flange_Plate.Preferences": "Outside",
+  "Connector.Flange_Plate.Thickness_list": [
+    "10",
+    "12",
+  ],
+  "Connector.Material": "E 165 (Fe 290)",
+  "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "3",
+  "Load.Axial": "10",
+  "Load.Moment": "10",
+  "Load.Shear": "10",
+  "Material": "E 165 (Fe 290)",
+  "Member.Designation": "MB 600",
+  "Member.Material": "E 165 (Fe 290)",
+  "Module": "Beam-to-Beam Cover Plate Welded Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "290",
+  "Weld.Type": "Fillet Weld",
+  "out_titles_status": [
+    1,
+    1,
+    1,
+    1,
+    0,
+  ],
+}
+`;
+
+exports[`buildOsiSaveContent > beam-beam end plate > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Non pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Coplanar Tension-Compression Flange",
+  "Connectivity *": "Coplanar Tension-Compression Flange",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "0",
+  "EndPlateType": "Flushed - Reversible Moment",
+  "Load.Axial": "100",
+  "Load.Moment": "100",
+  "Load.Shear": "100",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Supported_Section.Designation": "WPB 900 X 300 X 291.46",
+  "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
+  "Module": "Beam-to-Beam End Plate Connection",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+  "Weld.Type": "Groove Weld",
+}
+`;
+
+exports[`buildOsiSaveContent > beam-beam end plate > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Non pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Coplanar Tension-Compression Flange",
+  "Connectivity *": "Coplanar Tension-Compression Flange",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "0",
+  "EndPlateType": "Flushed - Reversible Moment",
+  "Load.Axial": "100",
+  "Load.Moment": "100",
+  "Load.Shear": "100",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Supported_Section.Designation": "WPB 900 X 300 X 291.46",
+  "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
+  "Module": "Beam-to-Beam End Plate Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+  "Weld.Type": "Groove Weld",
+}
+`;
+
+exports[`buildOsiSaveContent > beam-column end plate > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Column Flange-Beam Web",
+  "Connector.Material": "E 165 (Fe 290)",
+  "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "EndPlateType": "Column Flange-Beam Web",
+  "Load.Axial": "0",
+  "Load.Moment": "2",
+  "Load.Shear": "2",
+  "Material": "E 165 (Fe 290)",
+  "Member.Supported_Section.Designation": "JB 150",
+  "Member.Supported_Section.Material": "E 165 (Fe 290)",
+  "Member.Supporting_Section.Designation": "HB 150",
+  "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+  "Module": "Beam-to-Column End Plate Connection",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+  "Weld.Type": "Groove Weld",
+}
+`;
+
+exports[`buildOsiSaveContent > beam-column end plate > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Column Flange-Beam Web",
+  "Connector.Material": "E 165 (Fe 290)",
+  "Connector.Plate.Thickness_List": [
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "EndPlateType": "Column Flange-Beam Web",
+  "Load.Axial": "0",
+  "Load.Moment": "2",
+  "Load.Shear": "2",
+  "Material": "E 165 (Fe 290)",
+  "Member.Supported_Section.Designation": "JB 150",
+  "Member.Supported_Section.Material": "E 165 (Fe 290)",
+  "Member.Supporting_Section.Designation": "HB 150",
+  "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+  "Module": "Beam-to-Column End Plate Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+  "Weld.Type": "Groove Weld",
+}
+`;
+
+exports[`buildOsiSaveContent > butt joint bolted > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Non Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "ButtJoint.CoverPlate": "Single-Cover",
+  "Design.For": "Tension",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Packing_Plate": "Yes",
+  "Load.Axial": "60",
+  "Material": "E 250 (Fe 410 W)A",
+  "Module": "Butt Joint Bolted Connection",
+  "Plate1Thickness": "10",
+  "Plate2Thickness": "12",
+  "PlateWidth": "200",
+}
+`;
+
+exports[`buildOsiSaveContent > butt joint bolted > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Non Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "ButtJoint.CoverPlate": "Single-Cover",
+  "Design.For": "Tension",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Packing_Plate": "Yes",
+  "Load.Axial": "60",
+  "Material": "E 250 (Fe 410 W)A",
+  "Module": "Butt Joint Bolted Connection",
+  "Plate1Thickness": "10",
+  "Plate2Thickness": "12",
+  "PlateWidth": "200",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+}
+`;
+
+exports[`buildOsiSaveContent > butt joint welded > all 1`] = `
+{
+  "ButtJoint.CoverPlate": "Single-Cover",
+  "Design.For": "Tension",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Packing_Plate": "No",
+  "Load.Axial": "40",
+  "Material": "E 250 (Fe 410 W)A",
+  "Module": "Butt Joint Welded Connection",
+  "Plate1Thickness": "10",
+  "Plate2Thickness": "12",
+  "PlateWidth": "200",
+  "Weld.Material_Grade_OverWrite": "290",
+  "Weld.Size": [
+    "4",
+    "6",
+    "8",
+  ],
+  "Weld.Type": "Shop weld",
+}
+`;
+
+exports[`buildOsiSaveContent > butt joint welded > customized, with Additional Inputs overrides 1`] = `
+{
+  "ButtJoint.CoverPlate": "Single-Cover",
+  "Design.For": "Tension",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Packing_Plate": "No",
+  "Load.Axial": "40",
+  "Material": "E 250 (Fe 410 W)A",
+  "Module": "Butt Joint Welded Connection",
+  "Plate1Thickness": "10",
+  "Plate2Thickness": "12",
+  "PlateWidth": "200",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Material_Grade_OverWrite": "290",
+  "Weld.Size": [
+    "6",
+    "8",
+  ],
+  "Weld.Type": "Shop weld",
+}
+`;
+
+exports[`buildOsiSaveContent > cleat angle > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Column Flange-Beam Web",
+  "Connector.Angle_List": [
+    "50 x 50 x 6",
+    "60 x 60 x 6",
+  ],
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Shear": "20",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Supported_Section.Designation": "MB 300",
+  "Member.Supported_Section.Material": "E 165 (Fe 290)",
+  "Member.Supporting_Section.Designation": "HB 150",
+  "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+  "Module": "Cleat Angle Connection",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+}
+`;
+
+exports[`buildOsiSaveContent > cleat angle > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Column Flange-Beam Web",
+  "Connector.Angle_List": [
+    "50 x 50 x 6",
+  ],
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Shear": "20",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Supported_Section.Designation": "MB 300",
+  "Member.Supported_Section.Material": "E 165 (Fe 290)",
+  "Member.Supporting_Section.Designation": "HB 150",
+  "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+  "Module": "Cleat Angle Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+}
+`;
+
+exports[`buildOsiSaveContent > column-column cover plate bolted > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connector.Flange_Plate.Preferences": "Outside",
+  "Connector.Flange_Plate.Thickness_list": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "3",
+  "Load.Axial": "100",
+  "Load.Moment": "70",
+  "Load.Shear": "50",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": "UC 305 x 305 x 118",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Module": "Column-to-Column Cover Plate Bolted Connection",
+}
+`;
+
+exports[`buildOsiSaveContent > column-column cover plate bolted > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connector.Flange_Plate.Preferences": "Outside",
+  "Connector.Flange_Plate.Thickness_list": [
+    "10",
+    "12",
+  ],
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "3",
+  "Load.Axial": "100",
+  "Load.Moment": "70",
+  "Load.Shear": "50",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": "UC 305 x 305 x 118",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Module": "Column-to-Column Cover Plate Bolted Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+}
+`;
+
+exports[`buildOsiSaveContent > column-column cover plate welded > all 1`] = `
+{
+  "Connector.Flange_Plate.Preferences": "Outside",
+  "Connector.Flange_Plate.Thickness_list": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Connector.Material": "E 165 (Fe 290)",
+  "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "3",
+  "Load.Axial": "100",
+  "Load.Moment": "100",
+  "Load.Shear": "100",
+  "Material": "E 165 (Fe 290)",
+  "Member.Designation": "UC 305 x 305 x 118",
+  "Member.Material": "E 165 (Fe 290)",
+  "Module": "Column-to-Column Cover Plate Welded Connection",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "290",
+  "Weld.Type": "Fillet Weld",
+  "flangespace": "0",
+  "out_titles_status": [
+    1,
+    1,
+    1,
+    1,
+    0,
+  ],
+  "type": "Fillet Weld",
+}
+`;
+
+exports[`buildOsiSaveContent > column-column cover plate welded > customized, with Additional Inputs overrides 1`] = `
+{
+  "Connector.Flange_Plate.Preferences": "Outside",
+  "Connector.Flange_Plate.Thickness_list": [
+    "10",
+    "12",
+  ],
+  "Connector.Material": "E 165 (Fe 290)",
+  "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "3",
+  "Load.Axial": "100",
+  "Load.Moment": "100",
+  "Load.Shear": "100",
+  "Material": "E 165 (Fe 290)",
+  "Member.Designation": "UC 305 x 305 x 118",
+  "Member.Material": "E 165 (Fe 290)",
+  "Module": "Column-to-Column Cover Plate Welded Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "290",
+  "Weld.Type": "Fillet Weld",
+  "flangespace": "0",
+  "out_titles_status": [
+    1,
+    1,
+    1,
+    1,
+    0,
+  ],
+  "type": "Fillet Weld",
+}
+`;
+
+exports[`buildOsiSaveContent > column-column end plate > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Non pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Flush End Plate",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "0",
+  "Load.Axial": "100",
+  "Load.Moment": "100",
+  "Load.Shear": "100",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": "UC 305 x 305 x 118",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
+  "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
+  "Module": "Column-to-Column End Plate Connection",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+  "Weld.Type": "Groove Weld",
+}
+`;
+
+exports[`buildOsiSaveContent > column-column end plate > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Non pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Flush End Plate",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Detailing.Gap": "0",
+  "Load.Axial": "100",
+  "Load.Moment": "100",
+  "Load.Shear": "100",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": "UC 305 x 305 x 118",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
+  "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
+  "Module": "Column-to-Column End Plate Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+  "Weld.Type": "Groove Weld",
+}
+`;
+
+exports[`buildOsiSaveContent > fin plate > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Column Flange-Beam Web",
+  "Connector.Material": "E 165 (Fe 290)",
+  "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Axial": "30",
+  "Load.Shear": "70",
+  "Material": "E 165 (Fe 290)",
+  "Member.Supported_Section.Designation": "MB 300",
+  "Member.Supported_Section.Material": "E 165 (Fe 290)",
+  "Member.Supporting_Section.Designation": "HB 150",
+  "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+  "Module": "Fin Plate Connection",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+}
+`;
+
+exports[`buildOsiSaveContent > fin plate > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Column Flange-Beam Web",
+  "Connector.Material": "E 165 (Fe 290)",
+  "Connector.Plate.Thickness_List": [
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Axial": "30",
+  "Load.Shear": "70",
+  "Material": "E 165 (Fe 290)",
+  "Member.Supported_Section.Designation": "MB 300",
+  "Member.Supported_Section.Material": "E 165 (Fe 290)",
+  "Member.Supporting_Section.Designation": "HB 150",
+  "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+  "Module": "Fin Plate Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+}
+`;
+
+exports[`buildOsiSaveContent > header plate > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Column Flange-Beam Web",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Axial": "10",
+  "Load.Shear": "20",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Supported_Section.Designation": "MB 300",
+  "Member.Supported_Section.Material": "E 165 (Fe 290)",
+  "Member.Supporting_Section.Designation": "HB 150",
+  "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+  "Module": "Header Plate Connection",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+}
+`;
+
+exports[`buildOsiSaveContent > header plate > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Column Flange-Beam Web",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Axial": "10",
+  "Load.Shear": "20",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Supported_Section.Designation": "MB 300",
+  "Member.Supported_Section.Material": "E 165 (Fe 290)",
+  "Member.Supporting_Section.Designation": "HB 150",
+  "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+  "Module": "Header Plate Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+}
+`;
+
+exports[`buildOsiSaveContent > lap joint bolted > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Non Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Design.For": "Tension",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Load.Axial": "60",
+  "Material": "E 250 (Fe 410 W)A",
+  "Module": "Lap Joint Bolted Connection",
+  "Plate1Thickness": "10",
+  "Plate2Thickness": "12",
+  "PlateWidth": "200",
+}
+`;
+
+exports[`buildOsiSaveContent > lap joint bolted > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Non Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Design.For": "Tension",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Load.Axial": "60",
+  "Material": "E 250 (Fe 410 W)A",
+  "Module": "Lap Joint Bolted Connection",
+  "Plate1Thickness": "10",
+  "Plate2Thickness": "12",
+  "PlateWidth": "200",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+}
+`;
+
+exports[`buildOsiSaveContent > lap joint welded > all 1`] = `
+{
+  "Design.For": "Tension",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Load.Axial": "40",
+  "Material": "E 250 (Fe 410 W)A",
+  "Module": "Lap Joint Welded Connection",
+  "Plate1Thickness": "10",
+  "Plate2Thickness": "12",
+  "PlateWidth": "200",
+  "Weld.Material_Grade_OverWrite": "290",
+  "Weld.Size": [
+    "4",
+    "6",
+    "8",
+  ],
+  "Weld.Type": "Shop weld",
+}
+`;
+
+exports[`buildOsiSaveContent > lap joint welded > customized, with Additional Inputs overrides 1`] = `
+{
+  "Design.For": "Tension",
+  "Detailing.Edge_type": "Sheared or hand flame cut",
+  "Load.Axial": "40",
+  "Material": "E 250 (Fe 410 W)A",
+  "Module": "Lap Joint Welded Connection",
+  "Plate1Thickness": "10",
+  "Plate2Thickness": "12",
+  "PlateWidth": "200",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Material_Grade_OverWrite": "290",
+  "Weld.Size": [
+    "6",
+    "8",
+  ],
+  "Weld.Type": "Shop weld",
+}
+`;
+
+exports[`buildOsiSaveContent > on cantilever > all 1`] = `
+{
+  "Bearing.Length": "NA",
+  "Cantilever.Support": "Continuous, with lateral restraint to top flange",
+  "Cantilever.Top": "Free",
+  "Design.Design_Method": "Limit State Design",
+  "Effective.Area_Para": "1.0",
+  "Flexure.Type": "Major Laterally Supported",
+  "Length.Overwrite": "NA",
+  "Load.Moment": "100",
+  "Load.Shear": "50",
+  "Loading.Condition": "Normal",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "MB 300",
+    "JB 200",
+    "HB 150",
+    "UC 305 x 305 x 118",
+  ],
+  "Member.Length": "5000",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Beams and Columns",
+  "Module": "Flexural Members - Cantilever",
+  "Optimum.Class": "Yes",
+}
+`;
+
+exports[`buildOsiSaveContent > on cantilever > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bearing.Length": "NA",
+  "Cantilever.Support": "Continuous, with lateral restraint to top flange",
+  "Cantilever.Top": "Free",
+  "Design.Design_Method": "Limit State Design",
+  "Effective.Area_Para": "1.0",
+  "Flexure.Type": "Major Laterally Supported",
+  "Length.Overwrite": "NA",
+  "Load.Moment": "100",
+  "Load.Shear": "50",
+  "Loading.Condition": "Normal",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "MB 300",
+    "JB 200",
+  ],
+  "Member.Length": "5000",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Beams and Columns",
+  "Module": "Flexural Members - Cantilever",
+  "Optimum.Class": "Yes",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+}
+`;
+
+exports[`buildOsiSaveContent > plate girder > all 1`] = `
+{
+  "Bendingmoment.shape": "Uniform Loading with pinned-pinned support",
+  "BottomFlange.Thickness": [
+    "8,10,12",
+  ],
+  "Bottomflange.Width": "350",
+  "Deflection.Max": "Span/600",
+  "Design.Design_Method": "Limit State Design",
+  "Design.Load": "Live load",
+  "Effective.Area_Para": "1.0",
+  "Flexure.Type": "Major Laterally Supported",
+  "IntermediateStiffener.Data": "No",
+  "IntermediateStiffener.Spacing": "NA",
+  "IntermediateStiffener.Thickness": "Standard",
+  "Length.Overwrite": "NA",
+  "Load.Moment": "2000",
+  "Load.Shear": "400",
+  "Loading.Condition": "Normal",
+  "LongitudnalStiffener.Data": "No",
+  "LongitudnalStiffner.Thickness": "Standard",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Length": "20000",
+  "Member.Options": "Simple Span",
+  "Module": "PLATE GIRDER",
+  "Optimum.Class": "Plastic",
+  "S.B.Methods": "Simple Post Critical",
+  "Support.Width": "300",
+  "Supporting.Options": "Not Applicable",
+  "Symmetry": "Symmetrical",
+  "TopFlange.Thickness": [
+    "8,10,12",
+  ],
+  "Topflange.Width": "350",
+  "Torsion.restraint": "Fully Restrained",
+  "Total.Depth": "1300",
+  "Total.Design_Type": "Customized",
+  "Warping.restraint": "Both flanges fully restrained",
+  "Web.Philosophy": "Thick Web without ITS",
+  "Web.Thickness": [
+    "8,10,12",
+  ],
+}
+`;
+
+exports[`buildOsiSaveContent > plate girder > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bendingmoment.shape": "Uniform Loading with pinned-pinned support",
+  "BottomFlange.Thickness": [
+    "12",
+  ],
+  "Bottomflange.Width": "350",
+  "Deflection.Max": "Span/600",
+  "Design.Design_Method": "Limit State Design",
+  "Design.Load": "Live load",
+  "Effective.Area_Para": "1.0",
+  "Flexure.Type": "Major Laterally Supported",
+  "IntermediateStiffener.Data": "No",
+  "IntermediateStiffener.Spacing": "NA",
+  "IntermediateStiffener.Thickness": "Standard",
+  "Length.Overwrite": "NA",
+  "Load.Moment": "2000",
+  "Load.Shear": "400",
+  "Loading.Condition": "Normal",
+  "LongitudnalStiffener.Data": "No",
+  "LongitudnalStiffner.Thickness": "Standard",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Length": "20000",
+  "Member.Options": "Simple Span",
+  "Module": "PLATE GIRDER",
+  "Optimum.Class": "Plastic",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "S.B.Methods": "Simple Post Critical",
+  "Support.Width": "300",
+  "Supporting.Options": "Not Applicable",
+  "Symmetry": "Symmetrical",
+  "TopFlange.Thickness": [
+    "12",
+  ],
+  "Topflange.Width": "350",
+  "Torsion.restraint": "Fully Restrained",
+  "Total.Depth": "1300",
+  "Total.Design_Type": "Customized",
+  "Warping.restraint": "Both flanges fully restrained",
+  "Web.Philosophy": "Thick Web without ITS",
+  "Web.Thickness": [
+    "10",
+  ],
+}
+`;
+
+exports[`buildOsiSaveContent > seated angle > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Column Flange-Beam Web",
+  "Connector.Angle_List": [
+    "50 x 50 x 6",
+    "60 x 60 x 6",
+  ],
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Top_Angle": [
+    "50 x 50 x 6",
+    "60 x 60 x 6",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Axial": "0",
+  "Load.Shear": "70",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Supported_Section.Designation": "MB 300",
+  "Member.Supported_Section.Material": "E 165 (Fe 290)",
+  "Member.Supporting_Section.Designation": "HB 150",
+  "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+  "Module": "Seated Angle Connection",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+}
+`;
+
+exports[`buildOsiSaveContent > seated angle > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Connectivity": "Column Flange-Beam Web",
+  "Connector.Angle_List": [
+    "50 x 50 x 6",
+  ],
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Top_Angle": [
+    "50 x 50 x 6",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Axial": "0",
+  "Load.Shear": "70",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Supported_Section.Designation": "MB 300",
+  "Member.Supported_Section.Material": "E 165 (Fe 290)",
+  "Member.Supporting_Section.Designation": "HB 150",
+  "Member.Supporting_Section.Material": "E 165 (Fe 290)",
+  "Module": "Seated Angle Connection",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+}
+`;
+
+exports[`buildOsiSaveContent > simply supported beam > all 1`] = `
+{
+  "Bearing.Length": "NA",
+  "Design.Design_Method": "Limit State Design",
+  "Effective.Area_Para": "1.0",
+  "Flexure.Support": "Simply Supported",
+  "Flexure.Type": "Major Laterally Supported",
+  "Length.Overwrite": "NA",
+  "Load.Moment": "100",
+  "Load.Shear": "50",
+  "Loading.Condition": "Normal",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "MB 300",
+    "JB 200",
+    "HB 150",
+    "UC 305 x 305 x 118",
+  ],
+  "Member.Length": "6000",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Beams and Columns",
+  "Module": "Flexural Members - Simply Supported",
+  "Optimum.Class": "Yes",
+  "Torsion.restraint": "Fully Restrained",
+  "Warping.restraint": "Both flanges fully restrained",
+}
+`;
+
+exports[`buildOsiSaveContent > simply supported beam > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bearing.Length": "NA",
+  "Design.Design_Method": "Limit State Design",
+  "Effective.Area_Para": "1.0",
+  "Flexure.Support": "Simply Supported",
+  "Flexure.Type": "Major Laterally Supported",
+  "Length.Overwrite": "NA",
+  "Load.Moment": "100",
+  "Load.Shear": "50",
+  "Loading.Condition": "Normal",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "MB 300",
+    "JB 200",
+  ],
+  "Member.Length": "6000",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Beams and Columns",
+  "Module": "Flexural Members - Simply Supported",
+  "Optimum.Class": "Yes",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Torsion.restraint": "Fully Restrained",
+  "Warping.restraint": "Both flanges fully restrained",
+}
+`;
+
+exports[`buildOsiSaveContent > struts bolted > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Conn_Location": "Long Leg",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "End_1": "Hinged",
+  "End_2": "Hinged",
+  "Load.Axial": "100",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "50 x 50 x 6",
+    "60 x 60 x 6",
+  ],
+  "Member.Length": "3000",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Angles",
+  "Module": "Struts Bolted to End Gusset",
+  "is_leg_loaded": "Yes",
+}
+`;
+
+exports[`buildOsiSaveContent > struts bolted > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Conn_Location": "Long Leg",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "End_1": "Hinged",
+  "End_2": "Hinged",
+  "Load.Axial": "100",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "50 x 50 x 6",
+  ],
+  "Member.Length": "3000",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Angles",
+  "Module": "Struts Bolted to End Gusset",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "is_leg_loaded": "Yes",
+}
+`;
+
+exports[`buildOsiSaveContent > struts welded > all 1`] = `
+{
+  "Conn_Location": "Long Leg",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Effective.Area_Para": "1.0",
+  "End_1": "Hinged",
+  "End_2": "Hinged",
+  "Load.Axial": "100",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "50 x 50 x 6",
+    "60 x 60 x 6",
+  ],
+  "Member.Length": "3000",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Angles",
+  "Module": "Struts Welded to End Gusset",
+  "Optimum.AllowUR": "1.0",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "",
+}
+`;
+
+exports[`buildOsiSaveContent > struts welded > customized, with Additional Inputs overrides 1`] = `
+{
+  "Conn_Location": "Long Leg",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Effective.Area_Para": "1.0",
+  "End_1": "Hinged",
+  "End_2": "Hinged",
+  "Load.Axial": "100",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "50 x 50 x 6",
+  ],
+  "Member.Length": "3000",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Angles",
+  "Module": "Struts Welded to End Gusset",
+  "Optimum.AllowUR": "1.0",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "",
+}
+`;
+
+exports[`buildOsiSaveContent > tension bolted > all 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "12",
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Conn_Location": "Long Leg",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Axial": "60",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "50 x 50 x 6",
+    "60 x 60 x 6",
+  ],
+  "Member.Length": "1250",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Back to Back Angles",
+  "Module": "Tension Member Design - Bolted to End Gusset",
+}
+`;
+
+exports[`buildOsiSaveContent > tension bolted > customized, with Additional Inputs overrides 1`] = `
+{
+  "Bolt.Bolt_Hole_Type": "Standard",
+  "Bolt.Diameter": [
+    "16",
+    "20",
+  ],
+  "Bolt.Grade": [
+    "8.8",
+    "10.9",
+  ],
+  "Bolt.Slip_Factor": "0.3",
+  "Bolt.TensionType": "Pre-tensioned",
+  "Bolt.Type": "Bearing Bolt",
+  "Conn_Location": "Long Leg",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Axial": "60",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "50 x 50 x 6",
+  ],
+  "Member.Length": "1250",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Back to Back Angles",
+  "Module": "Tension Member Design - Bolted to End Gusset",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+}
+`;
+
+exports[`buildOsiSaveContent > tension welded > all 1`] = `
+{
+  "Conn_Location": "Long Leg",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Axial": "60",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "50 x 50 x 6",
+    "60 x 60 x 6",
+  ],
+  "Member.Length": "1250",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Back to Back Angles",
+  "Module": "Tension Member Design - Welded to End Gusset",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+}
+`;
+
+exports[`buildOsiSaveContent > tension welded > customized, with Additional Inputs overrides 1`] = `
+{
+  "Conn_Location": "Long Leg",
+  "Connector.Material": "E 250 (Fe 410 W)A",
+  "Connector.Plate.Thickness_List": [
+    "10",
+    "12",
+  ],
+  "Design.Design_Method": "Limit State Design",
+  "Detailing.Corrosive_Influences": "No",
+  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
+  "Detailing.Gap": "10",
+  "Load.Axial": "60",
+  "Material": "E 250 (Fe 410 W)A",
+  "Member.Designation": [
+    "50 x 50 x 6",
+    "60 x 60 x 6",
+  ],
+  "Member.Length": "1250",
+  "Member.Material": "E 250 (Fe 410 W)A",
+  "Member.Profile": "Back to Back Angles",
+  "Module": "Tension Member Design - Welded to End Gusset",
+  "Pref.Bolt.Bolt_Hole_Type": "Over-sized",
+  "Pref.Detailing.Gap": "5",
+  "Weld.Fab": "Shop Weld",
+  "Weld.Material_Grade_OverWrite": "410",
+}
+`;

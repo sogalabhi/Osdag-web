@@ -1,13 +1,13 @@
 import { useRef, useState, useEffect } from "react";
 import { useEngineeringService } from "../hooks/useEngineeringService";
-import { KEY_DISP_FINPLATE, KEY_DISP_PLATE_GIRDER_WELDED } from '../../../constants/generated/coreKeys';
+import { KEY_DISP_PLATE_GIRDER_WELDED } from '../../../constants/generated/coreKeys';
 import { message } from 'antd';
 import { apiBase } from "../../../api"; // eslint-disable-line no-unused-vars
 import { openOsiFile } from "../../../datasources/osiDataSource";
 import { loadStateFromOsi } from "./osiLoader";
 import { downloadSectionCatalog } from "../../../datasources/sectionsDataSource";
 import { getModuleDesignPref } from "../../registry";
-import { expandAllSelectedInputs } from "./osiInputSerializer";
+import { buildOsiSaveContent, getOsiSaveIdentity } from "./osiSave";
 import { buildLogFileContent } from "./logExport";
 import { canOpenAdditionalInputs } from "./designPrefOpenGuard";
 import { isGuestUser } from "../../../utils/auth";
@@ -39,6 +39,8 @@ function UnifiedDropdownMenu({
   isExistingProject = false,
   hasOutput = false,
   moduleConfig = null,
+  extraState = {},
+  designPrefOverrides = {},
   setCreateDesignReportBool = null,
 }) {
   const service = useEngineeringService();
@@ -123,10 +125,10 @@ function UnifiedDropdownMenu({
       message.error('No inputs to save');
       return;
     }
-    const inputsForSave = expandAllSelectedInputs(inputs, allSelected, getContextData());
-
-    const module_id = inputs?.module || KEY_DISP_FINPLATE;
-    const projectName = inputs?.project_name || inputs?.name || 'project';
+    const { moduleId: module_id, projectName } = getOsiSaveIdentity({ moduleConfig, inputs });
+    const inputsForSave = buildOsiSaveContent({
+      moduleConfig, inputs, allSelected, contextData: getContextData(), extraState, designPrefOverrides,
+    });
 
     try {
       const result = await service.saveOSIFromInputs(projectName, module_id, inputsForSave, true);

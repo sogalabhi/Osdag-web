@@ -25,6 +25,7 @@ import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import { menuItems } from "../utils/moduleUtils";
 import { downloadGroupedInputsCsv, downloadRawOutputsCsv } from "../utils/groupedCsvExport";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
+import { buildOsiSaveContent, getOsiSaveIdentity } from "../utils/osiSave";
 import { loadStateFromOsi } from "../utils/osiLoader";
 import { getModuleDesignPref } from "../../registry";
 import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
@@ -554,33 +555,11 @@ export const EngineeringModule = ({
     }
   };
   const handleSaveInputs = async () => {
-    // Determine module_id - use designType from moduleConfig, or fallback to inputs.module
-    const module_id = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || KEY_DISP_SEATED_ANGLE;
-    const projectName = inputs?.project_name || inputs?.name || moduleConfig?.sessionName || 'project';
+    const { moduleId: module_id, projectName } = getOsiSaveIdentity({ moduleConfig, inputs });
 
     try {
-      const inputsForSave = expandAllSelectedInputs(inputs, allSelected, contextData);
-
-      let flatInputs = {};
-      if (moduleConfig && typeof moduleConfig.buildSubmissionParams === "function") {
-        try {
-          flatInputs = moduleConfig.buildSubmissionParams(
-            inputsForSave,
-            allSelected,
-            contextData,
-            extraState
-          ) || {};
-        } catch (e) {
-          console.warn("Failed to dynamically build flat parameters, falling back to raw inputs:", e);
-          flatInputs = { ...inputsForSave };
-        }
-      } else {
-        flatInputs = { ...inputsForSave };
-      }
-
-      // Prefix design pref overrides
-      Object.entries(designPrefOverrides || {}).forEach(([key, val]) => {
-        flatInputs[`Pref.${key}`] = val;
+      const flatInputs = buildOsiSaveContent({
+        moduleConfig, inputs, allSelected, contextData, extraState, designPrefOverrides,
       });
 
       // Always download-only (no backend persistence). Force inline/base64 response.
@@ -987,6 +966,7 @@ export const EngineeringModule = ({
                 isExistingProject={!!projectIdFromUrl}
                 moduleConfig={moduleConfig}
                 extraState={extraState}
+                designPrefOverrides={designPrefOverrides}
               />
             ))}
 
