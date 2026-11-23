@@ -2,6 +2,7 @@ import { apiClient, subscribeToTask } from "../utils/apiClient";
 import { MODULES, CAD, MATERIALS, DESIGN_PREFERENCES } from "./endpoints";
 import { getModuleSlug } from "../modules/registry";
 import { getErrorMessage } from "../utils/apiError";
+import { fromSyncResponse, toSyncRequest } from "../modules/shared/utils/prefSyncKeys";
 
 // Status the design task sends once the design is calculated, before its 3D model is built.
 const DESIGN_READY_STATUS = "DESIGN_READY";
@@ -147,13 +148,17 @@ export async function addCustomMaterial(materialData) {
  * Get design preferences for connections.
  */
 /**
- * Server-resolved design-preference sync.
- * @param {object} body - { module_session_name, inputs, operation, design_pref_draft? }
+ * Server-resolved design-preference sync. The request goes out in core keys with the module id
+ * and the answer comes back in the module's form field names (see utils/prefSyncKeys.js).
+ * @param {object} config - the module config (`designType`, `coreKeys`)
+ * @param {object} request - { state, operation, draft? }: the dock inputs merged with the current
+ *   Additional Inputs values, one of open/refresh/save/reset, and the values to apply
  * @param {AbortSignal} [signal]
  * @returns {Promise<{ success: boolean, data?: object, error?: string }>}
  */
-export async function fetchDesignPrefSync(body, signal) {
+export async function fetchDesignPrefSync(config, request, signal) {
   try {
+    const { body, context } = toSyncRequest(config, request);
     const res = await apiClient(DESIGN_PREFERENCES.sync, {
       method: "POST",
       body: JSON.stringify(body),
@@ -165,11 +170,11 @@ export async function fetchDesignPrefSync(body, signal) {
     }
     return {
       success: true,
-      data: {
+      data: fromSyncResponse(config, context, {
         ...data,
         resolved_inputs: data.resolved_inputs || {},
         section_details: data.section_details || { supporting: {}, supported: {} },
-      },
+      }),
     };
   } catch (err) {
     if (err?.name === "AbortError") {
@@ -180,13 +185,15 @@ export async function fetchDesignPrefSync(body, signal) {
 }
 
 /**
- * Resolve Additional Inputs defaults for a module + dock state.
- * @param {object} body - { module_session_name, inputs }
+ * Resolve Additional Inputs defaults for a module + dock state (core keys out, field names back).
+ * @param {object} config - the module config (`designType`, `coreKeys`)
+ * @param {object} request - { state }
  * @param {AbortSignal} [signal]
  * @returns {Promise<{ success: boolean, data?: object, error?: string }>}
  */
-export async function fetchDesignPrefDefaults(body, signal) {
+export async function fetchDesignPrefDefaults(config, request, signal) {
   try {
+    const { body, context } = toSyncRequest(config, request);
     const res = await apiClient(DESIGN_PREFERENCES.defaults, {
       method: "POST",
       body: JSON.stringify(body),
@@ -198,11 +205,11 @@ export async function fetchDesignPrefDefaults(body, signal) {
     }
     return {
       success: true,
-      data: {
+      data: fromSyncResponse(config, context, {
         ...data,
         default_pref_inputs: data.default_pref_inputs || {},
         section_details: data.section_details || { supporting: {}, supported: {} },
-      },
+      }),
     };
   } catch (err) {
     if (err?.name === "AbortError") {

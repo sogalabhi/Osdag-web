@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { fetchDesignPrefSync } from "../../../datasources/modulesDataSource";
 import { mergeLinkedParityKeysIntoInputs } from "../utils/mergeDesignPrefSyncIntoInputs";
+import { dockDriverFields } from "../utils/prefSyncKeys";
 
 const DEBOUNCE_MS = 200;
 
@@ -9,7 +10,7 @@ const DEBOUNCE_MS = 200;
  * input dock (driving grade) through backend refresh.
  */
 export function useDesignPrefSync({
-  sessionName,
+  moduleConfig,
   inputs,
   setInputs,
   applyStrictLinkedReseed,
@@ -31,11 +32,15 @@ export function useDesignPrefSync({
    */
   const driverAtPauseRef = useRef(null);
 
+  // The dock fields that hold the driving grade (see `dockDriverFields`); a change in any re-runs the effect.
+  const driverFields = useMemo(() => dockDriverFields(moduleConfig), [moduleConfig]);
+  const driverKey = JSON.stringify(driverFields.map((field) => inputs?.[field]));
+
   useEffect(() => {
-    if (!sessionName || !setInputs) return;
+    if (!moduleConfig?.designType || !setInputs) return;
 
     const latest = inputsRef.current;
-    const driver = latest?.connector_material ?? latest?.material ?? latest?.member_material;
+    const driver = driverFields.map((field) => latest?.[field]).find((grade) => grade);
 
     if (pause) {
       // Record driver value when modal opens so we can detect no-change on close.
@@ -60,12 +65,7 @@ export function useDesignPrefSync({
 
     const t = setTimeout(async () => {
       const snap = inputsRef.current;
-      const body = {
-        module_session_name: sessionName,
-        inputs: snap,
-        operation: "refresh",
-      };
-      const res = await fetchDesignPrefSync(body, ac.signal);
+      const res = await fetchDesignPrefSync(moduleConfig, { state: snap, operation: "refresh" }, ac.signal);
       if (myGen !== reqGen.current) return;
       if (!res.success) {
         if (res.aborted) return;
@@ -98,10 +98,9 @@ export function useDesignPrefSync({
       ac.abort();
     };
   }, [
-    sessionName,
-    inputs?.connector_material,
-    inputs?.material,
-    inputs?.member_material,
+    moduleConfig,
+    driverFields,
+    driverKey,
     setInputs,
     applyStrictLinkedReseed,
     setLastKnownGoodDesignPrefSnapshot,

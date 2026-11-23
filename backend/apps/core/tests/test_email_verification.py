@@ -56,8 +56,8 @@ class EmailVerificationTests(TestCase):
 
         # 3. Design Preference Sync -> should return 403 Forbidden
         sync_data = {
-            "module_session_name": "Fin Plate Connection",
-            "inputs": {"material": "E 250 (Fe 410 W)A"},
+            "module_id": "Fin Plate Connection",
+            "inputs": {"Material": "E 250 (Fe 410 W)A"},
             "operation": "open"
         }
         r = self.client.post("/api/design-preferences/sync/", data=sync_data, content_type="application/json", **headers)

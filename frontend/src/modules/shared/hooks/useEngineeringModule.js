@@ -122,7 +122,7 @@ export const useEngineeringModule = (moduleConfig) => {
   } = useModuleForm(moduleConfig, moduleData);
 
   useDesignPrefSync({
-    sessionName: moduleConfig.sessionName,
+    moduleConfig,
     inputs,
     setInputs,
     applyStrictLinkedReseed,

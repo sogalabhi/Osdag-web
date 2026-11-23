@@ -4,30 +4,44 @@ import pytest
 from apps.core.api.design.report_customization_api import LaTeXParser
 from apps.core.api.design.sync_merge import lookup_sources, merge_design_pref_sync
 
-# (module session name, input key, designation, role the Additional Inputs tab reads)
+from osdag_core.Common import (
+    KEY_DISP_BB_EP_SPLICE,
+    KEY_DISP_COLUMNENDPLATE,
+    KEY_DISP_COMPRESSION_COLUMN,
+    KEY_DISP_FLEXURE,
+    KEY_DISP_FLEXURE2,
+    KEY_DISP_STRUT_BOLTED_END_GUSSET,
+    KEY_DISP_STRUT_WELDED_END_GUSSET,
+    KEY_DISP_TENSION_BOLTED,
+    KEY_DISP_TENSION_WELDED,
+    KEY_SECSIZE,
+    KEY_SUPTDSEC,
+)
+
+# (module id, designation keys the draft sets, designation, role the Additional Inputs tab reads)
 SECTION_CASES = [
-    ("Column Column End Plate Connection", "supported_designation", "HB 150", "supporting"),
-    ("Beam Beam End Plate Connection", "supported_designation", "MB 300", "supported"),
-    ("Simply Supported Beam Design", "section_designation", "MB 400", "supporting"),
-    ("Simply Supported Beam Design", "section_designation", "HB 150", "supporting"),
-    ("On Cantilever Beam Design", "section_designation", "MB 400", "supporting"),
-    ("Axially Loaded Column", "section_designation", "HB 150", "supporting"),
+    (KEY_DISP_COLUMNENDPLATE, (KEY_SECSIZE, KEY_SUPTDSEC), "HB 150", "supporting"),
+    (KEY_DISP_BB_EP_SPLICE, (KEY_SUPTDSEC,), "MB 300", "supported"),
+    (KEY_DISP_FLEXURE, (KEY_SECSIZE,), "MB 400", "supporting"),
+    (KEY_DISP_FLEXURE, (KEY_SECSIZE,), "HB 150", "supporting"),
+    (KEY_DISP_FLEXURE2, (KEY_SECSIZE,), "MB 400", "supporting"),
+    (KEY_DISP_COMPRESSION_COLUMN, (KEY_SECSIZE,), "HB 150", "supporting"),
     # Beam sections are offered for this module too, so both tables must be searched.
-    ("Axially Loaded Column", "section_designation", "JB 150", "supporting"),
-    ("Tension Member Bolted Design", "section_designation", "20 x 20 x 3", "supported"),
-    ("Tension Member Welded Design", "section_designation", "20 x 20 x 3", "supported"),
-    ("Struts Bolted to End Gusset", "section_designation", "20 x 20 x 3", "supported"),
-    ("Struts Welded to End Gusset", "section_designation", "20 x 20 x 3", "supported"),
+    (KEY_DISP_COMPRESSION_COLUMN, (KEY_SECSIZE,), "JB 150", "supporting"),
+    (KEY_DISP_TENSION_BOLTED, (KEY_SECSIZE,), "20 x 20 x 3", "supported"),
+    (KEY_DISP_TENSION_WELDED, (KEY_SECSIZE,), "20 x 20 x 3", "supported"),
+    (KEY_DISP_STRUT_BOLTED_END_GUSSET, (KEY_SECSIZE,), "20 x 20 x 3", "supported"),
+    (KEY_DISP_STRUT_WELDED_END_GUSSET, (KEY_SECSIZE,), "20 x 20 x 3", "supported"),
 ]
 
 
-@pytest.mark.parametrize("module,key,designation,role", SECTION_CASES)
-def test_selected_section_details_reach_the_tab_that_reads_them(module, key, designation, role):
+@pytest.mark.parametrize("module_id,keys,designation,role", SECTION_CASES)
+def test_selected_section_details_reach_the_tab_that_reads_them(module_id, keys, designation, role):
     _, _, _, details = merge_design_pref_sync(
-        module_session_name=module,
+        module_id=module_id,
         inputs={},
         operation="open",
-        design_pref_draft={key: [designation]},
+        design_pref_draft={key: [designation] for key in keys},
         **lookup_sources(None),
     )
     assert details[role].get("Designation") == designation
