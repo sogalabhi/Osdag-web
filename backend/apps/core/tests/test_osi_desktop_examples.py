@@ -103,7 +103,8 @@ def test_example_parses_and_resolves_to_a_module(path: Path):
     module_id, name, inputs = read_example(path)
 
     assert name == module_id
-    assert set(inputs) == {"dock", "pref", "flat"}
+    assert inputs == _parse_flat_yaml(path.read_text(encoding="utf-8"))
+    assert not {"dock", "pref", "flat"} & set(inputs)
     if path.name in LEGACY_MODULE_NAME:
         assert module_id == LEGACY_MODULE_NAME[path.name]
         assert module_id not in MODULE_IDS
@@ -115,21 +116,18 @@ def test_example_parses_and_resolves_to_a_module(path: Path):
 def test_example_has_no_unresolved_yaml_anchors(path: Path):
     _, _, inputs = read_example(path)
 
-    for section in ("flat", "dock"):
-        for value in all_values(inputs[section]):
-            assert not (isinstance(value, str) and ANCHOR_OR_ALIAS.match(value)), (section, value)
+    for value in all_values(inputs):
+        assert not (isinstance(value, str) and ANCHOR_OR_ALIAS.match(value)), value
 
 
 @pytest.mark.parametrize("path", EXAMPLE_FILES, ids=lambda p: p.name)
 def test_example_connectivity_is_a_desktop_value(path: Path):
     _, _, inputs = read_example(path)
-    flat = inputs["flat"]
 
-    connectivity = flat.get("Connectivity *") or flat.get("Connectivity")
+    connectivity = inputs.get("Connectivity *") or inputs.get("Connectivity")
     if connectivity is None:
         pytest.skip("module has no connectivity")
     assert connectivity in KNOWN_CONNECTIVITY
-    assert inputs["dock"]["connectivity"] == connectivity
 
 
 @pytest.mark.parametrize("path", EXAMPLE_FILES, ids=lambda p: p.name)
@@ -151,7 +149,7 @@ def test_example_is_covered_by_the_web_import_fixtures(path: Path):
 @pytest.mark.parametrize("name", sorted(BLANK_LOADS))
 def test_rejected_examples_have_blank_loads(name: str):
     rejected = json.loads((FIXTURES_DIR / "osi_rejected.json").read_text(encoding="utf-8"))
-    flat = read_example(EXAMPLES_DIR / name)[2]["flat"]
+    flat = read_example(EXAMPLES_DIR / name)[2]
 
     assert name in rejected
     assert rejected[name]["error"].startswith("MissingKeyError")
@@ -209,5 +207,5 @@ class TestFlatYamlReader:
 def test_desktop_end_plate_connection_opens_the_header_plate_module(name: str):
     module_id, _, inputs = read_example(EXAMPLES_DIR / name)
 
-    assert inputs["flat"]["Module"] == "End Plate Connection"
+    assert inputs["Module"] == "End Plate Connection"
     assert module_id == Common.KEY_DISP_HEADERPLATE

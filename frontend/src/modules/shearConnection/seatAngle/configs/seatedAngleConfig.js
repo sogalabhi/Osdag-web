@@ -95,6 +95,8 @@ export const seatedAngleConfig = {
     primary_beam: KEY_SUPTNGSEC,
     // The dock material is sent twice, as the connector material and as Material.
     connector_material: [KEY_CONNECTOR_MATERIAL, KEY_MATERIAL],
+    // Not a field of this form: Material comes from connector_material.
+    material: null,
   },
 
   modalConfig: [

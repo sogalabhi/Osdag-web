@@ -279,7 +279,7 @@ The script imports `osdag_core.Common` and `apps.core.web_keys`, so run it in th
 ### 5. Payload Parity Tests
 `frontend/src/test/payloadParity.test.js` runs every module's `buildSubmissionParams` on its `defaultInputs`: once per connectivity choice with every customizable list on "All" (so the builder sends the whole option list), and once with explicit selections. The option lists are small fixed samples, so no backend is needed. Each result is snapshotted in `frontend/src/test/__snapshots__/`, so a config change that alters a request body shows up as a diff. Run them with `npm test`; update a snapshot on purpose with `npm test -- -u`.
 
-`frontend/src/test/osiLoad.test.js` pins the other direction. It loads all 66 desktop example `.osi` files (parsed by the backend's `parse_osi` and saved in `frontend/src/test/fixtures/osiExamples.json`) into their modules with `loadStateFromOsi` and snapshots the form state, and it snapshots the key map `getModuleKeyMap` derives for each module. A change to `osiNormalizer.js`, `osiMapperTracer.js` or the loader shows up as a diff.
+`frontend/src/test/osiLoad.test.js` pins the other direction. It loads all 66 desktop example `.osi` files (parsed by the backend's `parse_osi` and saved in `frontend/src/test/fixtures/osiExamples.json`) into their modules with `loadStateFromOsi` and snapshots the form state, read through the module's declared `coreKeys`. A change to a `coreKeys` declaration, `designDictionary.js` or the loader shows up as a diff, and `osiToWire.test.js` shows whether it changes the request an opened file sends.
 
 ---
 

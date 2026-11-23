@@ -1,11 +1,11 @@
 import {
-    KEY_MODULE, KEY_MATERIAL, KEY_AXIAL, KEY_DP_DETAILING_EDGE_TYPE,
+    KEY_MODULE, KEY_MATERIAL, KEY_AXIAL, KEY_AXIAL_FORCE, KEY_DP_DETAILING_EDGE_TYPE,
     KEY_PLATE1_THICKNESS, KEY_PLATE2_THICKNESS, KEY_PLATE_WIDTH, KEY_WELD_SIZE,
     KEY_COVER_PLATE, KEY_DISP_COVER_PLT, KEY_DP_DETAILING_PACKING_PLATE,
     KEY_DISP_PLATE1_THICKNESS, KEY_DISP_PLATE_WIDTH, KEY_DP_BOLT_SLIP_FACTOR,
     KEY_DISP_PLATE2_THICKNESS, KEY_D, KEY_TYP, KEY_GRD, KEY_DP_BOLT_HOLE_TYPE,
     KEY_DP_BOLT_TYPE, KEY_DESIGN_FOR, KEY_DISP_WELD_SIZE,
-    KEY_DP_WELD_TYPE, KEY_DP_WELD_MATERIAL_G_O,
+    KEY_DP_WELD_TYPE, KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O,
 } from "../../../constants/generated/coreKeys";
 import { validateSimpleConnectionInputs } from "./validation";
 import { validateRequiredFields } from "../../shared/utils/validation";
@@ -59,8 +59,8 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
             ...PREF_CORE_KEYS,
             ...MATERIAL_CORE_KEYS,
             module: KEY_MODULE,
-            // The desktop .osi writes the axial load as Load.Axial.Force.
-            axial_force: KEY_AXIAL,
+            // The builder sends the axial load as Load.Axial; the desktop .osi writes Load.Axial.Force.
+            axial_force: [KEY_AXIAL, KEY_AXIAL_FORCE],
             plate1_thickness: KEY_PLATE1_THICKNESS,
             plate2_thickness: KEY_PLATE2_THICKNESS,
             plate_width: KEY_PLATE_WIDTH,
@@ -220,14 +220,14 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
             ...PREF_CORE_KEYS,
             ...MATERIAL_CORE_KEYS,
             module: KEY_MODULE,
-            // The desktop .osi writes the axial load as Load.Axial.Force.
-            axial_force: KEY_AXIAL,
+            // The builder sends the axial load as Load.Axial; the desktop .osi writes Load.Axial.Force.
+            axial_force: [KEY_AXIAL, KEY_AXIAL_FORCE],
             plate1_thickness: KEY_PLATE1_THICKNESS,
             plate2_thickness: KEY_PLATE2_THICKNESS,
             plate_width: KEY_PLATE_WIDTH,
             weld_size: KEY_WELD_SIZE,
             // The builder sends the shop/field weld choice as Weld.Type; the desktop .osi calls it Weld.Fab.
-            weld_fab: KEY_DP_WELD_TYPE,
+            weld_fab: [KEY_DP_WELD_TYPE, KEY_DP_WELD_FAB],
             // Set next to material when the dock material changes, but the builder never sends it.
             connector_material: null,
             ...(hasCoverPlate ? { cover_plate: KEY_COVER_PLATE } : {}),

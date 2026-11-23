@@ -75,7 +75,7 @@ When a user imports an `.osi` file via the UI:
 1. The frontend posts the file to the `/api/open-osi/` endpoint.
 2. The [OpenOsiUpload](../backend/apps/core/api/projects/osi_api.py) view intercepts the stream and reads it into memory.
 3. The parser detects if the file starts with a JSON brace (`{`) or a YAML dotted structure.
-4. It parses the file and returns `{ dock, pref, flat }`: `flat` holds the keys exactly as written in the file, `dock` and `pref` are a module-independent translation of them (section 5.4).
+4. It parses the file and returns `inputs`: the file's design dictionary, keys and values exactly as written (core keys such as `Bolt.Diameter`). The backend does not translate them; the frontend reads them with the module's declared `coreKeys` (section 5.4).
 
 ### 2. Module Routing
 The parsed response carries the module name from the file's `Module:` line (`module_id`). A module's id is its desktop module name (`KEY_DISP_*` in `osdag_core/Common.py`), so the frontend resolves it directly with `findModule` from [registry.js](../frontend/src/modules/registry.js) and navigates to that module's `path`. A name that matches no registry entry is rejected as an unsupported module.
@@ -90,8 +90,8 @@ Desktop compatibility notes:
 
 Because the Python desktop engine uses dotted PascalCase parameters (e.g. `Bolt.TensionType`, `Detailing.Gap`) while Osdag-Web uses snake_case keys (e.g. `bolt_tension_type`, `detailing_gap`), the frontend translates these configurations during import:
 
-1. **`normalizeOsiPayload`:** Translates the file's keys (`flat`) into the web form keys of the active module. [osiMapperTracer.js](../frontend/src/modules/shared/utils/osiMapperTracer.js) finds the mapping by running the module's `buildSubmissionParams` on sentinel values, so one `.osi` key can feed several fields (for example `Member.Supported_Section.Designation` fills `beam_section` and `secondary_beam`). A module config can add `osiKeyAliases` for keys the desktop writes under a different name than the web sends (the base plate config maps `Load.Axial_Compression` and `Anchor Bolt.OCF/ICF.*`). When several keys share one field the more specific key wins (`Material`, then `Connector.Material`, then the member and section materials). Desktop output-panel state (`out_titles_status`, `Label_*`) is ignored.
-2. **`loadStateFromOsi`:** An observer utility in [osiLoader.js](../frontend/src/modules/shared/utils/osiLoader.js) that hydrates the React states with the normalized payload.
+1. **`fromDesignDictionary`:** [designDictionary.js](../frontend/src/modules/shared/utils/designDictionary.js) reads the design dictionary with the module config's declared `coreKeys` (field to core key or keys, see [CORE_KEYS_README.md](../frontend/src/modules/shared/config/CORE_KEYS_README.md)) backwards: a core key fills every field that declares it, so one `.osi` key can feed several fields (for example `Member.Supported_Section.Designation` fills `beam_section` and `secondary_beam`). A field declares each key the desktop can write it under, not only the one the web sends (the base plate config declares `Load.Axial_Compression` next to `Load.Axial`). Keys no field declares (desktop output-panel state such as `out_titles_status` and `Label_*`, keys of other modules) are dropped, and so are keys a config lists in `computedCoreKeys`. When several keys share one field the more specific key wins (`Material`, then `Connector.Material`, then the member and section materials). `Pref.<key>` entries are the Additional Inputs overrides. A list equal to the full option list is read as "All".
+2. **`loadStateFromOsi`:** An observer utility in [osiLoader.js](../frontend/src/modules/shared/utils/osiLoader.js) that hydrates the React states with the result. It also accepts a stored project (`{ dock, pref }` keyed by the module's field names), which needs no key translation.
    * Restores input form states (`setInputs`).
    * Configures customized selections (`setSelectionStates` and `setSelectedItems`).
    * Recovers design preference overrides (`setDesignPrefOverrides`).
@@ -133,7 +133,7 @@ When a user uploads a `.osi` file using the **Load Input** option:
 
 ### 2. Frontend Configuration Normalizer & Hydrator (Frontend)
 Once the backend returns the parsed dictionary:
-* **Client-Side Key Resolution:** The frontend uses module-specific configurations (like the `*Config.js` files and `osiNormalizer.js`) to translate the parsed keys (e.g. mapping desktop dotted PascalCase parameters from the backend into snake_case) and map standard dropdown inputs.
+* **Client-Side Key Resolution:** The frontend uses each module's declared `coreKeys` (in the `*Config.js` files, read by `designDictionary.js`) to map the parsed core keys onto the form fields and normalise standard dropdown inputs.
 * This separates concerns: the backend performs raw file format deserialization, while the frontend handles visual form binding, default values, and interface state hydration.
 
 ---
@@ -145,7 +145,7 @@ Osdag-Web ensures full bidirectional compatibility for three main round-trip exc
 | Scenario | Export Source | Import Target | Processing & Formatting |
 | :--- | :--- | :--- | :--- |
 | **Web-to-Desktop** | Osdag-Web | Osdag Desktop | The web app exports files using backend-assisted serialization (`SaveOsiFromInputs`). Overrides are prefixed with `Pref.` and flattened to compile with the native desktop dotted flat format. The Osdag Desktop application reads the generated file directly. |
-| **Desktop-to-Web** | Osdag Desktop | Osdag-Web | Osdag Desktop saves files in the native flat format. When uploaded to Osdag-Web, the backend parses the YAML-like structure into JSON statelessly (`OpenOsiUpload`). The React frontend normalizes PascalCase keys to snake_case using `normalizeOsiPayload` and hydrates forms. |
+| **Desktop-to-Web** | Osdag Desktop | Osdag-Web | Osdag Desktop saves files in the native flat format. When uploaded to Osdag-Web, the backend parses the YAML-like structure into JSON statelessly (`OpenOsiUpload`). The React frontend reads the core keys into the form fields with the module's declared `coreKeys` (`fromDesignDictionary`) and hydrates forms. |
 | **Web-to-Web** | Osdag-Web | Osdag-Web (later) | Users can export their design configuration from the web, and re-import it later to restore all inputs and design preferences. Hydration restores exact form values, customized selections (such as specific multi-select dropdown values), and preference overrides. |
 
 Since the serialization and parsing logic is centralized in the Python backend, we guarantee that the same formatting rules and engineering dictionary mappings apply across both Desktop and Web, eliminating validation drift.
@@ -160,7 +160,7 @@ Since the serialization and parsing logic is centralized in the Python backend, 
 
 ### 2. Download OSI in Project / Dashboard List Page (Key Flattening Drift) (Resolved)
 * **The Problem:** When downloading an existing project as an `.osi` file from the dashboard, the backend endpoint `ProjectOsiDownload` reads the stored nested JSON, flattens it by prefixing overrides with `Pref.`, and streams the flat text file. This flattening logic was duplicated separately in Python, leading to a sync drift risk.
-* **Resolution:** Centralized the key translation in `osi_files.py`: one table, `OSI_KEY_TO_FIELD`, holds only core keys, and the reverse map used by an export takes the first key listed for a field, which is the core spelling (`test_osi_key_table.py` checks both). Refactored `build_osi_payload` to automatically flatten and translate the input keys on the backend before serialization, ensuring that any download from `ProjectOsiDownload` or `SaveOsiFromInputs` outputs consistent, Osdag-desktop-compatible flat files.
+* **Resolution:** Centralized the export key translation in `osi_files.py`: `FIELD_TO_OSI_KEY` holds only core keys and an export writes the core spelling (`test_osi_key_table.py` checks it). Opening a file needs no backend table since the frontend reads each module's declared `coreKeys`. Refactored `build_osi_payload` to automatically flatten and translate the input keys on the backend before serialization, ensuring that any download from `ProjectOsiDownload` or `SaveOsiFromInputs` outputs consistent, Osdag-desktop-compatible flat files.
 
 ### 3. Import OSI from Homepage / Dashboard (Inconsistent Parsing Engine) (Resolved)
 * **The Problem:** The homepage import flow (in `Header.jsx`) parsed the `.osi` file using client-side JavaScript (`yaml-js`), which could fail or diverge from Python's parsing behaviors on complex YAML flat structures.
@@ -168,5 +168,5 @@ Since the serialization and parsing logic is centralized in the Python backend, 
 
 ### 4. Import OSI in Module Page (Key Mapping & Translation Drift) (Resolved)
 * **The Problem:** The module-level import uploaded the file to the stateless parser and received raw dotted PascalCase engineering keys, leaving the translation mapping logic to be hardcoded client-side in the frontend normalizers.
-* **Resolution:** Moved key normalization and translation mapping dictionary to the backend engine inside `osi_files.py`. The `parse_osi` utility returns a translated `{ dock, pref }` dictionary inside `inputs`, together with the file's own keys (`flat`). The module-independent `dock` translation cannot know each module's form fields, so the frontend maps `flat` with the module's own config (section 5.4) and uses `dock`/`pref` only for payloads that have no `flat`, such as saved projects.
+* **Resolution:** Moved parsing to the backend engine inside `osi_files.py`. The `parse_osi` utility returns the file's design dictionary as written. A backend translation cannot know each module's form fields, so the frontend maps it with the module's declared `coreKeys` (section 5.4); saved projects (`{ dock, pref }`) need no mapping.
 

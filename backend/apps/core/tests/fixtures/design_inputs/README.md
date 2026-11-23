@@ -41,8 +41,8 @@ each fixture's `notes` says which:
 
 **`osi:<file>`** (desktop examples in `osdag_core/data/ResourceFiles/design_example/`).
 The path a user's "open .osi" takes in the browser: `parse_osi()` (backend) gives
-`{dock, pref}`; the frontend's `loadStateFromOsi()` loads it into the module config's
-form state; `buildSubmissionParams` builds the body. An example whose body today's
+the file's design dictionary (core keys as written); the frontend's `loadStateFromOsi()`
+reads it with the module config's declared `coreKeys` into the form state; `buildSubmissionParams` builds the body. An example whose body today's
 `validate_input()` rejects is not written as a fixture; it is listed with the error in
 `osi_rejected.json`, and its module keeps the frontend-default fixtures.
 
@@ -51,8 +51,7 @@ form state; `buildSubmissionParams` builds the body. An example whose body today
 | osi + frontend-defaults | fin plate (5 osi), cleat angle (4), header plate (5), seated angle (5), base plate (3), beam-beam cover plate bolted (2) and welded (5), column-column cover plate bolted (4) and welded (5), beam-beam end plate (2), beam-column end plate (5), column-column end plate (1), tension bolted (5) and welded (5) |
 | frontend-defaults only, no desktop example | axially loaded column, struts bolted and welded, simply supported beam, on cantilever, purlin, plate girder, lap/butt joint bolted and welded |
 
-`parse_osi()` also returns the keys as written in the file (`flat`); `loadStateFromOsi()`
-maps those to the module's own fields, so the generator passes `{dock, pref, flat}`.
+The generator passes the dictionary `parse_osi()` returns to `loadStateFromOsi()` as is.
 
 ### Desktop examples without a fixture (10 of 66)
 

@@ -2,10 +2,9 @@
  * Loading `.osi` files into a module's form state.
  *
  * Every desktop example under `osdag_core/data/ResourceFiles/design_example` is parsed by the
- * backend (`parse_osi`, saved in `fixtures/osiExamples.json`) and loaded into its module with
- * `loadStateFromOsi`. The snapshots pin the resulting form state, so a change to the key
- * mapping (`osiNormalizer`, `osiMapperTracer`, the loader) shows up as a diff. The key map that
- * `getModuleKeyMap` derives for each module is pinned the same way.
+ * backend (`parse_osi`, saved in `fixtures/osiExamples.json`: the file's core-keyed dictionary)
+ * and loaded into its module with `loadStateFromOsi`. The snapshots pin the resulting form state,
+ * so a change to a module's declared `coreKeys` or to `designDictionary.js` shows up as a diff.
  *
  * To refresh the fixtures, run the backend's `parse_osi` (`apps/core/utils/osi_files.py`) over the
  * example files again and write `{ module, payload }` per file. Update the snapshots with
@@ -15,7 +14,6 @@ import { describe, expect, it } from "vitest";
 
 import examples from "./fixtures/osiExamples.json";
 import { loadStateFromOsi } from "../modules/shared/utils/osiLoader";
-import { getModuleKeyMap } from "../modules/shared/utils/osiMapperTracer";
 
 import { basePlateConfig } from "../modules/basePlate/configs/basePlateConfig";
 import { beamBeamEndPlateConfig } from "../modules/beamBeamEndPlate/configs/beamBeamEndPlateConfig";
@@ -89,12 +87,4 @@ describe("loading a desktop .osi example into its module", () => {
     const opened = [...modules].filter((m) => BY_MODULE.has(m));
     expect(opened.length).toBeGreaterThanOrEqual(13);
   });
-});
-
-describe("the key map derived for each module", () => {
-  for (const config of CONFIGS) {
-    it(config.designType, () => {
-      expect(getModuleKeyMap(config)).toMatchSnapshot();
-    });
-  }
 });

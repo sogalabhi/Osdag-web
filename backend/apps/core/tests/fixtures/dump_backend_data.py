@@ -4,13 +4,14 @@ Writes one JSON document to the path given as argv[1] (stdout is noisy: osdag_co
 prints import-time INFO lines):
 
     {
-      "osi": {"<file>": {"module_line": str, "dock": {...}, "pref": {...}, "flat": {...}}, ...},
+      "osi": {"<file>": {"module_line": str, "flat": {...}}, ...},
       "catalog": {"beams": [...], "columns": [...], ..., "materials": [...]}
     }
 
 "osi": every desktop example parsed with the backend's parse_osi(), the same step the
 web app performs when a user opens an .osi file (OpenOsiUpload -> parse_osi ->
-web-ready {dock, pref}).
+the file's design dictionary, core keys as written; the frontend reads it with each
+module's declared coreKeys).
 
 "catalog": the realistic option values the options views serve, read through
 apps.core.catalog (designations, bolt diameters, materials).
@@ -40,7 +41,7 @@ def dump_osi():
             continue
         with open(os.path.join(EXAMPLES, name), encoding="utf-8") as fh:
             module_line, _name, inputs = parse_osi(fh.read())
-        out[name] = {"module_line": module_line, "dock": inputs["dock"], "pref": inputs["pref"], "flat": inputs["flat"]}
+        out[name] = {"module_line": module_line, "flat": inputs}
     return out
 
 
