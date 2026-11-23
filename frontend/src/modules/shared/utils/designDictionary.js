@@ -1,5 +1,6 @@
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { KEY_CONNECTOR_MATERIAL } from "../../../constants/generated/coreKeys";
+import { DESIGN_PREF_TABLES } from "../../../constants/generated/designPrefTables";
 
 /**
  * Turns a design dictionary (core key -> value, the content of a desktop `.osi` file) into
@@ -8,14 +9,12 @@ import { KEY_CONNECTOR_MATERIAL } from "../../../constants/generated/coreKeys";
  *
  * - A core key feeds every field that declares it (the supported section feeds both
  *   `beam_section` and `secondary_beam`; each module reads the one its connectivity uses).
- * - A key no field declares is dropped (desktop output-panel state, keys of other modules, the
- *   desktop's material overwrite keys), and so is a key the module lists in `computedCoreKeys` (the
- *   builder derives it from several fields).
- * - The Additional Inputs a project or file carries (bolt hole type, gap, weld fabrication, ...) are
- *   core keys like any other: the module declares them for their fields, so they come back as
- *   form values, which the design request reads with the same result as an override. The desktop
- *   sends the keys no dock field declares to its design preferences; here they are dropped, so
- *   `designPrefOverrides` is empty after a load.
+ * - A key no field declares is dropped (desktop output-panel state, keys of other modules), and so is
+ *   a key the module lists in `computedCoreKeys` (the builder derives it from several fields).
+ * - The Additional Inputs a file carries are core keys like any other. The ones a form field
+ *   declares (bolt hole type, gap, weld fabrication, ...) come back as form values; the ones no
+ *   field declares but the core lists for the module's Additional Inputs tabs
+ *   (`DESIGN_PREF_TABLES`) become `designPrefOverrides`, keyed by core key, as the desktop does.
  */
 
 // The desktop stores the overall material, the connector material and each member's
@@ -26,7 +25,7 @@ const keyPriority = (key) => (key === "Material" ? 0 : key === KEY_CONNECTOR_MAT
 const inverted = new WeakMap();
 
 /** core key -> [field, ...], from `config.coreKeys`. */
-const fieldsByCoreKey = (config) => {
+export const fieldsByCoreKey = (config) => {
   let map = inverted.get(config);
   if (!map) {
     map = new Map();
@@ -118,6 +117,23 @@ const normalizeValue = (config, field, value, lists) => {
   return finalVal;
 };
 
+// The Additional Inputs keys of a module (those on the core's Additional Inputs tabs) that no
+// form field declares, with the values the dictionary holds for them.
+const prefOverridesOf = (config, dict) => {
+  const table = DESIGN_PREF_TABLES[config.designType];
+  if (!table) return {};
+  const declared = fieldsByCoreKey(config);
+  const prefKeys = new Set();
+  (table.prefTabs || []).forEach((tab) => (tab[2] || []).forEach((key) => prefKeys.add(key)));
+  const overrides = {};
+  Object.entries(dict).forEach(([key, value]) => {
+    if (prefKeys.has(key) && !declared.has(key) && !/^Label_/.test(key)) {
+      overrides[key] = Array.isArray(value) ? [...value] : value;
+    }
+  });
+  return overrides;
+};
+
 /**
  * Builds the form state from the values of a module's fields.
  *
@@ -191,5 +207,6 @@ const buildState = (config, dock, pref, lists) => {
  * @param {Object} lists - the module's option lists (`boltDiameterList`, `materialList`, ...)
  */
 export function fromDesignDictionary(config, dict, lists = {}) {
-  return buildState(config, splitByField(config, dict || {}), {}, lists);
+  const source = dict || {};
+  return buildState(config, splitByField(config, source), prefOverridesOf(config, source), lists);
 }

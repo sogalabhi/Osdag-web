@@ -141,6 +141,7 @@ export const EngineeringModals = () => {
         >
           <DesignPrefSections
             module={moduleConfig.sessionName}
+            moduleConfig={moduleConfig}
             inputs={inputs}
             setInputs={setInputs}
             setDesignPrefModalStatus={setDesignPrefModalStatus}

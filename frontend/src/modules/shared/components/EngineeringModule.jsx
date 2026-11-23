@@ -1488,6 +1488,7 @@ ${!isMobile ? (docks.output ? 'pr-0' : 'pr-[40px]') : ''}
           >
             <DesignPrefSections
               module={moduleConfig.sessionName}
+              moduleConfig={moduleConfig}
               inputs={inputs}
               setInputs={setInputs}
               setDesignPrefModalStatus={setDesignPrefModalStatus}

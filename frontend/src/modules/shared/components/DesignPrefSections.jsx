@@ -1,4 +1,4 @@
-import { useRef, useState, useContext, useEffect, useCallback } from "react";
+import { useRef, useState, useContext, useEffect, useCallback, useMemo } from "react";
 import { ModuleContext } from "../../../context/ModuleState";
 import { useAuth } from "../../../context/AuthContext";
 import GenericSectionView from "./GenericSectionView";
@@ -14,6 +14,7 @@ import OptimizationSectionModal from "./OptimizationSectionModal";
 import DesignSectionModal from "./DesignSectionModal";
 import { Button, Modal, Spin, message } from "antd";
 import { getDesignPrefConfig, getDesignPrefTabs } from "../config/designPrefModuleConfig";
+import { dockDriverFields } from "../utils/prefSyncKeys";
 import {
   fetchDesignPrefDefaults,
   fetchDesignPrefSync,
@@ -28,6 +29,7 @@ import {
 
 const DesignPrefSections = ({
   module,
+  moduleConfig,
   inputs,
   setInputs,
   designPrefOverrides = {},
@@ -139,12 +141,8 @@ const DesignPrefSections = ({
       setSyncLoading(true);
       try {
         const res = await fetchDesignPrefSync(
-          {
-            module_session_name: module,
-            inputs: buildMergedInputsForSync(),
-            operation,
-            design_pref_draft: designDraft,
-          },
+          moduleConfig,
+          { state: buildMergedInputsForSync(), operation, draft: designDraft },
           ac.signal
         );
         if (reqId !== syncReqIdRef.current) return { success: false, stale: true };
@@ -168,7 +166,7 @@ const DesignPrefSections = ({
         }
       }
     },
-    [applySyncResponse, module, rollBackSync, buildMergedInputsForSync]
+    [applySyncResponse, moduleConfig, rollBackSync, buildMergedInputsForSync]
   );
 
   // Shows one section's properties without changing what the design will use.
@@ -178,12 +176,8 @@ const DesignPrefSections = ({
       const ac = new AbortController();
       previewAbortRef.current = ac;
       const res = await fetchDesignPrefSync(
-        {
-          module_session_name: module,
-          inputs: buildMergedInputsForSync(),
-          operation: "open",
-          design_pref_draft: { [key]: value },
-        },
+        moduleConfig,
+        { state: buildMergedInputsForSync(), operation: "open", draft: { [key]: value } },
         ac.signal
       );
       if (!res.success) {
@@ -199,7 +193,7 @@ const DesignPrefSections = ({
         return next;
       });
     },
-    [module, buildMergedInputsForSync]
+    [moduleConfig, buildMergedInputsForSync]
   );
 
   const handleDesignationChange = useCallback(async (tabIndex, newDesignation, { preview = false } = {}) => {
@@ -253,10 +247,8 @@ const DesignPrefSections = ({
     setSyncLoading(true);
     try {
       const res = await fetchDesignPrefDefaults(
-        {
-          module_session_name: module,
-          inputs: buildMergedInputsForSync(),
-        },
+        moduleConfig,
+        { state: buildMergedInputsForSync() },
         ac.signal
       );
       if (reqId !== syncReqIdRef.current) return { success: false, stale: true };
@@ -283,7 +275,7 @@ const DesignPrefSections = ({
         setSyncReady(true);
       }
     }
-  }, [applySyncResponse, module, rollBackSync, buildMergedInputsForSync]);
+  }, [applySyncResponse, moduleConfig, rollBackSync, buildMergedInputsForSync]);
 
   // Resolve canonical open state on modal mount.
   useEffect(() => {
@@ -301,6 +293,10 @@ const DesignPrefSections = ({
     };
   }, [runSync, setDesignPrefOverrides, toStoredPrefOverrides]);
 
+  // The dock fields that hold the driving material (see `dockDriverFields`); a change in any refreshes the linked rows.
+  const driverFields = useMemo(() => dockDriverFields(moduleConfig), [moduleConfig]);
+  const driverKey = JSON.stringify(driverFields.map((field) => inputs?.[field]));
+
   const skipMaterialRefresh = useRef(true);
   useEffect(() => {
     if (!syncReady) return;
@@ -315,9 +311,7 @@ const DesignPrefSections = ({
       }
     })();
   }, [
-    inputs?.connector_material,
-    inputs?.material,
-    inputs?.member_material,
+    driverKey,
     syncReady,
     runSync,
     setDesignPrefOverrides,

@@ -707,7 +707,9 @@ exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plat
     "anchor_diameter_ocf": false,
     "anchor_grade_ocf": false,
   },
-  "designPrefOverrides": {},
+  "designPrefOverrides": {
+    "Member.Material": "E 250 (Fe 410 W)A",
+  },
   "extraState": {
     "selectedOption": "Moment Base Plate",
   },
@@ -811,7 +813,9 @@ exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plat
     "anchor_diameter_ocf": false,
     "anchor_grade_ocf": false,
   },
-  "designPrefOverrides": {},
+  "designPrefOverrides": {
+    "Member.Material": "E 250 (Fe 410 W)A",
+  },
   "extraState": {
     "selectedOption": "Hollow/Tubular Column Base",
   },
@@ -915,7 +919,11 @@ exports[`loading a desktop .osi example into its module > baseplate_3 (Base Plat
     "anchor_diameter_ocf": false,
     "anchor_grade_ocf": false,
   },
-  "designPrefOverrides": {},
+  "designPrefOverrides": {
+    "Member.Fu": "410",
+    "Member.Fy": "250",
+    "Member.Material": "E 250 (Fe 410 W)A",
+  },
   "extraState": {
     "selectedOption": "Welded Column Base",
   },
@@ -991,7 +999,11 @@ exports[`loading a desktop .osi example into its module > baseplate_4 (Base Plat
     "anchor_diameter_ocf": false,
     "anchor_grade_ocf": false,
   },
-  "designPrefOverrides": {},
+  "designPrefOverrides": {
+    "Member.Fu": "440",
+    "Member.Fy": "300",
+    "Member.Material": "E 300 (Fe 440)",
+  },
   "extraState": {
     "selectedOption": "Moment Base Plate",
   },
@@ -1061,7 +1073,11 @@ exports[`loading a desktop .osi example into its module > baseplate_5 (Base Plat
     "anchor_diameter_ocf": false,
     "anchor_grade_ocf": false,
   },
-  "designPrefOverrides": {},
+  "designPrefOverrides": {
+    "Member.Fu": "440",
+    "Member.Fy": "300",
+    "Member.Material": "E 300 (Fe 440)",
+  },
   "extraState": {
     "selectedOption": "Hollow/Tubular Column Base",
   },

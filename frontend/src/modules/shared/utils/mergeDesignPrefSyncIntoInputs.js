@@ -1,11 +1,7 @@
 /**
- * Merge design-pref sync API results into form `inputs` without clobbering
- * input-dock driver fields (material / member_material / connector_material), matching the
- * stricter policy in `useDesignPrefSync`.
+ * Merge design-pref sync API results (already in form field names) into form `inputs`,
+ * only where the server linked a preference row from the dock, as `useDesignPrefSync` does.
  */
-
-/** Keys that the input dock owns; never overwrite from server merge on save/reset. */
-const DOCK_DRIVER_KEYS = ["material", "member_material", "connector_material"];
 
 /**
  * @param {Object|null|undefined} metadata - `metadata` from design-pref sync response
@@ -42,24 +38,4 @@ export function mergeLinkedParityKeysIntoInputs(prev, resolvedInputs, metadata) 
     }
   });
   return next;
-}
-
-/**
- * Full merge of server `resolved_inputs` (e.g. after save or defaults), but always
- * keep current dock driver values from `prev` so the material dropdown does not jump.
- *
- * @param {Object} prev
- * @param {Object} resolvedInputs
- */
-export function mergeParityIntoInputsPreservingDockDrivers(prev, resolvedInputs) {
-  if (!resolvedInputs || typeof resolvedInputs !== "object") {
-    return { ...prev };
-  }
-  const out = { ...prev, ...resolvedInputs };
-  for (const k of DOCK_DRIVER_KEYS) {
-    if (Object.prototype.hasOwnProperty.call(prev, k)) {
-      out[k] = prev[k];
-    }
-  }
-  return out;
 }

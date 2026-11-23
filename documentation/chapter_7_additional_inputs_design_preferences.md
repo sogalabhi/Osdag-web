@@ -35,7 +35,7 @@ The preferences modal panel [DesignPrefSections.jsx](../frontend/src/modules/sha
 * **`sectionDetails`:** Stores structural characteristics (sectional area, radius of gyration, root/toe radii) resolved by the backend database for the active sections.
 
 ### 2. State Actions & Buttons
-* **Open Modal (`open`):** On mount, the modal dispatches a `POST` request to `/api/design-pref/sync/` with `operation: "open"` to retrieve the initial structural sections and material data.
+* **Open Modal (`open`):** On mount, the modal dispatches a `POST` request to `/api/design-pref/sync/` with `operation: "open"` (core-keyed `inputs` and the module id, see section 2.3c) to retrieve the initial structural sections and material data.
 * **Defaults Button (`defaults`):** Fetches the default configuration parameters from `/api/design-pref/defaults/` and resets both the local draft inputs and active overrides.
 * **Discard/Cancel:** Closes the modal without applying modifications, discarding the local `designPrefInputs` draft.
 * **Save Button (`save`):** Triggers `saveCoreInputs()`. It checks if any required fields are blank, dispatches a sync query with `operation: "save"` to the backend, updates the parent context overrides, invalidates old design outputs (triggering a redesign requirement), and closes the modal.
@@ -91,8 +91,8 @@ Osdag-Web resolves this through a bidirectional sync state machine using the [us
 └─────────────────────────────────┘
 ```
 
-1. **Active Hook Monitoring:** `useDesignPrefSync.js` monitors key driving dropdowns: `connector_material`, `material`, and `member_material`.
-2. **Debounced Network Synchronization:** When a driver changes, the hook schedules a debounced call (200ms) to the `/api/design-pref/sync/` endpoint with `operation: "refresh"`.
+1. **Active Hook Monitoring:** `useDesignPrefSync.js` monitors the dock fields that hold the driving material. `dockDriverFields(config)` (`prefSyncKeys.js`) reads them from the core's table: the fields that feed a dock material the core copies to other keys (`DESIGN_PREF_TABLES[module].dockCopies`), e.g. `connector_material` in the shear modules and `material` in tension, cover plate and flexure. The four butt and lap joints, where the core copies no material, keep the old three names (`connector_material`, `material`, `member_material`). `useModuleForm.js` and `DesignPrefSections.jsx` use the same list.
+2. **Debounced Network Synchronization:** When a driver changes, the hook schedules a debounced call (200ms) to the `/api/design-preferences/sync/` endpoint with `operation: "refresh"`. The request is built by `toSyncRequest` (`prefSyncKeys.js`): core keys and the module id (`config.designType`) out, form field names back.
 3. **Modal Collision Prevention (`pause` flag):** When the Additional Inputs modal is open, the hook's `pause` parameter is set to `true`. This prevents page-level sync requests from conflicting with manual configurations made inside the modal.
 4. **No-Change Optimization:** When the modal closes, the hook compares the driver material with its state prior to the modal opening. If it is unchanged, the refresh call is skipped to protect manual overrides from being clobbered.
 5. **Writethrough Rollbacks:** If the sync request fails due to network issues, the system rolls back to the `lastKnownGoodDesignPrefSnapshot` to prevent corrupted states.
@@ -165,7 +165,7 @@ When a user clicks the **Defaults** button, Osdag-Web executes a two-phase reset
 
 The tabs displayed inside the Additional Inputs panel are mapped dynamically based on the active module name. This is driven by [designPrefModuleConfig.js](../frontend/src/modules/shared/config/designPrefModuleConfig.js):
 
-The section tabs show the selected section's properties. If the module's list is on "All" or holds several sections, the tab previews the first one, and picking another only changes what the tab shows. The design's list changes only from the input dock. The backend's `_SECTION_KEY_MAP` in `sync_merge.py` must return each module's section under the role its tab reads: tab 2 and the beam sections read `supported`, tab 0 reads `supporting`, and the cleat and seated angle tabs read `connector`.
+The section tabs show the selected section's properties. If the module's list is on "All" or holds several sections, the tab previews the first one, and picking another only changes what the tab shows. The design's list changes only from the input dock. The backend's section sources in `sync_merge.py` (`core_section_sources`, plus `LEGACY_SECTION_SOURCES`) must return each module's section under the role its tab reads: tab 2 and the beam sections read `supported`, tab 0 reads `supporting`, and the cleat and seated angle tabs read `connector`.
 
 | Module Name | Tab IDs List | Displayed Tabs | Initial Tab |
 | :--- | :--- | :--- | :--- |
@@ -196,16 +196,11 @@ The section tabs show the selected section's properties. If the module's list is
 
 During the code review of the Design Preferences and sync subsystems, two implementation concerns were identified:
 
-### 1. Inconsistent Driver Key Preservation (Clobbering `connector_material` on Reset) (Resolved)
-* **The Problem:** The utility `mergeParityIntoInputsPreservingDockDrivers` in [mergeDesignPrefSyncIntoInputs.js](../frontend/src/modules/shared/utils/mergeDesignPrefSyncIntoInputs.js) is designed to protect driving material dropdown selections from jumping when a user resets/syncs preferences. However, it only protected `["material", "member_material"]`. The driver field `connector_material` (used heavily across connection submodules) was omitted from this array.
-* **The Risk:** When a user clicked the **Defaults** button, the connector material selection in the basic input dock would be overwritten by default database selections, causing the select boxes to snap back to default steel grades unexpectedly.
-* **Resolution:** Added `"connector_material"` to the `DOCK_DRIVER_KEYS` constant in [mergeDesignPrefSyncIntoInputs.js](../frontend/src/modules/shared/utils/mergeDesignPrefSyncIntoInputs.js):
-  ```javascript
-  const DOCK_DRIVER_KEYS = ["material", "member_material", "connector_material"];
-  ```
-  The `mergeParityIntoInputsPreservingDockDrivers` function iterates this array and restores each key's current value from `prev` after the server merge, so the connector material dropdown no longer jumps on Defaults or Save.
+### 1. Inconsistent Driver Key Preservation (Clobbering `connector_material` on Reset) (Resolved, helper removed)
+* **The Problem:** The utility `mergeParityIntoInputsPreservingDockDrivers` in [mergeDesignPrefSyncIntoInputs.js](../frontend/src/modules/shared/utils/mergeDesignPrefSyncIntoInputs.js) was meant to protect the driving material dropdowns from jumping on Defaults or Save, but it listed only `material` and `member_material`.
+* **Resolution:** Nothing called it: the Additional Inputs modal never writes sync answers into the dock `inputs` (only `mergeLinkedParityKeysIntoInputs` does, and only for rows the server linked), so the dock dropdowns cannot jump. The helper and its hard-coded `DOCK_DRIVER_KEYS` list were removed; the dock driver fields are now read from the core's table (`dockDriverFields`, section 7.3).
 
 ### 2. Material Refresh State Races inside the Modal (Resolved)
-* **The Problem:** In [DesignPrefSections.jsx](../frontend/src/modules/shared/components/DesignPrefSections.jsx), a `useEffect` block executes a background `runSync("refresh")` whenever the driving material variables (`inputs.connector_material`, `inputs.material`, `inputs.member_material`) change while the modal is open.
+* **The Problem:** In [DesignPrefSections.jsx](../frontend/src/modules/shared/components/DesignPrefSections.jsx), a `useEffect` block executes a background `runSync("refresh")` whenever the driving material variables (the dock driver fields from `dockDriverFields`: `inputs.connector_material` or `inputs.material` depending on the module) change while the modal is open.
 * **The Risk:** When a user clicked **Defaults** or **Save**, the corresponding handler (`resetInputs` / `saveCoreInputs`) called `setDesignPrefOverrides(toStoredPrefOverrides(...))` after its `await` resolved. This wrote a new `connector_material` (or other material key) into the parent's `inputs` prop. Because `syncLoading` and `syncReady` were already committed to their post-operation values (`false` / `true` respectively) by the time `setDesignPrefOverrides` was called, the material `useEffect` saw valid conditions and launched a redundant `runSync("refresh")` network request in parallel — an unnecessary round-trip that could also collide with residual re-render states.
 * **Resolution:** Extended the existing `skipMaterialRefresh` ref — already used to suppress the first mount-triggered refresh — to also guard the managed-operation cascades. Immediately before each `setDesignPrefOverrides` call in `saveCoreInputs` and `resetInputs`, `skipMaterialRefresh.current` is set to `true`. Because the ref is checked **synchronously during the render triggered by `setDesignPrefOverrides`**, the effect correctly detects the skip flag, returns early without firing the network request, and resets the flag to `false` for genuine future material changes. No new state variables or extra hooks are required.

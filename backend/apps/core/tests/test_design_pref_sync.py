@@ -5,71 +5,104 @@ Unit tests for design preference sync merge and HTTP API.
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from apps.core.api.design.sync_merge import lookup_sources, merge_design_pref_sync, list_registered_session_names
+from apps.core.api.design.sync_merge import (
+    list_registered_module_ids,
+    lookup_sources,
+    merge_design_pref_sync,
+    unchanged,
+)
 from apps.core.models import CustomMaterials
 from apps.core.tests.auth_utils import authenticated_as
 from apps.core.tests.test_osdag_overrides import make_beam
+
+from osdag_core.Common import (
+    KEY_CONNECTOR_MATERIAL,
+    KEY_DISP_FINPLATE,
+    KEY_DISP_FLEXURE,
+    KEY_DISP_FLEXURE4,
+    KEY_DP_BOLT_HOLE_TYPE,
+    KEY_MATERIAL,
+    KEY_SECSIZE,
+    KEY_SUPTDSEC_MATERIAL,
+    KEY_SUPTNGSEC_MATERIAL,
+)
 
 
 class DesignPrefSyncMergeTests(TestCase):
     def test_fin_plate_open_copies_dock_material_to_pref_keys(self):
         inputs = {
-            "material": "E 250 (Fe 410 W)A",
-            "bolt_diameter": "12",
+            KEY_CONNECTOR_MATERIAL: "E 250 (Fe 410 W)A",
+            KEY_MATERIAL: "E 250 (Fe 410 W)A",
         }
         resolved, meta, _md, _sd = merge_design_pref_sync(
-            "Fin Plate Connection",
+            KEY_DISP_FINPLATE,
             inputs,
             "open",
             design_pref_draft=None,
             material_model=None,
         )
-        self.assertEqual(resolved["supporting_material"], "E 250 (Fe 410 W)A")
-        self.assertEqual(resolved["supported_material"], "E 250 (Fe 410 W)A")
-        self.assertEqual(resolved["connector_material"], "E 250 (Fe 410 W)A")
-        self.assertIn("material", meta["copied_from_input_dock_keys"])
+        self.assertEqual(resolved[KEY_SUPTNGSEC_MATERIAL], "E 250 (Fe 410 W)A")
+        self.assertEqual(resolved[KEY_SUPTDSEC_MATERIAL], "E 250 (Fe 410 W)A")
+        self.assertEqual(resolved[KEY_CONNECTOR_MATERIAL], "E 250 (Fe 410 W)A")
+        self.assertIn(KEY_CONNECTOR_MATERIAL, meta["copied_from_input_dock_keys"])
+        self.assertEqual(meta["module_id"], KEY_DISP_FINPLATE)
 
     def test_save_preserves_draft_overrides_without_forcing_dock_resync(self):
         inputs = {
-            "material": "E 250 (Fe 410 W)A",
-            "supporting_material": "E 250 (Fe 410 W)A",
-            "supported_material": "E 250 (Fe 410 W)A",
-            "connector_material": "E 250 (Fe 410 W)A",
+            KEY_MATERIAL: "E 250 (Fe 410 W)A",
+            KEY_SUPTNGSEC_MATERIAL: "E 250 (Fe 410 W)A",
+            KEY_SUPTDSEC_MATERIAL: "E 250 (Fe 410 W)A",
+            KEY_CONNECTOR_MATERIAL: "E 250 (Fe 410 W)A",
         }
-        draft = {"connector_material": "E 350 (Fe 490)"}
+        draft = {KEY_CONNECTOR_MATERIAL: "E 350 (Fe 490)"}
         resolved, _meta, _md, _sd = merge_design_pref_sync(
-            "Fin Plate Connection",
+            KEY_DISP_FINPLATE,
             inputs,
             "save",
             design_pref_draft=draft,
             material_model=None,
         )
-        self.assertEqual(resolved["connector_material"], "E 350 (Fe 490)")
+        self.assertEqual(resolved[KEY_CONNECTOR_MATERIAL], "E 350 (Fe 490)")
 
     def test_reset_applies_driver_sync(self):
-        inputs = {"material": "E 165 (Fe 290)"}
+        inputs = {KEY_CONNECTOR_MATERIAL: "E 165 (Fe 290)"}
         resolved, _meta, _md, _sd = merge_design_pref_sync(
-            "Fin Plate Connection",
+            KEY_DISP_FINPLATE,
             inputs,
             "reset",
             design_pref_draft=None,
             material_model=None,
         )
-        self.assertEqual(resolved["connector_material"], "E 165 (Fe 290)")
+        self.assertEqual(resolved[KEY_SUPTNGSEC_MATERIAL], "E 165 (Fe 290)")
         self.assertIn("linked_pref_keys", _meta)
-        self.assertIn("connector_material", _meta["linked_pref_keys"])
+        self.assertIn(KEY_SUPTNGSEC_MATERIAL, _meta["linked_pref_keys"])
 
-    def test_mapping_covers_all_registered_names(self):
-        names = list_registered_session_names()
-        self.assertIn("Fin Plate Connection", names)
-        self.assertIn("Purlin Design", names)
+    def test_request_is_not_mutated_and_answer_has_core_keys_only(self):
+        inputs = {KEY_CONNECTOR_MATERIAL: "E 250 (Fe 410 W)A", KEY_SECSIZE: ["MB 300"]}
+        resolved, _meta, _md, _sd = merge_design_pref_sync(KEY_DISP_FLEXURE, inputs, "refresh")
+        self.assertEqual(inputs, {KEY_CONNECTOR_MATERIAL: "E 250 (Fe 410 W)A", KEY_SECSIZE: ["MB 300"]})
+        self.assertIn(KEY_SECSIZE, resolved)
+        self.assertNotIn("connector_material", resolved)
+
+    def test_the_core_knows_every_module_the_frontend_serves(self):
+        ids = list_registered_module_ids()
+        self.assertIn(KEY_DISP_FINPLATE, ids)
+        self.assertNotIn(KEY_DISP_FLEXURE4, ids)
+
+    def test_purlin_has_no_core_tables_and_is_answered_unchanged(self):
+        # Purlin is out of scope: it keeps web names and gets no sync.
+        inputs = {"material": "E 250 (Fe 410 W)A", "section_material": "E 350 (Fe 490)"}
+        resolved, meta, _md, _sd = unchanged(KEY_DISP_FLEXURE4, inputs, "open")
+        self.assertEqual(resolved, inputs)
+        self.assertEqual(meta["copied_from_input_dock_keys"], {})
+        self.assertEqual(meta["module_id"], KEY_DISP_FLEXURE4)
 
 
 class DesignPrefSyncAPITests(TestCase):
     def test_defaults_post_returns_default_payload(self):
         body = {
-            "module_session_name": "Fin Plate Connection",
-            "inputs": {"material": "E 250 (Fe 410 W)A"},
+            "module_id": KEY_DISP_FINPLATE,
+            "inputs": {KEY_CONNECTOR_MATERIAL: "E 250 (Fe 410 W)A"},
         }
         r = self.client.post(
             "/api/design-preferences/defaults/",
@@ -85,8 +118,8 @@ class DesignPrefSyncAPITests(TestCase):
 
     def test_sync_post_returns_resolved_payload(self):
         body = {
-            "module_session_name": "Fin Plate Connection",
-            "inputs": {"material": "E 250 (Fe 410 W)A"},
+            "module_id": KEY_DISP_FINPLATE,
+            "inputs": {KEY_CONNECTOR_MATERIAL: "E 250 (Fe 410 W)A"},
             "operation": "open",
         }
         r = self.client.post(
@@ -107,13 +140,25 @@ class DesignPrefSyncAPITests(TestCase):
         r = self.client.post(
             "/api/design-preferences/sync/",
             data={
-                "module_session_name": "Fin Plate Connection",
+                "module_id": KEY_DISP_FINPLATE,
                 "inputs": {},
                 "operation": "not-an-operation",
             },
             content_type="application/json",
         )
         self.assertEqual(r.status_code, 400)
+
+    def test_sync_answers_a_module_without_core_tables_unchanged(self):
+        inputs = {"material": "E 250 (Fe 410 W)A"}
+        for url, extra, field in (
+            ("/api/design-preferences/sync/", {"operation": "open"}, "resolved_inputs"),
+            ("/api/design-preferences/defaults/", {}, "default_pref_inputs"),
+        ):
+            r = self.client.post(
+                url, data={"module_id": KEY_DISP_FLEXURE4, "inputs": inputs, **extra}, content_type="application/json"
+            )
+            self.assertEqual(r.status_code, 200, url)
+            self.assertEqual(r.json()[field], inputs)
 
     def test_sync_requires_module(self):
         r = self.client.post(
@@ -127,7 +172,7 @@ class DesignPrefSyncAPITests(TestCase):
 class DesignPrefCustomRowsTests(TestCase):
     """Custom sections and materials reach the design preference dialog for their owner only."""
 
-    INPUTS = {"material": "My Steel", "section_designation": ["MY 200"]}
+    INPUTS = {KEY_MATERIAL: "My Steel", KEY_SECSIZE: ["MY 200"]}
 
     def setUp(self):
         self.user = User.objects.create_user(username="u1", email="u1@example.com", password="x")
@@ -141,7 +186,7 @@ class DesignPrefCustomRowsTests(TestCase):
 
     def merge(self, user):
         return merge_design_pref_sync(
-            "Simply Supported Beam Design", self.INPUTS, "open", **lookup_sources(user),
+            KEY_DISP_FLEXURE, self.INPUTS, "open", **lookup_sources(user),
         )
 
     def test_owner_gets_custom_rows(self):
@@ -158,7 +203,7 @@ class DesignPrefCustomRowsTests(TestCase):
             self.assertEqual(material_details["connector"], [])
 
     def test_sync_api_returns_custom_details(self):
-        body = {"module_session_name": "Simply Supported Beam Design", "inputs": self.INPUTS, "operation": "open"}
+        body = {"module_id": KEY_DISP_FLEXURE, "inputs": self.INPUTS, "operation": "open"}
         with authenticated_as(self.user):
             r = self.client.post("/api/design-preferences/sync/", data=body, content_type="application/json")
         self.assertEqual(r.status_code, 200)
@@ -167,7 +212,7 @@ class DesignPrefCustomRowsTests(TestCase):
         self.assertEqual(data["material_details"]["connector"][0]["Grade"], "My Steel")
 
     def test_defaults_api_returns_custom_details(self):
-        body = {"module_session_name": "Simply Supported Beam Design", "inputs": self.INPUTS}
+        body = {"module_id": KEY_DISP_FLEXURE, "inputs": self.INPUTS}
         with authenticated_as(self.user):
             r = self.client.post("/api/design-preferences/defaults/", data=body, content_type="application/json")
         self.assertEqual(r.status_code, 200)
@@ -179,14 +224,14 @@ class DesignPrefCustomRowsTests(TestCase):
 class DesignPrefCatalogTests(TestCase):
     """Without custom rows, section and material details come from the SQLite catalog."""
 
-    INPUTS = {"material": "E 250 (Fe 410 W)A", "section_designation": ["MB 300"]}
+    INPUTS = {KEY_MATERIAL: "E 250 (Fe 410 W)A", KEY_SECSIZE: ["MB 300"]}
 
     def setUp(self):
         self.user = User.objects.create_user(username="u1", email="u1@example.com", password="x")
 
     def merge(self, user):
         return merge_design_pref_sync(
-            "Simply Supported Beam Design", self.INPUTS, "open", **lookup_sources(user),
+            KEY_DISP_FLEXURE, self.INPUTS, "open", **lookup_sources(user),
         )
 
     def test_guest_gets_catalog_rows(self):

@@ -10,6 +10,7 @@ import {
 } from "../../../constants/generated/coreKeys";
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { loadStateFromOsi } from "../utils/osiLoader";
+import { dockDriverFields } from "../utils/prefSyncKeys";
 
 const buildInitialSelectionStates = (config) =>
   (config.selectionConfig || []).reduce((acc, selection) => {
@@ -156,26 +157,18 @@ export const useModuleForm = (moduleConfig, moduleData) => {
   }, [displaySaveInputPopup]);
 
   const dockDriverSnapshotRef = useRef(null);
+  // The dock fields that hold the driving material (see `dockDriverFields`).
+  const dockDriverFieldNames = useMemo(() => dockDriverFields(moduleConfig), [moduleConfig]);
+  const dockDriverSnapshot = JSON.stringify(dockDriverFieldNames.map((field) => inputs?.[field]));
 
   useEffect(() => {
-    const currentDockDrivers = {
-      material: inputs?.material,
-      member_material: inputs?.member_material,
-      connector_material: inputs?.connector_material,
-    };
-
-    if (!dockDriverSnapshotRef.current) {
-      dockDriverSnapshotRef.current = currentDockDrivers;
+    if (dockDriverSnapshotRef.current === null) {
+      dockDriverSnapshotRef.current = dockDriverSnapshot;
       return;
     }
 
-    const prev = dockDriverSnapshotRef.current;
-    const dockDriverChanged =
-      prev.material !== currentDockDrivers.material ||
-      prev.member_material !== currentDockDrivers.member_material ||
-      prev.connector_material !== currentDockDrivers.connector_material;
-
-    dockDriverSnapshotRef.current = currentDockDrivers;
+    const dockDriverChanged = dockDriverSnapshotRef.current !== dockDriverSnapshot;
+    dockDriverSnapshotRef.current = dockDriverSnapshot;
     if (!dockDriverChanged) return;
 
     setDesignPrefOverrides((prevOverrides) => {
@@ -186,12 +179,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
       delete nextOverrides.connector_material;
       return nextOverrides;
     });
-  }, [
-    inputs?.material,
-    inputs?.member_material,
-    inputs?.connector_material,
-    setDesignPrefOverrides,
-  ]);
+  }, [dockDriverSnapshot, setDesignPrefOverrides]);
 
   const updateModalState = (modalKey, isOpen) => {
     setModalStates((prev) => ({
