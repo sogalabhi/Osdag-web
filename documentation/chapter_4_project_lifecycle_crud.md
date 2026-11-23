@@ -9,9 +9,9 @@ Osdag-Web maintains relational project history for authenticated users. The data
 The relational state of a user project is managed in the `Project` model in [models.py](../backend/apps/core/models.py). 
 
 ### The `inputs_json` Schema
-Instead of storing form inputs as flat fields, Osdag-Web encapsulates them inside a structured `inputs_json` JSON column:
-* **`dock`:** Stores the active inputs populated inside the main web form dock (e.g. beam designations, weld sizes, load inputs).
-* **`pref`:** Stores the design preference overrides configured inside the **Additional Inputs** tabs (e.g. connector details, detailing gaps, safety factors).
+`inputs_json` holds the **design dictionary**: one flat `{ core key: value }` object, the same content as the module's desktop `.osi` file (chapter 5) and the same keys the design request carries (`Bolt.Diameter`, `Material`, `Detailing.Gap`, `Module`, ...). It has no `{dock, pref}` split, no `Pref.` prefix and no web field names. It holds the module's inputs (with "All" lists written out in full) and the Additional Inputs the user set. The frontend builds it with `toDesignDictionary` ([osiSave.js](../frontend/src/modules/shared/utils/osiSave.js)) on project creation and on every design run, and reads it back with `fromDesignDictionary` through `loadStateFromOsi`. The `module` and `submodule` columns hold the parent module and the module id; the dictionary also carries the module name under `Module`.
+
+Projects saved before this shape (form state keyed by web field names) are cleared by migration `0018_clear_field_state_project_inputs`: their `inputs_json` becomes null. The GDPR export (`export_data_api.py`) writes `inputs_json` as stored and does not depend on its shape.
 
 ### The `outputs_json` Schema
 Stores the raw calculated outputs returned by the Celery calculation solver. This JSON payload is loaded back as the project's outputs upon opening a saved project, avoiding the need to re-run calculations. It is the flat `data` dict only: it does not hold the dock layout (`output_layout`, see chapter 6, section 6.5.2), so an opened project shows the module's empty output dock (fetched from `/api/modules/<module>/output-layout/`, section 6.5.2) with its popup buttons disabled until the design is run again.
@@ -77,10 +77,7 @@ Osdag-Web implements an automated calculation-autosave flow within the [useDesig
 3. **API Autosave Trigger:** If a project ID is present, the hook immediately dispatches a background PUT request to `/api/projects/<id>/` using [useEngineeringService.js](../frontend/src/modules/shared/hooks/useEngineeringService.js):
    ```javascript
    await service.updateProject(projectId, {
-     inputs_json: {
-       dock: inputs,
-       pref: designPrefOverrides,
-     },
+     inputs_json: toDesignDictionary({ moduleConfig, inputs, allSelected, contextData, extraState, designPrefOverrides }),
      outputs_json: designBody.data,
    });
    ```

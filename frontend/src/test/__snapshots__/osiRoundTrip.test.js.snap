@@ -1,0 +1,988 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`a desktop .osi example opened and saved again > EP-1 (Header Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Module": ""End Plate Connection" -> "Header Plate Connection"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > EP-2 (Header Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Module": ""End Plate Connection" -> "Header Plate Connection"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > EP-3 (Header Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Module": ""End Plate Connection" -> "Header Plate Connection"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > EP-4 (Header Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Module": ""End Plate Connection" -> "Header Plate Connection"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > EP-5 (Header Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Module": ""End Plate Connection" -> "Header Plate Connection"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > SA-1 (Seated Angle Connection) 1`] = `
+{
+  "added": [
+    "Load.Axial",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > SA-2 (Seated Angle Connection) 1`] = `
+{
+  "added": [
+    "Load.Axial",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > SA-3 (Seated Angle Connection) 1`] = `
+{
+  "added": [
+    "Load.Axial",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > SA-4 (Seated Angle Connection) 1`] = `
+{
+  "added": [
+    "Load.Axial",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > SA-5 (Seated Angle Connection) 1`] = `
+{
+  "added": [
+    "Load.Axial",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Material": ""E 350 (Fe 490)" -> "E 250 (Fe 410 W)A"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > baseplate_1 (Base Plate Connection) 1`] = `
+{
+  "added": [
+    "Load.Axial",
+  ],
+  "changed": {
+    "Anchor Bolt.ICF.Diameter": "["M20","M24","M30","M36","M42","M48","M56","M64","M72"] -> ["M20","M24"]",
+    "Anchor Bolt.ICF.Grade": "["3.6","4.6","4.8","5.6","5.8","6.8","8.8","9.8","10.9","... -> ["4.6","8.8"]",
+    "Load.Axial_Tension": """ -> "0"",
+    "Load.Moment.Major": """ -> "0"",
+    "Load.Moment.Minor": """ -> "0"",
+  },
+  "dropped": [
+    "Base_Plate.Fu",
+    "Base_Plate.Fy",
+    "Base_Plate.Material",
+    "Design.Design_Method",
+    "DesignPreferences.Anchor_Bolt.Friction_coefficient",
+    "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.ICF.Designation",
+    "DesignPreferences.Anchor_Bolt.ICF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.ICF.Length",
+    "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.ICF.Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Designation",
+    "DesignPreferences.Anchor_Bolt.OCF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.OCF.Length",
+    "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.OCF.Type",
+    "DesignPreferences.Design.Base_Plate",
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "Load.Axial_Compression",
+    "Member.Material",
+    "Stiffener_Key.Fu",
+    "Stiffener_Key.Fy",
+    "Stiffener_Key.Material",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > baseplate_2 (Base Plate Connection) 1`] = `
+{
+  "added": [
+    "Load.Axial",
+  ],
+  "changed": {
+    "Anchor Bolt.ICF.Diameter": "["M20","M24","M30","M36","M42","M48","M56","M64","M72"] -> ["M20","M24"]",
+    "Anchor Bolt.ICF.Grade": "["3.6","4.6","4.8","5.6","5.8","6.8","8.8","9.8","10.9","... -> ["4.6","8.8"]",
+    "Load.Axial_Tension": """ -> "0"",
+    "Load.Moment.Major": """ -> "0"",
+    "Load.Moment.Minor": """ -> "0"",
+    "Member.Designation": "" CHS 355.6 x 12" -> "CHS 355.6 x 12"",
+  },
+  "dropped": [
+    "Base_Plate.Fu",
+    "Base_Plate.Fy",
+    "Base_Plate.Material",
+    "Design.Design_Method",
+    "DesignPreferences.Anchor_Bolt.Friction_coefficient",
+    "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.ICF.Designation",
+    "DesignPreferences.Anchor_Bolt.ICF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.ICF.Length",
+    "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.ICF.Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Designation",
+    "DesignPreferences.Anchor_Bolt.OCF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.OCF.Length",
+    "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.OCF.Type",
+    "DesignPreferences.Design.Base_Plate",
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "Load.Axial_Compression",
+    "Member.Material",
+    "Stiffener_Key.Fu",
+    "Stiffener_Key.Fy",
+    "Stiffener_Key.Material",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > baseplate_3 (Base Plate Connection) 1`] = `
+{
+  "added": [
+    "Load.Axial",
+  ],
+  "changed": {
+    "Anchor Bolt.ICF.Diameter": "["M20","M24","M30","M36","M42","M48","M56","M64","M72"] -> ["M20","M24"]",
+    "Anchor Bolt.ICF.Grade": "["8.8"] -> ["4.6","8.8"]",
+    "Load.Axial_Tension": """ -> "0"",
+    "Load.Moment.Major": """ -> "0"",
+    "Load.Moment.Minor": """ -> "0"",
+  },
+  "dropped": [
+    "Base_Plate.Material",
+    "Design.Design_Method",
+    "DesignPreferences.Anchor_Bolt.Friction_coefficient",
+    "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.ICF.Designation",
+    "DesignPreferences.Anchor_Bolt.ICF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.ICF.Length",
+    "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.ICF.Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Designation",
+    "DesignPreferences.Anchor_Bolt.OCF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.OCF.Length",
+    "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.OCF.Type",
+    "DesignPreferences.Design.Base_Plate",
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "Label_21",
+    "Label_8",
+    "Load.Axial_Compression",
+    "Member.Fu",
+    "Member.Fy",
+    "Member.Material",
+    "Stiffener_Key.Material",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > baseplate_4 (Base Plate Connection) 1`] = `
+{
+  "added": [
+    "Load.Axial",
+  ],
+  "changed": {
+    "Anchor Bolt.ICF.Diameter": "["M20"] -> ["M20","M24"]",
+    "Anchor Bolt.ICF.Grade": "["8.8"] -> ["4.6","8.8"]",
+    "Load.Axial_Tension": """ -> "0"",
+  },
+  "dropped": [
+    "Base_Plate.Material",
+    "Design.Design_Method",
+    "DesignPreferences.Anchor_Bolt.Friction_coefficient",
+    "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.ICF.Designation",
+    "DesignPreferences.Anchor_Bolt.ICF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.ICF.Length",
+    "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.ICF.Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Designation",
+    "DesignPreferences.Anchor_Bolt.OCF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.OCF.Length",
+    "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.OCF.Type",
+    "DesignPreferences.Design.Base_Plate",
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "Label_21",
+    "Label_8",
+    "Load.Axial_Compression",
+    "Member.Fu",
+    "Member.Fy",
+    "Member.Material",
+    "Stiffener_Key.Material",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > baseplate_5 (Base Plate Connection) 1`] = `
+{
+  "added": [
+    "Load.Axial",
+  ],
+  "changed": {
+    "Anchor Bolt.ICF.Diameter": "["M20"] -> ["M20","M24"]",
+    "Anchor Bolt.ICF.Grade": "["8.8"] -> ["4.6","8.8"]",
+    "Load.Axial_Tension": """ -> "0"",
+    "Load.Moment.Major": """ -> "0"",
+    "Load.Moment.Minor": """ -> "0"",
+    "Member.Designation": "" CHS 355.6 x 10" -> "CHS 355.6 x 10"",
+  },
+  "dropped": [
+    "Base_Plate.Material",
+    "Design.Design_Method",
+    "DesignPreferences.Anchor_Bolt.Friction_coefficient",
+    "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.ICF.Designation",
+    "DesignPreferences.Anchor_Bolt.ICF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.ICF.Length",
+    "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.ICF.Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type",
+    "DesignPreferences.Anchor_Bolt.OCF.Designation",
+    "DesignPreferences.Anchor_Bolt.OCF.Galvanized",
+    "DesignPreferences.Anchor_Bolt.OCF.Length",
+    "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite",
+    "DesignPreferences.Anchor_Bolt.OCF.Type",
+    "DesignPreferences.Design.Base_Plate",
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "Label_8",
+    "Load.Axial_Compression",
+    "Member.Fu",
+    "Member.Fy",
+    "Member.Material",
+    "Stiffener_Key.Material",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > bbep_1 (Beam-to-Beam End Plate Connection) 1`] = `
+{
+  "added": [
+    "Connectivity *",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Connector.Material": ""E 250 (Fe 410 W)A" -> "E 450 (Fe 590) E"",
+  },
+  "dropped": [
+    "out_titles_status",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > bbep_2 (Beam-to-Beam End Plate Connection) 1`] = `
+{
+  "added": [
+    "Connectivity *",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Connector.Material": ""E 250 (Fe 410 W)A" -> "E 450 (Fe 590) E"",
+  },
+  "dropped": [
+    "out_titles_status",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > bc_ep_1 (Beam-to-Column End Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > bc_ep_2 (Beam-to-Column End Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > bc_ep_3 (Beam-to-Column End Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+    "Load.Axial": """ -> "0"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > bc_ep_4 (Beam-to-Column End Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+    "Load.Axial": """ -> "0"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > bc_ep_5 (Beam-to-Column End Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > beam_bolted1 (Beam-to-Beam Cover Plate Bolted Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Load.Axial": """ -> "0"",
+  },
+  "dropped": [
+    "out_titles_status",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > beam_bolted2 (Beam-to-Beam Cover Plate Bolted Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Load.Axial": """ -> "0"",
+  },
+  "dropped": [
+    "out_titles_status",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > beam_bolted3 (Beam-to-Beam Cover Plate Bolted Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+    "Load.Axial": """ -> "0"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > beam_bolted4 (Beam-to-Beam Cover Plate Bolted Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+  },
+  "dropped": [
+    "out_titles_status",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > beam_bolted5 (Beam-to-Beam Cover Plate Bolted Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > beam_welded1 (Beam-to-Beam Cover Plate Welded Connection) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "out_titles_status",
+  ],
+  "changed": {
+    "Load.Axial": """ -> "0"",
+    "Load.Moment": """ -> "0"",
+    "Load.Shear": """ -> "0"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > beam_welded2 (Beam-to-Beam Cover Plate Welded Connection) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "out_titles_status",
+  ],
+  "changed": {
+    "Load.Axial": """ -> "0"",
+    "Load.Moment": """ -> "0"",
+    "Load.Shear": """ -> "0"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > beam_welded3 (Beam-to-Beam Cover Plate Welded Connection) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "out_titles_status",
+  ],
+  "changed": {},
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > beam_welded4 (Beam-to-Beam Cover Plate Welded Connection) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "out_titles_status",
+  ],
+  "changed": {},
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > beam_welded5 (Beam-to-Beam Cover Plate Welded Connection) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "out_titles_status",
+  ],
+  "changed": {},
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > ccep1 (Column-to-Column End Plate Connection) 1`] = `
+{
+  "added": [
+    "Member.Supported_Section.Designation",
+    "Member.Supported_Section.Material",
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+    "Weld.Type",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > ccep2 (Column-to-Column End Plate Connection) 1`] = `
+{
+  "added": [
+    "Member.Supported_Section.Designation",
+    "Member.Supported_Section.Material",
+    "Weld.Type",
+  ],
+  "changed": {
+    "Connector.Material": ""Cus_400_500_600_1400" -> "E 300 (Fe 440)"",
+    "Load.Axial": """ -> "0"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > cleat_1 (Cleat Angle Connection) 1`] = `
+{
+  "added": [
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Non-pretensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [
+    "out_titles_status",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > cleat_2 (Cleat Angle Connection) 1`] = `
+{
+  "added": [
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Non-pretensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [
+    "out_titles_status",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > cleat_3 (Cleat Angle Connection) 1`] = `
+{
+  "added": [
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Non-pretensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [
+    "out_titles_status",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > cleat_4 (Cleat Angle Connection) 1`] = `
+{
+  "added": [
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Non-pretensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [
+    "out_titles_status",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > cleat_5 (Cleat Angle Connection) 1`] = `
+{
+  "added": [
+    "Weld.Fab",
+    "Weld.Material_Grade_OverWrite",
+  ],
+  "changed": {
+    "Bolt.TensionType": ""Non-pretensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [
+    "out_titles_status",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > column_bolted1 (Column-to-Column Cover Plate Bolted Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Load.Axial": """ -> "0"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > column_bolted2 (Column-to-Column Cover Plate Bolted Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > column_bolted3 (Column-to-Column Cover Plate Bolted Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > column_bolted4 (Column-to-Column Cover Plate Bolted Connection) 1`] = `
+{
+  "added": [],
+  "changed": {},
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > column_bolted5 (Column-to-Column Cover Plate Bolted Connection) 1`] = `
+{
+  "added": [],
+  "changed": {},
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > column_welded1 (Column-to-Column Cover Plate Welded Connection) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "flangespace",
+    "out_titles_status",
+    "type",
+  ],
+  "changed": {},
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > column_welded2 (Column-to-Column Cover Plate Welded Connection) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "flangespace",
+    "out_titles_status",
+    "type",
+  ],
+  "changed": {},
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > column_welded3 (Column-to-Column Cover Plate Welded Connection) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "flangespace",
+    "out_titles_status",
+    "type",
+  ],
+  "changed": {},
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > column_welded4 (Column-to-Column Cover Plate Welded Connection) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "flangespace",
+    "out_titles_status",
+    "type",
+  ],
+  "changed": {
+    "Load.Axial": """ -> "0"",
+    "Load.Moment": """ -> "0"",
+    "Load.Shear": """ -> "0"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > column_welded5 (Column-to-Column Cover Plate Welded Connection) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "flangespace",
+    "out_titles_status",
+    "type",
+  ],
+  "changed": {},
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > fin1 (Fin Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Material": ""E 250 (Fe 410 W)A" -> "E 165 (Fe 290)"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > fin2 (Fin Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Material": ""E 350 (Fe 490)" -> "E 450 (Fe 570)D"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > fin3 (Fin Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Material": ""E 350 (Fe 490)" -> "E 250 (Fe 410 W)A"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > fin4 (Fin Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > fin5 (Fin Plate Connection) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+    "Material": ""E 165 (Fe 290)" -> "E 410 (Fe 540)"",
+  },
+  "dropped": [
+    "Bolt.Material_Grade_OverWrite",
+  ],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > tension_b_angle (Tension Member Design - Bolted to End Gusset) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > tension_b_bbangle (Tension Member Design - Bolted to End Gusset) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > tension_b_bbchannel (Tension Member Design - Bolted to End Gusset) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+    "Material": ""E 250 (Fe 410 W)A" -> "E 165 (Fe 290)"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > tension_b_channel (Tension Member Design - Bolted to End Gusset) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+    "Material": ""E 250 (Fe 410 W)A" -> "E 165 (Fe 290)"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > tension_b_starangle (Tension Member Design - Bolted to End Gusset) 1`] = `
+{
+  "added": [],
+  "changed": {
+    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > tension_w_angle (Tension Member Design - Welded to End Gusset) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "Detailing.Gap",
+  ],
+  "changed": {
+    "Member.Designation": "["20 x 20 x 3","20 x 20 x 4","25 x 25 x 3","25 x 25 x 4",... -> ["50 x 50 x 6","60 x 60 x 6"]",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > tension_w_bbangle (Tension Member Design - Welded to End Gusset) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "Detailing.Gap",
+  ],
+  "changed": {
+    "Member.Designation": "["20 x 20 x 3","20 x 20 x 4","25 x 25 x 3","25 x 25 x 4",... -> ["50 x 50 x 6","60 x 60 x 6"]",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > tension_w_bbchannels (Tension Member Design - Welded to End Gusset) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "Detailing.Gap",
+  ],
+  "changed": {
+    "Member.Designation": "["MC 75","MC 100","MC 125","MC 125*","MC 150","MC 150*","... -> ["MC 100","MC 125"]",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > tension_w_channels (Tension Member Design - Welded to End Gusset) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "Detailing.Gap",
+  ],
+  "changed": {
+    "Member.Designation": "["MC 75","MC 100","MC 125","MC 125*","MC 150","MC 150*","... -> ["MC 100","MC 125"]",
+  },
+  "dropped": [],
+}
+`;
+
+exports[`a desktop .osi example opened and saved again > tension_w_starangle (Tension Member Design - Welded to End Gusset) 1`] = `
+{
+  "added": [
+    "Detailing.Corrosive_Influences",
+    "Detailing.Edge_type",
+    "Detailing.Gap",
+  ],
+  "changed": {
+    "Member.Designation": "["20 x 20 x 3","20 x 20 x 4","25 x 25 x 3","25 x 25 x 4",... -> ["50 x 50 x 6","60 x 60 x 6"]",
+  },
+  "dropped": [],
+}
+`;

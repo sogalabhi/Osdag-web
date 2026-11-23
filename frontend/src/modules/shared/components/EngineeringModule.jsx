@@ -25,7 +25,7 @@ import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import { menuItems } from "../utils/moduleUtils";
 import { downloadGroupedInputsCsv, downloadRawOutputsCsv } from "../utils/groupedCsvExport";
 import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
-import { buildOsiSaveContent, getOsiSaveIdentity } from "../utils/osiSave";
+import { toDesignDictionary, getOsiSaveIdentity } from "../utils/osiSave";
 import { loadStateFromOsi } from "../utils/osiLoader";
 import { getModuleDesignPref } from "../../registry";
 import { canOpenAdditionalInputs } from "../utils/designPrefOpenGuard";
@@ -558,7 +558,7 @@ export const EngineeringModule = ({
     const { moduleId: module_id, projectName } = getOsiSaveIdentity({ moduleConfig, inputs });
 
     try {
-      const flatInputs = buildOsiSaveContent({
+      const flatInputs = toDesignDictionary({
         moduleConfig, inputs, allSelected, contextData, extraState, designPrefOverrides,
       });
 

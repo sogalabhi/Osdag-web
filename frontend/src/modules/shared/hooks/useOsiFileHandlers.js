@@ -1,4 +1,4 @@
-import { buildOsiSaveContent, getOsiSaveIdentity } from "../utils/osiSave";
+import { toDesignDictionary, getOsiSaveIdentity } from "../utils/osiSave";
 import { openOsiFile } from "../../../datasources/osiDataSource";
 import { loadStateFromOsi } from "../utils/osiLoader";
 import { message } from "antd";
@@ -23,7 +23,7 @@ export const useOsiFileHandlers = ({ form, moduleData, actions }, moduleConfig) 
     const { moduleId: module_id, projectName } = getOsiSaveIdentity({ moduleConfig, inputs });
 
     try {
-      const flatInputs = buildOsiSaveContent({
+      const flatInputs = toDesignDictionary({
         moduleConfig, inputs, allSelected, contextData, extraState, designPrefOverrides,
       });
 

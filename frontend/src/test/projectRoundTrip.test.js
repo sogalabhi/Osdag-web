@@ -2,74 +2,52 @@
  * Saving a project and opening it again must give the same design request.
  *
  * For every module case in `payloadParity.test.js` (default inputs, each connectivity, lists
- * on "All" and on an explicit selection) the form state is saved the two ways the app saves
- * a project, JSON-encoded as the backend stores it, then loaded back the way
- * `useProjectLoader` does (`loadStateFromOsi`), and the module's `buildSubmissionParams` must
- * send the same request as before:
- * - on create (`useProjectCreation`): `{ version, name, module_id, inputs: { dock, pref } }`, with
- *   the "All" lists expanded and the extra state merged into the dock;
- * - on every design run (`useDesignSubmission`): `{ dock, pref }` with the dock inputs as they are.
+ * on "All" and on an explicit selection) the form state is saved as the app saves a project
+ * (`toDesignDictionary`, the one function `useProjectCreation` and the design run use), JSON-encoded
+ * as the backend stores it, then loaded back the way `useProjectLoader` does (`loadStateFromOsi`),
+ * and the module's `buildSubmissionParams` must send the same request as before, with and
+ * without Additional Inputs overrides.
  */
 import { describe, expect, it } from "vitest";
 
 import { MODULES } from "./cases";
 import { LISTS, caseState, designRequest, formRecorder, wire } from "./cases/shared";
-import { INPUT_KEY_TO_LIST } from "../modules/shared/constants/moduleDataKeys";
 import { loadStateFromOsi } from "../modules/shared/utils/osiLoader";
-import { expandAllSelectedInputs } from "../modules/shared/utils/osiInputSerializer";
+import { toDesignDictionary } from "../modules/shared/utils/osiSave";
+import * as webKeys from "../constants/generated/webKeys";
 
-const PREFS = { "Bolt.Bolt_Hole_Type": "Over-sized", "Detailing.Gap": "5" };
+// Keys the web defines for the wire itself (`is_leg_loaded`); they match a field name on purpose.
+const WEB_WIRE_KEYS = new Set(Object.values(webKeys));
 
-// What `useModuleForm` does: an "All" list that is empty is filled from the module's option list.
-const fillAllFromLists = (inputs, allSelected) => {
-  const next = { ...inputs };
-  for (const [inputKey, listKey] of Object.entries(INPUT_KEY_TO_LIST)) {
-    if (!allSelected?.[inputKey]) continue;
-    const current = next[inputKey];
-    if (Array.isArray(current) ? current.length : current) continue;
-    const full = LISTS[listKey];
-    if (Array.isArray(full) && full.length) next[inputKey] = full.map((v) => (typeof v === "object" && v ? v.value || v.Grade || String(v) : String(v)));
-  }
-  return next;
-};
+// Additional Inputs as the form keeps them, keyed by the web field names (a pref a module lacks is ignored).
+const PREFS = { bolt_hole_type: "Over-sized", detailing_gap: "5", weld_fab: "Field Weld" };
 
-// The two project shapes the app stores in `inputs_json`.
-const SAVES = {
-  "on create": ({ config, inputs, allSelected, extraState }, pref) => ({
-    version: "1.0",
-    name: "Round_trip",
-    module_id: config.designType,
-    inputs: { dock: expandAllSelectedInputs({ ...inputs, ...extraState }, allSelected, LISTS), pref },
-  }),
-  "on design": ({ inputs, allSelected }, pref) => ({ dock: fillAllFromLists(inputs, allSelected), pref }),
-};
+const saveProject = ({ config, inputs, allSelected, extraState }, prefs) =>
+  wire(toDesignDictionary({
+    moduleConfig: config, inputs, allSelected, contextData: LISTS, extraState, designPrefOverrides: prefs,
+  }));
 
 const reopen = (config, savedInputsJson) => {
   const { state, options } = formRecorder(config);
-  loadStateFromOsi(wire(savedInputsJson), options);
+  loadStateFromOsi(savedInputsJson, options);
   return state;
 };
 
 // Requests that change on the way through a saved project, and the keys that change. Each is a
 // bug to fix, not a behaviour to keep: when one is fixed its entry goes. Unconfirmed in a browser.
-// - The section list of a module whose "All" is a dynamic list (the list depends on the profile) is
-//   not stored, since the dock holds only what the user picked, and on reopening an empty or default
-//   list is read as an explicit selection.
-// - The plate girder thickness lists on "All" are sent from the dock inputs, but a project saved on
-//   create stores the lists expanded from the option list, which then replace them.
-const SECTION_GAP = ["Member.Designation"];
+// - Base plate: `notLoadedFromDictionary` keeps the two inside-flange anchor lists from being filled by
+//   a file (the old loader never filled them); their saved values are not read back.
+// - Plate girder: with the thickness lists on "All" and the design type "Customized", the builder sends
+//   the dock's own value, but the save expands the "All" lists into the dock first, and the expanded
+//   list is what comes back. The case state here leaves the "All" lists unfilled, as `defaultInputs`
+//   does; the form fills them before Design, which would make the two agree (not checked).
+const BASE_PLATE_GAP = ["Anchor Bolt.ICF.Diameter", "Anchor Bolt.ICF.Grade"];
+const PLATE_GIRDER_GAP = ["Web.Thickness", "TopFlange.Thickness", "BottomFlange.Thickness"];
 const KNOWN_GAPS = {
-  "tension bolted | all, saved on create": SECTION_GAP,
-  "tension bolted | all, saved on design": SECTION_GAP,
-  "struts bolted | all, saved on create": SECTION_GAP,
-  "struts bolted | all, saved on design": SECTION_GAP,
-  "struts welded | all, saved on create": SECTION_GAP,
-  "struts welded | all, saved on design": SECTION_GAP,
-  "simply supported beam | all, saved on create": SECTION_GAP,
-  "simply supported beam | all, saved on design": SECTION_GAP,
-  "on cantilever | all, saved on create": SECTION_GAP,
-  "on cantilever | all, saved on design": SECTION_GAP,
-  "plate girder | all, saved on create": ["Web.Thickness", "TopFlange.Thickness", "BottomFlange.Thickness"],
+  "base plate | customized / Welded Column Base, saved": BASE_PLATE_GAP,
+  "base plate | customized / Welded Column Base, saved with overrides": BASE_PLATE_GAP,
+  "plate girder | all, saved": PLATE_GIRDER_GAP,
+  "plate girder | all, saved with overrides": PLATE_GIRDER_GAP,
 };
 
 describe("project round trip: the design request after save and reopen", () => {
@@ -82,14 +60,15 @@ describe("project round trip: the design request after save and reopen", () => {
       ];
 
       for (const { selection, connectivity } of variants) {
-        for (const [saveName, save] of Object.entries(SAVES)) {
-          const label = `${selection}${connectivity ? ` / ${connectivity}` : ""}, saved ${saveName}`;
+        for (const [withOverrides, prefs] of [["", {}], [" with overrides", PREFS]]) {
+          const label = `${selection}${connectivity ? ` / ${connectivity}` : ""}, saved${withOverrides}`;
           it(label, () => {
             const { config } = module;
             const before = caseState(module, selection, connectivity);
-            const original = designRequest(config, { ...before, designPrefOverrides: {} });
+            const original = designRequest(config, { ...before, designPrefOverrides: prefs });
 
-            const reopened = reopen(config, save({ config, ...before }, {}));
+            const saved = saveProject({ config, ...before }, prefs);
+            const reopened = reopen(config, saved);
 
             const after = designRequest(config, reopened);
 
@@ -100,13 +79,16 @@ describe("project round trip: the design request after save and reopen", () => {
         }
       }
 
-      it("keeps the Additional Inputs overrides", () => {
+      it("saves a flat dictionary of core keys", () => {
         const { config } = module;
-        const before = caseState(module, "customized", connectivities[0]);
-        for (const save of Object.values(SAVES)) {
-          const reopened = reopen(config, save({ config, ...before }, PREFS));
-          expect(reopened.designPrefOverrides).toEqual(PREFS);
+        const saved = saveProject({ config, ...caseState(module, "customized", connectivities[0]) }, PREFS);
+        for (const [key, value] of Object.entries(saved)) {
+          expect(key.startsWith("Pref."), key).toBe(false);
+          if (!WEB_WIRE_KEYS.has(key)) expect(Object.keys(config.coreKeys), `${key} is a form field name`).not.toContain(key);
+          expect(typeof value === "object" && !Array.isArray(value) && value !== null, key).toBe(false);
         }
+        expect(saved).not.toHaveProperty("dock");
+        expect(saved).not.toHaveProperty("pref");
       });
     });
   }

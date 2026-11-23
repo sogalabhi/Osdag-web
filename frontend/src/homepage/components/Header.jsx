@@ -2,7 +2,6 @@ import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import { toast } from 'react-toastify';
 import { findModule, getModuleRoute, loadModuleConfigs, MENU_GROUPS, getMenuSections } from '../../modules/registry';
-import { loadProjectReportContext } from '../utils/projectReportContext';
 import { KEY_DISP_FINPLATE } from '../../constants/generated/coreKeys';
 import { isGuestUser } from '../../utils/auth';
 import { useAuth } from '../../context/AuthContext';
@@ -70,9 +69,6 @@ const Header = ({ setshowSideBar, active }) => {
   const [reportInputValues, setReportInputValues] = useState({});
   const [reportModuleId, setReportModuleId] = useState(null);
   const [reportModuleConfig, setReportModuleConfig] = useState(null);
-  const [reportAllSelected, setReportAllSelected] = useState({});
-  const [reportLists, setReportLists] = useState({});
-  const [reportExtraState, setReportExtraState] = useState({});
 
   const handleDeleteProject = async (projectId) => {
     try {
@@ -100,10 +96,6 @@ const Header = ({ setshowSideBar, active }) => {
       const loaded = await loadModuleConfigs(modId);
       const cfg = loaded?.moduleConfig || null;
       setReportModuleConfig(cfg);
-      const context = await loadProjectReportContext(detail?.inputs_json, modId, cfg);
-      setReportAllSelected(context.allSelected);
-      setReportLists(context.lists);
-      setReportExtraState(context.extraState);
       setReportModalOpen(true);
     } catch (e) {
       toast.error(e.message || 'Failed to load project');
@@ -1352,9 +1344,7 @@ const Header = ({ setshowSideBar, active }) => {
         inputValues={reportInputValues}
         logs={[]}
         moduleConfig={reportModuleConfig}
-        allSelected={reportAllSelected}
-        lists={reportLists}
-        extraState={reportExtraState}
+        inputsAreDesignDictionary
       />
     </div>
   );

@@ -7,7 +7,7 @@ import { openOsiFile } from "../../../datasources/osiDataSource";
 import { loadStateFromOsi } from "./osiLoader";
 import { downloadSectionCatalog } from "../../../datasources/sectionsDataSource";
 import { getModuleDesignPref } from "../../registry";
-import { buildOsiSaveContent, getOsiSaveIdentity } from "./osiSave";
+import { toDesignDictionary, getOsiSaveIdentity } from "./osiSave";
 import { buildLogFileContent } from "./logExport";
 import { canOpenAdditionalInputs } from "./designPrefOpenGuard";
 import { isGuestUser } from "../../../utils/auth";
@@ -126,7 +126,7 @@ function UnifiedDropdownMenu({
       return;
     }
     const { moduleId: module_id, projectName } = getOsiSaveIdentity({ moduleConfig, inputs });
-    const inputsForSave = buildOsiSaveContent({
+    const inputsForSave = toDesignDictionary({
       moduleConfig, inputs, allSelected, contextData: getContextData(), extraState, designPrefOverrides,
     });
 

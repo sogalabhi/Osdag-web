@@ -3,7 +3,7 @@ import { message } from 'antd';
 import { useNavigate, useLocation } from "react-router";
 import ProjectNameModal from '../../../homepage/components/ProjectNameModal';
 import { isGuestUser, canCreateProjects } from '../../../utils/auth';
-import { expandAllSelectedInputs } from '../utils/osiInputSerializer';
+import { toDesignDictionary } from '../utils/osiSave';
 import { createProject } from '../../../datasources/projectsDataSource';
 
 /**
@@ -43,22 +43,14 @@ export const useProjectCreation = ({
       const safeProjectName = (projectName || 'Untitled Project').replace(/\s+/g, '_');
       const module_id = moduleConfig?.designType || inputs?.module;
       const parent_module = moduleConfig?.parentModule || 'connections';
-      const mergedState = { ...inputs, ...extraState };
-      const inputsForSave = expandAllSelectedInputs(mergedState, allSelected, contextData);
-
       const payload = {
         name: safeProjectName,
         module: parent_module,
         submodule: module_id,
-        inputs_json: {
-          version: "1.0",
-          name: safeProjectName,
-          module_id: module_id,
-          inputs: {
-            dock: inputsForSave || {},
-            pref: designPrefOverrides || {},
-          }
-        },
+        // The design dictionary, the same content as the module's .osi file.
+        inputs_json: toDesignDictionary({
+          moduleConfig, inputs, allSelected, contextData, extraState, designPrefOverrides,
+        }),
       };
 
       const result = await createProject(payload);

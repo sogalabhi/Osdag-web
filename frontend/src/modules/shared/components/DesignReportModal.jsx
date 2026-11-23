@@ -3,7 +3,6 @@ import { Modal, Row, Col, Input, Button, Upload, message } from 'antd';
 import { ReportCustomizationModal } from './ReportCustomizationModal';
 import { useEngineeringService } from '../hooks/useEngineeringService';
 import { apiBase } from '../../../api';
-import { unwrapReportInputs } from '../utils/reportInputs';
 import {
   KEY_D,
   KEY_DIA_ANCHOR_ICF,
@@ -11,8 +10,6 @@ import {
   KEY_GRD,
   KEY_GRD_ANCHOR_ICF,
   KEY_GRD_ANCHOR_OCF,
-  KEY_MODULE,
-  KEY_SHEAR,
 } from "../../../constants/generated/coreKeys";
 
 export const DesignReportModal = ({
@@ -36,6 +33,9 @@ export const DesignReportModal = ({
   selectedSection,
   setSelectedSection,
   lists,
+  // true when `inputValues` is already a design dictionary (core keys, as a saved project or an
+  // .osi file holds it); false when it is the module's form inputs, which are built into one here.
+  inputsAreDesignDictionary = false,
 }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -147,22 +147,11 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           console.warn("[DesignReportModal] logo upload failed", e);
         }
       }
-      const effectiveInputValues = unwrapReportInputs(inputValues);
+      let transformedInputValues = inputValues;
 
-      // Transform input values using the same logic as design calculation
-      let transformedInputValues = effectiveInputValues;
-      
-      // Check if effectiveInputValues is already a transformed backend dictionary (e.g. from saved DB projects)
-      const isAlreadyTransformed = effectiveInputValues && (
-        effectiveInputValues[KEY_D] !== undefined ||
-        effectiveInputValues[KEY_SHEAR] !== undefined ||
-        effectiveInputValues[KEY_MODULE] !== undefined ||
-        Object.keys(effectiveInputValues).some(k => k.includes('.'))
-      );
-
-      if (!isAlreadyTransformed && moduleConfig?.buildSubmissionParams) {
+      if (!inputsAreDesignDictionary && moduleConfig?.buildSubmissionParams) {
         try {
-          transformedInputValues = moduleConfig.buildSubmissionParams(effectiveInputValues, allSelected, lists || {
+          transformedInputValues = moduleConfig.buildSubmissionParams(inputValues, allSelected, lists || {
             boltDiameterList,
             propertyClassList,
             thicknessList,
@@ -170,7 +159,7 @@ Group/TeamName: ${designReportInputs.groupTeamName}`;
           }, extraState);
         } catch (transformErr) {
           console.warn("[DesignReportModal] buildSubmissionParams failed, using raw inputs:", transformErr.message);
-          transformedInputValues = effectiveInputValues;
+          transformedInputValues = inputValues;
         }
       }
 

@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { fromDesignDictionary, fromFieldState } from "../modules/shared/utils/designDictionary";
+import { fromDesignDictionary } from "../modules/shared/utils/designDictionary";
 
 const config = {
   defaultInputs: { bolt_diameter: [], bolt_type: "Bearing_Bolt", bolt_tension_type: "Non Pre-tensioned", material: "E 250" },
@@ -42,10 +42,15 @@ describe("fromDesignDictionary", () => {
     expect(inputs.connector_material).toBe("E 300");
   });
 
-  it("reads Pref. entries as Additional Inputs overrides", () => {
-    const { inputs, designPrefOverrides } = fromDesignDictionary(config, { "Pref.Detailing.Gap": "5" }, LISTS);
-    expect(designPrefOverrides).toEqual({ "Detailing.Gap": "5" });
-    expect(inputs).not.toHaveProperty("Detailing.Gap");
+  it("drops the keys no field declares, the module name stamp and web field names; no overrides come back", () => {
+    const skipped = { ...config, computedCoreKeys: ["Deflection.Max"], notLoadedFromDictionary: ["beam_section"] };
+    const { inputs, designPrefOverrides } = fromDesignDictionary(skipped, {
+      Module: "Fin Plate Connection", "OsdagWeb.Version": "1.0", out_titles_status: "1", bolt_diameter: ["12"],
+      "Deflection.Max": "1", "Member.Supported_Section.Designation": "MB 300", "Bolt.Material_Grade_OverWrite": "410",
+    }, LISTS);
+    expect(designPrefOverrides).toEqual({});
+    expect(inputs.bolt_diameter).toEqual([]);
+    expect(inputs).not.toHaveProperty("bolt_grade");
   });
 
   it("detects 'All' by comparing a list with the full option list", () => {
@@ -89,14 +94,5 @@ describe("fromDesignDictionary", () => {
     const { extraState, inputs } = fromDesignDictionary(withImage, { Connectivity: "Beam-Beam", "Member.Profile": "Channels" }, LISTS);
     expect(extraState).toEqual({ selectedOption: "Beam-Beam", selectedProfile: "Channels", imageSource: "img:Channels" });
     expect(inputs.location).toBe("Web");
-  });
-});
-
-describe("fromFieldState", () => {
-  it("takes a stored project's field values as they are", () => {
-    const { inputs, designPrefOverrides } = fromFieldState(config, { dock: { bolt_diameter: ["12"], bolt_type: "Friction_Grip_Bolt" }, pref: { "Detailing.Gap": "5" } }, LISTS);
-    expect(inputs.bolt_diameter).toEqual(["12"]);
-    expect(inputs.bolt_type).toBe("Friction_Grip_Bolt");
-    expect(designPrefOverrides).toEqual({ "Detailing.Gap": "5" });
   });
 });

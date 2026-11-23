@@ -4,47 +4,9 @@ from datetime import datetime
 from typing import Any, Dict, Tuple
 
 import yaml
-from apps.core.web_keys import WEB_OSDAGWEB_VERSION
 from django.core.files.base import ContentFile
 
-from osdag_core.Common import (
-    KEY_ACTUAL_LEN_YY,
-    KEY_ACTUAL_LEN_ZZ,
-    KEY_ANGLE_LIST,
-    KEY_AXIAL,
-    KEY_AXIAL_FORCE,
-    KEY_CONNECTOR_MATERIAL,
-    KEY_D,
-    KEY_DESIGN_FOR,
-    KEY_DISP_HEADERPLATE,
-    KEY_DP_BOLT_HOLE_TYPE,
-    KEY_DP_BOLT_SLIP_FACTOR,
-    KEY_DP_BOLT_TYPE,
-    KEY_DP_DESIGN_METHOD,
-    KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-    KEY_DP_DETAILING_EDGE_TYPE,
-    KEY_DP_DETAILING_GAP,
-    KEY_DP_WELD_FAB,
-    KEY_DP_WELD_MATERIAL_G_O,
-    KEY_END1,
-    KEY_END1_Y,
-    KEY_END2,
-    KEY_END2_Y,
-    KEY_FLANGEPLATE_THICKNESS,
-    KEY_GRD,
-    KEY_MATERIAL,
-    KEY_MODULE,
-    KEY_PLATE1_THICKNESS,
-    KEY_PLATE2_THICKNESS,
-    KEY_PLATE_WIDTH,
-    KEY_PLATETHK,
-    KEY_SEC_PROFILE,
-    KEY_SHEAR,
-    KEY_TYP,
-    KEY_WEBPLATE_THICKNESS,
-    KEY_WELD_SIZE,
-    KEY_WELD_TYPE,
-)
+from osdag_core.Common import KEY_DISP_HEADERPLATE, KEY_MODULE
 
 OSI_SCHEMA_VERSION = "1.0"
 SUPPORTED_VERSIONS = {"1.0"}
@@ -52,6 +14,7 @@ SUPPORTED_VERSIONS = {"1.0"}
 # Desktop module names that differ from the web module id. The desktop calls the shear
 # header plate module "End Plate Connection".
 DESKTOP_MODULE_NAMES = {"End Plate Connection": KEY_DISP_HEADERPLATE}
+WEB_MODULE_NAMES = {web: desktop for desktop, web in DESKTOP_MODULE_NAMES.items()}
 
 
 def validate_module_id(module_id: str) -> bool:
@@ -59,83 +22,6 @@ def validate_module_id(module_id: str) -> bool:
         return False
     # allow letters, numbers, spaces, dashes and underscores
     return bool(re.fullmatch(r"[A-Za-z0-9 _-]{2,64}", module_id))
-
-
-# Frontend field name -> core key, for exporting a stored project. A project saved with the web
-# field names ({dock, pref}) has no core keys, so the export writes each field under the key the
-# desktop reads. Every value is a core key (a value in osdag_core.Common). Opening a file needs no
-# table: the frontend reads each module's declared `coreKeys`.
-FIELD_TO_OSI_KEY: Dict[str, str] = {
-    "bolt_hole_type": KEY_DP_BOLT_HOLE_TYPE,
-    "bolt_diameter": KEY_D,
-    "bolt_grade": KEY_GRD,
-    "bolt_slip_factor": KEY_DP_BOLT_SLIP_FACTOR,
-    "bolt_tension_type": KEY_DP_BOLT_TYPE,
-    "bolt_type": KEY_TYP,
-    "connector_material": KEY_CONNECTOR_MATERIAL,
-    "plate_thickness": KEY_PLATETHK,
-    "flange_plate_thickness": KEY_FLANGEPLATE_THICKNESS,
-    "web_plate_thickness": KEY_WEBPLATE_THICKNESS,
-    "angle_list": KEY_ANGLE_LIST,
-    "section_profile": KEY_SEC_PROFILE,
-    "end_condition_1": KEY_END1,
-    "end_condition_2": KEY_END2,
-    "end_condition_1_y": KEY_END1_Y,
-    "end_condition_2_y": KEY_END2_Y,
-    "actual_length_zz": KEY_ACTUAL_LEN_ZZ,
-    "actual_length_yy": KEY_ACTUAL_LEN_YY,
-    "design_method": KEY_DP_DESIGN_METHOD,
-    "detailing_corr_status": KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-    "detailing_edge_type": KEY_DP_DETAILING_EDGE_TYPE,
-    "detailing_gap": KEY_DP_DETAILING_GAP,
-    "design_for": KEY_DESIGN_FOR,
-    "load_axial": KEY_AXIAL,
-    "axial_force": KEY_AXIAL_FORCE,
-    "load_shear": KEY_SHEAR,
-    "material": KEY_MATERIAL,
-    "plate1_thickness": KEY_PLATE1_THICKNESS,
-    "plate2_thickness": KEY_PLATE2_THICKNESS,
-    "plate_width": KEY_PLATE_WIDTH,
-    "weld_fab": KEY_DP_WELD_FAB,
-    "weld_material_grade": KEY_DP_WELD_MATERIAL_G_O,
-    "weld_size": KEY_WELD_SIZE,
-    "weld_type": KEY_WELD_TYPE,
-}
-
-
-def flatten_and_translate_keys(inputs: Dict[str, Any]) -> Dict[str, Any]:
-    if not isinstance(inputs, dict):
-        return {}
-
-    dock = inputs.get("dock") or {}
-    pref = inputs.get("pref") or {}
-
-    # If it is not nested under dock/pref, assume it is already flat
-    if not dock and not pref:
-        inner_inputs = inputs.get("inputs")
-        if isinstance(inner_inputs, dict) and ("dock" in inner_inputs or "pref" in inner_inputs):
-            dock = inner_inputs.get("dock") or {}
-            pref = inner_inputs.get("pref") or {}
-        else:
-            return inputs
-
-    combined = {}
-
-    # 1. Translate and flatten dock keys
-    for k, v in dock.items():
-        if k in FIELD_TO_OSI_KEY:
-            combined[FIELD_TO_OSI_KEY[k]] = v
-        else:
-            # Fallback: convert snake_case to PascalCase (best effort)
-            pascal_key = ''.join(word.capitalize() for word in k.split('_'))
-            combined[pascal_key] = v
-
-    # 2. Translate and flatten pref keys (prefix with Pref.)
-    for k, v in pref.items():
-        pascal_key = ''.join(word.capitalize() for word in k.split('_'))
-        combined[f"Pref.{pascal_key}"] = v
-
-    return combined
 
 
 def build_osi_payload(name: str, module_id: str, inputs: Dict[str, Any]) -> Dict[str, Any]:
@@ -149,62 +35,41 @@ def build_osi_payload(name: str, module_id: str, inputs: Dict[str, Any]) -> Dict
         "version": OSI_SCHEMA_VERSION,
         "name": name,
         "module_id": module_id,
-        "inputs": flatten_and_translate_keys(inputs),
+        "inputs": inputs,
         "meta": {
             "saved_at": datetime.utcnow().isoformat() + "Z",
         },
     }
 
 
-def _to_flat_yaml(module_id: str, name: str, inputs: Dict[str, Any]) -> str:
-    """Render a flat dictionary of inputs into OSI flat YAML with dotted keys."""
-    def qt(s: Any) -> str:
-        # quote list items as strings in YAML as per standard flat files
-        return f"'{str(s)}'"
+class _NoAliasDumper(yaml.SafeDumper):
+    """SafeDumper that writes a list that occurs twice out in full, never as an anchor and alias."""
 
-    flat_inputs = {**inputs}
-    
-    # Guarantee Module and Version are set
-    if KEY_MODULE not in flat_inputs and "module" not in flat_inputs:
-        flat_inputs[KEY_MODULE] = module_id
-    if WEB_OSDAGWEB_VERSION not in flat_inputs:
-        flat_inputs[WEB_OSDAGWEB_VERSION] = "1.0"
+    def ignore_aliases(self, data):
+        return True
 
-    # Build YAML string manually
-    lines: list[str] = []
-    
-    # Sort keys for deterministic output
-    for key in sorted(flat_inputs.keys()):
-        if key in ["name", "project_name"]:
-            continue
-        value = flat_inputs[key]
-        if value is None:
-            continue
-        if isinstance(value, list):
-            if len(value) == 0:
-                continue
-            lines.append(f"{key}:")
-            for item in value:
-                lines.append(f"- {qt(item)}")
-        else:
-            if isinstance(value, str) and value.strip() == "":
-                continue
-            lines.append(f"{key}: {value}")
 
-    return "\n".join(lines) + "\n"
+def _text(value: Any) -> Any:
+    """A value as the file keeps it: a string, or a list of strings."""
+    if isinstance(value, (list, tuple)):
+        return ["" if item is None else str(item) for item in value]
+    return "" if value is None else str(value)
+
+
+def _to_flat_yaml(module_id: str, inputs: Dict[str, Any]) -> str:
+    """Write the design dictionary as the flat YAML the desktop reads: core key -> string or list of strings.
+
+    The dictionary is written as it is. Only the `Module` entry is set, if it is missing, and
+    spelled as the desktop names the module.
+    """
+    flat_inputs = {str(key): _text(value) for key, value in inputs.items()}
+    module = flat_inputs.get(KEY_MODULE) or module_id
+    flat_inputs[KEY_MODULE] = WEB_MODULE_NAMES.get(module, module)
+    return yaml.dump(flat_inputs, Dumper=_NoAliasDumper, default_flow_style=False, allow_unicode=True, sort_keys=True)
 
 
 def serialize_osi(payload: Dict[str, Any]) -> str:
-    module_id = payload.get("module_id") or ""
-    name = payload.get("name") or "project"
-    inputs = payload.get("inputs") or {}
-
-    # If payload inputs are already nested, fallback to JSON
-    if "dock" in inputs or "pref" in inputs:
-        return json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
-
-    # Otherwise, serialize as generic flat YAML
-    return _to_flat_yaml(module_id, name, inputs)
+    return _to_flat_yaml(payload.get("module_id") or "", payload.get("inputs") or {})
 
 
 class _StringSafeLoader(yaml.SafeLoader):

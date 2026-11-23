@@ -1,15 +1,11 @@
-import { fromDesignDictionary, fromFieldState } from "./designDictionary";
+import { fromDesignDictionary } from "./designDictionary";
 
 /**
- * Hydrates React state hooks with an input/preference payload.
- *
- * The payload is one of:
- * - a design dictionary, the parsed `.osi` file (core key -> value), read with the module's
- *   declared `coreKeys` (see `fromDesignDictionary`);
- * - nested `{ dock, pref }` (or `{ inputs: { dock, pref } }`) as stored with a project, keyed
- *   by the module's field names.
+ * Hydrates React state hooks from a design dictionary: the parsed `.osi` file or a saved
+ * project's `inputs_json` (core key -> value), read with the module's declared `coreKeys`
+ * (see `fromDesignDictionary`).
  */
-export function loadStateFromOsi(payload, {
+export function loadStateFromOsi(dictionary, {
   setInputs,
   setDesignPrefOverrides,
   setExtraState,
@@ -19,15 +15,9 @@ export function loadStateFromOsi(payload, {
   moduleConfig,
   safeModuleData = {}
 }) {
-  if (!payload || !moduleConfig) return;
+  if (!dictionary || !moduleConfig) return;
 
-  const isNested = (payload.dock || payload.pref) || (payload.inputs && (payload.inputs.dock || payload.inputs.pref));
-  const state = isNested
-    ? fromFieldState(moduleConfig, {
-        dock: payload.dock || payload.inputs?.dock,
-        pref: payload.pref || payload.inputs?.pref,
-      }, safeModuleData)
-    : fromDesignDictionary(moduleConfig, payload, safeModuleData);
+  const state = fromDesignDictionary(moduleConfig, dictionary, safeModuleData);
 
   if (setDesignPrefOverrides) setDesignPrefOverrides(state.designPrefOverrides);
   if (setInputs) setInputs(state.inputs);
