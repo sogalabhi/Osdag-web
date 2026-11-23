@@ -42,7 +42,7 @@
     "Bolt.TensionType": "Non Pre-tensioned",
     "Bolt.Type": "Bearing Bolt",
     "Connector.Material": "E 300 (Fe 440)",
-    "Material": "E 165 (Fe 290)",
+    "Material": "E 250 (Fe 410 W)A",
     "Member.Material": "E 165 (Fe 290)",
     "Design.Design_Method": "Limit State Design",
     "Detailing.Corrosive_Influences": "Yes",

@@ -159,7 +159,7 @@ describe("the request", () => {
   });
 
   it("an Additional Inputs override saved under its core key passes through", () => {
-    const { body } = toSyncRequest(tension, { state: { material: GRADE, [KEY_DP_BOLT_HOLE_TYPE]: "Over-sized" }, operation: "open" });
+    const { body } = toSyncRequest(tension, { state: { material: GRADE, supported_material: GRADE, [KEY_DP_BOLT_HOLE_TYPE]: "Over-sized" }, operation: "open" });
     expect(body.inputs).toEqual({ [KEY_MATERIAL]: GRADE, [KEY_SEC_MATERIAL]: GRADE, [KEY_DP_BOLT_HOLE_TYPE]: "Over-sized" });
   });
 });

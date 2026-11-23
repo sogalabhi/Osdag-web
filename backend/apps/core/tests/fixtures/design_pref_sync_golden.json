@@ -14367,12 +14367,7 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [
             "Weld.Fab",
             "Weld.Material_Grade_OverWrite"
@@ -14381,8 +14376,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -14411,8 +14405,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -14437,12 +14429,7 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [
             "Weld.Fab",
             "Weld.Material_Grade_OverWrite"
@@ -14451,8 +14438,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -14481,7 +14467,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Struts Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
@@ -14510,8 +14495,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -14538,9 +14522,8 @@
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": [],
           "Member.Length": "3000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
@@ -14568,8 +14551,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -14578,8 +14560,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -14608,8 +14589,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "is_leg_loaded": "Yes"
         },
@@ -14634,8 +14613,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -14644,8 +14622,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -14674,8 +14651,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Struts Bolted to End Gusset",
           "is_leg_loaded": "Yes"
         },
@@ -14693,15 +14668,12 @@
           "supported": [
             "E 250 (Fe 410 W)A"
           ],
-          "supporting": [
-            "E 250 (Fe 410 W)A"
-          ]
+          "supporting": []
         },
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -14710,8 +14682,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -14740,8 +14711,7 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Bolted to End Gusset",
           "is_leg_loaded": "Yes"
         },
@@ -14766,8 +14736,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -14786,8 +14755,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -14816,8 +14784,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -14844,8 +14810,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -14864,8 +14829,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -14894,8 +14858,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Struts Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "490",
@@ -14915,15 +14877,12 @@
           "supported": [
             "E 250 (Fe 410 W)A"
           ],
-          "supporting": [
-            "E 250 (Fe 410 W)A"
-          ]
+          "supporting": []
         },
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -14942,8 +14901,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -14972,8 +14930,7 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -15004,8 +14961,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -15062,8 +15018,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -15119,8 +15074,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Bolted to End Gusset",
@@ -15147,9 +15101,8 @@
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": [],
           "Member.Length": "3000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Struts Bolted to End Gusset",
           "is_leg_loaded": "Yes"
@@ -15175,19 +15128,13 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15208,8 +15155,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
@@ -15234,19 +15179,13 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15268,7 +15207,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Struts Welded to End Gusset",
           "Optimum.AllowUR": "1.0",
@@ -15294,8 +15232,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15315,9 +15252,8 @@
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": [],
           "Member.Length": "3000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Welded to End Gusset",
           "Optimum.AllowUR": "1.0",
@@ -15345,8 +15281,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -15355,8 +15290,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15377,8 +15311,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
@@ -15405,8 +15337,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -15415,8 +15346,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15437,8 +15367,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Struts Welded to End Gusset",
           "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
@@ -15458,15 +15386,12 @@
           "supported": [
             "E 250 (Fe 410 W)A"
           ],
-          "supporting": [
-            "E 250 (Fe 410 W)A"
-          ]
+          "supporting": []
         },
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -15475,8 +15400,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15498,8 +15422,7 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Welded to End Gusset",
           "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
@@ -15526,8 +15449,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -15540,8 +15462,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15562,8 +15483,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
@@ -15590,8 +15509,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -15604,8 +15522,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15626,8 +15543,6 @@
           "Member.Length": "3000",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Struts Welded to End Gusset",
           "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
@@ -15647,15 +15562,12 @@
           "supported": [
             "E 250 (Fe 410 W)A"
           ],
-          "supporting": [
-            "E 250 (Fe 410 W)A"
-          ]
+          "supporting": []
         },
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -15668,8 +15580,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15691,8 +15602,7 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Welded to End Gusset",
           "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
@@ -15723,8 +15633,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15775,8 +15684,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15827,8 +15735,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
@@ -15848,9 +15755,8 @@
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": [],
           "Member.Length": "3000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Angles",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Struts Welded to End Gusset",
           "Optimum.AllowUR": "1.0",
@@ -15878,11 +15784,7 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supported_Section.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [
             "Weld.Fab",
             "Weld.Material_Grade_OverWrite"
@@ -15891,7 +15793,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -15918,7 +15820,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -15942,11 +15843,7 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supported_Section.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [
             "Weld.Fab",
             "Weld.Material_Grade_OverWrite"
@@ -15955,7 +15852,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -15982,7 +15879,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
@@ -16010,7 +15906,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -16035,9 +15931,8 @@
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": [],
           "Member.Length": "1250",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
@@ -16064,7 +15959,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -16073,7 +15968,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -16100,7 +15995,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset"
         },
         "section_designations": {
@@ -16124,7 +16018,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -16133,7 +16027,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -16160,7 +16054,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
           "Module": "Tension Member Design - Bolted to End Gusset"
         },
         "section_designations": {
@@ -16182,7 +16075,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -16191,7 +16084,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -16218,7 +16111,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Tension Member Design - Bolted to End Gusset"
         },
@@ -16243,7 +16135,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -16262,7 +16154,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -16289,7 +16181,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -16315,7 +16206,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -16334,7 +16225,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -16361,7 +16252,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "490"
@@ -16385,7 +16275,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -16404,7 +16294,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -16431,7 +16321,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Weld.Fab": "Shop Weld",
@@ -16462,7 +16351,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -16516,7 +16405,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -16569,7 +16458,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Bolted to End Gusset",
@@ -16594,9 +16483,8 @@
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": [],
           "Member.Length": "1250",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Tension Member Design - Bolted to End Gusset"
         },
@@ -16621,11 +16509,7 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supported_Section.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [
             "Bolt.TensionType",
             "Bolt.Bolt_Hole_Type",
@@ -16635,7 +16519,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -16659,7 +16543,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -16683,11 +16566,7 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supported_Section.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [
             "Bolt.TensionType",
             "Bolt.Slip_Factor"
@@ -16696,7 +16575,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -16720,7 +16599,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Weld.Fab": "Shop Weld",
@@ -16748,7 +16626,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -16770,9 +16648,8 @@
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": [],
           "Member.Length": "1250",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Weld.Fab": "Shop Weld",
@@ -16799,7 +16676,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -16808,7 +16685,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -16829,7 +16706,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -16855,7 +16731,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -16864,7 +16740,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -16885,7 +16761,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -16909,7 +16784,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -16918,7 +16793,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -16940,7 +16815,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Weld.Fab": "Shop Weld",
@@ -16967,7 +16841,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -16986,7 +16860,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -17010,7 +16884,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -17036,7 +16909,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -17055,7 +16928,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -17079,7 +16952,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "490"
@@ -17103,7 +16975,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supported_Section.Material",
+              "Member.Material",
               "Connector.Material"
             ]
           },
@@ -17122,7 +16994,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -17146,7 +17018,6 @@
           "Member.Length": "1250",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Weld.Fab": "Shop Weld",
@@ -17177,7 +17048,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -17227,7 +17098,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -17277,7 +17148,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material",
+            "Member.Material",
             "Connector.Material"
           ],
           "module_id": "Tension Member Design - Welded to End Gusset",
@@ -17297,9 +17168,8 @@
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": [],
           "Member.Length": "1250",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Back to Back Angles",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Weld.Fab": "Shop Weld",

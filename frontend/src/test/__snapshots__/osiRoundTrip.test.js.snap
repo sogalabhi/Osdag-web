@@ -875,7 +875,6 @@ exports[`a desktop .osi example opened and saved again > tension_b_bbchannel (Te
   "added": [],
   "changed": {
     "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
-    "Material": ""E 250 (Fe 410 W)A" -> "E 165 (Fe 290)"",
   },
   "dropped": [],
 }
@@ -886,7 +885,6 @@ exports[`a desktop .osi example opened and saved again > tension_b_channel (Tens
   "added": [],
   "changed": {
     "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
-    "Material": ""E 250 (Fe 410 W)A" -> "E 165 (Fe 290)"",
   },
   "dropped": [],
 }

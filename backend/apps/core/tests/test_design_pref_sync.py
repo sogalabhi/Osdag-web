@@ -114,6 +114,13 @@ class DesignPrefSyncMergeTests(TestCase):
         self.assertEqual(resolved[KEY_CONNECTOR_MATERIAL], "E 350 (Fe 490)")
         self.assertEqual(resolved[KEY_SUPTNGSEC_MATERIAL], "E 250 (Fe 410 W)A")
 
+    def test_the_section_tab_of_a_tension_member_shows_the_saved_member_material(self):
+        inputs = {"Material": "E 250 (Fe 410 W)A", "Member.Material": "E 350 (Fe 490)"}
+        _resolved, _meta, material_details, _sd = merge_design_pref_sync(
+            "Tension Member Design - Bolted to End Gusset", inputs, "open", **lookup_sources()
+        )
+        assert [row["Grade"] for row in material_details["supported"]] == ["E 350 (Fe 490)"]
+
 
 class DesignPrefSyncAPITests(TestCase):
     def test_defaults_post_returns_default_payload(self):

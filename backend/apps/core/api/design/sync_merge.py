@@ -90,6 +90,15 @@ from osdag_core.Common import (
 
 VALID_OPERATIONS = frozenset({"open", "refresh", "save", "reset"})
 
+# The modules whose web form holds Member.Material as the material of one section tab: that tab shows
+# the properties of Member.Material (the saved one), not of the dock Material.
+MEMBER_MATERIAL_TAB = {
+    KEY_DISP_TENSION_BOLTED: "supported",
+    KEY_DISP_TENSION_WELDED: "supported",
+    KEY_DISP_STRUT_BOLTED_END_GUSSET: "supported",
+    KEY_DISP_STRUT_WELDED_END_GUSSET: "supported",
+}
+
 # A material grade the core can look up; used when the dock has none yet.
 _FALLBACK_GRADE = "E 250 (Fe 410 W)A"
 
@@ -115,20 +124,17 @@ _M, _R, _S, _D, _C = (KEY_MATERIAL, KEY_SEC_MATERIAL, KEY_SUPTNGSEC_MATERIAL, KE
                       KEY_CONNECTOR_MATERIAL)
 _SHEAR_RULES = [(_C, [_S, _D])]
 _MEMBER_RULES = [(_M, [_S, _D, _C])]
-_SINGLE_MEMBER_RULES = [(_M, [_D, _C])]
 LEGACY_SYNC_RULES: Dict[str, List[Tuple[str, List[str]]]] = {
     KEY_DISP_BCENDPLATE: _SHEAR_RULES,
     KEY_DISP_BB_EP_SPLICE: [(_C, [_D])],
     KEY_DISP_COLUMNENDPLATE: [(_M, [_S, _R, _C, _D])],
     KEY_DISP_BASE_PLATE: [(_M, [_S, _C])],
-    KEY_DISP_TENSION_BOLTED: _SINGLE_MEMBER_RULES,
-    KEY_DISP_TENSION_WELDED: _SINGLE_MEMBER_RULES,
     KEY_DISP_FLEXURE: _MEMBER_RULES,
     KEY_DISP_FLEXURE2: _MEMBER_RULES,
     KEY_DISP_PLATE_GIRDER_WELDED: _MEMBER_RULES,
     KEY_DISP_COMPRESSION_COLUMN: _MEMBER_RULES,
-    KEY_DISP_STRUT_BOLTED_END_GUSSET: _MEMBER_RULES,
-    KEY_DISP_STRUT_WELDED_END_GUSSET: _MEMBER_RULES,
+    # The core gives the welded strut no Connector.Material row, which the web form still sends.
+    KEY_DISP_STRUT_WELDED_END_GUSSET: [(_M, [_R, _C])],
 }
 
 # module id -> {role: [section source, ...]}; a section source is
@@ -512,8 +518,11 @@ def merge_design_pref_sync(
 
     material_details = {"connector": [], "supported": [], "supporting": []}
     if material_model is not None:
+        member_role = MEMBER_MATERIAL_TAB.get(module_id)
         for role, key in MATERIAL_ROLE_KEYS.items():
-            material_details[role] = _material_row_for_grade(material_model, str(out.get(key) or grade or ""))
+            # The section tab that holds Member.Material shows that material's properties.
+            shown = (out.get(KEY_SEC_MATERIAL) if role == member_role else None) or out.get(key) or grade
+            material_details[role] = _material_row_for_grade(material_model, str(shown or ""))
     section_details = _resolve_section_details(
         module_id=module_id,
         inputs=out,

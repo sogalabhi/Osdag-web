@@ -4486,7 +4486,7 @@ exports[`a desktop .osi example sends this design request > tension_b_bbchannel 
   "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
   "Detailing.Gap": "0",
   "Load.Axial": "500",
-  "Material": "E 165 (Fe 290)",
+  "Material": "E 250 (Fe 410 W)A",
   "Member.Designation": [
     "MC 75",
     "MC 100",
@@ -4629,7 +4629,7 @@ exports[`a desktop .osi example sends this design request > tension_b_channel (T
   "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
   "Detailing.Gap": "0",
   "Load.Axial": "500",
-  "Material": "E 165 (Fe 290)",
+  "Material": "E 250 (Fe 410 W)A",
   "Member.Designation": [
     "MC 75",
     "MC 100",

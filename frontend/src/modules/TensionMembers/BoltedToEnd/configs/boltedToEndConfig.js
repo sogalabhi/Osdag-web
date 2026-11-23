@@ -48,6 +48,7 @@ export const boltedToEndConfig = {
     plate_thickness: [],
     section_designation: [],
     material: "E 250 (Fe 410 W)A",
+    supported_material: "E 250 (Fe 410 W)A",
     bolt_hole_type: "Standard",
     bolt_slip_factor: "0.3",
     bolt_tension_type: "Pre-tensioned",
@@ -75,8 +76,9 @@ export const boltedToEndConfig = {
     section_designation: KEY_SECSIZE,
     length: KEY_LENGTH,
     axial_force: KEY_AXIAL,
-    // The dock material is sent twice, as Material and as the member material.
-    material: [KEY_MATERIAL, KEY_SEC_MATERIAL],
+    // The dock material is Material; supported_material is the section tab of Additional Inputs, sent as the member material.
+    material: KEY_MATERIAL,
+    supported_material: KEY_SEC_MATERIAL,
     // member_designation is a leftover default and profile_image is only a picture.
     member_designation: null,
     profile_image: null,
@@ -172,7 +174,7 @@ export const boltedToEndConfig = {
       [KEY_TYP]: String(inputs.bolt_type),
       [KEY_CONNECTOR_MATERIAL]: String(inputs.connector_material),
       [KEY_MATERIAL]: String(inputs.material),
-      [KEY_SEC_MATERIAL]: String(inputs.material),
+      [KEY_SEC_MATERIAL]: String(inputs.supported_material),
       [KEY_DP_DESIGN_METHOD]: String(inputs.design_method),
       [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: String(inputs.detailing_corr_status),
       [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),

@@ -36,3 +36,19 @@ describe("shear modules: Connector tab material", () => {
     });
   }
 });
+
+describe("tension members and struts: section tab material", () => {
+  for (const name of ["tension bolted", "tension welded", "struts bolted", "struts welded"]) {
+    it(`${name}: Member.Material is the section tab, Material the dock material`, () => {
+      const body = request(name, { material: "E 250 (Fe 410 W)A" }, { supported_material: "E 350 (Fe 490)" });
+      expect(body.Material).toBe("E 250 (Fe 410 W)A");
+      expect(body["Member.Material"]).toBe("E 350 (Fe 490)");
+    });
+
+    it(`${name}: Member.Material follows the dock until the section tab is saved`, () => {
+      const body = request(name, { material: "E 350 (Fe 490)", supported_material: "E 350 (Fe 490)" }, {});
+      expect(body.Material).toBe("E 350 (Fe 490)");
+      expect(body["Member.Material"]).toBe("E 350 (Fe 490)");
+    });
+  }
+});

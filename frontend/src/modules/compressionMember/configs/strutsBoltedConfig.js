@@ -56,6 +56,7 @@ export const strutsBoltedConfig = {
     plate_thickness: [],
     section_designation: [],
     material: "E 250 (Fe 410 W)A",
+    supported_material: "E 250 (Fe 410 W)A",
     bolt_hole_type: "Standard",
     bolt_slip_factor: "0.3",
     bolt_tension_type: "Pre-tensioned",
@@ -87,8 +88,9 @@ export const strutsBoltedConfig = {
     axial_force: KEY_AXIAL,
     end_condition_1: KEY_END1,
     end_condition_2: KEY_END2,
-    // The dock material is sent twice, as Material and as the member material.
-    material: [KEY_MATERIAL, KEY_SEC_MATERIAL],
+    // The dock material is Material; supported_material is the section tab of Additional Inputs, sent as the member material.
+    material: KEY_MATERIAL,
+    supported_material: KEY_SEC_MATERIAL,
     // Sent under the bare name "is_leg_loaded", which the core reads by literal name: a web key.
     is_leg_loaded: WEB_IS_LEG_LOADED,
     // member_designation is a leftover default; the images are only pictures.
@@ -207,7 +209,7 @@ export const strutsBoltedConfig = {
       [KEY_SECSIZE]: memberDesignation,
 
       [KEY_MATERIAL]: inputs.material,
-      [KEY_SEC_MATERIAL]: inputs.material,
+      [KEY_SEC_MATERIAL]: inputs.supported_material,
 
       [KEY_LENGTH]: String(inputs.length),
       [KEY_AXIAL]: String(inputs.axial_force),

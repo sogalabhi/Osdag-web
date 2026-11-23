@@ -46,6 +46,7 @@ export const strutsWeldedConfig = {
     plate_thickness: [],
     section_designation: [],
     material: "E 250 (Fe 410 W)A",
+    supported_material: "E 250 (Fe 410 W)A",
     member_designation: "All",
     design_method: "Limit State Design",
     end_condition_1: "Hinged",
@@ -74,8 +75,9 @@ export const strutsWeldedConfig = {
     end_condition_2: KEY_END2,
     allow_ur: KEY_ALLOW_UR,
     effective_area_parameter: KEY_EFFECTIVE_AREA_PARA,
-    // The dock material is sent twice, as Material and as the member material.
-    material: [KEY_MATERIAL, KEY_SEC_MATERIAL],
+    // The dock material is Material; supported_material is the section tab of Additional Inputs, sent as the member material.
+    material: KEY_MATERIAL,
+    supported_material: KEY_SEC_MATERIAL,
     // member_designation is a leftover default; the images are only pictures.
     member_designation: null,
     profile_image: null,
@@ -183,7 +185,7 @@ export const strutsWeldedConfig = {
       [KEY_SECSIZE]: memberDesignation,
 
       [KEY_MATERIAL]: inputs.material,
-      [KEY_SEC_MATERIAL]: inputs.material,
+      [KEY_SEC_MATERIAL]: inputs.supported_material,
 
       [KEY_LENGTH]: String(inputs.length),
       [KEY_AXIAL]: String(inputs.axial_force),
