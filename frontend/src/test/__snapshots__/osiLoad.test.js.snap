@@ -704,7 +704,9 @@ exports[`loading a desktop .osi example into its module > SA-5 (Seated Angle Con
 exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plate Connection) 1`] = `
 {
   "allSelected": {
+    "anchor_diameter_icf": false,
     "anchor_diameter_ocf": false,
+    "anchor_grade_icf": false,
     "anchor_grade_ocf": false,
   },
   "designPrefOverrides": {
@@ -730,7 +732,17 @@ exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plat
     "DesignPreferences.Anchor_Bolt.OCF.Type": "End Plate Type",
     "DesignPreferences.Design.Base_Plate": "Effective Area Method",
     "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
-    "anchor_diameter_icf": [],
+    "anchor_diameter_icf": [
+      "M20",
+      "M24",
+      "M30",
+      "M36",
+      "M42",
+      "M48",
+      "M56",
+      "M64",
+      "M72",
+    ],
     "anchor_diameter_ocf": [
       "M20",
       "M24",
@@ -742,7 +754,18 @@ exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plat
       "M64",
       "M72",
     ],
-    "anchor_grade_icf": [],
+    "anchor_grade_icf": [
+      "3.6",
+      "4.6",
+      "4.8",
+      "5.6",
+      "5.8",
+      "6.8",
+      "8.8",
+      "9.8",
+      "10.9",
+      "12.9",
+    ],
     "anchor_grade_ocf": [
       "3.6",
       "4.6",
@@ -776,6 +799,17 @@ exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plat
     "weld_type": "Groove Weld",
   },
   "selectedItems": {
+    "anchor_diameter_icf": [
+      "M20",
+      "M24",
+      "M30",
+      "M36",
+      "M42",
+      "M48",
+      "M56",
+      "M64",
+      "M72",
+    ],
     "anchor_diameter_ocf": [
       "M20",
       "M24",
@@ -786,6 +820,18 @@ exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plat
       "M56",
       "M64",
       "M72",
+    ],
+    "anchor_grade_icf": [
+      "3.6",
+      "4.6",
+      "4.8",
+      "5.6",
+      "5.8",
+      "6.8",
+      "8.8",
+      "9.8",
+      "10.9",
+      "12.9",
     ],
     "anchor_grade_ocf": [
       "3.6",
@@ -801,7 +847,9 @@ exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plat
     ],
   },
   "selectionStates": {
+    "anchorDiameterIcfSelect": "Customized",
     "anchorDiameterOcfSelect": "Customized",
+    "anchorGradeIcfSelect": "Customized",
     "anchorGradeOcfSelect": "Customized",
   },
 }
@@ -810,7 +858,9 @@ exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plat
 exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plate Connection) 1`] = `
 {
   "allSelected": {
+    "anchor_diameter_icf": false,
     "anchor_diameter_ocf": false,
+    "anchor_grade_icf": false,
     "anchor_grade_ocf": false,
   },
   "designPrefOverrides": {
@@ -836,7 +886,17 @@ exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plat
     "DesignPreferences.Anchor_Bolt.OCF.Type": "End Plate Type",
     "DesignPreferences.Design.Base_Plate": "Effective Area Method",
     "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
-    "anchor_diameter_icf": [],
+    "anchor_diameter_icf": [
+      "M20",
+      "M24",
+      "M30",
+      "M36",
+      "M42",
+      "M48",
+      "M56",
+      "M64",
+      "M72",
+    ],
     "anchor_diameter_ocf": [
       "M20",
       "M24",
@@ -848,7 +908,18 @@ exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plat
       "M64",
       "M72",
     ],
-    "anchor_grade_icf": [],
+    "anchor_grade_icf": [
+      "3.6",
+      "4.6",
+      "4.8",
+      "5.6",
+      "5.8",
+      "6.8",
+      "8.8",
+      "9.8",
+      "10.9",
+      "12.9",
+    ],
     "anchor_grade_ocf": [
       "3.6",
       "4.6",
@@ -882,6 +953,17 @@ exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plat
     "weld_type": "Groove Weld",
   },
   "selectedItems": {
+    "anchor_diameter_icf": [
+      "M20",
+      "M24",
+      "M30",
+      "M36",
+      "M42",
+      "M48",
+      "M56",
+      "M64",
+      "M72",
+    ],
     "anchor_diameter_ocf": [
       "M20",
       "M24",
@@ -892,6 +974,18 @@ exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plat
       "M56",
       "M64",
       "M72",
+    ],
+    "anchor_grade_icf": [
+      "3.6",
+      "4.6",
+      "4.8",
+      "5.6",
+      "5.8",
+      "6.8",
+      "8.8",
+      "9.8",
+      "10.9",
+      "12.9",
     ],
     "anchor_grade_ocf": [
       "3.6",
@@ -907,7 +1001,9 @@ exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plat
     ],
   },
   "selectionStates": {
+    "anchorDiameterIcfSelect": "Customized",
     "anchorDiameterOcfSelect": "Customized",
+    "anchorGradeIcfSelect": "Customized",
     "anchorGradeOcfSelect": "Customized",
   },
 }
@@ -916,7 +1012,9 @@ exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plat
 exports[`loading a desktop .osi example into its module > baseplate_3 (Base Plate Connection) 1`] = `
 {
   "allSelected": {
+    "anchor_diameter_icf": false,
     "anchor_diameter_ocf": false,
+    "anchor_grade_icf": false,
     "anchor_grade_ocf": false,
   },
   "designPrefOverrides": {
@@ -944,13 +1042,25 @@ exports[`loading a desktop .osi example into its module > baseplate_3 (Base Plat
     "DesignPreferences.Anchor_Bolt.OCF.Type": "End Plate Type",
     "DesignPreferences.Design.Base_Plate": "Effective Area Method",
     "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
-    "anchor_diameter_icf": [],
+    "anchor_diameter_icf": [
+      "M20",
+      "M24",
+      "M30",
+      "M36",
+      "M42",
+      "M48",
+      "M56",
+      "M64",
+      "M72",
+    ],
     "anchor_diameter_ocf": [
       "M20",
       "M24",
       "M30",
     ],
-    "anchor_grade_icf": [],
+    "anchor_grade_icf": [
+      "8.8",
+    ],
     "anchor_grade_ocf": [
       "8.8",
       "9.8",
@@ -976,10 +1086,24 @@ exports[`loading a desktop .osi example into its module > baseplate_3 (Base Plat
     "weld_type": "Groove Weld",
   },
   "selectedItems": {
+    "anchor_diameter_icf": [
+      "M20",
+      "M24",
+      "M30",
+      "M36",
+      "M42",
+      "M48",
+      "M56",
+      "M64",
+      "M72",
+    ],
     "anchor_diameter_ocf": [
       "M20",
       "M24",
       "M30",
+    ],
+    "anchor_grade_icf": [
+      "8.8",
     ],
     "anchor_grade_ocf": [
       "8.8",
@@ -987,7 +1111,9 @@ exports[`loading a desktop .osi example into its module > baseplate_3 (Base Plat
     ],
   },
   "selectionStates": {
+    "anchorDiameterIcfSelect": "Customized",
     "anchorDiameterOcfSelect": "Customized",
+    "anchorGradeIcfSelect": "Customized",
     "anchorGradeOcfSelect": "Customized",
   },
 }
@@ -996,7 +1122,9 @@ exports[`loading a desktop .osi example into its module > baseplate_3 (Base Plat
 exports[`loading a desktop .osi example into its module > baseplate_4 (Base Plate Connection) 1`] = `
 {
   "allSelected": {
+    "anchor_diameter_icf": false,
     "anchor_diameter_ocf": false,
+    "anchor_grade_icf": false,
     "anchor_grade_ocf": false,
   },
   "designPrefOverrides": {
@@ -1024,11 +1152,15 @@ exports[`loading a desktop .osi example into its module > baseplate_4 (Base Plat
     "DesignPreferences.Anchor_Bolt.OCF.Type": "End Plate Type",
     "DesignPreferences.Design.Base_Plate": "Effective Area Method",
     "Stiffener_Key.Material": "E 300 (Fe 440)",
-    "anchor_diameter_icf": [],
+    "anchor_diameter_icf": [
+      "M20",
+    ],
     "anchor_diameter_ocf": [
       "M30",
     ],
-    "anchor_grade_icf": [],
+    "anchor_grade_icf": [
+      "8.8",
+    ],
     "anchor_grade_ocf": [
       "10.9",
     ],
@@ -1053,15 +1185,23 @@ exports[`loading a desktop .osi example into its module > baseplate_4 (Base Plat
     "weld_type": "Groove Weld",
   },
   "selectedItems": {
+    "anchor_diameter_icf": [
+      "M20",
+    ],
     "anchor_diameter_ocf": [
       "M30",
+    ],
+    "anchor_grade_icf": [
+      "8.8",
     ],
     "anchor_grade_ocf": [
       "10.9",
     ],
   },
   "selectionStates": {
+    "anchorDiameterIcfSelect": "Customized",
     "anchorDiameterOcfSelect": "Customized",
+    "anchorGradeIcfSelect": "Customized",
     "anchorGradeOcfSelect": "Customized",
   },
 }
@@ -1070,7 +1210,9 @@ exports[`loading a desktop .osi example into its module > baseplate_4 (Base Plat
 exports[`loading a desktop .osi example into its module > baseplate_5 (Base Plate Connection) 1`] = `
 {
   "allSelected": {
+    "anchor_diameter_icf": false,
     "anchor_diameter_ocf": false,
+    "anchor_grade_icf": false,
     "anchor_grade_ocf": false,
   },
   "designPrefOverrides": {
@@ -1098,11 +1240,15 @@ exports[`loading a desktop .osi example into its module > baseplate_5 (Base Plat
     "DesignPreferences.Anchor_Bolt.OCF.Type": "End Plate Type",
     "DesignPreferences.Design.Base_Plate": "Effective Area Method",
     "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
-    "anchor_diameter_icf": [],
+    "anchor_diameter_icf": [
+      "M20",
+    ],
     "anchor_diameter_ocf": [
       "M20",
     ],
-    "anchor_grade_icf": [],
+    "anchor_grade_icf": [
+      "8.8",
+    ],
     "anchor_grade_ocf": [
       "8.8",
     ],
@@ -1127,15 +1273,23 @@ exports[`loading a desktop .osi example into its module > baseplate_5 (Base Plat
     "weld_type": "Groove Weld",
   },
   "selectedItems": {
+    "anchor_diameter_icf": [
+      "M20",
+    ],
     "anchor_diameter_ocf": [
       "M20",
+    ],
+    "anchor_grade_icf": [
+      "8.8",
     ],
     "anchor_grade_ocf": [
       "8.8",
     ],
   },
   "selectionStates": {
+    "anchorDiameterIcfSelect": "Customized",
     "anchorDiameterOcfSelect": "Customized",
+    "anchorGradeIcfSelect": "Customized",
     "anchorGradeOcfSelect": "Customized",
   },
 }

@@ -367,10 +367,25 @@ exports[`a desktop .osi example sends this design request > baseplate_1 (Base Pl
   "Anchor Bolt.ICF.Diameter": [
     "M20",
     "M24",
+    "M30",
+    "M36",
+    "M42",
+    "M48",
+    "M56",
+    "M64",
+    "M72",
   ],
   "Anchor Bolt.ICF.Grade": [
+    "3.6",
     "4.6",
+    "4.8",
+    "5.6",
+    "5.8",
+    "6.8",
     "8.8",
+    "9.8",
+    "10.9",
+    "12.9",
   ],
   "Anchor Bolt.OCF.Diameter": [
     "M20",
@@ -417,10 +432,25 @@ exports[`a desktop .osi example sends this design request > baseplate_2 (Base Pl
   "Anchor Bolt.ICF.Diameter": [
     "M20",
     "M24",
+    "M30",
+    "M36",
+    "M42",
+    "M48",
+    "M56",
+    "M64",
+    "M72",
   ],
   "Anchor Bolt.ICF.Grade": [
+    "3.6",
     "4.6",
+    "4.8",
+    "5.6",
+    "5.8",
+    "6.8",
     "8.8",
+    "9.8",
+    "10.9",
+    "12.9",
   ],
   "Anchor Bolt.OCF.Diameter": [
     "M20",
@@ -467,9 +497,15 @@ exports[`a desktop .osi example sends this design request > baseplate_3 (Base Pl
   "Anchor Bolt.ICF.Diameter": [
     "M20",
     "M24",
+    "M30",
+    "M36",
+    "M42",
+    "M48",
+    "M56",
+    "M64",
+    "M72",
   ],
   "Anchor Bolt.ICF.Grade": [
-    "4.6",
     "8.8",
   ],
   "Anchor Bolt.OCF.Diameter": [
@@ -502,10 +538,8 @@ exports[`a desktop .osi example sends this design request > baseplate_4 (Base Pl
 {
   "Anchor Bolt.ICF.Diameter": [
     "M20",
-    "M24",
   ],
   "Anchor Bolt.ICF.Grade": [
-    "4.6",
     "8.8",
   ],
   "Anchor Bolt.OCF.Diameter": [
@@ -535,10 +569,8 @@ exports[`a desktop .osi example sends this design request > baseplate_5 (Base Pl
 {
   "Anchor Bolt.ICF.Diameter": [
     "M20",
-    "M24",
   ],
   "Anchor Bolt.ICF.Grade": [
-    "4.6",
     "8.8",
   ],
   "Anchor Bolt.OCF.Diameter": [

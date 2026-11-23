@@ -46,12 +46,6 @@ export const basePlateConfig = {
   cameraKey: "BasePlateConnection",
   cadOptions: ["Model", "Column", "Plate", "Welds", "Bolts", "Concrete", "Grout"],
 
-  // Fields a design dictionary does not fill. The old .osi loader read the inside-flange anchor
-  // lists (Anchor Bolt.ICF.*) into the outside-flange fields and the outside ones overwrote them,
-  // so a loaded file never set the ICF lists (they stayed on "All"). Kept so opening a file sends
-  // the same request as before; remove these two entries to read the ICF lists from the file.
-  notLoadedFromDictionary: ["anchor_diameter_icf", "anchor_grade_icf"],
-
   defaultInputs: {
     module: KEY_DISP_BASE_PLATE,
     member_designation: "",
