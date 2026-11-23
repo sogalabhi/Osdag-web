@@ -254,6 +254,9 @@ export const plateGirderConfig = {
     bottom_flange_width_inc: "10",
   },
 
+  // Core keys the builder computes from several fields; a file's value is never read back into them.
+  computedCoreKeys: [KEY_MAX_DEFL],
+
   // Every form field and the core key(s) it feeds; null for a field that feeds none.
   // The test in src/test/coreKeyMap.test.js checks this against what buildSubmissionParams sends.
   coreKeys: {

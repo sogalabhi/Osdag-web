@@ -1,6 +1,6 @@
 # Declared core-key map
 
-Every module config lists, for each form field, the core key(s) it feeds. This is the single, tested place that says "this field is that core key". The mapping is not code yet: nothing reads `coreKeys` at runtime (later slices use it to drop the tracer, the normalizer and the backend key tables), so declaring it changes no wire body.
+Every module config lists, for each form field, the core key(s) it feeds. This is the single, tested place that says "this field is that core key". The `.osi` loader reads it backwards (`utils/designDictionary.js`, `fromDesignDictionary`): a core key in a design dictionary fills every field that declares it. Nothing else reads it at runtime yet, and declaring it changes no wire body.
 
 ## Format
 
@@ -45,9 +45,17 @@ For each module and each payloadParity variant (every connectivity on "All", plu
 - every wire key that came from a field is among that field's declared keys;
 - every declared key is a real export of `coreKeys.js` / `webKeys.js` (a misspelled import is `undefined` and is reported);
 - every form field is declared, and nothing unknown is;
-- every core key the current `.osi` loader (`getModuleKeyMap`) maps onto a field is declared by that field.
 
 The check is one way: a declared key the builder never sends is allowed (prefs the builder ignores, `.osi`-only keys). A module without `coreKeys` fails unless it is in `PENDING`, where it shows as a todo; a module that has `coreKeys` but is still in `PENDING` fails, so the list only shrinks.
+
+## How the loader uses it
+
+- A key in the file fills every field that declares it, so a field has to declare each key the desktop file can carry it under, not only the one the builder sends (`load_axial: [KEY_AXIAL, KEY_AXIAL_BP]`: the builder sends `Load.Axial`, the desktop file writes `Load.Axial_Compression`).
+- A field declared with `null`, or not declared, is never filled from a file. A key no field declares is dropped.
+- Declare a field only if the form has it. A spread row for a field the form lacks (`material` in a module whose dock has `connector_material`) is loaded as a stray input; give the module `material: null`.
+- `computedCoreKeys: [KEY]` on a config lists keys the builder derives from several fields (plate girder `Deflection.Max`); a file's value is never read back into them.
+- `notLoadedFromDictionary: [field]` lists fields a file must not fill. Base plate uses it for the two inside-flange anchor lists, which the old loader never filled; remove the entry to fix that.
+- When several keys feed one field, the more specific key wins: `Material`, then `Connector.Material`, then the rest (`keyPriority`).
 
 ## Pitfalls
 

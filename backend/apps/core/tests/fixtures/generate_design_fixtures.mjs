@@ -341,7 +341,7 @@ try {
     let extraState = initialExtraState(config);
     let prefOverrides = {};
     const apply = (cur) => (v) => (typeof v === 'function' ? v(cur()) : v);
-    mod.loadStateFromOsi({ dock: rec.dock, pref: rec.pref, flat: rec.flat }, {
+    mod.loadStateFromOsi(rec.flat, {
       setInputs: (v) => { inputs = v; },
       setDesignPrefOverrides: (v) => { prefOverrides = v; },
       setExtraState: (f) => { extraState = apply(() => extraState)(f); },

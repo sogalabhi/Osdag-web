@@ -46,10 +46,11 @@ export const basePlateConfig = {
   cameraKey: "BasePlateConnection",
   cadOptions: ["Model", "Column", "Plate", "Welds", "Bolts", "Concrete", "Grout"],
 
-  // Keys the desktop writes under a different name than buildSubmissionParams sends.
-  osiKeyAliases: {
-    [KEY_AXIAL_BP]: "load_axial",
-  },
+  // Fields a design dictionary does not fill. The old .osi loader read the inside-flange anchor
+  // lists (Anchor Bolt.ICF.*) into the outside-flange fields and the outside ones overwrote them,
+  // so a loaded file never set the ICF lists (they stayed on "All"). Kept so opening a file sends
+  // the same request as before; remove these two entries to read the ICF lists from the file.
+  notLoadedFromDictionary: ["anchor_diameter_icf", "anchor_grade_icf"],
 
   defaultInputs: {
     module: KEY_DISP_BASE_PLATE,
@@ -151,7 +152,7 @@ export const basePlateConfig = {
     connectivity: KEY_CONN,
     end_condition: KEY_END_CONDITION,
     // The builder sends the compression load as Load.Axial; the desktop .osi writes Load.Axial_Compression.
-    load_axial: KEY_AXIAL,
+    load_axial: [KEY_AXIAL, KEY_AXIAL_BP],
     load_axial_tension: KEY_AXIAL_TENSION_BP,
     load_shear_major: KEY_SHEAR_MAJOR,
     load_shear_minor: KEY_SHEAR_MINOR,
