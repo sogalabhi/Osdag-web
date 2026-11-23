@@ -18,6 +18,9 @@ from apps.core.tests.test_osdag_overrides import make_beam
 from osdag_core.Common import (
     KEY_CONNECTOR_MATERIAL,
     KEY_DISP_FINPLATE,
+    KEY_DISP_SEATED_ANGLE,
+    KEY_DISP_HEADERPLATE,
+    KEY_DISP_CLEATANGLE,
     KEY_DISP_FLEXURE,
     KEY_DISP_FLEXURE4,
     KEY_DP_BOLT_HOLE_TYPE,
@@ -44,7 +47,7 @@ class DesignPrefSyncMergeTests(TestCase):
         self.assertEqual(resolved[KEY_SUPTNGSEC_MATERIAL], "E 250 (Fe 410 W)A")
         self.assertEqual(resolved[KEY_SUPTDSEC_MATERIAL], "E 250 (Fe 410 W)A")
         self.assertEqual(resolved[KEY_CONNECTOR_MATERIAL], "E 250 (Fe 410 W)A")
-        self.assertIn(KEY_CONNECTOR_MATERIAL, meta["copied_from_input_dock_keys"])
+        self.assertIn(KEY_MATERIAL, meta["copied_from_input_dock_keys"])
         self.assertEqual(meta["module_id"], KEY_DISP_FINPLATE)
 
     def test_save_preserves_draft_overrides_without_forcing_dock_resync(self):
@@ -65,7 +68,7 @@ class DesignPrefSyncMergeTests(TestCase):
         self.assertEqual(resolved[KEY_CONNECTOR_MATERIAL], "E 350 (Fe 490)")
 
     def test_reset_applies_driver_sync(self):
-        inputs = {KEY_CONNECTOR_MATERIAL: "E 165 (Fe 290)"}
+        inputs = {KEY_MATERIAL: "E 165 (Fe 290)"}
         resolved, _meta, _md, _sd = merge_design_pref_sync(
             KEY_DISP_FINPLATE,
             inputs,
@@ -96,6 +99,20 @@ class DesignPrefSyncMergeTests(TestCase):
         self.assertEqual(resolved, inputs)
         self.assertEqual(meta["copied_from_input_dock_keys"], {})
         self.assertEqual(meta["module_id"], KEY_DISP_FLEXURE4)
+
+    def test_shear_refresh_follows_dock_material_not_connector_tab(self):
+        for module in (KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_HEADERPLATE, KEY_DISP_SEATED_ANGLE):
+            inputs = {KEY_MATERIAL: "E 350 (Fe 490)", KEY_CONNECTOR_MATERIAL: "E 165 (Fe 290)"}
+            resolved, _meta, _md, _sd = merge_design_pref_sync(module, inputs, "refresh")
+            self.assertEqual(resolved[KEY_CONNECTOR_MATERIAL], "E 350 (Fe 490)", module)
+            self.assertEqual(resolved[KEY_SUPTNGSEC_MATERIAL], "E 350 (Fe 490)", module)
+            self.assertEqual(resolved[KEY_SUPTDSEC_MATERIAL], "E 350 (Fe 490)", module)
+
+    def test_shear_open_keeps_saved_connector_material(self):
+        inputs = {KEY_MATERIAL: "E 250 (Fe 410 W)A", KEY_CONNECTOR_MATERIAL: "E 350 (Fe 490)"}
+        resolved, _meta, _md, _sd = merge_design_pref_sync(KEY_DISP_FINPLATE, inputs, "open")
+        self.assertEqual(resolved[KEY_CONNECTOR_MATERIAL], "E 350 (Fe 490)")
+        self.assertEqual(resolved[KEY_SUPTNGSEC_MATERIAL], "E 250 (Fe 410 W)A")
 
 
 class DesignPrefSyncAPITests(TestCase):

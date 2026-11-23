@@ -125,7 +125,7 @@ describe("the request", () => {
 
   it("carries the module id, core keys and a core-keyed draft", () => {
     const { body } = toSyncRequest(finPlate, {
-      state: { connector_material: GRADE, bolt_hole_type: "Standard", profile_image: "x" },
+      state: { material: GRADE, connector_material: GRADE, bolt_hole_type: "Standard", profile_image: "x" },
       operation: "save",
       draft: { bolt_hole_type: "Over-sized" },
     });
@@ -154,7 +154,7 @@ describe("the request", () => {
   });
 
   it("the defaults request has no operation and no draft", () => {
-    const { body } = toSyncRequest(finPlate, { state: { connector_material: GRADE } });
+    const { body } = toSyncRequest(finPlate, { state: { material: GRADE, connector_material: GRADE } });
     expect(body).toEqual({ module_id: KEY_DISP_FINPLATE, inputs: { [KEY_CONNECTOR_MATERIAL]: GRADE, [KEY_MATERIAL]: GRADE } });
   });
 

@@ -4870,11 +4870,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "open",
@@ -4926,11 +4927,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "open",
@@ -4951,7 +4953,7 @@
           "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
           "Detailing.Gap": "10",
           "Load.Shear": "20",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -4976,11 +4978,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "open",
@@ -5001,7 +5004,7 @@
           "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
           "Detailing.Gap": "10",
           "Load.Shear": "20",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -5030,18 +5033,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "refresh",
@@ -5091,18 +5096,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "refresh",
@@ -5140,24 +5147,32 @@
       },
       "refresh_stale_prefs": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
-          "supporting": []
+          "connector": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supported": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supporting": [
+            "E 250 (Fe 410 W)A"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "refresh",
@@ -5172,17 +5187,17 @@
           "Bolt.Type": "Bearing Bolt",
           "Connectivity": "Column Flange-Beam Web",
           "Connector.Angle_List": [],
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 250 (Fe 410 W)A",
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
           "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
           "Detailing.Gap": "10",
           "Load.Shear": "20",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Designation": "HB 150",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Cleat Angle Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -5207,9 +5222,10 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -5224,11 +5240,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "reset",
@@ -5278,9 +5295,10 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -5295,11 +5313,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "reset",
@@ -5337,15 +5356,22 @@
       },
       "reset_saved_overrides": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
-          "supporting": []
+          "connector": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supported": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supporting": [
+            "E 250 (Fe 410 W)A"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -5360,11 +5386,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "reset",
@@ -5379,20 +5406,20 @@
           "Bolt.Type": "Bearing Bolt",
           "Connectivity": "Column Flange-Beam Web",
           "Connector.Angle_List": [],
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 250 (Fe 410 W)A",
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
           "Detailing.Edge_type": "Sheared or hand flame cut",
           "Detailing.Gap": "10",
           "Load.Shear": "20",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Designation": "HB 150",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Cleat Angle Connection",
           "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "0.0"
+          "Weld.Material_Grade_OverWrite": "410"
         },
         "section_designations": {
           "connector": null,
@@ -5416,11 +5443,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "save",
@@ -5472,11 +5500,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "save",
@@ -5497,7 +5526,7 @@
           "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
           "Detailing.Gap": "10",
           "Load.Shear": "20",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -5526,11 +5555,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Cleat Angle Connection",
           "operation": "save",
@@ -5551,7 +5581,7 @@
           "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
           "Detailing.Gap": "10",
           "Load.Shear": "20",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -8520,11 +8550,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "open",
@@ -8577,11 +8608,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "open",
@@ -8603,7 +8635,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "30",
           "Load.Shear": "70",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 165 (Fe 290)",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -8628,11 +8660,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "open",
@@ -8654,7 +8687,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "30",
           "Load.Shear": "70",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 165 (Fe 290)",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -8683,18 +8716,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "refresh",
@@ -8745,18 +8780,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "refresh",
@@ -8795,24 +8832,32 @@
       },
       "refresh_stale_prefs": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
-          "supporting": []
+          "connector": [
+            "E 165 (Fe 290)"
+          ],
+          "supported": [
+            "E 165 (Fe 290)"
+          ],
+          "supporting": [
+            "E 165 (Fe 290)"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "refresh",
@@ -8826,7 +8871,7 @@
           "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Type": "Bearing_Bolt",
           "Connectivity": "Column Flange-Beam Web",
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 165 (Fe 290)",
           "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
@@ -8834,11 +8879,11 @@
           "Detailing.Gap": "10",
           "Load.Axial": "30",
           "Load.Shear": "70",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 165 (Fe 290)",
           "Member.Supported_Section.Designation": "MB 300",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "HB 150",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Fin Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -8863,9 +8908,10 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -8880,11 +8926,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "reset",
@@ -8935,9 +8982,10 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -8952,11 +9000,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "reset",
@@ -8995,15 +9044,22 @@
       },
       "reset_saved_overrides": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
-          "supporting": []
+          "connector": [
+            "E 165 (Fe 290)"
+          ],
+          "supported": [
+            "E 165 (Fe 290)"
+          ],
+          "supporting": [
+            "E 165 (Fe 290)"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -9018,11 +9074,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "reset",
@@ -9036,7 +9093,7 @@
           "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Type": "Bearing_Bolt",
           "Connectivity": "Column Flange-Beam Web",
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 165 (Fe 290)",
           "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
@@ -9044,14 +9101,14 @@
           "Detailing.Gap": "10",
           "Load.Axial": "30",
           "Load.Shear": "70",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 165 (Fe 290)",
           "Member.Supported_Section.Designation": "MB 300",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "HB 150",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Fin Plate Connection",
           "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "0.0"
+          "Weld.Material_Grade_OverWrite": "290"
         },
         "section_designations": {
           "connector": null,
@@ -9075,11 +9132,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "save",
@@ -9132,11 +9190,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "save",
@@ -9158,7 +9217,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "30",
           "Load.Shear": "70",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 165 (Fe 290)",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -9187,11 +9246,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Fin Plate Connection",
           "operation": "save",
@@ -9213,7 +9273,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "30",
           "Load.Shear": "70",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 165 (Fe 290)",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -10714,11 +10774,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "open",
@@ -10771,11 +10832,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "open",
@@ -10797,7 +10859,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "10",
           "Load.Shear": "20",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "",
           "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "",
@@ -10822,11 +10884,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "open",
@@ -10848,7 +10911,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "10",
           "Load.Shear": "20",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Designation": "",
@@ -10877,18 +10940,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "refresh",
@@ -10939,18 +11004,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "refresh",
@@ -10989,24 +11056,32 @@
       },
       "refresh_stale_prefs": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
-          "supporting": []
+          "connector": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supported": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supporting": [
+            "E 250 (Fe 410 W)A"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "refresh",
@@ -11020,7 +11095,7 @@
           "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Type": "Bearing Bolt",
           "Connectivity": "Column Flange-Beam Web",
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 250 (Fe 410 W)A",
           "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
@@ -11028,11 +11103,11 @@
           "Detailing.Gap": "10",
           "Load.Axial": "10",
           "Load.Shear": "20",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Designation": "",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Header Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -11057,18 +11132,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "reset",
@@ -11119,18 +11196,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "reset",
@@ -11169,24 +11248,32 @@
       },
       "reset_saved_overrides": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
-          "supporting": []
+          "connector": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supported": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supporting": [
+            "E 250 (Fe 410 W)A"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "reset",
@@ -11200,7 +11287,7 @@
           "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Type": "Bearing Bolt",
           "Connectivity": "Column Flange-Beam Web",
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 250 (Fe 410 W)A",
           "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
@@ -11208,11 +11295,11 @@
           "Detailing.Gap": "10",
           "Load.Axial": "10",
           "Load.Shear": "20",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Designation": "",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Header Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -11239,11 +11326,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "save",
@@ -11296,11 +11384,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "save",
@@ -11322,7 +11411,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "10",
           "Load.Shear": "20",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "",
           "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "",
@@ -11351,11 +11440,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Header Plate Connection",
           "operation": "save",
@@ -11377,7 +11467,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "10",
           "Load.Shear": "20",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Designation": "",
@@ -13512,11 +13602,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "open",
@@ -13570,11 +13661,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "open",
@@ -13597,7 +13689,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "0",
           "Load.Shear": "70",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -13622,11 +13714,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "open",
@@ -13649,7 +13742,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "0",
           "Load.Shear": "70",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -13678,18 +13771,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "refresh",
@@ -13741,18 +13836,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "refresh",
@@ -13792,24 +13889,32 @@
       },
       "refresh_stale_prefs": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
-          "supporting": []
+          "connector": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supported": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supporting": [
+            "E 250 (Fe 410 W)A"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "refresh",
@@ -13824,7 +13929,7 @@
           "Bolt.Type": "Bearing_Bolt",
           "Connectivity": "Column Flange-Beam Web",
           "Connector.Angle_List": [],
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 250 (Fe 410 W)A",
           "Connector.Top_Angle": [],
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
@@ -13832,11 +13937,11 @@
           "Detailing.Gap": "10",
           "Load.Axial": "0",
           "Load.Shear": "70",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Designation": "HB 150",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Seated Angle Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
@@ -13861,9 +13966,10 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -13878,11 +13984,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "reset",
@@ -13934,9 +14041,10 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -13951,11 +14059,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "reset",
@@ -13995,15 +14104,22 @@
       },
       "reset_saved_overrides": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
-          "supporting": []
+          "connector": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supported": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supporting": [
+            "E 250 (Fe 410 W)A"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -14018,11 +14134,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "reset",
@@ -14037,7 +14154,7 @@
           "Bolt.Type": "Bearing_Bolt",
           "Connectivity": "Column Flange-Beam Web",
           "Connector.Angle_List": [],
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 250 (Fe 410 W)A",
           "Connector.Top_Angle": [],
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
@@ -14045,14 +14162,14 @@
           "Detailing.Gap": "10",
           "Load.Axial": "0",
           "Load.Shear": "70",
-          "Material": "E 450 (Fe 570) D",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Designation": "HB 150",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Seated Angle Connection",
           "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "0.0"
+          "Weld.Material_Grade_OverWrite": "410"
         },
         "section_designations": {
           "connector": null,
@@ -14076,11 +14193,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "save",
@@ -14134,11 +14252,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "save",
@@ -14161,7 +14280,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "0",
           "Load.Shear": "70",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "HB 150",
@@ -14190,11 +14309,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Seated Angle Connection",
           "operation": "save",
@@ -14217,7 +14337,7 @@
           "Detailing.Gap": "10",
           "Load.Axial": "0",
           "Load.Shear": "70",
-          "Material": "E 350 (Fe 490)",
+          "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "MB 300",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Designation": "HB 150",

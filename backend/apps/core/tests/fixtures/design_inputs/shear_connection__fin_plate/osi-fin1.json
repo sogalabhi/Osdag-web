@@ -29,7 +29,7 @@
     "Detailing.Gap": "10",
     "Load.Axial": "40",
     "Load.Shear": "60",
-    "Material": "E 165 (Fe 290)",
+    "Material": "E 250 (Fe 410 W)A",
     "Member.Supported_Section.Designation": "MB 500",
     "Member.Supported_Section.Material": "E 250 (Fe 410 W)B",
     "Member.Supporting_Section.Designation": "UC 356 x 406 x 393",

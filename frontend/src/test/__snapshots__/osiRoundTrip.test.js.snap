@@ -138,7 +138,6 @@ exports[`a desktop .osi example opened and saved again > SA-5 (Seated Angle Conn
   ],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
-    "Material": ""E 350 (Fe 490)" -> "E 250 (Fe 410 W)A"",
   },
   "dropped": [
     "Bolt.Material_Grade_OverWrite",
@@ -796,7 +795,6 @@ exports[`a desktop .osi example opened and saved again > fin1 (Fin Plate Connect
   "added": [],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
-    "Material": ""E 250 (Fe 410 W)A" -> "E 165 (Fe 290)"",
   },
   "dropped": [
     "Bolt.Material_Grade_OverWrite",
@@ -809,7 +807,6 @@ exports[`a desktop .osi example opened and saved again > fin2 (Fin Plate Connect
   "added": [],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
-    "Material": ""E 350 (Fe 490)" -> "E 450 (Fe 570)D"",
   },
   "dropped": [
     "Bolt.Material_Grade_OverWrite",
@@ -822,7 +819,6 @@ exports[`a desktop .osi example opened and saved again > fin3 (Fin Plate Connect
   "added": [],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
-    "Material": ""E 350 (Fe 490)" -> "E 250 (Fe 410 W)A"",
   },
   "dropped": [
     "Bolt.Material_Grade_OverWrite",
@@ -847,7 +843,6 @@ exports[`a desktop .osi example opened and saved again > fin5 (Fin Plate Connect
   "added": [],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
-    "Material": ""E 165 (Fe 290)" -> "E 410 (Fe 540)"",
   },
   "dropped": [
     "Bolt.Material_Grade_OverWrite",

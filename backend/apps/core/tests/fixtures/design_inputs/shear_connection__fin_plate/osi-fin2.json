@@ -29,7 +29,7 @@
     "Detailing.Gap": "10",
     "Load.Axial": "60",
     "Load.Shear": "150",
-    "Material": "E 450 (Fe 570)D",
+    "Material": "E 350 (Fe 490)",
     "Member.Supported_Section.Designation": "MB 550",
     "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
     "Member.Supporting_Section.Designation": "UC 305 x 305 x 97",

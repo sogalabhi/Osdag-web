@@ -42,8 +42,7 @@ export const PREF_CORE_KEYS = {
 
 /**
  * The material rows (dock dropdown and Additional Inputs material rows) in their plain
- * one-to-one meaning. These differ by module (the shear modules send `connector_material`
- * as both `Connector.Material` and `Material`; tension sends `material` as the section
+ * one-to-one meaning. These differ by module (tension sends `material` as the section
  * material), so a module overrides the rows it handles differently, after the spread.
  */
 export const MATERIAL_CORE_KEYS = {
