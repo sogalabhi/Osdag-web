@@ -42,11 +42,12 @@ from osdag_core.Common import (
 RULE_OVERRIDES = {
     KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE, KEY_DISP_BCENDPLATE,
     KEY_DISP_BB_EP_SPLICE, KEY_DISP_COLUMNENDPLATE, KEY_DISP_BASE_PLATE,
-    KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
     KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED,
     KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_PLATE_GIRDER_WELDED, KEY_DISP_COMPRESSION_COLUMN,
     KEY_DISP_STRUT_BOLTED_END_GUSSET, KEY_DISP_STRUT_WELDED_END_GUSSET,
 }
+# Cover plates: the dock Material copies to Member.Material and Connector.Material, as the core says.
+CORE_RULES = {KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD}
 # Modules where core and old agree on "no material sync": no copy rows.
 NO_RULES = {KEY_DISP_BUTTJOINTBOLTED, KEY_DISP_BUTTJOINTWELDED, KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED}
 
@@ -61,7 +62,7 @@ def test_the_override_tables_list_exactly_the_documented_modules():
     assert set(sync_merge.LEGACY_SYNC_RULES) == RULE_OVERRIDES
     assert set(sync_merge.LEGACY_SECTION_SOURCES) == SECTION_OVERRIDES
     assert set(sync_merge.NO_CORE_DEFAULTS) == NO_DEFAULTS
-    assert RULE_OVERRIDES | NO_RULES == set(module_ids())
+    assert RULE_OVERRIDES | CORE_RULES | NO_RULES == set(module_ids())
 
 
 @pytest.mark.parametrize("module_id", sorted(RULE_OVERRIDES))
@@ -82,12 +83,23 @@ def test_a_section_override_differs_from_the_core_sources(module_id):
     assert sync_merge.LEGACY_SECTION_SOURCES[module_id] != sync_merge.core_section_sources(module_id)
 
 
-def test_the_core_rule_adds_the_member_material_where_the_old_rule_did_not():
-    # Cover plate: the core copies Material into Member.Material (and the connector echoes it);
-    # the old web copied it into the supported and connector material rows.
-    core = dict(sync_merge.core_sync_rules(KEY_DISP_BEAMCOVERPLATE))
-    assert "Member.Material" in core["Material"]
-    assert "Member.Supported_Section.Material" not in core["Material"]
+@pytest.mark.parametrize("module_id", sorted(CORE_RULES))
+def test_a_cover_plate_follows_the_core_rule(module_id):
+    # The dock Material copies into Member.Material and Connector.Material; no other driver.
+    assert sync_merge.sync_rules(module_id) == [("Material", ["Member.Material", "Connector.Material"])]
+
+
+@pytest.mark.parametrize("module_id", sorted(CORE_RULES))
+def test_a_changed_dock_material_replaces_the_member_and_connector_materials(module_id):
+    # A stale Member.Material or Connector.Material in the request (the form still holds the old
+    # grade) must not win over the dock Material on refresh.
+    resolved, _meta, _md, _sd = sync_merge.merge_design_pref_sync(
+        module_id,
+        {"Material": "E 350 (Fe 490)", "Member.Material": "E 250 (Fe 410 W)A", "Connector.Material": "E 250 (Fe 410 W)A"},
+        "refresh",
+    )
+    assert resolved["Member.Material"] == "E 350 (Fe 490)"
+    assert resolved["Connector.Material"] == "E 350 (Fe 490)"
 
 
 def test_a_channel_strut_is_looked_up_in_channels():
