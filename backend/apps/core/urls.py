@@ -14,7 +14,7 @@ from apps.core.api import (
     SaveOsiFromInputs, OpenOsiUpload, OpenOsiById, ProjectOsiDownload,
     ParseReportSections, CustomizeReport,
     DesignPreference, DesignPreferenceSync, DesignPreferenceDefaults, MaterialDetails, CompanyLogoView,
-    CADGeneration, CADDownload, CADExport,
+    CADDownload, CADExport,
     CoreImageView
 )
 from apps.core import views
@@ -65,9 +65,7 @@ urlpatterns = [
     path('api/report/parse-sections/', ParseReportSections.as_view(), name='parse-report-sections'),
     path('api/report/customize/', CustomizeReport.as_view(), name='customize-report'),
 
-    # CAD generation & download (new backend handlers)
-    path('api/design/cad', CADGeneration.as_view()),
-    path('api/design/cad/', CADGeneration.as_view()),
+    # CAD download and on-demand export
     path('api/design/downloadCad', CADDownload.as_view()),
     path('api/design/downloadCad/', CADDownload.as_view()),
     path('api/design/exportCad', CADExport.as_view()),
