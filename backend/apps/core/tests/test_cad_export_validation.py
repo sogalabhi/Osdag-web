@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest import mock
 
 from django.core.cache import cache
+from django.test import SimpleTestCase
 from rest_framework.test import APIClient, APISimpleTestCase
 from rest_framework.throttling import SimpleRateThrottle
 
@@ -91,14 +92,14 @@ class CadExportValidationTest(APISimpleTestCase):
         self.assertTrue(response["Content-Disposition"].endswith('_Model.step"'))
 
     def test_requests_over_the_rate_limit_get_429(self):
-        rates = {"anon": "2/minute", "user": "2/minute"}
+        rates = {"anon": "2/minute", "user": "2/minute", "cad_export_anon": "2/minute"}
         with mock.patch.object(SimpleRateThrottle, "THROTTLE_RATES", rates):
             # cheap invalid requests: the limit counts requests, not successful exports
             statuses = [self.post(module_id="x", input_values={"a": 1}, format="step").status_code for _ in range(3)]
         self.assertEqual(statuses, [400, 400, 429])
 
     def test_throttled_response_uses_the_standard_error_format(self):
-        rates = {"anon": "1/minute", "user": "1/minute"}
+        rates = {"anon": "1/minute", "user": "1/minute", "cad_export_anon": "1/minute"}
         with mock.patch.object(SimpleRateThrottle, "THROTTLE_RATES", rates):
             self.post(module_id="x", input_values={"a": 1}, format="step")
             response = self.post(module_id="x", input_values={"a": 1}, format="step")
@@ -109,3 +110,14 @@ class CadExportValidationTest(APISimpleTestCase):
         for url in ("/api/design/cad", "/api/design/cad/"):
             response = self.client.post(url, {"module_id": FIN_PLATE, "input_values": fin_plate_inputs()}, format="json")
             self.assertEqual(response.status_code, 404, url)
+
+
+class CadExportGuestRateTests(SimpleTestCase):
+    def test_guests_have_a_tighter_default_rate_than_the_global_anonymous_rate(self):
+        from apps.core.api.cad.cad_model_export import CadExportAnonThrottle
+
+        self.assertEqual(CadExportAnonThrottle.scope, "cad_export_anon")
+        from django.conf import settings
+
+        rates = settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]
+        self.assertIn("cad_export_anon", rates)
