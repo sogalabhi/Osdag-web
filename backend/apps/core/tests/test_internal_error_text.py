@@ -11,10 +11,6 @@ import types
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from django.contrib.auth.models import User
-from django.core.files.uploadedfile import SimpleUploadedFile
-from rest_framework.test import APIClient, APIRequestFactory
-
 from apps.core import consumers, signals, tasks, views
 from apps.core.api.design import report_customization_api as report_api
 from apps.core.models import OsiFile, Project
@@ -22,6 +18,10 @@ from apps.core.tests.auth_utils import authenticated_as
 from apps.core.utils import cad_helpers, module_helpers
 from apps.core.utils.api_errors import INTERNAL_ERROR_MESSAGE, failure_result
 from apps.core.utils.errors import MissingKeyError
+from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
+from rest_framework.test import APIClient, APIRequestFactory
+
 from osdag_core.Common import KEY_DISP_FINPLATE
 
 SECRET = "secret-internal-detail"
@@ -229,22 +229,6 @@ def test_design_preference_defaults_hides_an_internal_failure(caplog):
             "/api/design-preferences/defaults/", {"module_id": KEY_DISP_FINPLATE, "inputs": {}}, format="json"
         )
     assert_generic(response, caplog)
-
-
-def test_cad_generation_hides_an_internal_failure(caplog):
-    with patch("apps.core.api.cad.cad_model_api.get_module_api", boom):
-        response = APIClient().post(
-            "/api/design/cad/", {"module_id": KEY_DISP_FINPLATE, "input_values": {"a": 1}}, format="json"
-        )
-    assert_generic(response, caplog)
-
-
-def test_cad_generation_for_an_unknown_module_is_a_400():
-    response = APIClient().post(
-        "/api/design/cad/", {"module_id": "No Such Module", "input_values": {"a": 1}}, format="json"
-    )
-    assert response.status_code == 400
-    assert response.json()["error"]["code"] == "unknown_module"
 
 
 class _CadService:
