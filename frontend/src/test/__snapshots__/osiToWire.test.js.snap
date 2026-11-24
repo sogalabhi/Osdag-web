@@ -204,8 +204,6 @@ exports[`a desktop .osi example sends this design request > SA-1 (Seated Angle C
   "Member.Supporting_Section.Designation": "PBP 400 X 230.9",
   "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Seated Angle Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
 }
 `;
 
@@ -241,8 +239,6 @@ exports[`a desktop .osi example sends this design request > SA-2 (Seated Angle C
   "Member.Supporting_Section.Designation": "HB 150",
   "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Seated Angle Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
 }
 `;
 
@@ -278,8 +274,6 @@ exports[`a desktop .osi example sends this design request > SA-3 (Seated Angle C
   "Member.Supporting_Section.Designation": "PBP 400 X 230.9",
   "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Seated Angle Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
 }
 `;
 
@@ -317,8 +311,6 @@ exports[`a desktop .osi example sends this design request > SA-4 (Seated Angle C
   "Member.Supporting_Section.Designation": "PBP 300 X 180.12",
   "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Seated Angle Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
 }
 `;
 
@@ -357,8 +349,6 @@ exports[`a desktop .osi example sends this design request > SA-5 (Seated Angle C
   "Member.Supporting_Section.Designation": "UC 305 x 305 x 118",
   "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Seated Angle Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
 }
 `;
 
@@ -1646,8 +1636,6 @@ exports[`a desktop .osi example sends this design request > beam_welded1 (Beam-t
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Sheared or hand flame cut",
   "Detailing.Gap": "3",
   "Load.Axial": "0",
   "Load.Moment": "0",
@@ -1724,8 +1712,6 @@ exports[`a desktop .osi example sends this design request > beam_welded2 (Beam-t
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Sheared or hand flame cut",
   "Detailing.Gap": "3",
   "Load.Axial": "0",
   "Load.Moment": "0",
@@ -1802,8 +1788,6 @@ exports[`a desktop .osi example sends this design request > beam_welded3 (Beam-t
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Sheared or hand flame cut",
   "Detailing.Gap": "3",
   "Load.Axial": "0",
   "Load.Moment": "100",
@@ -1880,8 +1864,6 @@ exports[`a desktop .osi example sends this design request > beam_welded4 (Beam-t
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Sheared or hand flame cut",
   "Detailing.Gap": "3",
   "Load.Axial": "0",
   "Load.Moment": "100",
@@ -1958,8 +1940,6 @@ exports[`a desktop .osi example sends this design request > beam_welded5 (Beam-t
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Sheared or hand flame cut",
   "Detailing.Gap": "3",
   "Load.Axial": "0",
   "Load.Moment": "100",
@@ -2061,8 +2041,6 @@ exports[`a desktop .osi example sends this design request > ccep1 (Column-to-Col
   "Member.Material": "E 250 (Fe 410 W)A",
   "Member.Supported_Section.Designation": "UC 203 x 203 x 60",
   "Module": "Column-to-Column End Plate Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
   "Weld.Type": "Groove Weld",
 }
 `;
@@ -2260,8 +2238,6 @@ exports[`a desktop .osi example sends this design request > cleat_1 (Cleat Angle
   "Member.Supporting_Section.Designation": "UC 356 x 406 x 634",
   "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Cleat Angle Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
 }
 `;
 
@@ -2372,8 +2348,6 @@ exports[`a desktop .osi example sends this design request > cleat_2 (Cleat Angle
   "Member.Supporting_Section.Designation": "PBP 300 X 88.46",
   "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Cleat Angle Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
 }
 `;
 
@@ -2504,8 +2478,6 @@ exports[`a desktop .osi example sends this design request > cleat_3 (Cleat Angle
   "Member.Supporting_Section.Designation": "HB 350",
   "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Cleat Angle Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
 }
 `;
 
@@ -2636,8 +2608,6 @@ exports[`a desktop .osi example sends this design request > cleat_4 (Cleat Angle
   "Member.Supporting_Section.Designation": "NPB 240 X 120 X 34.32",
   "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Cleat Angle Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
 }
 `;
 
@@ -2768,8 +2738,6 @@ exports[`a desktop .osi example sends this design request > cleat_5 (Cleat Angle
   "Member.Supporting_Section.Designation": "NPB 240 X 120 X 34.32",
   "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Cleat Angle Connection",
-  "Weld.Fab": "Shop Weld",
-  "Weld.Material_Grade_OverWrite": "410",
 }
 `;
 
@@ -3307,8 +3275,6 @@ exports[`a desktop .osi example sends this design request > column_welded1 (Colu
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Sheared or hand flame cut",
   "Detailing.Gap": "3",
   "Load.Axial": "20",
   "Load.Moment": "50",
@@ -3387,8 +3353,6 @@ exports[`a desktop .osi example sends this design request > column_welded2 (Colu
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Sheared or hand flame cut",
   "Detailing.Gap": "3",
   "Load.Axial": "1300",
   "Load.Moment": "250",
@@ -3467,8 +3431,6 @@ exports[`a desktop .osi example sends this design request > column_welded3 (Colu
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Sheared or hand flame cut",
   "Detailing.Gap": "3",
   "Load.Axial": "1300",
   "Load.Moment": "250",
@@ -3547,8 +3509,6 @@ exports[`a desktop .osi example sends this design request > column_welded4 (Colu
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Sheared or hand flame cut",
   "Detailing.Gap": "3",
   "Load.Axial": "0",
   "Load.Moment": "0",
@@ -3627,8 +3587,6 @@ exports[`a desktop .osi example sends this design request > column_welded5 (Colu
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Sheared or hand flame cut",
   "Detailing.Gap": "3",
   "Load.Axial": "1000",
   "Load.Moment": "400",
@@ -5109,9 +5067,6 @@ exports[`a desktop .osi example sends this design request > tension_w_angle (Ten
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-  "Detailing.Gap": "10",
   "Load.Axial": "800",
   "Material": "E 250 (Fe 410 W)A",
   "Member.Designation": [
@@ -5157,9 +5112,6 @@ exports[`a desktop .osi example sends this design request > tension_w_bbangle (T
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-  "Detailing.Gap": "10",
   "Load.Axial": "800",
   "Material": "E 300 (Fe 440)",
   "Member.Designation": [
@@ -5205,9 +5157,6 @@ exports[`a desktop .osi example sends this design request > tension_w_bbchannels
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-  "Detailing.Gap": "10",
   "Load.Axial": "1200",
   "Material": "E 300 (Fe 440)",
   "Member.Designation": [
@@ -5253,9 +5202,6 @@ exports[`a desktop .osi example sends this design request > tension_w_channels (
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-  "Detailing.Gap": "10",
   "Load.Axial": "1200",
   "Material": "E 300 (Fe 440)",
   "Member.Designation": [
@@ -5301,9 +5247,6 @@ exports[`a desktop .osi example sends this design request > tension_w_starangle 
     "120",
   ],
   "Design.Design_Method": "Limit State Design",
-  "Detailing.Corrosive_Influences": "No",
-  "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-  "Detailing.Gap": "10",
   "Load.Axial": "800",
   "Material": "E 300 (Fe 440)",
   "Member.Designation": [

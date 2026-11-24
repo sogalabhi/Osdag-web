@@ -14,6 +14,7 @@ import { getDesignPrefConfig } from "../modules/shared/config/designPrefModuleCo
 import { BASE_PLATE_ANALYSIS_OPTIONS } from "../modules/shared/config/prefOptions";
 import { basePlateConfig } from "../modules/basePlate/configs/basePlateConfig";
 import { boltedToEndConfig } from "../modules/TensionMembers/BoltedToEnd/configs/boltedToEndConfig";
+import openDefaults from "./fixtures/designPrefOpenDefaults.json";
 
 const render = (config, prefs) =>
   renderToStaticMarkup(
@@ -32,7 +33,9 @@ describe("Design tab of the base plate", () => {
 
   it("offers the core's one method and starts on it", () => {
     expect(BASE_PLATE_ANALYSIS_OPTIONS).toEqual(["Effective Area Method"]);
-    const prefs = getDesignPrefConfig(basePlateConfig.sessionName).getInitialPrefs(basePlateConfig.defaultInputs, basePlateConfig.sessionName);
+    // The dialog opens on what the server's "open" sync took from the core (the form holds no Additional Inputs).
+    const opened = { ...basePlateConfig.defaultInputs, ...openDefaults[basePlateConfig.sessionName] };
+    const prefs = getDesignPrefConfig(basePlateConfig.sessionName).getInitialPrefs(opened, basePlateConfig.sessionName);
     expect(BASE_PLATE_ANALYSIS_OPTIONS).toContain(prefs[KEY_DP_DESIGN_BASE_PLATE]);
   });
 

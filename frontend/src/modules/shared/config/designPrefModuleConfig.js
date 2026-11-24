@@ -50,6 +50,15 @@ const ALL_TABS = [
   { id: 13, name: "Design" },
 ];
 
+/*
+ * The dialog shows what the form holds, which is what the user saved or what the "open" sync took
+ * from the core: no Additional Inputs value is invented here. A fallback is left only for a field
+ * the dialog lists although the module's core has no value for it (the core never reads it), so
+ * that Save is not blocked by an empty field.
+ */
+// Fin plate, header plate and plate girder. The sync answers every one of these from the fin and
+// header plate cores; the fallbacks are for the plate girder, whose core has none of the bolt, weld
+// and detailing values (and never reads them), and for the packing plate no shear core has.
 const DEFAULT_INITIAL_PREFS = (inputs) => ({
   supported_material: inputs.supported_material,
   supporting_material: inputs.supporting_material,
@@ -63,7 +72,7 @@ const DEFAULT_INITIAL_PREFS = (inputs) => ({
   detailing_packing_plate: inputs.detailing_packing_plate ?? "Yes",
   detailing_gap: inputs.detailing_gap ?? "0",
   detailing_corr_status: inputs.detailing_corr_status ?? "No",
-  design_method: inputs.design_method ?? DEFAULT_DESIGN_METHOD,
+  design_method: inputs.design_method,
   design_for: inputs.design_for ?? "Tension",
 });
 
@@ -84,79 +93,49 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [6, 11],
     initialTabIndex: 6,
     getInitialPrefs: (inputs) => ({
-      bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
-      bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
-      bolt_slip_factor: inputs.bolt_slip_factor ?? "0.2",
-      detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
-      detailing_packing_plate: inputs.detailing_packing_plate ?? "Yes",
+      bolt_tension_type: inputs.bolt_tension_type,
+      bolt_hole_type: inputs.bolt_hole_type,
+      bolt_slip_factor: inputs.bolt_slip_factor,
+      detailing_edge_type: inputs.detailing_edge_type,
+      detailing_packing_plate: inputs.detailing_packing_plate,
       design_for: inputs.design_for ?? "Tension",
     }),
-    getDefaultPrefs: () => ({
-      bolt_tension_type: "Pre-tensioned",
-      bolt_hole_type: "Standard",
-      bolt_slip_factor: "0.2",
-      detailing_edge_type: "Sheared or hand flame cut",
-      detailing_packing_plate: "Yes",
-      design_for: "Tension",
-    }),
+    getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
   "Lap Joint Bolted": {
     tabIds: [6, 11],
     initialTabIndex: 6,
     getInitialPrefs: (inputs) => ({
-      bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
-      bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
-      bolt_slip_factor: inputs.bolt_slip_factor ?? "0.2",
-      detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
+      bolt_tension_type: inputs.bolt_tension_type,
+      bolt_hole_type: inputs.bolt_hole_type,
+      bolt_slip_factor: inputs.bolt_slip_factor,
+      detailing_edge_type: inputs.detailing_edge_type,
       design_for: inputs.design_for ?? "Tension",
     }),
-    getDefaultPrefs: () => ({
-      bolt_tension_type: "Pre-tensioned",
-      bolt_hole_type: "Standard",
-      bolt_slip_factor: "0.2",
-      detailing_edge_type: "Sheared or hand flame cut",
-      design_for: "Tension",
-    }),
+    getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
   "Butt Joint Welded": {
     tabIds: [10, 11],
     initialTabIndex: 10,
     getInitialPrefs: (inputs) => ({
-      weld_fab: inputs.weld_fab ?? "Shop weld",
-      weld_material_grade: inputs.weld_material_grade || "290",
-      detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
-      detailing_packing_plate: inputs.detailing_packing_plate ?? "Yes",
+      weld_fab: inputs.weld_fab ?? "Shop weld", // the core's Weld.Type; the sync does not answer it
+      weld_material_grade: inputs.weld_material_grade,
+      detailing_edge_type: inputs.detailing_edge_type,
+      detailing_packing_plate: inputs.detailing_packing_plate,
       design_for: inputs.design_for ?? "Tension",
     }),
-    getDefaultPrefs: (inputs) => {
-      const defs = {
-        weld_fab: "Shop weld",
-        weld_material_grade: inputs.weld_material_grade || "290",
-        detailing_edge_type: "Sheared or hand flame cut",
-        design_for: "Tension",
-      };
-      defs.detailing_packing_plate = "Yes";
-      return defs;
-    },
+    getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
   "Lap Joint Welded": {
     tabIds: [10, 11],
     initialTabIndex: 10,
     getInitialPrefs: (inputs) => ({
-      weld_fab: inputs.weld_fab ?? "Shop weld",
-      weld_material_grade: inputs.weld_material_grade || "290",
-      detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
+      weld_fab: inputs.weld_fab ?? "Shop weld", // the core's Weld.Type; the sync does not answer it
+      weld_material_grade: inputs.weld_material_grade,
+      detailing_edge_type: inputs.detailing_edge_type,
       design_for: inputs.design_for ?? "Tension",
     }),
-    getDefaultPrefs: (inputs) => {
-      const defs = {
-        weld_fab: "Shop weld",
-        weld_material_grade: inputs.weld_material_grade || "290",
-        detailing_edge_type: "Sheared or hand flame cut",
-        design_for: "Tension",
-      };
-      return defs;
-    },
+    getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
   "Column Cover Plate Bolted Connection": {
     tabIds: [0, 3, 6, 11, 13],
@@ -198,12 +177,12 @@ const DESIGN_PREF_CONFIG = {
       // The Column Section tab is Member.Material, the column's material.
       supporting_material: inputs.supporting_material ?? inputs.material,
       connector_material: inputs.connector_material,
-      weld_fab: inputs.weld_fab ?? "Shop Weld",
-      weld_material_grade: inputs.weld_material_grade || inputs.weld_material_grade_overwrite || "290",
-      detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
-      detailing_gap: inputs.detailing_gap ?? "3",
-      detailing_corr_status: inputs.detailing_corr_status ?? "No",
-      design_method: inputs.design_method ?? "Limit State Design",
+      weld_fab: inputs.weld_fab,
+      weld_material_grade: inputs.weld_material_grade ?? inputs.weld_material_grade_overwrite,
+      detailing_edge_type: inputs.detailing_edge_type,
+      detailing_gap: inputs.detailing_gap,
+      detailing_corr_status: inputs.detailing_corr_status,
+      design_method: inputs.design_method,
     }),
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
@@ -213,12 +192,12 @@ const DESIGN_PREF_CONFIG = {
     getInitialPrefs: (inputs) => ({
       supported_material: inputs.supported_material ?? inputs.material,
       connector_material: inputs.connector_material,
-      weld_fab: inputs.weld_fab ?? "Shop Weld",
-      weld_material_grade: inputs.weld_material_grade || inputs.weld_material_grade_overwrite || "290",
-      detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
-      detailing_gap: inputs.detailing_gap ?? "3",
-      detailing_corr_status: inputs.detailing_corr_status ?? "No",
-      design_method: inputs.design_method ?? "Limit State Design",
+      weld_fab: inputs.weld_fab,
+      weld_material_grade: inputs.weld_material_grade ?? inputs.weld_material_grade_overwrite,
+      detailing_edge_type: inputs.detailing_edge_type,
+      detailing_gap: inputs.detailing_gap,
+      detailing_corr_status: inputs.detailing_corr_status,
+      design_method: inputs.design_method,
     }),
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
@@ -231,8 +210,8 @@ const DESIGN_PREF_CONFIG = {
       bolt_tension_type: inputs.bolt_tension_type,
       bolt_hole_type: inputs.bolt_hole_type,
       bolt_slip_factor: inputs.bolt_slip_factor,
-      weld_fab: inputs.weld_fab ?? "Shop Weld",
-      weld_material_grade: inputs.weld_material_grade || "410",
+      weld_fab: inputs.weld_fab,
+      weld_material_grade: inputs.weld_material_grade ?? "410", // not read by the core
       detailing_edge_type: inputs.detailing_edge_type,
       detailing_gap: inputs.detailing_gap,
       detailing_corr_status: inputs.detailing_corr_status,
@@ -250,7 +229,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_hole_type: inputs.bolt_hole_type,
       bolt_slip_factor: inputs.bolt_slip_factor,
       weld_fab: inputs.weld_fab,
-      weld_material_grade: inputs.weld_material_grade || "290",
+      weld_material_grade: inputs.weld_material_grade,
       detailing_edge_type: inputs.detailing_edge_type,
       detailing_gap: inputs.detailing_gap,
       detailing_corr_status: inputs.detailing_corr_status,
@@ -269,7 +248,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_hole_type: inputs.bolt_hole_type,
       bolt_slip_factor: inputs.bolt_slip_factor,
       weld_fab: inputs.weld_fab,
-      weld_material_grade: inputs.weld_material_grade || "290",
+      weld_material_grade: inputs.weld_material_grade,
       detailing_edge_type: inputs.detailing_edge_type,
       detailing_gap: inputs.detailing_gap,
       detailing_corr_status: inputs.detailing_corr_status,
@@ -283,81 +262,39 @@ const DESIGN_PREF_CONFIG = {
     getInitialPrefs: (inputs) => ({
       // The Column Section tab: the column's material (Member.Material), the dock material until it is saved.
       supporting_material: inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
-      bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
+      bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned", // not in the base plate's core
       bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
       bolt_slip_factor: inputs.bolt_slip_factor ?? "0.3",
-      weld_fab: inputs[KEY_DP_WELD_FAB] ?? inputs.weld_fab ?? "Shop Weld",
-      weld_material_grade: inputs[KEY_DP_WELD_MATERIAL_G_O] || inputs.weld_material_grade || "290",
-      detailing_edge_type: inputs[KEY_DP_DETAILING_EDGE_TYPE] ?? inputs.detailing_edge_type ?? "Sheared or hand flame cut",
-      detailing_gap: inputs.detailing_gap ?? "10",
-      detailing_corr_status: inputs[KEY_DP_DETAILING_CORROSIVE_INFLUENCES] ?? inputs.detailing_corr_status ?? "No",
-      design_method: inputs[KEY_DP_DESIGN_METHOD] ?? inputs.design_method ?? "Limit State Design",
-
+      weld_fab: inputs[KEY_DP_WELD_FAB] ?? inputs.weld_fab,
+      weld_material_grade: inputs[KEY_DP_WELD_MATERIAL_G_O] || inputs.weld_material_grade,
+      detailing_edge_type: inputs[KEY_DP_DETAILING_EDGE_TYPE] ?? inputs.detailing_edge_type,
+      detailing_gap: inputs.detailing_gap ?? "10", // not in the base plate's core
+      detailing_corr_status: inputs[KEY_DP_DETAILING_CORROSIVE_INFLUENCES] ?? inputs.detailing_corr_status,
+      design_method: inputs[KEY_DP_DESIGN_METHOD] ?? inputs.design_method,
       // Anchor Bolt OCF
-      [KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF]: inputs[KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF] ?? "",
-      [KEY_DP_ANCHOR_BOLT_TYPE_OCF]: inputs[KEY_DP_ANCHOR_BOLT_TYPE_OCF] ?? "End Plate Type",
-      [KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF]: inputs[KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF] ?? "Yes",
-      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF]: inputs[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF] ?? "Over-sized",
-      [KEY_DP_ANCHOR_BOLT_LENGTH_OCF]: inputs[KEY_DP_ANCHOR_BOLT_LENGTH_OCF] ?? "300",
-      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF]: inputs[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF] ?? "0",
-
+      [KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF]: inputs[KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF],
+      [KEY_DP_ANCHOR_BOLT_TYPE_OCF]: inputs[KEY_DP_ANCHOR_BOLT_TYPE_OCF],
+      [KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF]: inputs[KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF],
+      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF]: inputs[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF],
+      [KEY_DP_ANCHOR_BOLT_LENGTH_OCF]: inputs[KEY_DP_ANCHOR_BOLT_LENGTH_OCF],
+      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF]: inputs[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF],
       // Anchor Bolt ICF
-      [KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF]: inputs[KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF] ?? "",
-      [KEY_DP_ANCHOR_BOLT_TYPE_ICF]: inputs[KEY_DP_ANCHOR_BOLT_TYPE_ICF] ?? "End Plate Type",
-      [KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF]: inputs[KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF] ?? "Yes",
-      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF]: inputs[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF] ?? "Over-sized",
-      [KEY_DP_ANCHOR_BOLT_LENGTH_ICF]: inputs[KEY_DP_ANCHOR_BOLT_LENGTH_ICF] ?? "300",
-      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF]: inputs[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF] ?? "0",
-
+      [KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF]: inputs[KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF],
+      [KEY_DP_ANCHOR_BOLT_TYPE_ICF]: inputs[KEY_DP_ANCHOR_BOLT_TYPE_ICF],
+      [KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF]: inputs[KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF],
+      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF]: inputs[KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF],
+      [KEY_DP_ANCHOR_BOLT_LENGTH_ICF]: inputs[KEY_DP_ANCHOR_BOLT_LENGTH_ICF],
+      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF]: inputs[KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF],
       // Anchor General
-      [KEY_DP_ANCHOR_BOLT_FRICTION]: inputs[KEY_DP_ANCHOR_BOLT_FRICTION] ?? "0.30",
-
+      [KEY_DP_ANCHOR_BOLT_FRICTION]: inputs[KEY_DP_ANCHOR_BOLT_FRICTION],
       // Base Plate & Stiffener materials
       [KEY_BASE_PLATE_MATERIAL]: inputs[KEY_BASE_PLATE_MATERIAL] ?? inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
       [KEY_ST_KEY_MATERIAL]: inputs[KEY_ST_KEY_MATERIAL] ?? inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
 
       // Other design keys
-      [KEY_DP_DESIGN_BASE_PLATE]: inputs[KEY_DP_DESIGN_BASE_PLATE] ?? "Effective Area Method",
+      [KEY_DP_DESIGN_BASE_PLATE]: inputs[KEY_DP_DESIGN_BASE_PLATE],
     }),
-    getDefaultPrefs: (inputs) => ({
-      supporting_material: inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
-      bolt_tension_type: "Pre-tensioned",
-      bolt_hole_type: "Standard",
-      bolt_slip_factor: "0.3",
-      weld_fab: "Shop Weld",
-      weld_material_grade: "290",
-      detailing_edge_type: "Sheared or hand flame cut",
-      detailing_gap: "10",
-      detailing_corr_status: "No",
-      design_method: "Limit State Design",
-
-      [KEY_DP_WELD_FAB]: "Shop Weld",
-      [KEY_DP_WELD_MATERIAL_G_O]: "290",
-      [KEY_DP_DETAILING_EDGE_TYPE]: "Sheared or hand flame cut",
-      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: "No",
-      [KEY_DP_DESIGN_METHOD]: "Limit State Design",
-
-      [KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF]: "",
-      [KEY_DP_ANCHOR_BOLT_TYPE_OCF]: "End Plate Type",
-      [KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF]: "Yes",
-      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF]: "Over-sized",
-      [KEY_DP_ANCHOR_BOLT_LENGTH_OCF]: "300",
-      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF]: "0",
-
-      [KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF]: "",
-      [KEY_DP_ANCHOR_BOLT_TYPE_ICF]: "End Plate Type",
-      [KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF]: "Yes",
-      [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF]: "Over-sized",
-      [KEY_DP_ANCHOR_BOLT_LENGTH_ICF]: "300",
-      [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF]: "0",
-
-      [KEY_DP_ANCHOR_BOLT_FRICTION]: "0.30",
-
-      [KEY_BASE_PLATE_MATERIAL]: inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
-      [KEY_ST_KEY_MATERIAL]: inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
-
-      [KEY_DP_DESIGN_BASE_PLATE]: "Effective Area Method",
-    }),
+    getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
   [KEY_DISP_CLEATANGLE]: {
     tabIds: [0, 1, 4, 6, 11, 13],
@@ -366,32 +303,18 @@ const DESIGN_PREF_CONFIG = {
       supported_material: inputs.supported_material,
       supporting_material: inputs.supporting_material,
       connector_material: inputs.connector_material,
-      bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
-      bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
-      bolt_slip_factor: inputs.bolt_slip_factor ?? "0.2",
-      weld_fab: inputs.weld_fab ?? KEY_DP_FAB_SHOP,
-      weld_material_grade: inputs.weld_material_grade || "290",
-      detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
-      detailing_gap: inputs.detailing_gap ?? "10",
-      detailing_corr_status: inputs.detailing_corr_status ?? "No",
-      design_method: inputs.design_method ?? DEFAULT_DESIGN_METHOD,
+      bolt_tension_type: inputs.bolt_tension_type,
+      bolt_hole_type: inputs.bolt_hole_type,
+      bolt_slip_factor: inputs.bolt_slip_factor,
+      weld_fab: inputs.weld_fab,
+      weld_material_grade: inputs.weld_material_grade,
+      detailing_edge_type: inputs.detailing_edge_type,
+      detailing_gap: inputs.detailing_gap,
+      detailing_corr_status: inputs.detailing_corr_status,
+      design_method: inputs.design_method,
       design_for: inputs.design_for ?? "Tension",
     }),
-    getDefaultPrefs: (inputs) => ({
-      supported_material: inputs.supported_material,
-      supporting_material: inputs.supporting_material,
-      connector_material: inputs.connector_material,
-      bolt_tension_type: "Pre-tensioned",
-      bolt_hole_type: "Standard",
-      bolt_slip_factor: "0.2",
-      weld_fab: KEY_DP_FAB_SHOP,
-      weld_material_grade: inputs.weld_material_grade || "290",
-      detailing_edge_type: "Sheared or hand flame cut",
-      detailing_gap: "0",
-      detailing_corr_status: "No",
-      design_method: DEFAULT_DESIGN_METHOD,
-      design_for: "Tension",
-    }),
+    getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
   "Tension Member Bolted Design":{
     tabIds: [2, 3, 6, 11, 13],
@@ -416,7 +339,7 @@ const DESIGN_PREF_CONFIG = {
       supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
       connector_material: inputs.connector_material,
       weld_fab: inputs.weld_fab,
-      weld_material_grade: inputs.weld_material_grade || "290",
+      weld_material_grade: inputs.weld_material_grade,
       detailing_edge_type: inputs.detailing_edge_type,
       detailing_gap: inputs.detailing_gap,
       detailing_corr_status: inputs.detailing_corr_status,
@@ -431,7 +354,7 @@ const DESIGN_PREF_CONFIG = {
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
-      design_method: inputs.design_method || DEFAULT_DESIGN_METHOD,
+      design_method: inputs.design_method,
       ...columnOptimizationPrefs(inputs),
     }),
     getDefaultPrefs: (inputs) => ({
@@ -464,12 +387,13 @@ const DESIGN_PREF_CONFIG = {
     getInitialPrefs: (inputs) => ({
       supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
       connector_material: inputs.connector_material,
-      weld_fab: inputs.weld_fab ?? KEY_DP_FAB_SHOP,
-      weld_material_grade: inputs.weld_material_grade || "290",
+      weld_fab: inputs.weld_fab,
+      weld_material_grade: inputs.weld_material_grade,
+      // Not in the welded strut's core (never read by it).
       detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_gap: inputs.detailing_gap ?? "0",
       detailing_corr_status: inputs.detailing_corr_status ?? "No",
-      design_method: inputs.design_method ?? DEFAULT_DESIGN_METHOD,
+      design_method: inputs.design_method,
     }),
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
@@ -480,7 +404,7 @@ const DESIGN_PREF_CONFIG = {
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
-      design_method: inputs.design_method || DEFAULT_DESIGN_METHOD,
+      design_method: inputs.design_method,
       ...flexureOptimizationPrefs(inputs),
     }),
     getDefaultPrefs: (inputs) => ({
@@ -498,7 +422,7 @@ const DESIGN_PREF_CONFIG = {
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
-      design_method: inputs.design_method || DEFAULT_DESIGN_METHOD,
+      design_method: inputs.design_method,
       ...flexureOptimizationPrefs(inputs),
     }),
     getDefaultPrefs: (inputs) => ({
@@ -542,58 +466,22 @@ const DESIGN_PREF_CONFIG = {
       toe_radius: inputs.toe_radius || 0,
 
       // Bolt
-      bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
-      bolt_slip_factor: inputs.bolt_slip_factor ?? "0.3",
-      bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
-
+      bolt_hole_type: inputs.bolt_hole_type,
+      bolt_slip_factor: inputs.bolt_slip_factor,
+      bolt_tension_type: inputs.bolt_tension_type,
       // Detailing
-      weld_fab: inputs.weld_fab ?? KEY_DP_FAB_SHOP,
-      weld_material_grade: inputs.weld_material_grade || "290",
+      weld_fab: inputs.weld_fab,
+      weld_material_grade: inputs.weld_material_grade,
       detailing_edge_type:
-        inputs.detailing_edge_type ?? "Sheared or hand flame cut",
-      detailing_gap: inputs.detailing_gap ?? "10",
-      detailing_corr_status: inputs.detailing_corr_status ?? "No",
-
+        inputs.detailing_edge_type,
+      detailing_gap: inputs.detailing_gap,
+      detailing_corr_status: inputs.detailing_corr_status,
       // Design
       design_for: inputs.design_for ?? "Tension",
-      design_method: inputs.design_method ?? "Limit State Design",
+      design_method: inputs.design_method,
     }),
 
-    getDefaultPrefs: (inputs) => ({
-      designation: "50 x 50 x 3",
-      material: "E 165 (Fe 290)",
-      supported_material: "E 165 (Fe 290)",
-      supporting_material: "E 165 (Fe 290)",
-
-      fu: 290,
-      fy: 165,
-      elastic_modulus: 200,
-      shear_modulus: 76.9,
-      poisson_ratio: 0.3,
-      thermal_coefficient: 12,
-
-      type: "Rolled",
-      source: "IS808 Rev",
-
-      long_leg: 50,
-      short_leg: 50,
-      thickness: 3,
-      root_radius: 6,
-      toe_radius: 0,
-
-      bolt_hole_type: "Standard",
-      bolt_slip_factor: "0.3",
-      bolt_tension_type: "Pre-tensioned",
-
-      weld_fab: KEY_DP_FAB_SHOP,
-      weld_material_grade: inputs.weld_material_grade || "290",
-      detailing_edge_type: "Sheared or hand flame cut",
-      detailing_gap: "10",
-      detailing_corr_status: "No",
-
-      design_for: "Tension",
-      design_method: "Limit State Design",
-    }),
+    getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
 };
 

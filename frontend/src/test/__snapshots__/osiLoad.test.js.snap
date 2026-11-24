@@ -367,8 +367,6 @@ exports[`loading a desktop .osi example into its module > SA-1 (Seated Angle Con
     "topangle_list": [
       "90 x 90 x 8",
     ],
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
   },
   "selectedItems": {
     "angle_list": [
@@ -445,8 +443,6 @@ exports[`loading a desktop .osi example into its module > SA-2 (Seated Angle Con
     "topangle_list": [
       "80 x 80 x 6",
     ],
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
   },
   "selectedItems": {
     "angle_list": [
@@ -523,8 +519,6 @@ exports[`loading a desktop .osi example into its module > SA-3 (Seated Angle Con
     "topangle_list": [
       "80 x 80 x 6",
     ],
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
   },
   "selectedItems": {
     "angle_list": [
@@ -603,8 +597,6 @@ exports[`loading a desktop .osi example into its module > SA-4 (Seated Angle Con
     "topangle_list": [
       "75 x 75 x 6",
     ],
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
   },
   "selectedItems": {
     "angle_list": [
@@ -682,8 +674,6 @@ exports[`loading a desktop .osi example into its module > SA-5 (Seated Angle Con
     "topangle_list": [
       "75 x 75 x 6",
     ],
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
   },
   "selectedItems": {
     "angle_list": [
@@ -3014,8 +3004,6 @@ exports[`loading a desktop .osi example into its module > beam_welded1 (Beam-to-
   "inputs": {
     "connector_material": "E 300 (Fe 440)",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Sheared or hand flame cut",
     "detailing_gap": "3",
     "flange_plate_preferences": "Outside",
     "flange_plate_thickness": [
@@ -3149,8 +3137,6 @@ exports[`loading a desktop .osi example into its module > beam_welded2 (Beam-to-
   "inputs": {
     "connector_material": "E 450 (Fe 590) E",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Sheared or hand flame cut",
     "detailing_gap": "3",
     "flange_plate_preferences": "Outside",
     "flange_plate_thickness": [
@@ -3284,8 +3270,6 @@ exports[`loading a desktop .osi example into its module > beam_welded3 (Beam-to-
   "inputs": {
     "connector_material": "E 450 (Fe 590) E",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Sheared or hand flame cut",
     "detailing_gap": "3",
     "flange_plate_preferences": "Outside",
     "flange_plate_thickness": [
@@ -3419,8 +3403,6 @@ exports[`loading a desktop .osi example into its module > beam_welded4 (Beam-to-
   "inputs": {
     "connector_material": "Cus_400_500_600_1400",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Sheared or hand flame cut",
     "detailing_gap": "3",
     "flange_plate_preferences": "Outside",
     "flange_plate_thickness": [
@@ -3554,8 +3536,6 @@ exports[`loading a desktop .osi example into its module > beam_welded5 (Beam-to-
   "inputs": {
     "connector_material": "E 450 (Fe 590) E",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Sheared or hand flame cut",
     "detailing_gap": "3",
     "flange_plate_preferences": "Outside",
     "flange_plate_thickness": [
@@ -3767,8 +3747,6 @@ exports[`loading a desktop .osi example into its module > ccep1 (Column-to-Colum
     ],
     "supported_designation": "UC 203 x 203 x 60",
     "supporting_material": "E 250 (Fe 410 W)A",
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
     "weld_type": "Groove Weld",
   },
   "selectedItems": {
@@ -4123,8 +4101,6 @@ exports[`loading a desktop .osi example into its module > cleat_1 (Cleat Angle C
     "secondary_beam": "WPB 280 X 280 X 188.54",
     "supported_material": "E 250 (Fe 410 W)A",
     "supporting_material": "E 250 (Fe 410 W)A",
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
   },
   "selectedItems": {
     "bolt_diameter": [
@@ -4343,8 +4319,6 @@ exports[`loading a desktop .osi example into its module > cleat_2 (Cleat Angle C
     "secondary_beam": "WPB 280 X 280 X 188.54",
     "supported_material": "E 250 (Fe 410 W)A",
     "supporting_material": "E 250 (Fe 410 W)A",
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
   },
   "selectedItems": {
     "bolt_diameter": [
@@ -4583,8 +4557,6 @@ exports[`loading a desktop .osi example into its module > cleat_3 (Cleat Angle C
     "secondary_beam": "NPB 220 X 110 X 29.35",
     "supported_material": "E 250 (Fe 410 W)A",
     "supporting_material": "E 250 (Fe 410 W)A",
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
   },
   "selectedItems": {
     "bolt_diameter": [
@@ -4843,8 +4815,6 @@ exports[`loading a desktop .osi example into its module > cleat_4 (Cleat Angle C
     "secondary_beam": "WPB 140 X 140 X 18.08",
     "supported_material": "E 250 (Fe 410 W)A",
     "supporting_material": "E 250 (Fe 410 W)A",
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
   },
   "selectedItems": {
     "bolt_diameter": [
@@ -5103,8 +5073,6 @@ exports[`loading a desktop .osi example into its module > cleat_5 (Cleat Angle C
     "secondary_beam": "WPB 200 X 200 X 83.52",
     "supported_material": "E 250 (Fe 410 W)A",
     "supporting_material": "E 250 (Fe 410 W)A",
-    "weld_fab": "Shop Weld",
-    "weld_material_grade": "410",
   },
   "selectedItems": {
     "bolt_diameter": [
@@ -6173,8 +6141,6 @@ exports[`loading a desktop .osi example into its module > column_welded1 (Column
   "inputs": {
     "connector_material": "E 250 (Fe 410 W)A",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Sheared or hand flame cut",
     "detailing_gap": "3",
     "flange_plate_preferences": "Outside + Inside",
     "flange_plate_thickness": [
@@ -6308,8 +6274,6 @@ exports[`loading a desktop .osi example into its module > column_welded2 (Column
   "inputs": {
     "connector_material": "E 250 (Fe 410 W)A",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Sheared or hand flame cut",
     "detailing_gap": "3",
     "flange_plate_preferences": "Outside",
     "flange_plate_thickness": [
@@ -6443,8 +6407,6 @@ exports[`loading a desktop .osi example into its module > column_welded3 (Column
   "inputs": {
     "connector_material": "E 250 (Fe 410 W)A",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Sheared or hand flame cut",
     "detailing_gap": "3",
     "flange_plate_preferences": "Outside + Inside",
     "flange_plate_thickness": [
@@ -6578,8 +6540,6 @@ exports[`loading a desktop .osi example into its module > column_welded4 (Column
   "inputs": {
     "connector_material": "E 250 (Fe 410 W)A",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Sheared or hand flame cut",
     "detailing_gap": "3",
     "flange_plate_preferences": "Outside + Inside",
     "flange_plate_thickness": [
@@ -6713,8 +6673,6 @@ exports[`loading a desktop .osi example into its module > column_welded5 (Column
   "inputs": {
     "connector_material": "Cus_400_500_600_1400",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Sheared or hand flame cut",
     "detailing_gap": "3",
     "flange_plate_preferences": "Outside",
     "flange_plate_thickness": [
@@ -9686,9 +9644,6 @@ exports[`loading a desktop .osi example into its module > tension_w_angle (Tensi
     "axial_force": "800",
     "connector_material": "E 250 (Fe 410 W)A",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Rolled, machine-flame cut, sawn and planed",
-    "detailing_gap": "10",
     "length": "5000",
     "location": "Long Leg",
     "material": "E 250 (Fe 410 W)A",
@@ -10175,9 +10130,6 @@ exports[`loading a desktop .osi example into its module > tension_w_bbangle (Ten
     "axial_force": "800",
     "connector_material": "E 300 (Fe 440)",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Rolled, machine-flame cut, sawn and planed",
-    "detailing_gap": "10",
     "length": "5000",
     "location": "Short Leg",
     "material": "E 300 (Fe 440)",
@@ -10664,9 +10616,6 @@ exports[`loading a desktop .osi example into its module > tension_w_bbchannels (
     "axial_force": "1200",
     "connector_material": "E 300 (Fe 440)",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Rolled, machine-flame cut, sawn and planed",
-    "detailing_gap": "10",
     "length": "5000",
     "location": "Web",
     "material": "E 300 (Fe 440)",
@@ -10875,9 +10824,6 @@ exports[`loading a desktop .osi example into its module > tension_w_channels (Te
     "axial_force": "1200",
     "connector_material": "E 300 (Fe 440)",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Rolled, machine-flame cut, sawn and planed",
-    "detailing_gap": "10",
     "length": "5000",
     "location": "Web",
     "material": "E 300 (Fe 440)",
@@ -11086,9 +11032,6 @@ exports[`loading a desktop .osi example into its module > tension_w_starangle (T
     "axial_force": "800",
     "connector_material": "E 300 (Fe 440)",
     "design_method": "Limit State Design",
-    "detailing_corr_status": "No",
-    "detailing_edge_type": "Rolled, machine-flame cut, sawn and planed",
-    "detailing_gap": "10",
     "length": "5000",
     "location": "Short Leg",
     "material": "E 300 (Fe 440)",

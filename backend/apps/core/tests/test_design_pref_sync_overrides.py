@@ -75,13 +75,13 @@ SECTION_OVERRIDES = {
     KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_COMPRESSION_COLUMN, KEY_DISP_STRUT_BOLTED_END_GUSSET,
     KEY_DISP_TENSION_WELDED,
 }
-NO_DEFAULTS = {KEY_DISP_HEADERPLATE, KEY_DISP_PLATE_GIRDER_WELDED}
 
 
 def test_the_override_tables_list_exactly_the_documented_modules():
     assert set(sync_merge.LEGACY_SYNC_RULES) == RULE_OVERRIDES
     assert set(sync_merge.LEGACY_SECTION_SOURCES) == SECTION_OVERRIDES
-    assert set(sync_merge.NO_CORE_DEFAULTS) == NO_DEFAULTS
+    # Every module asks the core for its defaults: the design fills unsaved prefs from it too.
+    assert not hasattr(sync_merge, "NO_CORE_DEFAULTS")
     assert RULE_OVERRIDES | CORE_RULES | NO_RULES == set(module_ids())
 
 

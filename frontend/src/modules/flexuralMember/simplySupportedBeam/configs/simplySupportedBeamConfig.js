@@ -27,6 +27,7 @@ import {
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../../shared/config/prefCoreKeys";
+import { prefText } from "../../../shared/utils/prefValue";
 export const simplySupportedBeamConfig = {
   sessionName: "Simply Supported Beam Design",
   designType: KEY_DISP_FLEXURE,
@@ -38,17 +39,10 @@ export const simplySupportedBeamConfig = {
     section_profile: "Beams and Columns",
     section_designation: ["MB 400"],
     material: "E 250 (Fe 410 W)A",
-    supporting_material: "E 250 (Fe 410 W)A",
-    design_method: "Limit State Design",
     // KEY_ALLOW_CLASS ('Optimum.Class') is a Yes/No toggle for "allow
     // Semi-Compact sections in the optimization search" (flexure.py:869,
     // `if self.allow_class == "Yes"`) — matches desktop's own default
     // (flexure.py:172, KEY_ALLOW_CLASS: 'Yes'). NOT a section-class name.
-    allowable_class: "Yes",
-    effective_area_parameter: "1.0",
-    length_overwrite: "NA",
-    bearing_length: "NA",
-    loading_condition: "Normal",
     shear_force: "50",
     bending_moment: "100",
     member_length: "6000",
@@ -123,9 +117,6 @@ export const simplySupportedBeamConfig = {
       !inputs.member_length ||
       !inputs.shear_force ||
       !inputs.bending_moment ||
-      !inputs.design_method ||
-      !inputs.allowable_class ||
-      !inputs.effective_area_parameter ||
       inputs.section_designation === "Select Section") {
       return { isValid: false, message: "Please input all the required fields" };
     }
@@ -161,12 +152,12 @@ export const simplySupportedBeamConfig = {
           ? inputs.section_designation
           : [inputs.section_designation || ""]),
       [KEY_MATERIAL]: String(inputs.material),
-      [KEY_SEC_MATERIAL]: String(inputs.supporting_material),
-      [KEY_DP_DESIGN_METHOD]: String(inputs.design_method),
-      [KEY_ALLOW_CLASS]: String(inputs.allowable_class),
-      [KEY_EFFECTIVE_AREA_PARA]: String(inputs.effective_area_parameter),
-      [KEY_LENGTH_OVERWRITE]: String(inputs.length_overwrite),
-      [KEY_BEARING_LENGTH]: String(inputs.bearing_length),
+      [KEY_SEC_MATERIAL]: prefText(inputs.supporting_material),
+      [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
+      [KEY_ALLOW_CLASS]: prefText(inputs.allowable_class),
+      [KEY_EFFECTIVE_AREA_PARA]: prefText(inputs.effective_area_parameter),
+      [KEY_LENGTH_OVERWRITE]: prefText(inputs.length_overwrite),
+      [KEY_BEARING_LENGTH]: prefText(inputs.bearing_length),
       [KEY_SHEAR]: String(inputs.shear_force),
       [KEY_MOMENT]: String(inputs.bending_moment),
       [KEY_LENGTH]: String(inputs.member_length),
@@ -174,7 +165,7 @@ export const simplySupportedBeamConfig = {
       [KEY_SUPPORT]: "Simply Supported", // Fixed value for simply supported beams
       [KEY_TORSIONAL_RES]: String(inputs.torsional_restraint),
       [KEY_WARPING_RES]: String(inputs.warping_restraint),
-      [KEY_LOAD]: String(inputs.loading_condition || "Normal"),
+      [KEY_LOAD]: prefText(inputs.loading_condition),
     };
   },
 

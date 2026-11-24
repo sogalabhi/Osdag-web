@@ -20,6 +20,7 @@ import {
   KEY_SUPPORT_TYPE,
   KEY_SUPPORT_TYPE2,
 } from "../../../../constants/generated/coreKeys";
+import { prefText } from "../../../shared/utils/prefValue";
 
 
 export const onCantileverConfig = {
@@ -35,7 +36,6 @@ export const onCantileverConfig = {
     section_profile: "Beams and Columns",
     section_designation: ["MB 400"],
     material: "E 250 (Fe 410 W)A",
-    supporting_material: "E 250 (Fe 410 W)A",
 
     support_type: "Major Laterally Supported",
     support_restraint: "Continuous, with lateral restraint to top flange",
@@ -45,12 +45,6 @@ export const onCantileverConfig = {
     shear_force: "50",
     bending_moment: "100",
 
-    design_method: "Limit State Design",
-    allowable_class: "Yes",
-    effective_area_parameter: "1.0",
-    length_overwrite: "NA",
-    bearing_length: "NA",
-    loading_condition: "Normal",
   },
 
   // Every form field and the core key(s) it feeds; null for a field that feeds none.
@@ -156,7 +150,7 @@ export const onCantileverConfig = {
 
       // Material
       [KEY_MATERIAL]: inputs.material || "",
-      [KEY_SEC_MATERIAL]: inputs.supporting_material || inputs.material || "",
+      [KEY_SEC_MATERIAL]: prefText(inputs.supporting_material),
 
       // Cantilever-specific restraints
       [KEY_DESIGN_TYPE_FLEXURE]: inputs.support_type || "Major Laterally Supported",
@@ -171,12 +165,12 @@ export const onCantileverConfig = {
       [KEY_MOMENT]: inputs.bending_moment,
 
       // Design preferences
-      [KEY_DP_DESIGN_METHOD]: inputs.design_method || "Limit State Design",
-      [KEY_ALLOW_CLASS]: inputs.allowable_class || "Yes",
-      [KEY_EFFECTIVE_AREA_PARA]: inputs.effective_area_parameter || "1.0",
-      [KEY_LENGTH_OVERWRITE]: inputs.length_overwrite || "NA",
-      [KEY_BEARING_LENGTH]: inputs.bearing_length || "NA",
-      [KEY_LOAD]: inputs.loading_condition || "Normal",
+      [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
+      [KEY_ALLOW_CLASS]: prefText(inputs.allowable_class),
+      [KEY_EFFECTIVE_AREA_PARA]: prefText(inputs.effective_area_parameter),
+      [KEY_LENGTH_OVERWRITE]: prefText(inputs.length_overwrite),
+      [KEY_BEARING_LENGTH]: prefText(inputs.bearing_length),
+      [KEY_LOAD]: prefText(inputs.loading_condition),
     };
   },
 

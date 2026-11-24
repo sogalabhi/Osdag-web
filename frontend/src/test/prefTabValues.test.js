@@ -51,7 +51,9 @@ describe("the base plate Column Section tab follows the dock material", () => {
   it("starts from the dock material when nothing was resolved", () => {
     const prefs = prefConfig.getInitialPrefs({ ...config.defaultInputs, material: "E 350 (Fe 490)" }, config.sessionName);
     expect(prefs.supporting_material).toBe("E 350 (Fe 490)");
-    expect(prefConfig.getDefaultPrefs({ material: "E 350 (Fe 490)" }, config.sessionName).supporting_material).toBe("E 350 (Fe 490)");
+    // Defaults are the server's reset answer, which copies the dock material to the column.
+    const reset = { supporting_material: "E 350 (Fe 490)" };
+    expect(prefConfig.getDefaultPrefs({ material: "E 350 (Fe 490)" }, config.sessionName, reset).supporting_material).toBe("E 350 (Fe 490)");
   });
 });
 

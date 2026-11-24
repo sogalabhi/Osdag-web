@@ -48,7 +48,6 @@ from osdag_core.Common import (
     KEY_DISP_FINPLATE,
     KEY_DISP_FLEXURE,
     KEY_DISP_FLEXURE2,
-    KEY_DISP_HEADERPLATE,
     KEY_DISP_PLATE_GIRDER_WELDED,
     KEY_DISP_SEATED_ANGLE,
     KEY_DISP_STRUT_BOLTED_END_GUSSET,
@@ -165,9 +164,6 @@ LEGACY_SECTION_SOURCES: Dict[str, Dict[str, List[Dict[str, Any]]]] = {
     KEY_DISP_STRUT_BOLTED_END_GUSSET: _ANGLES_OR_CHANNELS,
     KEY_DISP_TENSION_WELDED: _ANGLES_OR_CHANNELS,
 }
-
-# Modules the old sync never asked the core for defaults (no entry in the old core class map).
-NO_CORE_DEFAULTS = frozenset({KEY_DISP_HEADERPLATE, KEY_DISP_PLATE_GIRDER_WELDED})
 
 # The keys the sync asks the core to default, in the order the old web table listed them. The core
 # computes more (Optimum.*, loads...) and does not list some of these for every module (Weld.Fab for a
@@ -434,7 +430,7 @@ def _apply_material_sync(out: Dict[str, Any], module_id: str) -> Tuple[Dict[str,
 
 def _core_defaults(module_id: str, inputs: Dict[str, Any], grade: str) -> Dict[str, Any]:
     """What ``get_values_for_design_pref`` answers for the keys the sync defaults."""
-    if module_id in NO_CORE_DEFAULTS or module_id not in CORE_CLASSES:
+    if module_id not in CORE_CLASSES:
         return {}
     material = grade or inputs.get(KEY_CONNECTOR_MATERIAL) or inputs.get(KEY_MATERIAL) or inputs.get(KEY_SEC_MATERIAL)
     if not material or material == "Select Material":

@@ -47,7 +47,6 @@ NOTES = [
     "core-keyed inputs, one entry per case.",
     "Cases: open*, refresh*, save*, reset*; *_draft sends design_pref_draft, *_saved_overrides / "
     "*_stale_prefs put non-driver pref values in inputs, *_changed_driver moves the dock grade.",
-    "Header Plate Connection and Plate Girder have no core defaults (NO_CORE_DEFAULTS): defaulted_keys stays empty.",
     "_core_defaults skips every key the core class does not answer (most flexure, compression and tension "
     "classes raise KeyError for some pref keys), so fewer defaults survive; the goldens pin which keys do.",
     "Butt/Lap Joint modules have no material sync rules: no driver, no linked keys, no material rows.",

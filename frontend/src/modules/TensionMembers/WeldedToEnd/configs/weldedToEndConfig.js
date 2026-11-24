@@ -26,6 +26,7 @@ import {
 
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../../shared/config/prefCoreKeys";
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { prefText } from "../../../shared/utils/prefValue";
 export const weldedToEndConfig = {
     sessionName: "Tension Member Welded Design",
     designType: KEY_DISP_TENSION_WELDED,
@@ -33,7 +34,6 @@ export const weldedToEndConfig = {
     cadOptions: ["Model", "Member", "Plate"],
 
     defaultInputs: {
-        connector_material: "E 250 (Fe 410 W)A",
         section_profile: "Back to Back Angles",
         location: "Long Leg",
         length: "1250",
@@ -42,14 +42,7 @@ export const weldedToEndConfig = {
         plate_thickness: [],
         section_designation: [],
         material: "E 250 (Fe 410 W)A",
-        supported_material: "E 250 (Fe 410 W)A",
         member_designation: "All",
-        detailing_edge_type: "Rolled, machine-flame cut, sawn and planed",
-        detailing_gap: "10",
-        detailing_corr_status: "No",
-        design_method: "Limit State Design",
-        weld_fab: "Shop Weld",
-        weld_material_grade: "410",
     },
 
     // Every form field and the core key(s) it feeds; null for a field that feeds none.
@@ -153,15 +146,15 @@ export const weldedToEndConfig = {
         );
 
         return {
-            [KEY_CONNECTOR_MATERIAL]: String(inputs.connector_material),
+            [KEY_CONNECTOR_MATERIAL]: prefText(inputs.connector_material),
             [KEY_MATERIAL]: String(inputs.material),
-            [KEY_SEC_MATERIAL]: String(inputs.supported_material),
-            [KEY_DP_DESIGN_METHOD]: String(inputs.design_method),
-            [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: String(inputs.detailing_corr_status),
-            [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
-            [KEY_DP_DETAILING_GAP]: String(inputs.detailing_gap),
-            [KEY_DP_WELD_FAB]: String(inputs.weld_fab),
-            [KEY_DP_WELD_MATERIAL_G_O]: String(inputs.weld_material_grade),
+            [KEY_SEC_MATERIAL]: prefText(inputs.supported_material),
+            [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
+            [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: prefText(inputs.detailing_corr_status),
+            [KEY_DP_DETAILING_EDGE_TYPE]: prefText(inputs.detailing_edge_type),
+            [KEY_DP_DETAILING_GAP]: prefText(inputs.detailing_gap),
+            [KEY_DP_WELD_FAB]: prefText(inputs.weld_fab),
+            [KEY_DP_WELD_MATERIAL_G_O]: prefText(inputs.weld_material_grade),
             [KEY_AXIAL]: String(inputs.axial_force),
             [KEY_SECSIZE]: dynamicSectionList,
             [KEY_LENGTH]: String(inputs.length),
