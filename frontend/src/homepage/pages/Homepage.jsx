@@ -8,8 +8,6 @@ import mosLogo from '../../assets/homepage/mos_logo.png';
 import constructSteelLogo from '../../assets/homepage/constructsteel_logo.png';
 import moeLogo from '../../assets/homepage/moe_logo.png';
 import InsdagLogo from '../../assets/homepage/insdag_logo.png';
-// import fosseeLogo from '../../assets/homepage/fossee_logo.png';
-// import Footer from "../components/Footer";
 
 const Homepage = () => {
   const [showSideBar, setshowSideBar] = useState(false);
