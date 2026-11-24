@@ -108,10 +108,3 @@ export const CATALOG = {
       .replaceAll("_", "-")}/${name.toLowerCase().replaceAll("_", "-")}`,
 };
 
-// ----------------------
-// Company / assets
-// ----------------------
-export const COMPANY = {
-  logo: `${API_PREFIX}company-logo/`, // POST
-};
-

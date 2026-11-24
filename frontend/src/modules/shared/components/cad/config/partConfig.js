@@ -53,25 +53,6 @@ export const RENDER_ORDER = {
   FASTENER: 2,    // Bolt, Bolts, Weld, Welds (render on top)
 };
 
-// Default render order mapping
-export const DEFAULT_RENDER_ORDER = {
-  // Structural members
-  beam: RENDER_ORDER.STRUCTURAL,
-  column: RENDER_ORDER.STRUCTURAL,
-  member: RENDER_ORDER.STRUCTURAL,
-
-  // Plates and connectors
-  plate: RENDER_ORDER.CONNECTOR,
-  endplate: RENDER_ORDER.CONNECTOR,
-  cleat: RENDER_ORDER.CONNECTOR,
-  seated: RENDER_ORDER.CONNECTOR,
-  connector: RENDER_ORDER.CONNECTOR,
-
-  // Fasteners
-  bolt: RENDER_ORDER.FASTENER,
-  weld: RENDER_ORDER.FASTENER,
-};
-
 // Valid part keys for grouping (must match API section names so parts are included in the scene)
 export const VALID_PART_KEYS = new Set([
   "Member",

@@ -19,9 +19,6 @@ export const WELD_TYPE_MODULES = ["Butt Joint Welded", "Lap Joint Welded"];
 /** The weld options of a module's weld tab (`module` is the session name `designPrefModuleConfig` is keyed by). */
 export const weldOptionsFor = (module) => (WELD_TYPE_MODULES.includes(module) ? WELD_TYPE_OPTIONS : WELD_FAB_OPTIONS);
 
-/** The weld value a module starts with: the first option. */
-export const defaultWeldFor = (module) => weldOptionsFor(module)[0];
-
 /**
  * Design.Design_Method: the core's dropdown (`design_values` in design_type/main.py) lists these three; only
  * 'Limit State Design' is implemented, so the other two are shown and cannot be picked, as in the desktop.

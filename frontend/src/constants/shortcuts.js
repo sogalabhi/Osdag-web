@@ -361,15 +361,6 @@ export const getShortcutDisplayLabel = (
   return keyList.length ? keyList[0] : '';
 };
 
-export const getShortcutCombos = (
-  actionId,
-  platform = SHORTCUT_PLATFORM.WIN_LINUX
-) => {
-  const action = SHORTCUT_ACTION_BY_ID[actionId];
-  if (!action) return [];
-  return action.shortcuts?.[platform] || [];
-};
-
 export const getMenuShortcutLabel = (
   menuActionName,
   platform = SHORTCUT_PLATFORM.WIN_LINUX
