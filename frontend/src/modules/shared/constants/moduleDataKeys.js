@@ -1,6 +1,6 @@
 /**
  * Single source of truth for module data list keys and input-key → list-key mapping.
- * Used by useModuleData, contextData, expandAllSelectedInputs, useModuleForm, and InputSection.
+ * Used by useModuleData, contextData, useModuleForm, and InputSection.
  */
 
 export const MODULE_DATA_LIST_KEYS = [

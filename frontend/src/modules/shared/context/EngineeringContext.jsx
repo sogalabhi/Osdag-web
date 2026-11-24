@@ -22,10 +22,10 @@ import { useOsiFileHandlers } from "../hooks/useOsiFileHandlers";
 import { useCadExport } from "../hooks/useCadExport";
 import { usePlateGirderOptimization } from "../hooks/usePlateGirderOptimization";
 import { isGuestUser } from "../../../utils/auth";
-import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
 import {
   downloadGroupedInputsCsv,
   downloadGroupedOutputsCsv,
+  inputsAsRequested,
 } from "../utils/groupedCsvExport";
 import { DESIGN_EXAMPLES_URL } from "../components/help/helpContent";
 
@@ -529,12 +529,18 @@ export const EngineeringProvider = ({ moduleConfig, title, children }) => {
       return;
     }
     if (name === "Download Inputs CSV" || name === "Save Inputs (.csv)") {
-      const inputsExpanded = expandAllSelectedInputs(form.inputs, form.allSelected, moduleData.contextData);
-      const effectiveInputs = { ...inputsExpanded, ...(form.designPrefOverrides || {}) };
+      const effectiveInputs = inputsAsRequested({
+        moduleConfig,
+        inputs: form.inputs,
+        allSelected: form.allSelected,
+        contextData: moduleData.contextData,
+        extraState: form.extraState,
+        designPrefOverrides: form.designPrefOverrides,
+      });
       const moduleId = moduleConfig?.designType || form.inputs?.module || moduleConfig?.cameraKey || KEY_DISP_SEATED_ANGLE;
       return downloadGroupedInputsCsv({
         moduleConfig,
-        inputs: inputsExpanded,
+        inputs: form.inputs,
         effectiveInputs,
         designPrefOverrides: form.designPrefOverrides,
         extraState: form.extraState,
