@@ -1,7 +1,12 @@
 from celery import shared_task
 import logging
 
+from apps.core.utils.api_errors import INTERNAL_ERROR_MESSAGE, failure_result
+
 logger = logging.getLogger(__name__)
+
+# Shown in place of the 3D model when building it fails; the cause is in the server log.
+CAD_ERROR_MESSAGE = "The 3D model could not be generated."
 
 
 def get_service_class(module_name: str, submodule_slug: str):
@@ -125,6 +130,9 @@ def run_design_calculation_task(self, module_name: str, submodule_slug: str, inp
                 project_id=project_id,
                 user_email=user_email
             )
+        except Exception as exc:
+            # A service that lets an error escape still answers with a result the page can show.
+            result = failure_result(exc, f"Design calculation {module_name}/{submodule_slug}")
         finally:
             instances = WebMainRegistry.stop_recording()
 
@@ -190,7 +198,7 @@ def run_design_calculation_task(self, module_name: str, submodule_slug: str, inp
             result['warnings'] = cad['warnings']
         except Exception as exc:
             logger.exception(f"CAD generation failed for task {self.request.id}")
-            result['cad_error'] = str(exc) or type(exc).__name__
+            result['cad_error'] = CAD_ERROR_MESSAGE
 
     return result
 

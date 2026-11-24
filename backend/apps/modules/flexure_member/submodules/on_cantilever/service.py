@@ -2,6 +2,7 @@
 On Cantilever Beam Service - Business logic layer
 Bridges between API and osdag_core Flexure_Cantilever
 """
+from apps.core.utils.api_errors import failure_result
 from .adapter import validate_input, generate_output, create_cad_model
 import traceback
 
@@ -53,29 +54,7 @@ class OnCantileverService:
             return result
 
         except Exception as e:
-            print("\n" + "=" * 60)
-            print("ERROR in OnCantileverService.calculate()")
-            print("=" * 60)
-            print(f"Exception type: {type(e).__name__}")
-            print(f"Exception message: {str(e)}")
-
-            error_msg = str(e)
-            if hasattr(e, 'error') and e.error is not None:
-                error_msg = str(e.error)
-            elif hasattr(e, 'args') and len(e.args) > 0:
-                error_msg = str(e.args[0])
-
-            print(f"Final error message: {error_msg}")
-            print("\nFull traceback:")
-            traceback.print_exc()
-            print("=" * 60)
-
-            return {
-                'data': {},
-                'logs': [],
-                'success': False,
-                'error': error_msg
-            }
+            return failure_result(e, "OnCantileverService calculation")
 
     @staticmethod
     def get_cad_model(inputs: dict, section: str, session: str, module=None) -> str:

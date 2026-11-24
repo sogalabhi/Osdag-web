@@ -9,7 +9,10 @@ from firebase_admin import auth as firebase_auth
 import firebase_admin
 from firebase_admin import credentials
 from django.contrib.auth.models import User
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 # importing data
 from .data.design_types import design_type_data, connections_data, shear_connection, moment_connection, b2b_splice, b2column, c2c_splice, base_plate, tension_member
@@ -72,7 +75,12 @@ class FirebaseAuthView(APIView):
         logger.info(f"FirebaseAuthView: Token received (length: {len(token) if token else 0})")
         
         try:
-            decoded = firebase_auth.verify_id_token(token)
+            try:
+                decoded = firebase_auth.verify_id_token(token)
+            except ValueError as e:
+                # A token that is not a well-formed Firebase ID token.
+                logger.error(f"FirebaseAuthView: Malformed Firebase token: {e}")
+                return error_response('invalid_token', "Invalid Firebase token", 400)
             logger.info(f"FirebaseAuthView: Token verified successfully. UID: {decoded.get('uid')}, Email: {decoded.get('email')}")
             
             uid = decoded.get('uid')
@@ -210,8 +218,7 @@ class FirebaseAuthView(APIView):
             logger.error(f"FirebaseAuthView: Expired Firebase token error: {str(e)}")
             return error_response('token_expired', "Firebase token has expired", 400)
         except Exception as e:
-            logger.error(f"FirebaseAuthView: Unexpected error: {str(e)}", exc_info=True)
-            return error_response('bad_request', str(e), 400)
+            return internal_error_response("FirebaseAuthView: unexpected error")
 
 
 @api_view(['GET'])
@@ -278,7 +285,7 @@ def get_tension_member(request):
 
 
 from celery.result import AsyncResult
-from apps.core.utils.api_errors import error_response
+from apps.core.utils.api_errors import INTERNAL_ERROR_MESSAGE, error_response, internal_error_response
 
 class TaskStatusAPIView(APIView):
     """
@@ -297,7 +304,8 @@ class TaskStatusAPIView(APIView):
             if task_result.successful():
                 response_data["result"] = task_result.result
             else:
-                response_data["error"] = str(task_result.result)
+                logger.error("Task %s ended as %s: %r", task_id, task_result.status, task_result.result)
+                response_data["error"] = INTERNAL_ERROR_MESSAGE
         return Response(response_data, status=status.HTTP_200_OK)
 
 

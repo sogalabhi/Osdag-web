@@ -145,7 +145,9 @@ def on_task_postrun(task_id, task, retval, state, **kwargs):
             except Exception as e:
                 logger.error(f"Failed to serialize Celery task {task_id} result: {e}")
         else:
-            error_val = str(retval)
+            from apps.core.utils.api_errors import INTERNAL_ERROR_MESSAGE
+            logger.error("Celery task %s ended as %s: %r", task_id, state, retval)
+            error_val = INTERNAL_ERROR_MESSAGE
 
         async_to_sync(channel_layer.group_send)(
             f"task_{task_id}",

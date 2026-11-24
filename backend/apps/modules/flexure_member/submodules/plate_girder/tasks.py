@@ -441,8 +441,7 @@ def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
                 "type": "pso_error",
                 "data": {
                     "sequence": seq + 1,
-                    "message": str(e),
-                    "traceback": error_traceback,
+                    "message": "The optimization failed.",
                 },
             },
         )

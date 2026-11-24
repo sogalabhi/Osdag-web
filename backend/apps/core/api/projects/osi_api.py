@@ -11,9 +11,9 @@ from django.core.files.base import ContentFile
 
 from apps.core.models import OsiFile
 from apps.core.serializers import OsiFileSerializer
-from apps.core.utils.osi_files import build_osi_payload, make_osifile_contentfile, parse_osi
+from apps.core.utils.osi_files import OsiFormatError, build_osi_payload, make_osifile_contentfile, parse_osi
 from apps.core.models import Project
-from apps.core.utils.api_errors import error_json_response
+from apps.core.utils.api_errors import error_json_response, internal_error_json_response
 from osdag_core.Common import KEY_DISP_FINPLATE
 
 
@@ -43,9 +43,10 @@ class SaveOsiFromInputs(APIView):
                 'content_base64': content_base64,
                 'message': 'OSI file generated. Download available.'
             }, safe=False, status=200)
-        except Exception as e:
-            print('Error in SaveOsiFromInputs:', e)
-            return error_json_response('bad_request', str(e), 400, success=False)
+        except OsiFormatError as e:
+            return error_json_response('invalid_osi', str(e), 400, success=False)
+        except Exception:
+            return internal_error_json_response('Error in SaveOsiFromInputs', success=False)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -74,9 +75,10 @@ class OpenOsiUpload(APIView):
                 'inputs_json': inputs,
             }
             return JsonResponse(mapped, safe=False)
-        except Exception as e:
-            print('Error in OpenOsiUpload:', e)
-            return error_json_response('bad_request', str(e), 400, success=False)
+        except OsiFormatError as e:
+            return error_json_response('invalid_osi', str(e), 400, success=False)
+        except Exception:
+            return internal_error_json_response('Error in OpenOsiUpload', success=False)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -98,9 +100,10 @@ class OpenOsiById(APIView):
             return JsonResponse({'success': True, 'module_id': module_id, 'name': name, 'inputs': inputs, 'module': None, 'submodule': module_id, 'inputs_json': inputs, 'url': osifile.file.url}, safe=False)
         except OsiFile.DoesNotExist:
             return error_json_response('file_not_found', 'OSI file not found', 404, success=False)
-        except Exception as e:
-            print('Error in OpenOsiById:', e)
-            return error_json_response('bad_request', str(e), 400, success=False)
+        except OsiFormatError as e:
+            return error_json_response('invalid_osi', str(e), 400, success=False)
+        except Exception:
+            return internal_error_json_response('Error in OpenOsiById', success=False)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -131,7 +134,8 @@ class ProjectOsiDownload(APIView):
             return resp
         except Project.DoesNotExist:
             return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
-        except Exception as e:
-            print('Error generating OSI for project:', e)
-            return error_json_response('bad_request', str(e), 400, success=False)
+        except OsiFormatError as e:
+            return error_json_response('invalid_osi', str(e), 400, success=False)
+        except Exception:
+            return internal_error_json_response('Error generating OSI for project', success=False)
 

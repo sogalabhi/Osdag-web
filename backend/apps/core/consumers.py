@@ -9,6 +9,8 @@ from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
 from celery.result import AsyncResult
 
+from apps.core.utils.api_errors import INTERNAL_ERROR_MESSAGE
+
 logger = logging.getLogger(__name__)
 
 # ─── Shared active-connection counter (atomic via threading.Lock) ─────────────
@@ -52,7 +54,8 @@ def _check_task_status_sync(task_id: str):
         if task_result.successful():
             result_val = task_result.result
         else:
-            error_val = str(task_result.result)
+            logger.error("Task %s ended as %s: %r", task_id, state, task_result.result)
+            error_val = INTERNAL_ERROR_MESSAGE
         return {
             "ready": True,
             "status": state,
@@ -219,11 +222,11 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
                     'type': 'task_started',
                     'data': {'task_id': self.task_id, 'channel_name': self.channel_name}
                 })
-            except Exception as e:
-                logger.error(f"Error triggering PSO task: {e}")
+            except Exception:
+                logger.exception("Error triggering PSO task")
                 await self.send_json({
                     'type': 'error',
-                    'data': {'message': f'Failed to start optimization: {str(e)}'}
+                    'data': {'message': 'Failed to start optimization.'}
                 })
         else:
             logger.warning(f"Unknown message type: {message_type}")

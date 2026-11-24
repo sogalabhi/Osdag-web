@@ -9,6 +9,7 @@ This module provides APIs for customizing design reports by allowing users to:
 Author: AI Assistant
 """
 
+import logging
 import os
 import re
 import tempfile
@@ -23,7 +24,9 @@ from django.http import FileResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from osdag_core.Common import PDFLATEX
-from apps.core.utils.api_errors import error_response
+from apps.core.utils.api_errors import INTERNAL_ERROR_MESSAGE, error_response, internal_error_response
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -181,8 +184,8 @@ class ParseReportSections(APIView):
             print('[report_customization_api] ParseReportSections:response', { 'report_id': report_id, 'sections_keys': list(sections.keys()) })
             return Response(response_payload, status=status.HTTP_200_OK)
             
-        except Exception as e:
-            return error_response('internal_error', f"Failed to parse sections: {str(e)}", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            return internal_error_response("Failed to parse the report sections")
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -333,13 +336,11 @@ class CustomizeReport(APIView):
                     return response
                 else:
                     print('[report_customization_api] CustomizeReport:pdflatex:failure', { 'code': result.returncode })
-                    error_msg = "PDF compilation failed"
-                    if result.stderr:
-                        error_msg += f"\n\nErrors:\n{result.stderr[:500]}"
-                    if result.stdout:
-                        error_msg += f"\n\nOutput:\n{result.stdout[:500]}"
-                    
-                    return error_response('internal_error', error_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    logger.error(
+                        "pdflatex failed for report %s (exit %s)\nstderr: %s\nstdout: %s",
+                        report_id, result.returncode, result.stderr[:500], result.stdout[:500],
+                    )
+                    return error_response('internal_error', "PDF compilation failed", status.HTTP_500_INTERNAL_SERVER_ERROR)
                     
             except subprocess.TimeoutExpired:
                 return error_response('internal_error', "PDF compilation timed out (>60s)", status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -348,8 +349,8 @@ class CustomizeReport(APIView):
             finally:
                 shutil.rmtree(safe_temp_dir, ignore_errors=True)
                 
-        except Exception as e:
-            return error_response('internal_error', f"Failed to customize report: {str(e)}", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            return internal_error_response("Failed to customize the report")
 
 
 def generate_initial_report_core(mapped_data):
@@ -453,7 +454,7 @@ def generate_initial_report_core(mapped_data):
             return (
                 {
                     "success": False,
-                    "error": f"LaTeX file not found at {tex_file_path}",
+                    "error": "The LaTeX file was not created.",
                     "report_id": report_id,
                 },
                 status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -489,15 +490,12 @@ def generate_initial_report_core(mapped_data):
         }
         return payload, status.HTTP_201_CREATED
 
-    except Exception as e:
-        print("[GenerateInitialReportCore] Exception:", str(e))
-        import traceback
-
-        traceback.print_exc()
+    except Exception:
+        logger.exception("Failed to generate the initial report")
         return (
             {
                 "success": False,
-                "error": f"Failed to generate initial report: {str(e)}",
+                "error": INTERNAL_ERROR_MESSAGE,
             },
             status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

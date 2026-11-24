@@ -5,7 +5,7 @@ Maps web API payload to osdag_core BasePlateConnection keys and back.
 from apps.core import catalog
 from apps.core.utils import (
     validate_arr, validate_num, validate_string,
-    MissingKeyError, InvalidInputTypeError,
+    MissingKeyError, InvalidInputTypeError, InvalidInputError,
     contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
     write_stl, build_raw_output_dict,
 )
@@ -333,7 +333,7 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
         # Run the actual design (bp_parameters); desktop calls this via func_for_validation
         validation_errors = module.func_for_validation(design_dict)
         if validation_errors is not None and len(validation_errors) > 0:
-            raise ValueError(validation_errors[0] if validation_errors else "Validation failed")
+            raise InvalidInputError(str(validation_errors[0]) if validation_errors else "Validation failed")
     except Exception as e:
         traceback.print_exc()
         raise

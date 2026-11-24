@@ -5,7 +5,34 @@ from django.http import JsonResponse
 from apps.core.models import Project
 from apps.core.permissions import IsEmailVerified
 from django.db.models import Q
-from apps.core.utils.api_errors import error_json_response
+from apps.core.utils.api_errors import error_json_response, internal_error_json_response
+
+# Project text columns are 200 characters wide.
+_TEXT_LIMIT = 200
+
+
+def _text_field_errors(data, names):
+    """Message per field for the project text fields that are present but not text of a valid length."""
+    fields = {}
+    for name in names:
+        value = data.get(name)
+        if value is None:
+            if name == 'name' and name in data:  # the name column cannot be empty
+                fields[name] = 'Must be text.'
+            continue
+        if not isinstance(value, str):
+            fields[name] = 'Must be text.'
+        elif len(value) > _TEXT_LIMIT:
+            fields[name] = f'Must be at most {_TEXT_LIMIT} characters.'
+    return fields
+
+
+def _invalid_text_response(data, names):
+    fields = _text_field_errors(data, names)
+    if fields:
+        return error_json_response('validation_error', 'Invalid project data.', 400, fields=fields, success=False)
+    return None
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectAPI(APIView):
@@ -57,9 +84,8 @@ class ProjectAPI(APIView):
                 'projects': project_list
             }, safe=False)
             
-        except Exception as e:
-            print(f"Error getting projects: {e}")
-            return error_json_response('bad_request', str(e), 400, success=False)
+        except Exception:
+            return internal_error_json_response('Listing projects', success=False)
     
     def post(self, request):
         """Create a new project"""
@@ -77,6 +103,10 @@ class ProjectAPI(APIView):
                 if field not in data:
                     return error_json_response('missing_field', f'Missing required field: {field}', 400, success=False)
             
+            invalid = _invalid_text_response(data, ('name', 'module', 'submodule', 'module_id'))
+            if invalid:
+                return invalid
+
             # Determine user email from authenticated user or JWT claims
             user_email = getattr(request.user, 'email', None)
             if not user_email and hasattr(request, 'auth') and isinstance(request.auth, dict):
@@ -100,9 +130,8 @@ class ProjectAPI(APIView):
                 'message': 'Project created successfully'
             }, safe=False, status=201)
             
-        except Exception as e:
-            print(f"Error creating project: {e}")
-            return error_json_response('bad_request', str(e), 400, success=False)
+        except Exception:
+            return internal_error_json_response('Creating a project', success=False)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectDetailAPI(APIView):
@@ -140,9 +169,8 @@ class ProjectDetailAPI(APIView):
         except Project.DoesNotExist:
             print(f"Project {project_id} not found or access denied")
             return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
-        except Exception as e:
-            print(f"Error getting project {project_id}: {e}")
-            return error_json_response('bad_request', str(e), 400, success=False)
+        except Exception:
+            return internal_error_json_response('Getting a project', success=False)
     
     def put(self, request, project_id):
         """Update project data (name, inputs_json, osi_file_path)"""
@@ -160,6 +188,9 @@ class ProjectDetailAPI(APIView):
             # Get project and verify ownership
             project = Project.objects.get(id=project_id, user_email=user_email)
             data = request.data
+            invalid = _invalid_text_response(data, ('name', 'module', 'submodule', 'module_id'))
+            if invalid:
+                return invalid
             
             print(f"Found project: {project.name}")
             print(f"Updating with data: {data}")
@@ -187,9 +218,8 @@ class ProjectDetailAPI(APIView):
         except Project.DoesNotExist:
             print(f"Project {project_id} not found or access denied")
             return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
-        except Exception as e:
-            print(f"Error updating project {project_id}: {e}")
-            return error_json_response('bad_request', str(e), 400, success=False)
+        except Exception:
+            return internal_error_json_response('Updating a project', success=False)
     
     def delete(self, request, project_id):
         """Delete a project"""
@@ -212,9 +242,8 @@ class ProjectDetailAPI(APIView):
             
         except Project.DoesNotExist:
             return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
-        except Exception as e:
-            print(f"Error deleting project {project_id}: {e}")
-            return error_json_response('bad_request', str(e), 400, success=False) 
+        except Exception:
+            return internal_error_json_response('Deleting a project', success=False)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectByNameAPI(APIView):
@@ -248,9 +277,8 @@ class ProjectByNameAPI(APIView):
         except Project.DoesNotExist:
             print(f"Project '{project_name}' not found or access denied")
             return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
-        except Exception as e:
-            print(f"Error getting project '{project_name}': {e}")
-            return error_json_response('bad_request', str(e), 400, success=False) 
+        except Exception:
+            return internal_error_json_response('Getting a project by name', success=False)
 
     def put(self, request, project_name):
         """Update project data (name, osi_file_path) by name"""
@@ -265,6 +293,9 @@ class ProjectByNameAPI(APIView):
             # Get project and verify ownership by name
             project = Project.objects.get(name=project_name, user_email=user_email)
             data = request.data
+            invalid = _invalid_text_response(data, ('name',))
+            if invalid:
+                return invalid
 
             # Update fields if provided
             if 'name' in data:
@@ -276,5 +307,5 @@ class ProjectByNameAPI(APIView):
             }, safe=False)
         except Project.DoesNotExist:
             return error_json_response('not_found', 'Project not found or access denied', 404, success=False)
-        except Exception as e:
-            return error_json_response('bad_request', str(e), 400, success=False) 
+        except Exception:
+            return internal_error_json_response('Updating a project by name', success=False)

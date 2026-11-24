@@ -2,12 +2,15 @@
 CAD Generation Helper Functions
 Extracted from legacy cad_model_api.py for reuse in new module-based endpoints
 """
+import logging
 import os
 import uuid
 import base64
 import json as json_module
 from typing import Dict, List, Any, Optional
 from osdag_core.Common import KEY_D, KEY_GRD
+
+logger = logging.getLogger(__name__)
 
 
 # Sections to build for each module/submodule. Every name here must be one the module's
@@ -220,9 +223,8 @@ def generate_cad_models(
             print(f"[cad_helpers] Resolved path for section '{section}': {path_to_file}")
             
             if not os.path.exists(path_to_file):
-                msg = f'Generated file for {section} does not exist at: {path_to_file}'
-                print(msg)
-                error_details.append({"section": section, "error": msg})
+                print(f'Generated file for {section} does not exist at: {path_to_file}')
+                error_details.append({"section": section, "error": "The CAD file was not created."})
                 continue
             
             # Try STL first, fall back to BREP
@@ -291,15 +293,14 @@ def generate_cad_models(
                 print(f"[cad_helpers] Failed reading model file for {section}: {e}")
                 error_details.append({
                     "section": section,
-                    "error": f"Failed reading file: {str(e)}"
+                    "error": "The CAD file could not be read."
                 })
                 continue
                 
         except Exception as e:
             print(f"[cad_helpers] Exception while generating {section}: {e}")
-            import traceback
-            traceback.print_exc()
-            error_details.append({"section": section, "error": str(e)})
+            logger.exception("CAD generation failed for section %s", section)
+            error_details.append({"section": section, "error": "The CAD model could not be generated."})
     
     print(f"[cad_helpers] Final output_files keys: {list(output_files.keys())}")
     

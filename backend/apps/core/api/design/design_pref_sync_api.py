@@ -14,7 +14,7 @@ from rest_framework import status
 from apps.core.api.design.sync_merge import lookup_sources, merge_design_pref_sync, unchanged, VALID_OPERATIONS
 from apps.core.design_dictionary import CORE_CLASSES
 from apps.core.osdag_overrides import user_id_from_request, user_rows
-from apps.core.utils.api_errors import error_response
+from apps.core.utils.api_errors import error_response, internal_error_response
 
 
 class DesignPreferenceSync(APIView):
@@ -49,8 +49,8 @@ class DesignPreferenceSync(APIView):
                         design_pref_draft=design_pref_draft,
                         **lookup_sources(request.user),
                     )
-        except Exception as e:
-            return error_response('internal_error', str(e), status.HTTP_500_INTERNAL_SERVER_ERROR, success=False)
+        except Exception:
+            return internal_error_response("Design preference sync", success=False)
 
         return Response(
             {
