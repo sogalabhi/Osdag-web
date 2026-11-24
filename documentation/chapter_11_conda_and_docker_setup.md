@@ -24,7 +24,7 @@ conda activate osdag-web
 # Install Pip dependencies for backend web frameworks
 pip install -r requirements.txt
 ```
-The python packages installed via pip are registered in [requirements.txt](../requirements.txt).
+The python packages installed via pip are registered in [requirements.txt](../requirements.txt). Every listed package is pinned to an exact version (`==`), the one the project is developed and tested with, so a fresh install, the Docker image and CI resolve the same set. Packages that are not listed (transitive dependencies) are resolved by pip. To change a pin, edit `requirements.txt`, check it with `pip install --dry-run --ignore-installed -r requirements.txt` and run the backend tests; Dependabot proposes updates weekly. `PySide6` and `PyQt5` come from pip, except on Windows where the conda-forge `pyside6` replaces the pip build (see the Windows installation guide).
 
 ### 2. Multi-Service Local Launcher
 The local setup is managed using [osdagweb.sh](../osdagweb.sh). This script automates starting the system dependencies locally:

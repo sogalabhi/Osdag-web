@@ -135,7 +135,7 @@ jobs:
           python scripts/gen_core_keys.py
           git diff --exit-code frontend/src/constants/generated/
 
-      # Report-only until the unpinned backend packages are locked; then drop continue-on-error.
+      # Report-only: the listed packages are pinned but transitive ones are not locked; drop continue-on-error once they are.
       - name: Audit Python dependencies
         shell: bash -l {0}
         continue-on-error: true
