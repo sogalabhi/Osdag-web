@@ -1,4 +1,5 @@
 import { Select } from "antd";
+import { DESIGN_METHOD_OPTIONS } from "../config/prefOptions";
 
 const { Option } = Select;
 
@@ -39,18 +40,11 @@ const DesignSectionModal = ({
                       })
                     }
                   >
-                    <Option value="Limited State Design">
-                      Limited State Design
-                    </Option>
-                    <Option
-                      value="Limited State (capacity based) Design"
-                      disabled
-                    >
-                      Limited State (capacity based) Design
-                    </Option>
-                    <Option value="Working Stressed Design" disabled>
-                      Working Stressed Design
-                    </Option>
+                    {DESIGN_METHOD_OPTIONS.map(({ value, disabled }) => (
+                      <Option key={value} value={value} disabled={disabled}>
+                        {value}
+                      </Option>
+                    ))}
                   </Select>
                 </div>
               </div>

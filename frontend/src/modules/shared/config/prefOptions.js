@@ -21,3 +21,16 @@ export const weldOptionsFor = (module) => (WELD_TYPE_MODULES.includes(module) ? 
 
 /** The weld value a module starts with: the first option. */
 export const defaultWeldFor = (module) => weldOptionsFor(module)[0];
+
+/**
+ * Design.Design_Method: the core's dropdown (`design_values` in design_type/main.py) lists these three; only
+ * 'Limit State Design' is implemented, so the other two are shown and cannot be picked, as in the desktop.
+ */
+export const DESIGN_METHOD_OPTIONS = [
+  { value: "Limit State Design", disabled: false },
+  { value: "Limit State (capacity based) Design", disabled: true },
+  { value: "Working Stress Design", disabled: true },
+];
+
+/** The design method a module starts with: the one option that can be picked. */
+export const DEFAULT_DESIGN_METHOD = DESIGN_METHOD_OPTIONS[0].value;
