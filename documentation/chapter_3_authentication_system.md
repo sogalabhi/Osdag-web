@@ -76,7 +76,7 @@ To encourage immediate engineering exploration, Osdag-Web implements a zero-barr
 * **The Problem:** Previously, the `SaveOsiFromInputs` endpoint bypassed email verification checks when the `inline` flag was set to `True`, allowing authenticated users with unverified emails to generate OSI base64 content. Other endpoints like project listing, individual project deletion, and CAD calculations also lacked strict email verification checks for authenticated callers.
 * **Resolution:** 
   - Implemented the `IsEmailVerifiedIfAuthenticated` permission class as the `DEFAULT_PERMISSION_CLASSES` in `settings.py` to globally secure all endpoints. Guest requests are permitted, but any authenticated request immediately checks and requires `request.email_verified` to be `True`.
-  - Applied `IsEmailVerified` to user-centric views (`ProjectAPI`, `ProjectDetailAPI`, `ProjectByNameAPI`, `OpenOsiById`, `ProjectOsiDownload`, and `JWTHomeView`) to guarantee authenticated and verified access.
+  - Applied `IsEmailVerified` to user-centric views (`ProjectAPI`, `ProjectDetailAPI`, `ProjectByNameAPI`, `OpenOsiById`, and `ProjectOsiDownload`) to guarantee authenticated and verified access.
   - Removed redundant manual checks from individual view method bodies, relying on DRF's declarative permission lifecycle instead.
 
 ### 4. Cache Invalidation on Immediate Email Verification (Accepted Risk / Client Mitigation)

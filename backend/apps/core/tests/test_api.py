@@ -28,6 +28,9 @@ class APITest(TestCase) :
         self.assertEqual(settings.CORS_ALLOWED_ORIGINS, expected)
         
 
+    def test_removed_jwt_test_route_is_not_served(self):
+        self.assertEqual(self.client.get("/jwt/home").status_code, 404)
+
     ### TESTING MAIN WINDOW API ###
     """ VALID """
     def test_valid_window(self) : 
