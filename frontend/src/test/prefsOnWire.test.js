@@ -69,20 +69,69 @@ describe("tension members and struts: section tab material", () => {
   }
 });
 
-describe("simply supported beam: section tab material", () => {
-  const name = "simply supported beam";
+describe("end plates: each Additional Inputs material goes under its own key", () => {
+  const OLD = "E 250 (Fe 410 W)A";
+  const NEW = "E 350 (Fe 490)";
 
-  it("Member.Material is the section tab, Material the dock material", () => {
-    const body = request(name, { material: "E 250 (Fe 410 W)A" }, { supporting_material: "E 350 (Fe 490)" });
-    expect(body.Material).toBe("E 250 (Fe 410 W)A");
-    expect(body["Member.Material"]).toBe("E 350 (Fe 490)");
+  it("beam-column end plate: Connector, Column Section and Beam Section tabs each move one key", () => {
+    const name = "beam-column end plate";
+    const dock = { material: OLD, connector_material: OLD, supporting_material: OLD, supported_material: OLD };
+    const key = (prefs) => {
+      const body = request(name, dock, prefs);
+      return [body.Material, body["Connector.Material"], body["Member.Supporting_Section.Material"], body["Member.Supported_Section.Material"]];
+    };
+    expect(key({ connector_material: NEW })).toEqual([OLD, NEW, OLD, OLD]);
+    expect(key({ supporting_material: NEW })).toEqual([OLD, OLD, NEW, OLD]);
+    expect(key({ supported_material: NEW })).toEqual([OLD, OLD, OLD, NEW]);
   });
 
-  it("Member.Material follows the dock until the section tab is saved", () => {
-    const body = request(name, { material: "E 350 (Fe 490)", supporting_material: "E 350 (Fe 490)" }, {});
-    expect(body.Material).toBe("E 350 (Fe 490)");
-    expect(body["Member.Material"]).toBe("E 350 (Fe 490)");
+  it("beam-beam end plate: the Connector tab is Connector.Material, the Beam Section tab the supported section only", () => {
+    const name = "beam-beam end plate";
+    const dock = { material: OLD, connector_material: OLD, supported_material: OLD };
+    const connector = request(name, dock, { connector_material: NEW });
+    expect(connector["Connector.Material"]).toBe(NEW);
+    expect(connector["Member.Supported_Section.Material"]).toBe(OLD);
+    const beam = request(name, dock, { supported_material: NEW });
+    expect(beam["Connector.Material"]).toBe(OLD);
+    expect(beam["Member.Supported_Section.Material"]).toBe(NEW);
+    expect(beam.Material).toBe(OLD);
   });
+
+  it("column-column end plate: the Column Section tab is Member.Material, the Connector tab Connector.Material", () => {
+    const name = "column-column end plate";
+    const dock = { material: OLD, connector_material: OLD, supporting_material: OLD };
+    const column = request(name, dock, { supporting_material: NEW });
+    expect(column["Member.Material"]).toBe(NEW);
+    expect(column["Connector.Material"]).toBe(OLD);
+    expect(column.Material).toBe(OLD);
+    const connector = request(name, dock, { connector_material: NEW });
+    expect(connector["Member.Material"]).toBe(OLD);
+    expect(connector["Connector.Material"]).toBe(NEW);
+    // The core reads one member for this module: no supported section material is sent.
+    expect(column).not.toHaveProperty("Member.Supported_Section.Material");
+  });
+
+  it("column-column end plate: Member.Material follows the dock until the Column Section tab is saved", () => {
+    const body = request("column-column end plate", { material: NEW, supporting_material: NEW, connector_material: NEW }, {});
+    expect(body["Member.Material"]).toBe(NEW);
+    expect(body["Connector.Material"]).toBe(NEW);
+  });
+});
+
+describe("simply supported and cantilever beams: section tab material", () => {
+  for (const name of ["simply supported beam", "on cantilever"]) {
+    it(`${name}: Member.Material is the section tab, Material the dock material`, () => {
+      const body = request(name, { material: "E 250 (Fe 410 W)A" }, { supporting_material: "E 350 (Fe 490)" });
+      expect(body.Material).toBe("E 250 (Fe 410 W)A");
+      expect(body["Member.Material"]).toBe("E 350 (Fe 490)");
+    });
+
+    it(`${name}: Member.Material follows the dock until the section tab is saved`, () => {
+      const body = request(name, { material: "E 350 (Fe 490)", supporting_material: "E 350 (Fe 490)" }, {});
+      expect(body.Material).toBe("E 350 (Fe 490)");
+      expect(body["Member.Material"]).toBe("E 350 (Fe 490)");
+    });
+  }
 });
 
 describe("base plate: saved Additional Inputs", () => {

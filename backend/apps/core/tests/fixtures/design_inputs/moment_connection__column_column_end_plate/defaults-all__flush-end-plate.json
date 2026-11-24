@@ -79,7 +79,6 @@
     "Load.Shear": "100",
     "Material": "E 250 (Fe 410 W)A",
     "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-    "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
     "Weld.Fab": "Shop Weld",
     "Weld.Material_Grade_OverWrite": "410",
     "Weld.Type": "Groove Weld",

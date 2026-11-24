@@ -3515,7 +3515,6 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
           "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3547,7 +3546,6 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
           "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3565,7 +3563,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "open_saved_overrides": {
@@ -3582,9 +3580,8 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3616,7 +3613,6 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
           "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3648,7 +3644,6 @@
           "Material": "E 350 (Fe 490)",
           "Connector.Material": "E 350 (Fe 490)",
           "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3679,9 +3674,8 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3713,7 +3707,6 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
           "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3745,7 +3738,6 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
           "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3763,7 +3755,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "save_saved_overrides_draft": {
@@ -3780,9 +3772,8 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3800,7 +3791,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "reset": {
@@ -3818,7 +3809,6 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
           "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3850,7 +3840,6 @@
           "Material": "E 350 (Fe 490)",
           "Connector.Material": "E 350 (Fe 490)",
           "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3881,9 +3870,8 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -4584,12 +4572,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4610,12 +4598,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4632,7 +4620,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "open_saved_overrides": {
@@ -4643,13 +4631,12 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4670,12 +4657,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4696,12 +4683,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4725,13 +4712,12 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4752,12 +4738,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4778,12 +4764,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4800,7 +4786,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "save_saved_overrides_draft": {
@@ -4811,13 +4797,12 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4834,7 +4819,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "reset": {
@@ -4842,12 +4827,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4868,12 +4853,12 @@
         "inputs": {
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
@@ -4897,13 +4882,12 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Flexure.Type": "Major Laterally Supported",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",

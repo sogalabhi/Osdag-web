@@ -80,10 +80,9 @@ export const beamBeamEndPlateConfig = {
     // The end plate type is an option list read from extraState.selectedOption, not from inputs.
     endPlateType: KEY_ENDPLATE_TYPE,
     supported_designation: KEY_SUPTDSEC,
-    // The beam material is sent as the connector material too.
-    supported_material: [KEY_CONNECTOR_MATERIAL, KEY_SUPTDSEC_MATERIAL],
-    // A leftover default: the builder never reads it (Connector.Material comes from supported_material).
-    connector_material: null,
+    // The dock material is Material. The Beam Section tab of Additional Inputs (supported_material) is the
+    // supported section's material and the Connector tab (connector_material) is Connector.Material; both are
+    // the spread's one-to-one rows, which default to the dock material.
   },
 
   modalConfig: [
@@ -129,7 +128,7 @@ export const beamBeamEndPlateConfig = {
       [KEY_ENDPLATE_TYPE]: conn_map[extraData?.selectedOption] || "Flushed - Reversible Moment",
       [KEY_PLATETHK]: allSelected.plate_thickness 
         ? lists.thicknessList : inputs.plate_thickness,
-      [KEY_CONNECTOR_MATERIAL]: inputs.supported_material,
+      [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
       [KEY_DP_DESIGN_METHOD]: inputs.design_method,
       [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: inputs.detailing_corr_status,
       [KEY_DP_DETAILING_EDGE_TYPE]: inputs.detailing_edge_type,

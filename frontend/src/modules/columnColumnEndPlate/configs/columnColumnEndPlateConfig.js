@@ -24,7 +24,6 @@ import {
   KEY_SEC_MATERIAL,
   KEY_SHEAR,
   KEY_SUPTDSEC,
-  KEY_SUPTDSEC_MATERIAL,
   KEY_TYP,
   KEY_WELD_TYPE,
 } from "../../../constants/generated/coreKeys";
@@ -54,7 +53,7 @@ export const columnColumnEndPlateConfig = {
     load_shear: "100",
     material: "E 250 (Fe 410 W)A",
     supported_designation: "UC 305 x 305 x 118",
-    supported_material: "E 250 (Fe 410 W)A",
+    supporting_material: "E 250 (Fe 410 W)A",
     module: KEY_DISP_COLUMNENDPLATE,
     weld_fab: "Shop Weld",
     weld_material_grade: "410",
@@ -78,10 +77,9 @@ export const columnColumnEndPlateConfig = {
     weld_type: KEY_WELD_TYPE,
     // One column section is sent as both the section size and the supported section.
     supported_designation: [KEY_SECSIZE, KEY_SUPTDSEC],
-    // The column material is sent as Member.Material, the connector material and the supported material.
-    supported_material: [KEY_SEC_MATERIAL, KEY_CONNECTOR_MATERIAL, KEY_SUPTDSEC_MATERIAL],
-    // A leftover default: the builder never reads it (Connector.Material comes from supported_material).
-    connector_material: null,
+    // The dock material is Material. The Column Section tab of Additional Inputs (supporting_material) is the
+    // column's material, Member.Material; the Connector tab (connector_material) is Connector.Material.
+    supporting_material: KEY_SEC_MATERIAL,
   },
 
   modalConfig: [
@@ -112,7 +110,7 @@ export const columnColumnEndPlateConfig = {
 
     return {
       [KEY_SECSIZE]: inputs.supported_designation,
-      [KEY_SEC_MATERIAL]: inputs.supported_material,
+      [KEY_SEC_MATERIAL]: inputs.supporting_material,
       [KEY_DP_BOLT_HOLE_TYPE]: inputs.bolt_hole_type,
       [KEY_D]: allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
       [KEY_GRD]: allSelected.bolt_grade ? lists.propertyClassList : inputs.bolt_grade,
@@ -122,7 +120,7 @@ export const columnColumnEndPlateConfig = {
       [KEY_CONN]: inputs.connectivity,
       [KEY_PLATETHK]: allSelected.plate_thickness 
         ? lists.thicknessList : inputs.plate_thickness,
-      [KEY_CONNECTOR_MATERIAL]: inputs.supported_material,
+      [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
       [KEY_DP_DESIGN_METHOD]: inputs.design_method,
       [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: inputs.detailing_corr_status,
       [KEY_DP_DETAILING_EDGE_TYPE]: inputs.detailing_edge_type,
@@ -132,7 +130,6 @@ export const columnColumnEndPlateConfig = {
       [KEY_SHEAR]: inputs.load_shear || "",
       [KEY_MATERIAL]: inputs.material,
       [KEY_SUPTDSEC]: inputs.supported_designation,
-      [KEY_SUPTDSEC_MATERIAL]: inputs.supported_material,
       [KEY_DP_WELD_FAB]: inputs.weld_fab,
       [KEY_DP_WELD_MATERIAL_G_O]: inputs.weld_material_grade,
       [KEY_WELD_TYPE]: inputs.weld_type,
@@ -171,7 +168,7 @@ export const columnColumnEndPlateConfig = {
               ...inputs,
               material: material.Grade,
               connector_material: material.Grade,
-              supported_material: material.Grade,
+              supporting_material: material.Grade,
             });
           }
         }

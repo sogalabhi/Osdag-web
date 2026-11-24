@@ -35,7 +35,7 @@ export const onCantileverConfig = {
     section_profile: "Beams and Columns",
     section_designation: ["MB 400"],
     material: "E 250 (Fe 410 W)A",
-    section_material: "E 250 (Fe 410 W)A",
+    supporting_material: "E 250 (Fe 410 W)A",
 
     support_type: "Major Laterally Supported",
     support_restraint: "Continuous, with lateral restraint to top flange",
@@ -62,8 +62,9 @@ export const onCantileverConfig = {
     // The wire carries Member.Profile; the .osi loader also fills this field from the older Section.Profile / "Section Profile" names.
     section_profile: KEY_SEC_PROFILE,
     section_designation: KEY_SECSIZE,
+    // The dock material is Material; supporting_material is the section tab of Additional Inputs, sent as the member material.
     material: KEY_MATERIAL,
-    section_material: KEY_SEC_MATERIAL,
+    supporting_material: KEY_SEC_MATERIAL,
     // The three restraint fields carry the cantilever's own key names.
     support_type: KEY_DESIGN_TYPE_FLEXURE,
     support_restraint: KEY_SUPPORT_TYPE,
@@ -155,7 +156,7 @@ export const onCantileverConfig = {
 
       // Material
       [KEY_MATERIAL]: inputs.material || "",
-      [KEY_SEC_MATERIAL]: inputs.section_material || inputs.material || "",
+      [KEY_SEC_MATERIAL]: inputs.supporting_material || inputs.material || "",
 
       // Cantilever-specific restraints
       [KEY_DESIGN_TYPE_FLEXURE]: inputs.support_type || "Major Laterally Supported",
@@ -222,7 +223,7 @@ export const onCantileverConfig = {
             setInputs({
               ...inputs,
               material: material?.Grade || "",
-              section_material: material?.Grade || "",
+              supporting_material: material?.Grade || "",
             });
           },
         },
