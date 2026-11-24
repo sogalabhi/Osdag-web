@@ -38,7 +38,7 @@ export const escapeCsvCell = (value) => {
  * @param {Object} data - Design output data.
  * @returns {string} CSV formatted string.
  */
-const convertToCSV = (data) => {
+export const convertToCSV = (data) => {
   if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
     return '';
   }
