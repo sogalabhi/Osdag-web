@@ -6,6 +6,8 @@
  */
 import { describe, expect, it } from "vitest";
 
+import { DESIGN_PREF_TABLES } from "../constants/generated/designPrefTables";
+
 import { MODULES } from "./cases";
 import { caseState, designRequest } from "./cases/shared";
 import { getDesignPrefConfig, getDesignPrefTabs } from "../modules/shared/config/designPrefModuleConfig";
@@ -23,6 +25,8 @@ describe("axially loaded column Optimization tab", () => {
   const module = MODULES.find((m) => m.name === "axially loaded column");
   const { config } = module;
   const prefConfig = getDesignPrefConfig(config.sessionName);
+  const tables = DESIGN_PREF_TABLES[config.designType];
+  const CORE_PREF_KEYS = new Set([...tables.prefTabs.flatMap(([, , keys]) => keys), ...tables.computed]);
   const state = () => ({ ...caseState(module, "all"), designPrefOverrides: {} });
 
   it("is offered, and the dock no longer repeats its fields", () => {
@@ -31,12 +35,14 @@ describe("axially loaded column Optimization tab", () => {
     for (const field of Object.keys(FIELD_KEYS)) expect(dockFields).not.toContain(field);
   });
 
-  it("starts with the core's defaults, which are what the request sends", () => {
+  it("starts with the core's defaults, and the request leaves unsaved values to the core", () => {
     const prefs = prefConfig.getInitialPrefs(config.defaultInputs, config.sessionName);
     const request = designRequest(config, state());
     for (const [field, coreKey] of Object.entries(FIELD_KEYS)) {
       expect(prefs[field], field).toBe(COLUMN_OPTIMIZATION_DEFAULTS[field]);
-      expect(request[coreKey], coreKey).toBe(COLUMN_OPTIMIZATION_DEFAULTS[field]);
+      // The backend fills what the user did not save from the core, which gives these same values.
+      if (CORE_PREF_KEYS.has(coreKey)) expect(request, coreKey).not.toHaveProperty(coreKey);
+      else expect(request[coreKey], coreKey).toBe(COLUMN_OPTIMIZATION_DEFAULTS[field]);
     }
     expect(COLUMN_OPTIMIZATION_DEFAULTS).toEqual({ allow_ur: "1.0", optimum_para: "Utilization Ratio", effective_area_parameter: "1.0" });
     expect(OPTIMIZATION_PARA_OPTIONS).toEqual(["Utilization Ratio"]);

@@ -30,6 +30,7 @@ import {
 
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../../shared/config/prefCoreKeys";
 import { validateRequiredFields } from '../../../shared/utils/validation';
+import { prefText } from "../../../shared/utils/prefValue";
 export const boltedToEndConfig = {
   sessionName: "Tension Member Bolted Design",
   designType: KEY_DISP_TENSION_BOLTED,
@@ -40,7 +41,6 @@ export const boltedToEndConfig = {
     bolt_diameter: [],
     bolt_grade: [],
     bolt_type: "Bearing Bolt",
-    connector_material: "E 250 (Fe 410 W)A",
     section_profile: "Back to Back Angles",
     location: "Long Leg",
     length: "1250",
@@ -49,15 +49,7 @@ export const boltedToEndConfig = {
     plate_thickness: [],
     section_designation: [],
     material: "E 250 (Fe 410 W)A",
-    supported_material: "E 250 (Fe 410 W)A",
-    bolt_hole_type: "Standard",
-    bolt_slip_factor: "0.3",
-    bolt_tension_type: "Pre-tensioned",
     member_designation: "All",
-    detailing_edge_type: "Rolled, machine-flame cut, sawn and planed",
-    detailing_gap: "10",
-    detailing_corr_status: "No",
-    design_method: "Limit State Design",
   },
 
   // Every form field and the core key(s) it feeds; null for a field that feeds none.
@@ -169,19 +161,19 @@ export const boltedToEndConfig = {
     );
 
     return {
-      [KEY_DP_BOLT_HOLE_TYPE]: String(inputs.bolt_hole_type),
+      [KEY_DP_BOLT_HOLE_TYPE]: prefText(inputs.bolt_hole_type),
       [KEY_D]: getArrayParam(allSelected.bolt_diameter, lists.boltDiameterList, inputs.bolt_diameter),
       [KEY_GRD]: getArrayParam(allSelected.bolt_grade, lists.propertyClassList, inputs.bolt_grade),
-      [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
-      [KEY_DP_BOLT_TYPE]: String(inputs.bolt_tension_type),
+      [KEY_DP_BOLT_SLIP_FACTOR]: prefText(inputs.bolt_slip_factor),
+      [KEY_DP_BOLT_TYPE]: prefText(inputs.bolt_tension_type),
       [KEY_TYP]: String(inputs.bolt_type),
-      [KEY_CONNECTOR_MATERIAL]: String(inputs.connector_material),
+      [KEY_CONNECTOR_MATERIAL]: prefText(inputs.connector_material),
       [KEY_MATERIAL]: String(inputs.material),
-      [KEY_SEC_MATERIAL]: String(inputs.supported_material),
-      [KEY_DP_DESIGN_METHOD]: String(inputs.design_method),
-      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: String(inputs.detailing_corr_status),
-      [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
-      [KEY_DP_DETAILING_GAP]: String(inputs.detailing_gap),
+      [KEY_SEC_MATERIAL]: prefText(inputs.supported_material),
+      [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
+      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: prefText(inputs.detailing_corr_status),
+      [KEY_DP_DETAILING_EDGE_TYPE]: prefText(inputs.detailing_edge_type),
+      [KEY_DP_DETAILING_GAP]: prefText(inputs.detailing_gap),
       [KEY_AXIAL]: String(inputs.axial_force),
       [KEY_SECSIZE]: allSelected.section_designation
         ? dynamicSectionList  // Entire list if "All" selected

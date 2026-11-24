@@ -30,6 +30,7 @@ import {
   KEY_SEC_MATERIAL,
   KEY_SEC_PROFILE,
 } from "../../../constants/generated/coreKeys";
+import { prefText } from "../../shared/utils/prefValue";
 export const strutsWeldedConfig = {
   sessionName: "Struts Welded to End Gusset",
   designType: KEY_DISP_STRUT_WELDED_END_GUSSET,
@@ -37,7 +38,6 @@ export const strutsWeldedConfig = {
   cadOptions: ["Model", "Member", "Plate"],
 
   defaultInputs: {
-    connector_material: "E 250 (Fe 410 W)A",
     section_profile: "Angles",
     location: "Long Leg",
     length: "3000",
@@ -46,13 +46,9 @@ export const strutsWeldedConfig = {
     plate_thickness: [],
     section_designation: [],
     material: "E 250 (Fe 410 W)A",
-    supported_material: "E 250 (Fe 410 W)A",
     member_designation: "All",
-    design_method: "Limit State Design",
     end_condition_1: "Hinged",
     end_condition_2: "Hinged",
-    weld_fab: "Shop Weld",
-    weld_material_grade: "",
     allow_ur: "1.0",
     effective_area_parameter: "1.0",
   },
@@ -185,7 +181,7 @@ export const strutsWeldedConfig = {
       [KEY_SECSIZE]: memberDesignation,
 
       [KEY_MATERIAL]: inputs.material,
-      [KEY_SEC_MATERIAL]: inputs.supported_material,
+      [KEY_SEC_MATERIAL]: prefText(inputs.supported_material),
 
       [KEY_LENGTH]: String(inputs.length),
       [KEY_AXIAL]: String(inputs.axial_force),
@@ -194,14 +190,14 @@ export const strutsWeldedConfig = {
       [KEY_END1]: inputs.end_condition_1,
       [KEY_END2]: inputs.end_condition_2,
 
-      [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
+      [KEY_CONNECTOR_MATERIAL]: prefText(inputs.connector_material),
       [KEY_PLATETHK]: getList("plate_thickness", "thicknessList"),
 
-      [KEY_DP_DESIGN_METHOD]: inputs.design_method,
-      [KEY_DP_WELD_FAB]: inputs.weld_fab || "Shop Weld",
-      [KEY_DP_WELD_MATERIAL_G_O]: String(inputs.weld_material_grade || ""),
-      [KEY_ALLOW_UR]: String(inputs.allow_ur || "1.0"),
-      [KEY_EFFECTIVE_AREA_PARA]: String(inputs.effective_area_parameter || "1.0"),
+      [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
+      [KEY_DP_WELD_FAB]: prefText(inputs.weld_fab),
+      [KEY_DP_WELD_MATERIAL_G_O]: prefText(inputs.weld_material_grade),
+      [KEY_ALLOW_UR]: prefText(inputs.allow_ur),
+      [KEY_EFFECTIVE_AREA_PARA]: prefText(inputs.effective_area_parameter),
     };
   },
 

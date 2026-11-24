@@ -10,7 +10,7 @@ import {
 import { validateSimpleConnectionInputs } from "./validation";
 import { validateRequiredFields } from "../../shared/utils/validation";
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../shared/config/prefCoreKeys";
-import { BOLT_NON_PRE_TENSIONED } from "../../shared/config/prefOptions";
+import { prefText } from "../../shared/utils/prefValue";
 
 function getArrayParam(allSelectedFlag, fullList, selectedList) {
     if (allSelectedFlag) {
@@ -44,13 +44,9 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
             bolt_diameter: [],
             bolt_grade: [],
             bolt_type: "Bearing Bolt",
-            bolt_hole_type: "Standard",
-            bolt_slip_factor: "0.3",
             plate_width: "200",
             material: "E 250 (Fe 410 W)A",
-            detailing_edge_type: "Sheared or hand flame cut",
-            ...(hasCoverPlate ? { cover_plate: "Single-Cover", detailing_packing_plate: "Yes" } : {}),
-            bolt_tension_type: BOLT_NON_PRE_TENSIONED,
+            ...(hasCoverPlate ? { cover_plate: "Single-Cover" } : {}),
             design_for: "Tension",
         },
 
@@ -90,15 +86,15 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
             [KEY_PLATE_WIDTH]: String(inputs.plate_width),
             [KEY_MATERIAL]: String(inputs.material),
             ...(hasCoverPlate ? { [KEY_COVER_PLATE]: String(inputs.cover_plate) } : {}),
-            ...(hasCoverPlate ? { [KEY_DP_DETAILING_PACKING_PLATE]: String(inputs.detailing_packing_plate || "Yes") } : {}),
+            ...(hasCoverPlate ? { [KEY_DP_DETAILING_PACKING_PLATE]: prefText(inputs.detailing_packing_plate) } : {}),
             [KEY_AXIAL]: String(inputs.axial_force || "0"),
             [KEY_D]: getArrayParam(allSelected.bolt_diameter, lists.boltDiameterList, inputs.bolt_diameter),
             [KEY_GRD]: getArrayParam(allSelected.bolt_grade, lists.propertyClassList, inputs.bolt_grade),
             [KEY_TYP]: String(inputs.bolt_type),
-            [KEY_DP_BOLT_HOLE_TYPE]: String(inputs.bolt_hole_type),
-            [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
-            [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
-            [KEY_DP_BOLT_TYPE]: String(inputs.bolt_tension_type),
+            [KEY_DP_BOLT_HOLE_TYPE]: prefText(inputs.bolt_hole_type),
+            [KEY_DP_BOLT_SLIP_FACTOR]: prefText(inputs.bolt_slip_factor),
+            [KEY_DP_DETAILING_EDGE_TYPE]: prefText(inputs.detailing_edge_type),
+            [KEY_DP_BOLT_TYPE]: prefText(inputs.bolt_tension_type),
             [KEY_DESIGN_FOR]: String(inputs.design_for),
         }),
 
@@ -187,10 +183,8 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
 }
 
 // Shared shape for the 4 SimpleConnection welded configs (butt/lap joint welded).
-// Same hasCoverPlate axis as the bolted pair; butt-welded also carries a
-// detailing_packing_plate default alongside cover_plate (co-occurs in the
-// original butt config, so bundled under the same flag rather than split
-// into a second param).
+// Same hasCoverPlate axis as the bolted pair: butt-welded has a cover plate and
+// sends the packing plate choice when the user saved one.
 export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasCoverPlate }) {
     const config = {
         sessionName,
@@ -208,10 +202,7 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
             weld_size: [],
             plate_width: "200",
             material: "E 250 (Fe 410 W)A",
-            detailing_edge_type: "Sheared or hand flame cut",
-            ...(hasCoverPlate ? { detailing_packing_plate: "No", cover_plate: "Single-Cover" } : {}),
-            weld_fab: "Shop weld",
-            weld_material_grade: "290",
+            ...(hasCoverPlate ? { cover_plate: "Single-Cover" } : {}),
             design_for: "Tension",
         },
 
@@ -252,10 +243,10 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
             [KEY_AXIAL]: String(inputs.axial_force || "0"),
             [KEY_WELD_SIZE]: getArrayParam(allSelected.weld_size, lists.weldSizeList, inputs.weld_size),
             [KEY_DESIGN_FOR]: String(inputs.design_for),
-            [KEY_DP_WELD_TYPE]: String(inputs.weld_fab || "Shop weld"),
-            [KEY_DP_WELD_MATERIAL_G_O]: String(inputs.weld_material_grade || ""),
-            [KEY_DP_DETAILING_EDGE_TYPE]: String(inputs.detailing_edge_type),
-            ...(hasCoverPlate ? { [KEY_DP_DETAILING_PACKING_PLATE]: String(inputs.detailing_packing_plate || "No") } : {}),
+            [KEY_DP_WELD_TYPE]: prefText(inputs.weld_fab),
+            [KEY_DP_WELD_MATERIAL_G_O]: prefText(inputs.weld_material_grade),
+            [KEY_DP_DETAILING_EDGE_TYPE]: prefText(inputs.detailing_edge_type),
+            ...(hasCoverPlate ? { [KEY_DP_DETAILING_PACKING_PLATE]: prefText(inputs.detailing_packing_plate) } : {}),
         }),
 
         inputSections: [

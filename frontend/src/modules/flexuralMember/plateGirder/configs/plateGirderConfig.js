@@ -54,6 +54,7 @@ import {
   WEB_TOTAL_DEPTH_LB,
   WEB_TOTAL_DEPTH_UB,
 } from "../../../../constants/generated/webKeys";
+import { prefText } from "../../../shared/utils/prefValue";
 // Plate Girder uses backend key strings directly (matching backend Common.py)
 
 /**
@@ -221,10 +222,6 @@ export const plateGirderConfig = {
     torsional_restraint: "Fully Restrained",
     warping_restraint: "Both flanges fully restrained",
     // Design Preferences defaults
-    design_method: "Limit State Design",
-    allowable_class: "Plastic",
-    effective_area_parameter: "1.0",
-    length_overwrite: "NA",
     loading_condition: "Normal",
     // Stiffeners
     intermediate_stiffener: "No",
@@ -487,12 +484,12 @@ export const plateGirderConfig = {
         [KEY_DESIGN_LOAD]: String(inputs.design_load || "Live load"),
         [KEY_MEMBER_OPTIONS]: String(inputs.member_options || "Simple Span"),
         [KEY_SUPPORTING_OPTIONS]: String(inputs.supporting_options || "NA"),
-        [KEY_ALLOW_CLASS]: String(inputs.allowable_class || "Plastic"),
+        [KEY_ALLOW_CLASS]: prefText(inputs.allowable_class),
         [KEY_WEB_PHILOSOPHY]: String(inputs.web_philosophy || "Thick Web without ITS"),
         [KEY_SUPPORT_WIDTH]: String(inputs.support_width || "100"),
-        [KEY_DP_DESIGN_METHOD]: String(inputs.design_method || "Limit State Design"),
-        [KEY_EFFECTIVE_AREA_PARA]: String(inputs.effective_area_parameter || "1.0"),
-        [KEY_LENGTH_OVERWRITE]: String(inputs.length_overwrite || "NA"),
+        [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
+        [KEY_EFFECTIVE_AREA_PARA]: prefText(inputs.effective_area_parameter),
+        [KEY_LENGTH_OVERWRITE]: prefText(inputs.length_overwrite),
         [KEY_ShearBucklingOption]: String(inputs.shear_buckling_option || "Simple Post Critical"),
       
         // --- Stiffener Settings ---

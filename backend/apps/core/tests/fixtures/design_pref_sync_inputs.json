@@ -350,16 +350,7 @@
       "open": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -378,16 +369,7 @@
       "open_draft": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -410,13 +392,7 @@
       "open_saved_overrides": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -439,16 +415,7 @@
       "refresh": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -467,16 +434,7 @@
       "refresh_changed_driver": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -495,13 +453,7 @@
       "refresh_stale_prefs": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -524,16 +476,7 @@
       "save": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -552,16 +495,7 @@
       "save_draft": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -584,13 +518,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -617,16 +545,7 @@
       "reset": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -645,16 +564,7 @@
       "reset_changed_driver": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -673,13 +583,7 @@
       "reset_saved_overrides": {
         "module_id": "Beam-to-Beam Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -707,15 +611,7 @@
       "open": {
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -732,15 +628,7 @@
       "open_draft": {
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -762,12 +650,6 @@
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -788,15 +670,7 @@
       "refresh": {
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -813,15 +687,7 @@
       "refresh_changed_driver": {
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -839,12 +705,6 @@
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -865,15 +725,7 @@
       "save": {
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -890,15 +742,7 @@
       "save_draft": {
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -920,12 +764,6 @@
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -950,15 +788,7 @@
       "reset": {
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -975,15 +805,7 @@
       "reset_changed_driver": {
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -1001,12 +823,6 @@
         "module_id": "Beam-to-Beam Cover Plate Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -1032,18 +848,7 @@
       "open": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam End Plate Connection",
           "Connectivity": "Coplanar Tension-Compression Flange",
           "Connectivity *": "Coplanar Tension-Compression Flange",
@@ -1063,18 +868,7 @@
       "open_draft": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam End Plate Connection",
           "Connectivity": "Coplanar Tension-Compression Flange",
           "Connectivity *": "Coplanar Tension-Compression Flange",
@@ -1098,15 +892,7 @@
       "open_saved_overrides": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -1130,18 +916,7 @@
       "refresh": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam End Plate Connection",
           "Connectivity": "Coplanar Tension-Compression Flange",
           "Connectivity *": "Coplanar Tension-Compression Flange",
@@ -1161,18 +936,7 @@
       "refresh_changed_driver": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam End Plate Connection",
           "Connectivity": "Coplanar Tension-Compression Flange",
           "Connectivity *": "Coplanar Tension-Compression Flange",
@@ -1192,15 +956,7 @@
       "refresh_stale_prefs": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -1224,18 +980,7 @@
       "save": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam End Plate Connection",
           "Connectivity": "Coplanar Tension-Compression Flange",
           "Connectivity *": "Coplanar Tension-Compression Flange",
@@ -1255,18 +1000,7 @@
       "save_draft": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam End Plate Connection",
           "Connectivity": "Coplanar Tension-Compression Flange",
           "Connectivity *": "Coplanar Tension-Compression Flange",
@@ -1290,15 +1024,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -1326,18 +1052,7 @@
       "reset": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam End Plate Connection",
           "Connectivity": "Coplanar Tension-Compression Flange",
           "Connectivity *": "Coplanar Tension-Compression Flange",
@@ -1357,18 +1072,7 @@
       "reset_changed_driver": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam End Plate Connection",
           "Connectivity": "Coplanar Tension-Compression Flange",
           "Connectivity *": "Coplanar Tension-Compression Flange",
@@ -1388,15 +1092,7 @@
       "reset_saved_overrides": {
         "module_id": "Beam-to-Beam End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -1425,19 +1121,7 @@
       "open": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Column End Plate Connection",
           "Connectivity": "Column Flange-Beam Web",
           "Bolt.Diameter": [],
@@ -1457,19 +1141,7 @@
       "open_draft": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Column End Plate Connection",
           "Connectivity": "Column Flange-Beam Web",
           "Bolt.Diameter": [],
@@ -1493,15 +1165,7 @@
       "open_saved_overrides": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -1525,19 +1189,7 @@
       "refresh": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Column End Plate Connection",
           "Connectivity": "Column Flange-Beam Web",
           "Bolt.Diameter": [],
@@ -1557,19 +1209,7 @@
       "refresh_changed_driver": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Column End Plate Connection",
           "Connectivity": "Column Flange-Beam Web",
           "Bolt.Diameter": [],
@@ -1589,15 +1229,7 @@
       "refresh_stale_prefs": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -1621,19 +1253,7 @@
       "save": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Column End Plate Connection",
           "Connectivity": "Column Flange-Beam Web",
           "Bolt.Diameter": [],
@@ -1653,19 +1273,7 @@
       "save_draft": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Column End Plate Connection",
           "Connectivity": "Column Flange-Beam Web",
           "Bolt.Diameter": [],
@@ -1689,15 +1297,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -1725,19 +1325,7 @@
       "reset": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Column End Plate Connection",
           "Connectivity": "Column Flange-Beam Web",
           "Bolt.Diameter": [],
@@ -1757,19 +1345,7 @@
       "reset_changed_driver": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Column End Plate Connection",
           "Connectivity": "Column Flange-Beam Web",
           "Bolt.Diameter": [],
@@ -1789,15 +1365,7 @@
       "reset_saved_overrides": {
         "module_id": "Beam-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -1826,11 +1394,6 @@
       "open": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Bolted Connection",
@@ -1850,11 +1413,6 @@
       "open_draft": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Bolted Connection",
@@ -1878,11 +1436,7 @@
       "open_saved_overrides": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -1905,11 +1459,6 @@
       "refresh": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Bolted Connection",
@@ -1929,11 +1478,6 @@
       "refresh_changed_driver": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 350 (Fe 490)",
           "Module": "Butt Joint Bolted Connection",
@@ -1953,11 +1497,7 @@
       "refresh_stale_prefs": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -1980,11 +1520,6 @@
       "save": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Bolted Connection",
@@ -2004,11 +1539,6 @@
       "save_draft": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Bolted Connection",
@@ -2032,11 +1562,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -2063,11 +1589,6 @@
       "reset": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Bolted Connection",
@@ -2087,11 +1608,6 @@
       "reset_changed_driver": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 350 (Fe 490)",
           "Module": "Butt Joint Bolted Connection",
@@ -2111,11 +1627,7 @@
       "reset_saved_overrides": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "Yes",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -2143,11 +1655,6 @@
       "open": {
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Welded Connection",
@@ -2165,11 +1672,6 @@
       "open_draft": {
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Welded Connection",
@@ -2192,11 +1694,6 @@
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -2217,11 +1714,6 @@
       "refresh": {
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Welded Connection",
@@ -2239,11 +1731,6 @@
       "refresh_changed_driver": {
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 350 (Fe 490)",
           "Module": "Butt Joint Welded Connection",
@@ -2262,11 +1749,6 @@
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -2287,11 +1769,6 @@
       "save": {
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Welded Connection",
@@ -2309,11 +1786,6 @@
       "save_draft": {
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Welded Connection",
@@ -2336,11 +1808,6 @@
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -2365,11 +1832,6 @@
       "reset": {
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Butt Joint Welded Connection",
@@ -2387,11 +1849,6 @@
       "reset_changed_driver": {
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 350 (Fe 490)",
           "Module": "Butt Joint Welded Connection",
@@ -2410,11 +1867,6 @@
         "module_id": "Butt Joint Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Packing_Plate": "No",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -2440,19 +1892,7 @@
       "open": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Cleat Angle Connection",
           "Bolt.Diameter": [],
@@ -2469,19 +1909,7 @@
       "open_draft": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Cleat Angle Connection",
           "Bolt.Diameter": [],
@@ -2502,15 +1930,7 @@
       "open_saved_overrides": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -2531,19 +1951,7 @@
       "refresh": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Cleat Angle Connection",
           "Bolt.Diameter": [],
@@ -2560,19 +1968,7 @@
       "refresh_changed_driver": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Cleat Angle Connection",
           "Bolt.Diameter": [],
@@ -2589,15 +1985,7 @@
       "refresh_stale_prefs": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -2618,19 +2006,7 @@
       "save": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Cleat Angle Connection",
           "Bolt.Diameter": [],
@@ -2647,19 +2023,7 @@
       "save_draft": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Cleat Angle Connection",
           "Bolt.Diameter": [],
@@ -2680,15 +2044,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -2713,19 +2069,7 @@
       "reset": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Cleat Angle Connection",
           "Bolt.Diameter": [],
@@ -2742,19 +2086,7 @@
       "reset_changed_driver": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Cleat Angle Connection",
           "Bolt.Diameter": [],
@@ -2771,15 +2103,7 @@
       "reset_saved_overrides": {
         "module_id": "Cleat Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -2805,16 +2129,7 @@
       "open": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -2833,16 +2148,7 @@
       "open_draft": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -2865,13 +2171,7 @@
       "open_saved_overrides": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -2894,16 +2194,7 @@
       "refresh": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -2922,16 +2213,7 @@
       "refresh_changed_driver": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -2950,13 +2232,7 @@
       "refresh_stale_prefs": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -2979,16 +2255,7 @@
       "save": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -3007,16 +2274,7 @@
       "save_draft": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -3039,13 +2297,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3072,16 +2324,7 @@
       "reset": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -3100,16 +2343,7 @@
       "reset_changed_driver": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -3128,13 +2362,7 @@
       "reset_saved_overrides": {
         "module_id": "Column-to-Column Cover Plate Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3162,15 +2390,7 @@
       "open": {
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3187,15 +2407,7 @@
       "open_draft": {
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3217,12 +2429,6 @@
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3243,15 +2449,7 @@
       "refresh": {
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3268,15 +2466,7 @@
       "refresh_changed_driver": {
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3294,12 +2484,6 @@
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3320,15 +2504,7 @@
       "save": {
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3345,15 +2521,7 @@
       "save_draft": {
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3375,12 +2543,6 @@
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3405,15 +2567,7 @@
       "reset": {
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3430,15 +2584,7 @@
       "reset_changed_driver": {
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3456,12 +2602,6 @@
         "module_id": "Column-to-Column Cover Plate Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "3",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3487,18 +2627,7 @@
       "open": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3518,18 +2647,7 @@
       "open_draft": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3553,15 +2671,7 @@
       "open_saved_overrides": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3585,18 +2695,7 @@
       "refresh": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3616,18 +2715,7 @@
       "refresh_changed_driver": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3647,15 +2735,7 @@
       "refresh_stale_prefs": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3679,18 +2759,7 @@
       "save": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3710,18 +2779,7 @@
       "save_draft": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3745,15 +2803,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3781,18 +2831,7 @@
       "reset": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3812,18 +2851,7 @@
       "reset_changed_driver": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Connectivity": "Flush End Plate",
           "Bolt.Diameter": [],
@@ -3843,15 +2871,7 @@
       "reset_saved_overrides": {
         "module_id": "Column-to-Column End Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
-          "Detailing.Gap": "0",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3880,7 +2900,6 @@
       "open": {
         "module_id": "Columns with known support conditions",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Columns with known support conditions",
           "Member.Profile": "Beams and Columns",
@@ -3892,8 +2911,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "open",
@@ -3902,7 +2919,6 @@
       "open_draft": {
         "module_id": "Columns with known support conditions",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Columns with known support conditions",
           "Member.Profile": "Beams and Columns",
@@ -3914,8 +2930,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "open",
@@ -3929,7 +2943,6 @@
         "module_id": "Columns with known support conditions",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -3944,8 +2957,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "open",
@@ -3954,7 +2965,6 @@
       "refresh": {
         "module_id": "Columns with known support conditions",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Columns with known support conditions",
           "Member.Profile": "Beams and Columns",
@@ -3966,8 +2976,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "refresh",
@@ -3976,7 +2984,6 @@
       "refresh_changed_driver": {
         "module_id": "Columns with known support conditions",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
           "Module": "Columns with known support conditions",
           "Member.Profile": "Beams and Columns",
@@ -3988,8 +2995,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "refresh",
@@ -3999,7 +3004,6 @@
         "module_id": "Columns with known support conditions",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4014,8 +3018,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "refresh",
@@ -4024,7 +3026,6 @@
       "save": {
         "module_id": "Columns with known support conditions",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Columns with known support conditions",
           "Member.Profile": "Beams and Columns",
@@ -4036,8 +3037,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "save",
@@ -4046,7 +3045,6 @@
       "save_draft": {
         "module_id": "Columns with known support conditions",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Columns with known support conditions",
           "Member.Profile": "Beams and Columns",
@@ -4058,8 +3056,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "save",
@@ -4073,7 +3069,6 @@
         "module_id": "Columns with known support conditions",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4088,8 +3083,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "save",
@@ -4102,7 +3095,6 @@
       "reset": {
         "module_id": "Columns with known support conditions",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Columns with known support conditions",
           "Member.Profile": "Beams and Columns",
@@ -4114,8 +3106,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "reset",
@@ -4124,7 +3114,6 @@
       "reset_changed_driver": {
         "module_id": "Columns with known support conditions",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
           "Module": "Columns with known support conditions",
           "Member.Profile": "Beams and Columns",
@@ -4136,8 +3125,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "reset",
@@ -4147,7 +3134,6 @@
         "module_id": "Columns with known support conditions",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4162,8 +3148,6 @@
           "End_1_Y": "Fixed",
           "End_2_Y": "Fixed",
           "Load.Axial": "100",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0",
           "Optimum.Para": "Utilization Ratio"
         },
         "operation": "reset",
@@ -4177,19 +3161,7 @@
       "open": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Fin Plate Connection",
           "Bolt.Diameter": [],
@@ -4207,19 +3179,7 @@
       "open_draft": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Fin Plate Connection",
           "Bolt.Diameter": [],
@@ -4241,15 +3201,7 @@
       "open_saved_overrides": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4271,19 +3223,7 @@
       "refresh": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Fin Plate Connection",
           "Bolt.Diameter": [],
@@ -4301,19 +3241,7 @@
       "refresh_changed_driver": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Fin Plate Connection",
           "Bolt.Diameter": [],
@@ -4331,15 +3259,7 @@
       "refresh_stale_prefs": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4361,19 +3281,7 @@
       "save": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Fin Plate Connection",
           "Bolt.Diameter": [],
@@ -4391,19 +3299,7 @@
       "save_draft": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Fin Plate Connection",
           "Bolt.Diameter": [],
@@ -4425,15 +3321,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4459,19 +3347,7 @@
       "reset": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Connector.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Fin Plate Connection",
           "Bolt.Diameter": [],
@@ -4489,19 +3365,7 @@
       "reset_changed_driver": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Fin Plate Connection",
           "Bolt.Diameter": [],
@@ -4519,15 +3383,7 @@
       "reset_saved_overrides": {
         "module_id": "Fin Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4554,9 +3410,7 @@
       "open": {
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
@@ -4567,12 +3421,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "open",
         "design_pref_draft": null
@@ -4580,9 +3429,7 @@
       "open_draft": {
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
@@ -4593,12 +3440,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "open",
         "design_pref_draft": {
@@ -4611,7 +3453,6 @@
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4626,12 +3467,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "open",
         "design_pref_draft": null
@@ -4639,9 +3475,7 @@
       "refresh": {
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
@@ -4652,12 +3486,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -4665,9 +3494,7 @@
       "refresh_changed_driver": {
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
@@ -4678,12 +3505,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -4692,7 +3514,6 @@
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4707,12 +3528,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -4720,9 +3536,7 @@
       "save": {
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
@@ -4733,12 +3547,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "save",
         "design_pref_draft": null
@@ -4746,9 +3555,7 @@
       "save_draft": {
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
@@ -4759,12 +3566,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "save",
         "design_pref_draft": {
@@ -4777,7 +3579,6 @@
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4792,12 +3593,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "save",
         "design_pref_draft": {
@@ -4809,9 +3605,7 @@
       "reset": {
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
@@ -4822,12 +3616,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -4835,9 +3624,7 @@
       "reset_changed_driver": {
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
@@ -4848,12 +3635,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -4862,7 +3644,6 @@
         "module_id": "Flexural Members - Cantilever",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4877,12 +3658,7 @@
           "Cantilever.Top": "Free",
           "Member.Length": "5000",
           "Load.Shear": "50",
-          "Load.Moment": "100",
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal"
+          "Load.Moment": "100"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -4895,19 +3671,12 @@
       "open": {
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -4921,19 +3690,12 @@
       "open_draft": {
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -4952,7 +3714,6 @@
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -4962,11 +3723,6 @@
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -4980,19 +3736,12 @@
       "refresh": {
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -5006,19 +3755,12 @@
       "refresh_changed_driver": {
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -5033,7 +3775,6 @@
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -5043,11 +3784,6 @@
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -5061,19 +3797,12 @@
       "save": {
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -5087,19 +3816,12 @@
       "save_draft": {
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -5118,7 +3840,6 @@
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -5128,11 +3849,6 @@
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -5150,19 +3866,12 @@
       "reset": {
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -5176,19 +3885,12 @@
       "reset_changed_driver": {
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Simply Supported",
           "Member.Profile": "Beams and Columns",
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -5203,7 +3905,6 @@
         "module_id": "Flexural Members - Simply Supported",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -5213,11 +3914,6 @@
           "Member.Designation": [
             "MB 400"
           ],
-          "Optimum.Class": "Yes",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
-          "Bearing.Length": "NA",
-          "Loading.Condition": "Normal",
           "Load.Shear": "50",
           "Load.Moment": "100",
           "Member.Length": "6000",
@@ -5236,19 +3932,7 @@
       "open": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Header Plate Connection",
           "Bolt.Diameter": [],
@@ -5266,19 +3950,7 @@
       "open_draft": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Header Plate Connection",
           "Bolt.Diameter": [],
@@ -5300,15 +3972,7 @@
       "open_saved_overrides": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -5330,19 +3994,7 @@
       "refresh": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Header Plate Connection",
           "Bolt.Diameter": [],
@@ -5360,19 +4012,7 @@
       "refresh_changed_driver": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Header Plate Connection",
           "Bolt.Diameter": [],
@@ -5390,15 +4030,7 @@
       "refresh_stale_prefs": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -5420,19 +4052,7 @@
       "save": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Header Plate Connection",
           "Bolt.Diameter": [],
@@ -5450,19 +4070,7 @@
       "save_draft": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Header Plate Connection",
           "Bolt.Diameter": [],
@@ -5484,15 +4092,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -5518,19 +4118,7 @@
       "reset": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Header Plate Connection",
           "Bolt.Diameter": [],
@@ -5548,19 +4136,7 @@
       "reset_changed_driver": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Header Plate Connection",
           "Bolt.Diameter": [],
@@ -5578,15 +4154,7 @@
       "reset_saved_overrides": {
         "module_id": "Header Plate Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -5613,10 +4181,6 @@
       "open": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Bolted Connection",
@@ -5635,10 +4199,6 @@
       "open_draft": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Bolted Connection",
@@ -5661,10 +4221,7 @@
       "open_saved_overrides": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -5686,10 +4243,6 @@
       "refresh": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Bolted Connection",
@@ -5708,10 +4261,6 @@
       "refresh_changed_driver": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 350 (Fe 490)",
           "Module": "Lap Joint Bolted Connection",
@@ -5730,10 +4279,7 @@
       "refresh_stale_prefs": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -5755,10 +4301,6 @@
       "save": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Bolted Connection",
@@ -5777,10 +4319,6 @@
       "save_draft": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Bolted Connection",
@@ -5803,10 +4341,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -5832,10 +4367,6 @@
       "reset": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Bolted Connection",
@@ -5854,10 +4385,6 @@
       "reset_changed_driver": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 350 (Fe 490)",
           "Module": "Lap Joint Bolted Connection",
@@ -5876,10 +4403,7 @@
       "reset_saved_overrides": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -5906,10 +4430,6 @@
       "open": {
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Welded Connection",
@@ -5926,10 +4446,6 @@
       "open_draft": {
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Welded Connection",
@@ -5951,10 +4467,6 @@
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -5974,10 +4486,6 @@
       "refresh": {
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Welded Connection",
@@ -5994,10 +4502,6 @@
       "refresh_changed_driver": {
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 350 (Fe 490)",
           "Module": "Lap Joint Welded Connection",
@@ -6015,10 +4519,6 @@
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -6038,10 +4538,6 @@
       "save": {
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Welded Connection",
@@ -6058,10 +4554,6 @@
       "save_draft": {
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Welded Connection",
@@ -6083,10 +4575,6 @@
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -6110,10 +4598,6 @@
       "reset": {
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Lap Joint Welded Connection",
@@ -6130,10 +4614,6 @@
       "reset_changed_driver": {
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 350 (Fe 490)",
           "Module": "Lap Joint Welded Connection",
@@ -6151,10 +4631,6 @@
         "module_id": "Lap Joint Welded Connection",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Type": "Shop weld",
-          "Weld.Fab": "Shop weld",
-          "Weld.Material_Grade_OverWrite": "290",
-          "Detailing.Edge_type": "Sheared or hand flame cut",
           "Design.For": "Tension",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
@@ -6179,7 +4655,6 @@
       "open": {
         "module_id": "PLATE GIRDER",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "PLATE GIRDER",
           "Total.Design_Type": "Customized",
@@ -6204,9 +4679,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6238,7 +4710,6 @@
       "open_draft": {
         "module_id": "PLATE GIRDER",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "PLATE GIRDER",
           "Total.Design_Type": "Customized",
@@ -6263,9 +4734,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6302,7 +4770,6 @@
         "module_id": "PLATE GIRDER",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -6330,9 +4797,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6364,7 +4828,6 @@
       "refresh": {
         "module_id": "PLATE GIRDER",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "PLATE GIRDER",
           "Total.Design_Type": "Customized",
@@ -6389,9 +4852,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6423,7 +4883,6 @@
       "refresh_changed_driver": {
         "module_id": "PLATE GIRDER",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
           "Module": "PLATE GIRDER",
           "Total.Design_Type": "Customized",
@@ -6448,9 +4907,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6483,7 +4939,6 @@
         "module_id": "PLATE GIRDER",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -6511,9 +4966,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6545,7 +4997,6 @@
       "save": {
         "module_id": "PLATE GIRDER",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "PLATE GIRDER",
           "Total.Design_Type": "Customized",
@@ -6570,9 +5021,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6604,7 +5052,6 @@
       "save_draft": {
         "module_id": "PLATE GIRDER",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "PLATE GIRDER",
           "Total.Design_Type": "Customized",
@@ -6629,9 +5076,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6668,7 +5112,6 @@
         "module_id": "PLATE GIRDER",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -6696,9 +5139,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6734,7 +5174,6 @@
       "reset": {
         "module_id": "PLATE GIRDER",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Module": "PLATE GIRDER",
           "Total.Design_Type": "Customized",
@@ -6759,9 +5198,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6793,7 +5229,6 @@
       "reset_changed_driver": {
         "module_id": "PLATE GIRDER",
         "inputs": {
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
           "Module": "PLATE GIRDER",
           "Total.Design_Type": "Customized",
@@ -6818,9 +5253,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6853,7 +5285,6 @@
         "module_id": "PLATE GIRDER",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -6881,9 +5312,6 @@
           "Web.Philosophy": "Thick Web without ITS",
           "Torsion.restraint": "Fully Restrained",
           "Warping.restraint": "Both flanges fully restrained",
-          "Optimum.Class": "Plastic",
-          "Effective.Area_Para": "1.0",
-          "Length.Overwrite": "NA",
           "Loading.Condition": "Normal",
           "S.B.Methods": "Simple Post Critical",
           "Symmetry": "Symmetrical",
@@ -6920,19 +5348,7 @@
       "open": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Seated Angle Connection",
           "Bolt.Diameter": [],
@@ -6951,19 +5367,7 @@
       "open_draft": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Seated Angle Connection",
           "Bolt.Diameter": [],
@@ -6986,15 +5390,7 @@
       "open_saved_overrides": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -7017,19 +5413,7 @@
       "refresh": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Seated Angle Connection",
           "Bolt.Diameter": [],
@@ -7048,19 +5432,7 @@
       "refresh_changed_driver": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Seated Angle Connection",
           "Bolt.Diameter": [],
@@ -7079,15 +5451,7 @@
       "refresh_stale_prefs": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -7110,19 +5474,7 @@
       "save": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Seated Angle Connection",
           "Bolt.Diameter": [],
@@ -7141,19 +5493,7 @@
       "save_draft": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Seated Angle Connection",
           "Bolt.Diameter": [],
@@ -7176,15 +5516,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -7211,19 +5543,7 @@
       "reset": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Seated Angle Connection",
           "Bolt.Diameter": [],
@@ -7242,19 +5562,7 @@
       "reset_changed_driver": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supported_Section.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Connectivity": "Column Flange-Beam Web",
           "Module": "Seated Angle Connection",
           "Bolt.Diameter": [],
@@ -7273,15 +5581,7 @@
       "reset_saved_overrides": {
         "module_id": "Seated Angle Connection",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
@@ -7309,16 +5609,7 @@
       "open": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -7339,16 +5630,7 @@
       "open_draft": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -7373,13 +5655,7 @@
       "open_saved_overrides": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -7404,16 +5680,7 @@
       "refresh": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -7434,16 +5701,7 @@
       "refresh_changed_driver": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -7464,13 +5722,7 @@
       "refresh_stale_prefs": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -7495,16 +5747,7 @@
       "save": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -7525,16 +5768,7 @@
       "save_draft": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -7559,13 +5793,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -7594,16 +5822,7 @@
       "reset": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -7624,16 +5843,7 @@
       "reset_changed_driver": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -7654,13 +5864,7 @@
       "reset_saved_overrides": {
         "module_id": "Struts Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -7690,12 +5894,7 @@
       "open": {
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
@@ -7714,12 +5913,7 @@
       "open_draft": {
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
@@ -7743,9 +5937,6 @@
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -7768,12 +5959,7 @@
       "refresh": {
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
@@ -7792,12 +5978,7 @@
       "refresh_changed_driver": {
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
@@ -7817,9 +5998,6 @@
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -7842,12 +6020,7 @@
       "save": {
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
@@ -7866,12 +6039,7 @@
       "save_draft": {
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
@@ -7895,9 +6063,6 @@
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -7924,12 +6089,7 @@
       "reset": {
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
@@ -7948,12 +6108,7 @@
       "reset_changed_driver": {
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
@@ -7973,9 +6128,6 @@
         "module_id": "Struts Welded to End Gusset",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -8003,16 +6155,7 @@
       "open": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -8030,16 +6173,7 @@
       "open_draft": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -8061,13 +6195,7 @@
       "open_saved_overrides": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -8089,16 +6217,7 @@
       "refresh": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -8116,16 +6235,7 @@
       "refresh_changed_driver": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -8143,13 +6253,7 @@
       "refresh_stale_prefs": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -8171,16 +6275,7 @@
       "save": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -8198,16 +6293,7 @@
       "save_draft": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -8229,13 +6315,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -8261,16 +6341,7 @@
       "reset": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -8288,16 +6359,7 @@
       "reset_changed_driver": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
-          "Bolt.Bolt_Hole_Type": "Standard",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Bolted to End Gusset",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -8315,13 +6377,7 @@
       "reset_saved_overrides": {
         "module_id": "Tension Member Design - Bolted to End Gusset",
         "inputs": {
-          "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Bolt.Slip_Factor": "0.3",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -8348,15 +6404,7 @@
       "open": {
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Back to Back Angles",
@@ -8371,15 +6419,7 @@
       "open_draft": {
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Back to Back Angles",
@@ -8399,12 +6439,6 @@
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -8423,15 +6457,7 @@
       "refresh": {
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Back to Back Angles",
@@ -8446,15 +6472,7 @@
       "refresh_changed_driver": {
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Back to Back Angles",
@@ -8470,12 +6488,6 @@
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -8494,15 +6506,7 @@
       "save": {
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Back to Back Angles",
@@ -8517,15 +6521,7 @@
       "save_draft": {
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Back to Back Angles",
@@ -8545,12 +6541,6 @@
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",
@@ -8573,15 +6563,7 @@
       "reset": {
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Back to Back Angles",
@@ -8596,15 +6578,7 @@
       "reset_changed_driver": {
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Tension Member Design - Welded to End Gusset",
           "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Back to Back Angles",
@@ -8620,12 +6594,6 @@
         "module_id": "Tension Member Design - Welded to End Gusset",
         "inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
-          "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "410",
-          "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-          "Detailing.Gap": "10",
-          "Detailing.Corrosive_Influences": "No",
-          "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Material": "E 450 (Fe 570) D",

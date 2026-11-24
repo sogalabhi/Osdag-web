@@ -17,6 +17,7 @@ import { describe, expect, it } from "vitest";
 import * as coreKeyExports from "../constants/generated/coreKeys";
 import * as webKeyExports from "../constants/generated/webKeys";
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../modules/shared/config/prefCoreKeys";
+import { COLUMN_OPTIMIZATION_DEFAULTS, FLEXURE_OPTIMIZATION_DEFAULTS } from "../modules/shared/config/prefOptions";
 import { MODULES } from "./cases";
 import { LISTS, caseState, wire } from "./cases/shared";
 
@@ -30,9 +31,23 @@ const ALL_CORE_KEYS = new Set(
 
 const asList = (declared) => (declared == null ? [] : Array.isArray(declared) ? declared : [declared]);
 
-/** Every field the module's form can hold: default inputs, input section fields, selection and modal inputs. */
+/**
+ * The Additional Inputs fields. The form holds them only once the user saved them (the default
+ * inputs carry none: the backend fills them from the core), so a module's own declaration says
+ * which of them it has.
+ */
+const ADDITIONAL_INPUTS_FIELDS = new Set([
+  ...Object.keys(PREF_CORE_KEYS),
+  ...Object.keys(MATERIAL_CORE_KEYS),
+  ...Object.keys(FLEXURE_OPTIMIZATION_DEFAULTS),
+  ...Object.keys(COLUMN_OPTIMIZATION_DEFAULTS),
+  "member_material",
+]);
+
+/** Every field the module's form can hold: default inputs, input section fields, selection and modal inputs, Additional Inputs. */
 const formFields = (config) => {
   const fields = new Set(Object.keys(config.defaultInputs || {}));
+  for (const field of Object.keys(config.coreKeys || {})) if (ADDITIONAL_INPUTS_FIELDS.has(field)) fields.add(field);
   for (const section of config.inputSections || []) {
     for (const field of section.fields || []) if (field.key) fields.add(field.key);
   }

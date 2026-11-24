@@ -1,10 +1,13 @@
 {
  "Axially Loaded Column": {
   "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
   "supported_material": "E 250 (Fe 410 W)A",
   "supporting_material": "E 250 (Fe 410 W)A"
  },
  "Base Plate": {
+  "Base_Plate.Material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
   "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
   "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "Over-sized",
   "DesignPreferences.Anchor_Bolt.ICF.Designation": "20X0 IS5624 GALV",
@@ -17,16 +20,35 @@
   "DesignPreferences.Anchor_Bolt.OCF.Length": "0",
   "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": "410",
   "DesignPreferences.Design.Base_Plate": "Effective Area Method",
-  "connector_material": "E 250 (Fe 410 W)A",
-  "design_method": "Limit State Design",
   "detailing_corr_status": "Yes",
   "detailing_edge_type": "a - Sheared or hand flame cut",
+  "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
   "supporting_material": "E 250 (Fe 410 W)A",
   "weld_fab": "Shop Weld",
   "weld_material_grade": "410"
  },
- "Beam Beam End Plate Connection": {},
+ "Beam Beam End Plate Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Non pre-tensioned",
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "10",
+  "supported_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "410"
+ },
  "Beam Cover Plate Bolted Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "3",
   "supported_material": "E 250 (Fe 410 W)A",
   "weld_fab": "Shop Weld"
  },
@@ -34,54 +56,187 @@
   "bolt_hole_type": "Standard",
   "bolt_slip_factor": "0.3",
   "bolt_tension_type": "Pre-tensioned",
-  "supported_material": "E 165 (Fe 290)"
+  "connector_material": "E 165 (Fe 290)",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "3",
+  "supported_material": "E 165 (Fe 290)",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "290"
  },
- "Beam to Column End Plate Connection": {},
- "Butt Joint Bolted": {},
- "Butt Joint Welded": {},
- "Cleat Angle Connection": {},
- "Column Column End Plate Connection": {
-  "supporting_material": "E 250 (Fe 410 W)A"
- },
- "Column Cover Plate Bolted Connection": {
-  "weld_fab": "Shop Weld"
- },
- "Column Cover Plate Welded Connection": {
+ "Beam to Column End Plate Connection": {
   "bolt_hole_type": "Standard",
   "bolt_slip_factor": "0.3",
-  "bolt_tension_type": "Pre-tensioned"
+  "bolt_tension_type": "Non pre-tensioned",
+  "connector_material": "E 165 (Fe 290)",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "10",
+  "supported_material": "E 165 (Fe 290)",
+  "supporting_material": "E 165 (Fe 290)",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "290"
  },
- "Fin Plate Connection": {},
- "Header Plate Connection": {},
- "Lap Joint Bolted": {},
- "Lap Joint Welded": {},
- "On Cantilever Beam Design": {
+ "Butt Joint Bolted": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Non pre-tensioned",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_packing_plate": "Yes"
+ },
+ "Butt Joint Welded": {
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_packing_plate": "Yes",
+  "weld_material_grade": "410"
+ },
+ "Cleat Angle Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
   "connector_material": "E 250 (Fe 410 W)A",
-  "supported_material": "E 250 (Fe 410 W)A",
-  "supporting_material": "E 250 (Fe 410 W)A"
- },
- "Plate Girder Design": {
-  "connector_material": "E 250 (Fe 410 W)A",
-  "supported_material": "E 250 (Fe 410 W)A",
-  "supporting_material": "E 250 (Fe 410 W)A"
- },
- "Seated Angle Connection": {},
- "Simply Supported Beam Design": {
-  "connector_material": "E 250 (Fe 410 W)A",
-  "supported_material": "E 250 (Fe 410 W)A",
-  "supporting_material": "E 250 (Fe 410 W)A"
- },
- "Struts Bolted to End Gusset": {
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "10",
   "supported_material": "E 250 (Fe 410 W)A",
   "supporting_material": "E 250 (Fe 410 W)A",
   "weld_fab": "Shop Weld",
   "weld_material_grade": "410"
  },
- "Struts Welded to End Gusset": {
+ "Column Column End Plate Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "10",
+  "supporting_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld"
+ },
+ "Column Cover Plate Bolted Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "3",
+  "supporting_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld"
+ },
+ "Column Cover Plate Welded Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "connector_material": "E 165 (Fe 290)",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "3",
+  "supporting_material": "E 165 (Fe 290)",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "290"
+ },
+ "Fin Plate Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "connector_material": "E 165 (Fe 290)",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "10",
+  "supported_material": "E 165 (Fe 290)",
+  "supporting_material": "E 165 (Fe 290)",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "290"
+ },
+ "Header Plate Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "10",
+  "supported_material": "E 250 (Fe 410 W)A",
+  "supporting_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "410"
+ },
+ "Lap Joint Bolted": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Non pre-tensioned",
+  "detailing_edge_type": "Sheared or hand flame cut"
+ },
+ "Lap Joint Welded": {
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "weld_material_grade": "410"
+ },
+ "On Cantilever Beam Design": {
+  "design_method": "Limit State Design",
+  "supporting_material": "E 250 (Fe 410 W)A"
+ },
+ "Plate Girder Design": {
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
   "supported_material": "E 250 (Fe 410 W)A",
   "supporting_material": "E 250 (Fe 410 W)A"
  },
+ "Seated Angle Connection": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "10",
+  "supported_material": "E 250 (Fe 410 W)A",
+  "supporting_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "410"
+ },
+ "Simply Supported Beam Design": {
+  "design_method": "Limit State Design",
+  "supporting_material": "E 250 (Fe 410 W)A"
+ },
+ "Struts Bolted to End Gusset": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "10",
+  "supported_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "410"
+ },
+ "Struts Welded to End Gusset": {
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "supported_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "410"
+ },
  "Tension Member Bolted Design": {
+  "bolt_hole_type": "Standard",
+  "bolt_slip_factor": "0.3",
+  "bolt_tension_type": "Pre-tensioned",
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "10",
   "supported_material": "E 250 (Fe 410 W)A",
   "weld_fab": "Shop Weld",
   "weld_material_grade": "410"
@@ -90,6 +245,13 @@
   "bolt_hole_type": "Standard",
   "bolt_slip_factor": "0.3",
   "bolt_tension_type": "Pre-tensioned",
-  "supported_material": "E 250 (Fe 410 W)A"
+  "connector_material": "E 250 (Fe 410 W)A",
+  "design_method": "Limit State Design",
+  "detailing_corr_status": "No",
+  "detailing_edge_type": "Sheared or hand flame cut",
+  "detailing_gap": "10",
+  "supported_material": "E 250 (Fe 410 W)A",
+  "weld_fab": "Shop Weld",
+  "weld_material_grade": "410"
  }
 }

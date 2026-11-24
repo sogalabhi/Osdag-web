@@ -69,8 +69,6 @@ exports[`a desktop .osi example opened and saved again > SA-1 (Seated Angle Conn
 {
   "added": [
     "Load.Axial",
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
   ],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
@@ -85,8 +83,6 @@ exports[`a desktop .osi example opened and saved again > SA-2 (Seated Angle Conn
 {
   "added": [
     "Load.Axial",
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
   ],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
@@ -101,8 +97,6 @@ exports[`a desktop .osi example opened and saved again > SA-3 (Seated Angle Conn
 {
   "added": [
     "Load.Axial",
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
   ],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
@@ -117,8 +111,6 @@ exports[`a desktop .osi example opened and saved again > SA-4 (Seated Angle Conn
 {
   "added": [
     "Load.Axial",
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
   ],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
@@ -133,8 +125,6 @@ exports[`a desktop .osi example opened and saved again > SA-5 (Seated Angle Conn
 {
   "added": [
     "Load.Axial",
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
   ],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
@@ -385,8 +375,6 @@ exports[`a desktop .osi example opened and saved again > beam_bolted5 (Beam-to-B
 exports[`a desktop .osi example opened and saved again > beam_welded1 (Beam-to-Beam Cover Plate Welded Connection) 1`] = `
 {
   "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
     "out_titles_status",
   ],
   "changed": {
@@ -401,8 +389,6 @@ exports[`a desktop .osi example opened and saved again > beam_welded1 (Beam-to-B
 exports[`a desktop .osi example opened and saved again > beam_welded2 (Beam-to-Beam Cover Plate Welded Connection) 1`] = `
 {
   "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
     "out_titles_status",
   ],
   "changed": {
@@ -417,8 +403,6 @@ exports[`a desktop .osi example opened and saved again > beam_welded2 (Beam-to-B
 exports[`a desktop .osi example opened and saved again > beam_welded3 (Beam-to-Beam Cover Plate Welded Connection) 1`] = `
 {
   "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
     "out_titles_status",
   ],
   "changed": {},
@@ -429,8 +413,6 @@ exports[`a desktop .osi example opened and saved again > beam_welded3 (Beam-to-B
 exports[`a desktop .osi example opened and saved again > beam_welded4 (Beam-to-Beam Cover Plate Welded Connection) 1`] = `
 {
   "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
     "out_titles_status",
   ],
   "changed": {},
@@ -441,8 +423,6 @@ exports[`a desktop .osi example opened and saved again > beam_welded4 (Beam-to-B
 exports[`a desktop .osi example opened and saved again > beam_welded5 (Beam-to-Beam Cover Plate Welded Connection) 1`] = `
 {
   "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
     "out_titles_status",
   ],
   "changed": {},
@@ -454,8 +434,6 @@ exports[`a desktop .osi example opened and saved again > ccep1 (Column-to-Column
 {
   "added": [
     "Member.Supported_Section.Designation",
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
     "Weld.Type",
   ],
   "changed": {
@@ -480,10 +458,7 @@ exports[`a desktop .osi example opened and saved again > ccep2 (Column-to-Column
 
 exports[`a desktop .osi example opened and saved again > cleat_1 (Cleat Angle Connection) 1`] = `
 {
-  "added": [
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
-  ],
+  "added": [],
   "changed": {
     "Bolt.TensionType": ""Non-pretensioned" -> "Non pre-tensioned"",
   },
@@ -495,10 +470,7 @@ exports[`a desktop .osi example opened and saved again > cleat_1 (Cleat Angle Co
 
 exports[`a desktop .osi example opened and saved again > cleat_2 (Cleat Angle Connection) 1`] = `
 {
-  "added": [
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
-  ],
+  "added": [],
   "changed": {
     "Bolt.TensionType": ""Non-pretensioned" -> "Non pre-tensioned"",
   },
@@ -510,10 +482,7 @@ exports[`a desktop .osi example opened and saved again > cleat_2 (Cleat Angle Co
 
 exports[`a desktop .osi example opened and saved again > cleat_3 (Cleat Angle Connection) 1`] = `
 {
-  "added": [
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
-  ],
+  "added": [],
   "changed": {
     "Bolt.TensionType": ""Non-pretensioned" -> "Non pre-tensioned"",
   },
@@ -525,10 +494,7 @@ exports[`a desktop .osi example opened and saved again > cleat_3 (Cleat Angle Co
 
 exports[`a desktop .osi example opened and saved again > cleat_4 (Cleat Angle Connection) 1`] = `
 {
-  "added": [
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
-  ],
+  "added": [],
   "changed": {
     "Bolt.TensionType": ""Non-pretensioned" -> "Non pre-tensioned"",
   },
@@ -540,10 +506,7 @@ exports[`a desktop .osi example opened and saved again > cleat_4 (Cleat Angle Co
 
 exports[`a desktop .osi example opened and saved again > cleat_5 (Cleat Angle Connection) 1`] = `
 {
-  "added": [
-    "Weld.Fab",
-    "Weld.Material_Grade_OverWrite",
-  ],
+  "added": [],
   "changed": {
     "Bolt.TensionType": ""Non-pretensioned" -> "Non pre-tensioned"",
   },
@@ -603,8 +566,6 @@ exports[`a desktop .osi example opened and saved again > column_bolted5 (Column-
 exports[`a desktop .osi example opened and saved again > column_welded1 (Column-to-Column Cover Plate Welded Connection) 1`] = `
 {
   "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
     "flangespace",
     "out_titles_status",
     "type",
@@ -617,8 +578,6 @@ exports[`a desktop .osi example opened and saved again > column_welded1 (Column-
 exports[`a desktop .osi example opened and saved again > column_welded2 (Column-to-Column Cover Plate Welded Connection) 1`] = `
 {
   "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
     "flangespace",
     "out_titles_status",
     "type",
@@ -631,8 +590,6 @@ exports[`a desktop .osi example opened and saved again > column_welded2 (Column-
 exports[`a desktop .osi example opened and saved again > column_welded3 (Column-to-Column Cover Plate Welded Connection) 1`] = `
 {
   "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
     "flangespace",
     "out_titles_status",
     "type",
@@ -645,8 +602,6 @@ exports[`a desktop .osi example opened and saved again > column_welded3 (Column-
 exports[`a desktop .osi example opened and saved again > column_welded4 (Column-to-Column Cover Plate Welded Connection) 1`] = `
 {
   "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
     "flangespace",
     "out_titles_status",
     "type",
@@ -663,8 +618,6 @@ exports[`a desktop .osi example opened and saved again > column_welded4 (Column-
 exports[`a desktop .osi example opened and saved again > column_welded5 (Column-to-Column Cover Plate Welded Connection) 1`] = `
 {
   "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
     "flangespace",
     "out_titles_status",
     "type",
@@ -778,11 +731,7 @@ exports[`a desktop .osi example opened and saved again > tension_b_starangle (Te
 
 exports[`a desktop .osi example opened and saved again > tension_w_angle (Tension Member Design - Welded to End Gusset) 1`] = `
 {
-  "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
-    "Detailing.Gap",
-  ],
+  "added": [],
   "changed": {
     "Member.Designation": "["20 x 20 x 3","20 x 20 x 4","25 x 25 x 3","25 x 25 x 4",... -> ["50 x 50 x 6","60 x 60 x 6"]",
   },
@@ -792,11 +741,7 @@ exports[`a desktop .osi example opened and saved again > tension_w_angle (Tensio
 
 exports[`a desktop .osi example opened and saved again > tension_w_bbangle (Tension Member Design - Welded to End Gusset) 1`] = `
 {
-  "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
-    "Detailing.Gap",
-  ],
+  "added": [],
   "changed": {
     "Member.Designation": "["20 x 20 x 3","20 x 20 x 4","25 x 25 x 3","25 x 25 x 4",... -> ["50 x 50 x 6","60 x 60 x 6"]",
   },
@@ -806,11 +751,7 @@ exports[`a desktop .osi example opened and saved again > tension_w_bbangle (Tens
 
 exports[`a desktop .osi example opened and saved again > tension_w_bbchannels (Tension Member Design - Welded to End Gusset) 1`] = `
 {
-  "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
-    "Detailing.Gap",
-  ],
+  "added": [],
   "changed": {
     "Member.Designation": "["MC 75","MC 100","MC 125","MC 125*","MC 150","MC 150*","... -> ["MC 100","MC 125"]",
   },
@@ -820,11 +761,7 @@ exports[`a desktop .osi example opened and saved again > tension_w_bbchannels (T
 
 exports[`a desktop .osi example opened and saved again > tension_w_channels (Tension Member Design - Welded to End Gusset) 1`] = `
 {
-  "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
-    "Detailing.Gap",
-  ],
+  "added": [],
   "changed": {
     "Member.Designation": "["MC 75","MC 100","MC 125","MC 125*","MC 150","MC 150*","... -> ["MC 100","MC 125"]",
   },
@@ -834,11 +771,7 @@ exports[`a desktop .osi example opened and saved again > tension_w_channels (Ten
 
 exports[`a desktop .osi example opened and saved again > tension_w_starangle (Tension Member Design - Welded to End Gusset) 1`] = `
 {
-  "added": [
-    "Detailing.Corrosive_Influences",
-    "Detailing.Edge_type",
-    "Detailing.Gap",
-  ],
+  "added": [],
   "changed": {
     "Member.Designation": "["20 x 20 x 3","20 x 20 x 4","25 x 25 x 3","25 x 25 x 4",... -> ["50 x 50 x 6","60 x 60 x 6"]",
   },

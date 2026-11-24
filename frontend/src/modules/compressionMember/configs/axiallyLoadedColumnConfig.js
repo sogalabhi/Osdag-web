@@ -29,6 +29,7 @@ import {
   KEY_SECSIZE,
   KEY_SEC_PROFILE,
 } from "../../../constants/generated/coreKeys";
+import { prefText } from "../../shared/utils/prefValue";
 export const axiallyLoadedColumnConfig = {
   sessionName: "Axially Loaded Column",
   designType: KEY_DISP_COMPRESSION_COLUMN,
@@ -47,9 +48,6 @@ export const axiallyLoadedColumnConfig = {
     end_condition_1_y: "Fixed",
     end_condition_2_y: "Fixed",
     axial_load: "100",
-    design_method: "Limit State Design",
-    allow_ur: "1.0",
-    effective_area_parameter: "1.0",
     optimum_para: "Utilization Ratio",
   },
 
@@ -192,9 +190,9 @@ export const axiallyLoadedColumnConfig = {
       [KEY_END1_Y]: String(inputs.end_condition_1_y),
       [KEY_END2_Y]: String(inputs.end_condition_2_y),
       [KEY_AXIAL]: String(inputs.axial_load),
-      [KEY_DP_DESIGN_METHOD]: String(inputs.design_method || "Limit State Design"),
-      [KEY_ALLOW_UR]: String(inputs.allow_ur || "1.0"),
-      [KEY_EFFECTIVE_AREA_PARA]: String(inputs.effective_area_parameter || "1.0"),
+      [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
+      [KEY_ALLOW_UR]: prefText(inputs.allow_ur),
+      [KEY_EFFECTIVE_AREA_PARA]: prefText(inputs.effective_area_parameter),
       [KEY_OPTIMIZATION_PARA]: String(inputs.optimum_para || "Utilization Ratio"),
     };
   },

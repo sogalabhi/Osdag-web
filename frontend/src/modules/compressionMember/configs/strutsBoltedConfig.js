@@ -36,6 +36,7 @@ import {
   KEY_TYP,
 } from "../../../constants/generated/coreKeys";
 import { WEB_IS_LEG_LOADED } from "../../../constants/generated/webKeys";
+import { prefText } from "../../shared/utils/prefValue";
 export const strutsBoltedConfig = {
   sessionName: "Struts Bolted to End Gusset",
   designType: KEY_DISP_STRUT_BOLTED_END_GUSSET,
@@ -46,7 +47,6 @@ export const strutsBoltedConfig = {
     bolt_diameter: [],
     bolt_grade: [],
     bolt_type: "Bearing Bolt",
-    connector_material: "E 250 (Fe 410 W)A",
     section_profile: "Angles",
     location: "Long Leg",
     is_leg_loaded: "Yes",
@@ -56,15 +56,7 @@ export const strutsBoltedConfig = {
     plate_thickness: [],
     section_designation: [],
     material: "E 250 (Fe 410 W)A",
-    supported_material: "E 250 (Fe 410 W)A",
-    bolt_hole_type: "Standard",
-    bolt_slip_factor: "0.3",
-    bolt_tension_type: "Pre-tensioned",
     member_designation: "All",
-    detailing_edge_type: "Rolled, machine-flame cut, sawn and planed",
-    detailing_gap: "10",
-    detailing_corr_status: "No",
-    design_method: "Limit State Design",
     end_condition_1: "Hinged",
     end_condition_2: "Hinged",
   },
@@ -209,7 +201,7 @@ export const strutsBoltedConfig = {
       [KEY_SECSIZE]: memberDesignation,
 
       [KEY_MATERIAL]: inputs.material,
-      [KEY_SEC_MATERIAL]: inputs.supported_material,
+      [KEY_SEC_MATERIAL]: prefText(inputs.supported_material),
 
       [KEY_LENGTH]: String(inputs.length),
       [KEY_AXIAL]: String(inputs.axial_force),
@@ -222,17 +214,17 @@ export const strutsBoltedConfig = {
       [KEY_D]: getList("bolt_diameter", "boltDiameterList"),
       [KEY_GRD]: getList("bolt_grade", "propertyClassList"),
       [KEY_TYP]: inputs.bolt_type,
-      [KEY_DP_BOLT_HOLE_TYPE]: inputs.bolt_hole_type,
-      [KEY_DP_BOLT_SLIP_FACTOR]: String(inputs.bolt_slip_factor),
-      [KEY_DP_BOLT_TYPE]: inputs.bolt_tension_type,
+      [KEY_DP_BOLT_HOLE_TYPE]: prefText(inputs.bolt_hole_type),
+      [KEY_DP_BOLT_SLIP_FACTOR]: prefText(inputs.bolt_slip_factor),
+      [KEY_DP_BOLT_TYPE]: prefText(inputs.bolt_tension_type),
 
-      [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
+      [KEY_CONNECTOR_MATERIAL]: prefText(inputs.connector_material),
       [KEY_PLATETHK]: getList("plate_thickness", "thicknessList"),
 
-      [KEY_DP_DESIGN_METHOD]: inputs.design_method,
-      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: inputs.detailing_corr_status,
-      [KEY_DP_DETAILING_EDGE_TYPE]: inputs.detailing_edge_type,
-      [KEY_DP_DETAILING_GAP]: String(inputs.detailing_gap),
+      [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
+      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: prefText(inputs.detailing_corr_status),
+      [KEY_DP_DETAILING_EDGE_TYPE]: prefText(inputs.detailing_edge_type),
+      [KEY_DP_DETAILING_GAP]: prefText(inputs.detailing_gap),
     };
   },
 

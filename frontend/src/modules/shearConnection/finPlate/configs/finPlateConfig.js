@@ -41,8 +41,6 @@ export const finPlateConfig = {
     bolt_diameter: [],
     bolt_grade: [],
     bolt_type: "Bearing_Bolt",
-    // connector_material: "E 250 (Fe 410 W)A",
-    connector_material: "E 165 (Fe 290)",
     material: "E 165 (Fe 290)",
     load_shear: "70",
     load_axial: "30",
@@ -52,18 +50,6 @@ export const finPlateConfig = {
     column_section: "HB 150",
     primary_beam: "JB 200",
     secondary_beam: "JB 150",
-    supported_material: "E 165 (Fe 290)",
-    supporting_material: "E 165 (Fe 290)",
-    // Hardcoded defaults for undefined fields:
-    bolt_hole_type: "Standard",
-    bolt_slip_factor: "0.3",
-    bolt_tension_type: "Pre-tensioned",
-    weld_fab: "Shop Weld",
-    weld_material_grade: "410",
-    detailing_edge_type: "Rolled, machine-flame cut, sawn and planed",
-    detailing_gap: "10",
-    detailing_corr_status: "No",
-    design_method: "Limit State Design",
   },
 
   // Every form field and the core key(s) it feeds; null for a field that feeds none.
