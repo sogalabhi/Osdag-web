@@ -47,6 +47,20 @@ describe("a saved selection reopens as it was", () => {
       expect(loaded.length, "at least one selection field is saved").toBeGreaterThan(0);
     });
 
+    // A desktop file can list an option twice (its channel list repeats four designations); the whole list is still "All".
+    it(`${module.name}: the whole list with an option repeated reopens as "All"`, () => {
+      const { dictionary } = reopen(module, "all", connectivity);
+      const repeated = Object.fromEntries(
+        Object.entries(dictionary).map(([key, value]) => [key, Array.isArray(value) && value.length > 0 ? [...value, value[0]] : value]),
+      );
+      const state = fromDesignDictionary(module.config, repeated, LISTS);
+      const isList = (field) => [].concat(module.config.coreKeys[field] ?? []).some((key) => Array.isArray(dictionary[key]));
+      const loaded = fields.filter((field) => field in state.allSelected && isList(field));
+      for (const field of loaded) {
+        expect(state.allSelected[field], field).toBe(true);
+      }
+    });
+
     const customized = SENDS_WHOLE_LIST.has(module.config) ? it.skip : it;
     customized(`${module.name}: a smaller selection reopens as "Customized"`, () => {
       const { state } = reopen(module, "customized", connectivity);

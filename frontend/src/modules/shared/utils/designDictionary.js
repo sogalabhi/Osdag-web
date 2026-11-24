@@ -189,11 +189,12 @@ const buildState = (config, dock, pref, lists) => {
     selectionItems.forEach((selectionItem) => {
       const options = optionsOf(config, field, inputs, lists);
 
-      // "All" is the whole option list.
+      // "All" is the whole option list (a file may repeat an option; the list is still all of them).
       let isAll = false;
-      if (Array.isArray(options) && options.length > 0 && options.length === list.length) {
+      if (Array.isArray(options) && options.length > 0) {
         const optionSet = new Set(options.map(optionValue));
-        isAll = list.every((x) => optionSet.has(x));
+        const listSet = new Set(list);
+        isAll = optionSet.size === listSet.size && list.every((x) => optionSet.has(x));
       }
 
       allSelected[field] = isAll;
