@@ -5,7 +5,8 @@ This regenerates the merged CAD shape from `input_values` in the module adapter 
 exports the requested format (step/iges/brep/stl/ifc). IFC is produced in this view
 from the generated BREP via `cad_export.export_ifc` (IfcOpenShell mesh).
 
-The view is a DRF `APIView`, so it uses the project's default throttles and error
+The view is a DRF `APIView`: guests are limited by the `cad_export_anon` rate (10 a minute by default,
+`THROTTLE_CAD_EXPORT_ANON_RATE`), signed-in users by the default user rate, and errors use the standard
 format. Before any CAD is built the module id, the input values (the module's own
 `validate_input`, as the design endpoint does), the format and the section are checked.
 """
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 from django.http import FileResponse
 from rest_framework.permissions import AllowAny
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework.views import APIView
 
 from apps.core.module_finder import get_module_api
@@ -49,6 +51,12 @@ def _resolve_file_path(path: str, repo_root: str, backend_root: str) -> str:
     return candidate_repo
 
 
+class CadExportAnonThrottle(AnonRateThrottle):
+    """Guests: a tighter limit than the global anonymous rate, since a CAD build is expensive."""
+
+    scope = "cad_export_anon"
+
+
 class CADExport(APIView):
     """
     POST /api/design/exportCad
@@ -62,7 +70,8 @@ class CADExport(APIView):
       }
     """
 
-    permission_classes = [AllowAny]  # guests can export too; the default throttles apply
+    permission_classes = [AllowAny]  # guests can export too, at a lower rate than signed-in users
+    throttle_classes = [CadExportAnonThrottle, UserRateThrottle]
 
     def post(self, request):
         data = request.data

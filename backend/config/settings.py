@@ -284,13 +284,14 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': os.getenv('THROTTLE_ANON_RATE', '120/minute'),
         'user': os.getenv('THROTTLE_USER_RATE', '300/minute'),
+        'cad_export_anon': os.getenv('THROTTLE_CAD_EXPORT_ANON_RATE', '10/minute'),
         'sections_import': '60/hour',
         'sections_export': '120/hour',
     },
 }
 if CELERY_TASK_ALWAYS_EAGER:
     # Test runs fire many requests from one client; don't let the global throttles interfere.
-    REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'].update({'anon': '100000/minute', 'user': '100000/minute'})
+    REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'].update({'anon': '100000/minute', 'user': '100000/minute', 'cad_export_anon': '100000/minute'})
 
 
 # Internationalization
