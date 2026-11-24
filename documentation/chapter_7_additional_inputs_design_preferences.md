@@ -61,6 +61,7 @@ The Additional Inputs modal displays configuration controls divided into tabs ba
 | **Weld** | Weld fabrication choices (`Shop Weld`, `Field weld`) and weld electrode strength overrides. |
 | **Detailing** | Detailing gap spacing (mm), edge types (Sheared, Machine flame-cut), and corrosive environment status (Yes/No). |
 | **Optimization** | The simply supported and the cantilever beam show the core's five values: Semi-compact sections (`Optimum.Class`, Yes or No), Effective Area Parameter (`Effective.Area_Para`, `1.0`), Loading Condition (`Loading.Condition`, Normal or Destabilizing), Effective Length Parameter (`Length.Overwrite`, `NA`) and Bearing Length (`Bearing.Length`, `NA`), with the core's description and effective length table for the module. The design reads all five from the request. The beams' Input Dock does not repeat them, as in the desktop. The Axially Loaded Column's tab is not yet the core's. |
+| **Optimization** | The Axially Loaded Column shows the core's three values: Allowable Utilization Ratio (`Optimum.AllowUR`, `1.0`), Optimization Parameter (`Optimum.Para`, Utilization Ratio, the one option the core offers) and Effective Area Parameter (`Effective.Area_Para`, `1.0`), with the core's description. The design reads all three from the request. The column's Input Dock does not repeat them, as in the desktop. The simply supported and cantilever beams' tab is not yet the core's. |
 | **Design** | Design methodology parameters (Limit State Design vs. Working Stress Design). |
 
 ---

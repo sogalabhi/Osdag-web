@@ -51,3 +51,17 @@ export const ALLOW_CLASS_OPTIONS = ["Yes", "No"];
 
 /** Loading.Condition (KEY_DISP_LOAD_list in the core). */
 export const LOADING_CONDITION_OPTIONS = ["Normal", "Destabilizing"];
+
+/**
+ * The Optimization tab of the axially loaded column (`optimization_tab_column_design` in design_type/member.py).
+ * The three values are the core's own keys (`Optimum.AllowUR`, `Optimum.Para`, `Effective.Area_Para`); the
+ * defaults are those of the core's `get_values_for_design_pref`, which the design reads from the request.
+ */
+export const COLUMN_OPTIMIZATION_DEFAULTS = {
+  allow_ur: "1.0",
+  optimum_para: "Utilization Ratio",
+  effective_area_parameter: "1.0",
+};
+
+/** Optimum.Para: the one option the core's tab offers (the Cost option is commented out there). */
+export const OPTIMIZATION_PARA_OPTIONS = ["Utilization Ratio"];

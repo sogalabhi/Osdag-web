@@ -11,6 +11,7 @@ import AnchorBoltSectionModal from "./AnchorBoltSectionModal";
 import WeldSectionModal from "./WeldSectionModal";
 import DetailingSectionModal from "./DetailingSectionModal";
 import OptimizationSectionModal from "./OptimizationSectionModal";
+import ColumnOptimizationSectionModal from "./ColumnOptimizationSectionModal";
 import FlexureOptimizationSectionModal from "./FlexureOptimizationSectionModal";
 import DesignSectionModal from "./DesignSectionModal";
 import { Button, Modal, Spin, message } from "antd";
@@ -614,7 +615,14 @@ const DesignPrefSections = ({
               isInputLocked={isInputLocked}
             />
           )}
-          {activeTab === 12 && !FLEXURE_BEAM_MODULES.includes(module) && (
+          {activeTab === 12 && module === "Axially Loaded Column" && (
+            <ColumnOptimizationSectionModal
+              designPrefInputs={designPrefInputs}
+              setDesignPrefInputs={setDesignPrefInputs}
+              isInputLocked={isInputLocked}
+            />
+          )}
+          {activeTab === 12 && !FLEXURE_BEAM_MODULES.includes(module) && module !== "Axially Loaded Column" && (
             <OptimizationSectionModal
               module={module}
               designPrefInputs={designPrefInputs}

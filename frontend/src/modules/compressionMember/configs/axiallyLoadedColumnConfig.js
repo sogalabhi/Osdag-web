@@ -403,33 +403,6 @@ export const axiallyLoadedColumnConfig = {
         },
       ],
     },
-    {
-      title: "Optimization",
-      fields: [
-        {
-          key: "allow_ur",
-          label: "Allowable Utilization Ratio (UR)",
-          type: "number",
-          validation: "positive_number",
-        },
-        {
-          key: "effective_area_parameter",
-          label: "Effective Area Parameter",
-          type: "number",
-          validation: "positive_number",
-        },
-        {
-          key: "optimum_para",
-          label: "Optimization Parameter",
-          type: "select",
-          options: [
-            { value: "Utilization Ratio", label: "Utilization Ratio" },
-            { value: "Cost", label: "Cost" },
-          ],
-          defaultValue: "Utilization Ratio",
-        },
-      ],
-    },
   ],
 };
 
