@@ -31,7 +31,7 @@ import {
   KEY_ST_KEY_MATERIAL,
 } from "../../../constants/generated/coreKeys";
 
-import { DEFAULT_DESIGN_METHOD } from "./prefOptions";
+import { DEFAULT_DESIGN_METHOD, FLEXURE_OPTIMIZATION_DEFAULTS } from "./prefOptions";
 
 const ALL_TABS = [
   { id: 0, name: "Column Section*" },
@@ -66,6 +66,12 @@ const DEFAULT_INITIAL_PREFS = (inputs) => ({
   design_method: inputs.design_method ?? DEFAULT_DESIGN_METHOD,
   design_for: inputs.design_for ?? "Tension",
 });
+
+/** The Optimization tab values of the beams, from the form or the core's defaults. */
+const flexureOptimizationPrefs = (inputs) =>
+  Object.fromEntries(
+    Object.entries(FLEXURE_OPTIMIZATION_DEFAULTS).map(([field, fallback]) => [field, inputs[field] ?? fallback]),
+  );
 
 const DESIGN_PREF_CONFIG = {
   "Butt Joint Bolted": {
@@ -474,12 +480,14 @@ const DESIGN_PREF_CONFIG = {
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       design_method: inputs.design_method || DEFAULT_DESIGN_METHOD,
+      ...flexureOptimizationPrefs(inputs),
     }),
     getDefaultPrefs: (inputs) => ({
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       design_method: DEFAULT_DESIGN_METHOD,
+      ...FLEXURE_OPTIMIZATION_DEFAULTS,
     }),
   },
   "On Cantilever Beam Design":{
@@ -490,12 +498,14 @@ const DESIGN_PREF_CONFIG = {
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       design_method: inputs.design_method || DEFAULT_DESIGN_METHOD,
+      ...flexureOptimizationPrefs(inputs),
     }),
     getDefaultPrefs: (inputs) => ({
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       design_method: DEFAULT_DESIGN_METHOD,
+      ...FLEXURE_OPTIMIZATION_DEFAULTS,
     }),
   },
   [KEY_DISP_SEATED_ANGLE]: {
