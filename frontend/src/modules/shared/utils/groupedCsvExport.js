@@ -91,7 +91,7 @@ export function groupedInputsRows({ moduleConfig, inputs, effectiveInputs, desig
     for (const field of section?.fields || []) {
       if (typeof field?.conditionalDisplay === "function") {
         try {
-          if (!field.conditionalDisplay(extraState)) continue;
+          if (!field.conditionalDisplay(extraState, inputs)) continue;
         } catch {
           // If conditional check fails, fall back to showing the field.
         }
