@@ -29,10 +29,6 @@
         "110",
         "120"
       ],
-      "Design.Design_Method": "Limit State Design",
-      "Detailing.Corrosive_Influences": "No",
-      "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-      "Detailing.Gap": "10",
       "Load.Axial": "60",
       "Material": "E 250 (Fe 410 W)A",
       "Member.Designation": [
@@ -239,9 +235,7 @@
       "Member.Length": "1250",
       "Member.Material": "E 250 (Fe 410 W)A",
       "Member.Profile": "Back to Back Angles",
-      "Module": "Tension Member Design - Welded to End Gusset",
-      "Weld.Fab": "Shop Weld",
-      "Weld.Material_Grade_OverWrite": "410"
+      "Module": "Tension Member Design - Welded to End Gusset"
     }
   }
 }

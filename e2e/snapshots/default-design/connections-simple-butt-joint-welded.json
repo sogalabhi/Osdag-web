@@ -4,15 +4,12 @@
     "inputs": {
       "ButtJoint.CoverPlate": "Single-Cover",
       "Design.For": "Tension",
-      "Detailing.Edge_type": "Sheared or hand flame cut",
-      "Detailing.Packing_Plate": "No",
       "Load.Axial": "40",
       "Material": "E 250 (Fe 410 W)A",
       "Module": "Butt Joint Welded Connection",
       "Plate1Thickness": "8",
       "Plate2Thickness": "8",
       "PlateWidth": "200",
-      "Weld.Material_Grade_OverWrite": "290",
       "Weld.Size": [
         "4",
         "5",
@@ -20,8 +17,7 @@
         "8",
         "10",
         "12"
-      ],
-      "Weld.Type": "Shop weld"
+      ]
     }
   }
 }

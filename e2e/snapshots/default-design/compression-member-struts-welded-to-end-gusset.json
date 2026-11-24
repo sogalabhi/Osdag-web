@@ -29,7 +29,6 @@
         "110",
         "120"
       ],
-      "Design.Design_Method": "Limit State Design",
       "Effective.Area_Para": "1.0",
       "End_1": "Hinged",
       "End_2": "Hinged",
@@ -240,9 +239,7 @@
       "Member.Material": "E 250 (Fe 410 W)A",
       "Member.Profile": "Angles",
       "Module": "Struts Welded to End Gusset",
-      "Optimum.AllowUR": "1.0",
-      "Weld.Fab": "Shop Weld",
-      "Weld.Material_Grade_OverWrite": ""
+      "Optimum.AllowUR": "1.0"
     }
   }
 }

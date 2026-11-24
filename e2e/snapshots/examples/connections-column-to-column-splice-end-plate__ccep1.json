@@ -80,8 +80,6 @@
       "Member.Material": "E 250 (Fe 410 W)A",
       "Member.Supported_Section.Designation": "UC 203 x 203 x 60",
       "Module": "Column-to-Column End Plate Connection",
-      "Weld.Fab": "Shop Weld",
-      "Weld.Material_Grade_OverWrite": "410",
       "Weld.Type": "Groove Weld"
     }
   }

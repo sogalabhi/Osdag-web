@@ -2,7 +2,6 @@
   "url": "/api/modules/simple-connection/lap-joint-bolted/design/",
   "body": {
     "inputs": {
-      "Bolt.Bolt_Hole_Type": "Standard",
       "Bolt.Diameter": [
         "10",
         "12",
@@ -38,11 +37,8 @@
         "10.9",
         "12.9"
       ],
-      "Bolt.Slip_Factor": "0.3",
-      "Bolt.TensionType": "Non pre-tensioned",
       "Bolt.Type": "Bearing Bolt",
       "Design.For": "Tension",
-      "Detailing.Edge_type": "Sheared or hand flame cut",
       "Load.Axial": "60",
       "Material": "E 250 (Fe 410 W)A",
       "Module": "Lap Joint Bolted Connection",

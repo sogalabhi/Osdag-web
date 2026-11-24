@@ -2,7 +2,6 @@
   "url": "/api/modules/shear-connection/header-plate/design/",
   "body": {
     "inputs": {
-      "Bolt.Bolt_Hole_Type": "Standard",
       "Bolt.Diameter": [
         "10",
         "12",
@@ -38,8 +37,6 @@
         "10.9",
         "12.9"
       ],
-      "Bolt.Slip_Factor": "0.3",
-      "Bolt.TensionType": "Pre-tensioned",
       "Bolt.Type": "Bearing Bolt",
       "Connectivity": "Column Flange-Beam Web",
       "Connector.Material": "E 250 (Fe 410 W)A",
@@ -68,10 +65,6 @@
         "110",
         "120"
       ],
-      "Design.Design_Method": "Limit State Design",
-      "Detailing.Corrosive_Influences": "No",
-      "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-      "Detailing.Gap": "10",
       "Load.Axial": "10",
       "Load.Shear": "20",
       "Material": "E 250 (Fe 410 W)A",
@@ -79,9 +72,7 @@
       "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
       "Member.Supporting_Section.Designation": "HB 150",
       "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
-      "Module": "Header Plate Connection",
-      "Weld.Fab": "Shop Weld",
-      "Weld.Material_Grade_OverWrite": "410"
+      "Module": "Header Plate Connection"
     }
   }
 }
