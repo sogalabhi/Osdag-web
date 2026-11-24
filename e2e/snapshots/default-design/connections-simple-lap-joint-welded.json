@@ -1,0 +1,25 @@
+{
+  "url": "/api/modules/simple-connection/lap-joint-welded/design/",
+  "body": {
+    "inputs": {
+      "Design.For": "Tension",
+      "Detailing.Edge_type": "Sheared or hand flame cut",
+      "Load.Axial": "40",
+      "Material": "E 250 (Fe 410 W)A",
+      "Module": "Lap Joint Welded Connection",
+      "Plate1Thickness": "8",
+      "Plate2Thickness": "8",
+      "PlateWidth": "200",
+      "Weld.Material_Grade_OverWrite": "290",
+      "Weld.Size": [
+        "4",
+        "5",
+        "6",
+        "8",
+        "10",
+        "12"
+      ],
+      "Weld.Type": "Shop weld"
+    }
+  }
+}

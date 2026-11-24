@@ -1,0 +1,48 @@
+{
+  "url": "/api/modules/flexure-member/plate-girder/design/",
+  "body": {
+    "inputs": {
+      "Bendingmoment.shape": "Uniform Loading with pinned-pinned support",
+      "BottomFlange.Thickness": [
+        "40"
+      ],
+      "Bottomflange.Width": "350",
+      "Deflection.Max": "Span/600",
+      "Design.Design_Method": "Limit State Design",
+      "Design.Load": "Live load",
+      "Effective.Area_Para": "1.0",
+      "Flexure.Type": "Major Laterally Supported",
+      "IntermediateStiffener.Data": "No",
+      "IntermediateStiffener.Spacing": "NA",
+      "IntermediateStiffener.Thickness": "Standard",
+      "Length.Overwrite": "NA",
+      "Load.Moment": "2000",
+      "Load.Shear": "400",
+      "Loading.Condition": "Normal",
+      "LongitudnalStiffener.Data": "No",
+      "LongitudnalStiffner.Thickness": "Standard",
+      "Material": "E 250 (Fe 410 W)A",
+      "Member.Length": "20000",
+      "Member.Options": "Simple Span",
+      "Module": "PLATE GIRDER",
+      "Optimum.Class": "Plastic",
+      "S.B.Methods": "Simple Post Critical",
+      "Structure.Type": "Highway Bridge",
+      "Support.Width": "300",
+      "Supporting.Options": "Not Applicable",
+      "Symmetry": "Symmetrical",
+      "TopFlange.Thickness": [
+        "40"
+      ],
+      "Topflange.Width": "350",
+      "Torsion.restraint": "Fully Restrained",
+      "Total.Depth": "1300",
+      "Total.Design_Type": "Customized",
+      "Warping.restraint": "Both flanges fully restrained",
+      "Web.Philosophy": "Thick Web without ITS",
+      "Web.Thickness": [
+        "20"
+      ]
+    }
+  }
+}

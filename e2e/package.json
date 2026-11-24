@@ -1,0 +1,17 @@
+{
+  "name": "osdag-web-e2e",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Browser sweep for Osdag-web against an isolated stack",
+  "scripts": {
+    "e2e": "playwright test",
+    "e2e:update": "E2E_UPDATE=1 playwright test",
+    "e2e:serve": "node stack-cli.mjs serve",
+    "e2e:drop-db": "node stack-cli.mjs drop-db",
+    "e2e:smoke": "E2E_MODULES=fin_plate,bolted_to_end_gusset,base_plate,plate_girder playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0"
+  }
+}

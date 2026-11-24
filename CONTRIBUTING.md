@@ -66,6 +66,17 @@ python -m pytest --ds=config.settings
 
 Use the database settings from `.env` (or the values shown in `.github/workflows/ci.yml`). On a Linux machine without a display, prefix the pytest command with `xvfb-run`, as CI does.
 
+**Browser sweep** (Playwright, optional, not part of CI). It starts its own Django (port 8030), Postgres database (`osdag_e2e`) and Vite (port 5230), never the services you use for development, and opens every module as a guest:
+
+```bash
+cd e2e
+npm ci
+npm run e2e          # everything
+npm run e2e:smoke    # four modules plus the app specs
+```
+
+Run it after changing a module config, a key, or a shared component. Snapshots under `e2e/snapshots/` change only with `E2E_UPDATE=1`; review the diff and commit it. See `e2e/README.md` and `documentation/chapter_14_browser_sweep.md`.
+
 **Python lint** (Ruff, configured in `pyproject.toml` and scoped to `backend/`):
 
 ```bash

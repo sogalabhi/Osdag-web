@@ -124,6 +124,13 @@ Welcome to the comprehensive Osdag-Web developer documentation. This index serve
 * **13.17 Error Tracking (Sentry or GlitchTip):** Optional backend and frontend exception reporting enabled by a DSN.
 * **13.18 Troubleshooting the Production Stack:** Common failures of the monitoring stack and their fixes.
 
+### 14. [Chapter 14: Browser Sweep (`e2e/`)](./chapter_14_browser_sweep.md)
+* **14.1 The Isolated Stack:** Django on its own port with a separate Postgres database, Vite with its own cache, no Redis, and the ports it never touches.
+* **14.2 What the Specs Cover:** Every module as a guest, Additional Inputs, the `.osi` round trip, desktop design examples, the default Design request.
+* **14.3 Snapshots and Known Issues:** `E2E_UPDATE=1`, the `defaults-drift` snapshots and `known-issues.mjs`.
+* **14.4 Writing a Spec:** The fixtures, waiting on what the page does, selector hooks.
+* **14.5 Limits:** What it cannot cover and what a CI job would need.
+
 ### Appendix: [Fixed & Resolved Issues Directory](./issues.md)
 * Tracking directory containing the statuses and fixes for architectural, storage, and security issues resolved in Chapters 1 to 3.
 
