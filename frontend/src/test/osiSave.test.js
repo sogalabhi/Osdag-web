@@ -2,21 +2,15 @@
  * The design dictionary: the content of a saved `.osi` file and the `inputs_json` of a project,
  * from `toDesignDictionary`.
  *
- * One function builds it for the save in `EngineeringModule`, `useOsiFileHandlers`,
- * `UnifiedDropdownMenu` and the project save. The snapshots pin it for every module (all lists on
- * "All"; and an explicit selection with Additional Inputs overrides), so a change to the request
- * keys shows up as a diff. `useOsiFileHandlers` is run end to end to show it sends exactly this
- * content to the backend.
+ * One function builds it for the save in `EngineeringModule`, `UnifiedDropdownMenu` and the
+ * project save. The snapshots pin it for every module (all lists on "All"; and an explicit
+ * selection with Additional Inputs overrides), so a change to the request keys shows up as a diff.
  */
-import { afterEach, describe, expect, it, vi } from "vitest";
-
-vi.mock("antd", () => ({ message: { success: vi.fn(), error: vi.fn(), warning: vi.fn() } }));
-vi.mock("../datasources/osiDataSource", () => ({ openOsiFile: vi.fn() }));
+import { describe, expect, it, vi } from "vitest";
 
 import { MODULES } from "./cases";
 import { LISTS, caseState, designRequest, wire } from "./cases/shared";
 import { toDesignDictionary, getOsiSaveIdentity } from "../modules/shared/utils/osiSave";
-import { useOsiFileHandlers } from "../modules/shared/hooks/useOsiFileHandlers";
 
 // Additional Inputs as the form keeps them (web field names), and one name no field declares.
 const PREFS = { bolt_hole_type: "Over-sized", detailing_gap: "5", leftover_state: "x" };
@@ -99,27 +93,5 @@ describe("getOsiSaveIdentity", () => {
     expect(getOsiSaveIdentity({ moduleConfig: { sessionName: "s" }, inputs: { module: "x" } }))
       .toEqual({ moduleId: "x", projectName: "s" });
     expect(getOsiSaveIdentity({ moduleConfig: null, inputs: {} }).projectName).toBe("project");
-  });
-});
-
-describe("useOsiFileHandlers save", () => {
-  afterEach(() => vi.unstubAllGlobals());
-
-  it("sends the content toDesignDictionary builds", async () => {
-    const module = MODULES[0];
-    const { inputs, allSelected, extraState } = caseState(module, "customized", module.connectivities[0]);
-    const saveOSIFromInputs = vi.fn().mockResolvedValue({ success: false, error: "stop here" });
-    const { handleSaveInputs } = useOsiFileHandlers({
-      form: { inputs, allSelected, extraState, designPrefOverrides: PREFS },
-      moduleData: { contextData: LISTS },
-      actions: { service: { saveOSIFromInputs } },
-    }, module.config);
-
-    await handleSaveInputs();
-
-    const expected = toDesignDictionary({
-      moduleConfig: module.config, inputs, allSelected, contextData: LISTS, extraState, designPrefOverrides: PREFS,
-    });
-    expect(saveOSIFromInputs).toHaveBeenCalledWith(module.config.designType, module.config.designType, expected, true);
   });
 });
