@@ -39,6 +39,7 @@ from functools import lru_cache
 from typing import Any, Dict, List, Optional
 
 from osdag_core.Common import (
+    KEY_DESIGN_LOAD,
     KEY_DISP_BASE_PLATE,
     KEY_DISP_BB_EP_SPLICE,
     KEY_DISP_BCENDPLATE,
@@ -63,6 +64,10 @@ from osdag_core.Common import (
     KEY_DISP_STRUT_WELDED_END_GUSSET,
     KEY_DISP_TENSION_BOLTED,
     KEY_DISP_TENSION_WELDED,
+    KEY_MAX_DEFL,
+    KEY_MODULE,
+    KEY_PLATETHK,
+    KEY_SUPPORTING_OPTIONS,
     TYPE_COMBOBOX,
     TYPE_COMBOBOX_CUSTOMIZED,
     TYPE_MODULE,
@@ -253,3 +258,73 @@ def derive(
             design_dictionary[key] = design_dictionary[dock_key]
     design_dictionary.update(derive_computed(module_id, dock))
     return design_dictionary
+
+
+# Keys the core lists as Additional Inputs that the web form holds on its main form. The web
+# always sends them, so the fill must never treat them as preferences.
+MAIN_FORM_KEYS: Dict[str, frozenset] = {
+    KEY_DISP_PLATE_GIRDER_WELDED: frozenset({KEY_MAX_DEFL, KEY_DESIGN_LOAD, KEY_SUPPORTING_OPTIONS}),
+    # The core derives one thickness ('8'); the web dock sends the list the design picks from.
+    KEY_DISP_STRUT_WELDED_END_GUSSET: frozenset({KEY_PLATETHK}),
+}
+
+
+def pref_keys(module_id: str) -> List[str]:
+    """
+    The Additional Inputs keys of a module: the keys of its pref tabs, its computed keys and the
+    targets of its 'Input Dock' copies, without the dock keys and the keys the web holds on its
+    main form (``MAIN_FORM_KEYS``).
+    """
+    tables = _pref_tables(module_id)
+    keys = [key for _tab, _kind, tab_keys in tables["pref_tabs"] for key in tab_keys]
+    keys += tables["computed"]
+    keys += [key for targets in tables["dock_copies"].values() for key in targets]
+    excluded = set(tables["dock_keys"]) | MAIN_FORM_KEYS.get(module_id, frozenset())
+    return [key for key in _unique(keys) if key not in excluded]
+
+
+def _wire_value(value: Any) -> Any:
+    """A derived value in the shape the web sends it: numbers as text, text without padding."""
+    if isinstance(value, str):
+        return value.strip()
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return str(value)
+    return value
+
+
+def fill_prefs(module_id: str, inputs: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    The design request with every Additional Inputs key it lacks filled the way the desktop fills
+    it when the dialog was never opened (``derive`` without prefs). Keys the request carries are
+    saved choices and win; a key with ``None`` counts as missing. A module without core tables
+    (Purlin) is returned unchanged.
+    """
+    filled = dict(inputs or {})
+    if module_id not in CORE_CLASSES:
+        return filled
+    keys = pref_keys(module_id)
+    missing = [key for key in keys if filled.get(key) is None]
+    if not missing:
+        return filled
+    dock = {key: value for key, value in filled.items() if key not in keys}
+    derived = derive(module_id, dock)
+    for key in missing:
+        if derived.get(key) is not None:
+            filled[key] = _wire_value(derived[key])
+    return filled
+
+
+def fill_request_prefs(inputs: Dict[str, Any], module_id: Optional[str] = None) -> Dict[str, Any]:
+    """
+    ``fill_prefs`` for a design request (design, report, CAD export, optimisation). The module is
+    ``module_id`` when the core has tables for it, else the request's ``Module`` key.
+    """
+    if not isinstance(inputs, dict):
+        return inputs
+    if module_id not in CORE_CLASSES:
+        module_id = inputs.get(KEY_MODULE)
+    if not isinstance(module_id, str):
+        return dict(inputs)
+    return fill_prefs(module_id, inputs)

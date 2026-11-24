@@ -12,6 +12,7 @@ import time
 import uuid
 import re
 import base64
+from apps.core.design_dictionary import fill_request_prefs
 from apps.core.registry import BaseModuleRegistry
 from apps.core.utils.api_errors import error_response
 
@@ -143,7 +144,9 @@ class CreateDesignReport(APIView):
             
         if not input_values:
             return error_response('missing_field', "Missing input_values", status.HTTP_400_BAD_REQUEST)
-            
+        # The report designs with the same Additional Inputs as the design: the core's where unsaved.
+        input_values = fill_request_prefs(input_values, module_id)
+
         create_module_func = metadata_entry['adapter_func']
 
         current_directory = os.getcwd()

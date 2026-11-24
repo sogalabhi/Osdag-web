@@ -12,13 +12,19 @@ from apps.core import design_dictionary as dd
 from osdag_core import Common
 from osdag_core.Common import (
     KEY_CONNECTOR_MATERIAL,
+    KEY_DESIGN_LOAD,
     KEY_DISP_FINPLATE,
     KEY_DISP_FLEXURE,
+    KEY_DISP_PLATE_GIRDER_WELDED,
     KEY_DISP_TENSION_BOLTED,
     KEY_DP_BOLT_TYPE,
     KEY_DP_DETAILING_EDGE_TYPE,
+    KEY_DP_DETAILING_GAP,
     KEY_DP_WELD_MATERIAL_G_O,
     KEY_MATERIAL,
+    KEY_MAX_DEFL,
+    KEY_MODULE,
+    KEY_SUPPORTING_OPTIONS,
     KEY_SUPTDSEC_MATERIAL,
     KEY_SUPTNGSEC_MATERIAL,
 )
@@ -126,6 +132,49 @@ def test_derive_computed_sees_the_earlier_answers_and_leaves_the_dock_alone():
     assert dock == {KEY_MATERIAL: GRADE}
     assert set(answers) <= set(dd.pref_tables(KEY_DISP_FINPLATE)["computed"])
     assert answers[KEY_CONNECTOR_MATERIAL] == GRADE
+
+
+def test_pref_keys_leave_out_the_dock_and_the_web_main_form():
+    keys = dd.pref_keys(KEY_DISP_FINPLATE)
+    assert KEY_DP_DETAILING_EDGE_TYPE in keys and KEY_SUPTNGSEC_MATERIAL in keys
+    assert KEY_MATERIAL not in keys
+    girder = dd.pref_keys(KEY_DISP_PLATE_GIRDER_WELDED)
+    assert not {KEY_MAX_DEFL, KEY_DESIGN_LOAD, KEY_SUPPORTING_OPTIONS} & set(girder)
+
+
+def test_fill_prefs_adds_what_the_core_derives_for_missing_keys():
+    filled = dd.fill_prefs(KEY_DISP_FINPLATE, {KEY_MATERIAL: GRADE, "Bolt.Diameter": ["12"]})
+    assert filled[KEY_DP_DETAILING_EDGE_TYPE] == "Sheared or hand flame cut"
+    assert filled[KEY_DP_WELD_MATERIAL_G_O] == "410"  # fu of the dock Material, as text
+    assert filled[KEY_SUPTNGSEC_MATERIAL] == filled[KEY_CONNECTOR_MATERIAL] == GRADE
+    assert filled[KEY_DP_DETAILING_GAP] == "10"
+    assert filled["Bolt.Diameter"] == ["12"]
+
+
+def test_fill_prefs_keeps_saved_values():
+    saved = {KEY_DP_DETAILING_EDGE_TYPE: "Rolled, machine-flame cut, sawn and planed", KEY_DP_WELD_MATERIAL_G_O: "290"}
+    request = {KEY_MATERIAL: GRADE, **saved}
+    filled = dd.fill_prefs(KEY_DISP_FINPLATE, request)
+    assert {key: filled[key] for key in saved} == saved
+    assert request == {KEY_MATERIAL: GRADE, **saved}  # the request itself is not changed
+
+
+def test_fill_prefs_treats_none_as_missing():
+    filled = dd.fill_prefs(KEY_DISP_FINPLATE, {KEY_MATERIAL: GRADE, KEY_DP_BOLT_TYPE: None})
+    assert filled[KEY_DP_BOLT_TYPE] == "Pre-tensioned"
+
+
+def test_fill_prefs_leaves_purlin_and_unknown_modules_alone():
+    request = {KEY_MATERIAL: GRADE}
+    assert dd.fill_prefs(PURLIN, request) == request
+    assert dd.fill_request_prefs({KEY_MODULE: "No such module", **request}) == {KEY_MODULE: "No such module", **request}
+
+
+def test_fill_request_prefs_reads_the_module_key():
+    filled = dd.fill_request_prefs({KEY_MODULE: KEY_DISP_FINPLATE, KEY_MATERIAL: GRADE})
+    assert filled[KEY_DP_DETAILING_EDGE_TYPE] == "Sheared or hand flame cut"
+    by_argument = dd.fill_request_prefs({KEY_MATERIAL: GRADE}, KEY_DISP_FINPLATE)
+    assert by_argument == {key: value for key, value in filled.items() if key != KEY_MODULE}
 
 
 def test_generated_js_tables_are_current():
