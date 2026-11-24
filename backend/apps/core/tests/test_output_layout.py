@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pytest
 
+from apps.core.design_dictionary import fill_request_prefs
 from apps.core.main_registry import WebMainRegistry
 from apps.core.tasks import _solved_module, get_service_class, run_design_calculation_task
 from apps.core.utils.output_layout import CORE_IMAGES_DIR, build_output_layout, core_image_url
@@ -37,7 +38,8 @@ POPUP_TYPES = (TYPE_NOTE, TYPE_SECTION, TYPE_TEXTBOX, TYPE_COMBOBOX, TYPE_IMAGE)
 
 def solve(path):
     """(solved module, inputs) for a fixture, or (None, inputs) when the design did not run."""
-    inputs = json.loads(path.read_text(encoding="utf-8"))["inputs"]
+    # The design task fills the Additional Inputs the request lacks; so does this direct call.
+    inputs = fill_request_prefs(json.loads(path.read_text(encoding="utf-8"))["inputs"])
     family, _, sub = path.parent.name.partition("__")
     service = get_service_class(family.replace("_", "-"), (sub or family).replace("_", "-"))
     WebMainRegistry.start_recording()

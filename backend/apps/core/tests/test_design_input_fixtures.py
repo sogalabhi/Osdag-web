@@ -18,6 +18,7 @@ import json
 from pathlib import Path
 
 import pytest
+from apps.core.design_dictionary import fill_request_prefs
 
 BACKEND_DIR = Path(__file__).resolve().parents[3]
 MODULES_DIR = BACKEND_DIR / "apps" / "modules"
@@ -73,4 +74,5 @@ def test_adapter_accepts_fixture(path: Path):
     assert isinstance(fixture["inputs"], dict) and fixture["inputs"]
 
     adapter = importlib.import_module(adapter_import_path(path.parent.name))
-    adapter.validate_input(fixture["inputs"])  # raises on bad input
+    # The design task fills the Additional Inputs the browser did not send before it validates.
+    adapter.validate_input(fill_request_prefs(fixture["inputs"]))  # raises on bad input

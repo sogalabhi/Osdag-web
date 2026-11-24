@@ -21,6 +21,7 @@ import re
 
 import pytest
 
+from apps.core.design_dictionary import fill_request_prefs
 from apps.core.tests.test_design_input_fixtures import (
     FIXTURE_FILES,
     _load,
@@ -39,7 +40,7 @@ def _runnable():
 
 
 def _run(path) -> str:
-    inputs = copy.deepcopy(_load(path)["inputs"])
+    inputs = fill_request_prefs(copy.deepcopy(_load(path)["inputs"]))
     adapter = importlib.import_module(adapter_import_path(path.parent.name))
     try:
         result = adapter.generate_output(inputs)
