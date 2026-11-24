@@ -12,8 +12,11 @@ from pathlib import Path
 
 from apps.core import design_dictionary
 from apps.core.tasks import run_design_calculation_task
-from apps.modules.shear_connection.submodules.header_plate.adapter import HEADER_PLATE_FAILED_MESSAGE
+from apps.modules.shear_connection.submodules.header_plate.adapter import (
+    HEADER_PLATE_FAILED_MESSAGE,
+)
 from apps.modules.shear_connection.submodules.header_plate.service import EndPlateService
+
 from osdag_core.Common import KEY_DISP_HEADERPLATE, KEY_DP_DETAILING_EDGE_TYPE
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "design_inputs" / "shear_connection__header_plate"
