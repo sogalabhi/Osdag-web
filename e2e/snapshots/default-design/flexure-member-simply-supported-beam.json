@@ -2,15 +2,10 @@
   "url": "/api/modules/flexure-member/simply-supported-beam/design/",
   "body": {
     "inputs": {
-      "Bearing.Length": "NA",
-      "Design.Design_Method": "Limit State Design",
-      "Effective.Area_Para": "1.0",
       "Flexure.Support": "Simply Supported",
       "Flexure.Type": "Major Laterally Supported",
-      "Length.Overwrite": "NA",
       "Load.Moment": "100",
       "Load.Shear": "50",
-      "Loading.Condition": "Normal",
       "Material": "E 250 (Fe 410 W)A",
       "Member.Designation": [
         "JB 150",
@@ -424,7 +419,6 @@
       "Member.Material": "E 250 (Fe 410 W)A",
       "Member.Profile": "Beams and Columns",
       "Module": "Flexural Members - Simply Supported",
-      "Optimum.Class": "Yes",
       "Torsion.restraint": "Fully Restrained",
       "Warping.restraint": "Both flanges fully restrained"
     }

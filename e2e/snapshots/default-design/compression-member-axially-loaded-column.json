@@ -4,8 +4,6 @@
     "inputs": {
       "Actual.Length_yy": "3000",
       "Actual.Length_zz": "3000",
-      "Design.Design_Method": "Limit State Design",
-      "Effective.Area_Para": "1.0",
       "End_1": "Fixed",
       "End_1_Y": "Fixed",
       "End_2": "Fixed",
@@ -422,7 +420,6 @@
       ],
       "Member.Profile": "Beams and Columns",
       "Module": "Columns with known support conditions",
-      "Optimum.AllowUR": "1.0",
       "Optimum.Para": "Utilization Ratio"
     }
   }

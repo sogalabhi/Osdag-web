@@ -30,9 +30,6 @@
         "120"
       ],
       "Design.Design_Method": "Limit State Design",
-      "Detailing.Corrosive_Influences": "No",
-      "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-      "Detailing.Gap": "10",
       "Load.Axial": "800",
       "Material": "E 250 (Fe 410 W)A",
       "Member.Designation": [

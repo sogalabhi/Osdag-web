@@ -54,10 +54,6 @@
         "110",
         "120"
       ],
-      "Design.Design_Method": "Limit State Design",
-      "Detailing.Corrosive_Influences": "No",
-      "Detailing.Edge_type": "Sheared or hand flame cut",
-      "Detailing.Gap": "3",
       "Load.Axial": "10",
       "Load.Moment": "10",
       "Load.Shear": "10",
@@ -65,8 +61,6 @@
       "Member.Designation": "MB 600",
       "Member.Material": "E 165 (Fe 290)",
       "Module": "Beam-to-Beam Cover Plate Welded Connection",
-      "Weld.Fab": "Shop Weld",
-      "Weld.Material_Grade_OverWrite": "290",
       "Weld.Type": "Fillet Weld",
       "out_titles_status": [
         1,

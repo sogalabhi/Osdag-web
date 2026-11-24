@@ -2,7 +2,6 @@
   "url": "/api/modules/moment-connection/beam-beam-end-plate/design/",
   "body": {
     "inputs": {
-      "Bolt.Bolt_Hole_Type": "Standard",
       "Bolt.Diameter": [
         "10",
         "12",
@@ -38,8 +37,6 @@
         "10.9",
         "12.9"
       ],
-      "Bolt.Slip_Factor": "0.3",
-      "Bolt.TensionType": "Non pre-tensioned",
       "Bolt.Type": "Bearing Bolt",
       "Connectivity": "Coplanar Tension-Compression Flange",
       "Connectivity *": "Coplanar Tension-Compression Flange",
@@ -69,10 +66,6 @@
         "110",
         "120"
       ],
-      "Design.Design_Method": "Limit State Design",
-      "Detailing.Corrosive_Influences": "No",
-      "Detailing.Edge_type": "Sheared or hand flame cut",
-      "Detailing.Gap": "0",
       "EndPlateType": "Flushed - Reversible Moment",
       "Load.Axial": "100",
       "Load.Moment": "100",
@@ -81,8 +74,6 @@
       "Member.Supported_Section.Designation": "WPB 900 X 300 X 291.46",
       "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
       "Module": "Beam-to-Beam End Plate Connection",
-      "Weld.Fab": "Shop Weld",
-      "Weld.Material_Grade_OverWrite": "410",
       "Weld.Type": "Groove Weld"
     }
   }

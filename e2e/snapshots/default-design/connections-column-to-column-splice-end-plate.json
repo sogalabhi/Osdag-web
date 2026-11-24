@@ -2,7 +2,6 @@
   "url": "/api/modules/moment-connection/column-column-end-plate/design/",
   "body": {
     "inputs": {
-      "Bolt.Bolt_Hole_Type": "Standard",
       "Bolt.Diameter": [
         "10",
         "12",
@@ -38,8 +37,6 @@
         "10.9",
         "12.9"
       ],
-      "Bolt.Slip_Factor": "0.3",
-      "Bolt.TensionType": "Non pre-tensioned",
       "Bolt.Type": "Bearing Bolt",
       "Connectivity": "Flush End Plate",
       "Connector.Material": "E 250 (Fe 410 W)A",
@@ -68,10 +65,6 @@
         "110",
         "120"
       ],
-      "Design.Design_Method": "Limit State Design",
-      "Detailing.Corrosive_Influences": "No",
-      "Detailing.Edge_type": "Sheared or hand flame cut",
-      "Detailing.Gap": "0",
       "Load.Axial": "100",
       "Load.Moment": "100",
       "Load.Shear": "100",
@@ -80,8 +73,6 @@
       "Member.Material": "E 250 (Fe 410 W)A",
       "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
       "Module": "Column-to-Column End Plate Connection",
-      "Weld.Fab": "Shop Weld",
-      "Weld.Material_Grade_OverWrite": "410",
       "Weld.Type": "Groove Weld"
     }
   }
