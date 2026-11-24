@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from apps.core.design_dictionary import fill_request_prefs
 from apps.core.tasks import get_service_class
 from apps.core.utils.cad_helpers import SECTION_MAPPINGS
 from apps.core.utils.errors import InvalidInputTypeError
@@ -91,14 +92,14 @@ def test_hollow_section_list_has_every_shape_without_leading_spaces():
 @pytest.mark.parametrize("designation", ["CHS 355.6 x 12", " CHS 355.6 x 12"])
 def test_hollow_base_plate_reaches_core_with_the_catalog_spelling(designation):
     fixture = json.loads((FIXTURES / "base_plate" / "osi-baseplate-2.json").read_text(encoding="utf-8"))
-    module = create_from_input({**fixture["inputs"], "Member.Designation": designation})
+    module = create_from_input(fill_request_prefs({**fixture["inputs"], "Member.Designation": designation}))
     assert module.dp_column_designation == " CHS 355.6 x 12"
     assert module.column_properties is not None
 
 
 def test_hollow_base_plate_ignores_a_moment_left_in_the_form():
     fixture = json.loads((FIXTURES / "base_plate" / "osi-baseplate-2.json").read_text(encoding="utf-8"))
-    module = create_from_input({**fixture["inputs"], "Load.Moment.Major": "40", "Load.Moment.Minor": "20"})
+    module = create_from_input(fill_request_prefs({**fixture["inputs"], "Load.Moment.Major": "40", "Load.Moment.Minor": "20"}))
     assert module.load_moment_major == 0
     assert module.load_moment_minor == 0
 
