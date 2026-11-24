@@ -103,7 +103,9 @@
       "Load.Shear": "100",
       "Material": "E 250 (Fe 410 W)A",
       "Member.Supported_Section.Designation": "WPB 280 X 280 X 188.54",
+      "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
       "Member.Supporting_Section.Designation": "UC 356 x 406 x 634",
+      "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
       "Module": "Cleat Angle Connection",
       "Weld.Fab": "Shop Weld",
       "Weld.Material_Grade_OverWrite": "410"

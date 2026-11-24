@@ -5,7 +5,7 @@ import { selectedModules, slugOf } from '../lib/modules.mjs';
 import { changeDockSelect, openModule } from '../lib/app.mjs';
 import { changeOneValue, openPrefs, readAllTabs, readTab, saveAndExpectClosed, selectTab } from '../lib/prefs.mjs';
 import { dockMaterialTargets } from '../lib/prefTables.mjs';
-import { KNOWN_LOST_CHANGES, RACY_DEFAULT_KEYS } from '../lib/known-issues.mjs';
+import { KNOWN_LOST_CHANGES } from '../lib/known-issues.mjs';
 import { expectSnapshot } from '../lib/snapshots.mjs';
 
 const strip = (tabs) => tabs.map(({ name, rows }) => ({ name, rows: rows.map(({ h5Index: _h5Index, ...row }) => row) }));
@@ -59,10 +59,7 @@ for (const module of selectedModules()) {
           else if (now.value !== row.value) drift.push(`${tab.name} / ${row.label}: ${JSON.stringify(row.value)} -> ${JSON.stringify(now.value)}`);
         });
       });
-      // Where the materials of Additional Inputs are set late and not always (RACY_DEFAULT_KEYS), what
-      // the freshly opened dialog shows for them depends on that race, so their rows are left out.
-      const racy = RACY_DEFAULT_KEYS[module.id] ? /\/ (Material|Ultimate Strength|Yield Strength)/ : null;
-      expectSnapshot('defaults-drift', slugOf(module), racy ? drift.filter((line) => !racy.test(line)) : drift);
+      expectSnapshot('defaults-drift', slugOf(module), drift);
       expectClean(page);
     });
 

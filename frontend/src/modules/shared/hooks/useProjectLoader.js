@@ -3,6 +3,7 @@ import { message } from "antd";
 import { useAuth } from "../../../context/AuthContext";
 import { loadStateFromOsi } from "../utils/osiLoader";
 import { getModuleRoute } from "../../registry";
+import { formLoadAction } from "../utils/formLoadAction";
 
 export const useProjectLoader = ({
   projectIdFromUrl,
@@ -28,6 +29,8 @@ export const useProjectLoader = ({
   moduleData,
 }) => {
   const lastLoadedProjectIdRef = useRef(undefined);
+  // True while the form is still what the page started from; a page opened on a project starts empty.
+  const formHoldsDefaultsRef = useRef(!projectIdFromUrl);
   const { user, loading } = useAuth();
 
   // Snapshot whether an OSI prefill key exists at render time, before any
@@ -121,18 +124,31 @@ export const useProjectLoader = ({
 
     lastLoadedProjectIdRef.current = projectId;
 
-    if (!projectId) {
-      const hasPrefill = hadPrefillAtMountRef.current;
+    const action = formLoadAction({
+      projectId,
+      formHoldsDefaults: formHoldsDefaultsRef.current,
+      hasPrefill: hadPrefillAtMountRef.current,
+    });
 
-      if (hasPrefill) {
-        console.info('[EngineeringModule] OSI prefill detected: skipping default reset');
-        return;
-      }
-
-      console.info('[EngineeringModule] No project ID in URL: resetting form to defaults');
-      callbacksRef.current.resetFormState();
+    if (action === "keep-prefill") {
+      console.info('[EngineeringModule] OSI prefill detected: skipping default reset');
+      formHoldsDefaultsRef.current = false;
       return;
     }
+
+    if (action === "keep-defaults") {
+      console.info('[EngineeringModule] No project ID in URL: the form already holds the defaults');
+      return;
+    }
+
+    if (action === "reset-defaults") {
+      console.info('[EngineeringModule] No project ID in URL: resetting form to defaults');
+      callbacksRef.current.resetFormState();
+      formHoldsDefaultsRef.current = true;
+      return;
+    }
+
+    formHoldsDefaultsRef.current = false;
 
     if (!user) {
       console.info('[EngineeringModule] Guest mode detected with project ID: skipping project loading');
