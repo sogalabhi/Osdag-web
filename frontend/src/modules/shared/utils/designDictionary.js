@@ -135,6 +135,24 @@ const prefOverridesOf = (config, dict) => {
 };
 
 /**
+ * The options a selection field offers: "All" is all of them. Most lists are held by the module data
+ * (`INPUT_KEY_TO_LIST`); the section designation depends on the section profile of the form, so the
+ * module's field gives its own list (`getDynamicDataSource`), read with the profile just loaded.
+ */
+const optionsOf = (config, field, inputs, lists) => {
+  const listKey = INPUT_KEY_TO_LIST[field];
+  if (listKey) return lists[listKey];
+  for (const section of config.inputSections || []) {
+    const entry = (section.fields || []).find((f) => f.key === field);
+    if (typeof entry?.getDynamicDataSource === "function") return entry.getDynamicDataSource(inputs, lists);
+  }
+  return [];
+};
+
+const optionValue = (option) =>
+  String(option?.id ?? option?.Grade ?? option?.value ?? option);
+
+/**
  * Builds the form state from the values of a module's fields.
  *
  * @returns {{inputs, designPrefOverrides, allSelected, selectionStates, selectedItems, extraState}}
@@ -169,13 +187,12 @@ const buildState = (config, dock, pref, lists) => {
     inputs[field] = list;
 
     selectionItems.forEach((selectionItem) => {
-      const listKey = INPUT_KEY_TO_LIST[field];
-      const options = listKey ? lists[listKey] : [];
+      const options = optionsOf(config, field, inputs, lists);
 
       // "All" is the whole option list.
       let isAll = false;
       if (Array.isArray(options) && options.length > 0 && options.length === list.length) {
-        const optionSet = new Set(options.map((o) => String(o.id || o.Grade || o)));
+        const optionSet = new Set(options.map(optionValue));
         isAll = list.every((x) => optionSet.has(x));
       }
 

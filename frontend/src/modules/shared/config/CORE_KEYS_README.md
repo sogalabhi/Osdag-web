@@ -56,6 +56,7 @@ The check is one way: a declared key the builder never sends is allowed (prefs t
 - Declare a field only if the form has it. A spread row for a field the form lacks (`material` in a module whose dock has `connector_material`) is loaded as a stray input; give the module `material: null`.
 - `computedCoreKeys: [KEY]` on a config lists keys the builder derives from several fields (plate girder `Deflection.Max`); a file's value is never read back into them. The fields it comes from must each be saved under a key of their own (plate girder `Structure.Type`), or a reopened form cannot rebuild them.
 - `notLoadedFromDictionary: [field]` lists fields a file must not fill. No module uses it now: base plate loads its inside-flange anchor lists (`anchor_diameter_icf`, `anchor_grade_icf`) from `Anchor Bolt.ICF.*` like the outside-flange ones from `Anchor Bolt.OCF.*`.
+- A selection field is read back as "All" when the file holds the field's whole option list: its `INPUT_KEY_TO_LIST` list, or for the section designation the `getDynamicDataSource` of its input field (it depends on the section profile). A new customizable field needs one of the two, or a saved "All" reopens as "Customized" (`test/allSelectionReopen.test.js` checks every module).
 - When several keys feed one field, the more specific key wins: `Material`, then `Connector.Material`, then the rest (`keyPriority`).
 
 ## Pitfalls
