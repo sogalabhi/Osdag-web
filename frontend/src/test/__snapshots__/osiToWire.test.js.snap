@@ -710,7 +710,7 @@ exports[`a desktop .osi example sends this design request > bbep_1 (Beam-to-Beam
   "Bolt.Type": "Bearing Bolt",
   "Connectivity": "Coplanar Tension-Compression Flange",
   "Connectivity *": "Coplanar Tension-Compression Flange",
-  "Connector.Material": "E 450 (Fe 590) E",
+  "Connector.Material": "E 250 (Fe 410 W)A",
   "Connector.Plate.Thickness_List": [
     "8",
     "10",
@@ -768,7 +768,7 @@ exports[`a desktop .osi example sends this design request > bbep_2 (Beam-to-Beam
   "Bolt.Type": "Bearing Bolt",
   "Connectivity": "Coplanar Tension-Compression Flange",
   "Connectivity *": "Coplanar Tension-Compression Flange",
-  "Connector.Material": "E 450 (Fe 590) E",
+  "Connector.Material": "E 250 (Fe 410 W)A",
   "Connector.Plate.Thickness_List": [
     "8",
     "10",
@@ -2060,7 +2060,6 @@ exports[`a desktop .osi example sends this design request > ccep1 (Column-to-Col
   "Member.Designation": "UC 203 x 203 x 60",
   "Member.Material": "E 250 (Fe 410 W)A",
   "Member.Supported_Section.Designation": "UC 203 x 203 x 60",
-  "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
   "Module": "Column-to-Column End Plate Connection",
   "Weld.Fab": "Shop Weld",
   "Weld.Material_Grade_OverWrite": "410",
@@ -2110,7 +2109,7 @@ exports[`a desktop .osi example sends this design request > ccep2 (Column-to-Col
   "Bolt.TensionType": "Non pre-tensioned",
   "Bolt.Type": "Friction Grip Bolt",
   "Connectivity": "Extended Both Ways",
-  "Connector.Material": "E 300 (Fe 440)",
+  "Connector.Material": "Cus_400_500_600_1400",
   "Connector.Plate.Thickness_List": [
     "8",
     "10",
@@ -2147,7 +2146,6 @@ exports[`a desktop .osi example sends this design request > ccep2 (Column-to-Col
   "Member.Designation": "UC 356 x 368 x 177",
   "Member.Material": "E 300 (Fe 440)",
   "Member.Supported_Section.Designation": "UC 356 x 368 x 177",
-  "Member.Supported_Section.Material": "E 300 (Fe 440)",
   "Module": "Column-to-Column End Plate Connection",
   "Weld.Fab": "Shop Weld",
   "Weld.Material_Grade_OverWrite": "440",

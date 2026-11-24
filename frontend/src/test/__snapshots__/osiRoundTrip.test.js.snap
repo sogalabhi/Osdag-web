@@ -261,7 +261,6 @@ exports[`a desktop .osi example opened and saved again > bbep_1 (Beam-to-Beam En
   ],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
-    "Connector.Material": ""E 250 (Fe 410 W)A" -> "E 450 (Fe 590) E"",
   },
   "dropped": [
     "out_titles_status",
@@ -276,7 +275,6 @@ exports[`a desktop .osi example opened and saved again > bbep_2 (Beam-to-Beam En
   ],
   "changed": {
     "Bolt.TensionType": ""Pretensioned" -> "Pre-tensioned"",
-    "Connector.Material": ""E 250 (Fe 410 W)A" -> "E 450 (Fe 590) E"",
   },
   "dropped": [
     "out_titles_status",
@@ -467,7 +465,6 @@ exports[`a desktop .osi example opened and saved again > ccep1 (Column-to-Column
 {
   "added": [
     "Member.Supported_Section.Designation",
-    "Member.Supported_Section.Material",
     "Weld.Fab",
     "Weld.Material_Grade_OverWrite",
     "Weld.Type",
@@ -483,11 +480,9 @@ exports[`a desktop .osi example opened and saved again > ccep2 (Column-to-Column
 {
   "added": [
     "Member.Supported_Section.Designation",
-    "Member.Supported_Section.Material",
     "Weld.Type",
   ],
   "changed": {
-    "Connector.Material": ""Cus_400_500_600_1400" -> "E 300 (Fe 440)"",
     "Load.Axial": """ -> "0"",
   },
   "dropped": [],

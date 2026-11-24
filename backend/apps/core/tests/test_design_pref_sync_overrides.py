@@ -40,9 +40,7 @@ from osdag_core.Common import (
 
 # Material rules: modules whose old rule differs from the core's 'Input Dock' rows.
 RULE_OVERRIDES = {
-    KEY_DISP_BCENDPLATE,
-    KEY_DISP_BB_EP_SPLICE, KEY_DISP_COLUMNENDPLATE,
-    KEY_DISP_FLEXURE2, KEY_DISP_PLATE_GIRDER_WELDED, KEY_DISP_COMPRESSION_COLUMN,
+    KEY_DISP_PLATE_GIRDER_WELDED, KEY_DISP_COMPRESSION_COLUMN,
     KEY_DISP_STRUT_WELDED_END_GUSSET,
 }
 # Cover plates and the shear modules with a Connector tab: the dock Material copies to the member and
@@ -52,12 +50,24 @@ SHEAR_CORE_RULES = {KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE, KEY_DISP_CLEATANGLE
 # Tension members and the bolted strut: the dock Material copies to Member.Material (the section tab, which
 # the web form holds as supported_material) and Connector.Material.
 MEMBER_CORE_RULES = {KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_STRUT_BOLTED_END_GUSSET}
-# The simply supported beam: the dock Material copies to Member.Material, the Column Section tab
-# (supporting_material in the web form).
-BEAM_CORE_RULES = {KEY_DISP_FLEXURE}
+# The simply supported and cantilever beams: the dock Material copies to Member.Material, the Column
+# Section tab (supporting_material in the web form).
+BEAM_CORE_RULES = {KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2}
+# The end plates: the dock Material copies to the member rows the module has and to Connector.Material
+# (the Connector tab defaults to the dock Material). The beam-to-column end plate has a supporting and a
+# supported section, the beam-to-beam end plate one supported section, the column-to-column end plate one
+# member (Member.Material).
+END_PLATE_CORE_RULES = {
+    KEY_DISP_BCENDPLATE: [
+        ("Material", ["Member.Supporting_Section.Material", "Member.Supported_Section.Material", "Connector.Material"])
+    ],
+    KEY_DISP_BB_EP_SPLICE: [("Material", ["Member.Supported_Section.Material", "Connector.Material"])],
+    KEY_DISP_COLUMNENDPLATE: [("Material", ["Member.Material", "Connector.Material"])],
+}
 # The base plate: the dock Material copies to the column (Member.Material), base plate and stiffener materials.
 BASE_PLATE_CORE_RULES = {KEY_DISP_BASE_PLATE}
-CORE_RULES = COVER_PLATE_RULES | SHEAR_CORE_RULES | MEMBER_CORE_RULES | BEAM_CORE_RULES | BASE_PLATE_CORE_RULES
+CORE_RULES = (COVER_PLATE_RULES | SHEAR_CORE_RULES | MEMBER_CORE_RULES | BEAM_CORE_RULES | BASE_PLATE_CORE_RULES
+              | set(END_PLATE_CORE_RULES))
 # Modules where core and old agree on "no material sync": no copy rows.
 NO_RULES = {KEY_DISP_BUTTJOINTBOLTED, KEY_DISP_BUTTJOINTWELDED, KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED}
 
@@ -151,6 +161,37 @@ def test_a_changed_dock_material_replaces_the_beam_section_tab_material(module_i
         "refresh",
     )
     assert resolved["Member.Material"] == "E 350 (Fe 490)"
+
+
+@pytest.mark.parametrize("module_id", sorted(END_PLATE_CORE_RULES))
+def test_an_end_plate_follows_the_core_rule(module_id):
+    assert sync_merge.sync_rules(module_id) == END_PLATE_CORE_RULES[module_id]
+
+
+@pytest.mark.parametrize("module_id", sorted(END_PLATE_CORE_RULES))
+def test_a_changed_dock_material_replaces_the_end_plate_materials(module_id):
+    # Every grade the dock copies to is stale in the request; the dock Material wins on refresh. The
+    # Connector tab is one of them: it holds the dock Material until the dock changes.
+    stale = "E 250 (Fe 410 W)A"
+    targets = END_PLATE_CORE_RULES[module_id][0][1]
+    resolved, _meta, _md, _sd = sync_merge.merge_design_pref_sync(
+        module_id, {"Material": "E 350 (Fe 490)", **{key: stale for key in targets}}, "refresh",
+    )
+    for key in targets:
+        assert resolved[key] == "E 350 (Fe 490)", key
+
+
+@pytest.mark.parametrize("module_id", sorted(END_PLATE_CORE_RULES))
+def test_a_saved_connector_material_is_kept_while_the_dock_is_unchanged(module_id):
+    # Saving a Connector tab grade must not be undone by the rows that follow the dock.
+    resolved, _meta, _md, _sd = sync_merge.merge_design_pref_sync(
+        module_id,
+        {"Material": "E 250 (Fe 410 W)A", "Connector.Material": "E 350 (Fe 490)"},
+        "save",
+        design_pref_draft={"Connector.Material": "E 350 (Fe 490)"},
+    )
+    assert resolved["Connector.Material"] == "E 350 (Fe 490)"
+    assert resolved["Material"] == "E 250 (Fe 410 W)A"
 
 
 @pytest.mark.parametrize("module_id", sorted(COVER_PLATE_RULES))

@@ -2396,10 +2396,11 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "open",
@@ -2453,10 +2454,11 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "open",
@@ -2505,10 +2507,11 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "open",
@@ -2561,16 +2564,18 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
-              "Member.Supported_Section.Material"
+            "Material": [
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "refresh",
@@ -2622,16 +2627,18 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
-              "Member.Supported_Section.Material"
+            "Material": [
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "refresh",
@@ -2671,22 +2678,28 @@
       },
       "refresh_stale_prefs": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
+          "connector": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supported": [
+            "E 250 (Fe 410 W)A"
+          ],
           "supporting": []
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
-              "Member.Supported_Section.Material"
+            "Material": [
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "refresh",
@@ -2701,7 +2714,7 @@
           "Bolt.Type": "Bearing Bolt",
           "Connectivity": "Coplanar Tension-Compression Flange",
           "Connectivity *": "Coplanar Tension-Compression Flange",
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 250 (Fe 410 W)A",
           "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
@@ -2712,7 +2725,7 @@
           "Load.Shear": "100",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "WPB 900 X 300 X 291.46",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam End Plate Connection",
           "Weld.Fab": "Shop Weld",
@@ -2739,8 +2752,9 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
-              "Member.Supported_Section.Material"
+            "Material": [
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -2755,10 +2769,11 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "reset",
@@ -2810,8 +2825,9 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
-              "Member.Supported_Section.Material"
+            "Material": [
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -2826,10 +2842,11 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "reset",
@@ -2869,14 +2886,19 @@
       },
       "reset_saved_overrides": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
+          "connector": [
+            "E 250 (Fe 410 W)A"
+          ],
+          "supported": [
+            "E 250 (Fe 410 W)A"
+          ],
           "supporting": []
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
-              "Member.Supported_Section.Material"
+            "Material": [
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -2891,10 +2913,11 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "reset",
@@ -2909,7 +2932,7 @@
           "Bolt.Type": "Bearing Bolt",
           "Connectivity": "Coplanar Tension-Compression Flange",
           "Connectivity *": "Coplanar Tension-Compression Flange",
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 250 (Fe 410 W)A",
           "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
@@ -2920,11 +2943,11 @@
           "Load.Shear": "100",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "WPB 900 X 300 X 291.46",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam End Plate Connection",
           "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "0.0",
+          "Weld.Material_Grade_OverWrite": "410",
           "Weld.Type": "Groove Weld"
         },
         "section_designations": {
@@ -2949,10 +2972,11 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "save",
@@ -3006,10 +3030,11 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "save",
@@ -3062,10 +3087,11 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Beam End Plate Connection",
           "operation": "save",
@@ -3122,11 +3148,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "open",
@@ -3181,11 +3208,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "open",
@@ -3234,11 +3262,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "open",
@@ -3291,18 +3320,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "refresh",
@@ -3355,18 +3386,20 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "refresh",
@@ -3407,24 +3440,32 @@
       },
       "refresh_stale_prefs": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
-          "supporting": []
+          "connector": [
+            "E 165 (Fe 290)"
+          ],
+          "supported": [
+            "E 165 (Fe 290)"
+          ],
+          "supporting": [
+            "E 165 (Fe 290)"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "refresh",
@@ -3438,7 +3479,7 @@
           "Bolt.TensionType": "Pre-tensioned",
           "Bolt.Type": "Bearing Bolt",
           "Connectivity": "Column Flange-Beam Web",
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 165 (Fe 290)",
           "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
@@ -3449,9 +3490,9 @@
           "Load.Shear": "2",
           "Material": "E 165 (Fe 290)",
           "Member.Supported_Section.Designation": "JB 150",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "HB 150",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -3477,9 +3518,10 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -3494,11 +3536,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "reset",
@@ -3551,9 +3594,10 @@
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -3568,11 +3612,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "reset",
@@ -3613,15 +3658,22 @@
       },
       "reset_saved_overrides": {
         "material_grades": {
-          "connector": [],
-          "supported": [],
-          "supporting": []
+          "connector": [
+            "E 165 (Fe 290)"
+          ],
+          "supported": [
+            "E 165 (Fe 290)"
+          ],
+          "supporting": [
+            "E 165 (Fe 290)"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
-            "Connector.Material": [
+            "Material": [
               "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material"
+              "Member.Supported_Section.Material",
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -3636,11 +3688,12 @@
             "Design.Design_Method"
           ],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "reset",
@@ -3654,7 +3707,7 @@
           "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Type": "Bearing Bolt",
           "Connectivity": "Column Flange-Beam Web",
-          "Connector.Material": "E 450 (Fe 570) D",
+          "Connector.Material": "E 165 (Fe 290)",
           "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
           "Detailing.Corrosive_Influences": "No",
@@ -3665,12 +3718,12 @@
           "Load.Shear": "2",
           "Material": "E 165 (Fe 290)",
           "Member.Supported_Section.Designation": "JB 150",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supported_Section.Material": "E 165 (Fe 290)",
           "Member.Supporting_Section.Designation": "HB 150",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Supporting_Section.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
-          "Weld.Material_Grade_OverWrite": "0.0",
+          "Weld.Material_Grade_OverWrite": "290",
           "Weld.Type": "Groove Weld"
         },
         "section_designations": {
@@ -3695,11 +3748,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "save",
@@ -3754,11 +3808,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "save",
@@ -3811,11 +3866,12 @@
           "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
-            "Connector.Material"
+            "Material"
           ],
           "linked_pref_keys": [
             "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material"
+            "Member.Supported_Section.Material",
+            "Connector.Material"
           ],
           "module_id": "Beam-to-Column End Plate Connection",
           "operation": "save",
@@ -7081,20 +7137,14 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supporting_Section.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "open",
@@ -7121,8 +7171,6 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7147,20 +7195,14 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supporting_Section.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "open",
@@ -7185,10 +7227,8 @@
           "Load.Shear": "100",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7213,10 +7253,8 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "open",
@@ -7244,7 +7282,6 @@
           "Member.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7271,10 +7308,8 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
               "Member.Material",
-              "Connector.Material",
-              "Member.Supported_Section.Material"
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
@@ -7282,10 +7317,8 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "refresh",
@@ -7312,8 +7345,6 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7340,10 +7371,8 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
               "Member.Material",
-              "Connector.Material",
-              "Member.Supported_Section.Material"
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
@@ -7351,10 +7380,8 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "refresh",
@@ -7381,8 +7408,6 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7399,9 +7424,7 @@
           "connector": [
             "E 250 (Fe 410 W)A"
           ],
-          "supported": [
-            "E 250 (Fe 410 W)A"
-          ],
+          "supported": [],
           "supporting": [
             "E 250 (Fe 410 W)A"
           ]
@@ -7409,10 +7432,8 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
               "Member.Material",
-              "Connector.Material",
-              "Member.Supported_Section.Material"
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [],
@@ -7420,10 +7441,8 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "refresh",
@@ -7450,8 +7469,7 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7478,10 +7496,8 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
               "Member.Material",
-              "Connector.Material",
-              "Member.Supported_Section.Material"
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -7498,10 +7514,8 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "reset",
@@ -7528,8 +7542,6 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7556,10 +7568,8 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
               "Member.Material",
-              "Connector.Material",
-              "Member.Supported_Section.Material"
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -7576,10 +7586,8 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "reset",
@@ -7606,8 +7614,6 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7624,9 +7630,7 @@
           "connector": [
             "E 250 (Fe 410 W)A"
           ],
-          "supported": [
-            "E 250 (Fe 410 W)A"
-          ],
+          "supported": [],
           "supporting": [
             "E 250 (Fe 410 W)A"
           ]
@@ -7634,10 +7638,8 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
               "Member.Material",
-              "Connector.Material",
-              "Member.Supported_Section.Material"
+              "Connector.Material"
             ]
           },
           "defaulted_keys": [
@@ -7654,10 +7656,8 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "reset",
@@ -7684,8 +7684,7 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7716,10 +7715,8 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "save",
@@ -7746,7 +7743,6 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7777,10 +7773,8 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "save",
@@ -7805,10 +7799,8 @@
           "Load.Shear": "100",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -7837,10 +7829,8 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
             "Member.Material",
-            "Connector.Material",
-            "Member.Supported_Section.Material"
+            "Connector.Material"
           ],
           "module_id": "Column-to-Column End Plate Connection",
           "operation": "save",
@@ -7865,10 +7855,9 @@
           "Load.Shear": "100",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column End Plate Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410",
@@ -9337,21 +9326,13 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "open",
@@ -9361,7 +9342,6 @@
           "Bearing.Length": "NA",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
-          "Connector.Material": "E 250 (Fe 410 W)A",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -9376,8 +9356,6 @@
           "Member.Length": "5000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },
@@ -9400,21 +9378,13 @@
           ]
         },
         "metadata": {
-          "copied_from_input_dock_keys": {
-            "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
-            ]
-          },
+          "copied_from_input_dock_keys": {},
           "defaulted_keys": [],
           "linked_input_dock_keys": [
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "open",
@@ -9438,10 +9408,8 @@
             "MB 400"
           ],
           "Member.Length": "5000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },
@@ -9464,9 +9432,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "open",
@@ -9490,10 +9456,9 @@
             "MB 400"
           ],
           "Member.Length": "5000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Beams and Columns",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },
@@ -9518,9 +9483,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [],
@@ -9528,9 +9491,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "refresh",
@@ -9540,7 +9501,6 @@
           "Bearing.Length": "NA",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
-          "Connector.Material": "E 250 (Fe 410 W)A",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -9555,8 +9515,6 @@
           "Member.Length": "5000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },
@@ -9581,9 +9539,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [],
@@ -9591,9 +9547,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "refresh",
@@ -9603,7 +9557,6 @@
           "Bearing.Length": "NA",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
-          "Connector.Material": "E 350 (Fe 490)",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -9616,10 +9569,8 @@
             "MB 400"
           ],
           "Member.Length": "5000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },
@@ -9631,12 +9582,8 @@
       },
       "refresh_stale_prefs": {
         "material_grades": {
-          "connector": [
-            "E 250 (Fe 410 W)A"
-          ],
-          "supported": [
-            "E 250 (Fe 410 W)A"
-          ],
+          "connector": [],
+          "supported": [],
           "supporting": [
             "E 250 (Fe 410 W)A"
           ]
@@ -9644,9 +9591,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [],
@@ -9654,9 +9599,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "refresh",
@@ -9667,7 +9610,7 @@
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
-          "Connector.Material": "E 250 (Fe 410 W)A",
+          "Connector.Material": "E 450 (Fe 570) D",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -9682,8 +9625,7 @@
           "Member.Length": "5000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },
@@ -9708,9 +9650,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -9720,9 +9660,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "reset",
@@ -9732,7 +9670,6 @@
           "Bearing.Length": "NA",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
-          "Connector.Material": "E 250 (Fe 410 W)A",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -9747,8 +9684,6 @@
           "Member.Length": "5000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },
@@ -9773,9 +9708,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -9785,9 +9718,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "reset",
@@ -9797,7 +9728,6 @@
           "Bearing.Length": "NA",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
-          "Connector.Material": "E 350 (Fe 490)",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -9810,10 +9740,8 @@
             "MB 400"
           ],
           "Member.Length": "5000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },
@@ -9825,12 +9753,8 @@
       },
       "reset_saved_overrides": {
         "material_grades": {
-          "connector": [
-            "E 250 (Fe 410 W)A"
-          ],
-          "supported": [
-            "E 250 (Fe 410 W)A"
-          ],
+          "connector": [],
+          "supported": [],
           "supporting": [
             "E 250 (Fe 410 W)A"
           ]
@@ -9838,9 +9762,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Supporting_Section.Material",
-              "Member.Supported_Section.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -9850,9 +9772,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "reset",
@@ -9863,7 +9783,7 @@
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Cantilever.Support": "Continuous, with lateral restraint to top flange",
           "Cantilever.Top": "Free",
-          "Connector.Material": "E 250 (Fe 410 W)A",
+          "Connector.Material": "E 450 (Fe 570) D",
           "Design.Design_Method": "Limit State Design",
           "Effective.Area_Para": "1.0",
           "Flexure.Type": "Major Laterally Supported",
@@ -9878,8 +9798,7 @@
           "Member.Length": "5000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Beams and Columns",
-          "Member.Supported_Section.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 250 (Fe 410 W)A",
+          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },
@@ -9908,9 +9827,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "save",
@@ -9962,9 +9879,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "save",
@@ -9988,9 +9903,8 @@
             "MB 400"
           ],
           "Member.Length": "5000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Beams and Columns",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },
@@ -10017,9 +9931,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Supporting_Section.Material",
-            "Member.Supported_Section.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Flexural Members - Cantilever",
           "operation": "save",
@@ -10043,10 +9955,9 @@
             "MB 400"
           ],
           "Member.Length": "5000",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Beams and Columns",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Flexural Members - Cantilever",
           "Optimum.Class": "Yes"
         },

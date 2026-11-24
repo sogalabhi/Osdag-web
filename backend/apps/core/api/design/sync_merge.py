@@ -38,8 +38,6 @@ from osdag_core.Common import (
     KEY_DIA_ANCHOR_ICF,
     KEY_DIA_ANCHOR_OCF,
     KEY_DISP_BASE_PLATE,
-    KEY_DISP_BB_EP_SPLICE,
-    KEY_DISP_BCENDPLATE,
     KEY_DISP_CLEATANGLE,
     KEY_DISP_COLUMNENDPLATE,
     KEY_DISP_COMPRESSION_COLUMN,
@@ -99,6 +97,8 @@ MEMBER_MATERIAL_TAB = {
     KEY_DISP_STRUT_WELDED_END_GUSSET: "supported",
     KEY_DISP_FLEXURE: "supporting",
     KEY_DISP_BASE_PLATE: "supporting",
+    KEY_DISP_FLEXURE2: "supporting",
+    KEY_DISP_COLUMNENDPLATE: "supporting",
 }
 
 # A material grade the core can look up; used when the dock has none yet.
@@ -124,13 +124,8 @@ MATERIAL_ROLE_KEYS = {
 # test_design_pref_sync_overrides.py lists how each differs.
 _M, _R, _S, _D, _C = (KEY_MATERIAL, KEY_SEC_MATERIAL, KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL,
                       KEY_CONNECTOR_MATERIAL)
-_SHEAR_RULES = [(_C, [_S, _D])]
 _MEMBER_RULES = [(_M, [_S, _D, _C])]
 LEGACY_SYNC_RULES: Dict[str, List[Tuple[str, List[str]]]] = {
-    KEY_DISP_BCENDPLATE: _SHEAR_RULES,
-    KEY_DISP_BB_EP_SPLICE: [(_C, [_D])],
-    KEY_DISP_COLUMNENDPLATE: [(_M, [_S, _R, _C, _D])],
-    KEY_DISP_FLEXURE2: _MEMBER_RULES,
     KEY_DISP_PLATE_GIRDER_WELDED: _MEMBER_RULES,
     KEY_DISP_COMPRESSION_COLUMN: _MEMBER_RULES,
     # The core gives the welded strut no Connector.Material row, which the web form still sends.

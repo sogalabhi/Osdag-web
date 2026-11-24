@@ -214,7 +214,7 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [0, 3, 6, 10, 11, 13],
     initialTabIndex: 0,
     getInitialPrefs: (inputs) => ({
-      supported_material: inputs.member_material ?? inputs.material,
+      supporting_material: inputs.supporting_material,
       connector_material: inputs.connector_material,
       bolt_tension_type: inputs.bolt_tension_type,
       bolt_hole_type: inputs.bolt_hole_type,
@@ -250,6 +250,7 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [0, 1, 3, 6, 10, 11, 13],
     initialTabIndex: 0,
     getInitialPrefs: (inputs) => ({
+      supporting_material: inputs.supporting_material,
       supported_material: inputs.supported_material,
       connector_material: inputs.connector_material,
       bolt_tension_type: inputs.bolt_tension_type,

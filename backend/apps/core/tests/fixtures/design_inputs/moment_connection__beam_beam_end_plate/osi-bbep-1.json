@@ -40,7 +40,7 @@
       "110",
       "120"
     ],
-    "Connector.Material": "E 450 (Fe 590) E",
+    "Connector.Material": "E 250 (Fe 410 W)A",
     "Design.Design_Method": "Limit State Design",
     "Detailing.Corrosive_Influences": "No",
     "Detailing.Edge_type": "Sheared or hand flame cut",
