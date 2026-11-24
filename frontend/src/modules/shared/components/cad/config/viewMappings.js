@@ -75,24 +75,3 @@ export const createViewMapper = (moduleCadConfig = null) => {
     return false;
   };
 };
-
-/**
- * Get view options for a module
- * @param {object} moduleCadConfig - Module-specific CAD config
- * @param {object} moduleConfig - Full module config (for fallback)
- * @returns {array} Array of view option strings
- */
-export const getViewOptions = (moduleCadConfig = null, moduleConfig = null) => {
-  // Check module-specific config first
-  if (moduleCadConfig?.viewOptions) {
-    return moduleCadConfig.viewOptions;
-  }
-
-  // Fallback to moduleConfig.cadOptions
-  if (moduleConfig?.cadOptions) {
-    return moduleConfig.cadOptions;
-  }
-
-  // Default fallback
-  return ["Model", "Beam", "Connector"];
-};
