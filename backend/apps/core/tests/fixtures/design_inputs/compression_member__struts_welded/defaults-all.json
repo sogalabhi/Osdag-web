@@ -206,13 +206,11 @@
       "200 x 150 x 18"
     ],
     "Material": "E 250 (Fe 410 W)A",
-    "Member.Material": "E 250 (Fe 410 W)A",
     "Member.Length": "3000",
     "Load.Axial": "100",
     "Conn_Location": "Long Leg",
     "End_1": "Hinged",
     "End_2": "Hinged",
-    "Connector.Material": "E 250 (Fe 410 W)A",
     "Connector.Plate.Thickness_List": [
       "8",
       "10",
@@ -238,9 +236,6 @@
       "110",
       "120"
     ],
-    "Design.Design_Method": "Limit State Design",
-    "Weld.Fab": "Shop Weld",
-    "Weld.Material_Grade_OverWrite": "",
     "Optimum.AllowUR": "1.0",
     "Effective.Area_Para": "1.0"
   }

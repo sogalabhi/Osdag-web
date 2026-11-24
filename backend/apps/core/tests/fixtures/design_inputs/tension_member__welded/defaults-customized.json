@@ -2,15 +2,7 @@
   "source": "frontend-defaults:weldedToEndConfig.js",
   "notes": "Run of weldedToEndConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"plate_thickness\":[\"10\",\"12\",\"16\"],\"section_designation\":[\"50 x 50 x 6\",\"60 x 60 x 6\"]}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Connector.Material": "E 250 (Fe 410 W)A",
     "Material": "E 250 (Fe 410 W)A",
-    "Member.Material": "E 250 (Fe 410 W)A",
-    "Design.Design_Method": "Limit State Design",
-    "Detailing.Corrosive_Influences": "No",
-    "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-    "Detailing.Gap": "10",
-    "Weld.Fab": "Shop Weld",
-    "Weld.Material_Grade_OverWrite": "410",
     "Load.Axial": "60",
     "Member.Designation": [
       "20 x 20 x 3",

@@ -12,9 +12,6 @@
       "6",
       "8"
     ],
-    "Design.For": "Tension",
-    "Weld.Type": "Shop weld",
-    "Weld.Material_Grade_OverWrite": "290",
-    "Detailing.Edge_type": "Sheared or hand flame cut"
+    "Design.For": "Tension"
   }
 }
