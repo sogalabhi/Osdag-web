@@ -215,3 +215,6 @@ The visualization utilities file [cadExport.js](../frontend/src/modules/shared/u
   Downloads individual structural component meshes (e.g., Column mesh, Beam mesh, Plate mesh) stored in the browser as individual separate `.stl` files sequentially, incorporating a brief delay to avoid browser queue blockages.
 
 
+
+### 4. Stored-File Download (`POST /api/design/downloadCad/`)
+This endpoint serves a CAD file a design run already wrote to `file_storage/cad_models/`. The body carries `format` (`obj`, `brep`, `step` or `iges`), `section` and `request_id`. The request id must be a UUID (the id the backend issued for the run) and the section a plain name of letters, digits, `_` and `-` (at most 64 characters); anything else is rejected with `invalid_request_id` or `invalid_section`. The resolved file path must lie inside the storage folder, otherwise the response is `file_not_found`. The web client does not call this endpoint today; its downloads come from the browser cache or from `exportCad`.
