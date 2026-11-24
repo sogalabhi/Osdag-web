@@ -5,7 +5,6 @@ Core API package - Re-exports
 from .auth.user_view import (
     SaveInputFileView
 )
-from .auth.jwt_api import JWTHomeView
 from .auth.delete_account_api import DeleteAccountAPIView
 from .auth.export_data_api import ExportUserDataAPIView
 from .auth.my_data_api import MyDataAPIView
@@ -34,7 +33,6 @@ from .modules.modules_api import GetModules
 __all__ = [
     # Auth
     'SaveInputFileView',
-    'JWTHomeView',
     'DeleteAccountAPIView',
     'ExportUserDataAPIView',
     'MyDataAPIView',
