@@ -275,7 +275,7 @@ pip install -r requirements.txt
 
 If a package fails to build, install the [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) ("Desktop development with C++") and retry.
 
-> **PySide6 / Qt DLL conflict (important):** `requirements.txt` allows the latest pip `PySide6` (6.12), but the conda `qtbase` pulled in by VTK is 6.11. Importing it then fails with `ImportError: DLL load failed while importing QtCore: The specified procedure could not be found`, and the backend cannot start. Replace the pip build with the conda-forge one:
+> **PySide6 / Qt DLL conflict (important):** `requirements.txt` pins the pip `PySide6` to 6.12.0, but the conda `qtbase` pulled in by VTK is 6.11. Importing it then fails with `ImportError: DLL load failed while importing QtCore: The specified procedure could not be found`, and the backend cannot start. Replace the pip build with the conda-forge one:
 >
 > ```powershell
 > python -m pip uninstall -y PySide6 PySide6-Addons PySide6-Essentials shiboken6
