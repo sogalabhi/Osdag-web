@@ -106,9 +106,11 @@ def optimization_input_error(data: Any) -> Optional[str]:
         if not _bound_number(value):
             return f"{key} must be a number of zero or more."
 
+    from apps.core.design_dictionary import fill_request_prefs
     from apps.modules.flexure_member.submodules.plate_girder.adapter import validate_input
     try:
-        validate_input(data)
+        # Checked as the optimisation task runs it: with the core's Additional Inputs where unsaved.
+        validate_input(fill_request_prefs(data))
     except Exception as exc:
         return str(exc)
     return None
