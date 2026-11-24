@@ -21,20 +21,9 @@ export const openModule = async (page, module) => {
   await expect(page.getByText('Loading Module...')).toHaveCount(0);
   // The defaults of some fields (plate thicknesses, a bolt type) are filled in a moment after the
   // form is shown; Design clicked before that is refused ("Please fill in ...") or reads "Select...".
-  // In about 3 loads in 100 they are not filled at all (see README, "Known bugs"); a user reloads
-  // the page, so the helper reloads once and records it.
+  // They must all be filled soon after the load, with no reload.
   const emptyFields = async () => (await readDock(page)).filter((row) => row.label && (row.value === '' || /^Select/.test(row.value))).map((row) => row.label);
-  for (let reloads = 0; ; reloads += 1) {
-    try {
-      await expect.poll(emptyFields, { message: 'dock fields still empty', timeout: 8_000 }).toEqual([]);
-      break;
-    } catch (error) {
-      if (reloads === 3) throw error;
-      test.info().annotations.push({ type: 'defaults missing after load', description: `${(await emptyFields()).join(', ')}: page reloaded` });
-      await page.reload();
-      await expect(designButton(page)).toBeEnabled();
-    }
-  }
+  await expect.poll(emptyFields, { message: 'dock fields still empty', timeout: 8_000 }).toEqual([]);
   // The first Additional Inputs sync and the option lists settle after the form is shown.
   await page.watch.settled();
 };
