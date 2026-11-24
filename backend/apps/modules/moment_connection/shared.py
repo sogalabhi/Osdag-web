@@ -216,11 +216,8 @@ def create_cover_plate_bolted_module(module_class):
 
 def create_cover_plate_bolted_from_input(module_class, input_values):
     """Create an instance of the given cover-plate module design class from input values."""
-    try:
-        module = create_cover_plate_bolted_module(module_class)
-    except Exception as e:
-        print('e in create_module : ', e)
-        print('error in creating module')
+    # A module that cannot be created is an error of its own: let it reach the caller as it is.
+    module = create_cover_plate_bolted_module(module_class)
 
     try:
         print("INPUT SET FOR FINAL OUTPUT", input_values)

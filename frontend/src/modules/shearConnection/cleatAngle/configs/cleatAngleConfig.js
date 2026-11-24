@@ -104,12 +104,12 @@ export const cleatAngleConfig = {
     { key: "cleatSectionSelect", inputKey: "cleat_section", defaultValue: "All" },
   ],
 
-  validateInputs: (inputs, contextData = {}, selectionStates = {}, realSelectionStates = {}) => {
-    const requiredCheck = validateRequiredFields(cleatAngleConfig.inputSections, inputs, contextData, realSelectionStates);
+  validateInputs: (inputs, extraState, lists, selectionStates) => {
+    const requiredCheck = validateRequiredFields(cleatAngleConfig.inputSections, inputs, extraState, selectionStates);
     if (!requiredCheck.isValid) return requiredCheck;
 
     const allSelected = selectionStates?.cleatSectionSelect === 'All';
-    const optionsList = (contextData && contextData.angleList) || [];
+    const optionsList = lists?.angleList || [];
     const selectedList = Array.isArray(inputs.cleat_section) ? inputs.cleat_section : [];
 
     // Accept 'All' if the full options list is present and non-empty. Accept Customized if at least one chosen item.
