@@ -1,12 +1,13 @@
 import os
 import shutil
+import subprocess
 import sys
 import time
 import datetime
 import math
 from builtins import str
 from pylatex import Document, Section, Subsection
-from pylatex.utils import italic, bold
+from pylatex.utils import italic, bold, NoEscape
 #import pdflatex
 import pylatex as pyl
 from pylatex.basic import TextColor
@@ -21,6 +22,60 @@ from ..Report_functions import *
 from ..utils.common.common_calculation import *
 # from ..Common import *
 # from ..utils.common import component
+
+# Characters with a special meaning in LaTeX text, written so they print as themselves.
+_LATEX_TEXT_ESCAPES = {
+    '\\': r'\textbackslash{}',
+    '{': r'\{',
+    '}': r'\}',
+    '$': r'\$',
+    '&': r'\&',
+    '#': r'\#',
+    '%': r'\%',
+    '_': r'\_',
+    '~': r'\textasciitilde{}',
+    '^': r'\^{}',
+}
+
+# Seconds a single pdflatex run of the report may take.
+REPORT_COMPILE_TIMEOUT = 120
+
+
+def escape_latex_text(value):
+    """Return value as LaTeX source that prints it literally.
+
+    Text that can come from a user (a section designation or material grade, which
+    may name a custom section or material) goes through here before it is placed in
+    the report without pylatex's own escaping. LaTeX built by the core is passed as
+    NoEscape and returned unchanged. Other characters, including hyphens, brackets
+    and non-ASCII letters, are kept as they are.
+    """
+    if isinstance(value, NoEscape):
+        return value
+    return ''.join(_LATEX_TEXT_ESCAPES.get(c, c) for c in str(value))
+
+
+def compile_report_tex(compiler, filename, timeout=REPORT_COMPILE_TIMEOUT):
+    """Compile filename + '.tex' to a PDF beside it.
+
+    Shell escape is turned off and the run is stopped after timeout seconds. As
+    pylatex did, the auxiliary files are removed after a successful run and the
+    .tex file is kept.
+    """
+    filename = os.path.abspath(filename)
+    report_dir = os.path.dirname(filename)
+    result = subprocess.run(
+        [compiler, '-interaction=nonstopmode', '-no-shell-escape', filename + '.tex'],
+        cwd=report_dir, capture_output=True, timeout=timeout,
+    )
+    if result.returncode == 0:
+        for ext in ('aux', 'log', 'out', 'fls', 'fdb_latexmk'):
+            try:
+                os.remove(filename + '.' + ext)
+            except OSError:
+                pass
+    return result
+
 
 class CreateLatex(Document):
 
@@ -150,7 +205,7 @@ class CreateLatex(Document):
                                         MultiColumn(2, align='|c|', data=sectiondetails[a[x]]),))
                                 elif x <= 4:
                                     table.add_row(('', MultiColumn(2, align='|c|', data=NoEscape(a[x])),
-                                                MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
+                                                MultiColumn(2, align='|c|', data=NoEscape(escape_latex_text(sectiondetails[a[x]]))),))
                                 else:
                                     table.add_row(('', NoEscape(a[x]), sectiondetails[a[x]], NoEscape(a[merge_rows + x - 4]),
                                                 sectiondetails[a[merge_rows + x - 4]],))
@@ -340,7 +395,7 @@ class CreateLatex(Document):
                                                           data=StandAloneGraphic(image_options="width=5cm,height=5cm",
                                                                                  filename=Img_path)),
                                                  MultiColumn(2, align='|c|', data=NoEscape(a[x])),
-                                                 MultiColumn(2, align='|c|', data=NoEscape(sectiondetails[a[x]])),))
+                                                 MultiColumn(2, align='|c|', data=NoEscape(escape_latex_text(sectiondetails[a[x]]))),))
                                         elif x <= 4:
                                             table.add_row(('', MultiColumn(2, align='|c|', data=NoEscape(a[x])),
 
@@ -545,7 +600,9 @@ class CreateLatex(Document):
 
         try:
             latex_executable = get_latex_executable()
-            doc.generate_pdf(filename, compiler=latex_executable, clean_tex = False)
+            doc.generate_tex(filename)
+            if latex_executable:
+                compile_report_tex(latex_executable, filename)
         except Exception as e:
             pass
   
