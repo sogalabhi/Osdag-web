@@ -58,7 +58,7 @@ The Additional Inputs modal displays configuration controls divided into tabs ba
 | **Base Plate** | Specific base plate steel grades and thickness list entries. |
 | **Stiffener/Shear Key** | Weld configurations and material selections for base plate stiffener sections. |
 | **Anchor Bolt** | Visual configurations for Anchor Bolts (Outer Column Flange - OCF, Inner Column Flange - ICF) including length, galvanization, and material grade. |
-| **Weld** | Weld fabrication choices (Shop Weld, Field Weld) and weld electrode strength overrides. |
+| **Weld** | Weld fabrication choices (`Shop Weld`, `Field weld`) and weld electrode strength overrides. |
 | **Detailing** | Detailing gap spacing (mm), edge types (Sheared, Machine flame-cut), and corrosive environment status (Yes/No). |
 | **Optimization** | Optimization parameters and limits. |
 | **Design** | Design methodology parameters (Limit State Design vs. Working Stress Design). |
@@ -97,11 +97,16 @@ Osdag-Web resolves this through a bidirectional sync state machine using the [us
 4. **No-Change Optimization:** When the modal closes, the hook compares the driver material with its state prior to the modal opening. If it is unchanged, the refresh call is skipped to protect manual overrides from being clobbered.
 5. **Writethrough Rollbacks:** If the sync request fails due to network issues, the system rolls back to the `lastKnownGoodDesignPrefSnapshot` to prevent corrupted states.
 
+
+### Spellings the dropdowns offer
+
+The weld tab offers the spellings of the core, and the request sends the value the tab holds, so nothing is translated on the way: `Shop Weld` and `Field weld` for `Weld.Fab` (`KEY_DP_WELD_FAB_VALUES`; the core looks the fabrication up by exact spelling, so `Shop weld` would fail inside the design). The butt and lap joint welded modules have one weld dropdown, `Weld.Type`, with `Shop weld` and `Field weld`, as their core class lists it. The options live in [prefOptions.js](../frontend/src/modules/shared/config/prefOptions.js); `src/test/weldOptions.test.js` checks every module's options, defaults and loaded `.osi` values against them and `apps/core/tests/test_weld_values.py` checks them against the core's own weld dropdowns.
+
 ### What the design request carries
 
 The Design button sends the dock inputs with the saved Additional Inputs merged over them, so a material saved in Additional Inputs must not be read where the request expects the dock material. As in the desktop, `Material` is the dock Material, and each material of Additional Inputs goes out under its own key: `Connector.Material` from the Connector tab, and the section tabs under the section keys. In the shear connection modules (fin plate, cleat angle, header plate, seated angle) the dock field is `material`; it also sets `connector_material`, which stays the Connector tab's value until the dock changes. In the tension member and strut modules the section tab's material is `supported_material`, sent as `Member.Material`, and in the simply supported and cantilever beams and the column-to-column end plate it is `supporting_material` (the Column Section tab); until it is saved it equals the dock material. The three end plate modules send the Connector tab's `connector_material` as `Connector.Material` (the beam-to-beam and column-to-column end plates no longer send the beam or column grade for it), and the Column Section tab of the beam-to-column and column-to-column end plates shows the grade from the start.
 
-The base plate sends the Additional Inputs that were saved (the column section material as `Member.Material`, the base plate and stiffener materials, the anchor bolt, weld, detailing and design settings) under their core keys, and nothing for a pref that was never saved, so the backend adapter keeps its own default for it. A saved weld fabrication is sent as `Shop Weld` or `Field weld`, the spellings the core knows. When the dock material changes, the saved prefs that the desktop derives from it (base plate and stiffener material, weld and anchor bolt strengths, listed in `prefsFollowingMaterial` of the config) are dropped, as the desktop drops all of its prefs when a dock input changes.
+The base plate sends the Additional Inputs that were saved (the column section material as `Member.Material`, the base plate and stiffener materials, the anchor bolt, weld, detailing and design settings) under their core keys, and nothing for a pref that was never saved, so the backend adapter keeps its own default for it. A saved weld fabrication is sent as the weld tab holds it. When the dock material changes, the saved prefs that the desktop derives from it (base plate and stiffener material, weld and anchor bolt strengths, listed in `prefsFollowingMaterial` of the config) are dropped, as the desktop drops all of its prefs when a dock input changes.
 
 ---
 
