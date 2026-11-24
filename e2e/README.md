@@ -118,8 +118,6 @@ stay as they are and turns red when the behaviour changes (fixed or worse):
   `/design-preferences/defaults/` answers). It no longer blanks section details or anchor bolt
   rows, and no longer layers the form's own `getDefaultPrefs` over the core's answer. Recorded in
   `snapshots/defaults-drift/`; the lines go once the modules' `defaultInputs` hold the core's values.
-* The four cover plate modules do not keep a changed section Material after Save and reopening
-  (`KNOWN_LOST_CHANGES` in `lib/known-issues.mjs`).
 * Intermittent races in the app, seen with four browsers in parallel (they are why the sweep has
   the small allowances listed here):
   * Additional Inputs does not open on the first click, about 1 time in 100: the helper clicks again

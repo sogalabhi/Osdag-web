@@ -162,9 +162,8 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [0, 3, 6, 11, 13],
     initialTabIndex: 0,
     getInitialPrefs: (inputs) => ({
-      // The Column Section tab shows the supporting material row.
-      supporting_material: inputs.member_material ?? inputs.material,
-      supported_material: inputs.member_material ?? inputs.material,
+      // The Column Section tab is Member.Material, the column's material.
+      supporting_material: inputs.supporting_material ?? inputs.material,
       connector_material: inputs.connector_material,
       bolt_tension_type: inputs.bolt_tension_type,
       bolt_hole_type: inputs.bolt_hole_type,
@@ -180,7 +179,7 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [1, 3, 6, 11, 13],
     initialTabIndex: 1,
     getInitialPrefs: (inputs) => ({
-      supported_material: inputs.member_material ?? inputs.material,
+      supported_material: inputs.supported_material ?? inputs.material,
       connector_material: inputs.connector_material,
       bolt_tension_type: inputs.bolt_tension_type,
       bolt_hole_type: inputs.bolt_hole_type,
@@ -196,10 +195,8 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [0, 3, 10, 11, 13],
     initialTabIndex: 0,
     getInitialPrefs: (inputs) => ({
-      // This module sends Member.Material from the dock `material` (its member_material feeds nothing),
-      // so that is the member's material. The Column Section tab shows the supporting material row.
-      supporting_material: inputs.material,
-      supported_material: inputs.material,
+      // The Column Section tab is Member.Material, the column's material.
+      supporting_material: inputs.supporting_material ?? inputs.material,
       connector_material: inputs.connector_material,
       weld_fab: inputs.weld_fab ?? "Shop Weld",
       weld_material_grade: inputs.weld_material_grade || inputs.weld_material_grade_overwrite || "290",
@@ -214,7 +211,7 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [1, 3, 10, 11, 13],
     initialTabIndex: 1,
     getInitialPrefs: (inputs) => ({
-      supported_material: inputs.member_material ?? inputs.material,
+      supported_material: inputs.supported_material ?? inputs.material,
       connector_material: inputs.connector_material,
       weld_fab: inputs.weld_fab ?? "Shop Weld",
       weld_material_grade: inputs.weld_material_grade || inputs.weld_material_grade_overwrite || "290",

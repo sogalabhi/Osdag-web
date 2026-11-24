@@ -26,6 +26,7 @@ import {
 } from "../constants/generated/coreKeys";
 import { MODULES } from "./cases";
 import { caseState, designRequest } from "./cases/shared";
+import { getDesignPrefConfig } from "../modules/shared/config/designPrefModuleConfig";
 
 const moduleNamed = (name) => MODULES.find((m) => m.name === name);
 
@@ -116,6 +117,36 @@ describe("end plates: each Additional Inputs material goes under its own key", (
     expect(body["Member.Material"]).toBe(NEW);
     expect(body["Connector.Material"]).toBe(NEW);
   });
+});
+
+describe("cover plates: section tab material", () => {
+  // The Column Section tab (supporting_material) or the Beam Section tab (supported_material) is Member.Material.
+  const TAB = {
+    "column-column cover plate bolted": "supporting_material",
+    "column-column cover plate welded": "supporting_material",
+    "beam-beam cover plate bolted": "supported_material",
+    "beam-beam cover plate welded": "supported_material",
+  };
+  for (const [name, field] of Object.entries(TAB)) {
+    it(`${name}: Member.Material is the section tab, Material the dock material`, () => {
+      const body = request(name, { material: "E 250 (Fe 410 W)A" }, { [field]: "E 350 (Fe 490)" });
+      expect(body.Material).toBe("E 250 (Fe 410 W)A");
+      expect(body["Member.Material"]).toBe("E 350 (Fe 490)");
+    });
+
+    it(`${name}: Member.Material follows the dock until the section tab is saved`, () => {
+      const body = request(name, { material: "E 350 (Fe 490)", [field]: "E 350 (Fe 490)" }, {});
+      expect(body.Material).toBe("E 350 (Fe 490)");
+      expect(body["Member.Material"]).toBe("E 350 (Fe 490)");
+    });
+
+    it(`${name}: the section tab shows the grade that was saved when Additional Inputs opens again`, () => {
+      const { config } = moduleNamed(name);
+      const prefConfig = getDesignPrefConfig(config.sessionName);
+      const saved = { ...config.defaultInputs, material: "E 250 (Fe 410 W)A", [field]: "E 350 (Fe 490)" };
+      expect(prefConfig.getInitialPrefs(saved, config.sessionName)[field]).toBe("E 350 (Fe 490)");
+    });
+  }
 });
 
 describe("simply supported and cantilever beams: section tab material", () => {

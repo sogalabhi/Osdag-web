@@ -359,6 +359,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -369,8 +370,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "MB 300"
         },
         "operation": "open",
         "design_pref_draft": null
@@ -387,6 +387,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -397,8 +398,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "MB 300"
         },
         "operation": "open",
         "design_pref_draft": {
@@ -419,7 +419,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
@@ -431,8 +431,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "MB 300"
         },
         "operation": "open",
         "design_pref_draft": null
@@ -449,6 +448,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -459,8 +459,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "MB 300"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -477,6 +476,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
           "Connector.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -487,8 +487,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 350 (Fe 490)"
+          "Member.Designation": "MB 300"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -505,7 +504,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
@@ -517,8 +516,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "MB 300"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -535,6 +533,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -545,8 +544,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "MB 300"
         },
         "operation": "save",
         "design_pref_draft": null
@@ -563,6 +561,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -573,8 +572,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "MB 300"
         },
         "operation": "save",
         "design_pref_draft": {
@@ -595,7 +593,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
@@ -607,8 +605,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "MB 300"
         },
         "operation": "save",
         "design_pref_draft": {
@@ -629,6 +626,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -639,8 +637,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "MB 300"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -657,6 +654,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
           "Connector.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -667,8 +665,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 350 (Fe 490)"
+          "Member.Designation": "MB 300"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -685,7 +682,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
@@ -697,8 +694,7 @@
           "Load.Axial": "10",
           "Load.Moment": "10",
           "Load.Shear": "10",
-          "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "MB 300"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -719,6 +715,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -727,8 +724,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 165 (Fe 290)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "open",
         "design_pref_draft": null
@@ -744,6 +740,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -752,8 +749,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 165 (Fe 290)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "open",
         "design_pref_draft": {
@@ -774,7 +770,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
@@ -784,8 +780,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 165 (Fe 290)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "open",
         "design_pref_draft": null
@@ -801,6 +796,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -809,8 +805,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 165 (Fe 290)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -826,6 +821,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
           "Connector.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -834,8 +830,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 350 (Fe 490)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -852,7 +847,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
@@ -862,8 +857,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 165 (Fe 290)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -879,6 +873,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -887,8 +882,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 165 (Fe 290)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "save",
         "design_pref_draft": null
@@ -904,6 +898,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -912,8 +907,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 165 (Fe 290)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "save",
         "design_pref_draft": {
@@ -934,7 +928,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
@@ -944,8 +938,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 165 (Fe 290)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "save",
         "design_pref_draft": {
@@ -965,6 +958,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -973,8 +967,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 165 (Fe 290)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -990,6 +983,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
           "Connector.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -998,8 +992,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 350 (Fe 490)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -1016,7 +1009,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
@@ -1026,8 +1019,7 @@
           "Load.Moment": "10",
           "Load.Shear": "10",
           "Member.Designation": "MB 600",
-          "Weld.Type": "Fillet Weld",
-          "Member.Material": "E 165 (Fe 290)"
+          "Weld.Type": "Fillet Weld"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -2822,6 +2814,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -2832,8 +2825,7 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "open",
         "design_pref_draft": null
@@ -2850,6 +2842,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -2860,14 +2853,13 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "open",
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "open_saved_overrides": {
@@ -2883,7 +2875,7 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -2894,8 +2886,7 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "open",
         "design_pref_draft": null
@@ -2912,6 +2903,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -2922,8 +2914,7 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -2940,6 +2931,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
           "Connector.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -2950,8 +2942,7 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 350 (Fe 490)"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -2969,7 +2960,7 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -2980,8 +2971,7 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -2998,6 +2988,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -3008,8 +2999,7 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "save",
         "design_pref_draft": null
@@ -3026,6 +3016,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -3036,14 +3027,13 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "save",
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "save_saved_overrides_draft": {
@@ -3059,7 +3049,7 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -3070,14 +3060,13 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "save",
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "reset": {
@@ -3092,6 +3081,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -3102,8 +3092,7 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -3120,6 +3109,7 @@
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
           "Connector.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 250 (Fe 410 W)A",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -3130,8 +3120,7 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 350 (Fe 490)"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -3149,7 +3138,7 @@
           "Material": "E 250 (Fe 410 W)A",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Bolt.Diameter": [],
           "Bolt.Grade": [],
@@ -3160,8 +3149,7 @@
           "Load.Axial": "100",
           "Load.Moment": "70",
           "Load.Shear": "50",
-          "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A"
+          "Member.Designation": "UC 305 x 305 x 118"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -3181,8 +3169,8 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3206,8 +3194,8 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3222,7 +3210,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "open_saved_overrides": {
@@ -3236,10 +3224,9 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3263,8 +3250,8 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3288,8 +3275,8 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Member.Material": "E 350 (Fe 490)",
           "Connector.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3314,10 +3301,9 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3341,8 +3327,8 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3366,8 +3352,8 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3382,7 +3368,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "save_saved_overrides_draft": {
@@ -3396,10 +3382,9 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3414,7 +3399,7 @@
         "design_pref_draft": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Connector.Material": "E 350 (Fe 490)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)"
+          "Member.Material": "E 350 (Fe 490)"
         }
       },
       "reset": {
@@ -3427,8 +3412,8 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Connector.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3452,8 +3437,8 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 350 (Fe 490)",
-          "Member.Material": "E 350 (Fe 490)",
           "Connector.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 165 (Fe 290)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],
@@ -3478,10 +3463,9 @@
           "Detailing.Corrosive_Influences": "No",
           "Design.Design_Method": "Limit State Design",
           "Material": "E 165 (Fe 290)",
-          "Member.Material": "E 165 (Fe 290)",
           "Connector.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Connector.Flange_Plate.Preferences": "Outside",
           "Connector.Flange_Plate.Thickness_list": [],

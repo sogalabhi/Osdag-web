@@ -1103,8 +1103,7 @@
           "Load.Shear": "10",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Weld.Fab": "Shop Weld"
@@ -1240,7 +1239,9 @@
           "connector": [
             "E 250 (Fe 410 W)A"
           ],
-          "supported": [],
+          "supported": [
+            "E 250 (Fe 410 W)A"
+          ],
           "supporting": []
         },
         "metadata": {
@@ -1283,7 +1284,6 @@
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "MB 300",
           "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection"
         },
@@ -1438,7 +1438,9 @@
           "connector": [
             "E 250 (Fe 410 W)A"
           ],
-          "supported": [],
+          "supported": [
+            "E 250 (Fe 410 W)A"
+          ],
           "supporting": []
         },
         "metadata": {
@@ -1490,7 +1492,6 @@
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "MB 300",
           "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection",
           "Weld.Fab": "Shop Weld"
@@ -1656,8 +1657,7 @@
           "Load.Shear": "10",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "MB 300",
-          "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Beam-to-Beam Cover Plate Bolted Connection"
         },
@@ -1827,8 +1827,7 @@
           "Load.Shear": "10",
           "Material": "E 165 (Fe 290)",
           "Member.Designation": "MB 600",
-          "Member.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Weld.Fab": "Shop Weld",
@@ -1960,7 +1959,9 @@
           "connector": [
             "E 165 (Fe 290)"
           ],
-          "supported": [],
+          "supported": [
+            "E 165 (Fe 290)"
+          ],
           "supporting": []
         },
         "metadata": {
@@ -1998,7 +1999,6 @@
           "Material": "E 165 (Fe 290)",
           "Member.Designation": "MB 600",
           "Member.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Weld.Fab": "Shop Weld",
@@ -2156,7 +2156,9 @@
           "connector": [
             "E 165 (Fe 290)"
           ],
-          "supported": [],
+          "supported": [
+            "E 165 (Fe 290)"
+          ],
           "supporting": []
         },
         "metadata": {
@@ -2206,7 +2208,6 @@
           "Material": "E 165 (Fe 290)",
           "Member.Designation": "MB 600",
           "Member.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Weld.Fab": "Shop Weld",
@@ -2364,8 +2365,7 @@
           "Load.Shear": "10",
           "Material": "E 165 (Fe 290)",
           "Member.Designation": "MB 600",
-          "Member.Material": "E 165 (Fe 290)",
-          "Member.Supported_Section.Material": "E 450 (Fe 570) D",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Beam-to-Beam Cover Plate Welded Connection",
           "Weld.Fab": "Shop Weld",
@@ -5794,8 +5794,7 @@
           "Load.Shear": "50",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Weld.Fab": "Shop Weld"
         },
@@ -5847,9 +5846,8 @@
           "Load.Shear": "50",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Weld.Fab": "Shop Weld"
         },
@@ -5985,7 +5983,9 @@
             "E 250 (Fe 410 W)A"
           ],
           "supported": [],
-          "supporting": []
+          "supporting": [
+            "E 250 (Fe 410 W)A"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
@@ -6028,7 +6028,6 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Bolted Connection"
         },
         "section_designations": {
@@ -6183,7 +6182,9 @@
             "E 250 (Fe 410 W)A"
           ],
           "supported": [],
-          "supporting": []
+          "supporting": [
+            "E 250 (Fe 410 W)A"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
@@ -6235,7 +6236,6 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Bolted Connection",
           "Weld.Fab": "Shop Weld"
         },
@@ -6346,8 +6346,7 @@
           "Load.Shear": "50",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column Cover Plate Bolted Connection"
         },
         "section_designations": {
@@ -6400,9 +6399,8 @@
           "Load.Shear": "50",
           "Material": "E 250 (Fe 410 W)A",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 250 (Fe 410 W)A",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column Cover Plate Bolted Connection"
         },
         "section_designations": {
@@ -6518,8 +6516,7 @@
           "Load.Shear": "100",
           "Material": "E 165 (Fe 290)",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "290",
@@ -6571,9 +6568,8 @@
           "Load.Shear": "100",
           "Material": "E 165 (Fe 290)",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 450 (Fe 570) D",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "290",
@@ -6705,7 +6701,9 @@
             "E 165 (Fe 290)"
           ],
           "supported": [],
-          "supporting": []
+          "supporting": [
+            "E 165 (Fe 290)"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
@@ -6743,7 +6741,6 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 165 (Fe 290)",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "290",
@@ -6901,7 +6898,9 @@
             "E 165 (Fe 290)"
           ],
           "supported": [],
-          "supporting": []
+          "supporting": [
+            "E 165 (Fe 290)"
+          ]
         },
         "metadata": {
           "copied_from_input_dock_keys": {
@@ -6951,7 +6950,6 @@
           "Member.Designation": "UC 305 x 305 x 118",
           "Member.Material": "E 165 (Fe 290)",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "290",
@@ -7056,8 +7054,7 @@
           "Load.Shear": "100",
           "Material": "E 165 (Fe 290)",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 165 (Fe 290)",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
+          "Member.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "290",
@@ -7108,9 +7105,8 @@
           "Load.Shear": "100",
           "Material": "E 165 (Fe 290)",
           "Member.Designation": "UC 305 x 305 x 118",
-          "Member.Material": "E 165 (Fe 290)",
+          "Member.Material": "E 350 (Fe 490)",
           "Member.Supported_Section.Material": "E 450 (Fe 570) D",
-          "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Column-to-Column Cover Plate Welded Connection",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "290",

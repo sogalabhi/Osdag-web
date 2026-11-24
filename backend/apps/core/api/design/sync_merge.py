@@ -38,7 +38,11 @@ from osdag_core.Common import (
     KEY_DIA_ANCHOR_ICF,
     KEY_DIA_ANCHOR_OCF,
     KEY_DISP_BASE_PLATE,
+    KEY_DISP_BEAMCOVERPLATE,
+    KEY_DISP_BEAMCOVERPLATEWELD,
     KEY_DISP_CLEATANGLE,
+    KEY_DISP_COLUMNCOVERPLATE,
+    KEY_DISP_COLUMNCOVERPLATEWELD,
     KEY_DISP_COLUMNENDPLATE,
     KEY_DISP_COMPRESSION_COLUMN,
     KEY_DISP_FINPLATE,
@@ -99,6 +103,10 @@ MEMBER_MATERIAL_TAB = {
     KEY_DISP_BASE_PLATE: "supporting",
     KEY_DISP_FLEXURE2: "supporting",
     KEY_DISP_COLUMNENDPLATE: "supporting",
+    KEY_DISP_COLUMNCOVERPLATE: "supporting",
+    KEY_DISP_COLUMNCOVERPLATEWELD: "supporting",
+    KEY_DISP_BEAMCOVERPLATE: "supported",
+    KEY_DISP_BEAMCOVERPLATEWELD: "supported",
 }
 
 # A material grade the core can look up; used when the dock has none yet.
