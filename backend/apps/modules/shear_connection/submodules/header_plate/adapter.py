@@ -4,6 +4,7 @@ from apps.core.utils import (
     contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
     build_raw_output_dict
 )
+from apps.core.utils.errors import DesignFailedError
 from apps.modules.shear_connection import shared as scc
 from OCC.Core import BRepTools
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
@@ -52,6 +53,15 @@ from apps.core.web_keys import (
     WEB_ENDPLATE_SUPPORTEDSHEARYIELD,
     WEB_ENDPLATE_SUPPORTINGTENSIONYIELD,
 )
+# What the page shows when the core stops on a failed header plate design (see create_from_input).
+HEADER_PLATE_FAILED_MESSAGE = (
+    "The design failed: no end plate and weld combination is safe for these inputs. "
+    "Plate moment or shear capacity is insufficient, the required plate width is greater than the "
+    "available width, or the weld is not thick enough [Ref. Cl. 10.5.7, IS 800:2007]. "
+    "Choose a higher thickness or grade."
+)
+
+
 def get_required_keys() -> List[str]:
     return [
         KEY_DP_BOLT_HOLE_TYPE,
@@ -289,6 +299,12 @@ def create_from_input(input_values: Dict[str, Any]) -> HeaderPlateConnection:
         print(f"[EndPlateAdapter.create_from_input] set_input_values with keys={list(design_dictionary.keys())[:20]}")
         module.set_input_values(design_dictionary)
         print("[EndPlateAdapter.create_from_input] set_input_values passed")
+    except IndexError as e:
+        # Core defect: when every bolt arrangement fits but no plate or weld does, set_values_to_class
+        # reads the (empty) list of failed bolt arrangements. The design has failed; say so.
+        if getattr(module, "design_status", None) is False:
+            raise DesignFailedError(HEADER_PLATE_FAILED_MESSAGE) from e
+        raise
     except Exception as e:
         print('e in set_input_values : ' , e)
         print('error in setting the input values')
