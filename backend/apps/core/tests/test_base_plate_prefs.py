@@ -1,12 +1,14 @@
 """
-The base plate adapter takes the Additional Inputs the web saves and hands them to the core.
+The base plate adapter hands the Additional Inputs of the request to the core.
 
-A pref that is not in the request keeps the adapter's own default; one that is in the request
-reaches the core module's design preference attributes.
+A pref the user did not save is filled from the core before the design
+(``design_dictionary.fill_prefs``, as the design task does); one the user saved reaches the core
+module's design preference attributes. The adapter adds no defaults of its own.
 """
 import json
 from pathlib import Path
 
+from apps.core.design_dictionary import fill_request_prefs
 from apps.modules.base_plate import adapter
 from osdag_core.Common import (
     KEY_BASE_PLATE_MATERIAL,
@@ -35,17 +37,17 @@ def _inputs():
         return json.load(fh)["inputs"]
 
 
-def test_unsaved_prefs_keep_the_adapter_defaults():
-    module = adapter.create_from_input(_inputs())
+def test_unsaved_prefs_take_the_core_defaults():
+    module = adapter.create_from_input(fill_request_prefs(_inputs()))
     assert module.dp_column_material == "E 250 (Fe 410 W)A"
     assert module.dp_bp_material == "E 250 (Fe 410 W)A"
     assert module.dp_stif_key_material == "E 250 (Fe 410 W)A"
     assert module.dp_anchor_hole_out == "Over-sized"
-    assert module.dp_anchor_friction == 0.30
+    assert module.dp_anchor_friction == 0.3
     assert module.dp_weld_fab == "Shop Weld"
     assert module.dp_weld_fu_overwrite == 410.0
-    assert module.dp_detail_edge_type == "b - Machine flame cut"
-    assert module.dp_detail_is_corrosive == "No"
+    assert module.dp_detail_edge_type == "a - Sheared or hand flame cut"
+    assert module.dp_detail_is_corrosive == "Yes"
 
 
 def test_saved_prefs_reach_the_core_module():
@@ -63,7 +65,7 @@ def test_saved_prefs_reach_the_core_module():
         KEY_DP_DESIGN_METHOD: "Limit State Design",
         KEY_DP_DESIGN_BASE_PLATE: "Effective Area Method",
     }
-    module = adapter.create_from_input({**_inputs(), **prefs})
+    module = adapter.create_from_input(fill_request_prefs({**_inputs(), **prefs}))
     assert module.dp_column_material == "E 350 (Fe 490)"
     assert module.dp_bp_material == "E 300 (Fe 440)"
     assert module.dp_stif_key_material == "E 410 (Fe 540)"

@@ -258,25 +258,35 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
     weld_type = input_values.get(KEY_WELD_TYPE, "Fillet Weld")
     anchor_type = input_values.get(KEY_TYP_ANCHOR, "End Plate Type")
 
-    # Design preferences defaults (desktop get_values_for_design_pref / init)
-    bp_material = input_values.get(KEY_BASE_PLATE_MATERIAL, member_material)
-    st_key_material = input_values.get(KEY_ST_KEY_MATERIAL, member_material)
-    length_ocf = input_values.get(KEY_DP_ANCHOR_BOLT_LENGTH_OCF, "0")
-    length_icf = input_values.get(KEY_DP_ANCHOR_BOLT_LENGTH_ICF, "0")
-    designation_ocf = input_values.get(KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF, "")
-    designation_icf = input_values.get(KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF, "")
-    if not designation_ocf and anchor_dia_ocf:
-        designation_ocf = f"{anchor_dia_ocf[0]}X{length_ocf} IS5624 GALV"
-    if not designation_icf and anchor_dia_icf:
-        designation_icf = f"{anchor_dia_icf[0]}X{length_icf} IS5624 GALV"
-
-    weld_fu_overwrite = float(input_values.get(KEY_DP_WELD_MATERIAL_G_O, 0) or 0)
-    if weld_fu_overwrite <= 0:
-        from osdag_core.utils.common.material import Material
-        try:
-            weld_fu_overwrite = float(Material(member_material).fu)
-        except Exception:
-            weld_fu_overwrite = 410.0
+    # Additional Inputs: the request carries them, saved by the user or filled from the core
+    # (design_dictionary.fill_prefs), so the adapter adds no defaults of its own.
+    prefs = {key: input_values.get(key) for key in (
+        KEY_BASE_PLATE_MATERIAL,
+        KEY_ST_KEY_MATERIAL,
+        KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
+        KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
+        KEY_DP_ANCHOR_BOLT_TYPE_OCF,
+        KEY_DP_ANCHOR_BOLT_TYPE_ICF,
+        KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF,
+        KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF,
+        KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF,
+        KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF,
+        KEY_DP_ANCHOR_BOLT_LENGTH_OCF,
+        KEY_DP_ANCHOR_BOLT_LENGTH_ICF,
+        KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
+        KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
+        KEY_DP_ANCHOR_BOLT_FRICTION,
+        KEY_DP_WELD_FAB,
+        KEY_DP_WELD_MATERIAL_G_O,
+        KEY_DP_DETAILING_EDGE_TYPE,
+        KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
+        KEY_DP_DESIGN_METHOD,
+        KEY_DP_DESIGN_BASE_PLATE,
+    )}
+    # The core computes with these as numbers.
+    for key in (KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF, KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF, KEY_DP_WELD_MATERIAL_G_O):
+        if prefs[key] is not None:
+            prefs[key] = float(prefs[key])
 
     # Parent MomentConnection.set_input_values() -> Load() requires numeric strings; use "0" when "Disabled"
     shear_for_load = "0" if shear_major == "Disabled" else str(shear_major)
@@ -304,28 +314,8 @@ def create_from_input(input_values: Dict[str, Any]) -> BasePlateConnection:
         KEY_TYP_ANCHOR: anchor_type,
         KEY_GRD_FOOTING: str(footing_grade),
         KEY_WELD_TYPE: weld_type,
-        KEY_BASE_PLATE_MATERIAL: bp_material,
-        KEY_ST_KEY_MATERIAL: st_key_material,
-        KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF: designation_ocf or f"{anchor_dia_ocf[0] if anchor_dia_ocf else 20}X{length_ocf} IS5624 GALV",
-        KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF: designation_icf or f"{anchor_dia_icf[0] if anchor_dia_icf else 20}X{length_icf} IS5624 GALV",
-        KEY_DP_ANCHOR_BOLT_TYPE_OCF: anchor_type,
-        KEY_DP_ANCHOR_BOLT_TYPE_ICF: anchor_type,
-        KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF: input_values.get(KEY_DP_ANCHOR_BOLT_GALVANIZED_OCF, "Yes"),
-        KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF: input_values.get(KEY_DP_ANCHOR_BOLT_GALVANIZED_ICF, "Yes"),
-        KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF: input_values.get(KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF, "Over-sized"),
-        KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF: input_values.get(KEY_DP_ANCHOR_BOLT_HOLE_TYPE_ICF, "Over-sized"),
-        KEY_DP_ANCHOR_BOLT_LENGTH_OCF: str(length_ocf),
-        KEY_DP_ANCHOR_BOLT_LENGTH_ICF: str(length_icf),
-        KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF: float(input_values.get(KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF, 0) or 0),
-        KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF: float(input_values.get(KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF, 0) or 0),
-        KEY_DP_ANCHOR_BOLT_FRICTION: input_values.get(KEY_DP_ANCHOR_BOLT_FRICTION, "0.30"),
-        KEY_DP_WELD_FAB: input_values.get(KEY_DP_WELD_FAB, "Shop Weld"),
-        KEY_DP_WELD_MATERIAL_G_O: weld_fu_overwrite,
         KEY_DP_WELD_TYPE: weld_type,
-        KEY_DP_DETAILING_EDGE_TYPE: input_values.get(KEY_DP_DETAILING_EDGE_TYPE, "b - Machine flame cut"),
-        KEY_DP_DETAILING_CORROSIVE_INFLUENCES: input_values.get(KEY_DP_DETAILING_CORROSIVE_INFLUENCES, "No"),
-        KEY_DP_DESIGN_METHOD: input_values.get(KEY_DP_DESIGN_METHOD, "Limit State Design"),
-        KEY_DP_DESIGN_BASE_PLATE: input_values.get(KEY_DP_DESIGN_BASE_PLATE, "Effective Area Method"),
+        **prefs,
     }
 
     try:
