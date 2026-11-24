@@ -112,9 +112,12 @@ page) and `logs/` (Django and Vite).
 Bugs the sweep found and that are not fixed are recorded so that the run stays green while they
 stay as they are and turns red when the behaviour changes (fixed or worse):
 
-* Defaults drift: pressing Defaults on a freshly opened Additional Inputs dialog changes values in
-  many modules (Detailing edge preparation, weld strength, bolt type, anchor bolt and section
-  details blanked, ...). Recorded in `snapshots/defaults-drift/`.
+* Defaults drift: pressing Defaults on a freshly opened Additional Inputs dialog still changes a few
+  values (Detailing edge preparation, weld strength, gap, bolt type): the freshly opened dialog shows
+  the values the module config's `defaultInputs` holds, and Defaults shows the core's (what
+  `/design-preferences/defaults/` answers). It no longer blanks section details or anchor bolt
+  rows, and no longer layers the form's own `getDefaultPrefs` over the core's answer. Recorded in
+  `snapshots/defaults-drift/`; the lines go once the modules' `defaultInputs` hold the core's values.
 * The four cover plate modules do not keep a changed section Material after Save and reopening
   (`KNOWN_LOST_CHANGES` in `lib/known-issues.mjs`).
 * Intermittent races in the app, seen with four browsers in parallel (they are why the sweep has
