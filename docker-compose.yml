@@ -7,7 +7,8 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
       POSTGRES_DB: ${DATABASE_NAME:-postgres_Intg_osdag}
     ports:
-      - "${DB_HOST_PORT:-5433}:5432"
+      # Loopback only: the database is for host tools on this machine, never the network.
+      - "127.0.0.1:${DB_HOST_PORT:-5433}:5432"
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
     healthcheck:

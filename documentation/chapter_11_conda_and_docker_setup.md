@@ -100,7 +100,7 @@ graph TD
 Compose reads variables from a root `.env` file, created by copying `.env.example`. `SECRET_KEY`, `DATABASE_PASSWORD`, `INFLUXDB_TOKEN`, `INFLUXDB_ADMIN_PASSWORD` and `GRAFANA_ADMIN_PASSWORD` have no defaults and Compose refuses to start without them; see the "Create the `.env` File" step of the [Linux installation guide](general/installation_docs_linux.md) for details.
 
 ### 1. Database & Cache Services
-* **`db`**: Runs PostgreSQL 14 on container port 5432, mapping to host port 5433 to avoid conflicts. Declares the volume `postgres_data_dev` to persist transactional tables.
+* **`db`**: Runs PostgreSQL 14 on container port 5432, mapping to port 5433 (`DB_HOST_PORT`) on the host's loopback interface only (`127.0.0.1`), so the database is reachable from tools on the same machine but never from the network. Containers reach it as `db:5432` and are not affected. Declares the volume `postgres_data_dev` to persist transactional tables.
 * **`redis`**: Instantiates a Redis 7 cache server to manage Celery task queues.
 
 ### 2. Django & Celery Integration
@@ -194,7 +194,17 @@ ports:
 >
 > **Recommended Fix**: Map database ports using environment variables (e.g. `ports: - "${DB_HOST_PORT:-5433}:5432"`) to allow dynamic port allocation.
 
-**Resolution**: Resolved by modifying the `ports` attribute of the `db` service in [docker-compose.yml](../docker-compose.yml) to use environment variable interpolation with default fallback: `ports: - "${DB_HOST_PORT:-5433}:5432"`.
+**Resolution**: Resolved by modifying the `ports` attribute of the `db` service in [docker-compose.yml](../docker-compose.yml) to use environment variable interpolation with default fallback, bound to the loopback interface: `ports: - "127.0.0.1:${DB_HOST_PORT:-5433}:5432"`.
+
+### 3. Which Dev Ports Are Published, and to Whom
+| Service | Host port | Bound to | Why |
+|---|---|---|---|
+| `db` (PostgreSQL) | `DB_HOST_PORT` (5433) | `127.0.0.1` only | Never needed from another machine; password-protected but should not be exposed. |
+| `influxdb`, `grafana` | 8086, 3001 | see [Chapter 13](chapter_13_metrics_telemetry.md) | Metrics tools for the developer's own machine. |
+| `backend` (Django) | 8000 | all interfaces | The dev stack is also used for load tests and demos from other machines, and the Vite proxy and `cloudflared` tunnel reach it. |
+| `frontend` (Vite) | 5173 | all interfaces | Same reason; `cloudflared` publishes it on purpose. |
+
+The backend and the frontend stay published on all interfaces because the compose file and docs treat them as shareable (demo tunnel, load tests from another host); nothing in the documentation says they are local-only. The dev compose file is not a production deployment: on an untrusted network, bind them to `127.0.0.1` as well by editing the `ports` entries, or use a firewall. Production uses `docker-compose.prod.yml`, which publishes only the reverse proxy, on `127.0.0.1`.
 
 ---
 
