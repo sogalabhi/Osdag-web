@@ -5,6 +5,7 @@
  */
 import { triggerBrowserDownload } from "../../../datasources/sectionsDataSource";
 import { isGuestUser } from "../../../utils/auth";
+import { toDesignDictionary } from "./osiSave";
 
 function extractLogMessage(line) {
   if (line === null || line === undefined) return "";
@@ -52,16 +53,36 @@ function downloadCsvString(csvString, filename) {
 }
 
 /**
- * Build grouped inputs CSV.
+ * The value of every dock field as the design request carries it.
+ *
+ * The request is built exactly as the Design button and the `.osi` save build it (`toDesignDictionary`),
+ * so a field that holds a typed value while its "All" flag is set shows the typed value, and an "All"
+ * selection shows the list the request sends. A field is read from the first core key it declares that
+ * the request carries; a field the request does not carry keeps the form's value. The Additional Inputs
+ * overrides are merged in as they are in the request.
  */
-export function downloadGroupedInputsCsv({
-  moduleConfig,
-  inputs,
-  effectiveInputs,
-  designPrefOverrides,
-  extraState,
-  filename = "inputs.csv",
-}) {
+export function inputsAsRequested({ moduleConfig, inputs, allSelected, contextData, extraState, designPrefOverrides }) {
+  const prefs = designPrefOverrides && typeof designPrefOverrides === "object" ? designPrefOverrides : {};
+  const values = { ...inputs, ...prefs };
+  const dictionary = toDesignDictionary({
+    moduleConfig, inputs, allSelected, contextData, extraState, designPrefOverrides: prefs,
+  });
+  for (const section of moduleConfig?.inputSections || []) {
+    for (const field of section?.fields || []) {
+      const declared = field?.key ? moduleConfig?.coreKeys?.[field.key] : null;
+      if (declared == null) continue;
+      const coreKey = [].concat(declared).find((k) => dictionary[k] !== undefined && dictionary[k] !== null);
+      if (coreKey !== undefined) values[field.key] = dictionary[coreKey];
+    }
+  }
+  return values;
+}
+
+/**
+ * The rows of the grouped inputs CSV: the dock sections (label and value), then the Additional Inputs overrides.
+ * `effectiveInputs` holds the value of each field (see `inputsAsRequested`); `inputs` is the fallback.
+ */
+export function groupedInputsRows({ moduleConfig, inputs, effectiveInputs, designPrefOverrides, extraState }) {
   const rows = [];
   rows.push(["Inputs"]);
   rows.push(["Section", "Label", "Value"]);
@@ -100,7 +121,21 @@ export function downloadGroupedInputsCsv({
       rows.push([k, val]);
     }
   }
+  return rows;
+}
 
+/**
+ * Build grouped inputs CSV.
+ */
+export function downloadGroupedInputsCsv({
+  moduleConfig,
+  inputs,
+  effectiveInputs,
+  designPrefOverrides,
+  extraState,
+  filename = "inputs.csv",
+}) {
+  const rows = groupedInputsRows({ moduleConfig, inputs, effectiveInputs, designPrefOverrides, extraState });
   downloadCsvString(rowsToCsv(rows), filename);
   return { success: true };
 }

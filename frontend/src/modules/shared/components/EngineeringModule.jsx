@@ -23,8 +23,7 @@ import { useDockPanels } from "../hooks/useDockPanels";
 import { useHover } from "../hooks/useHover";
 import UnifiedDropdownMenu from "../utils/UnifiedDropdownMenu";
 import { menuItems } from "../utils/moduleUtils";
-import { downloadGroupedInputsCsv, downloadRawOutputsCsv } from "../utils/groupedCsvExport";
-import { expandAllSelectedInputs } from "../utils/osiInputSerializer";
+import { downloadGroupedInputsCsv, downloadRawOutputsCsv, inputsAsRequested } from "../utils/groupedCsvExport";
 import { toDesignDictionary, getOsiSaveIdentity } from "../utils/osiSave";
 import { loadStateFromOsi } from "../utils/osiLoader";
 import { getModuleDesignPref } from "../../registry";
@@ -819,12 +818,13 @@ export const EngineeringModule = ({
     }
     // Database menu actions (desktop-style)
     if (name === "Download Inputs CSV" || name === "Save Inputs (.csv)") {
-      const inputsExpanded = expandAllSelectedInputs(inputs, allSelected, contextData);
-      const effectiveInputs = { ...inputsExpanded, ...(designPrefOverrides || {}) };
+      const effectiveInputs = inputsAsRequested({
+        moduleConfig, inputs, allSelected, contextData, extraState, designPrefOverrides,
+      });
       const moduleId = moduleConfig?.designType || inputs?.module || moduleConfig?.cameraKey || KEY_DISP_SEATED_ANGLE;
       return downloadGroupedInputsCsv({
         moduleConfig,
-        inputs: inputsExpanded,
+        inputs,
         effectiveInputs,
         designPrefOverrides,
         extraState,

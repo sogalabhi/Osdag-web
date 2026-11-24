@@ -44,6 +44,8 @@ Module: Fin Plate Connection
 
 The export endpoint [SaveOsiFromInputs](../backend/apps/core/api/projects/osi_api.py) processes client export requests. The request carries the design dictionary and the writer (`osi_files._to_flat_yaml`) dumps it as flat YAML as it is: keys sorted, every value a string or a list of strings (a number is written as its string), lists written in full (no anchors). The only entry it touches is `Module`: it is filled from the module id when missing, and the header plate module is written under the desktop's name `End Plate Connection`. The file is readable by the desktop (`parse_osi` of the export gives the same dictionary back; `test_osi_export.py` checks it for the 66 desktop examples).
 
+The Database menu's "Download Inputs CSV" (human-readable, label and value per dock field) takes each value from the same dictionary (`inputsAsRequested` in [groupedCsvExport.js](../frontend/src/modules/shared/utils/groupedCsvExport.js) calls `toDesignDictionary`), so a field the form holds as a typed value shows that value and an "All" selection shows the list the design request sends, exactly as the `.osi` file holds them.
+
 ### Guest Users (Base64 Inline Stream)
 Since guest users have no cloud database storage permissions:
 1. The backend builds the `.osi` payload.
