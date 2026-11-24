@@ -178,11 +178,17 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
     Receives start_optimization requests, dispatches the heavy work to a Celery
     task, forwards streamed particle/heartbeat/completion updates back to the
     client, and revokes the running task on disconnect to avoid zombie tasks.
+
+    Guests may optimise. Each start is validated like a design request, a
+    connection runs one optimisation at a time (a new start replaces the running
+    one), and one client may only have a few running at once
+    (settings.PSO_MAX_RUNNING_PER_CLIENT); see plate_girder/optimization_limits.py.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.task_id = None
+        self.slot_ident = None
 
     async def connect(self):
         logger.info(f"PSO WebSocket connecting: {self.channel_name}")
@@ -192,27 +198,81 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
         logger.info(f"PSO WebSocket disconnected: {self.channel_name}, code: {close_code}")
         if self.task_id:
             logger.warning(f"Disconnect detected. Revoking task {self.task_id} to prevent zombie task")
-            try:
-                from config.celery import app
+            await self._revoke_task()
+        await self._release_slot()
 
-                def revoke_task():
-                    app.control.revoke(self.task_id, terminate=True)
+    async def _revoke_task(self):
+        task_id, self.task_id = self.task_id, None
+        try:
+            from config.celery import app
 
-                await sync_to_async(revoke_task)()
-            except Exception as e:
-                logger.error(f"Error revoking task {self.task_id}: {e}")
+            def revoke_task():
+                app.control.revoke(task_id, terminate=True)
+
+            await sync_to_async(revoke_task)()
+        except Exception as e:
+            logger.error(f"Error revoking task {task_id}: {e}")
+
+    async def _release_slot(self):
+        if self.slot_ident is None:
+            return
+        from apps.modules.flexure_member.submodules.plate_girder.optimization_limits import release_run_slot
+        ident, self.slot_ident = self.slot_ident, None
+        await sync_to_async(release_run_slot)(ident)
+
+    async def _send_error(self, message):
+        await self.send_json({'type': 'pso_error', 'data': {'message': message}})
+
+    async def receive(self, text_data=None, bytes_data=None, **kwargs):
+        from apps.modules.flexure_member.submodules.plate_girder.optimization_limits import MAX_MESSAGE_CHARS
+        if text_data is None:
+            await self._send_error('Optimisation requests must be JSON text.')
+            return
+        if len(text_data) > MAX_MESSAGE_CHARS:
+            await self._send_error('Optimisation request is too large.')
+            return
+        await super().receive(text_data=text_data, **kwargs)
 
     async def receive_json(self, content):
+        if not isinstance(content, dict):
+            await self._send_error('Optimisation request must be an object.')
+            return
         message_type = content.get('type')
 
         if message_type == 'start_optimization':
+            from apps.modules.flexure_member.submodules.plate_girder.optimization_limits import (
+                acquire_run_slot,
+                client_ident,
+                max_running_per_client,
+                optimization_input_error,
+            )
             input_data = content.get('data', {})
+            input_error = await sync_to_async(optimization_input_error)(input_data)
+            if input_error:
+                await self._send_error(input_error)
+                return
             # The client sends its Firebase ID token in the message (not the URL, which gets logged).
             user_id = await _user_id_from_token(content.get('token'))
             material_error = await _unknown_material_error(input_data, user_id)
             if material_error:
-                await self.send_json({'type': 'pso_error', 'data': {'message': material_error}})
+                await self._send_error(material_error)
                 return
+
+            if self.task_id:
+                # A new start on this connection replaces the running optimisation and keeps its slot.
+                logger.info(f"Replacing PSO task {self.task_id} with a new start")
+                await self._revoke_task()
+            if self.slot_ident is None:
+                ident = client_ident(self.scope, user_id)
+                if not await sync_to_async(acquire_run_slot)(ident):
+                    limit = max_running_per_client()
+                    await self._send_error(
+                        f'You already have {limit} optimisation{"s" if limit != 1 else ""} running. '
+                        'Wait for one to finish, or close it, and try again.'
+                    )
+                    return
+                self.slot_ident = ident
+
             from apps.modules.flexure_member.submodules.plate_girder.tasks import run_pso_optimization
             try:
                 task_result = run_pso_optimization.delay(self.channel_name, input_data, user_id=user_id)
@@ -224,6 +284,7 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
                 })
             except Exception:
                 logger.exception("Error triggering PSO task")
+                await self._release_slot()
                 await self.send_json({
                     'type': 'error',
                     'data': {'message': 'Failed to start optimization.'}
@@ -231,16 +292,29 @@ class PSOOptimizationConsumer(AsyncJsonWebsocketConsumer):
         else:
             logger.warning(f"Unknown message type: {message_type}")
 
+    def _is_current(self, event):
+        """Events carry the id of the task that sent them; drop those of a replaced run."""
+        task_id = event.get('task_id')
+        return task_id is None or task_id == self.task_id
+
     async def pso_update(self, event):
-        await self.send_json({'type': 'pso_update', 'data': event.get('data', {})})
+        if self._is_current(event):
+            await self.send_json({'type': 'pso_update', 'data': event.get('data', {})})
 
     async def pso_complete(self, event):
+        if not self._is_current(event):
+            return
         self.task_id = None
+        await self._release_slot()
         await self.send_json({'type': 'pso_complete', 'data': event.get('data', {})})
 
     async def pso_heartbeat(self, event):
-        await self.send_json({'type': 'pso_heartbeat', 'data': event.get('data', {})})
+        if self._is_current(event):
+            await self.send_json({'type': 'pso_heartbeat', 'data': event.get('data', {})})
 
     async def pso_error(self, event):
+        if not self._is_current(event):
+            return
         self.task_id = None
+        await self._release_slot()
         await self.send_json({'type': 'pso_error', 'data': event.get('data', {})})

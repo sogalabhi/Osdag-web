@@ -455,10 +455,16 @@ def test_optimization_start_failure_message_has_no_exception_text(caplog):
     consumer = consumers.PSOOptimizationConsumer()
     consumer.send_json = AsyncMock()
     consumer.channel_name = "chan"
+    consumer.scope = {"client": ("127.0.0.1", 1), "headers": []}
     task = MagicMock()
     task.delay.side_effect = RuntimeError(SECRET)
+    limits = "apps.modules.flexure_member.submodules.plate_girder.optimization_limits"
     with patch.object(consumers, "_user_id_from_token", AsyncMock(return_value=None)), \
             patch.object(consumers, "_unknown_material_error", AsyncMock(return_value=None)), \
+            patch(f"{limits}.optimization_input_error", return_value=None), \
+            patch(f"{limits}.client_ident", return_value="test-client"), \
+            patch(f"{limits}.acquire_run_slot", return_value=True), \
+            patch(f"{limits}.release_run_slot"), \
             patch("apps.modules.flexure_member.submodules.plate_girder.tasks.run_pso_optimization", task):
         asyncio.run(consumer.receive_json({"type": "start_optimization", "data": {}}))
     sent = consumer.send_json.call_args.args[0]

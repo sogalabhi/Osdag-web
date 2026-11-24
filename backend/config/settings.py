@@ -289,6 +289,10 @@ REST_FRAMEWORK = {
         'sections_export': '120/hour',
     },
 }
+# Plate girder optimisations (WebSocket) one client may have running at once: the
+# signed-in user, or the client address for guests. Each run takes a calculation worker.
+PSO_MAX_RUNNING_PER_CLIENT = int(os.getenv('PSO_MAX_RUNNING_PER_CLIENT', '3'))
+
 if CELERY_TASK_ALWAYS_EAGER:
     # Test runs fire many requests from one client; don't let the global throttles interfere.
     REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'].update({'anon': '100000/minute', 'user': '100000/minute', 'cad_export_anon': '100000/minute'})
