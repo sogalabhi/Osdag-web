@@ -7,7 +7,7 @@
     "Plate2Thickness": "12",
     "PlateWidth": "200",
     "Material": "E 250 (Fe 410 W)A",
-    "Load.Axial": "60",
+    "Load.Axial": "40",
     "Weld.Size": [
       "6",
       "8"

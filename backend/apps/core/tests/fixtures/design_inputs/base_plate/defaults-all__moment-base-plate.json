@@ -14,7 +14,7 @@
     "Load.Moment.Major": "40",
     "Load.Moment.Minor": "20",
     "Anchor Bolt.Type": "End Plate Type",
-    "Footing.Grade": "M20",
+    "Footing.Grade": "M25",
     "Weld.Type": "Fillet Weld",
     "Anchor Bolt.OCF.Diameter": [
       "M8",
