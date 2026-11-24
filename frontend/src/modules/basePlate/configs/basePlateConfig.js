@@ -43,8 +43,6 @@ import {
   KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
   KEY_DP_DETAILING_EDGE_TYPE,
   KEY_DP_DESIGN_METHOD,
-  KEY_DP_FAB_FIELD,
-  KEY_DP_FAB_SHOP,
   KEY_DP_WELD_FAB,
   KEY_DP_WELD_MATERIAL_G_O,
 } from "../../../constants/generated/coreKeys";
@@ -80,11 +78,6 @@ const savedPrefs = (inputs) => {
   for (const [requestKey, ...fields] of SAVED_PREFS) {
     const value = fields.map((field) => inputs[field]).find((v) => v !== undefined && v !== null && v !== "");
     if (value !== undefined) body[requestKey] = value;
-  }
-  // The weld tab offers "Shop weld"; the core only knows "Shop Weld" and "Field weld".
-  const fab = body[KEY_DP_WELD_FAB];
-  if (typeof fab === "string") {
-    body[KEY_DP_WELD_FAB] = /^field/i.test(fab) ? KEY_DP_FAB_FIELD : /^shop/i.test(fab) ? KEY_DP_FAB_SHOP : fab;
   }
   return body;
 };

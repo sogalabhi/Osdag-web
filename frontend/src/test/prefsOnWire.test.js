@@ -164,7 +164,7 @@ describe("base plate: saved Additional Inputs", () => {
       [KEY_DP_ANCHOR_BOLT_HOLE_TYPE_OCF]: "Standard",
       [KEY_DP_ANCHOR_BOLT_LENGTH_ICF]: "450",
       [KEY_DP_ANCHOR_BOLT_FRICTION]: "0.45",
-      weld_fab: "Field weld",
+      weld_fab: KEY_DP_FAB_FIELD,
       weld_material_grade: "490",
       detailing_edge_type: "b - Machine flame cut",
       detailing_corr_status: "No",
@@ -188,13 +188,12 @@ describe("base plate: saved Additional Inputs", () => {
   });
 
   it("takes the core-keyed copy a save writes before the field-named one", () => {
-    const body = request(name, {}, { weld_fab: "Shop weld", [KEY_DP_WELD_FAB]: "Field weld" });
+    const body = request(name, {}, { weld_fab: KEY_DP_FAB_SHOP, [KEY_DP_WELD_FAB]: KEY_DP_FAB_FIELD });
     expect(body[KEY_DP_WELD_FAB]).toBe(KEY_DP_FAB_FIELD);
   });
 
-  it("sends the weld fabrication in the spelling the core knows", () => {
-    // The weld tab offers "Shop weld"; the core only has "Shop Weld" and "Field weld".
-    expect(request(name, {}, { weld_fab: "Shop weld" })[KEY_DP_WELD_FAB]).toBe(KEY_DP_FAB_SHOP);
-    expect(request(name, {}, { weld_fab: "Field weld" })[KEY_DP_WELD_FAB]).toBe(KEY_DP_FAB_FIELD);
+  it("sends the weld fabrication as the weld tab holds it (the core's own spelling)", () => {
+    expect(request(name, {}, { weld_fab: KEY_DP_FAB_SHOP })[KEY_DP_WELD_FAB]).toBe("Shop Weld");
+    expect(request(name, {}, { weld_fab: KEY_DP_FAB_FIELD })[KEY_DP_WELD_FAB]).toBe("Field weld");
   });
 });

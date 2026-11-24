@@ -25,6 +25,7 @@ import {
   KEY_DP_DESIGN_METHOD,
   KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
   KEY_DP_DETAILING_EDGE_TYPE,
+  KEY_DP_FAB_SHOP,
   KEY_DP_WELD_FAB,
   KEY_DP_WELD_MATERIAL_G_O,
   KEY_ST_KEY_MATERIAL,
@@ -54,7 +55,7 @@ const DEFAULT_INITIAL_PREFS = (inputs) => ({
   bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
   bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
   bolt_slip_factor: inputs.bolt_slip_factor ?? "0.2",
-  weld_fab: inputs.weld_fab ?? "Shop weld",
+  weld_fab: inputs.weld_fab ?? KEY_DP_FAB_SHOP,
   weld_material_grade: inputs.weld_material_grade || "290",
   detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
   detailing_packing_plate: inputs.detailing_packing_plate ?? "Yes",
@@ -358,7 +359,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
       bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
       bolt_slip_factor: inputs.bolt_slip_factor ?? "0.2",
-      weld_fab: inputs.weld_fab ?? "Shop weld",
+      weld_fab: inputs.weld_fab ?? KEY_DP_FAB_SHOP,
       weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_gap: inputs.detailing_gap ?? "10",
@@ -373,7 +374,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_tension_type: "Pre-tensioned",
       bolt_hole_type: "Standard",
       bolt_slip_factor: "0.2",
-      weld_fab: "Shop weld",
+      weld_fab: KEY_DP_FAB_SHOP,
       weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: "Sheared or hand flame cut",
       detailing_gap: "0",
@@ -455,7 +456,7 @@ const DESIGN_PREF_CONFIG = {
     getInitialPrefs: (inputs) => ({
       supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
       connector_material: inputs.connector_material,
-      weld_fab: inputs.weld_fab ?? "Shop weld",
+      weld_fab: inputs.weld_fab ?? KEY_DP_FAB_SHOP,
       weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_gap: inputs.detailing_gap ?? "0",
@@ -534,7 +535,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
 
       // Detailing
-      weld_fab: inputs.weld_fab ?? "Shop weld",
+      weld_fab: inputs.weld_fab ?? KEY_DP_FAB_SHOP,
       weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type:
         inputs.detailing_edge_type ?? "Sheared or hand flame cut",
@@ -572,7 +573,7 @@ const DESIGN_PREF_CONFIG = {
       bolt_slip_factor: "0.3",
       bolt_tension_type: "Pre-tensioned",
 
-      weld_fab: "Shop weld",
+      weld_fab: KEY_DP_FAB_SHOP,
       weld_material_grade: inputs.weld_material_grade || "290",
       detailing_edge_type: "Sheared or hand flame cut",
       detailing_gap: "10",

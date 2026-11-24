@@ -1,5 +1,6 @@
 import { Select, Input } from "antd";
 import GenericConfigView from "./GenericConfigView";
+import { weldOptionsFor } from "../config/prefOptions";
 
 const { Option } = Select;
 
@@ -33,12 +34,11 @@ Field weld takes a material safety factor of 1.5
             setDesignPrefInputs({ ...designPrefInputs, weld_fab: value })
           }
         >
-          <Option value="Shop weld">
-            {isSimpleConnection ? "Shop weld" : "Shop Weld"}
-          </Option>
-          <Option value="Field weld">
-            {isSimpleConnection ? "Field weld" : "Field Weld"}
-          </Option>
+          {weldOptionsFor(module).map((option) => (
+            <Option key={option} value={option}>
+              {option}
+            </Option>
+          ))}
         </Select>
       </div>
       <div className="input-cont">
