@@ -48,6 +48,20 @@ describe("inputs CSV", () => {
     expect(labels.map((f) => cell(f.label))).toEqual(["20", "40", "36"]);
   });
 
+  it("lists the fields that depend on other inputs when they are shown (base plate loads of a moment base plate)", () => {
+    const module = MODULES.find((m) => m.name === "base plate");
+    const state = { ...caseState(module, "all", "Moment Base Plate"), designPrefOverrides: {} };
+    state.inputs = { ...state.inputs, connectivity: "Moment Base Plate", load_moment_major: "180", load_moment_minor: "45", load_axial_tension: "12" };
+    const rows = csvRows(module, state);
+    const cell = (label) => rows.find((r) => r[1] === label)?.[2];
+    expect(cell("Bending Moment (kNm) - Major axis (M\u2082-z)")).toBe("180");
+    expect(cell("Bending Moment (kNm) - Minor axis (My-y)")).toBe("45");
+    expect(cell("Axial Tension/Uplift (kN)")).toBe("12");
+
+    const welded = csvRows(module, { ...state, inputs: { ...state.inputs, connectivity: "Welded Column Base" } });
+    expect(welded.some((r) => String(r[1]).startsWith("Bending Moment"))).toBe(false);
+  });
+
   for (const module of MODULES) {
     for (const selection of ["all", "customized"]) {
       it(`${module.name}, ${selection}: each field the request carries shows the request's value`, () => {
@@ -61,7 +75,7 @@ describe("inputs CSV", () => {
           for (const field of section.fields || []) {
             const declared = module.config.coreKeys?.[field.key];
             if (declared == null) continue;
-            if (typeof field.conditionalDisplay === "function" && !field.conditionalDisplay(state.extraState)) continue;
+            if (typeof field.conditionalDisplay === "function" && !field.conditionalDisplay(state.extraState, state.inputs)) continue;
             const coreKey = [].concat(declared).find((k) => dictionary[k] !== undefined && dictionary[k] !== null);
             if (coreKey === undefined) continue;
             const row = rows.find((r) => r[0] === (section.title || "Section") && r[1] === (field.label || field.key));
