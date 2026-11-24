@@ -44,9 +44,6 @@ def get_required_keys() -> List[str]:
         KEY_PLATETHK,
         KEY_CONNECTOR_MATERIAL,
         KEY_DP_DESIGN_METHOD,
-        KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-        KEY_DP_DETAILING_EDGE_TYPE,
-        KEY_DP_DETAILING_GAP,
         KEY_AXIAL,
         KEY_LENGTH,
         KEY_LOCATION,
@@ -69,16 +66,17 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     if not isinstance(input_values[KEY_DP_DESIGN_METHOD], str):
         raise InvalidInputTypeError(KEY_DP_DESIGN_METHOD, "str")
 
-    # Validate Detailing.Corrosive_Influences
-    if not is_yes_or_no(input_values[KEY_DP_DETAILING_CORROSIVE_INFLUENCES]):
+    # The Detailing values are optional: the welded tension core neither derives nor reads them.
+    # A saved value is still checked.
+    if KEY_DP_DETAILING_CORROSIVE_INFLUENCES in input_values and not is_yes_or_no(input_values[KEY_DP_DETAILING_CORROSIVE_INFLUENCES]):
         raise InvalidInputTypeError(KEY_DP_DETAILING_CORROSIVE_INFLUENCES, "'Yes' or 'No'")
 
     # Validate Detailing.Edge_type
-    if not isinstance(input_values[KEY_DP_DETAILING_EDGE_TYPE], str):
+    if KEY_DP_DETAILING_EDGE_TYPE in input_values and not isinstance(input_values[KEY_DP_DETAILING_EDGE_TYPE], str):
         raise InvalidInputTypeError(KEY_DP_DETAILING_EDGE_TYPE, "str")
 
     # Validate Detailing.Gap
-    detailing_gap = input_values[KEY_DP_DETAILING_GAP]
+    detailing_gap = input_values.get(KEY_DP_DETAILING_GAP, "0")
     if (not isinstance(detailing_gap, str)
             or not int_able(detailing_gap)):
         raise InvalidInputTypeError(KEY_DP_DETAILING_GAP, "str where str can be converted to int")

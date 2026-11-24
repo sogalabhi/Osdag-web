@@ -49,7 +49,6 @@ def get_required_keys() -> List[str]:
         KEY_MATERIAL,
         KEY_SEC_MATERIAL,
         KEY_PLATETHK,
-        KEY_CONNECTOR_MATERIAL,
         KEY_DP_DESIGN_METHOD,
         KEY_AXIAL,
         KEY_LENGTH,
@@ -67,8 +66,9 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     if missing_keys is not None:
         raise MissingKeyError(missing_keys[0])
 
-    # Validate Connector.Material
-    if not isinstance(input_values[KEY_CONNECTOR_MATERIAL], str):
+    # Connector.Material is optional: the welded strut core neither derives nor reads it. A saved
+    # value is still checked.
+    if KEY_CONNECTOR_MATERIAL in input_values and not isinstance(input_values[KEY_CONNECTOR_MATERIAL], str):
         raise InvalidInputTypeError(KEY_CONNECTOR_MATERIAL, "str")
 
     # Validate Design.Design_Method

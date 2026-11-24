@@ -72,8 +72,6 @@ def get_required_keys_seated_angle() -> List[str]:
         KEY_SUPTNGSEC,
         KEY_SUPTNGSEC_MATERIAL,
         KEY_MODULE,
-        KEY_DP_WELD_FAB,
-        KEY_DP_WELD_MATERIAL_G_O,
         KEY_ANGLE_LIST,
         KEY_TOPANGLE
     ]
@@ -214,11 +212,13 @@ def validate_input(input_values: Dict[str,Any])-> None:
 
     # Validate Weld.Fab
     # Check if Weld.Fab is a string.
-    if not isinstance(input_values[KEY_DP_WELD_FAB], str):
+    # Weld.Fab and Weld.Material_Grade_OverWrite are optional: the core neither derives nor reads
+    # them for this module. A saved value is still checked.
+    if KEY_DP_WELD_FAB in input_values and not isinstance(input_values[KEY_DP_WELD_FAB], str):
         raise InvalidInputTypeError(KEY_DP_WELD_FAB, "str")  # If not, raise error.
 
     # Validate Weld.Material_Grade_OverWrite
-    weld_materialgradeoverwrite = input_values[KEY_DP_WELD_MATERIAL_G_O]
+    weld_materialgradeoverwrite = input_values.get(KEY_DP_WELD_MATERIAL_G_O, "0")
     if (not isinstance(weld_materialgradeoverwrite, str)  # Check if Weld.Material_Grade_OverwWite is a string.
             or not int_able(weld_materialgradeoverwrite)):  # Check if Weld.Material_Grade_OverWrite can be converted to int.
         # If any of these conditions fail, raise error.
