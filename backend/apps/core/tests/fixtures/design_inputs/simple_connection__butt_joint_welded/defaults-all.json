@@ -8,7 +8,7 @@
     "PlateWidth": "200",
     "Material": "E 250 (Fe 410 W)A",
     "ButtJoint.CoverPlate": "Single-Cover",
-    "Load.Axial": "60",
+    "Load.Axial": "40",
     "Weld.Size": [
       "4",
       "5",

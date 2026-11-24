@@ -61,6 +61,26 @@
       "9.8",
       "10.9",
       "12.9"
-    ]
+    ],
+    "Member.Material": "E 250 (Fe 410 W)A",
+    "Base_Plate.Material": "E 250 (Fe 410 W)A",
+    "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
+    "DesignPreferences.Anchor_Bolt.OCF.Designation": "M20X346.5 IS5624 GALV",
+    "DesignPreferences.Anchor_Bolt.OCF.Galvanized": "Yes",
+    "DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type": "Over-sized",
+    "DesignPreferences.Anchor_Bolt.OCF.Length": "346.5",
+    "DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite": "410",
+    "DesignPreferences.Anchor_Bolt.ICF.Designation": "M20X0 IS5624 GALV",
+    "DesignPreferences.Anchor_Bolt.ICF.Galvanized": "Yes",
+    "DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type": "Over-sized",
+    "DesignPreferences.Anchor_Bolt.ICF.Length": "0",
+    "DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite": "410",
+    "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
+    "Weld.Fab": "Shop Weld",
+    "Weld.Material_Grade_OverWrite": "410",
+    "Detailing.Edge_type": "a - Sheared or hand flame cut",
+    "Detailing.Corrosive_Influences": "Yes",
+    "Design.Design_Method": "Limit State Design",
+    "DesignPreferences.Design.Base_Plate": "Effective Area Method"
   }
 }
