@@ -153,7 +153,7 @@ export const BaseInputDock = React.memo(({
       </div>
 
       {/* Scrollable Input Sections */}
-      <div className="flex-1 overflow-y-auto subMainBody scroll-data dark:bg-osdag-dark-color bg-white relative">
+      <div data-testid="input-dock" className="flex-1 overflow-y-auto subMainBody scroll-data dark:bg-osdag-dark-color bg-white relative">
         {loadingOptions && (
           <div className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-white/70 dark:bg-osdag-dark-color/70 backdrop-blur-sm">
             <div className="w-8 h-8 border-4 border-osdag-green border-t-transparent rounded-full animate-spin"></div>
@@ -241,6 +241,7 @@ export const BaseInputDock = React.memo(({
 
         {/* Design Button */}
         <button
+          data-testid="design-button"
           onClick={handleSubmitEnhanced}
           disabled={isInputLocked || loadingOptions}
           title={isInputLocked ? 'Unlock the dock to redesign' : 'Run Design'}

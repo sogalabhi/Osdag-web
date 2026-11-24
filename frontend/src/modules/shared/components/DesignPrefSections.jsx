@@ -388,6 +388,7 @@ const DesignPrefSections = ({
             <button
               key={item.id}
               type="button"
+              data-testid="pref-tab"
               className={
                 activeTab == item.id
                   ? "tab-btn tabs-design-pref active-tabs"
