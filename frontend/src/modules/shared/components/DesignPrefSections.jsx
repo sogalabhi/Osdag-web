@@ -22,6 +22,7 @@ import {
   fetchDesignPrefSync,
 } from "../../../datasources/modulesDataSource";
 import { buildPrefDraft, findEmptyPrefField } from "../utils/designPrefValidation";
+import { keepShownSections, withFormDefaults } from "../utils/prefDefaults";
 
 // The beams show the core's Optimization tab; the other modules with that tab keep the shared one.
 const FLEXURE_BEAM_MODULES = ["Simply Supported Beam Design", "On Cantilever Beam Design"];
@@ -64,6 +65,8 @@ const DesignPrefSections = ({
     designPrefConfig.getInitialPrefs({ ...inputs, ...(designPrefOverrides || {}) }, module)
   );
   const [sectionDetails, setSectionDetails] = useState({ supporting: {}, supported: {} });
+  const sectionDetailsRef = useRef(sectionDetails);
+  sectionDetailsRef.current = sectionDetails;
 
   const [syncLoading, setSyncLoading] = useState(true);
   const [syncReady, setSyncReady] = useState(false);
@@ -258,6 +261,8 @@ const DesignPrefSections = ({
       const normalized = {
         ...res.data,
         resolved_inputs: res.data.default_pref_inputs || {},
+        // The defaults request carries no section choice made in the dialog; keep the sections shown.
+        section_details: keepShownSections(res.data.section_details, sectionDetailsRef.current),
       };
       applySyncResponse(normalized);
       return { success: true, data: normalized };
@@ -343,13 +348,11 @@ const DesignPrefSections = ({
     const r = await runDefaults();
     if (!r?.success) return;
     const backendDefaults = r.data?.resolved_inputs || {};
-    const frontendDefaults = typeof designPrefConfig.getDefaultPrefs === "function"
-      ? designPrefConfig.getDefaultPrefs({ ...inputsRef.current, ...backendDefaults }, module, backendDefaults)
-      : {};
-    const mergedDefaults = {
-      ...backendDefaults,
-      ...frontendDefaults,
-    };
+    const mergedDefaults = withFormDefaults(backendDefaults, r.data?.metadata, (answered) =>
+      typeof designPrefConfig.getDefaultPrefs === "function"
+        ? designPrefConfig.getDefaultPrefs({ ...inputsRef.current, ...answered }, module, answered)
+        : {}
+    );
     setDesignPrefInputs(designPrefConfig.getInitialPrefs(mergedDefaults, module));
     if (setDesignPrefOverrides) {
       skipMaterialRefresh.current = true;

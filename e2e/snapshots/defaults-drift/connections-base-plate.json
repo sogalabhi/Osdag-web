@@ -1,11 +1,4 @@
 [
-  "Anchor Bolt / Designation: \"20X0 IS5624 GALV\" -> \"\"",
-  "Anchor Bolt / Total Length (mm): \"0\" -> \"300\"",
-  "Anchor Bolt / Material Grade, Fu (MPa): \"410\" -> \"0\"",
-  "Anchor Bolt / Designation: \"20X0 IS5624 GALV\" -> \"\"",
-  "Anchor Bolt / Total Length (mm): \"0\" -> \"300\"",
-  "Anchor Bolt / Material Grade, Fu (MPa): \"410\" -> \"0\"",
-  "Anchor Bolt / Friction Coefficient (between concrete and anchor bolt): \"0.3\" -> \"0.30\"",
   "Weld / Material Grade Overwrite, Fu (MPa): \"410\" -> \"290\"",
   "Detailing / Edge Preparation Method: \"a - Sheared or hand flame cut\" -> \"Sheared or hand flame cut\"",
   "Detailing / Are the Member Exposed to Corrosive influences?: \"Yes\" -> \"No\""
