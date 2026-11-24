@@ -3,8 +3,8 @@ End Plate Service - Business logic layer
 """
 # from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
 from osdag_core.design_type.connection.header_plate_connection import HeaderPlateConnection
+from apps.core.utils.api_errors import failure_result
 from .adapter import validate_input, generate_output, create_cad_model
-import traceback
 from osdag_core.Common import (
     KEY_CONN,
     KEY_MODULE,
@@ -51,9 +51,9 @@ class EndPlateService:
         except Exception as e:
             print("[EndPlateService.calculate] ERROR")
             print(f"[EndPlateService.calculate] exception={type(e).__name__}: {e}")
-            traceback.print_exc()
             print("=" * 80 + "\n")
-            raise
+            # Reported, not raised: a failed design (DesignFailedError) keeps its message for the page.
+            return failure_result(e, "EndPlateService calculation")
     
     @staticmethod
     def get_cad_model(inputs: dict, section: str, session: str, module=None) -> str:

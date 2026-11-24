@@ -12,6 +12,11 @@ class InvalidInputError(OsdagApiException):
     pass
 
 
+class DesignFailedError(OsdagApiException):
+    """Raised when the core stopped on a design it could not complete; the message is written for the user."""
+    pass
+
+
 class MissingKeyError(OsdagApiException):
     """Raised when a design parameter is missing from the input parameters."""
     def __init__(self, key: str):
