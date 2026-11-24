@@ -6,7 +6,7 @@ import { selectedModules, slugOf } from '../lib/modules.mjs';
 import { clickDesign, clickDesignOrValidation, downloadOsi, loadOsi, openModule, readDock } from '../lib/app.mjs';
 import { DESKTOP_NAMES, readExamples, selectedExamples } from '../lib/examples.mjs';
 import { expectSnapshot } from '../lib/snapshots.mjs';
-import { KNOWN_ROUND_TRIP_ROW_DIFFS, withoutRacyKeys } from '../lib/known-issues.mjs';
+import { KNOWN_ROUND_TRIP_ROW_DIFFS } from '../lib/known-issues.mjs';
 
 /** Moves the first plain numeric field of the dock by one, so the file does not hold the defaults. */
 const changeFirstNumber = async (page) => {
@@ -45,7 +45,7 @@ for (const module of selectedModules()) {
     const rowsAfter = await readDock(pageB);
     const requestAfter = await clickDesign(pageB);
 
-    expect(withoutRacyKeys(module.id, requestAfter.body), 'the Design request is the same after loading the file').toEqual(withoutRacyKeys(module.id, requestBefore.body));
+    expect(requestAfter.body, 'the Design request is the same after loading the file').toEqual(requestBefore.body);
     const rowDiffs = rowsBefore.flatMap((row, index) => {
       const after = rowsAfter[index];
       return !after || after.label !== row.label || after.value !== row.value
@@ -73,7 +73,7 @@ for (const example of examples) {
     if (outcome.request) {
       expect(outcome.request.status, 'the server accepts the request an example sends').toBe(202);
       expect(outcome.request.body.inputs.Module).toBe(example.module.id);
-      expectSnapshot('examples', name, { url: outcome.request.url, body: withoutRacyKeys(example.module.id, outcome.request.body) });
+      expectSnapshot('examples', name, { url: outcome.request.url, body: outcome.request.body });
     } else {
       expectSnapshot('examples', name, { validation: outcome.validation });
     }

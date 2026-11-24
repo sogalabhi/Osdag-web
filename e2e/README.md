@@ -70,7 +70,6 @@ Settings (environment variables):
 | `E2E_DB_HOST`, `E2E_DB_PORT`, `E2E_DB_USER`, `E2E_DB_PASSWORD`, `E2E_DB_NAME` | `localhost`, `5470`, `osdagdeveloper`, `password`, `osdag_e2e` | |
 | `E2E_WORKERS` | `4` | parallel Playwright workers (each module test uses its own guest page) |
 | `E2E_MODULES` | all | comma separated words matching a module's path or id |
-| `E2E_RACE` | unset | `1` also runs the tests that fail when the stale-materials race hits |
 | `E2E_ALL_EXAMPLES` | unset | `1` loads every desktop design example instead of one per module |
 | `E2E_UPDATE` | unset | `1` writes snapshots |
 | `E2E_CHROMIUM` | unset | path of a Chromium/Chrome binary |
@@ -124,12 +123,6 @@ stay as they are and turns red when the behaviour changes (fixed or worse):
     ("Type" shows "Select..." in cleat angle, base plate and beam-to-column end plate; the plate
     thicknesses of the butt joints are empty). A reload fixes it, so `openModule` reloads (up to three
     times) and records an annotation ("defaults missing after load").
-  * Stale Additional Inputs materials: in cleat angle, header plate, seated angle and base plate the
-    dock Material (E 250) is copied to the Additional Inputs materials by a refresh after the load,
-    and in a share of the loads the default Design request goes out with the older E 165 values (base
-    plate: without them). Those keys are left out of the default Design snapshots
-    (`RACY_DEFAULT_KEYS` in `lib/known-issues.mjs`); `E2E_RACE=1` runs a test per module that checks
-    them and fails whenever the race hits.
   * Additional Inputs does not open on the first click, about 1 time in 100: the helper clicks again
     after 8 seconds and records an annotation.
   * Design clicked and nothing happens (no request, no message), about 2 loads in 100: the helper

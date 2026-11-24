@@ -57,6 +57,7 @@
         "12.9"
       ],
       "Anchor Bolt.Type": "End Plate Type",
+      "Base_Plate.Material": "E 250 (Fe 410 W)A",
       "Connectivity": "Welded Column Base",
       "End Condition": "Pinned",
       "Footing.Grade": "M25",
@@ -68,7 +69,9 @@
       "Load.Shear.Minor": "30",
       "Material": "E 250 (Fe 410 W)A",
       "Member.Designation": "HB 150",
+      "Member.Material": "E 250 (Fe 410 W)A",
       "Module": "Base Plate Connection",
+      "Stiffener_Key.Material": "E 250 (Fe 410 W)A",
       "Weld.Type": "Fillet Weld"
     }
   }

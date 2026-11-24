@@ -6,7 +6,16 @@ import { selectedModules, slugOf } from '../lib/modules.mjs';
 import { clickDesign, openModule, readDock } from '../lib/app.mjs';
 import { differences, parityEntriesFor } from '../lib/parity.mjs';
 import { expectSnapshot } from '../lib/snapshots.mjs';
-import { RACY_DEFAULT_KEYS, withoutRacyKeys } from '../lib/known-issues.mjs';
+
+// Modules where the core copies the dock Material (E 250) to the Additional Inputs material rows of the
+// members; the default Design request must carry it in all of them (the form once went back to its
+// defaults after the first sync, so these rows went out with the older E 165 values or without).
+const DOCK_MATERIAL_ROWS = {
+  'Cleat Angle Connection': ['Member.Supported_Section.Material', 'Member.Supporting_Section.Material'],
+  'Header Plate Connection': ['Member.Supported_Section.Material', 'Member.Supporting_Section.Material'],
+  'Seated Angle Connection': ['Member.Supported_Section.Material', 'Member.Supporting_Section.Material'],
+  'Base Plate Connection': ['Member.Material', 'Base_Plate.Material', 'Stiffener_Key.Material'],
+};
 
 for (const module of selectedModules()) {
   test.describe(`module ${slugOf(module)}`, () => {
@@ -23,14 +32,12 @@ for (const module of selectedModules()) {
       expectClean(page);
     });
 
-    // The race behind RACY_DEFAULT_KEYS, run on request (E2E_RACE=1): it fails when it hits.
-    if (RACY_DEFAULT_KEYS[module.id]) {
+    if (DOCK_MATERIAL_ROWS[module.id]) {
       test(`default Design request carries the dock Material in the Additional Inputs materials [${module.id}]`, async ({ newPage }) => {
-        test.skip(process.env.E2E_RACE !== '1', 'intermittent app bug, see lib/known-issues.mjs (E2E_RACE=1 runs it)');
         const page = await newPage();
         await openModule(page, module);
         const request = await clickDesign(page);
-        for (const key of RACY_DEFAULT_KEYS[module.id]) expect(request.body.inputs[key], key).toBe(request.body.inputs.Material);
+        for (const key of DOCK_MATERIAL_ROWS[module.id]) expect(request.body.inputs[key], key).toBe(request.body.inputs.Material);
       });
     }
 
@@ -41,8 +48,7 @@ for (const module of selectedModules()) {
 
       expect(request.status, 'the server accepts the default request').toBe(202);
       expect(request.body.inputs.Module, 'the request names the module').toBe(module.id);
-      const racy = RACY_DEFAULT_KEYS[module.id] || [];
-      expectSnapshot('default-design', slugOf(module), { url: request.url, body: withoutRacyKeys(module.id, request.body) });
+      expectSnapshot('default-design', slugOf(module), { url: request.url, body: request.body });
 
       // The frontend's own payload parity snapshot (unit level, short sample lists) names the keys a
       // module sends for its defaults; the browser's real request must carry every one of them.
@@ -53,7 +59,7 @@ for (const module of selectedModules()) {
         .map((entry) => ({ entry, diff: differences(request.body.inputs, entry.payload) }))
         .sort((a, b) => a.diff.missing.length - b.diff.missing.length || a.diff.valueDiffs.length - b.diff.valueDiffs.length)[0];
       for (const line of best.diff.valueDiffs) test.info().annotations.push({ type: 'parity value', description: line });
-      expect(best.diff.missing.filter((line) => !racy.some((key) => line.startsWith(`${key}:`))), `keys of payload parity "${best.entry.name}" missing from the request`).toEqual([]);
+      expect(best.diff.missing, `keys of payload parity "${best.entry.name}" missing from the request`).toEqual([]);
     });
   });
 }

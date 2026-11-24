@@ -18,23 +18,3 @@ export const KNOWN_LOST_CHANGES = {
  * separately and strictly).
  */
 export const KNOWN_ROUND_TRIP_ROW_DIFFS = {};
-
-/**
- * Keys of the default Design request that the app sets late and not always: in these modules the
- * dock Material (E 250) is copied to the Additional Inputs materials by a refresh after the page
- * loads, and in a share of the loads (about every second one with four browsers running) the request
- * is sent with the older E 165 values, or without them (base plate). The default request is
- * compared without these keys; `E2E_RACE=1` runs a test that checks them and fails on the race.
- */
-export const RACY_DEFAULT_KEYS = {
-  'Cleat Angle Connection': ['Member.Supported_Section.Material', 'Member.Supporting_Section.Material'],
-  'Header Plate Connection': ['Member.Supported_Section.Material', 'Member.Supporting_Section.Material'],
-  'Seated Angle Connection': ['Member.Supported_Section.Material', 'Member.Supporting_Section.Material'],
-  'Base Plate Connection': ['Member.Material', 'Base_Plate.Material', 'Stiffener_Key.Material'],
-};
-
-/** A Design request body without the keys of RACY_DEFAULT_KEYS for the module. */
-export const withoutRacyKeys = (moduleId, body) => {
-  const racy = RACY_DEFAULT_KEYS[moduleId] || [];
-  return { ...body, inputs: Object.fromEntries(Object.entries(body.inputs).filter(([key]) => !racy.includes(key))) };
-};

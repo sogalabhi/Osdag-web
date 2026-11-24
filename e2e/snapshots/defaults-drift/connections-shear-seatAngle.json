@@ -1,3 +1,6 @@
 [
+  "Column Section* / Material *: \"E 250 (Fe 410 W)A\" -> \"E 165 (Fe 290)\"",
+  "Beam Section* / Material *: \"E 250 (Fe 410 W)A\" -> \"E 165 (Fe 290)\"",
+  "Seated Angle Connection / Material *: \"E 250 (Fe 410 W)A\" -> \"E 165 (Fe 290)\"",
   "Detailing / Edge Preparation Method: \"Rolled, machine-flame cut, sawn and planed\" -> \"Sheared or hand flame cut\""
 ]
