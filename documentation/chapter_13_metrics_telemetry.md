@@ -597,6 +597,9 @@ No credentials are hardcoded. Copy `.env.example` to `.env` (see the [installati
 
 > InfluxDB applies the token and admin password only on first initialization of its data volume. After changing them in `.env`, recreate the volume (`docker compose down -v`, which deletes stored metrics) or rotate the token inside InfluxDB.
 
+### Reaching Grafana and InfluxDB
+In `docker-compose.yml` Grafana (`3001`) and the InfluxDB UI/API (`8086`) are published on the loopback interface only (`127.0.0.1`), and Grafana's anonymous access is off, so every viewer signs in as `admin` with `GRAFANA_ADMIN_PASSWORD` (or a user created from there). To look at the dashboards of a dev stack on another machine, forward the port over SSH (`ssh -L 3001:127.0.0.1:3001 user@host`, then browse `http://localhost:3001`). Containers reach each other over the compose network and do not use the published ports.
+
 ### 1. The Sidecar Container Build Schema (`Dockerfile`)
 The collector is containerized using a multi-runtime Alpine stack:
 ```dockerfile
