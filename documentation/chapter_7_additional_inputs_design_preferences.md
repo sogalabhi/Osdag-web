@@ -98,9 +98,11 @@ Osdag-Web resolves this through a bidirectional sync state machine using the [us
 5. **Writethrough Rollbacks:** If the sync request fails due to network issues, the system rolls back to the `lastKnownGoodDesignPrefSnapshot` to prevent corrupted states.
 
 
-### Spellings the dropdowns offer
+### Wording the dropdowns offer
 
 The weld tab offers the spellings of the core, and the request sends the value the tab holds, so nothing is translated on the way: `Shop Weld` and `Field weld` for `Weld.Fab` (`KEY_DP_WELD_FAB_VALUES`; the core looks the fabrication up by exact spelling, so `Shop weld` would fail inside the design). The butt and lap joint welded modules have one weld dropdown, `Weld.Type`, with `Shop weld` and `Field weld`, as their core class lists it. The options live in [prefOptions.js](../frontend/src/modules/shared/config/prefOptions.js); `src/test/weldOptions.test.js` checks every module's options, defaults and loaded `.osi` values against them and `apps/core/tests/test_weld_values.py` checks them against the core's own weld dropdowns.
+
+The Design tab offers the design methods of the core's dropdown with the same wording as the main form (`Limit State Design`; `Limit State (capacity based) Design` and `Working Stress Design` are listed and cannot be picked), and every module's fallback for the method is `Limit State Design`, so the text the tab shows is the text the request sends (`DESIGN_METHOD_OPTIONS` in `prefOptions.js`; `src/test/prefTabValues.test.js` and `apps/core/tests/test_design_method_values.py`).
 
 ### What the design request carries
 
@@ -178,7 +180,7 @@ The tabs displayed inside the Additional Inputs panel are mapped dynamically bas
 
 The section tabs show the selected section's properties. If the module's list is on "All" or holds several sections, the tab previews the first one, and picking another only changes what the tab shows. The design's list changes only from the input dock. The backend's section sources in `sync_merge.py` (`core_section_sources`, plus `LEGACY_SECTION_SOURCES`) must return each module's section under the role its tab reads: tab 2 and the beam sections read `supported`, tab 0 reads `supporting`, and the cleat and seated angle tabs read `connector`.
 
-Each module's `getInitialPrefs` lists only the values its dialog shows or the design uses, and gives every one a value (from the server, or a fallback), because Save refuses an empty value. A key a module never shows, such as the packing plate in the cleat angle, seated angle and lap joint welded modules, or the bolt and detailing values in the two flexure modules, stays out of its state. `src/test/designPrefSave.test.js` checks this for every module, on the state after opening and after Defaults.
+Each module's `getInitialPrefs` lists only the values its dialog shows or the design uses, and gives every one a value (from the server, or a fallback), because Save refuses an empty value. A section or Connector tab shows its material from the state (`supporting_material` for the Column Section tab, `supported_material` for the Beam Section and angle tabs, `connector_material` for the Connector tab), so the state must hold it: the base plate's Column Section tab starts from the grade the server resolved for the column (the dock material until it is saved), and `src/test/prefTabValues.test.js` checks every tab of every module. A key a module never shows, such as the packing plate in the cleat angle, seated angle and lap joint welded modules, or the bolt and detailing values in the two flexure modules, stays out of its state. `src/test/designPrefSave.test.js` checks this for every module, on the state after opening and after Defaults.
 
 | Module Name | Tab IDs List | Displayed Tabs | Initial Tab |
 | :--- | :--- | :--- | :--- |

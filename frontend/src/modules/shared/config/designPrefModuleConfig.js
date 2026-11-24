@@ -31,6 +31,8 @@ import {
   KEY_ST_KEY_MATERIAL,
 } from "../../../constants/generated/coreKeys";
 
+import { DEFAULT_DESIGN_METHOD } from "./prefOptions";
+
 const ALL_TABS = [
   { id: 0, name: "Column Section*" },
   { id: 1, name: "Beam Section*" },
@@ -61,7 +63,7 @@ const DEFAULT_INITIAL_PREFS = (inputs) => ({
   detailing_packing_plate: inputs.detailing_packing_plate ?? "Yes",
   detailing_gap: inputs.detailing_gap ?? "0",
   detailing_corr_status: inputs.detailing_corr_status ?? "No",
-  design_method: inputs.design_method ?? "Limited State Design",
+  design_method: inputs.design_method ?? DEFAULT_DESIGN_METHOD,
   design_for: inputs.design_for ?? "Tension",
 });
 
@@ -270,8 +272,8 @@ const DESIGN_PREF_CONFIG = {
     tabIds: [0, 7, 8, 9, 10, 11, 13],
     initialTabIndex: 0,
     getInitialPrefs: (inputs) => ({
-      supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
-      connector_material: inputs.connector_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      // The Column Section tab: the column's material (Member.Material), the dock material until it is saved.
+      supporting_material: inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
       bolt_tension_type: inputs.bolt_tension_type ?? "Pre-tensioned",
       bolt_hole_type: inputs.bolt_hole_type ?? "Standard",
       bolt_slip_factor: inputs.bolt_slip_factor ?? "0.3",
@@ -309,8 +311,7 @@ const DESIGN_PREF_CONFIG = {
       [KEY_DP_DESIGN_BASE_PLATE]: inputs[KEY_DP_DESIGN_BASE_PLATE] ?? "Effective Area Method",
     }),
     getDefaultPrefs: (inputs) => ({
-      supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
-      connector_material: inputs.connector_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
+      supporting_material: inputs.supporting_material ?? inputs.member_material ?? inputs.material ?? "E 250 (Fe 410 W)A",
       bolt_tension_type: "Pre-tensioned",
       bolt_hole_type: "Standard",
       bolt_slip_factor: "0.3",
@@ -364,7 +365,7 @@ const DESIGN_PREF_CONFIG = {
       detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_gap: inputs.detailing_gap ?? "10",
       detailing_corr_status: inputs.detailing_corr_status ?? "No",
-      design_method: inputs.design_method ?? "Limited State Design",
+      design_method: inputs.design_method ?? DEFAULT_DESIGN_METHOD,
       design_for: inputs.design_for ?? "Tension",
     }),
     getDefaultPrefs: (inputs) => ({
@@ -379,7 +380,7 @@ const DESIGN_PREF_CONFIG = {
       detailing_edge_type: "Sheared or hand flame cut",
       detailing_gap: "0",
       detailing_corr_status: "No",
-      design_method: "Limited State Design",
+      design_method: DEFAULT_DESIGN_METHOD,
       design_for: "Tension",
     }),
   },
@@ -421,7 +422,7 @@ const DESIGN_PREF_CONFIG = {
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
-      design_method: inputs.design_method || "Limited State Design",
+      design_method: inputs.design_method || DEFAULT_DESIGN_METHOD,
       allow_ur: inputs.allow_ur || "1.0",
       effective_area_parameter: inputs.effective_area_parameter || "1.0",
     }),
@@ -429,7 +430,7 @@ const DESIGN_PREF_CONFIG = {
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
-      design_method: "Limited State Design",
+      design_method: DEFAULT_DESIGN_METHOD,
       allow_ur: "1.0",
       effective_area_parameter: "1.0",
     }),
@@ -461,7 +462,7 @@ const DESIGN_PREF_CONFIG = {
       detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
       detailing_gap: inputs.detailing_gap ?? "0",
       detailing_corr_status: inputs.detailing_corr_status ?? "No",
-      design_method: inputs.design_method ?? "Limited State Design",
+      design_method: inputs.design_method ?? DEFAULT_DESIGN_METHOD,
     }),
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
@@ -472,13 +473,13 @@ const DESIGN_PREF_CONFIG = {
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
-      design_method: inputs.design_method || "Limited State Design",
+      design_method: inputs.design_method || DEFAULT_DESIGN_METHOD,
     }),
     getDefaultPrefs: (inputs) => ({
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
-      design_method: "Limited State Design",
+      design_method: DEFAULT_DESIGN_METHOD,
     }),
   },
   "On Cantilever Beam Design":{
@@ -488,13 +489,13 @@ const DESIGN_PREF_CONFIG = {
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
-      design_method: inputs.design_method || "Limited State Design",
+      design_method: inputs.design_method || DEFAULT_DESIGN_METHOD,
     }),
     getDefaultPrefs: (inputs) => ({
       supporting_material: inputs.supporting_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       supported_material: inputs.supported_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
       connector_material: inputs.connector_material || inputs.member_material || inputs.material || "E 250 (Fe 410 W)A",
-      design_method: "Limited State Design",
+      design_method: DEFAULT_DESIGN_METHOD,
     }),
   },
   [KEY_DISP_SEATED_ANGLE]: {
