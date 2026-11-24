@@ -119,10 +119,6 @@ stay as they are and turns red when the behaviour changes (fixed or worse):
   (`KNOWN_LOST_CHANGES` in `lib/known-issues.mjs`).
 * Intermittent races in the app, seen with four browsers in parallel (they are why the sweep has
   the small allowances listed here):
-  * Defaults not filled: in about 3 loads in 100 a module opens with defaults missing for good
-    ("Type" shows "Select..." in cleat angle, base plate and beam-to-column end plate; the plate
-    thicknesses of the butt joints are empty). A reload fixes it, so `openModule` reloads (up to three
-    times) and records an annotation ("defaults missing after load").
   * Additional Inputs does not open on the first click, about 1 time in 100: the helper clicks again
     after 8 seconds and records an annotation.
   * Design clicked and nothing happens (no request, no message), about 2 loads in 100: the helper

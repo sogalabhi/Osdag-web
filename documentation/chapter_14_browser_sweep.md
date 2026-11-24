@@ -31,7 +31,7 @@ The module list is read from `frontend/src/modules/registry.js` (`e2e/lib/module
 
 ## 14.3 Snapshots and Known Issues
 
-Snapshots under `e2e/snapshots/` are compared as JSON and are never written without `E2E_UPDATE=1`; review the diff and commit it as for the Vitest snapshots. Bugs the sweep found and that are not fixed are recorded where a fix shows up as a change to review: `e2e/lib/known-issues.mjs` for Additional Inputs changes that are not kept and for the default Design keys an intermittent race leaves out, and the `defaults-drift` snapshots. The races themselves (defaults not filled after a load, stale Additional Inputs materials, a Design click that does nothing) are listed in `e2e/README.md`.
+Snapshots under `e2e/snapshots/` are compared as JSON and are never written without `E2E_UPDATE=1`; review the diff and commit it as for the Vitest snapshots. Bugs the sweep found and that are not fixed are recorded where a fix shows up as a change to review: `e2e/lib/known-issues.mjs` for Additional Inputs changes that are not kept, and the `defaults-drift` snapshots. The intermittent races that remain (an Additional Inputs click or a Design click that does nothing) are listed in `e2e/README.md`.
 
 ## 14.4 Writing a Spec
 
