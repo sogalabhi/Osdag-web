@@ -1,3 +1,38 @@
+const FORMULA_PREFIX = /^[=+\-@\t\r]/;
+const NUMERIC_LITERAL = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/;
+
+/**
+ * The one place that decides how a value is written into a CSV cell.
+ *
+ * Spreadsheet programs read a cell that starts with `=`, `+`, `-`, `@`, a tab or a carriage return as a
+ * formula. Text that comes from the user (project and section names, custom labels, log lines) is
+ * therefore prefixed with a single quote, the same convention the sections XLSX export uses.
+ * Values that are numbers are never touched, so a negative result stays a number. A string that is
+ * only a plain numeric literal (`-12.5`, `+3`, `1e-3`) cannot run anything and is also left alone,
+ * as is a lone `-` or `+` placeholder.
+ * Quoting for commas, quotes and line breaks is applied after that.
+ */
+export const neutraliseCsvText = (value) => {
+  if (typeof value !== 'string') return value;
+  if (!FORMULA_PREFIX.test(value)) return value;
+  if (value === '-' || value === '+' || NUMERIC_LITERAL.test(value)) return value;
+  return `'${value}`;
+};
+
+/**
+ * One CSV cell: formula-neutralised, then quoted when it holds a comma, quote or line break.
+ * @param {*} value - Cell value (a null or undefined value gives an empty cell).
+ * @returns {string}
+ */
+export const escapeCsvCell = (value) => {
+  if (value === null || value === undefined) return '';
+  const str = String(neutraliseCsvText(value));
+  if (/[",\r\n]/.test(str)) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+};
+
 /**
  * Convert design output data to CSV format.
  * @param {Object} data - Design output data.
@@ -40,17 +75,8 @@ export const convertToCSV = (data) => {
     return '';
   }
 
-  // Escape CSV values
-  const escapeCSV = (value) => {
-    const str = String(value);
-    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-      return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
-  };
-
-  const header = keys.map(escapeCSV).join(',');
-  const row = values.map(escapeCSV).join(',');
+  const header = keys.map(escapeCsvCell).join(',');
+  const row = values.map(escapeCsvCell).join(',');
 
   return [header, row].join('\n');
 };

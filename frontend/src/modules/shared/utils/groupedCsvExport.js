@@ -5,6 +5,7 @@
  */
 import { triggerBrowserDownload } from "../../../datasources/sectionsDataSource";
 import { isGuestUser } from "../../../utils/auth";
+import { escapeCsvCell } from "../../../utils/csvUtils";
 import { toDesignDictionary } from "./osiSave";
 
 function extractLogMessage(line) {
@@ -34,12 +35,10 @@ function extractOutputLabel(field, outItem) {
 }
 
 function escapeCell(value) {
-  if (value === null || value === undefined) return "";
-  let str = typeof value === "object" ? extractLogMessage(value) : String(value);
-  if (/[",\r\n]/.test(str)) {
-    return `"${str.replace(/"/g, '""')}"`;
+  if (value !== null && value !== undefined && typeof value === "object") {
+    return escapeCsvCell(extractLogMessage(value));
   }
-  return str;
+  return escapeCsvCell(value);
 }
 
 function rowsToCsv(rows) {
