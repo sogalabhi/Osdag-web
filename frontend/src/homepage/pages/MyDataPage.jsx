@@ -9,6 +9,7 @@ import { AUTH, PROJECTS, MATERIALS, SECTIONS } from "../../datasources/endpoints
 import { getModuleRoute } from "../../modules/registry";
 import { UI_STRINGS } from "../../constants/UIStrings";
 import { getErrorMessage } from "../../utils/apiError";
+import { myDataGate } from "./myDataGate";
 
 /** ── DEBUG: catches render crashes in each section and logs which one ── */
 class DebugErrorBoundary extends React.Component {
@@ -182,7 +183,8 @@ const getSectionFields = (tableName) => {
 
 const MyDataPage = () => {
   const [showSideBar, setShowSideBar] = useState(false);
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, loading: authLoading, isGuest } = useAuth();
+  const gate = myDataGate({ loading: authLoading, isGuest });
   const navigate = useNavigate();
 
   // State for data
@@ -250,8 +252,14 @@ const MyDataPage = () => {
   };
 
   useEffect(() => {
-    fetchAllData();
-  }, []);
+    if (gate === "fetch") {
+      fetchAllData();
+    } else if (gate === "guest") {
+      toast.info("Sign in to see your saved data", { toastId: "my-data-guest" });
+      navigate("/home", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gate]);
 
   // Format date helper
   const formatDate = (dateString) => {
@@ -570,6 +578,9 @@ const MyDataPage = () => {
     s.Designation?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.table?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // A guest is sent back to the home page by the effect above.
+  if (gate === "guest") return null;
 
   return (
     <div className="min-h-screen antialiased w-full relative bg-white dark:bg-osdag-dark-color">
