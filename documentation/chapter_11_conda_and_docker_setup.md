@@ -259,6 +259,19 @@ Limits:
 * **release-please** ([release-please.yml](../.github/workflows/release-please.yml)) keeps a release pull request open on `25april` with the next version and `CHANGELOG.md`, built from conventional commits (`feat:`, `fix:`, ...). Merging it creates the version tag and GitHub release.
 * **cloudflared** is pinned to a fixed version in both compose files instead of `latest`.
 
+### 5a. The Default Branch Name in the Workflows
+The workflows are written for the default branch `25april`. Where GitHub accepts an expression, they read the name from the repository instead of repeating it: the CI concurrency rule (runs on the default branch are never cancelled), the Rollback guard (it only runs from the default branch) and the CD job condition (the run's branch must equal the default branch) all use `github.event.repository.default_branch`.
+
+Triggers cannot do this: `on.push.branches`, `on.pull_request.branches` and `on.workflow_run.branches` take only literal names, and so does `target-branch` in `dependabot.yml`. If the default branch is ever renamed, change the literal `25april` in these places in the same change as the rename:
+* `ci.yml`: `on.pull_request.branches`
+* `cd.yml`: `on.workflow_run.branches`
+* `codeql.yml`: `on.pull_request.branches` and `on.push.branches`
+* `secrets.yml`: `on.pull_request.branches`
+* `release-please.yml`: `on.push.branches`
+* `dependabot.yml`: `target-branch` (five entries)
+
+The `production` environment's deployment-branch rule (Settings -> Environments) also names the branch and has to be updated by hand. The expression-based checks follow the rename on their own. CD and Release Please stay disabled on the fork until the production setup below is done; editing the branch name does not enable them.
+
 ### 6. One-Time Setup
 GitHub (repository settings):
 * **Environments -> `production`**: add required reviewers (and optionally restrict deployment branches). This gates every deploy, including rollbacks.

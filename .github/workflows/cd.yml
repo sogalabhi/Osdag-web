@@ -1,5 +1,9 @@
 name: CD
 
+# The default branch name is a literal in `branches` below: workflow_run filters
+# do not accept expressions. If the default branch is renamed, update it (see
+# Chapter 11.8). The job condition also compares the run's branch with the
+# repository's default branch, so a loosened filter cannot deploy another branch.
 on:
   workflow_run:
     workflows: ["CI"]
@@ -14,10 +18,11 @@ jobs:
   build-and-push:
     # Repo is public, and this workflow deploys to a self-hosted runner on
     # prod infra. Guard against a fork PR whose branch happens to be named
-    # "main" from satisfying the `branches: [main]` filter above and
+    # like the default branch from satisfying the `branches` filter above and
     # triggering a build/deploy from fork-controlled code.
     if: >-
       ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.head_branch == github.event.repository.default_branch &&
           github.event.workflow_run.head_repository.full_name == github.repository }}
     runs-on: ubuntu-latest
     permissions:

@@ -1,4 +1,6 @@
 version: 2
+# target-branch is a literal on every entry (it takes no expressions); update all of
+# them if the default branch is renamed (see Chapter 11.8).
 updates:
   # Frontend (React/Vite) dependencies
   - package-ecosystem: npm
