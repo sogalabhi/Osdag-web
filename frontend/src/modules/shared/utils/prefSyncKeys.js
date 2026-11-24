@@ -81,6 +81,44 @@ export function dockDriverFields(config) {
   return fields.length ? fields : LEGACY_DRIVER_FIELDS;
 }
 
+/**
+ * The dock fields whose change clears every saved Additional Input, as on the desktop
+ * (`clear_design_pref_dictionary`): the fields that feed a dock key the core copies into
+ * Additional Inputs ('Input Dock' rows: Material, and the anchor bolt type of the base plate).
+ * The butt and lap joints have none.
+ */
+export function prefClearingFields(config) {
+  const sources = Object.keys(DESIGN_PREF_TABLES[config.designType]?.dockCopies || {});
+  return [...fieldKeys(config)].filter(([, keys]) => keys.some((key) => sources.includes(key))).map(([field]) => field);
+}
+
+const mainFormFields = (config) =>
+  new Set((config.inputSections || []).flatMap((section) => (section.fields || []).map((field) => field.key)));
+
+/** The core's Additional Inputs keys of a module: its pref tabs, computed keys and 'Input Dock' targets, without its dock keys. */
+const corePrefKeys = (config) => {
+  const tables = DESIGN_PREF_TABLES[config.designType];
+  if (!tables) return new Set();
+  const keys = new Set([
+    ...tables.prefTabs.flatMap(([, , tabKeys]) => tabKeys),
+    ...tables.computed,
+    ...Object.values(tables.dockCopies).flat(),
+  ]);
+  for (const key of tables.dockKeys) keys.delete(key);
+  return keys;
+};
+
+/**
+ * Whether a name of the form state (a field, or a core key a saved override is kept under) holds
+ * an Additional Input of the module. A main-form field never does. Purlin has no table: none.
+ */
+export function isAdditionalInput(config, name) {
+  const prefKeys = corePrefKeys(config);
+  if (!prefKeys.size || mainFormFields(config).has(name)) return false;
+  if (prefKeys.has(name)) return true;
+  return (fieldKeys(config).get(name) || []).some((key) => prefKeys.has(key));
+}
+
 /** The module id the backend keys its tables by: the desktop `KEY_DISP_*` name. */
 export const prefSyncModuleId = (config) => config.designType;
 

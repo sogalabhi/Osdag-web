@@ -10,7 +10,7 @@ import {
 } from "../../../constants/generated/coreKeys";
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { loadStateFromOsi } from "../utils/osiLoader";
-import { dockDriverFields } from "../utils/prefSyncKeys";
+import { isAdditionalInput, prefClearingFields } from "../utils/prefSyncKeys";
 
 const buildInitialSelectionStates = (config) =>
   (config.selectionConfig || []).reduce((acc, selection) => {
@@ -158,11 +158,15 @@ export const useModuleForm = (moduleConfig, moduleData) => {
   }, [displaySaveInputPopup]);
 
   const dockDriverSnapshotRef = useRef(null);
-  // The dock fields that hold the driving material (see `dockDriverFields`).
-  const dockDriverFieldNames = useMemo(() => dockDriverFields(moduleConfig), [moduleConfig]);
+  // The dock fields whose change clears the saved Additional Inputs (see `prefClearingFields`).
+  const dockDriverFieldNames = useMemo(() => prefClearingFields(moduleConfig), [moduleConfig]);
   const dockDriverSnapshot = JSON.stringify(dockDriverFieldNames.map((field) => inputs?.[field]));
+  // The overrides of the previous commit: a file or project load (or a reset) sets the dock and the
+  // overrides in one commit, and what it loads must stay. Updated by the effect after this one.
+  const previousOverridesRef = useRef(designPrefOverrides);
 
   useEffect(() => {
+    const overridesReplaced = previousOverridesRef.current !== designPrefOverrides;
     if (dockDriverSnapshotRef.current === null) {
       dockDriverSnapshotRef.current = dockDriverSnapshot;
       return;
@@ -170,19 +174,24 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
     const dockDriverChanged = dockDriverSnapshotRef.current !== dockDriverSnapshot;
     dockDriverSnapshotRef.current = dockDriverSnapshot;
-    if (!dockDriverChanged) return;
+    if (!dockDriverChanged || overridesReplaced) return;
 
-    setDesignPrefOverrides((prevOverrides) => {
-      if (!prevOverrides || typeof prevOverrides !== "object") return prevOverrides;
-      const nextOverrides = { ...prevOverrides };
-      delete nextOverrides.supporting_material;
-      delete nextOverrides.supported_material;
-      delete nextOverrides.connector_material;
-      // Prefs the desktop derives from the dock material (its defaults follow a dock change).
-      (moduleConfig.prefsFollowingMaterial || []).forEach((key) => delete nextOverrides[key]);
-      return nextOverrides;
-    });
+    // As on the desktop, every saved Additional Input is dropped: the design takes the core's
+    // values for the new dock again (the backend fills them), and the dialog shows those.
+    const withoutPrefs = (state) => {
+      if (!state || typeof state !== "object") return state;
+      const kept = Object.entries(state).filter(([name]) => !isAdditionalInput(moduleConfig, name));
+      return kept.length === Object.keys(state).length ? state : Object.fromEntries(kept);
+    };
+    setDesignPrefOverrides(withoutPrefs);
+    setInputs(withoutPrefs);
+    // designPrefOverrides is read only to tell a load from a user's dock change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dockDriverSnapshot, moduleConfig, setDesignPrefOverrides]);
+
+  useEffect(() => {
+    previousOverridesRef.current = designPrefOverrides;
+  }, [designPrefOverrides]);
 
   const updateModalState = (modalKey, isOpen) => {
     setModalStates((prev) => ({

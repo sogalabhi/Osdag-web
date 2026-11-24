@@ -88,17 +88,6 @@ export const basePlateConfig = {
   cameraKey: "BasePlateConnection",
   cadOptions: ["Model", "Column", "Plate", "Welds", "Bolts", "Concrete", "Grout"],
 
-  // Saved Additional Inputs that are dropped when the dock material changes: the desktop takes their
-  // defaults from the material (base plate and stiffener material, the weld and anchor bolt strengths).
-  prefsFollowingMaterial: [
-    KEY_BASE_PLATE_MATERIAL,
-    KEY_ST_KEY_MATERIAL,
-    KEY_DP_WELD_MATERIAL_G_O,
-    "weld_material_grade",
-    KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_OCF,
-    KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
-  ],
-
   defaultInputs: {
     module: KEY_DISP_BASE_PLATE,
     member_designation: "",
