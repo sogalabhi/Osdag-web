@@ -16,6 +16,7 @@ from channels.layers import get_channel_layer
 from django.test import SimpleTestCase
 
 from apps.core import tasks
+from apps.core.design_dictionary import fill_request_prefs
 from apps.core.main_registry import WebMainRegistry
 from apps.core.tasks import DESIGN_READY_STATUS, run_design_calculation_task
 from apps.core.utils import cad_helpers
@@ -116,7 +117,7 @@ class RealDesignTests(SimpleTestCase):
         from apps.modules.shear_connection.submodules.fin_plate import adapter
 
         module_name, slug, directory, name = FIN_PLATE
-        inputs = fixture_inputs(directory, name)
+        inputs = fill_request_prefs(fixture_inputs(directory, name))
         solved = adapter.create_from_input(inputs)
         with patch.object(adapter, "create_from_input", side_effect=AssertionError("recalculated")):
             path = adapter.create_cad_model(inputs, "Plate", f"test_{uuid.uuid4().hex}", module=solved)
