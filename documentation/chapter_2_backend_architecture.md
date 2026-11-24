@@ -205,6 +205,7 @@ When a design calculation is completed, users can generate:
 1. **CAD Geometries:** Formatted as `.brep`, `.stl`, and optionally `.step` or `.iges` formats.
 2. **Design Reports:** Formatted as compiled PDF documents.
    The design log shown in the report comes from the `logs` the frontend sends with the report request. `format_report_logs()` in `design_report_pdf_view.py` turns them into `timestamp - LEVEL - message` lines with the level in upper case, because the LaTeX report generator only prints lines containing `INFO`, `WARNING` or `ERROR`.
+   User text is written to the `.tex` source as literal text. pylatex escapes the report metadata (company, team, designer, project title, subtitle, job number, client) and the design log. The section details table places its values without pylatex's escaping, so `osdag_core/design_report/reportGenerator_latex.py` passes them through `escape_latex_text()`, because the designation and material can name a user's custom section or material. The company logo is only taken from the file stored by the logo upload (`_safe_company_logo_path`). pdflatex runs with `-no-shell-escape` and a timeout, both in the core (`compile_report_tex`, 120 s) and when a customized report is compiled (60 s per pass). TeX Live's `openin_any` setting no longer restricts which files pdflatex reads, so the escaping is what keeps user text from reading files. Tests: `apps/core/tests/test_report_latex_text.py`.
 
 ### Storage Directory Structure
 In the backend root directory, the system utilizes the following storage hierarchy:
