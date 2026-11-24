@@ -99,8 +99,12 @@ export const useProjectLoader = ({
     };
   }, []);
 
+  // The saved selections are read against the module's option lists ("All" is the whole list),
+  // so a project is loaded once the lists are here.
+  const listsLoading = !!moduleData?.loadingOptions;
+
   useEffect(() => {
-    if (loading) return;
+    if (loading || listsLoading) return;
 
     const projectId = projectIdFromUrl || null;
 
@@ -207,5 +211,5 @@ export const useProjectLoader = ({
       abortController.abort();
     };
 
-  }, [projectIdFromUrl, user, loading, designCompletedRef]);
+  }, [projectIdFromUrl, user, loading, listsLoading, designCompletedRef]);
 };

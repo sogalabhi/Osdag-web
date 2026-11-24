@@ -95,7 +95,8 @@ export const useModuleForm = (moduleConfig, moduleData) => {
       if (moduleKey) {
         const raw = sessionStorage.getItem(`prefill:${moduleKey}`);
         if (raw) {
-          const hasLoadedLists = Object.keys(safeModuleData).length > 0;
+          // The "All" of a selection is the whole option list, so the file is read once the lists are here.
+          const hasLoadedLists = safeModuleData.loadingOptions === false;
           if (hasLoadedLists) {
             const uiObj = JSON.parse(raw);
             loadStateFromOsi(uiObj, {
