@@ -117,6 +117,7 @@ def run_design_calculation_task(self, module_name: str, submodule_slug: str, inp
     if not ServiceClass:
         raise ValueError(f"Service class for {module_name}/{submodule_slug} not found")
 
+    from apps.core.design_dictionary import fill_request_prefs
     from apps.core.main_registry import WebMainRegistry
     from apps.core.osdag_overrides import user_rows
     from apps.core.utils.cad_helpers import generate_cad_models, get_default_sections
@@ -124,6 +125,9 @@ def run_design_calculation_task(self, module_name: str, submodule_slug: str, inp
     with user_rows(user_id):
         WebMainRegistry.start_recording()
         try:
+            # Additional Inputs the request lacks come from the core, as on the desktop. The filled
+            # dict feeds the design, the output dock and the 3D model alike.
+            inputs = fill_request_prefs(inputs)
             result = ServiceClass.calculate(
                 inputs=inputs,
                 request=None,

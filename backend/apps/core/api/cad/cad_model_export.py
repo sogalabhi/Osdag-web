@@ -25,6 +25,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework.views import APIView
 
+from apps.core.design_dictionary import fill_request_prefs
 from apps.core.module_finder import get_module_api
 from apps.core.osdag_overrides import unknown_material_error, user_id_from_request, user_rows
 from apps.core.utils.api_errors import error_response
@@ -112,6 +113,8 @@ class CADExport(APIView):
 
         # Make the requesting user's custom sections/materials visible to osdag_core.
         with user_rows(user_id):
+            # The export builds the design the Design button built: the core's Additional Inputs where unsaved.
+            input_values = fill_request_prefs(input_values, module_id)
             try:
                 # Same input checks as the design endpoint (raises the standard validation errors).
                 module_api.validate_input(input_values)

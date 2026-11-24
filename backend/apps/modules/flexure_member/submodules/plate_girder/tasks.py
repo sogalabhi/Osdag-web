@@ -106,10 +106,12 @@ def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any], us
     Celery task that runs Plate Girder PSO optimization and streams results
     to a WebSocket channel identified by `channel_name`.
     """
+    from apps.core.design_dictionary import fill_request_prefs
     from apps.core.osdag_overrides import user_rows
     # Make the requesting user's custom materials visible to osdag_core.
     with user_rows(user_id):
-        return _run_pso_optimization(self, channel_name, input_data)
+        # Additional Inputs the request lacks come from the core, as for the design.
+        return _run_pso_optimization(self, channel_name, fill_request_prefs(input_data))
 
 
 def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
