@@ -39,6 +39,7 @@ from functools import lru_cache
 from typing import Any, Dict, List, Optional
 
 from osdag_core.Common import (
+    KEY_ALLOW_UR,
     KEY_DESIGN_LOAD,
     KEY_DISP_BASE_PLATE,
     KEY_DISP_BB_EP_SPLICE,
@@ -64,15 +65,25 @@ from osdag_core.Common import (
     KEY_DISP_STRUT_WELDED_END_GUSSET,
     KEY_DISP_TENSION_BOLTED,
     KEY_DISP_TENSION_WELDED,
+    KEY_EFFECTIVE_AREA_PARA,
+    KEY_LOAD,
     KEY_MAX_DEFL,
+    KEY_MEMBER_OPTIONS,
     KEY_MODULE,
     KEY_PLATETHK,
+    KEY_STR_TYPE,
     KEY_SUPPORTING_OPTIONS,
     TYPE_COMBOBOX,
     TYPE_COMBOBOX_CUSTOMIZED,
     TYPE_MODULE,
     TYPE_NOTE,
     TYPE_TEXTBOX,
+    KEY_IntermediateStiffener,
+    KEY_IntermediateStiffener_spacing,
+    KEY_IntermediateStiffener_thickness,
+    KEY_LongitudnalStiffener,
+    KEY_LongitudnalStiffener_thickness,
+    KEY_ShearBucklingOption,
 )
 
 logger = logging.getLogger(__name__)
@@ -263,9 +274,13 @@ def derive(
 # Keys the core lists as Additional Inputs that the web form holds on its main form. The web
 # always sends them, so the fill must never treat them as preferences.
 MAIN_FORM_KEYS: Dict[str, frozenset] = {
-    KEY_DISP_PLATE_GIRDER_WELDED: frozenset({KEY_MAX_DEFL, KEY_DESIGN_LOAD, KEY_SUPPORTING_OPTIONS}),
+    KEY_DISP_PLATE_GIRDER_WELDED: frozenset({
+        KEY_MAX_DEFL, KEY_DESIGN_LOAD, KEY_SUPPORTING_OPTIONS, KEY_STR_TYPE, KEY_MEMBER_OPTIONS, KEY_LOAD,
+        KEY_ShearBucklingOption, KEY_IntermediateStiffener, KEY_IntermediateStiffener_spacing,
+        KEY_IntermediateStiffener_thickness, KEY_LongitudnalStiffener, KEY_LongitudnalStiffener_thickness,
+    }),
     # The core derives one thickness ('8'); the web dock sends the list the design picks from.
-    KEY_DISP_STRUT_WELDED_END_GUSSET: frozenset({KEY_PLATETHK}),
+    KEY_DISP_STRUT_WELDED_END_GUSSET: frozenset({KEY_PLATETHK, KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA}),
 }
 
 
