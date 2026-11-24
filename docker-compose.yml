@@ -138,7 +138,7 @@ services:
     platform: linux/amd64
     restart: unless-stopped
     ports:
-      - "8086:8086"   # InfluxDB UI + API  →  http://<server-ip>:8086
+      - "127.0.0.1:8086:8086"   # InfluxDB UI + API, this machine only  →  http://localhost:8086
     environment:
       DOCKER_INFLUXDB_INIT_MODE:         setup
       DOCKER_INFLUXDB_INIT_USERNAME:     osdag_admin
@@ -161,12 +161,11 @@ services:
     platform: linux/amd64
     restart: unless-stopped
     ports:
-      - "3001:3000"   # Grafana UI  →  http://<server-ip>:3001
+      - "127.0.0.1:3001:3000"   # Grafana UI, this machine only  →  http://localhost:3001
     environment:
       GF_SECURITY_ADMIN_USER:     admin
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD must be set}
-      GF_AUTH_ANONYMOUS_ENABLED:  "true"        # allow LAN users to view without login
-      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_ANONYMOUS_ENABLED:  "false"       # every viewer signs in
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/osdag_load_test.json
       GF_SERVER_ROOT_URL:         "%(protocol)s://%(domain)s:%(http_port)s"
       # Read by the InfluxDB datasource in monitoring/grafana/provisioning.

@@ -99,7 +99,9 @@ Each tier runs for **3 minutes** with a **30-second cooldown** between tiers so 
 - **`design_ws_connect`** *(WebSocket mode only)* — Spike here signals file-descriptor exhaustion; ensure `ulimit -n ≥ 65536` on the server.
 - **Failures / Errors** — Watch for backend timeouts, connection errors, or calculation failures.
 
-### 2. Grafana Dashboard (`http://10.104.135.9:3001`)
+### 2. Grafana Dashboard (`http://localhost:3001` on the machine running the stack)
+Grafana listens on the loopback interface only and asks for a login (`admin` and `GRAFANA_ADMIN_PASSWORD`). From another machine use `ssh -L 3001:127.0.0.1:3001 user@10.104.135.9` and browse `http://localhost:3001`.
+
 - **Host CPU / RAM** — Celery worker calculations are CPU-intensive; watch for saturation and OOM events.
 - **Redis Queue Depth** — Monitor queued task count during Tiers 3 & 4 to observe backlog behaviour.
 - **DB Connection Pool** — Check that PostgreSQL connections aren't exhausted by the API or workers.
