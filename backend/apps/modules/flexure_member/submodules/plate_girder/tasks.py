@@ -32,6 +32,10 @@ from apps.modules.flexure_member.submodules.plate_girder.adapter import (
     determine_optimization_flags,
     create_module,
 )
+from apps.modules.flexure_member.submodules.plate_girder.optimization_limits import (
+    SOFT_TIME_LIMIT,
+    TIME_LIMIT,
+)
 from osdag_core.Common import (
     KEY_MATERIAL, KEY_LENGTH, KEY_SHEAR, KEY_MOMENT, KEY_WEB_PHILOSOPHY,
     KEY_TOP_FLANGE_THICKNESS_PG, KEY_BOTTOM_FLANGE_THICKNESS_PG, KEY_WEB_THICKNESS_PG
@@ -95,7 +99,7 @@ def _sanitize_for_channels(obj: Any) -> Any:
     return obj
 
 
-@shared_task(bind=True, max_retries=3)
+@shared_task(bind=True, max_retries=3, soft_time_limit=SOFT_TIME_LIMIT, time_limit=TIME_LIMIT)
 def run_pso_optimization(self, channel_name: str, input_data: Dict[str, Any], user_id=None):
     """
     Celery task that runs Plate Girder PSO optimization and streams results
@@ -121,6 +125,8 @@ def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
     logger.info(f"Input keys: {list(input_data.keys())[:10]}...")
 
     channel_layer = get_channel_layer()
+    # Every event names its task, so the consumer can drop events of a run it replaced.
+    task_id = getattr(task.request, 'id', None)
     seq = 0
     last_send = 0.0
     last_heartbeat = 0.0
@@ -143,6 +149,7 @@ def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
                 channel_name,
                 {
                     "type": "pso_update",
+                    "task_id": task_id,
                     "data": _sanitize_for_channels(payload),
                 },
             )
@@ -166,6 +173,7 @@ def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
                 channel_name,
                 {
                     "type": "pso_heartbeat",
+                    "task_id": task_id,
                     "data": {
                         "sequence": seq + 1,
                         "status": "alive",
@@ -393,6 +401,7 @@ def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
             channel_name,
             {
                 "type": "pso_complete",
+                "task_id": task_id,
                 "data": {
                     "sequence": seq,
                     "cad_paths": cad_paths,
@@ -439,6 +448,7 @@ def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
             channel_name,
             {
                 "type": "pso_error",
+                "task_id": task_id,
                 "data": {
                     "sequence": seq + 1,
                     "message": "The optimization failed.",
