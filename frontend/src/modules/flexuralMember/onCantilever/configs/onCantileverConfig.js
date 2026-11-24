@@ -322,48 +322,5 @@ export const onCantileverConfig = {
           placeholder: "Enter shear force", required: true },
       ],
     },
-    {
-      title: "Optimization",
-      fields: [
-        {
-          key: "allowable_class",
-          label: "Allow Semi-Compact Sections",
-          type: "select",
-          options: [
-            { value: "Yes", label: "Yes" },
-            { value: "No", label: "No" }
-          ],
-          defaultValue: "Yes"
-        },
-        {
-          key: "effective_area_parameter",
-          label: "Effective Area Parameter",
-          type: "number",
-          validation: "positive_number"
-        },
-        {
-          key: "length_overwrite",
-          label: "Effective Length Parameter",
-          type: "text",
-          placeholder: "NA or a value in mm"
-        },
-        {
-          key: "bearing_length",
-          label: "Bearing Length (mm)",
-          type: "text",
-          placeholder: "NA or a value in mm"
-        },
-        {
-          key: "loading_condition",
-          label: "Loading Condition",
-          type: "select",
-          options: [
-            { value: "Normal", label: "Normal" },
-            { value: "Destabilizing", label: "Destabilizing" }
-          ],
-          defaultValue: "Normal"
-        }
-      ]
-    },
   ],
 };

@@ -31,3 +31,23 @@ export const DESIGN_METHOD_OPTIONS = [
 
 /** The design method a module starts with: the one option that can be picked. */
 export const DEFAULT_DESIGN_METHOD = DESIGN_METHOD_OPTIONS[0].value;
+
+/**
+ * The Optimization tab of the simply supported and the cantilever beam (`optimization_tab_flexure_design` in
+ * design_type/member.py). The five values are the core's own keys (`Optimum.Class`, `Effective.Area_Para`,
+ * `Loading.Condition`, `Length.Overwrite`, `Bearing.Length`); the defaults are those of the core's
+ * `get_values_for_design_pref`, which the design reads from the request.
+ */
+export const FLEXURE_OPTIMIZATION_DEFAULTS = {
+  allowable_class: "Yes",
+  effective_area_parameter: "1.0",
+  loading_condition: "Normal",
+  length_overwrite: "NA",
+  bearing_length: "NA",
+};
+
+/** Optimum.Class: the core offers Yes and No. */
+export const ALLOW_CLASS_OPTIONS = ["Yes", "No"];
+
+/** Loading.Condition (KEY_DISP_LOAD_list in the core). */
+export const LOADING_CONDITION_OPTIONS = ["Normal", "Destabilizing"];

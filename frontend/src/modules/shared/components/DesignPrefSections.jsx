@@ -11,6 +11,7 @@ import AnchorBoltSectionModal from "./AnchorBoltSectionModal";
 import WeldSectionModal from "./WeldSectionModal";
 import DetailingSectionModal from "./DetailingSectionModal";
 import OptimizationSectionModal from "./OptimizationSectionModal";
+import FlexureOptimizationSectionModal from "./FlexureOptimizationSectionModal";
 import DesignSectionModal from "./DesignSectionModal";
 import { Button, Modal, Spin, message } from "antd";
 import { getDesignPrefConfig, getDesignPrefTabs } from "../config/designPrefModuleConfig";
@@ -20,6 +21,9 @@ import {
   fetchDesignPrefSync,
 } from "../../../datasources/modulesDataSource";
 import { buildPrefDraft, findEmptyPrefField } from "../utils/designPrefValidation";
+
+// The beams show the core's Optimization tab; the other modules with that tab keep the shared one.
+const FLEXURE_BEAM_MODULES = ["Simply Supported Beam Design", "On Cantilever Beam Design"];
 
 const DesignPrefSections = ({
   module,
@@ -602,7 +606,15 @@ const DesignPrefSections = ({
               isInputLocked={isInputLocked}
             />
           )}
-          {activeTab === 12 && (
+          {activeTab === 12 && FLEXURE_BEAM_MODULES.includes(module) && (
+            <FlexureOptimizationSectionModal
+              cantilever={module === "On Cantilever Beam Design"}
+              designPrefInputs={designPrefInputs}
+              setDesignPrefInputs={setDesignPrefInputs}
+              isInputLocked={isInputLocked}
+            />
+          )}
+          {activeTab === 12 && !FLEXURE_BEAM_MODULES.includes(module) && (
             <OptimizationSectionModal
               module={module}
               designPrefInputs={designPrefInputs}
