@@ -37,6 +37,7 @@ export function makeCoverPlateBoltedConfig({
   sectionOptionsKey,
   defaultLoads,
   defaultDesignation = "MB 300",
+  memberMaterialField,
 }) {
   const config = {
     sessionName,
@@ -64,7 +65,7 @@ export function makeCoverPlateBoltedConfig({
       load_shear: defaultLoads.shear,
       material: "E 250 (Fe 410 W)A",
       member_designation: defaultDesignation,
-      member_material: "E 250 (Fe 410 W)A",
+      [memberMaterialField]: "E 250 (Fe 410 W)A",
       module: designType,
     },
 
@@ -86,7 +87,9 @@ export function makeCoverPlateBoltedConfig({
       load_moment: KEY_MOMENT,
       load_shear: KEY_SHEAR,
       member_designation: KEY_SECSIZE,
-      member_material: KEY_SEC_MATERIAL,
+      // The dock material is Material. The section tab of Additional Inputs (`memberMaterialField`) is the
+      // member's material, Member.Material; the Connector tab (connector_material) is Connector.Material.
+      [memberMaterialField]: KEY_SEC_MATERIAL,
     },
 
     modalConfig: [
@@ -127,7 +130,7 @@ export function makeCoverPlateBoltedConfig({
       [KEY_SHEAR]: inputs.load_shear || "",
       [KEY_MATERIAL]: inputs.material,
       [KEY_SECSIZE]: inputs.member_designation,
-      [KEY_SEC_MATERIAL]: inputs.member_material,
+      [KEY_SEC_MATERIAL]: inputs[memberMaterialField],
       [KEY_MODULE]: designType,
     }),
 
@@ -153,7 +156,7 @@ export function makeCoverPlateBoltedConfig({
                 ...inputs,
                 material: material.Grade,
                 connector_material: material.Grade,
-                member_material: material.Grade,
+                [memberMaterialField]: material.Grade,
               });
             },
           },
@@ -288,7 +291,7 @@ export function makeCoverPlateWeldedConfig({
       load_shear: defaultLoads.shear,
       material: "E 165 (Fe 290)",
       member_designation: defaultDesignation,
-      member_material: "E 165 (Fe 290)",
+      [memberMaterialField]: "E 165 (Fe 290)",
       module: designType,
       weld_fab: "Shop Weld",
       weld_material_grade: "290",
@@ -311,10 +314,10 @@ export function makeCoverPlateWeldedConfig({
       load_shear: KEY_SHEAR,
       member_designation: KEY_SECSIZE,
       weld_type: KEY_WELD_TYPE,
-      // Member.Material comes from `memberMaterialField`: member_material in the beam variant,
-      // the dock material in the column variant (where member_material feeds nothing).
-      material: memberMaterialField === "material" ? [KEY_MATERIAL, KEY_SEC_MATERIAL] : KEY_MATERIAL,
-      member_material: memberMaterialField === "member_material" ? KEY_SEC_MATERIAL : null,
+      // The dock material is Material. The section tab of Additional Inputs (`memberMaterialField`) is the
+      // member's material, Member.Material; the Connector tab (connector_material) is Connector.Material.
+      material: KEY_MATERIAL,
+      [memberMaterialField]: KEY_SEC_MATERIAL,
     },
 
     modalConfig: [
@@ -374,7 +377,7 @@ export function makeCoverPlateWeldedConfig({
                 ...inputs,
                 material: material.Grade,
                 connector_material: material.Grade,
-                member_material: material.Grade,
+                [memberMaterialField]: material.Grade,
               });
             }
           }

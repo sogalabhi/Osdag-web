@@ -5,7 +5,7 @@ export const coverPlateWeldedConfig = makeCoverPlateWeldedConfig({
   sessionName: "Beam Cover Plate Welded Connection",
   designType: KEY_DISP_BEAMCOVERPLATEWELD,
   cadOptions: ["Model", "Beam", "CoverPlate"],
+  memberMaterialField: "supported_material",
   sectionOptionsKey: "beamList",
   defaultLoads: { axial: "10", moment: "10", shear: "10" },
-  memberMaterialField: "member_material",
 });

@@ -2039,8 +2039,8 @@ exports[`loading a desktop .osi example into its module > beam_bolted1 (Beam-to-
     "load_shear": "",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "NPB 270 X 135 X 30.73",
-    "member_material": "E 250 (Fe 410 W)A",
     "module": "Beam-to-Beam Cover Plate Bolted Connection",
+    "supported_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -2249,8 +2249,8 @@ exports[`loading a desktop .osi example into its module > beam_bolted2 (Beam-to-
     "load_shear": "",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "UB 457 x 191 x 89",
-    "member_material": "E 250 (Fe 410 W)A",
     "module": "Beam-to-Beam Cover Plate Bolted Connection",
+    "supported_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -2459,8 +2459,8 @@ exports[`loading a desktop .osi example into its module > beam_bolted3 (Beam-to-
     "load_shear": "",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "UB 254 x 102 x 25",
-    "member_material": "E 250 (Fe 410 W)A",
     "module": "Beam-to-Beam Cover Plate Bolted Connection",
+    "supported_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -2669,8 +2669,8 @@ exports[`loading a desktop .osi example into its module > beam_bolted4 (Beam-to-
     "load_shear": "40",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "UB 457 x 191 x 89",
-    "member_material": "E 250 (Fe 410 W)A",
     "module": "Beam-to-Beam Cover Plate Bolted Connection",
+    "supported_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -2879,8 +2879,8 @@ exports[`loading a desktop .osi example into its module > beam_bolted5 (Beam-to-
     "load_shear": "40",
     "material": "E 300 (Fe 440)",
     "member_designation": "UB 305 x 165 x 54",
-    "member_material": "E 250 (Fe 410 W)A",
     "module": "Beam-to-Beam Cover Plate Bolted Connection",
+    "supported_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -3048,8 +3048,8 @@ exports[`loading a desktop .osi example into its module > beam_welded1 (Beam-to-
     "load_shear": "",
     "material": "E 300 (Fe 440)",
     "member_designation": "NPB 300 X 165 X 39.88",
-    "member_material": "E 300 (Fe 440)",
     "module": "Beam-to-Beam Cover Plate Welded Connection",
+    "supported_material": "E 300 (Fe 440)",
     "web_plate_thickness": [
       "8",
       "10",
@@ -3183,8 +3183,8 @@ exports[`loading a desktop .osi example into its module > beam_welded2 (Beam-to-
     "load_shear": "",
     "material": "E 450 (Fe 590) E",
     "member_designation": "NPB 240 X 120 X 26.15",
-    "member_material": "E 450 (Fe 590) E",
     "module": "Beam-to-Beam Cover Plate Welded Connection",
+    "supported_material": "E 450 (Fe 590) E",
     "web_plate_thickness": [
       "8",
       "10",
@@ -3318,8 +3318,8 @@ exports[`loading a desktop .osi example into its module > beam_welded3 (Beam-to-
     "load_shear": "20",
     "material": "E 450 (Fe 590) E",
     "member_designation": "WB 550",
-    "member_material": "E 450 (Fe 590) E",
     "module": "Beam-to-Beam Cover Plate Welded Connection",
+    "supported_material": "E 450 (Fe 590) E",
     "web_plate_thickness": [
       "8",
       "10",
@@ -3453,8 +3453,8 @@ exports[`loading a desktop .osi example into its module > beam_welded4 (Beam-to-
     "load_shear": "20",
     "material": "Cus_400_500_600_1400",
     "member_designation": "WPB 250 X 250 X 117.58",
-    "member_material": "Cus_400_500_600_1400",
     "module": "Beam-to-Beam Cover Plate Welded Connection",
+    "supported_material": "Cus_400_500_600_1400",
     "web_plate_thickness": [
       "8",
       "10",
@@ -3588,8 +3588,8 @@ exports[`loading a desktop .osi example into its module > beam_welded5 (Beam-to-
     "load_shear": "20",
     "material": "E 450 (Fe 590) E",
     "member_designation": "WPB 250 X 250 X 117.58",
-    "member_material": "E 450 (Fe 590) E",
     "module": "Beam-to-Beam Cover Plate Welded Connection",
+    "supported_material": "E 450 (Fe 590) E",
     "web_plate_thickness": [
       "8",
       "10",
@@ -5310,8 +5310,8 @@ exports[`loading a desktop .osi example into its module > column_bolted1 (Column
     "load_shear": "",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "UC 152 x 152 x 37",
-    "member_material": "E 250 (Fe 410 W)A",
     "module": "Column-to-Column Cover Plate Bolted Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -5520,8 +5520,8 @@ exports[`loading a desktop .osi example into its module > column_bolted2 (Column
     "load_shear": "30",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "UC 356 x 406 x 467",
-    "member_material": "E 250 (Fe 410 W)A",
     "module": "Column-to-Column Cover Plate Bolted Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -5730,8 +5730,8 @@ exports[`loading a desktop .osi example into its module > column_bolted3 (Column
     "load_shear": "30",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "PBP 300 X 88.46",
-    "member_material": "E 250 (Fe 410 W)A",
     "module": "Column-to-Column Cover Plate Bolted Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -5926,8 +5926,8 @@ exports[`loading a desktop .osi example into its module > column_bolted4 (Column
     "load_shear": "50",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "PBP 360 X 152.2",
-    "member_material": "E 250 (Fe 410 W)A",
     "module": "Column-to-Column Cover Plate Bolted Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -6080,8 +6080,8 @@ exports[`loading a desktop .osi example into its module > column_bolted5 (Column
     "load_shear": "50",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "SC 250",
-    "member_material": "E 250 (Fe 410 W)A",
     "module": "Column-to-Column Cover Plate Bolted Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -6207,8 +6207,8 @@ exports[`loading a desktop .osi example into its module > column_welded1 (Column
     "load_shear": "20",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "UC 305 x 305 x 118",
-    "member_material": "E 165 (Fe 290)",
     "module": "Column-to-Column Cover Plate Welded Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -6342,8 +6342,8 @@ exports[`loading a desktop .osi example into its module > column_welded2 (Column
     "load_shear": "200",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "UC 305 x 305 x 118",
-    "member_material": "E 165 (Fe 290)",
     "module": "Column-to-Column Cover Plate Welded Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -6477,8 +6477,8 @@ exports[`loading a desktop .osi example into its module > column_welded3 (Column
     "load_shear": "200",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "UC 305 x 305 x 118",
-    "member_material": "E 165 (Fe 290)",
     "module": "Column-to-Column Cover Plate Welded Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -6612,8 +6612,8 @@ exports[`loading a desktop .osi example into its module > column_welded4 (Column
     "load_shear": "",
     "material": "E 250 (Fe 410 W)A",
     "member_designation": "PBP 400 X 230.9",
-    "member_material": "E 165 (Fe 290)",
     "module": "Column-to-Column Cover Plate Welded Connection",
+    "supporting_material": "E 250 (Fe 410 W)A",
     "web_plate_thickness": [
       "8",
       "10",
@@ -6747,8 +6747,8 @@ exports[`loading a desktop .osi example into its module > column_welded5 (Column
     "load_shear": "200",
     "material": "Cus_400_500_600_1400",
     "member_designation": "PBP 400 X 230.9",
-    "member_material": "E 165 (Fe 290)",
     "module": "Column-to-Column Cover Plate Welded Connection",
+    "supporting_material": "Cus_400_500_600_1400",
     "web_plate_thickness": [
       "8",
       "10",
