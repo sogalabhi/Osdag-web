@@ -24,6 +24,8 @@ import django  # noqa: E402
 
 django.setup()  # adapters import apps.core.models; no database connection is made
 
+from apps.core.design_dictionary import fill_request_prefs  # noqa: E402
+
 
 def adapter_import_path(slug):
     family, _, sub = slug.partition("__")
@@ -46,7 +48,8 @@ def main():
             with open(os.path.join(slug_dir, name), encoding="utf-8") as fh:
                 inputs = json.load(fh)["inputs"]
             try:
-                adapter.validate_input(inputs)
+                # As the design task: the Additional Inputs the browser did not send come from the core.
+                adapter.validate_input(fill_request_prefs(inputs))
                 results[f"{slug}/{name[:-5]}"] = None
             except Exception as exc:  # noqa: BLE001 - we want every failure mode
                 results[f"{slug}/{name[:-5]}"] = f"{type(exc).__name__}: {exc}"

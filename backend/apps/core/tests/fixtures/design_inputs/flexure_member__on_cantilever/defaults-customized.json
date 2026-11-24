@@ -9,18 +9,11 @@
       "MB 350"
     ],
     "Material": "E 250 (Fe 410 W)A",
-    "Member.Material": "E 250 (Fe 410 W)A",
     "Flexure.Type": "Major Laterally Supported",
     "Cantilever.Support": "Continuous, with lateral restraint to top flange",
     "Cantilever.Top": "Free",
     "Member.Length": "5000",
     "Load.Shear": "50",
-    "Load.Moment": "100",
-    "Design.Design_Method": "Limit State Design",
-    "Optimum.Class": "Yes",
-    "Effective.Area_Para": "1.0",
-    "Length.Overwrite": "NA",
-    "Bearing.Length": "NA",
-    "Loading.Condition": "Normal"
+    "Load.Moment": "100"
   }
 }

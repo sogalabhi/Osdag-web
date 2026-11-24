@@ -9,7 +9,6 @@
       "60 x 60 x 6"
     ],
     "Material": "E 250 (Fe 410 W)A",
-    "Member.Material": "E 250 (Fe 410 W)A",
     "Member.Length": "3000",
     "Load.Axial": "100",
     "Conn_Location": "Long Leg",
@@ -25,18 +24,10 @@
       "10.9"
     ],
     "Bolt.Type": "Bearing Bolt",
-    "Bolt.Bolt_Hole_Type": "Standard",
-    "Bolt.Slip_Factor": "0.3",
-    "Bolt.TensionType": "Pre-tensioned",
-    "Connector.Material": "E 250 (Fe 410 W)A",
     "Connector.Plate.Thickness_List": [
       "10",
       "12",
       "16"
-    ],
-    "Design.Design_Method": "Limit State Design",
-    "Detailing.Corrosive_Influences": "No",
-    "Detailing.Edge_type": "Rolled, machine-flame cut, sawn and planed",
-    "Detailing.Gap": "10"
+    ]
   }
 }

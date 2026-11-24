@@ -16,9 +16,6 @@
     "End_1_Y": "Fixed",
     "End_2_Y": "Fixed",
     "Load.Axial": "100",
-    "Design.Design_Method": "Limit State Design",
-    "Optimum.AllowUR": "1.0",
-    "Effective.Area_Para": "1.0",
     "Optimum.Para": "Utilization Ratio"
   }
 }

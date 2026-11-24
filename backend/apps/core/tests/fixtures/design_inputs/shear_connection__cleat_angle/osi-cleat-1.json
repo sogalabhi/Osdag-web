@@ -30,8 +30,6 @@
     "Load.Shear": "100",
     "Material": "E 250 (Fe 410 W)A",
     "Module": "Cleat Angle Connection",
-    "Weld.Fab": "Shop Weld",
-    "Weld.Material_Grade_OverWrite": "410",
     "Connector.Angle_List": [
       "50 x 50 x 3",
       "50 x 50 x 4",

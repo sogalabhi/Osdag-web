@@ -2,7 +2,6 @@
   "source": "frontend-defaults:coverPlateBoltedConfig.js",
   "notes": "Run of ccCoverBolted.buildSubmissionParams on defaultInputs; every customizable list set to \"All\" (the UI default; full option lists sent). Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
-    "Bolt.Bolt_Hole_Type": "Standard",
     "Bolt.Diameter": [
       "10",
       "12",
@@ -38,8 +37,6 @@
       "10.9",
       "12.9"
     ],
-    "Bolt.Slip_Factor": "0.3",
-    "Bolt.TensionType": "Pre-tensioned",
     "Bolt.Type": "Bearing Bolt",
     "Connector.Flange_Plate.Preferences": "Outside",
     "Connector.Flange_Plate.Thickness_list": [
@@ -67,7 +64,6 @@
       "110",
       "120"
     ],
-    "Connector.Material": "E 250 (Fe 410 W)A",
     "Connector.Web_Plate.Thickness_List": [
       "8",
       "10",
@@ -93,16 +89,11 @@
       "110",
       "120"
     ],
-    "Design.Design_Method": "Limit State Design",
-    "Detailing.Corrosive_Influences": "No",
-    "Detailing.Edge_type": "Sheared or hand flame cut",
-    "Detailing.Gap": "3",
     "Load.Axial": "100",
     "Load.Moment": "70",
     "Load.Shear": "50",
     "Material": "E 250 (Fe 410 W)A",
     "Member.Designation": "UC 305 x 305 x 118",
-    "Member.Material": "E 250 (Fe 410 W)A",
     "Module": "Column-to-Column Cover Plate Bolted Connection"
   }
 }
