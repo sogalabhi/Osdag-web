@@ -66,18 +66,6 @@ export async function downloadSectionCatalog(table) {
 }
 
 /**
- * Export current user's custom rows for `table` (scope=user).
- * @param {string} table
- */
-export async function downloadSectionExportUser(table) {
-  const qs = new URLSearchParams({ table, scope: "user" }).toString();
-  const url = `${SECTIONS.export}?${qs}`;
-  const { blob, filename } = await fetchBlobWithFilename(url);
-  triggerBrowserDownload(blob, filename || `${table}_MySections.xlsx`);
-  return { success: true };
-}
-
-/**
  * @param {string} table
  * @param {File} file
  * @returns {Promise<{ success: true, data: object } | { success: false, error: string }>}
@@ -106,17 +94,6 @@ export async function addCustomSection(table, payload) {
   });
   const data = await res.json();
   return { success: true, status: res.status, data };
-}
-
-/**
- * @param {string} table
- * @param {string} designation
- */
-export async function deleteCustomSection(table, designation) {
-  const qs = new URLSearchParams({ table, designation }).toString();
-  const url = `${SECTIONS.customDelete}?${qs}`;
-  const res = await apiClient(url, { method: "DELETE" });
-  return { success: true, status: res.status };
 }
 
 /**

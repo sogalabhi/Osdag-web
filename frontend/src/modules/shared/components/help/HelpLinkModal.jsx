@@ -1,6 +1,6 @@
 import HelpDialogShell from "./HelpDialogShell";
 
-export const HelpLinkModal = ({
+const HelpLinkModal = ({
   open,
   onClose,
   title,

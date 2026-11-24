@@ -134,7 +134,7 @@ export const ShortcutProvider = ({ children }) => {
   return <ShortcutContext.Provider value={value}>{children}</ShortcutContext.Provider>;
 };
 
-export const useShortcutEngine = () => {
+const useShortcutEngine = () => {
   const ctx = useContext(ShortcutContext);
   if (!ctx) {
     throw new Error("useShortcutEngine must be used inside ShortcutProvider.");

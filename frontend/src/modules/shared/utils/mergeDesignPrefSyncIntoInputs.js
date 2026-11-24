@@ -7,7 +7,7 @@
  * @param {Object|null|undefined} metadata - `metadata` from design-pref sync response
  * @returns {Set<string>} Target keys that were copied from the dock driver
  */
-export function collectLinkedPrefKeysFromMetadata(metadata) {
+function collectLinkedPrefKeysFromMetadata(metadata) {
   const copied = metadata?.copied_from_input_dock_keys || {};
   const linkedKeys = new Set();
   Object.values(copied).forEach((targets) => {

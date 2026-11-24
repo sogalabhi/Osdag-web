@@ -4,7 +4,7 @@
  */
 
 // Default view-to-part mappings
-export const DEFAULT_VIEW_MAPPINGS = {
+const DEFAULT_VIEW_MAPPINGS = {
   "Model": "all",  // Show all parts when Model is selected
   "Beam": ["Beam"],
   "Column": ["Column"],

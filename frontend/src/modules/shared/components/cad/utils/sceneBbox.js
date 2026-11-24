@@ -30,7 +30,7 @@ export function computeSceneBoundingBox(scene) {
 
 export const DEFAULT_DISTANCE = 20;
 /** Extra margin so full model (including height) is in frame (multiplier on FOV-based distance). */
-export const PADDING_FACTOR = 2.2;
+const PADDING_FACTOR = 2.2;
 
 /**
  * Distance so the full bounding box fits in frame from any view angle.

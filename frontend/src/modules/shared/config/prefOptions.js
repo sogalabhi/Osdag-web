@@ -14,7 +14,7 @@ export const WELD_FAB_OPTIONS = [KEY_DP_FAB_SHOP, KEY_DP_FAB_FIELD];
 export const WELD_TYPE_OPTIONS = ["Shop weld", "Field weld"];
 
 /** The modules whose weld tab is Weld.Type, not Weld.Fab. */
-export const WELD_TYPE_MODULES = ["Butt Joint Welded", "Lap Joint Welded"];
+const WELD_TYPE_MODULES = ["Butt Joint Welded", "Lap Joint Welded"];
 
 /** The weld options of a module's weld tab (`module` is the session name `designPrefModuleConfig` is keyed by). */
 export const weldOptionsFor = (module) => (WELD_TYPE_MODULES.includes(module) ? WELD_TYPE_OPTIONS : WELD_FAB_OPTIONS);
