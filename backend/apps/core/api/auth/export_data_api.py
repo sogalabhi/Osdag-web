@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.core.serializers.json import DjangoJSONEncoder
 from apps.core.models import Project, CustomMaterials
-from apps.core.utils.api_errors import error_response
+from apps.core.utils.api_errors import error_response, internal_error_response
 import json
 import logging
 
@@ -62,6 +62,5 @@ class ExportUserDataAPIView(APIView):
             logger.info(f"User data exported successfully for: {user_email}")
             return response
 
-        except Exception as e:
-            logger.error(f"Error during user data export for {user_email}: {e}", exc_info=True)
-            return error_response('internal_error', f"Failed to generate data export: {str(e)}", 500)
+        except Exception:
+            return internal_error_response("Error during user data export")

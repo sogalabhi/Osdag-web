@@ -184,7 +184,7 @@ class SectionImportView(APIView):
             wb = load_workbook(upload, data_only=True)
         except Exception as exc:  # noqa: BLE001
             logger.warning("[SectionImport] 400 — could not read workbook: %s", exc)
-            return error_response('bad_request', f"Could not read Excel file: {exc}", status.HTTP_400_BAD_REQUEST)
+            return error_response('bad_request', "Could not read the Excel file. Upload a valid .xlsx file.", status.HTTP_400_BAD_REQUEST)
 
         try:
             logger.info("[SectionImport] workbook sheet names=%s", wb.sheetnames)

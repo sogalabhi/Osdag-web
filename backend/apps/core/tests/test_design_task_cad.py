@@ -150,7 +150,8 @@ class StubbedServiceTests(SimpleTestCase):
         self.assertTrue(result["design_status"])
         self.assertEqual(result["data"]["Key"]["val"], 1)
         self.assertEqual(result["files"], {})
-        self.assertEqual(result["cad_error"], "OCC crashed")
+        self.assertEqual(result["cad_error"], tasks.CAD_ERROR_MESSAGE)
+        self.assertNotIn("OCC crashed", json.dumps(result))
 
     def test_cad_is_built_from_the_recorded_module(self):
         cad = {"files": {"Model": "data:x"}, "hover_dict": {"Bolt": "M16"}, "warnings": [{"section": "Weld"}]}

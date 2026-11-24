@@ -7,6 +7,11 @@ class OsdagApiException(Exception):
     pass
 
 
+class InvalidInputError(OsdagApiException):
+    """Raised when the design inputs are not acceptable; the message is written for the user."""
+    pass
+
+
 class MissingKeyError(OsdagApiException):
     """Raised when a design parameter is missing from the input parameters."""
     def __init__(self, key: str):

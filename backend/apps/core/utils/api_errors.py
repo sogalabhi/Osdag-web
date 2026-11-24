@@ -16,7 +16,14 @@ client can map it back to a form field.
 
 Celery task results (``{'success': False, 'error': msg}`` sent over the task
 WebSocket or ``/api/tasks/<id>/``) are a separate channel and keep their own
-shape.
+shape. Their ``error`` text follows the same rule as the HTTP errors: a message
+written for the user for invalid input, the generic message otherwise (see
+``failure_result``).
+
+Exception text, file paths and class names are never put into a response or a
+task result. Handlers that catch everything use ``internal_error_response``
+(or ``internal_error_json_response``) in the ``except`` block, which logs the
+exception on the server.
 """
 import logging
 from typing import Any, Dict, Optional
@@ -38,6 +45,7 @@ from .errors import (
 logger = logging.getLogger(__name__)
 
 INTERNAL_ERROR_MESSAGE = "An unexpected error occurred."
+INTERNAL_ERROR_CODE = "internal_error"
 
 
 def error_payload(
@@ -75,6 +83,37 @@ def error_json_response(
 ) -> JsonResponse:
     """``JsonResponse`` in the standard error format, for plain Django views."""
     return JsonResponse(error_payload(code, message, fields, **extra), status=status)
+
+
+def internal_error_response(context: str, **extra: Any) -> Response:
+    """500 in the standard format for an unexpected failure, in DRF views.
+
+    Call it inside an ``except`` block: the exception is logged here, with
+    ``context`` saying what was being done, and never put into the response.
+    """
+    logger.exception(context)
+    return error_response(INTERNAL_ERROR_CODE, INTERNAL_ERROR_MESSAGE, 500, **extra)
+
+
+def internal_error_json_response(context: str, **extra: Any) -> JsonResponse:
+    """Like ``internal_error_response``, for plain Django views."""
+    logger.exception(context)
+    return error_json_response(INTERNAL_ERROR_CODE, INTERNAL_ERROR_MESSAGE, 500, **extra)
+
+
+def failure_result(exc: BaseException, context: str) -> Dict[str, Any]:
+    """Task or service result (``success: False``) for an exception that stopped a calculation.
+
+    An ``OsdagApiException`` is a problem with the inputs and its message is written
+    for the user, so it is kept. Any other exception is logged here and the result
+    carries only the generic message.
+    """
+    if isinstance(exc, OsdagApiException):
+        message = str(exc)
+    else:
+        logger.error("%s failed", context, exc_info=exc)
+        message = INTERNAL_ERROR_MESSAGE
+    return {'data': {}, 'logs': [], 'success': False, 'error': message}
 
 
 def flatten_validation_errors(detail: Any, prefix: str = "") -> Dict[str, str]:

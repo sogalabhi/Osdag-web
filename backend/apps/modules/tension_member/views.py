@@ -16,7 +16,7 @@ from apps.core.utils.module_helpers import (
 from apps.core import catalog
 from apps.core.models import CustomMaterials
 from apps.sections.options_merge import merge_user_sections_into_options
-from apps.core.utils.api_errors import error_response
+from apps.core.utils.api_errors import error_response, internal_error_response
 
 
 # Mapping from tension-member slug to report module_id
@@ -130,6 +130,6 @@ class TensionMemberViewSet(viewsets.ViewSet):
                 )
 
             return error_response('submodule_not_found', f'Sub-module {slug} not found', status.HTTP_404_NOT_FOUND)
-        except Exception as exc:
-            return error_response('internal_error', str(exc), status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            return internal_error_response("Options for the tension member module")
     

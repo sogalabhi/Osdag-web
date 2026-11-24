@@ -20,7 +20,7 @@ from apps.core.utils.module_helpers import (
 from apps.core import catalog
 from apps.core.models import CustomMaterials
 from apps.sections.options_merge import merge_user_sections_into_options
-from apps.core.utils.api_errors import error_response
+from apps.core.utils.api_errors import error_response, internal_error_response
 
 
 SHEAR_REPORT_MODULE_ID_MAP = {
@@ -154,6 +154,6 @@ class ShearConnectionViewSet(viewsets.ViewSet):
                 )
 
             return error_response('submodule_not_found', f'Sub-module {slug} not found', 404)
-        except Exception as e:
-            return error_response('internal_error', str(e), 500)
+        except Exception:
+            return internal_error_response("Options for the shear connection module")
     

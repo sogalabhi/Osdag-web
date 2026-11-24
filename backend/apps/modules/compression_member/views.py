@@ -21,7 +21,7 @@ from apps.core import catalog
 from apps.core.models import CustomMaterials
 from apps.core.osdag_overrides import unknown_material_error, user_id_from_request, user_rows
 from apps.sections.options_merge import merge_user_sections_into_options
-from apps.core.utils.api_errors import error_response
+from apps.core.utils.api_errors import error_response, internal_error_response
 
 
 # Mapping from compression-member submodule slug to report module_id
@@ -192,8 +192,8 @@ class CompressionMemberViewSet(viewsets.ViewSet):
                 )
 
             return error_response('submodule_not_found', f'Sub-module {slug} not found', status.HTTP_404_NOT_FOUND)
-        except Exception as exc:
-            return error_response('internal_error', str(exc), status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            return internal_error_response("Options for the compression member module")
     
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
     def report_generate_initial(self, request, submodule_slug=None):

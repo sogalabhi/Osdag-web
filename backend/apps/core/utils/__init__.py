@@ -1,7 +1,7 @@
 """
 Core utilities package - Re-exports for convenience
 """
-from .errors import OsdagApiException, MissingKeyError, InvalidInputTypeError
+from .errors import OsdagApiException, MissingKeyError, InvalidInputTypeError, InvalidInputError
 from .validation import (
     validate_list_type, contains_keys, custom_list_validation,
     int_able, float_able, is_yes_or_no,
@@ -13,7 +13,7 @@ from .raw_output_export import build_raw_output_dict
 
 __all__ = [
     # Errors
-    'OsdagApiException', 'MissingKeyError', 'InvalidInputTypeError',
+    'OsdagApiException', 'MissingKeyError', 'InvalidInputTypeError', 'InvalidInputError',
     # Validation utilities
     'validate_list_type', 'contains_keys', 'custom_list_validation',
     'int_able', 'float_able', 'is_yes_or_no',

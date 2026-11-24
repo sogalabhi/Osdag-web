@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from apps.core.module_finder import developed_modules, get_module_api
 from apps.core.osdag_overrides import user_id_from_request, user_rows
+import logging
 import shutil
 import json
 import os
@@ -22,7 +23,7 @@ from io import BytesIO
 # rest_framework
 from rest_framework import status
 from rest_framework.response import Response
-from apps.core.utils.api_errors import error_json_response
+from apps.core.utils.api_errors import error_json_response, internal_error_json_response
 from osdag_core.Common import (
     KEY_D,
     KEY_DISP_BB_EP_SPLICE,
@@ -44,6 +45,8 @@ from osdag_core.Common import (
     KEY_DISP_TENSION_WELDED,
     KEY_GRD,
 )
+
+logger = logging.getLogger(__name__)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CADGeneration(View):
@@ -75,7 +78,10 @@ class CADGeneration(View):
                 return error_json_response('missing_field', "input_values are required", 400)
             
             # Get module API
-            module_api = get_module_api(module_id)
+            try:
+                module_api = get_module_api(module_id)
+            except KeyError:
+                return error_json_response('unknown_module', "Unknown module type", 400)
             
             # Determine session type from module id
             module_type_mapping = {
@@ -105,8 +111,8 @@ class CADGeneration(View):
                 
         except json.JSONDecodeError:
             return error_json_response('invalid_json', "Invalid JSON in request body", 400)
-        except Exception as e:
-            return error_json_response('internal_error', f"Error parsing request: {str(e)}", 500)
+        except Exception:
+            return internal_error_json_response("Error parsing the CAD generation request")
         
         # Directory setup
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -190,9 +196,8 @@ class CADGeneration(View):
                 print(f"[cad_model_api] Resolved path for section '{section}': {path_to_file} (base_root={base_root})")
                 print(f"[cadissue] Path resolution for section={section}: {path_to_file}, exists={os.path.exists(path_to_file)}")
                 if not os.path.exists(path_to_file):
-                    msg = f'Generated file for {section} does not exist at: {path_to_file}'
-                    print(msg)
-                    error_details.append({"section": section, "error": msg})
+                    print(f'Generated file for {section} does not exist at: {path_to_file}')
+                    error_details.append({"section": section, "error": "The CAD file was not created."})
                     continue
 
                 stl_path = path_to_file.replace(".brep", ".stl")
@@ -258,12 +263,12 @@ class CADGeneration(View):
                             print(f"Failed to load parts from manifest: {me}")
                 except Exception as e:
                     print(f"Failed reading model file for {section}: {e}")
-                    error_details.append({"section": section, "error": f"Failed reading file: {str(e)}"})
+                    error_details.append({"section": section, "error": "The CAD file could not be read."})
                     continue
                 
             except Exception as e:
-                print(f"Exception while generating {section}: {e}")
-                error_details.append({"section": section, "error": str(e)})
+                logger.exception("CAD generation failed for section %s", section)
+                error_details.append({"section": section, "error": "The CAD model could not be generated."})
                 
         print(f"[cad_model_api] Final output_files keys: {list(output_files.keys())}")
         print(f"[cadissue] Final output_files keys: {list(output_files.keys())}")

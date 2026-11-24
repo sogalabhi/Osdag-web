@@ -3,6 +3,7 @@ Axially Loaded Column - Service Layer
 Bridges between the REST API and osdag_core ColumnDesign via the local adapter.
 """
 
+from apps.core.utils.api_errors import failure_result
 from .adapter import validate_input, generate_output, create_cad_model
 import traceback
 
@@ -58,30 +59,7 @@ class AxiallyLoadedColumnService:
             return result
 
         except Exception as e:
-            print("\n" + "=" * 60)
-            print(" ERROR in AxiallyLoadedColumnService.calculate()")
-            print("=" * 60)
-            print(f"Exception type: {type(e).__name__}")
-            print(f"Exception message: {str(e)}")
-
-            # Derive a clean error message
-            error_msg = str(e)
-            if hasattr(e, "error") and e.error is not None:
-                error_msg = str(e.error)
-            elif hasattr(e, "args") and e.args:
-                error_msg = str(e.args[0])
-
-            print(f"Final error message: {error_msg}")
-            print("\nFull traceback:")
-            traceback.print_exc()
-            print("=" * 60)
-
-            return {
-                "data": {},
-                "logs": [],
-                "success": False,
-                "error": error_msg,
-            }
+            return failure_result(e, "AxiallyLoadedColumnService calculation")
 
     @staticmethod
     def get_cad_model(inputs: dict, section: str, session: str, module=None) -> str:

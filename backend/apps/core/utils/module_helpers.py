@@ -3,9 +3,13 @@ Shared utilities for module endpoints
 Handles authentication, guest mode, and project saving logic
 Used by all parent module ViewSets (shear_connection, moment_connection, etc.)
 """
+import logging
 from typing import Optional, Dict, Any
 from django.http import HttpRequest
 from apps.core.models import Project
+from apps.core.utils.api_errors import INTERNAL_ERROR_MESSAGE
+
+logger = logging.getLogger(__name__)
 
 
 def is_guest_user(request: HttpRequest) -> bool:
@@ -74,11 +78,12 @@ def save_to_project(
             'project_id': project_id,
             'error': 'Project not found or access denied'
         }
-    except Exception as e:
+    except Exception:
+        logger.exception("Could not save the inputs to project %s", project_id)
         return {
             'saved': False,
             'project_id': project_id,
-            'error': str(e)
+            'error': INTERNAL_ERROR_MESSAGE
         }
 
 

@@ -19,7 +19,7 @@ from . import MODULE_ID
 from .service import BasePlateService
 from .adapter import create_from_input, hollow_section_designations
 from apps.sections.options_merge import merge_user_sections_into_options
-from apps.core.utils.api_errors import error_response
+from apps.core.utils.api_errors import error_response, internal_error_response
 
 logger = logging.getLogger(__name__)
 
@@ -83,9 +83,8 @@ class BasePlateViewSet(viewsets.ViewSet):
                 merge_user_sections_into_options(request, data),
                 status=status.HTTP_200_OK,
             )
-        except Exception as exc:
-            logger.exception("Base plate options failed")
-            return error_response('internal_error', str(exc), status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            return internal_error_response("Options for the base plate module")
 
     @action(detail=False, methods=['post'], url_path='report/generate-initial')
     def report_generate_initial(self, request):

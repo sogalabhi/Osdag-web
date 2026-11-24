@@ -19,7 +19,7 @@ from osdag_core.Common import (
     KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED,
 )
 from .registry import SimpleConnectionRegistry
-from apps.core.utils.api_errors import error_response
+from apps.core.utils.api_errors import error_response, internal_error_response
 
 logger = logging.getLogger(__name__)
 
@@ -133,8 +133,8 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
                 return Response(data, status=status.HTTP_200_OK)
 
             return error_response('submodule_not_found', f'Sub-module {slug} not found', 404)
-        except Exception as exc:
-            return error_response('internal_error', str(exc), 500)
+        except Exception:
+            return internal_error_response("Options for the simple connection module")
     
     @action(detail=False, methods=['post'], url_path='(?P<submodule_slug>[^/.]+)/report/generate-initial')
     def report_generate_initial(self, request, submodule_slug=None):

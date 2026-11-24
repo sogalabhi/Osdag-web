@@ -24,7 +24,7 @@ from osdag_core.Common import (
     KEY_SUPPORT_TYPE2,
 )
 from apps.core.utils import (
-    MissingKeyError, InvalidInputTypeError,
+    MissingKeyError, InvalidInputTypeError, InvalidInputError,
     contains_keys, build_raw_output_dict,
 )
 from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
@@ -99,7 +99,7 @@ def create_from_input(input_values: Dict[str, Any]) -> Flexure_Cantilever:
         member_designation = [str(member_designation)]
 
     if not member_designation:
-        raise ValueError("No section designations provided!")
+        raise InvalidInputError("No section designations provided!")
 
     # ---- Support Type mapping ----
     # Frontend sends "Major Laterally Supported", "Minor Laterally Unsupported", "Major Laterally Unsupported"

@@ -17,6 +17,10 @@ DESKTOP_MODULE_NAMES = {"End Plate Connection": KEY_DISP_HEADERPLATE}
 WEB_MODULE_NAMES = {web: desktop for desktop, web in DESKTOP_MODULE_NAMES.items()}
 
 
+class OsiFormatError(ValueError):
+    """An `.osi` payload or file that is not valid. The message is fixed text, written for the user."""
+
+
 def validate_module_id(module_id: str) -> bool:
     if not isinstance(module_id, str):
         return False
@@ -26,11 +30,11 @@ def validate_module_id(module_id: str) -> bool:
 
 def build_osi_payload(name: str, module_id: str, inputs: Dict[str, Any]) -> Dict[str, Any]:
     if not name or not isinstance(name, str):
-        raise ValueError("Invalid project name")
+        raise OsiFormatError("Invalid project name")
     if not validate_module_id(module_id):
-        raise ValueError("Invalid module_id")
+        raise OsiFormatError("Invalid module_id")
     if not isinstance(inputs, dict):
-        raise ValueError("Invalid inputs; expected object")
+        raise OsiFormatError("Invalid inputs; expected object")
     return {
         "version": OSI_SCHEMA_VERSION,
         "name": name,
@@ -93,9 +97,12 @@ def _parse_flat_yaml(text: str) -> Dict[str, Any]:
     same list occurs twice) are resolved, so each key gets its own copy of the list.
     An empty value becomes an empty list.
     """
-    data = yaml.load(text, Loader=_StringSafeLoader)
+    try:
+        data = yaml.load(text, Loader=_StringSafeLoader)
+    except yaml.YAMLError:
+        raise OsiFormatError("Malformed OSI file") from None
     if not isinstance(data, dict):
-        raise ValueError("Malformed OSI file")
+        raise OsiFormatError("Malformed OSI file")
 
     flat_inputs: Dict[str, Any] = {}
     for key, value in data.items():
@@ -131,7 +138,7 @@ def parse_osi(text: str) -> Tuple[str, str, Dict[str, Any]]:
         module_id = flat_inputs.get(KEY_MODULE) or flat_inputs.get("module") or ""
 
         if not module_id:
-            raise ValueError("Module missing in OSI")
+            raise OsiFormatError("Module missing in OSI")
         module_id = DESKTOP_MODULE_NAMES.get(module_id, module_id)
 
         name = flat_inputs.get("name") or module_id

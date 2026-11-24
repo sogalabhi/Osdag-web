@@ -2,6 +2,7 @@
 Service for Lap Joint Welded
 """
 from osdag_core.Common import KEY_DISP_LAPJOINTWELDED
+from apps.core.utils.api_errors import failure_result
 from .adapter import validate_input, generate_output, create_cad_model
 import traceback
 
@@ -22,13 +23,7 @@ class Service:
                 'raw_csv': raw_csv or {},
             }
         except Exception as exc:
-            traceback.print_exc()
-            return {
-                'data': {},
-                'logs': [],
-                'success': False,
-                'error': str(exc),
-            }
+            return failure_result(exc, "lap joint welded calculation")
 
     @staticmethod
     def get_cad_model(inputs: dict, section: str, session: str, module=None) -> str:
