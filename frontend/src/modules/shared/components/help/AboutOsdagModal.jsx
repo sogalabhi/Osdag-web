@@ -18,7 +18,7 @@ const TAB_IDS = [
   "Caveats",
 ];
 
-export const AboutOsdagModal = ({ open, onClose, initialTab = "About" }) => {
+const AboutOsdagModal = ({ open, onClose, initialTab = "About" }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
 
   useEffect(() => {

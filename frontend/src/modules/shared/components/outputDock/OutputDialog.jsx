@@ -77,7 +77,7 @@ const FractureCards = ({ dialog }) => {
 };
 
 /** One dialog: its left panel next to its drawings, or the cards of a fracture dialog. */
-export const OutputDialog = ({ dialog }) => {
+const OutputDialog = ({ dialog }) => {
   if (dialog.id in FRACTURES) return <FractureCards dialog={dialog} />;
   const drawings = DIALOGS[dialog.id](dialog.values);
   return (

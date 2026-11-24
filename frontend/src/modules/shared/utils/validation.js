@@ -30,7 +30,7 @@ const isEmptyValue = (value) => {
  * `selectionStates[field.selectionKey]` is "Customized" — otherwise the full list from
  * `field.dataSource` is used instead of `inputs[field.key]`, so an empty array is valid.
  */
-export const getMissingRequiredFields = (inputSections, inputs, extraState, selectionStates) => {
+const getMissingRequiredFields = (inputSections, inputs, extraState, selectionStates) => {
   const missing = [];
   for (const section of inputSections || []) {
     for (const field of section.fields || []) {
@@ -62,7 +62,7 @@ const isNumericValue = (value) => {
 };
 
 /** Visible, enabled 'number' fields whose non-empty value is not a number. */
-export const getInvalidNumberFields = (inputSections, inputs, extraState) => {
+const getInvalidNumberFields = (inputSections, inputs, extraState) => {
   const invalid = [];
   for (const section of inputSections || []) {
     for (const field of section.fields || []) {

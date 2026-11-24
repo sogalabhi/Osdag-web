@@ -1,4 +1,4 @@
-export const SHORTCUT_PLATFORM = {
+const SHORTCUT_PLATFORM = {
   WIN_LINUX: 'winLinux',
   MAC: 'mac',
 };
@@ -337,7 +337,7 @@ export const SHORTCUT_ACTION_BY_ID = SHORTCUT_ACTIONS.reduce((acc, action) => {
   return acc;
 }, {});
 
-export const MENU_ACTION_TO_SHORTCUT_ID = {
+const MENU_ACTION_TO_SHORTCUT_ID = {
   'Create Project': 'eng.project.create',
   'Load Input': 'eng.input.load',
   'Create Design Report': 'eng.report.download',
@@ -351,7 +351,7 @@ export const MENU_ACTION_TO_SHORTCUT_ID = {
   'Show optimization graph': '',
 };
 
-export const getShortcutDisplayLabel = (
+const getShortcutDisplayLabel = (
   actionId,
   platform = SHORTCUT_PLATFORM.WIN_LINUX
 ) => {

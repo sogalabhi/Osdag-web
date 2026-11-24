@@ -1,6 +1,6 @@
 import { Modal, Button } from "antd";
 
-export const HelpDialogShell = ({
+const HelpDialogShell = ({
   open,
   onClose,
   title,

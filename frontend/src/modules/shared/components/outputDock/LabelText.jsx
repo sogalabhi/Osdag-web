@@ -7,7 +7,7 @@ const TOKEN = /<(sub|sup|b|i)>(.*?)<\/\1>|<br\s*\/?>/gi;
  * (output labels, popup rows, the 3D model's hover text) as real React elements. Any other
  * text (including other tags) is rendered as plain text, so no HTML is ever injected.
  */
-export function LabelText({ children }) {
+function LabelText({ children }) {
   const text = typeof children === "string" ? children : "";
   if (!text) return children ?? null;
   const parts = [];

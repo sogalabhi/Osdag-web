@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useReducer, useRef } from 'react';
 import AppReducer from './AppReducer';
 
@@ -20,7 +19,7 @@ let initialValue = {
 }
 
 //create context
-export const GlobalContext = createContext(initialValue);
+const GlobalContext = createContext(initialValue);
 
 //provider component
 export const GlobalProvider = ({ children }) => {

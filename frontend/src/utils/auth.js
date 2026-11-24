@@ -12,7 +12,7 @@ export const getCurrentUser = () => {
 /**
  * Check if current user's email is verified
  */
-export const isEmailVerified = () => {
+const isEmailVerified = () => {
   return auth.currentUser?.emailVerified || false;
 };
 

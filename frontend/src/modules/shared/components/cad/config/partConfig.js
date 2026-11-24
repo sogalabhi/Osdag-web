@@ -4,7 +4,7 @@
  */
 
 // Default part colors (hex values)
-export const DEFAULT_PART_COLORS = {
+const DEFAULT_PART_COLORS = {
   // Structural members
   Beam: "#C8C89E",
   Column: "#909078",

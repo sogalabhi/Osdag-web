@@ -1,7 +1,7 @@
 // Centralized endpoint path builders for Osdag web backend.
 // These are relative to apiBase and consumed by datasources + services.
 
-export const API_PREFIX = "api/";
+const API_PREFIX = "api/";
 
 // ----------------------
 // Projects
