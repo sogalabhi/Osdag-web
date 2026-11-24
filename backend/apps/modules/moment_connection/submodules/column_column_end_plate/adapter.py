@@ -91,8 +91,6 @@ def get_required_keys() -> List[str]:
         KEY_SECSIZE,
         KEY_SEC_MATERIAL,
         KEY_MODULE,
-        KEY_DP_WELD_FAB,
-        KEY_DP_WELD_MATERIAL_G_O,
         KEY_WELD_TYPE,
         KEY_PLATETHK,
     ]
@@ -212,8 +210,9 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     if not isinstance(input_values[KEY_MODULE], str):
         raise InvalidInputTypeError(KEY_MODULE, "str")
 
-    # Validate Weld.Fab
-    if not isinstance(input_values[KEY_DP_WELD_FAB], str):
+    # Weld.Fab and Weld.Material_Grade_OverWrite are optional: the core neither derives nor reads
+    # them for this module. A saved value is still checked.
+    if KEY_DP_WELD_FAB in input_values and not isinstance(input_values[KEY_DP_WELD_FAB], str):
         raise InvalidInputTypeError(KEY_DP_WELD_FAB, "str")
 
     # Validate Weld.Type
@@ -221,7 +220,7 @@ def validate_input(input_values: Dict[str, Any]) -> None:
         raise InvalidInputTypeError(KEY_WELD_TYPE, "str")
 
     # Validate Weld.Material_Grade_OverWrite
-    weld_materialgradeoverwrite = input_values[KEY_DP_WELD_MATERIAL_G_O]
+    weld_materialgradeoverwrite = input_values.get(KEY_DP_WELD_MATERIAL_G_O, "0")
     if (not isinstance(weld_materialgradeoverwrite, str)
             or not int_able(weld_materialgradeoverwrite)):
         raise InvalidInputTypeError(
