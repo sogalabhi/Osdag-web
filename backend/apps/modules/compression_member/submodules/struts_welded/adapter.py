@@ -5,18 +5,10 @@ Implements the business logic for compression member welded design
 # Module identifier for CommonDesignLogic (used for CAD generation)
 
 from osdag_core.Common import (
-    KEY_ALLOW_LOAD,
-    KEY_ALLOW_UR,
     KEY_AXIAL,
-    KEY_BOLT_Number,
-    KEY_Buckling_In_plane,
-    KEY_Buckling_Out_plane,
     KEY_CONNECTOR_MATERIAL,
     KEY_DISP_STRUT_WELDED_END_GUSSET,
     KEY_DP_DESIGN_METHOD,
-    KEY_DP_WELD_FAB,
-    KEY_DP_WELD_MATERIAL_G_O,
-    KEY_EFFECTIVE_AREA_PARA,
     KEY_END1,
     KEY_END2,
     KEY_LENGTH,
@@ -168,29 +160,6 @@ def create_from_input(input_values: Dict[str, Any]) -> Compression_welded:
         input_values[KEY_SECSIZE] = [
             str(x).strip() for x in md if x is not None and str(x).strip() != ""
         ]
-    
-    
-    # Set default values for design preferences if they are not already set
-    if KEY_ALLOW_UR not in input_values:
-        input_values[KEY_ALLOW_UR] = "1.0"
-    if KEY_EFFECTIVE_AREA_PARA not in input_values:
-        input_values[KEY_EFFECTIVE_AREA_PARA] = "1.0"
-    if KEY_Buckling_Out_plane not in input_values:
-        input_values[KEY_Buckling_Out_plane] = "1.0"
-    if KEY_Buckling_In_plane not in input_values:
-        input_values[KEY_Buckling_In_plane] = "1.0"
-    if KEY_ALLOW_LOAD not in input_values:
-        input_values[KEY_ALLOW_LOAD] = "Concentric Load"
-    if KEY_BOLT_Number not in input_values:
-        input_values[KEY_BOLT_Number] = "1.0"
-    if KEY_DP_DESIGN_METHOD not in input_values:
-        input_values[KEY_DP_DESIGN_METHOD] = "Limit State Design"
-    
-    # Weld fabrication/grade defaults
-    if KEY_DP_WELD_FAB not in input_values:
-        input_values[KEY_DP_WELD_FAB] = "Shop Weld"
-    if KEY_DP_WELD_MATERIAL_G_O not in input_values:
-        input_values[KEY_DP_WELD_MATERIAL_G_O] = ""
 
     module.set_input_values(input_values)
     # Restore the display name for reports (set_input_values overrides self.module with the raw KEY_MODULE value)
