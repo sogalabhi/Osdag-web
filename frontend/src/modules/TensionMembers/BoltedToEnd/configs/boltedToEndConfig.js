@@ -2,6 +2,7 @@ import ANGLES from "../../../../assets/TensionMember/Angles.png";
 import BACK_TO_BACK_ANGLES from "../../../../assets/TensionMember/back_back_angles.png";
 import STAR_ANGLES from "../../../../assets/TensionMember/star_angles.png";
 import CHANNELS from "../../../../assets/TensionMember/Channels.png";
+import BACK_TO_BACK_CHANNELS from "../../../../assets/TensionMember/back_back_channels_bolted.png";
 import ErrorImg from "../../../../assets/notSelected.png";
 import {
   KEY_AXIAL,
@@ -109,6 +110,8 @@ export const boltedToEndConfig = {
         return STAR_ANGLES;
       case "Channels":
         return CHANNELS;
+      case "Back to Back Channels":
+        return BACK_TO_BACK_CHANNELS;
       default:
         return ErrorImg;
     }

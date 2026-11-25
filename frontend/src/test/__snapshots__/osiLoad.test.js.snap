@@ -8542,7 +8542,7 @@ exports[`loading a desktop .osi example into its module > tension_b_bbchannel (T
   },
   "designPrefOverrides": {},
   "extraState": {
-    "imageSource": "/src/assets/notSelected.png",
+    "imageSource": "/src/assets/TensionMember/back_back_channels_bolted.png",
     "selectedProfile": "Back to Back Channels",
   },
   "inputs": {
@@ -10657,7 +10657,7 @@ exports[`loading a desktop .osi example into its module > tension_w_bbchannels (
   },
   "designPrefOverrides": {},
   "extraState": {
-    "imageSource": "/src/assets/notSelected.png",
+    "imageSource": "/src/assets/TensionMember/back_back_channels_welded.png",
     "selectedProfile": "Back to Back Channels",
   },
   "inputs": {

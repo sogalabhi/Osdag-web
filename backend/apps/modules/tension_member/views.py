@@ -7,7 +7,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from osdag_core.Common import KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED
+from osdag_core.Common import KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, VALUES_SEC_PROFILE_2
 from .registry import TensionMemberRegistry
 from apps.core.utils.module_helpers import (
     trigger_async_design,
@@ -81,7 +81,8 @@ class TensionMemberViewSet(viewsets.ViewSet):
             '8', '10', '12', '14', '16', '18', '20', '22', '25', '28', '32', '36', '40', '45', '50',
             '56', '63', '75', '80', '90', '100', '110', '120'
         ]
-        section_profiles = ["Angles", "Back to Back Angles", "Star Angles", "Channels"]
+        # The core's own list, shared by both tension modules (ends with Back to Back Channels).
+        section_profiles = list(VALUES_SEC_PROFILE_2)
         bolt_hole_type_list = ["Standard", "Over-sized"]
         bolt_type_list = ["Bearing Bolt", "Friction Grip Bolt"]
         bolt_slip_factor_list = ["0.3", "0.5"]
