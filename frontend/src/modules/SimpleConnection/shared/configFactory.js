@@ -10,6 +10,7 @@ import {
 import { validateSimpleConnectionInputs } from "./validation";
 import { validateRequiredFields } from "../../shared/utils/validation";
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../shared/config/prefCoreKeys";
+import { BOLT_NON_PRE_TENSIONED } from "../../shared/config/prefOptions";
 
 function getArrayParam(allSelectedFlag, fullList, selectedList) {
     if (allSelectedFlag) {
@@ -49,7 +50,7 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
             material: "E 250 (Fe 410 W)A",
             detailing_edge_type: "Sheared or hand flame cut",
             ...(hasCoverPlate ? { cover_plate: "Single-Cover", detailing_packing_plate: "Yes" } : {}),
-            bolt_tension_type: "Non Pre-tensioned",
+            bolt_tension_type: BOLT_NON_PRE_TENSIONED,
             design_for: "Tension",
         },
 

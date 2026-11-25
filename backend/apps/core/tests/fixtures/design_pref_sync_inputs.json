@@ -1826,7 +1826,7 @@
       "open": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -1850,7 +1850,7 @@
       "open_draft": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -1878,7 +1878,7 @@
       "open_saved_overrides": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -1905,7 +1905,7 @@
       "refresh": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -1929,7 +1929,7 @@
       "refresh_changed_driver": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -1953,7 +1953,7 @@
       "refresh_stale_prefs": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -1980,7 +1980,7 @@
       "save": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -2004,7 +2004,7 @@
       "save_draft": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -2032,7 +2032,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -2063,7 +2063,7 @@
       "reset": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -2087,7 +2087,7 @@
       "reset_changed_driver": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -2111,7 +2111,7 @@
       "reset_saved_overrides": {
         "module_id": "Butt Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5613,7 +5613,7 @@
       "open": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5635,7 +5635,7 @@
       "open_draft": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5661,7 +5661,7 @@
       "open_saved_overrides": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5686,7 +5686,7 @@
       "refresh": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5708,7 +5708,7 @@
       "refresh_changed_driver": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5730,7 +5730,7 @@
       "refresh_stale_prefs": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5755,7 +5755,7 @@
       "save": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5777,7 +5777,7 @@
       "save_draft": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5803,7 +5803,7 @@
       "save_saved_overrides_draft": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5832,7 +5832,7 @@
       "reset": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5854,7 +5854,7 @@
       "reset_changed_driver": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Standard",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",
@@ -5876,7 +5876,7 @@
       "reset_saved_overrides": {
         "module_id": "Lap Joint Bolted Connection",
         "inputs": {
-          "Bolt.TensionType": "Non Pre-tensioned",
+          "Bolt.TensionType": "Non pre-tensioned",
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Bolt.Slip_Factor": "0.3",
           "Detailing.Edge_type": "Sheared or hand flame cut",

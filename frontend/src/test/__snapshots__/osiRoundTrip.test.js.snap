@@ -285,9 +285,7 @@ exports[`a desktop .osi example opened and saved again > bbep_2 (Beam-to-Beam En
 exports[`a desktop .osi example opened and saved again > bc_ep_1 (Beam-to-Column End Plate Connection) 1`] = `
 {
   "added": [],
-  "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
-  },
+  "changed": {},
   "dropped": [],
 }
 `;
@@ -295,9 +293,7 @@ exports[`a desktop .osi example opened and saved again > bc_ep_1 (Beam-to-Column
 exports[`a desktop .osi example opened and saved again > bc_ep_2 (Beam-to-Column End Plate Connection) 1`] = `
 {
   "added": [],
-  "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
-  },
+  "changed": {},
   "dropped": [],
 }
 `;
@@ -306,7 +302,6 @@ exports[`a desktop .osi example opened and saved again > bc_ep_3 (Beam-to-Column
 {
   "added": [],
   "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
     "Load.Axial": """ -> "0"",
   },
   "dropped": [],
@@ -317,7 +312,6 @@ exports[`a desktop .osi example opened and saved again > bc_ep_4 (Beam-to-Column
 {
   "added": [],
   "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
     "Load.Axial": """ -> "0"",
   },
   "dropped": [],
@@ -327,9 +321,7 @@ exports[`a desktop .osi example opened and saved again > bc_ep_4 (Beam-to-Column
 exports[`a desktop .osi example opened and saved again > bc_ep_5 (Beam-to-Column End Plate Connection) 1`] = `
 {
   "added": [],
-  "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
-  },
+  "changed": {},
   "dropped": [],
 }
 `;
@@ -364,7 +356,6 @@ exports[`a desktop .osi example opened and saved again > beam_bolted3 (Beam-to-B
 {
   "added": [],
   "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
     "Load.Axial": """ -> "0"",
   },
   "dropped": [],
@@ -386,9 +377,7 @@ exports[`a desktop .osi example opened and saved again > beam_bolted4 (Beam-to-B
 exports[`a desktop .osi example opened and saved again > beam_bolted5 (Beam-to-Beam Cover Plate Bolted Connection) 1`] = `
 {
   "added": [],
-  "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
-  },
+  "changed": {},
   "dropped": [],
 }
 `;
@@ -496,7 +485,7 @@ exports[`a desktop .osi example opened and saved again > cleat_1 (Cleat Angle Co
     "Weld.Material_Grade_OverWrite",
   ],
   "changed": {
-    "Bolt.TensionType": ""Non-pretensioned" -> "Non Pre-tensioned"",
+    "Bolt.TensionType": ""Non-pretensioned" -> "Non pre-tensioned"",
   },
   "dropped": [
     "out_titles_status",
@@ -511,7 +500,7 @@ exports[`a desktop .osi example opened and saved again > cleat_2 (Cleat Angle Co
     "Weld.Material_Grade_OverWrite",
   ],
   "changed": {
-    "Bolt.TensionType": ""Non-pretensioned" -> "Non Pre-tensioned"",
+    "Bolt.TensionType": ""Non-pretensioned" -> "Non pre-tensioned"",
   },
   "dropped": [
     "out_titles_status",
@@ -526,7 +515,7 @@ exports[`a desktop .osi example opened and saved again > cleat_3 (Cleat Angle Co
     "Weld.Material_Grade_OverWrite",
   ],
   "changed": {
-    "Bolt.TensionType": ""Non-pretensioned" -> "Non Pre-tensioned"",
+    "Bolt.TensionType": ""Non-pretensioned" -> "Non pre-tensioned"",
   },
   "dropped": [
     "out_titles_status",
@@ -541,7 +530,7 @@ exports[`a desktop .osi example opened and saved again > cleat_4 (Cleat Angle Co
     "Weld.Material_Grade_OverWrite",
   ],
   "changed": {
-    "Bolt.TensionType": ""Non-pretensioned" -> "Non Pre-tensioned"",
+    "Bolt.TensionType": ""Non-pretensioned" -> "Non pre-tensioned"",
   },
   "dropped": [
     "out_titles_status",
@@ -556,7 +545,7 @@ exports[`a desktop .osi example opened and saved again > cleat_5 (Cleat Angle Co
     "Weld.Material_Grade_OverWrite",
   ],
   "changed": {
-    "Bolt.TensionType": ""Non-pretensioned" -> "Non Pre-tensioned"",
+    "Bolt.TensionType": ""Non-pretensioned" -> "Non pre-tensioned"",
   },
   "dropped": [
     "out_titles_status",
@@ -758,9 +747,7 @@ exports[`a desktop .osi example opened and saved again > tension_b_angle (Tensio
 exports[`a desktop .osi example opened and saved again > tension_b_bbangle (Tension Member Design - Bolted to End Gusset) 1`] = `
 {
   "added": [],
-  "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
-  },
+  "changed": {},
   "dropped": [],
 }
 `;
@@ -768,9 +755,7 @@ exports[`a desktop .osi example opened and saved again > tension_b_bbangle (Tens
 exports[`a desktop .osi example opened and saved again > tension_b_bbchannel (Tension Member Design - Bolted to End Gusset) 1`] = `
 {
   "added": [],
-  "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
-  },
+  "changed": {},
   "dropped": [],
 }
 `;
@@ -778,9 +763,7 @@ exports[`a desktop .osi example opened and saved again > tension_b_bbchannel (Te
 exports[`a desktop .osi example opened and saved again > tension_b_channel (Tension Member Design - Bolted to End Gusset) 1`] = `
 {
   "added": [],
-  "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
-  },
+  "changed": {},
   "dropped": [],
 }
 `;
@@ -788,9 +771,7 @@ exports[`a desktop .osi example opened and saved again > tension_b_channel (Tens
 exports[`a desktop .osi example opened and saved again > tension_b_starangle (Tension Member Design - Bolted to End Gusset) 1`] = `
 {
   "added": [],
-  "changed": {
-    "Bolt.TensionType": ""Non pre-tensioned" -> "Non Pre-tensioned"",
-  },
+  "changed": {},
   "dropped": [],
 }
 `;

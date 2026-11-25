@@ -98,7 +98,7 @@ class ButtJointBolted(MomentConnection):
     def get_values_for_design_pref(self, key, design_dictionary):
         # Default values as per requirements
         defaults = {
-            KEY_DP_BOLT_TYPE: "Non Pre-tensioned",
+            KEY_DP_BOLT_TYPE: "Non pre-tensioned",
             KEY_DP_BOLT_HOLE_TYPE: "Standard",
             KEY_DP_BOLT_SLIP_FACTOR: "0.3",
             KEY_DP_DETAILING_EDGE_TYPE: "Sheared or hand flame cut",

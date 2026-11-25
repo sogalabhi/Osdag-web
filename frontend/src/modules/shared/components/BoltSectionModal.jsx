@@ -1,5 +1,6 @@
 import { Select } from "antd";
 import GenericConfigView from "./GenericConfigView";
+import { BOLT_TENSION_TYPE_OPTIONS } from "../config/prefOptions";
 
 const { Option } = Select;
 
@@ -48,8 +49,9 @@ const BoltSectionModal = ({
             })
           }
         >
-          <Option value="Pre-tensioned">Pre-tensioned</Option>
-          <Option value="Non Pre-tensioned">Non Pre-tensioned</Option>
+          {BOLT_TENSION_TYPE_OPTIONS.map((option) => (
+            <Option key={option} value={option}>{option}</Option>
+          ))}
         </Select>
       </div>
       <div className="input-cont">
