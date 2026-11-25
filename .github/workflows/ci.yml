@@ -53,7 +53,7 @@ jobs:
     # browser-sweep.yml, which also runs the full sweep nightly. Runs in parallel with backend-qa.
     uses: ./.github/workflows/browser-sweep.yml
     with:
-      suite: full
+      suite: smoke
 
   backend-lint:
     # Fails on rules that catch real bugs (same set as the pre-commit hook).
