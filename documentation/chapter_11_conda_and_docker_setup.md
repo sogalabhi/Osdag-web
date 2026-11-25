@@ -201,10 +201,10 @@ ports:
 |---|---|---|---|
 | `db` (PostgreSQL) | `DB_HOST_PORT` (5433) | `127.0.0.1` only | Never needed from another machine; password-protected but should not be exposed. |
 | `influxdb`, `grafana` | 8086, 3001 | see [Chapter 13](chapter_13_metrics_telemetry.md) | Metrics tools for the developer's own machine. |
-| `backend` (Django) | 8000 | all interfaces | The dev stack is also used for load tests and demos from other machines, and the Vite proxy and `cloudflared` tunnel reach it. |
-| `frontend` (Vite) | 5173 | all interfaces | Same reason; `cloudflared` publishes it on purpose. |
+| `backend` (Django) | `BACKEND_HOST_PORT` (8000) | `127.0.0.1` (`BACKEND_BIND_ADDR`) | Browsers and tools on this machine. The Vite proxy reaches it as `backend:8000` on the Docker network. |
+| `frontend` (Vite) | `FRONTEND_HOST_PORT` (5173) | `127.0.0.1` (`FRONTEND_BIND_ADDR`) | Browsers on this machine. The `cloudflared` demo tunnel reaches it as `http://frontend:5173` on the Docker network, so the host port is not involved. |
 
-The backend and the frontend stay published on all interfaces because the compose file and docs treat them as shareable (demo tunnel, load tests from another host); nothing in the documentation says they are local-only. The dev compose file is not a production deployment: on an untrusted network, bind them to `127.0.0.1` as well by editing the `ports` entries, or use a firewall. Production uses `docker-compose.prod.yml`, which publishes only the reverse proxy, on `127.0.0.1`.
+The backend and the frontend are bound to the loopback interface like the database. `cloudflared` (`--url http://frontend:5173`) and the Vite proxy (`VITE_PROXY_BACKEND_URL=http://backend:8000`) both use service names on the Docker network, so the tunnel and the in-browser API calls through it keep working. To reach the dev stack from another machine, for example to run the load tests against it, set `BACKEND_BIND_ADDR=0.0.0.0` (and `FRONTEND_BIND_ADDR=0.0.0.0` if needed) in `.env`, and only on a trusted network. Production uses `docker-compose.prod.yml`, which publishes only the reverse proxy, on `127.0.0.1`.
 
 ---
 
