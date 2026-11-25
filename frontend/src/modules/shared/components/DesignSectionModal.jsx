@@ -1,5 +1,6 @@
 import { Select } from "antd";
-import { DESIGN_METHOD_OPTIONS } from "../config/prefOptions";
+import { KEY_DISP_DP_DESIGN_BASE_PLATE, KEY_DP_DESIGN_BASE_PLATE } from "../../../constants/generated/coreKeys";
+import { BASE_PLATE_ANALYSIS_OPTIONS, DESIGN_METHOD_OPTIONS } from "../config/prefOptions";
 
 const { Option } = Select;
 
@@ -10,6 +11,9 @@ const SIMPLE_CONNECTION_MODULES = [
   "Lap Joint Welded",
 ];
 
+// The session name the Additional Inputs dialog is keyed by (basePlateConfig.sessionName).
+const BASE_PLATE_MODULE = "Base Plate";
+
 const DesignSectionModal = ({
   module,
   designPrefInputs,
@@ -18,6 +22,8 @@ const DesignSectionModal = ({
 }) => {
   const isSimpleConnection =
     module && SIMPLE_CONNECTION_MODULES.includes(module);
+  // The base plate's Design tab has a second box, Base Plate Analysis (the desktop's design_values).
+  const isBasePlate = module === BASE_PLATE_MODULE;
 
   return (
     <>
@@ -42,6 +48,30 @@ const DesignSectionModal = ({
                   >
                     {DESIGN_METHOD_OPTIONS.map(({ value, disabled }) => (
                       <Option key={value} value={value} disabled={disabled}>
+                        {value}
+                      </Option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+            )}
+            {isBasePlate && (
+              <div className="input-cont">
+                <h5>{KEY_DISP_DP_DESIGN_BASE_PLATE}</h5>
+                <div>
+                  <Select
+                    disabled={isInputLocked}
+                    style={{ width: "132px", height: "25px", fontSize: "12px" }}
+                    value={designPrefInputs[KEY_DP_DESIGN_BASE_PLATE]}
+                    onSelect={(value) =>
+                      setDesignPrefInputs({
+                        ...designPrefInputs,
+                        [KEY_DP_DESIGN_BASE_PLATE]: value,
+                      })
+                    }
+                  >
+                    {BASE_PLATE_ANALYSIS_OPTIONS.map((value) => (
+                      <Option key={value} value={value}>
                         {value}
                       </Option>
                     ))}
