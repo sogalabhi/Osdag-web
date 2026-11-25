@@ -49,7 +49,7 @@
     "Bolt.Bolt_Hole_Type": "Standard",
     "Bolt.Slip_Factor": "0.3",
     "Detailing.Edge_type": "Sheared or hand flame cut",
-    "Bolt.TensionType": "Non Pre-tensioned",
+    "Bolt.TensionType": "Non pre-tensioned",
     "Design.For": "Tension"
   }
 }

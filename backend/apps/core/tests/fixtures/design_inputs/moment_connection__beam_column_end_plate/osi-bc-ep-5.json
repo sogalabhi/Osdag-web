@@ -10,7 +10,7 @@
       "4.8"
     ],
     "Bolt.Slip_Factor": "0.3",
-    "Bolt.TensionType": "Non Pre-tensioned",
+    "Bolt.TensionType": "Non pre-tensioned",
     "Bolt.Type": "Bearing Bolt",
     "Connectivity": "Column Web-Beam Web",
     "EndPlateType": "Extended One Way - Irreversible Moment",

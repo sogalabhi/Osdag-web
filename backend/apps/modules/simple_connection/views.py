@@ -76,7 +76,8 @@ class SimpleConnectionViewSet(viewsets.ViewSet):
         weld_size_list = ['4', '5', '6', '8', '10', '12']
 
         # Design preferences options
-        bolt_type_list = ['Non Pre-tensioned', 'Pre-tensioned']
+        # The core's Bolt tab Type options (Main.bolt_values in osdag_core/design_type/main.py)
+        bolt_type_list = ['Pre-tensioned', 'Non pre-tensioned']
         bolt_hole_type_list = ['Standard', 'Over-sized']
         slip_factor_list = ['0.3', '0.45', '0.5']
         edge_type_list = ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed']

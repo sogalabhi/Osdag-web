@@ -1,6 +1,7 @@
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { KEY_CONNECTOR_MATERIAL } from "../../../constants/generated/coreKeys";
 import { DESIGN_PREF_TABLES } from "../../../constants/generated/designPrefTables";
+import { BOLT_NON_PRE_TENSIONED, BOLT_PRE_TENSIONED } from "../config/prefOptions";
 
 /**
  * Turns a design dictionary (core key -> value, the content of a desktop `.osi` file) into
@@ -62,7 +63,6 @@ const splitByField = (config, dict) => {
 
 // The `.osi` spellings of a few dropdown values differ from the web options.
 const normalizeValue = (config, field, value, lists) => {
-  const baseDefaults = config.defaultInputs || {};
   let finalVal = String(value);
 
   if (field === "bolt_type") {
@@ -89,10 +89,10 @@ const normalizeValue = (config, field, value, lists) => {
   }
 
   if (field === "bolt_tension_type") {
-    if (/non[- ]?pretensioned/i.test(finalVal) || /non pre-tensioned/i.test(finalVal)) {
-      finalVal = baseDefaults[field]?.includes("pre-tensioned") ? "Non pre-tensioned" : "Non Pre-tensioned";
-    } else if (/pretensioned/i.test(finalVal) || /pre-tensioned/i.test(finalVal)) {
-      finalVal = "Pre-tensioned";
+    if (/non[- ]?pre-?tensioned/i.test(finalVal)) {
+      finalVal = BOLT_NON_PRE_TENSIONED;
+    } else if (/pre-?tensioned/i.test(finalVal)) {
+      finalVal = BOLT_PRE_TENSIONED;
     }
   }
 

@@ -19,7 +19,7 @@
       "12.9"
     ],
     "Bolt.Slip_Factor": "0.3",
-    "Bolt.TensionType": "Non Pre-tensioned",
+    "Bolt.TensionType": "Non pre-tensioned",
     "Bolt.Type": "Friction Grip Bolt",
     "Connectivity": "Column Flange-Beam Web",
     "Connector.Material": "E 250 (Fe 410 W)A",

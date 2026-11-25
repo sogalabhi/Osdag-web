@@ -13,6 +13,14 @@ export const WELD_FAB_OPTIONS = [KEY_DP_FAB_SHOP, KEY_DP_FAB_FIELD];
  */
 export const WELD_TYPE_OPTIONS = ["Shop weld", "Field weld"];
 
+/**
+ * Bolt.TensionType (KEY_DP_BOLT_TYPE): the Bolt tab's Type, `bolt_values` in design_type/main.py, which lists
+ * 'Pre-tensioned' and 'Non pre-tensioned' (lowercase p) for every module that has the tab.
+ */
+export const BOLT_PRE_TENSIONED = "Pre-tensioned";
+export const BOLT_NON_PRE_TENSIONED = "Non pre-tensioned";
+export const BOLT_TENSION_TYPE_OPTIONS = [BOLT_PRE_TENSIONED, BOLT_NON_PRE_TENSIONED];
+
 /** The modules whose weld tab is Weld.Type, not Weld.Fab. */
 const WELD_TYPE_MODULES = ["Butt Joint Welded", "Lap Joint Welded"];
 
