@@ -616,7 +616,7 @@ COPY metrics_collector.py .
 
 CMD ["python3", "-u", "metrics_collector.py"]
 ```
-`requirements.txt` pins `psutil`, `influxdb-client` and `redis` to exact versions (the transitive packages are resolved by pip), like the root `requirements.txt`. `psutil` comes from pip as a prebuilt musllinux wheel and not from the Alpine `py3-psutil` package: that package is an older version, and pip refuses to replace a package installed by `apk`. `load_tests/requirements.txt` (Locust and `websocket-client`) is pinned the same way. To change a pin, edit the file and check `pip install --dry-run -r <file>`.
+`requirements.txt` pins `psutil`, `influxdb-client` and `redis` to exact versions (the transitive packages are resolved by pip), like the root `requirements.txt`. `psutil` comes from pip as a prebuilt musllinux wheel and not from the Alpine `py3-psutil` package: that package is an older version, and pip refuses to replace a package installed by `apk`. `load_tests/requirements.txt` (Locust and `websocket-client`) is pinned the same way. Dependabot proposes weekly updates for both files (separate `pip` entries in `.github/dependabot.yml`). To change a pin, edit the file and check `pip install --dry-run -r <file>`.
 
 ### 2. First-Boot Initialisation Script (`influxdb-init.sh`)
 To bypass manual user configuration interfaces upon container deployment, the InfluxDB container executes a bootstrapping script on first initialization:
