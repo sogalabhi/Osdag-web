@@ -30,6 +30,8 @@ pip install -r requirements.txt
 
 ### 2. Run interactively via the Locust Web UI
 
+The dev `docker-compose.yml` publishes the backend on `127.0.0.1:8000` only. To load-test a dev stack from another machine, set `BACKEND_BIND_ADDR=0.0.0.0` in that stack's `.env` and recreate the `backend` container (trusted network only).
+
 **HTTP Polling mode:**
 ```bash
 locust -f locustfile.py --host http://10.104.135.9:8000

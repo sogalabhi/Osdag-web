@@ -35,7 +35,9 @@ services:
     restart: unless-stopped
     user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     ports:
-      - "8000:8000"
+      # Loopback by default. The cloudflared tunnel reaches the frontend over the Docker network, not
+      # through this port; set BACKEND_BIND_ADDR=0.0.0.0 only to load-test from another machine.
+      - "${BACKEND_BIND_ADDR:-127.0.0.1}:${BACKEND_HOST_PORT:-8000}:8000"
     volumes:
       - .:/app
     environment:
@@ -121,7 +123,8 @@ services:
       network: host
     restart: unless-stopped
     ports:
-      - "5173:5173"
+      # Loopback by default; the cloudflared tunnel uses http://frontend:5173 on the Docker network.
+      - "${FRONTEND_BIND_ADDR:-127.0.0.1}:${FRONTEND_HOST_PORT:-5173}:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
