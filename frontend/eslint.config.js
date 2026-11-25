@@ -52,6 +52,11 @@ export default defineConfig([
     },
   },
   {
+    // Test helpers export components and functions side by side; there is no fast refresh in a test.
+    files: ['src/test/**/*.{js,jsx}'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
+  {
     files: ['src/**/*.{js,jsx}'],
     ignores: [
       'src/constants/generated/**',

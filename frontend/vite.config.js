@@ -7,7 +7,9 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'node',
-    include: ['src/**/*.test.js'],
+    // The component tests (*.test.jsx) switch to jsdom with a `// @vitest-environment jsdom` comment.
+    include: ['src/**/*.test.{js,jsx}'],
+    setupFiles: ['./src/test/setup.js'],
   },
   server: {
     host: true,
