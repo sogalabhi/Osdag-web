@@ -48,6 +48,13 @@ jobs:
       - name: Build
         run: npm run build
 
+  browser-sweep:
+    # Playwright smoke run (four modules and the app specs) against an isolated stack; see
+    # browser-sweep.yml, which also runs the full sweep nightly. Runs in parallel with backend-qa.
+    uses: ./.github/workflows/browser-sweep.yml
+    with:
+      suite: smoke
+
   backend-lint:
     # Fails on rules that catch real bugs (same set as the pre-commit hook).
     # The full rule set is report-only until the old findings are cleaned up;

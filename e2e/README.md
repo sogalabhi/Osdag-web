@@ -46,7 +46,7 @@ The backend needs its conda environment (`osdag-web`) and the frontend needs `np
 
 ```bash
 npm run e2e                                   # everything: 24 modules, about 189 tests, about 7 minutes on 4 workers
-npm run e2e:smoke                             # four modules + the app specs: 45 tests, about 2 minutes
+npm run e2e:smoke                             # four modules + the app specs: 46 tests, about 2 minutes
 E2E_MODULES=fin_plate npm run e2e             # one module: words that match a module path or id
 E2E_MODULES=tension,plate_girder npm run e2e  # several
 npx playwright test specs/osi.spec.mjs        # one spec file
@@ -137,10 +137,25 @@ stay as they are and turns red when the behaviour changes (fixed or worse):
 * Redis-backed behaviour (task progress, caching), and the production build (the sweep runs the Vite
   dev server).
 
-## A CI job would need
+## CI
 
-Not wired into `.github/workflows`. It would need: Node 22 with `npm ci` in `frontend/` and `e2e/`;
-`npx playwright install --with-deps chromium`; the backend environment (conda env or the pip
-requirements plus the system libraries `osdag_core` imports, `QT_QPA_PLATFORM=offscreen`); a Postgres
-service (set `E2E_DB_*`, and `E2E_PYTHON=python` when not using conda); upload of `e2e/artifacts` on
-failure. No Redis service is needed. Use `E2E_WORKERS=2` on small runners.
+`.github/workflows/browser-sweep.yml` runs the sweep on GitHub Actions in three ways:
+
+* **Every push and pull request**: `ci.yml` has a job `browser-sweep` that calls it with the smoke subset
+  (`npm run e2e:smoke`, 46 tests). It runs in parallel with `backend-qa`, so a red sweep fails CI and
+  therefore blocks the CD workflow that waits for CI.
+* **Nightly**: a schedule runs the full sweep (`npm run e2e`) on the default branch.
+* **By hand**: Actions > Browser sweep > Run workflow, with `smoke` or `full`.
+
+The job starts a Postgres 14 service container (`E2E_DB_*` point at it; the sweep creates and migrates
+its own `osdag_e2e` database), builds the conda environment as `backend-qa` does (`E2E_PYTHON=python`
+with the environment active), runs `npm ci` in `frontend/` and `e2e/`, installs Chromium
+(`npx playwright install --with-deps chromium`, browsers cached in `~/.cache/ms-playwright`) and runs
+the sweep on the default ports 8030 and 5230 with the default 4 workers. No Redis service is needed.
+When a run fails, `e2e/artifacts/report`, `failures`, `results` and `logs` are uploaded as the
+artifact `browser-sweep-<suite>-<attempt>` (7 days): download it and run
+`npx playwright show-report report` on the `report` folder.
+
+The job has a timeout of 25 minutes (45 for the full sweep). The races listed under "Known bugs"
+are absorbed by the helpers' retries, so a red run in CI is a real failure or a new race; look at
+`logs/django.log` and `logs/vite.log` in the artifact before re-running.
