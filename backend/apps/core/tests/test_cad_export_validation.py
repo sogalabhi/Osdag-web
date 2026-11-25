@@ -121,3 +121,68 @@ class CadExportGuestRateTests(SimpleTestCase):
 
         rates = settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]
         self.assertIn("cad_export_anon", rates)
+
+
+class CadExportBuildRunsOnceTests(SimpleTestCase):
+    """A TypeError raised inside the build is a build failure, not a signature mismatch to retry."""
+
+    @staticmethod
+    def api(build):
+        from types import SimpleNamespace
+
+        from apps.core.module_finder import ModuleApiAdapter
+
+        return ModuleApiAdapter(SimpleNamespace(create_cad_model=build))
+
+    def test_adapter_that_takes_export_formats_gets_them_and_is_called_once(self):
+        calls = []
+
+        def build(input_values, section, session, export_formats=None, module=None):
+            calls.append(export_formats)
+            return "file.brep"
+
+        self.assertEqual(self.api(build).create_cad_model({}, "Model", "s", export_formats=["step"]), "file.brep")
+        self.assertEqual(calls, [["step"]])
+
+    def test_adapter_without_export_formats_is_called_once_without_it(self):
+        calls = []
+
+        def build(input_values, section, session, module=None):
+            calls.append((section, session))
+            return "file.brep"
+
+        self.assertEqual(self.api(build).create_cad_model({}, "Model", "s", export_formats=["step"]), "file.brep")
+        self.assertEqual(calls, [("Model", "s")])
+
+    def test_type_error_inside_the_build_is_not_retried(self):
+        calls = []
+
+        def build(input_values, section, session, export_formats=None, module=None):
+            calls.append(1)
+            raise TypeError("raised inside the build")
+
+        with self.assertRaisesMessage(TypeError, "raised inside the build"):
+            self.api(build).create_cad_model({}, "Model", "s", export_formats=["step"])
+        self.assertEqual(len(calls), 1)
+
+    def test_type_error_inside_a_build_without_export_formats_is_not_retried(self):
+        calls = []
+
+        def build(input_values, section, session, module=None):
+            calls.append(1)
+            raise TypeError("raised inside the build")
+
+        with self.assertRaisesMessage(TypeError, "raised inside the build"):
+            self.api(build).create_cad_model({}, "Model", "s", export_formats=["step"])
+        self.assertEqual(len(calls), 1)
+
+    def test_export_view_runs_the_build_once_when_it_raises_type_error(self):
+        build = mock.Mock(side_effect=TypeError("raised inside the build"))
+        client = APIClient(raise_request_exception=False)
+        with mock.patch("apps.core.module_finder.ModuleApiAdapter.create_cad_model", build):
+            client.post(
+                URL,
+                {"module_id": FIN_PLATE, "input_values": fin_plate_inputs(), "format": "step"},
+                format="json",
+            )
+        self.assertEqual(build.call_count, 1)
