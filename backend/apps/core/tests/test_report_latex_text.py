@@ -3,8 +3,10 @@
 Report metadata (company, designer, project title, ...) and the section details
 (designation and material, which can name a user's custom section or material)
 must not change the structure of the generated .tex file. These tests read the
-.tex source only; pdflatex is not run.
+.tex source only; pdflatex is run in one test, which is skipped where it is not
+installed.
 """
+import shutil
 import subprocess
 
 import pylatex
@@ -131,3 +133,43 @@ def test_report_compile_disables_shell_escape_and_has_a_timeout(tmp_path, monkey
     assert "-interaction=nonstopmode" in cmd
     assert kwargs["timeout"] > 0
     assert kwargs["cwd"] == str(tmp_path)
+
+
+# A custom designation or material name is user text. Every place of the report that
+# prints one (input table, list of input sections, both section detail blocks, log
+# lines and the metadata) has to print it literally.
+HOSTILE_NAME = r"ISMB 150 & $x_1$ \input{x}"
+HOSTILE_NAME_ESCAPED = r"ISMB 150 \& \$x\_1\$ \textbackslash{}input\{x\}"
+SELECTED_CHECKS = [["Selected", "Selected Section", "|p{5cm}|p{2.5cm}|p{1.5cm}|p{3cm}|p{3.5cm}|"]]
+
+
+def _hostile_ui_obj(name):
+    section = _section(name, name + " M")
+    return {
+        "Module": "x",
+        "Material": name,
+        "Section Size*": "['%s', 'ISMB 100']" % name,
+        "Section": section,
+        "Selected Section Details": dict(section),
+    }
+
+
+def test_hostile_designation_is_escaped_on_every_report_path(tmp_path, no_compile):
+    tex = _tex(tmp_path, _summary(HOSTILE_NAME), _hostile_ui_obj(HOSTILE_NAME), SELECTED_CHECKS)
+    # nothing of the name is left unescaped: no \input command and no math group
+    assert r"\input{x}" not in tex
+    assert "$x_1$" not in tex
+    # metadata, input table material, list of input sections, both section blocks, log line
+    assert tex.count(HOSTILE_NAME_ESCAPED) >= 8
+    assert r"\multicolumn{3}{|c|}{Material}&\multicolumn{2}{|c|}{" + HOSTILE_NAME_ESCAPED + "}" in tex
+    assert "'" + HOSTILE_NAME_ESCAPED + "', 'ISMB 100'" in tex
+    assert "INFO " + HOSTILE_NAME_ESCAPED in tex
+
+
+@pytest.mark.skipif(shutil.which("pdflatex") is None, reason="pdflatex is not installed")
+def test_report_with_hostile_designation_compiles(tmp_path, monkeypatch):
+    monkeypatch.setattr(rg, "get_latex_executable", lambda: shutil.which("pdflatex"))
+    _tex(tmp_path, _summary(HOSTILE_NAME), _hostile_ui_obj(HOSTILE_NAME), SELECTED_CHECKS)
+    # compile_report_tex removes the .log only after a run that returned 0
+    assert (tmp_path / "report.pdf").exists()
+    assert not (tmp_path / "report.log").exists()
