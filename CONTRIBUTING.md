@@ -44,6 +44,24 @@ cp .env.example .env
 
 These are the same checks that the CI workflow in `.github/workflows/ci.yml` runs. Run them locally before opening a PR.
 
+**Everything fast, in one command** (before a push):
+
+```bash
+scripts/pre-push.sh             # ESLint, Vitest, ruff (blocking rules), generated keys, key guards, quick backend tests: about 25 s
+scripts/pre-push.sh --build     # also the frontend build
+scripts/pre-push.sh --full      # the full backend suite, the build and npm audit, as CI runs them
+```
+
+It runs every check even when one fails, prints the output of the ones that failed, and exits non-zero if any did. It needs `frontend/node_modules` (`npm ci`), `ruff`, and a Python with the backend requirements; point it at that Python with `PYTHON=/path/to/python scripts/pre-push.sh` (with conda: `PYTHON=$(conda run -n osdag-web which python) scripts/pre-push.sh`). The quick backend tests need no database; `--full` needs the database settings (see Backend tests below), with a database name nothing else uses. `--skip-frontend` and `--skip-backend` leave a group out. The commands are the ones in `.github/workflows/ci.yml`; change both together.
+
+To run it automatically before every `git push` (optional, not installed for you):
+
+```bash
+ln -sf "$(git rev-parse --show-toplevel)/scripts/pre-push.sh" "$(git rev-parse --git-path hooks)/pre-push"
+```
+
+`git push --no-verify` skips the hook once; `rm "$(git rev-parse --git-path hooks)/pre-push"` removes it.
+
 **Frontend** (Node 22, see `engines` in `frontend/package.json`):
 
 ```bash
