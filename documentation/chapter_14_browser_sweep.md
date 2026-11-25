@@ -25,7 +25,7 @@ It never uses the developer's Redis (6379), Django (8000) or Vite (5173) and ref
 | `app.spec.mjs` | Login and guest entry, the module list against the live registry, the module menu, the guest profile menu, guest My Data |
 | `modules.spec.mjs` | Every module in `registry.js` (Purlin is hidden there and cannot be opened): loads with defaults as a guest with no page error, no 4xx/5xx from `/api`, no failed module import; the default Design request against `e2e/snapshots/default-design/` and the keys of `payloadParity.test.js.snap` |
 | `additional-inputs.spec.mjs` | Save without changes, dock Material against the dialog's material rows (from `DESIGN_PREF_TABLES[...].dockCopies`), one change per tab with Save, reopen, Defaults and Save, and what Defaults changes on a fresh dialog (`snapshots/defaults-drift/`) |
-| `osi.spec.mjs` | File > Download Osi then File > Load Input gives the same form and the same Design request; one desktop design example per module against `snapshots/examples/` |
+| `osi.spec.mjs` | File > Download Osi then File > Load Input gives the same form and the same Design request; one desktop design example per module against `snapshots/examples/`; four examples keep the material rows of their file in Additional Inputs |
 
 The module list is read from `frontend/src/modules/registry.js` (`e2e/lib/modules.mjs`), and a test compares it with the registry the running app loads, so a new module is picked up and a parser that no longer reads the file fails.
 

@@ -226,3 +226,25 @@ def test_a_channel_strut_is_looked_up_in_channels():
         **lookup_sources(None),
     )
     assert details["supported"].get("Designation") == "MC 75"
+
+
+@pytest.mark.parametrize("module_id", sync_merge.list_registered_module_ids())
+def test_a_loaded_file_keeps_its_material_rows_that_differ_from_the_dock_material(module_id):
+    # After a file or project load the web runs "open", not "refresh": the desktop keeps the saved
+    # rows of a file whose dock Material differs (`ui_loaded`), they go only when the user changes
+    # the dock afterwards ("refresh", the dock wins).
+    rules = sync_merge.sync_rules(module_id)
+    if not rules:
+        pytest.skip("a module without material rules (butt and lap joints)")
+    dock, saved = "E 350 (Fe 490)", "E 250 (Fe 410 W)A"
+    driver, targets = rules[0]
+    file_rows = {driver: dock, **{key: saved for key in targets if key != driver}}
+
+    opened, _meta, _md, _sd = sync_merge.merge_design_pref_sync(module_id, file_rows, "open")
+    for key in targets:
+        if key != driver:
+            assert opened[key] == saved, key
+
+    refreshed, _meta, _md, _sd = sync_merge.merge_design_pref_sync(module_id, file_rows, "refresh")
+    for key in targets:
+        assert refreshed[key] == dock, key
