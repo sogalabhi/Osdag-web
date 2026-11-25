@@ -133,11 +133,9 @@ class CADExport(APIView):
         export_formats = [format_type]
 
         # Call adapter to regenerate CAD and export requested format.
-        # Adapter is expected to still write a merged brep and return its path.
-        try:
-            brep_path = module_api.create_cad_model(input_values, section, session_id, export_formats=export_formats)
-        except TypeError:
-            brep_path = module_api.create_cad_model(input_values, section, session_id)
+        # Adapter is expected to still write a merged brep and return its path. One call: the module
+        # API passes `export_formats` only to adapters that take it, so there is no retry here.
+        brep_path = module_api.create_cad_model(input_values, section, session_id, export_formats=export_formats)
 
         if not brep_path:
             return error_response('cad_export_failed', "CAD export failed: adapter returned empty brep_path", 422)

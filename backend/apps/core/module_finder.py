@@ -3,7 +3,8 @@ Dynamic Module Finder - Auto-discovers modules from parent module registries
 Replaces the old osdag_api/module_finder.py with registry-based discovery
 """
 import importlib
-from typing import Dict, Any, List, Protocol, Optional
+import inspect
+from typing import Any, Callable, Dict, List, Optional, Protocol
 from types import ModuleType
 
 
@@ -50,6 +51,16 @@ class ModuleApiType(Protocol):
         pass
 
 
+def _accepts_keyword(func: Callable[..., Any], name: str) -> bool:
+    """True when `func` can be called with the keyword argument `name`."""
+    parameters = inspect.signature(func).parameters.values()
+    return any(
+        p.kind is inspect.Parameter.VAR_KEYWORD
+        or (p.name == name and p.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY))
+        for p in parameters
+    )
+
+
 class ModuleApiAdapter:
     """
     Adapter class that wraps adapter module functions to provide ModuleApiType interface
@@ -92,11 +103,16 @@ class ModuleApiAdapter:
         session: str,
         export_formats: Optional[List[str]] = None,
     ) -> str:
-        """Delegate to adapter's create_cad_model function (best-effort)."""
-        try:
-            return self._adapter.create_cad_model(input_values, section, session, export_formats=export_formats)
-        except TypeError:
-            return self._adapter.create_cad_model(input_values, section, session)
+        """Delegate to adapter's create_cad_model function, once.
+
+        `export_formats` is passed only to adapters whose function declares it. The signature is
+        read up front, so a TypeError raised while the model is being built is not mistaken for
+        a signature mismatch and the (expensive) build is never run a second time.
+        """
+        build = self._adapter.create_cad_model
+        if _accepts_keyword(build, "export_formats"):
+            return build(input_values, section, session, export_formats=export_formats)
+        return build(input_values, section, session)
 
 
 # Global module dictionary - auto-populated on import
