@@ -1,2 +1,5 @@
-locust>=2.29.0
-websocket-client>=1.9.0
+# Locust load tests (see README.md). Every package is pinned to an exact version, the ones the
+# tests were last run with; transitive packages are resolved by pip.
+# To change a pin, update it here and run `pip install --dry-run -r load_tests/requirements.txt`.
+locust==2.47.0
+websocket-client==1.9.2

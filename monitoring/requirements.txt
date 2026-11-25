@@ -1,3 +1,6 @@
-psutil>=5.9.0
-influxdb-client>=1.40.0
-redis>=5.0.0
+# Metrics collector (monitoring/Dockerfile). Every package is pinned to an exact version, the
+# ones used for development and testing; transitive packages are resolved by pip.
+# To change a pin, update it here and run `pip install --dry-run -r monitoring/requirements.txt`.
+psutil==7.2.2
+influxdb-client==1.50.0
+redis==5.0.8
