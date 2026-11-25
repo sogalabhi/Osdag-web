@@ -15,6 +15,7 @@ from config.secret_key import get_secret_key
 from config.postgres_credentials import get_database_name, get_host, get_password, get_port, get_username
 import os
 import sys
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -264,6 +265,27 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+def _num_proxies() -> int:
+    """Reverse proxies in front of Django that each append to X-Forwarded-For (env NUM_PROXIES).
+
+    DRF's throttles identify a guest by the address NUM_PROXIES hops from the right of
+    X-Forwarded-For. 0 (the default, also for unset or empty) ignores the header and uses the
+    socket address, which a client cannot forge; this is right for development with no proxy.
+    DRF itself must not be left without a value: it then keys on the whole header, and a client
+    that sends a different X-Forwarded-For on every request gets a fresh throttle bucket each time.
+    """
+    raw = os.getenv('NUM_PROXIES', '').strip()
+    if not raw:
+        return 0
+    try:
+        value = int(raw)
+    except ValueError:
+        value = -1
+    if value < 0:
+        raise ImproperlyConfigured(f"NUM_PROXIES must be a whole number of 0 or more, got {raw!r}")
+    return value
+
+
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'apps.core.utils.api_errors.exception_handler',
     'DEFAULT_PARSER_CLASSES': [
@@ -281,6 +303,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
     ),
+    # Hops of X-Forwarded-For to trust when identifying a guest for throttling; see _num_proxies().
+    'NUM_PROXIES': _num_proxies(),
     'DEFAULT_THROTTLE_RATES': {
         'anon': os.getenv('THROTTLE_ANON_RATE', '120/minute'),
         'user': os.getenv('THROTTLE_USER_RATE', '300/minute'),

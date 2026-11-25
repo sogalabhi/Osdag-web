@@ -49,6 +49,9 @@ services:
       DEBUG: "False"
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,frontend}
+      # Proxies between the client address and Django in X-Forwarded-For. nginx (frontend) sets that header
+      # to the visitor's address alone (from Cloudflare's CF-Connecting-IP), so it is one. See chapter 11.4.
+      NUM_PROXIES: ${NUM_PROXIES:-1}
       DATABASE_NAME: ${DATABASE_NAME:-osdagdeveloper}
       DATABASE_USER: ${DATABASE_USER:-osdagdeveloper}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
