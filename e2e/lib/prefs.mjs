@@ -71,7 +71,7 @@ const DERIVED = /Strength|Elasticity|Rigidity|Poisson|Thermal Expansion/i;
 
 /**
  * Changes one value of the open tab and returns what changed ({ tab, label, from, to }) or null
- * when the tab has nothing to change (the Design tab lists one usable method).
+ * when the tab has nothing to change (the Design tab lists one usable method, and the base plate's Base Plate Analysis one method).
  * A section tab (it has a Designation row) changes its Material: the dimensions shown there are
  * the catalog's and are not saved. The materials of a module are linked (changing one moves the
  * others), so pass `skipMaterial` after the first material change of a pass. Other tabs prefer a numeric text field (gap, weld strength),
@@ -107,6 +107,8 @@ export const changeOneValue = async (page, dialog, tabName, { skipMaterial = fal
     const target = texts.find((text) => text !== row.value && !/custom/i.test(text));
     if (!target) {
       await page.keyboard.press('Escape');
+      // Wait for the list to close: while it fades out, the next dropdown's options would be read together with it.
+      await expect(page.locator('.ant-select-dropdown:not(.ant-select-dropdown-hidden)')).toHaveCount(0);
       continue;
     }
     await options.filter({ hasText: target }).first().click();

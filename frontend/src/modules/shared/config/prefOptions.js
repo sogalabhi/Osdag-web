@@ -29,6 +29,13 @@ export const DESIGN_METHOD_OPTIONS = [
   { value: "Working Stress Design", disabled: true },
 ];
 
+/**
+ * Base Plate Analysis (KEY_DP_DESIGN_BASE_PLATE, label KEY_DISP_DP_DESIGN_BASE_PLATE): the second box of the base plate's
+ * Design tab (`design_values` in design_type/connection/base_plate_connection.py). The core lists one method, so it can
+ * be shown but not changed.
+ */
+export const BASE_PLATE_ANALYSIS_OPTIONS = ["Effective Area Method"];
+
 /** The design method a module starts with: the one option that can be picked. */
 export const DEFAULT_DESIGN_METHOD = DESIGN_METHOD_OPTIONS[0].value;
 
