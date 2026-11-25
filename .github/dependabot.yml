@@ -24,6 +24,28 @@ updates:
       - dependencies
       - backend
 
+  # Metrics collector (monitoring/requirements.txt) and Locust load tests
+  # (load_tests/requirements.txt) have their own pinned requirements files
+  - package-ecosystem: pip
+    directory: /monitoring
+    target-branch: "25april"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    labels:
+      - dependencies
+      - monitoring
+
+  - package-ecosystem: pip
+    directory: /load_tests
+    target-branch: "25april"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    labels:
+      - dependencies
+      - load-tests
+
   # Base images in the Dockerfiles (backend at the root, frontend in /frontend)
   - package-ecosystem: docker
     directory: /

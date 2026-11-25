@@ -24,7 +24,7 @@ conda activate osdag-web
 # Install Pip dependencies for backend web frameworks
 pip install -r requirements.txt
 ```
-The python packages installed via pip are registered in [requirements.txt](../requirements.txt). Every listed package is pinned to an exact version (`==`), the one the project is developed and tested with, so a fresh install, the Docker image and CI resolve the same set. Packages that are not listed (transitive dependencies) are resolved by pip. To change a pin, edit `requirements.txt`, check it with `pip install --dry-run --ignore-installed -r requirements.txt` and run the backend tests; Dependabot proposes updates weekly. `PySide6` and `PyQt5` come from pip, except on Windows where the conda-forge `pyside6` replaces the pip build (see the Windows installation guide).
+The python packages installed via pip are registered in [requirements.txt](../requirements.txt). Every listed package is pinned to an exact version (`==`), the one the project is developed and tested with, so a fresh install, the Docker image and CI resolve the same set. Packages that are not listed (transitive dependencies) are resolved by pip. To change a pin, edit `requirements.txt`, check it with `pip install --dry-run --ignore-installed -r requirements.txt` and run the backend tests; Dependabot proposes updates weekly, also for `monitoring/requirements.txt` and `load_tests/requirements.txt` (their own `pip` entries in `dependabot.yml`). `PySide6` and `PyQt5` come from pip, except on Windows where the conda-forge `pyside6` replaces the pip build (see the Windows installation guide).
 
 ### 2. Multi-Service Local Launcher
 The local setup is managed using [osdagweb.sh](../osdagweb.sh). This script automates starting the system dependencies locally:
@@ -289,7 +289,7 @@ Triggers cannot do this: `on.push.branches`, `on.pull_request.branches` and `on.
 * `codeql.yml`: `on.pull_request.branches` and `on.push.branches`
 * `secrets.yml`: `on.pull_request.branches`
 * `release-please.yml`: `on.push.branches`
-* `dependabot.yml`: `target-branch` (five entries)
+* `dependabot.yml`: `target-branch` (seven entries)
 
 The `production` environment's deployment-branch rule (Settings -> Environments) also names the branch and has to be updated by hand. The expression-based checks follow the rename on their own. CD and Release Please stay disabled on the fork until the production setup below is done; editing the branch name does not enable them.
 
