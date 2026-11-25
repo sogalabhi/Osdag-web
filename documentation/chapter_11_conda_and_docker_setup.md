@@ -151,6 +151,17 @@ The production deployment in [docker-compose.prod.yml](../docker-compose.prod.ym
 * **Healthchecks**: Every service except `cloudflared` has a healthcheck, and `depends_on` waits for `db`, `redis` and `backend` to be healthy. `backend` calls `/api/health/`, the Celery workers use `celery inspect ping`, and `frontend` fetches `/` from Nginx.
 * **Static Asset Persistence**: Declares dedicated volume mounts (`static_volume`, `media_volume`, `osifiles_volume`) shared between the backend, frontend, and Celery workers to store user calculations, reports, and CAD drawings.
 
+### 1a. Client Addresses Behind the Tunnel (`NUM_PROXIES`)
+Every public request travels visitor -> Cloudflare -> `cloudflared` -> nginx (`frontend`) -> Django. Django never sees the visitor's socket: its `REMOTE_ADDR` is the nginx container, and nginx's own `$remote_addr` is the `cloudflared` container. The guest throttles (`anon`, `cad_export_anon`, the section import/export limits) and the plate girder WebSocket limit need the visitor's address, so the config is:
+
+* **Cloudflare** sets `CF-Connecting-IP` to the visitor's address and replaces any value a client sends. Port 80 of nginx is published on `127.0.0.1` only, so the tunnel is the only way in.
+* **nginx** ([frontend/nginx.conf](../frontend/nginx.conf)) maps `CF-Connecting-IP` (or `$remote_addr` when it is absent, such as a request from the host) to `$client_ip` and sends it to Django, on both `/api/` and `/ws/`, as `X-Real-IP` and as `X-Forwarded-For`. It **replaces** `X-Forwarded-For` rather than appending to it (`$proxy_add_x_forwarded_for` would keep whatever chain the client sent), so Django receives exactly one address. The WebSocket route sets `X-Real-IP` too; `client_ident` in `plate_girder/optimization_limits.py` reads it.
+* **Django** takes the throttle address `NUM_PROXIES` hops from the right of `X-Forwarded-For` (the `NUM_PROXIES` environment variable, read in `config/settings.py` into `REST_FRAMEWORK['NUM_PROXIES']`). `docker-compose.prod.yml` sets it to `1`: the one hop is nginx's single address.
+
+Counting `NUM_PROXIES`: it is the number of trusted proxies that add an entry to `X-Forwarded-For`, starting from the one next to Django. Each appending proxy adds the address it received the request from, so the client address is `NUM_PROXIES` entries from the right; everything to its left is client-supplied and ignored. With the default of `0` (and in development) the header is ignored and the socket address is used. Do not set it higher than the real number of appending proxies, since then the entry it picks is one the client wrote. If the chain changes (a different proxy in front of nginx, or nginx appending instead of replacing), change this number with it. A value left unset in Django's own settings would make DRF key on the whole header, which a client can vary on every request to get a new throttle bucket each time; that is why the setting always has a number.
+
+To check a deployment, send `curl -H 'X-Forwarded-For: 1.2.3.4' https://<site>/api/...` repeatedly past the guest limit of an endpoint: the requests must still be throttled together.
+
 ### 2. Specialized Celery Worker Splits
 To prevent heavy design computations from blocking report generation, production workers are divided into two specialized service queues. The design task calculates the design and builds its 3D model in one go, so there is no separate CAD worker:
 

@@ -46,6 +46,8 @@ services:
       DEBUG: ${DEBUG:-True}
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,.trycloudflare.com}
+      # 0: guests are told apart by socket address (no trusted proxy). See .env.example.
+      NUM_PROXIES: ${NUM_PROXIES:-0}
       DATABASE_NAME: ${DATABASE_NAME:-postgres_Intg_osdag}
       DATABASE_USER: ${DATABASE_USER:-osdagdeveloper}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD must be set}
