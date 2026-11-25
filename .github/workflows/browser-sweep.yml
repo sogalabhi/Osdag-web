@@ -1,0 +1,144 @@
+name: Browser sweep
+
+# Playwright sweep of the real frontend against an isolated stack (see
+# documentation/chapter_14_browser_sweep.md). Three ways in:
+#   * ci.yml calls it with the smoke subset (about 2 minutes of tests) on every push and PR;
+#   * a nightly schedule runs the full sweep (about 7 minutes of tests);
+#   * workflow_dispatch runs either, from the Actions tab.
+# Scheduled runs use the default branch.
+on:
+  workflow_call:
+    inputs:
+      suite:
+        description: "smoke (npm run e2e:smoke) or full (npm run e2e)"
+        type: string
+        default: smoke
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "Which sweep to run"
+        type: choice
+        options: [smoke, full]
+        default: full
+  schedule:
+    - cron: "17 21 * * *"
+
+# Only matters for the nightly and manual runs; a call from ci.yml is cancelled
+# by that workflow's own concurrency group.
+concurrency:
+  group: browser-sweep-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ (inputs.suite || 'full') == 'full' && 45 || 25 }}
+    # The sweep creates its own database (osdag_e2e) and migrates it; the service
+    # only has to accept the owner login. CI-only dummy credentials.
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: osdagdeveloper
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U osdagdeveloper"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # e2e/lib/config.mjs reads these; the default DB port there (5470) is the developer's own.
+      E2E_DB_HOST: localhost
+      E2E_DB_PORT: "5432"
+      E2E_DB_USER: osdagdeveloper
+      E2E_DB_PASSWORD: password
+      # The Python of the conda environment set up below (the sweep otherwise runs `conda run -n osdag-web`).
+      E2E_PYTHON: python
+      SUITE: ${{ inputs.suite || 'full' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # PySide6 (imported by osdag_core) needs these GL libraries; backend-qa installs the same set.
+      - name: Install system libraries
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libegl1 libgl1 libglu1-mesa libxkbcommon0
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: osdag_env
+          python-version: "3.11"
+          channels: conda-forge
+          channel-priority: strict
+          miniforge-version: "latest"
+          use-mamba: true
+          cache-downloads: true
+          cache-downloads-key: ${{ runner.os }}-conda-${{ hashFiles('.github/workflows/ci.yml', '.github/workflows/browser-sweep.yml') }}
+
+      - name: Install backend dependencies
+        shell: bash -l {0}
+        run: |
+          mamba install pythonocc-core cairo pip -y
+          python -m pip install -r requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            frontend/package-lock.json
+            e2e/package-lock.json
+
+      - name: Install frontend and e2e dependencies
+        run: |
+          npm ci --prefix frontend
+          npm ci --prefix e2e
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('e2e/package-lock.json') }}
+
+      - name: Install Chromium
+        working-directory: e2e
+        run: |
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" = "true" ]; then
+            npx playwright install-deps chromium
+          else
+            npx playwright install --with-deps chromium
+          fi
+
+      # bash -l {0} activates the conda environment so `python` is the backend's.
+      - name: Run the sweep
+        shell: bash -l {0}
+        working-directory: e2e
+        run: |
+          node --version
+          python --version
+          if [ "$SUITE" = "smoke" ]; then npm run e2e:smoke; else npm run e2e; fi
+
+      - name: Upload the report and failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-sweep-${{ env.SUITE }}-${{ github.run_attempt }}
+          path: |
+            e2e/artifacts/report
+            e2e/artifacts/failures
+            e2e/artifacts/results
+            e2e/artifacts/logs
+          if-no-files-found: ignore
+          retention-days: 7

@@ -39,4 +39,10 @@ Use the `test` of `e2e/lib/fixtures.mjs`: `newPage()` hands out a guest-ready pa
 
 ## 14.5 Limits
 
-No Design results, no sign-in (Firebase), no Redis-backed behaviour, development server only. A CI job would need Node 22, Chromium (`npx playwright install --with-deps chromium`), the backend environment, a Postgres service and no Redis; it is not part of `.github/workflows` yet.
+No Design results, no sign-in (Firebase), no Redis-backed behaviour, development server only.
+
+## 14.6 CI
+
+`.github/workflows/browser-sweep.yml` runs the sweep; `ci.yml` calls it as the job `browser-sweep` on every push and pull request with the smoke subset (`npm run e2e:smoke`: Fin Plate, Bolted to End Gusset, Base Plate and Plate Girder plus the app specs, about 2 minutes of tests). The job runs in parallel with `backend-qa` and, because the CD workflow waits for CI, a red sweep also stops a deploy. A nightly schedule runs the full sweep (`npm run e2e`, about 7 minutes of tests) on the default branch, and the workflow can be started by hand with `smoke` or `full`.
+
+The job needs no Redis: it starts a Postgres service container (the sweep creates its own `osdag_e2e` database in it), builds the same conda environment as `backend-qa`, runs `npm ci` in `frontend/` and `e2e/`, installs Chromium with `npx playwright install --with-deps chromium` (cached in `~/.cache/ms-playwright`) and runs the sweep on its default ports. It has a timeout of 25 minutes (45 for the full sweep). On failure the Playwright report, per-test failure folders, screenshots and the Django and Vite logs are uploaded as the artifact `browser-sweep-<suite>-<attempt>`. See [`e2e/README.md`](../e2e/README.md) for the settings.
