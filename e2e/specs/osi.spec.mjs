@@ -5,6 +5,7 @@ import { test, expect, expectClean } from '../lib/fixtures.mjs';
 import { selectedModules, slugOf } from '../lib/modules.mjs';
 import { clickDesign, clickDesignOrValidation, downloadOsi, loadOsi, openModule, readDock } from '../lib/app.mjs';
 import { DESKTOP_NAMES, readExamples, selectedExamples } from '../lib/examples.mjs';
+import { openPrefs, readAllTabs } from '../lib/prefs.mjs';
 import { expectSnapshot } from '../lib/snapshots.mjs';
 import { KNOWN_ROUND_TRIP_ROW_DIFFS } from '../lib/known-issues.mjs';
 
@@ -77,6 +78,33 @@ for (const example of examples) {
     } else {
       expectSnapshot('examples', name, { validation: outcome.validation });
     }
+    expectClean(page);
+  });
+}
+
+// Examples whose dock Material differs from the module's default and from some material rows of Additional
+// Inputs. Loading a file is not the user changing the dock (the desktop's `ui_loaded`), so the dialog shows the
+// file's rows, not the dock Material over them (the rows that do equal the dock Material are the ones
+// the file leaves to follow it).
+const KEPT_MATERIAL_ROWS = {
+  'baseplate_5.osi': { 'Column Section*': 'E 300 (Fe 440)', 'Base Plate': 'E 250 (Fe 410 W)A', 'Stiffener/Shear Key': 'E 250 (Fe 410 W)A' },
+  'bc_ep_3.osi': { 'Column Section*': 'E 350 (Fe 490)', 'Beam Section*': 'E 300 (Fe 440)', Connector: 'E 250 (Fe 410 W)A' },
+  'fin2.osi': { 'Column Section*': 'E 410 (Fe 540)', 'Beam Section*': 'E 250 (Fe 410 W)A', Connector: 'E 450 (Fe 570)D' },
+  'beam_bolted5.osi': { 'Beam Section*': 'E 250 (Fe 410 W)A', Connector: 'E 450 (Fe 590) E' },
+};
+for (const example of readExamples().filter((e) => e.module && KEPT_MATERIAL_ROWS[e.name] && selectedModules().includes(e.module))) {
+  test(`design example ${example.name} keeps the material rows of its file in Additional Inputs [${example.module.id}]`, async ({ newPage }) => {
+    const page = await newPage();
+    await openModule(page, example.module);
+    expect(await loadOsi(page, example.file)).toBe(200);
+    // Anything that refreshes the rows from the dock after a load does so within a moment of it.
+    await page.waitForTimeout(1500);
+    const dialog = await openPrefs(page);
+    const rows = {};
+    for (const tab of await readAllTabs(dialog)) {
+      for (const row of tab.rows) if (/material/i.test(row.label) && row.kind === 'select') rows[tab.name] = row.value;
+    }
+    expect(rows, 'the material rows of the file, not the dock Material').toEqual(KEPT_MATERIAL_ROWS[example.name]);
     expectClean(page);
   });
 }

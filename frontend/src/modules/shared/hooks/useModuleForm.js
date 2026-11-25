@@ -10,6 +10,7 @@ import {
 } from "../../../constants/generated/coreKeys";
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { loadStateFromOsi } from "../utils/osiLoader";
+import { shouldClearOverridesOnDockChange } from "../utils/dockDriverChange";
 import { isAdditionalInput, prefClearingFields } from "../utils/prefSyncKeys";
 
 const buildInitialSelectionStates = (config) =>
@@ -162,19 +163,20 @@ export const useModuleForm = (moduleConfig, moduleData) => {
   const dockDriverFieldNames = useMemo(() => prefClearingFields(moduleConfig), [moduleConfig]);
   const dockDriverSnapshot = JSON.stringify(dockDriverFieldNames.map((field) => inputs?.[field]));
   // The overrides of the previous commit: a file or project load (or a reset) sets the dock and the
-  // overrides in one commit, and what it loads must stay. Updated by the effect after this one.
+  // overrides in one commit, and what it loads must stay (see `dockDriverChange`). Updated by the
+  // effect after this one.
   const previousOverridesRef = useRef(designPrefOverrides);
 
   useEffect(() => {
-    const overridesReplaced = previousOverridesRef.current !== designPrefOverrides;
-    if (dockDriverSnapshotRef.current === null) {
-      dockDriverSnapshotRef.current = dockDriverSnapshot;
-      return;
-    }
-
-    const dockDriverChanged = dockDriverSnapshotRef.current !== dockDriverSnapshot;
+    // A load only moves the last seen dock driver; the user's later edit of it clears.
+    const commit = {
+      previousSnapshot: dockDriverSnapshotRef.current,
+      snapshot: dockDriverSnapshot,
+      previousOverrides: previousOverridesRef.current,
+      overrides: designPrefOverrides,
+    };
     dockDriverSnapshotRef.current = dockDriverSnapshot;
-    if (!dockDriverChanged || overridesReplaced) return;
+    if (!shouldClearOverridesOnDockChange(commit)) return;
 
     // As on the desktop, every saved Additional Input is dropped: the design takes the core's
     // values for the new dock again (the backend fills them), and the dialog shows those.

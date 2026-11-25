@@ -124,6 +124,7 @@ export const useEngineeringModule = (moduleConfig) => {
   useDesignPrefSync({
     moduleConfig,
     inputs,
+    designPrefOverrides,
     setInputs,
     applyStrictLinkedReseed,
     setLastKnownGoodDesignPrefSnapshot,
