@@ -31,6 +31,7 @@ from apps.modules.flexure_member.submodules.plate_girder.adapter import (
     create_optimization_input,
     determine_optimization_flags,
     create_module,
+    set_input_values_for_request,
 )
 from apps.modules.flexure_member.submodules.plate_girder.optimization_limits import (
     SOFT_TIME_LIMIT,
@@ -231,7 +232,7 @@ def _run_pso_optimization(task, channel_name: str, input_data: Dict[str, Any]):
         # Call set_input_values with scalar values to initialize all attributes
         # (suppress verbose core stdout so realtime streaming stays responsive)
         with _suppress_core_stdout():
-            module.set_input_values(scalar_design_dict)
+            set_input_values_for_request(module, scalar_design_dict)
 
         # Now override the thickness lists for PSO optimization
         logger.info("Overriding thickness lists for PSO optimization...")
