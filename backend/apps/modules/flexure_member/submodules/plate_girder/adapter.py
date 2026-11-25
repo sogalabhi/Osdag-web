@@ -31,6 +31,8 @@ from osdag_core.Common import (
 )
 import sys
 import os
+import threading
+from contextlib import contextmanager
 from typing import Dict, Any, List, Tuple
 import traceback
 import json
@@ -194,6 +196,68 @@ def validate_input(input_values: Dict[str, Any]) -> None:
             raise InvalidInputTypeError(key, "List[str]")
 
 
+def _derive_stiffener_lists(design_dict: Dict[str, Any], input_values: Dict[str, Any]) -> None:
+    """
+    Put the request's stiffener thickness lists into design_dict: the list the request customized, else the
+    standard VALUES_STIFFENER_THICKNESS (which is also what the core uses for an empty customized list).
+    """
+    from osdag_core.design_type.plate_girder.core.plate_girder import VALUES_STIFFENER_THICKNESS
+
+    for thickness_key, values_key, web_key in (
+        (KEY_IntermediateStiffener_thickness, KEY_IntermediateStiffener_thickness_val,
+         WEB_DESIGN_INTERMEDIATESTIFFENER_THICKNESS_VALUES),
+        (KEY_LongitudnalStiffener_thickness, KEY_LongitudnalStiffener_thickness_val,
+         WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES),
+    ):
+        custom = _customized_stiffener_list(design_dict.get(thickness_key), input_values.get(web_key))
+        design_dict[values_key] = custom or list(VALUES_STIFFENER_THICKNESS)
+
+
+# The core's set_input_values() takes the customized stiffener thickness lists from the class attributes
+# PlateGirderWelded.int_thicklist / long_thicklist, not from the design dictionary (they are what its desktop
+# popups write). Class attributes are shared by every request of the process, so a list is put there only
+# for the one set_input_values() call of a request, under a lock, and cleared again afterwards: a later
+# 'Customized' request without a list then gets the core's fallback (the standard list), never the list of
+# an earlier request.
+_STIFFENER_LISTS_LOCK = threading.RLock()
+
+
+def _customized_stiffener_list(mode: Any, custom_values: Any) -> List[str]:
+    """The customized thickness list of one request: its own list, or [] (the core then uses the standard list)."""
+    if mode != 'Customized' or not isinstance(custom_values, list):
+        return []
+    return [str(v) for v in custom_values]
+
+
+@contextmanager
+def _stiffener_lists_applied(int_list: List[str], long_list: List[str]):
+    """Hold the core's class-level customized lists for one request, and leave them empty afterwards."""
+    from osdag_core.design_type.plate_girder.core.plate_girder import PlateGirderWelded
+
+    with _STIFFENER_LISTS_LOCK:
+        PlateGirderWelded.int_thicklist = list(int_list)
+        PlateGirderWelded.long_thicklist = list(long_list)
+        try:
+            yield
+        finally:
+            PlateGirderWelded.int_thicklist = []
+            PlateGirderWelded.long_thicklist = []
+
+
+def set_input_values_for_request(module, design_dict: Dict[str, Any]) -> None:
+    """
+    module.set_input_values(design_dict) with the request's own customized stiffener lists.
+
+    design_dict[KEY_..._thickness_val] holds the lists create_from_input() and create_optimization_input()
+    derived from the request (the standard list unless the request customized them).
+    """
+    with _stiffener_lists_applied(
+        _customized_stiffener_list(design_dict.get(KEY_IntermediateStiffener_thickness), design_dict.get(KEY_IntermediateStiffener_thickness_val)),
+        _customized_stiffener_list(design_dict.get(KEY_LongitudnalStiffener_thickness), design_dict.get(KEY_LongitudnalStiffener_thickness_val)),
+    ):
+        module.set_input_values(design_dict)
+
+
 def create_module():
     """Create an instance of the PlateGirderWelded module design class and set it up for use"""
     from osdag_core.design_type.plate_girder.core.plate_girder import PlateGirderWelded
@@ -278,31 +342,12 @@ def create_from_input(input_values: Dict[str, Any]):
         design_dict[KEY_TOP_Bflange_PG] = '1'
         design_dict[KEY_BOTTOM_Bflange_PG] = '1'
     
-    from osdag_core.design_type.plate_girder.core.plate_girder import VALUES_STIFFENER_THICKNESS, PlateGirderWelded
-
-    # Intermediate stiffener: populate the class-level customized list if provided,
-    # matching set_input_values()'s handling of the "Customized" thickness option.
-    if design_dict[KEY_IntermediateStiffener_thickness] == 'Customized':
-        custom_values = input_values.get(WEB_DESIGN_INTERMEDIATESTIFFENER_THICKNESS_VALUES, None)
-        if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
-            PlateGirderWelded.int_thicklist = [str(v) for v in custom_values]
-        design_dict[KEY_IntermediateStiffener_thickness_val] = PlateGirderWelded.int_thicklist
-    else:
-        design_dict[KEY_IntermediateStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
-
-    # Longitudinal stiffener: same customized-list handling as above.
-    if design_dict[KEY_LongitudnalStiffener_thickness] == 'Customized':
-        custom_values = input_values.get(WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES, None)
-        if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
-            PlateGirderWelded.long_thicklist = [str(v) for v in custom_values]
-        design_dict[KEY_LongitudnalStiffener_thickness_val] = PlateGirderWelded.long_thicklist
-    else:
-        design_dict[KEY_LongitudnalStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
+    _derive_stiffener_lists(design_dict, input_values)
 
     try:
         if module is None:
             raise RuntimeError('Module instance was not created')
-        module.set_input_values(design_dict)
+        set_input_values_for_request(module, design_dict)
     except Exception as e:
         traceback.print_exc()
         print('Error in set_input_values:', e)
@@ -516,24 +561,8 @@ def create_optimization_input(input_values: Dict[str, Any]) -> Dict[str, Any]:
         VALUES_STIFFENER_THICKNESS = ['6', '8', '10', '12', '14', '16', '18', '20', 
                                       '22', '24', '26', '28', '30', '32', '36', '40']
      
-    from osdag_core.design_type.plate_girder.core.plate_girder import VALUES_STIFFENER_THICKNESS, PlateGirderWelded
-
     # Same customized-list handling as create_from_input(), sourced from optimization_input.
-    if design_dict[KEY_IntermediateStiffener_thickness] == 'Customized':
-        custom_values = optimization_input.get(WEB_DESIGN_INTERMEDIATESTIFFENER_THICKNESS_VALUES, None)
-        if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
-            PlateGirderWelded.int_thicklist = [str(v) for v in custom_values]
-        design_dict[KEY_IntermediateStiffener_thickness_val] = PlateGirderWelded.int_thicklist
-    else:
-        design_dict[KEY_IntermediateStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
-
-    if design_dict[KEY_LongitudnalStiffener_thickness] == 'Customized':
-        custom_values = optimization_input.get(WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES, None)
-        if custom_values and isinstance(custom_values, list) and len(custom_values) > 0:
-            PlateGirderWelded.long_thicklist = [str(v) for v in custom_values]
-        design_dict[KEY_LongitudnalStiffener_thickness_val] = PlateGirderWelded.long_thicklist
-    else:
-        design_dict[KEY_LongitudnalStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
+    _derive_stiffener_lists(design_dict, optimization_input)
 
     return design_dict
 
