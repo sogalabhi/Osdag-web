@@ -40,7 +40,7 @@ from osdag_core.Common import (
 
 # Material rules: modules whose old rule differs from the core's 'Input Dock' rows.
 RULE_OVERRIDES = {
-    KEY_DISP_PLATE_GIRDER_WELDED, KEY_DISP_COMPRESSION_COLUMN,
+    KEY_DISP_COMPRESSION_COLUMN,
     KEY_DISP_STRUT_WELDED_END_GUSSET,
 }
 # Cover plates and the shear modules with a Connector tab: the dock Material copies to the member and
@@ -53,6 +53,9 @@ MEMBER_CORE_RULES = {KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_
 # The simply supported and cantilever beams: the dock Material copies to Member.Material, the Column
 # Section tab (supporting_material in the web form).
 BEAM_CORE_RULES = {KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2}
+# The plate girder: the dock Material copies to Member.Material, the Girder Properties tab (girder_material in
+# the web form).
+GIRDER_CORE_RULES = {KEY_DISP_PLATE_GIRDER_WELDED}
 # The end plates: the dock Material copies to the member rows the module has and to Connector.Material
 # (the Connector tab defaults to the dock Material). The beam-to-column end plate has a supporting and a
 # supported section, the beam-to-beam end plate one supported section, the column-to-column end plate one
@@ -66,7 +69,7 @@ END_PLATE_CORE_RULES = {
 }
 # The base plate: the dock Material copies to the column (Member.Material), base plate and stiffener materials.
 BASE_PLATE_CORE_RULES = {KEY_DISP_BASE_PLATE}
-CORE_RULES = (COVER_PLATE_RULES | SHEAR_CORE_RULES | MEMBER_CORE_RULES | BEAM_CORE_RULES | BASE_PLATE_CORE_RULES
+CORE_RULES = (COVER_PLATE_RULES | SHEAR_CORE_RULES | MEMBER_CORE_RULES | BEAM_CORE_RULES | GIRDER_CORE_RULES | BASE_PLATE_CORE_RULES
               | set(END_PLATE_CORE_RULES))
 # Modules where core and old agree on "no material sync": no copy rows.
 NO_RULES = {KEY_DISP_BUTTJOINTBOLTED, KEY_DISP_BUTTJOINTWELDED, KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED}
@@ -148,12 +151,12 @@ def test_a_changed_dock_material_replaces_the_base_plate_materials(module_id):
         assert resolved[key] == "E 350 (Fe 490)", key
 
 
-@pytest.mark.parametrize("module_id", sorted(BEAM_CORE_RULES))
+@pytest.mark.parametrize("module_id", sorted(BEAM_CORE_RULES | GIRDER_CORE_RULES))
 def test_a_beam_copies_the_dock_material_to_the_member_material(module_id):
     assert sync_merge.sync_rules(module_id) == [("Material", ["Member.Material"])]
 
 
-@pytest.mark.parametrize("module_id", sorted(BEAM_CORE_RULES))
+@pytest.mark.parametrize("module_id", sorted(BEAM_CORE_RULES | GIRDER_CORE_RULES))
 def test_a_changed_dock_material_replaces_the_beam_section_tab_material(module_id):
     resolved, _meta, _md, _sd = sync_merge.merge_design_pref_sync(
         module_id,

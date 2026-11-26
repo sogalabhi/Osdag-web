@@ -106,6 +106,8 @@ MEMBER_MATERIAL_TAB = {
     KEY_DISP_COLUMNCOVERPLATEWELD: "supporting",
     KEY_DISP_BEAMCOVERPLATE: "supported",
     KEY_DISP_BEAMCOVERPLATEWELD: "supported",
+    # The Girder Properties tab: the web reads the material properties of the supporting role.
+    KEY_DISP_PLATE_GIRDER_WELDED: "supporting",
 }
 
 # A material grade the core can look up; used when the dock has none yet.
@@ -133,7 +135,6 @@ _M, _R, _S, _D, _C = (KEY_MATERIAL, KEY_SEC_MATERIAL, KEY_SUPTNGSEC_MATERIAL, KE
                       KEY_CONNECTOR_MATERIAL)
 _MEMBER_RULES = [(_M, [_S, _D, _C])]
 LEGACY_SYNC_RULES: Dict[str, List[Tuple[str, List[str]]]] = {
-    KEY_DISP_PLATE_GIRDER_WELDED: _MEMBER_RULES,
     KEY_DISP_COMPRESSION_COLUMN: _MEMBER_RULES,
     # The core gives the welded strut no Connector.Material row, which the web form still sends.
     KEY_DISP_STRUT_WELDED_END_GUSSET: [(_M, [_R, _C])],

@@ -14,10 +14,9 @@ is compared with the core's answers, not with copies of values. Custom materials
 path as in the API: ``user_rows`` makes the signed-in user's grades (and the ``Cus_`` names a guest
 may type) visible to the core class.
 
-Header Plate follows the core rule. Plate Girder does not: ``LEGACY_SYNC_RULES`` still writes the
-shear connection keys (``Member.Supporting_Section.Material`` ...) that the plate girder does not
-have and never writes ``Member.Material``, the one material row of its Girder Properties tab. That is
-pinned as a strict ``xfail`` below; delete the mark when the override is removed.
+Header Plate and Plate Girder follow the core rule: the plate girder's dock Material copies to
+``Member.Material``, the one material row of its Girder Properties tab (the web used to give it the
+shear connection rule, which wrote keys the plate girder does not have).
 
 The butt and lap joints have no material row at all. Their only Material dependent default is the
 weld grade of the welded ones (``Weld.Material_Grade_OverWrite``, the ``fu`` of the dock Material).
@@ -68,13 +67,6 @@ FU_OF = {
 GRADE, OTHER_GRADE = "E 250 (Fe 410 W)A", "E 350 (Fe 490)"
 GUEST_GRADE = "Cus_250_240_230_410"  # a guest may type this: fy 250 / fu 410, read from the name
 OPERATIONS = ("open", "refresh", "save", "reset")
-
-GIRDER_BUG = pytest.mark.xfail(
-    strict=True,
-    reason="LEGACY_SYNC_RULES gives the plate girder the shear connection rule (Supporting/Supported/Connector "
-    "material); the core's rule is Material -> Member.Material",
-)
-
 
 def pref_keys(module_id):
     """Every key of the module's Additional Inputs tabs (what the dialog can hold)."""
@@ -134,9 +126,7 @@ def test_every_pref_key_in_a_dock_copy_belongs_to_an_additional_inputs_tab(modul
         assert set(targets) <= pref_keys(module_id), (dock_key, targets)
 
 
-@pytest.mark.parametrize("module_id", [
-    HEADER, *JOINTS, pytest.param(GIRDER, marks=GIRDER_BUG),
-])
+@pytest.mark.parametrize("module_id", [HEADER, GIRDER, *JOINTS])
 def test_the_web_rule_writes_only_keys_the_core_class_has(module_id):
     """The rule's targets are keys of the module's Additional Inputs (or computed from the dock)."""
     known = pref_keys(module_id) | set(dd.pref_tables(module_id)["computed"])
@@ -144,9 +134,7 @@ def test_the_web_rule_writes_only_keys_the_core_class_has(module_id):
         assert set(targets) <= known, set(targets) - known
 
 
-@pytest.mark.parametrize("module_id", [
-    HEADER, *JOINTS, pytest.param(GIRDER, marks=GIRDER_BUG),
-])
+@pytest.mark.parametrize("module_id", [HEADER, GIRDER, *JOINTS])
 def test_the_web_rule_is_the_core_rule(module_id):
     assert sync_merge.sync_rules(module_id) == sync_merge.core_sync_rules(module_id)
 
@@ -259,7 +247,6 @@ def test_a_joint_save_keeps_the_draft_over_the_dock_material(module_id):
     assert resolved[KEY_DP_WELD_MATERIAL_G_O] == "500"
 
 
-@GIRDER_BUG
 @pytest.mark.parametrize("operation", ("refresh", "reset"))
 def test_plate_girder_dock_material_reaches_the_girder_material(operation):
     resolved, meta, *_ = merge(GIRDER, {KEY_MATERIAL: OTHER_GRADE, KEY_SEC_MATERIAL: GRADE}, operation)
@@ -366,9 +353,11 @@ class CustomRowsSyncTests(TestCase):
         self.assertEqual(data["section_details"]["supporting"], {})
         self.assertEqual(data["section_details"]["supported"], {})
 
-    def test_plate_girder_custom_material_is_not_linked_to_any_row_of_its_own_tab(self):
-        # What the core would do (Member.Material follows the dock) is the xfail above; here the part
-        # that already holds: a custom dock grade must not break the sync or invent section rows.
+    def test_plate_girder_custom_dock_material_reaches_the_girder_material_row(self):
+        # A custom dock grade copies to Member.Material, whose properties (the supporting role, which the
+        # Girder Properties tab shows) are the owner's row; the sync invents no section rows.
         data = self.sync(GIRDER, {KEY_MATERIAL: self.CUSTOM}, user=self.user)
         self.assertEqual(data["resolved_inputs"][KEY_MATERIAL], self.CUSTOM)
+        self.assertEqual(data["resolved_inputs"][KEY_SEC_MATERIAL], self.CUSTOM)
+        self.assertEqual([row["Grade"] for row in data["material_details"]["supporting"]], [self.CUSTOM])
         self.assertEqual(data["section_details"], {"supporting": {}, "supported": {}, "connector": {}})
