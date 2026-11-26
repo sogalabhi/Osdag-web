@@ -685,7 +685,13 @@ const DesignPrefSections = ({
             />
           )}
           {activeTab === 14 && (
-            <GirderPropertiesTab inputs={inputs} materialList={materialListForModals} {...girderTabProps} />
+            <GirderPropertiesTab
+              inputs={inputs}
+              materialList={materialListForModals}
+              sectionData={safeSectionDetails.supporting}
+              onRefetchModuleOptions={onRefetchModuleOptions}
+              {...girderTabProps}
+            />
           )}
           {activeTab === 15 && <StiffenersTab inputs={inputs} />}
           {activeTab === 16 && <AdditionalGirderDataTab inputs={inputs} />}

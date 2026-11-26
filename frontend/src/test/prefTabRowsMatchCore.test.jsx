@@ -168,6 +168,10 @@ const GIRDER_TABS = {
       KEY_DISP_MOD_OF_ELAST, KEY_DISP_MOD_OF_RIGID, KEY_DISP_POISSON_RATIO, "Thermal Expansion Coefficient", KEY_DISP_TYPE,
       KEY_DISP_OVERALL_DEPTH_PG, KEY_DISP_WEB_THICKNESS_PG, KEY_DISP_TOP_Bflange_PG, KEY_DISP_TOP_FLANGE_THICKNESS_PG,
       KEY_DISP_BOTTOM_Bflange_PG, KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG,
+      // Label_12..Label_23: the section properties the core computes from the dimensions.
+      "Mass, M", "Sectional Area, a", "2nd Moment of Area, Iz", "2nd Moment of Area, Iy", "Radius of Gyration, rz",
+      "Radius of Gyration, ry", "Elastic Modulus, Zz", "Elastic Modulus, Zy", "Plastic Modulus, Zpz",
+      "Plastic Modulus, Zpy", "Torsion Constant, It", "Warping Constant, Iw",
     ],
   },
   Optimisation: {

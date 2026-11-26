@@ -1,7 +1,8 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Input, Select } from "antd";
 
 import { ModuleContext } from "../../../../context/ModuleState";
+import CustomMaterialModal from "../../../shared/components/CustomMaterialModal";
 import {
   KEY_DISP_BOTTOM_Bflange_PG,
   KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG,
@@ -26,6 +27,7 @@ import {
   KEY_DISP_MOD_OF_RIGID,
   KEY_DISP_OVERALL_DEPTH_PG,
   KEY_DISP_POISSON_RATIO,
+  KEY_DISP_SEC_PROP,
   KEY_DISP_STR_TYPE,
   KEY_DISP_SUPPORTING_OPTIONS,
   KEY_DISP_TOP_Bflange_PG,
@@ -125,16 +127,61 @@ const fyFor = (row, thickness) => {
   return row.Yield_Stress_greater_than_40;
 };
 
-/** Girder Properties: the girder material (saved), its strengths and the girder's dimensions (main form). */
-export const GirderPropertiesTab = ({ inputs, designPrefInputs, setDesignPrefInputs, isInputLocked, materialList }) => {
+/**
+ * The strengths a `Cus_<fy 0-20>_<fy 20-40>_<fy >40>_<fu>` grade names, as the backend reads them for a guest
+ * (`osdag_overrides`); null for any other name.
+ */
+const customGradeRow = (grade) => {
+  const match = /^Cus_(\d+(?:\.\d+)?)_(\d+(?:\.\d+)?)_(\d+(?:\.\d+)?)_(\d+(?:\.\d+)?)$/.exec(grade || "");
+  if (!match) return null;
+  const [, fy20, fy2040, fy40, fu] = match;
+  return { Grade: grade, Yield_Stress_less_than_20: fy20, Yield_Stress_between_20_and_neg40: fy2040, Yield_Stress_greater_than_40: fy40, Ultimate_Tensile_Stress: fu };
+};
+
+/** The dropdown entry that opens the custom material dialog, as on the dock and the other section tabs. */
+const CUSTOM_MATERIAL_OPTION = "Custom";
+
+/**
+ * The section properties the core computes for the girder from its dimensions (Label_12..Label_23 of
+ * `tab_girder_sec`), as the sync answers them for the supporting role in the catalog's column names.
+ * The core computes them in mm (the desktop labels them in cm).
+ */
+const GIRDER_SECTION_PROPERTIES = [
+  ["Mass", "Mass, M (kg/m)"],
+  ["Area", "Sectional Area, a (mm²)"],
+  ["Iz", "2nd Moment of Area, Iz (mm⁴)"],
+  ["Iy", "2nd Moment of Area, Iy (mm⁴)"],
+  ["rz", "Radius of Gyration, rz (mm)"],
+  ["ry", "Radius of Gyration, ry (mm)"],
+  ["Zz", "Elastic Modulus, Zz (mm³)"],
+  ["Zy", "Elastic Modulus, Zy (mm³)"],
+  ["Zpz", "Plastic Modulus, Zpz (mm³)"],
+  ["Zpy", "Plastic Modulus, Zpy (mm³)"],
+  ["It", "Torsion Constant, It (mm⁴)"],
+  ["Iw", "Warping Constant, Iw (mm⁶)"],
+];
+
+/** Girder Properties: the girder material (saved), its strengths, the girder's dimensions (main form) and section properties. */
+export const GirderPropertiesTab = ({
+  inputs,
+  designPrefInputs,
+  setDesignPrefInputs,
+  isInputLocked,
+  materialList,
+  sectionData,
+  onRefetchModuleOptions,
+}) => {
   const { supporting_material_details: synced } = useContext(ModuleContext) ?? {};
+  const [showCustomMaterial, setShowCustomMaterial] = useState(false);
   const materials = materialList ?? [];
   const grade = designPrefInputs.girder_material;
-  const row = materials.find((item) => item.Grade === grade) ?? (synced?.[0]?.Grade === grade ? synced[0] : null);
+  const row =
+    materials.find((item) => item.Grade === grade) ?? (synced?.[0]?.Grade === grade ? synced[0] : null) ?? customGradeRow(grade);
   // The core reads Fy for the web thickness (20 mm when it has none).
   const webThickness = Number(firstOf(inputs?.web_thickness)) || 20;
   const optimized = inputs?.design_type === "Optimized";
   const dimension = (field) => (optimized && !field.endsWith("thickness") ? "Optimized" : String(firstOf(inputs?.[field]) ?? ""));
+  const property = (column) => (optimized ? "Optimized" : String(sectionData?.[column] ?? ""));
 
   return (
     <div className="Connector-col-beam-cont">
@@ -144,9 +191,15 @@ export const GirderPropertiesTab = ({ inputs, designPrefInputs, setDesignPrefInp
           <ChoiceRow
             label={KEY_DISP_MATERIAL}
             value={grade || ""}
-            options={materials.map((item) => item.Grade)}
+            options={[...materials.map((item) => item.Grade), CUSTOM_MATERIAL_OPTION]}
             disabled={isInputLocked}
-            onSelect={(value) => setDesignPrefInputs({ ...designPrefInputs, girder_material: value })}
+            onSelect={(value) => {
+              if (value === CUSTOM_MATERIAL_OPTION) {
+                setShowCustomMaterial(true);
+                return;
+              }
+              setDesignPrefInputs({ ...designPrefInputs, girder_material: value });
+            }}
           />
           <DockText label={KEY_DISP_FU} value={row ? String(row.Ultimate_Tensile_Stress) : ""} />
           <DockText label={KEY_DISP_FY} value={row ? String(fyFor(row, webThickness)) : ""} />
@@ -169,6 +222,24 @@ export const GirderPropertiesTab = ({ inputs, designPrefInputs, setDesignPrefInp
           <DockText label={KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG} value={dimension("bottom_flange_thickness")} />
         </div>
       </div>
+      <div className="col-left">
+        <div className="sub-container">
+          <h4>{KEY_DISP_SEC_PROP}</h4>
+          {GIRDER_SECTION_PROPERTIES.map(([column, label]) => (
+            <DockText key={column} label={label} value={property(column)} />
+          ))}
+        </div>
+      </div>
+      <CustomMaterialModal
+        showModal={showCustomMaterial}
+        setShowModal={setShowCustomMaterial}
+        setInputValues={setDesignPrefInputs}
+        inputValues={designPrefInputs}
+        type="supporting"
+        field="girder_material"
+        materialList={materials}
+        onRefetchModuleOptions={onRefetchModuleOptions}
+      />
     </div>
   );
 };
