@@ -528,6 +528,17 @@ describe("plate girder", () => {
     }
   });
 
+  it("shows the section properties the sync answers for the girder", async () => {
+    server.fail = (url, body) => ({
+      ...answer(url, body),
+      section_details: { supporting: { Mass: "411.34", Zpz: "25082000.0" }, supported: {}, connector: {} },
+    });
+    openGirder();
+    await ready();
+    expect(textInputOf("Mass, M").value).toBe("411.34");
+    expect(textInputOf("Plastic Modulus, Zpz").value).toBe("25082000.0");
+  });
+
   it("shows a main-form value the main form changed while the dialog is open", async () => {
     const { withInputs } = openGirder();
     await ready();

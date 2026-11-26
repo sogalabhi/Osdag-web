@@ -7,8 +7,13 @@
  *
  * The values used are made up for the test and never compared with the module's defaults.
  */
-import { fireEvent, render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
+// A signed-in user: the custom material dialog saves to the database only for one.
+vi.mock("../utils/auth", () => ({ isGuestUser: () => false }));
+
+import { ModuleContext } from "../context/ModuleState";
 
 import {
   KEY_DISP_CLASS,
@@ -92,7 +97,7 @@ describe("Girder Properties tab", () => {
 
   it("writes a material back and shows its strengths", () => {
     show();
-    expect(texts(optionsOf(KEY_DISP_MATERIAL))).toEqual(MATERIALS.map((m) => m.Grade));
+    expect(texts(optionsOf(KEY_DISP_MATERIAL))).toEqual([...MATERIALS.map((m) => m.Grade), "Custom"]);
     pick(KEY_DISP_MATERIAL, "E 350 (Fe 490)");
     expect(prefsNow()).toEqual({ girder_material: "E 350 (Fe 490)" });
     expect(textInputOf(KEY_DISP_FU).value).toBe("490");
@@ -108,6 +113,60 @@ describe("Girder Properties tab", () => {
   it("changes nothing when the dialog is locked", () => {
     show({ isInputLocked: true });
     expect(isSelectDisabled(KEY_DISP_MATERIAL)).toBe(true);
+  });
+
+  it("shows the section properties the sync computed from the dimensions, read only", () => {
+    const sectionData = { Mass: "411.34", Area: "52400.0", Iz: "14143346666.67", Iw: "113447250000000.0" };
+    show({ sectionData });
+    expect(textInputOf("Mass, M").value).toBe("411.34");
+    expect(textInputOf("Sectional Area, a").value).toBe("52400.0");
+    expect(textInputOf("2nd Moment of Area, Iz").value).toBe("14143346666.67");
+    expect(textInputOf("Warping Constant, Iw").value).toBe("113447250000000.0");
+    expect(textInputOf("Radius of Gyration, ry").value).toBe("");
+    expect(textInputOf("Mass, M").readOnly).toBe(true);
+  });
+
+  it("shows no section properties when the optimisation chooses the dimensions", () => {
+    show({ inputs: dock({ design_type: "Optimized" }), sectionData: { Mass: "1" } });
+    expect(textInputOf("Mass, M").value).toBe("Optimized");
+  });
+
+  it("reads the strengths of a guest's Cus_ grade from its name", () => {
+    show({ initial: { girder_material: "Cus_300_290_280_450" }, inputs: dock({ web_thickness: ["30"] }) });
+    expect(textInputOf(KEY_DISP_FU).value).toBe("450");
+    expect(textInputOf(KEY_DISP_FY).value).toBe("290");
+  });
+
+  it("opens the custom material dialog from the Custom entry and saves the new grade as the girder material", async () => {
+    const manageCustomMaterials = vi.fn(async () => ({ success: true, data: { Grade: "Cus_300_290_280_450" } }));
+    const manageDesignPreferences = vi.fn();
+    const onRefetchModuleOptions = vi.fn();
+    vi.spyOn(window, "alert").mockImplementation(() => {});
+    render(
+      <ModuleContext.Provider value={{ manageCustomMaterials, manageDesignPreferences, supporting_material_details: [] }}>
+        <PrefTabHost
+          Tab={GirderPropertiesTab}
+          initial={{ girder_material: "E 250 (Fe 410 W)A", allowable_class: "Yes" }}
+          inputs={dock()}
+          materialList={MATERIALS}
+          isInputLocked={false}
+          onRefetchModuleOptions={onRefetchModuleOptions}
+        />
+      </ModuleContext.Provider>,
+    );
+    pick(KEY_DISP_MATERIAL, "Custom");
+    expect(prefsNow().girder_material).toBe("E 250 (Fe 410 W)A"); // the entry itself is no grade
+    const dialog = (await screen.findByText("Custom Material")).closest(".ant-modal");
+    const [, fy20, fy2040, fy40, fu] = within(dialog).getAllByRole("textbox");
+    fireEvent.change(fy20, { target: { value: "300" } });
+    fireEvent.change(fy2040, { target: { value: "290" } });
+    fireEvent.change(fy40, { target: { value: "280" } });
+    fireEvent.change(fu, { target: { value: "450" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save to database" }));
+    await waitFor(() => expect(prefsNow()).toEqual({ girder_material: "Cus_300_290_280_450", allowable_class: "Yes" }));
+    expect(manageCustomMaterials).toHaveBeenCalledWith("add", expect.objectContaining({ grade: "Cus_300_290_280_450", type: "supporting" }));
+    expect(manageDesignPreferences).toHaveBeenCalledWith("material_update", expect.objectContaining({ materialType: "supporting" }));
+    expect(onRefetchModuleOptions).toHaveBeenCalled();
   });
 });
 

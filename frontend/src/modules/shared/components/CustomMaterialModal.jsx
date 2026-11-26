@@ -9,9 +9,12 @@ const CustomMaterialModal = ({
   setInputValues,
   inputValues,
   type = "supported",
+  // The dialog field the new grade goes to; by default the material row of `type`.
+  field,
   materialList: materialsFromParent,
   onRefetchModuleOptions,
 }) => {
+  const targetField = field ?? `${type}_material`;
   const {
     manageDesignPreferences,
     manageCustomMaterials,
@@ -82,13 +85,7 @@ const CustomMaterialModal = ({
 
       localStorage.setItem(key, JSON.stringify(newData));
       alert("Data added successfully");
-      if (type === "supported") {
-        setInputValues({ ...inputValues, supported_material: grade });
-      } else if (type === "supporting") {
-        setInputValues({ ...inputValues, supporting_material: grade });
-      } else if (type === "connector") {
-        setInputValues({ ...inputValues, connector_material: grade });
-      }
+      setInputValues({ ...inputValues, [targetField]: grade });
 
       manageDesignPreferences("material_update", {
         materialType: type,
@@ -119,13 +116,7 @@ const CustomMaterialModal = ({
       type,
     });
     if (result?.success === true) {
-      if (type === "supported") {
-        setInputValues({ ...inputValues, supported_material: grade });
-      } else if (type === "supporting") {
-        setInputValues({ ...inputValues, supporting_material: grade });
-      } else if (type === "connector") {
-        setInputValues({ ...inputValues, connector_material: grade });
-      }
+      setInputValues({ ...inputValues, [targetField]: grade });
       manageDesignPreferences("material_update", {
         materialType: type,
         materialData: result?.data?.data ?? result?.data ?? { Grade: grade, ...inputs },
