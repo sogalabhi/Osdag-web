@@ -10,6 +10,56 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import {
+  KEY_ALLOW_CLASS,
+  KEY_DESIGN_LOAD,
+  KEY_DISP_BOTTOM_Bflange_PG,
+  KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG,
+  KEY_DISP_CLASS,
+  KEY_DISP_DESIGN_LOAD,
+  KEY_DISP_EFFECTIVE_AREA_PARA,
+  KEY_DISP_FU,
+  KEY_DISP_FY,
+  KEY_DISP_IntermediateStiffener,
+  KEY_DISP_IntermediateStiffener_spacing,
+  KEY_DISP_IntermediateStiffener_thickness,
+  KEY_DISP_IS_IT_SYMMETRIC,
+  KEY_DISP_LOAD,
+  KEY_DISP_LongitudnalStiffener,
+  KEY_DISP_LongitudnalStiffener_thickness,
+  KEY_DISP_MATERIAL,
+  KEY_DISP_MAX_DEFL,
+  KEY_DISP_MEMBER_OPTIONS,
+  KEY_DISP_MOD_OF_ELAST,
+  KEY_DISP_MOD_OF_RIGID,
+  KEY_DISP_OVERALL_DEPTH_PG,
+  KEY_DISP_POISSON_RATIO,
+  KEY_DISP_STR_TYPE,
+  KEY_DISP_SUPPORTING_OPTIONS,
+  KEY_DISP_TOP_Bflange_PG,
+  KEY_DISP_TOP_FLANGE_THICKNESS_PG,
+  KEY_DISP_TYPE,
+  KEY_DISP_WEB_THICKNESS_PG,
+  KEY_DISPP_LENGTH_OVERWRITE,
+  KEY_EFFECTIVE_AREA_PARA,
+  KEY_IntermediateStiffener,
+  KEY_IntermediateStiffener_spacing,
+  KEY_IntermediateStiffener_thickness,
+  KEY_IntermediateStiffener_thickness_val,
+  KEY_IS_IT_SYMMETRIC,
+  KEY_LENGTH_OVERWRITE,
+  KEY_LOAD,
+  KEY_LongitudnalStiffener,
+  KEY_LongitudnalStiffener_thickness,
+  KEY_LongitudnalStiffener_thickness_val,
+  KEY_MAX_DEFL,
+  KEY_MEMBER_OPTIONS,
+  KEY_SEC_FU,
+  KEY_SEC_FY,
+  KEY_SEC_MATERIAL,
+  KEY_ShearBuckling,
+  KEY_ShearBucklingOption,
+  KEY_STR_TYPE,
+  KEY_SUPPORTING_OPTIONS,
   KEY_DP_BOLT_HOLE_TYPE,
   KEY_DP_BOLT_SLIP_FACTOR,
   KEY_DP_BOLT_TYPE,
@@ -30,6 +80,13 @@ import BoltSectionModal from "../modules/shared/components/BoltSectionModal";
 import DesignSectionModal from "../modules/shared/components/DesignSectionModal";
 import DetailingSectionModal from "../modules/shared/components/DetailingSectionModal";
 import WeldSectionModal from "../modules/shared/components/WeldSectionModal";
+import {
+  AdditionalGirderDataTab,
+  DeflectionTab,
+  GirderOptimisationTab,
+  GirderPropertiesTab,
+  StiffenersTab,
+} from "../modules/flexuralMember/plateGirder/components/PlateGirderPrefTabs";
 import { getDesignPrefTabs } from "../modules/shared/config/designPrefModuleConfig";
 import { MODULES } from "./cases";
 import { PrefTabHost, rowLabels } from "./componentHarness";
@@ -97,6 +154,77 @@ const KNOWN_DIFFERENCES = {
   // The core's Detailing tab of the base plate has no gap row.
   "base plate|Detailing": { webOnly: [KEY_DP_DETAILING_GAP], coreOnly: [] },
 };
+
+/**
+ * The plate girder's own tabs (Design is compared above). Each row label stands for one core key; the rows the
+ * core's tab shows as plain labels (`Label_*`: elastic constants, type, dimensions) are listed as `display`. The
+ * stiffener thickness values rows show only for a customized thickness, so the tab is read with both customized.
+ */
+const GIRDER_TABS = {
+  "Girder Properties": {
+    Tab: GirderPropertiesTab,
+    keys: { [KEY_DISP_MATERIAL]: KEY_SEC_MATERIAL, [KEY_DISP_FU]: KEY_SEC_FU, [KEY_DISP_FY]: KEY_SEC_FY },
+    display: [
+      KEY_DISP_MOD_OF_ELAST, KEY_DISP_MOD_OF_RIGID, KEY_DISP_POISSON_RATIO, "Thermal Expansion Coefficient", KEY_DISP_TYPE,
+      KEY_DISP_OVERALL_DEPTH_PG, KEY_DISP_WEB_THICKNESS_PG, KEY_DISP_TOP_Bflange_PG, KEY_DISP_TOP_FLANGE_THICKNESS_PG,
+      KEY_DISP_BOTTOM_Bflange_PG, KEY_DISP_BOTTOM_FLANGE_THICKNESS_PG,
+    ],
+  },
+  Optimisation: {
+    Tab: GirderOptimisationTab,
+    keys: {
+      [KEY_DISP_EFFECTIVE_AREA_PARA]: KEY_EFFECTIVE_AREA_PARA,
+      [KEY_DISP_CLASS]: KEY_ALLOW_CLASS,
+      [KEY_DISP_LOAD]: KEY_LOAD,
+      [KEY_DISPP_LENGTH_OVERWRITE]: KEY_LENGTH_OVERWRITE,
+    },
+  },
+  Stiffeners: {
+    Tab: StiffenersTab,
+    keys: {
+      [KEY_DISP_IntermediateStiffener]: KEY_IntermediateStiffener,
+      [KEY_DISP_IntermediateStiffener_spacing]: KEY_IntermediateStiffener_spacing,
+      [KEY_DISP_LongitudnalStiffener]: KEY_LongitudnalStiffener,
+      [KEY_DISP_IntermediateStiffener_thickness]: KEY_IntermediateStiffener_thickness,
+      [KEY_DISP_LongitudnalStiffener_thickness]: KEY_LongitudnalStiffener_thickness,
+      "Intermediate Stiffener Thickness Values": KEY_IntermediateStiffener_thickness_val,
+      "Longitudnal Stiffener Thickness Values": KEY_LongitudnalStiffener_thickness_val,
+      [KEY_ShearBuckling.trim()]: KEY_ShearBucklingOption,
+    },
+  },
+  "Additional Girder Data": { Tab: AdditionalGirderDataTab, keys: { [KEY_DISP_IS_IT_SYMMETRIC]: KEY_IS_IT_SYMMETRIC } },
+  Deflection: {
+    Tab: DeflectionTab,
+    keys: {
+      [KEY_DISP_STR_TYPE]: KEY_STR_TYPE,
+      [KEY_DISP_DESIGN_LOAD]: KEY_DESIGN_LOAD,
+      [KEY_DISP_MEMBER_OPTIONS]: KEY_MEMBER_OPTIONS,
+      [KEY_DISP_SUPPORTING_OPTIONS]: KEY_SUPPORTING_OPTIONS,
+      [KEY_DISP_MAX_DEFL]: KEY_MAX_DEFL,
+    },
+  },
+};
+
+describe("plate girder tab rows against the core's keys", () => {
+  const girder = MODULES.find((module) => module.name === "plate girder").config;
+  const inputs = {
+    ...girder.defaultInputs,
+    intermediate_stiffener_thickness: "Customized",
+    intermediate_stiffener_thickness_val: ["10"],
+    longitudinal_stiffener_thickness: "Customized",
+    longitudinal_stiffener_thickness_val: ["12"],
+  };
+
+  it.each(Object.entries(GIRDER_TABS))("%s", (tabName, { Tab, keys, display = [] }) => {
+    const { unmount } = render(<PrefTabHost Tab={Tab} initial={{}} inputs={inputs} materialList={[]} isInputLocked={false} />);
+    const labels = rowLabels();
+    unmount();
+    const shown = labels.filter((label) => !display.some((start) => label.startsWith(start)));
+    expect(labels.length - shown.length, "display rows").toBe(display.length);
+    const web = shown.map((label) => keyOfRow(keys, label) ?? `unknown row: ${label}`).sort();
+    expect(web).toEqual(coreKeys(girder.designType, tabName));
+  });
+});
 
 describe.each(Object.entries(TABS))("%s tab rows against the core's keys", (tabName, tab) => {
   const modules = MODULES.filter(

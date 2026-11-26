@@ -30,11 +30,6 @@ const KNOWN_DIFFERENCES = {
   "struts bolted": { webOnly: [], coreOnly: ["Channel Section"] },
   // The core's welded strut has no Connector or Detailing tab, but an Optimization tab.
   "struts welded": { webOnly: ["Connector", "Detailing"], coreOnly: ["Optimization"] },
-  // The plate girder gets the dialog of the shear connections; the core lists its own tabs.
-  "plate girder": {
-    webOnly: ["Column Section*", "Beam Section*", "Connector", "Bolt", "Weld", "Detailing"],
-    coreOnly: ["Girder Properties", "Optimization", "Stiffeners", "Additional Girder Data", "Deflection"],
-  },
 };
 
 const sortedDiff = (a, b) => a.filter((name) => !b.includes(name)).sort();
@@ -56,6 +51,11 @@ describe("Additional Inputs tabs against the core's tabs", () => {
   it("lists only modules that exist in the pinned differences", () => {
     const names = MODULES.map((module) => module.name);
     for (const name of Object.keys(KNOWN_DIFFERENCES)) expect(names).toContain(name);
+  });
+
+  it("shows the plate girder's tabs in the core's order", () => {
+    const { config } = MODULES.find((module) => module.name === "plate girder");
+    expect(webTabs(config.sessionName)).toEqual(coreTabs(config.designType));
   });
 
   it("shows no tab twice", () => {

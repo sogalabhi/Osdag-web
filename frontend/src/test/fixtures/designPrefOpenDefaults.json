@@ -185,10 +185,8 @@
   "supporting_material": "E 250 (Fe 410 W)A"
  },
  "Plate Girder Design": {
-  "connector_material": "E 250 (Fe 410 W)A",
   "design_method": "Limit State Design",
-  "supported_material": "E 250 (Fe 410 W)A",
-  "supporting_material": "E 250 (Fe 410 W)A"
+  "girder_material": "E 250 (Fe 410 W)A"
  },
  "Seated Angle Connection": {
   "bolt_hole_type": "Standard",

@@ -14,6 +14,7 @@ import { MODULES } from "./cases";
 import { LISTS, caseState, designRequest, formRecorder, wire } from "./cases/shared";
 import { loadStateFromOsi } from "../modules/shared/utils/osiLoader";
 import { toDesignDictionary } from "../modules/shared/utils/osiSave";
+import { getDesignPrefConfig } from "../modules/shared/config/designPrefModuleConfig";
 import * as webKeys from "../constants/generated/webKeys";
 
 // Keys the web defines for the wire itself (`is_leg_loaded`); they match a field name on purpose.
@@ -102,5 +103,20 @@ describe("project round trip: the design request after save and reopen", () => {
       const after = designRequest(config, reopen(config, saveProject({ config, ...before }, {})));
       expect(after).toEqual(original);
     }
+  });
+
+  // The girder's Additional Inputs (Girder Properties material, Optimisation values) are saved under their core
+  // keys and the dialog shows them again after reopening.
+  it("plate girder: the saved dialog values reopen in the dialog", () => {
+    const module = MODULES.find((m) => m.name === "plate girder");
+    const { config } = module;
+    const saved = { girder_material: "E 350 (Fe 490)", allowable_class: "No", effective_area_parameter: "0.8", length_overwrite: "1.1", design_method: "Limit State Design" };
+    const before = caseState(module, "customized");
+    const file = saveProject({ config, ...before }, saved);
+    expect(file).toMatchObject({ "Member.Material": "E 350 (Fe 490)", "Optimum.Class": "No", "Effective.Area_Para": "0.8", "Length.Overwrite": "1.1" });
+    const state = reopen(config, file);
+    const prefConfig = getDesignPrefConfig(config.sessionName);
+    expect(prefConfig.getInitialPrefs({ ...state.inputs, ...state.designPrefOverrides }, config.sessionName)).toEqual(saved);
+    expect(designRequest(config, state)).toEqual(designRequest(config, { ...before, designPrefOverrides: saved }));
   });
 });

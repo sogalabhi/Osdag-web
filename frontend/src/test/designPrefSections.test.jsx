@@ -19,8 +19,14 @@ vi.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: null, loading
 
 import { ModuleContext } from "../context/ModuleState";
 import {
+  KEY_ALLOW_CLASS,
   KEY_CONNECTOR_MATERIAL,
+  KEY_DISP_CLASS,
   KEY_DISP_FINPLATE,
+  KEY_DISP_MATERIAL,
+  KEY_DISP_MEMBER_OPTIONS,
+  KEY_DISP_PLATE_GIRDER_WELDED,
+  KEY_DISP_STR_TYPE,
   KEY_DP_BOLT_HOLE_TYPE,
   KEY_DP_BOLT_SLIP_FACTOR,
   KEY_DP_BOLT_TYPE,
@@ -30,12 +36,19 @@ import {
   KEY_DP_DETAILING_GAP,
   KEY_DP_WELD_FAB,
   KEY_DP_WELD_MATERIAL_G_O,
+  KEY_EFFECTIVE_AREA_PARA,
+  KEY_IntermediateStiffener,
+  KEY_LOAD,
   KEY_MATERIAL,
+  KEY_MAX_DEFL,
+  KEY_SEC_MATERIAL,
+  KEY_STR_TYPE,
   KEY_SUPTDSEC_MATERIAL,
   KEY_SUPTNGSEC_MATERIAL,
 } from "../constants/generated/coreKeys";
 import { DESIGN_PREFERENCES } from "../datasources/endpoints";
 import DesignPrefSections from "../modules/shared/components/DesignPrefSections";
+import { plateGirderConfig } from "../modules/flexuralMember/plateGirder/configs/plateGirderConfig";
 import { finPlateConfig } from "../modules/shearConnection/finPlate/configs/finPlateConfig";
 import { InPlace, optionsOf, pick, shownIn, textInputOf } from "./componentHarness";
 
@@ -461,5 +474,67 @@ describe("closing with unsaved changes", () => {
     expect(spies.setConfirmationModal).toHaveBeenCalledWith(false);
     expect(spies.setDesignPrefModalStatus).not.toHaveBeenCalled();
     expect(operations()).toEqual(["open"]);
+  });
+});
+
+describe("main-form values in the stored overrides", () => {
+  it("stores no copy of a main-form value the dialog did not change, so a later edit of the main form counts", async () => {
+    const { spies } = open();
+    await ready();
+    const stored = lastOverrides(spies);
+    const mainForm = finPlateConfig.inputSections.flatMap((section) => section.fields.map((field) => field.key));
+    expect(Object.keys(stored).filter((field) => mainForm.includes(field))).toEqual([]);
+    // What the Design button sends: the dock with the overrides merged over it.
+    expect({ ...dock({ load_shear: "123" }), ...stored }.load_shear).toBe("123");
+  });
+});
+
+describe("plate girder", () => {
+  const girderDock = (changes = {}) => ({ ...plateGirderConfig.defaultInputs, material: GRADE, ...changes });
+  const openGirder = (inputs = girderDock()) =>
+    open({ inputs, module: plateGirderConfig.sessionName, moduleConfig: plateGirderConfig });
+
+  it("shows the core's six tabs in its order, Girder Properties first", async () => {
+    openGirder();
+    await ready();
+    expect(screen.getAllByTestId("pref-tab").map((tab) => tab.textContent)).toEqual([
+      "Girder Properties",
+      "Optimization",
+      "Stiffeners",
+      "Additional Girder Data",
+      "Design",
+      "Deflection",
+    ]);
+    expect(syncs()[0].body.module_id).toBe(KEY_DISP_PLATE_GIRDER_WELDED);
+    expect(shownIn(KEY_DISP_MATERIAL)).toBe(GRADE);
+  });
+
+  it("saves the girder material and the Optimisation and Design values, and no main-form value", async () => {
+    const { spies } = openGirder();
+    await ready();
+    pick(KEY_DISP_MATERIAL, OTHER_GRADE);
+    goTo("Optimization");
+    pick(KEY_DISP_CLASS, "No");
+    fireEvent.click(button("Save"));
+    await waitFor(() => expect(operations()).toEqual(["open", "save"]));
+    const { design_pref_draft: draft } = syncs()[1].body;
+    expect(draft).toMatchObject({ [KEY_SEC_MATERIAL]: OTHER_GRADE, [KEY_ALLOW_CLASS]: "No", [KEY_EFFECTIVE_AREA_PARA]: "1.0" });
+    for (const key of [KEY_STR_TYPE, KEY_LOAD, KEY_IntermediateStiffener, KEY_MAX_DEFL]) expect(draft).not.toHaveProperty(key);
+    await waitFor(() => expect(spies.setDesignPrefModalStatus).toHaveBeenCalledWith(false));
+    const stored = lastOverrides(spies);
+    expect(stored).toMatchObject({ girder_material: OTHER_GRADE, allowable_class: "No" });
+    for (const field of ["structure_type", "loading_condition", "intermediate_stiffener", "symmetry"]) {
+      expect(stored).not.toHaveProperty(field);
+    }
+  });
+
+  it("shows a main-form value the main form changed while the dialog is open", async () => {
+    const { withInputs } = openGirder();
+    await ready();
+    goTo("Deflection");
+    expect(shownIn(KEY_DISP_STR_TYPE)).toBe("Highway Bridge");
+    withInputs(girderDock({ structure_type: "Other Building", member_options: "Floor and roof" }));
+    await waitFor(() => expect(shownIn(KEY_DISP_STR_TYPE)).toBe("Other Building"));
+    expect(shownIn(KEY_DISP_MEMBER_OPTIONS)).toBe("Floor and roof");
   });
 });
