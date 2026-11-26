@@ -255,7 +255,9 @@ def test_plate_girder_dock_material_reaches_the_girder_material(operation):
 
 
 def test_plate_girder_sync_does_not_invent_section_rows():
-    # The core's refresh_input_dock() has no rows for the plate girder: nothing to look up.
+    # The core's refresh_input_dock() has no rows for the plate girder: nothing to look up. Its section
+    # properties are computed from the dimensions (test_plate_girder_section_properties.py); without any
+    # there is no row.
     assert dd.pref_tables(GIRDER)["section_sources"] == []
     _r, _m, _md, section_details = merge(GIRDER, {KEY_MATERIAL: GRADE}, "open", **sync_merge.lookup_sources())
     assert section_details == {"supporting": {}, "supported": {}, "connector": {}}
@@ -361,3 +363,29 @@ class CustomRowsSyncTests(TestCase):
         self.assertEqual(data["resolved_inputs"][KEY_SEC_MATERIAL], self.CUSTOM)
         self.assertEqual([row["Grade"] for row in data["material_details"]["supporting"]], [self.CUSTOM])
         self.assertEqual(data["section_details"], {"supporting": {}, "supported": {}, "connector": {}})
+
+    def test_plate_girder_keeps_a_custom_girder_material_saved_in_the_dialog(self):
+        # The Custom entry of the Girder Properties tab: the owner's grade is saved as Member.Material and its
+        # properties are the owner's row; opening again keeps it; a dock change replaces it, as for a catalog grade.
+        inputs = {KEY_MATERIAL: GRADE}
+        body ={"module_id": GIRDER, "inputs": inputs, "operation": "save", "design_pref_draft": {KEY_SEC_MATERIAL: self.CUSTOM}}
+        with authenticated_as(self.user):
+            r = self.client.post("/api/design-preferences/sync/", data=body, content_type="application/json")
+        data = r.json()
+        self.assertEqual(data["resolved_inputs"][KEY_SEC_MATERIAL], self.CUSTOM)
+        self.assertEqual([row["Grade"] for row in data["material_details"]["supporting"]], [self.CUSTOM])
+        self.assertEqual(data["material_details"]["supporting"][0]["Ultimate_Tensile_Stress"], 450)
+        data = self.sync(GIRDER, {**inputs, KEY_SEC_MATERIAL: self.CUSTOM}, "open", user=self.user)
+        self.assertEqual(data["resolved_inputs"][KEY_SEC_MATERIAL], self.CUSTOM)
+        data = self.sync(GIRDER, {KEY_MATERIAL: OTHER_GRADE, KEY_SEC_MATERIAL: self.CUSTOM}, "refresh", user=self.user)
+        self.assertEqual(data["resolved_inputs"][KEY_SEC_MATERIAL], OTHER_GRADE)
+        # Another user does not see the owner's row.
+        data = self.sync(GIRDER, {**inputs, KEY_SEC_MATERIAL: self.CUSTOM}, "open", user=self.other)
+        self.assertEqual(data["material_details"]["supporting"], [])
+
+    def test_plate_girder_copies_a_guests_cus_dock_material_to_the_girder_material(self):
+        data = self.sync(GIRDER, {KEY_MATERIAL: GUEST_GRADE}, "reset")
+        self.assertEqual(data["resolved_inputs"][KEY_SEC_MATERIAL], GUEST_GRADE)
+        with user_rows(None):
+            answers = dd.derive_computed(GIRDER, {KEY_MATERIAL: GUEST_GRADE})
+        self.assertEqual(answers["Member.Fu"], "410")
