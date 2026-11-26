@@ -61,6 +61,7 @@ const ALL_TABS = [
   { id: 15, name: "Stiffeners" },
   { id: 16, name: "Additional Girder Data" },
   { id: 17, name: "Deflection" },
+  { id: 18, name: "Channel Section" },
 ];
 
 /*
@@ -369,7 +370,7 @@ const DESIGN_PREF_CONFIG = {
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
   "Tension Member Bolted Design":{
-    tabIds: [2, 3, 6, 11, 13],
+    tabIds: [2, 18, 3, 6, 11, 13],
     initialTabIndex: 2,
     getInitialPrefs: (inputs) => ({
       supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
@@ -385,7 +386,7 @@ const DESIGN_PREF_CONFIG = {
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
   "Tension Member Welded Design":{
-    tabIds: [2, 3, 10, 13],
+    tabIds: [2, 18, 3, 10, 13],
     initialTabIndex: 2,
     getInitialPrefs: (inputs) => ({
       supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
@@ -415,7 +416,7 @@ const DESIGN_PREF_CONFIG = {
     }),
   },
   "Struts Bolted to End Gusset":{
-    tabIds: [2, 3, 6, 11, 13],
+    tabIds: [2, 18, 3, 6, 11, 13],
     initialTabIndex: 2,
     getInitialPrefs: (inputs) => ({
       supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,

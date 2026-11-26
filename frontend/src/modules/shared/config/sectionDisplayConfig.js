@@ -1,5 +1,6 @@
 import Slope_Beam from "../../../assets/Slope_Beam.png";
 import equaldp from "../../../assets/equaldp.png";
+import Slope_Channel from "../../../assets/Slope_Channel.png";
 import { UNIT_LABELS } from "../constants/engineering";
 
 /**
@@ -76,4 +77,39 @@ export const ANGLE_DISPLAY_CONFIG = {
       { label: "Torsion Constant, It", key: "It", unit: UNIT_LABELS.TORSION_CONSTANT },
     ]
   }
+};
+
+/** The channel of the Channel Section tab (`tab_channel_section` in design_type/member.py); the catalog rows are in the desktop's units. */
+export const CHANNEL_DISPLAY_CONFIG = {
+  designationKey: "channel_section",
+  showType: true,
+  image: Slope_Channel,
+  dimensions: [
+    { label: "Depth, D", key: "D" },
+    { label: "Flange Width, B", key: "B" },
+    { label: "Flange Thickness, T", key: "T" },
+    { label: "Web Thickness, t", key: "tw" },
+    { label: "Flange Slope, a", key: "FlangeSlope", unit: UNIT_LABELS.ANGLE },
+    { label: "Root Radius, R1", key: "R1" },
+    { label: "Toe Radius, R2", key: "R2" },
+  ],
+  properties: {
+    middle: [
+      { label: "Mass, M", key: "Mass", unit: UNIT_LABELS.MASS },
+      { label: "Sectional Area, a", key: "Area", unit: UNIT_LABELS.AREA },
+      { label: "Cy", key: "Cy", unit: UNIT_LABELS.RADIUS_OF_GYRATION },
+      { label: "2nd Moment of Area, Iz", key: "Iz", unit: UNIT_LABELS.MOMENT_OF_AREA },
+      { label: "2nd Moment of Area, Iy", key: "Iy", unit: UNIT_LABELS.MOMENT_OF_AREA },
+      { label: "Radius of Gyration, rz", key: "rz", unit: UNIT_LABELS.RADIUS_OF_GYRATION },
+      { label: "Radius of Gyration, ry", key: "ry", unit: UNIT_LABELS.RADIUS_OF_GYRATION },
+    ],
+    right: [
+      { label: "Elastic Modulus, Zz", key: "Zz", unit: UNIT_LABELS.ELASTIC_MODULUS },
+      { label: "Elastic Modulus, Zy", key: "Zy", unit: UNIT_LABELS.ELASTIC_MODULUS },
+      { label: "Plastic Modulus, Zpz", key: "Zpz", unit: UNIT_LABELS.PLASTIC_MODULUS },
+      { label: "Plastic Modulus, Zpy", key: "Zpy", unit: UNIT_LABELS.PLASTIC_MODULUS },
+      { label: "Torsion Constant, It", key: "It", unit: UNIT_LABELS.TORSION_CONSTANT },
+      { label: "Warping Constant, Iw", key: "Iw", unit: UNIT_LABELS.WARPING_CONSTANT },
+    ],
+  },
 };

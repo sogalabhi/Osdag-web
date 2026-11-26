@@ -58,6 +58,8 @@ export const readAllTabs = async (dialog) => {
   const tabs = [];
   for (let index = 0; index < names.length; index += 1) {
     await selectTab(dialog, index);
+    // A section tab of the other table asks the server for its first section when it opens.
+    await dialog.page().watch.settled();
     tabs.push({ name: names[index], rows: await readTab(dialog) });
   }
   return tabs;

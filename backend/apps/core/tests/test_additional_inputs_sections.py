@@ -14,6 +14,7 @@ from osdag_core.Common import (
     KEY_DISP_STRUT_WELDED_END_GUSSET,
     KEY_DISP_TENSION_BOLTED,
     KEY_DISP_TENSION_WELDED,
+    KEY_SEC_PROFILE,
     KEY_SECSIZE,
     KEY_SUPTDSEC,
 )
@@ -62,3 +63,47 @@ def test_section_titles_keep_their_nested_braces():
             "Plain Title",
         ]
     }
+
+
+# The tension members and the bolted strut have an Angle Section and a Channel Section tab; the dock's section
+# profile decides which table the member's section is read from. The dialog also asks for a section of the other
+# tab's table by naming that tab's profile in the draft, so its tab shows something to look at.
+ANGLE_OR_CHANNEL_MODULES = [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_STRUT_BOLTED_END_GUSSET]
+CHANNEL_PROFILES = ["Channels", "Back to Back Channels"]
+ANGLE_PROFILES = ["Angles", "Back to Back Angles"]
+
+
+@pytest.mark.parametrize("module_id", ANGLE_OR_CHANNEL_MODULES)
+@pytest.mark.parametrize("profile", CHANNEL_PROFILES)
+def test_a_channel_profile_reads_the_section_from_the_channels(module_id, profile):
+    _, _, _, details = merge_design_pref_sync(
+        module_id=module_id,
+        inputs={},
+        operation="open",
+        design_pref_draft={KEY_SECSIZE: ["MC 100"], KEY_SEC_PROFILE: profile},
+        **lookup_sources(None),
+    )
+    assert details["supported"].get("Designation") == "MC 100"
+    assert details["supported"].get("FlangeSlope") is not None  # a channel row, not an angle row
+
+
+@pytest.mark.parametrize("module_id", ANGLE_OR_CHANNEL_MODULES)
+@pytest.mark.parametrize("profile", ANGLE_PROFILES)
+def test_an_angle_profile_reads_the_section_from_the_angles(module_id, profile):
+    _, _, _, details = merge_design_pref_sync(
+        module_id=module_id,
+        inputs={},
+        operation="open",
+        design_pref_draft={KEY_SECSIZE: ["20 x 20 x 3"], KEY_SEC_PROFILE: profile},
+        **lookup_sources(None),
+    )
+    assert details["supported"].get("Designation") == "20 x 20 x 3"
+    assert details["supported"].get("Cz") is not None  # an angle row
+
+
+@pytest.mark.parametrize("module_id", ANGLE_OR_CHANNEL_MODULES)
+def test_the_core_lists_the_channel_section_tab_of_these_modules(module_id):
+    from apps.core import design_dictionary
+
+    tabs = [tab for tab, _kind, _keys in design_dictionary.pref_tables(module_id)["pref_tabs"]]
+    assert "Channel Section" in tabs
