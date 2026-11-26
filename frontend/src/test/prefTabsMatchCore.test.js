@@ -23,12 +23,8 @@ const coreTabs = (designType) => [...new Set(DESIGN_PREF_TABLES[designType].pref
  * What differs today. `webOnly`: tabs the web shows that the core does not list; `coreOnly`: tabs the core lists
  * that the web does not show. Anything missing here has the same tabs as the core.
  */
-const KNOWN_DIFFERENCES = {
-  // The core has a Channel Section tab next to the Angle Section tab; the web's Angle Section tab serves both.
-  "tension bolted": { webOnly: [], coreOnly: ["Channel Section"] },
-  "tension welded": { webOnly: [], coreOnly: ["Channel Section"] },
-  "struts bolted": { webOnly: [], coreOnly: ["Channel Section"] },
-};
+// No module differs today: a new difference fails the test, and so does listing one that was fixed.
+const KNOWN_DIFFERENCES = {};
 
 const sortedDiff = (a, b) => a.filter((name) => !b.includes(name)).sort();
 

@@ -2,7 +2,12 @@ import { useRef, useState, useContext, useEffect, useCallback, useMemo } from "r
 import { ModuleContext } from "../../../context/ModuleState";
 import { useAuth } from "../../../context/AuthContext";
 import GenericSectionView from "./GenericSectionView";
-import { BEAM_DISPLAY_CONFIG, COLUMN_DISPLAY_CONFIG, ANGLE_DISPLAY_CONFIG } from "../config/sectionDisplayConfig";
+import {
+  BEAM_DISPLAY_CONFIG,
+  COLUMN_DISPLAY_CONFIG,
+  ANGLE_DISPLAY_CONFIG,
+  CHANNEL_DISPLAY_CONFIG,
+} from "../config/sectionDisplayConfig";
 import ConnectorSectionModal from "./ConnectorSectionModal";
 import BoltSectionModal from "./BoltSectionModal";
 import BasePlateSectionModal from "./BasePlateSectionModal";
@@ -38,6 +43,13 @@ const FLEXURE_BEAM_MODULES = ["Simply Supported Beam Design", "On Cantilever Bea
 // The plate girder has its own tabs (Girder Properties, Optimisation, Stiffeners, Additional Girder Data, Deflection).
 const PLATE_GIRDER_MODULE = "Plate Girder Design";
 const STRUT_WELDED_MODULE = "Struts Welded to End Gusset";
+
+// The Angle Section and Channel Section tabs of the tension members and the struts. The dock's section profile
+// decides which of them describes the member; the other one only shows a section of its own table to look at.
+const ANGLE_TAB = 2;
+const CHANNEL_TAB = 18;
+const TAB_PROFILE = { [ANGLE_TAB]: "Angles", [CHANNEL_TAB]: "Channels" };
+const tabMatchesProfile = (tab, profile) => (tab === CHANNEL_TAB) === String(profile || "").includes("Channel");
 
 const DesignPrefSections = ({
   module,
@@ -77,6 +89,8 @@ const DesignPrefSections = ({
     designPrefConfig.getInitialPrefs({ ...inputs, ...(designPrefOverrides || {}) }, module)
   );
   const [sectionDetails, setSectionDetails] = useState({ supporting: {}, supported: {} });
+  // The section shown on the Angle or Channel tab that is not the dock's own, by tab.
+  const [otherTabDetails, setOtherTabDetails] = useState({});
   const sectionDetailsRef = useRef(sectionDetails);
   sectionDetailsRef.current = sectionDetails;
 
@@ -196,14 +210,17 @@ const DesignPrefSections = ({
   );
 
   // Shows one section's properties without changing what the design will use.
+  // `tab` is the Angle or Channel tab that is not the dock's own: the request names that tab's profile, and the
+  // answer is kept for that tab alone.
   const previewSection = useCallback(
-    async (key, value) => {
+    async (key, value, tab = null) => {
       previewAbortRef.current?.abort();
       const ac = new AbortController();
       previewAbortRef.current = ac;
+      const draft = { [key]: value, ...(tab ? { section_profile: TAB_PROFILE[tab] } : {}) };
       const res = await fetchDesignPrefSync(
         moduleConfig,
-        { state: buildMergedInputsForSync(), operation: "open", draft: { [key]: value } },
+        { state: buildMergedInputsForSync(), operation: "open", draft },
         ac.signal
       );
       if (!res.success) {
@@ -211,6 +228,10 @@ const DesignPrefSections = ({
         return;
       }
       const details = res.data.section_details || {};
+      if (tab) {
+        setOtherTabDetails((prev) => ({ ...prev, [tab]: details.supported || {} }));
+        return;
+      }
       setSectionDetails((prev) => {
         const next = { ...prev };
         for (const [role, row] of Object.entries(details)) {
@@ -237,7 +258,7 @@ const DesignPrefSections = ({
       keyToUpdate = inputsRef.current.column_section ? "column_section" : (inputsRef.current.section_designation ? "section_designation" : "member_designation");
     } else if (tabIndex === 1) {
       keyToUpdate = inputsRef.current.beam_section ? "beam_section" : (inputsRef.current.section_designation ? "section_designation" : "member_designation");
-    } else if (tabIndex === 2) {
+    } else if (tabIndex === ANGLE_TAB || tabIndex === CHANNEL_TAB) {
       keyToUpdate = inputsRef.current.section_designation ? "section_designation" : "member_designation";
     } else if (tabIndex === 4) {
       keyToUpdate = "cleat_section";
@@ -249,6 +270,15 @@ const DesignPrefSections = ({
       const current = inputsRef.current[keyToUpdate];
       const isList = Array.isArray(current);
       const updatedValue = isList ? [newDesignation] : newDesignation;
+
+      // The tab of the other table only looks at a section: the dock's own section stays.
+      if (
+        (tabIndex === ANGLE_TAB || tabIndex === CHANNEL_TAB) &&
+        !tabMatchesProfile(tabIndex, inputsRef.current.section_profile)
+      ) {
+        await previewSection(keyToUpdate, updatedValue, tabIndex);
+        return;
+      }
 
       // Looking at one section of an "All" or multi-section list must not narrow that list.
       if (preview || (isList && current.length !== 1)) {
@@ -408,6 +438,23 @@ const DesignPrefSections = ({
     return defaultTable;
   };
 
+  // What the Angle and Channel tabs are given: the dock's inputs on the tab of the dock's profile, and on the other
+  // tab none of its designations (it opens on the first section of its own table).
+  const dockProfile = inputs?.section_profile;
+  const tabInputs = useMemo(() => {
+    const blank = { ...inputs, section_designation: undefined, member_designation: undefined };
+    return {
+      [ANGLE_TAB]: tabMatchesProfile(ANGLE_TAB, dockProfile) ? inputs : blank,
+      [CHANNEL_TAB]: tabMatchesProfile(CHANNEL_TAB, dockProfile) ? inputs : blank,
+    };
+  }, [inputs, dockProfile]);
+  const tabSectionData = (tab) =>
+    tabMatchesProfile(tab, dockProfile) ? safeSectionDetails.supported : otherTabDetails[tab];
+  const clearTabSection = (tab) => {
+    if (tabMatchesProfile(tab, dockProfile)) setSectionDetails((prev) => ({ ...prev, supported: {} }));
+    else setOtherTabDetails((prev) => ({ ...prev, [tab]: {} }));
+  };
+
   return (
     <div>
       <Spin spinning={syncLoading} description="Syncing preferences…">
@@ -487,14 +534,14 @@ const DesignPrefSections = ({
               {...modalCommon}
             />
           )}
-          {activeTab === 2 && (
+          {activeTab === ANGLE_TAB && (
             <GenericSectionView
               sectionType="supported"
-              sectionTableName={getDynamicSectionTableName("Angles")}
+              sectionTableName="Angles"
               displayConfig={ANGLE_DISPLAY_CONFIG}
               module={module}
-              inputs={inputs}
-              sectionData={safeSectionDetails.supported}
+              inputs={tabInputs[ANGLE_TAB]}
+              sectionData={tabSectionData(ANGLE_TAB)}
               designPrefInputs={designPrefInputs}
               setDesignPrefInputs={setDesignPrefInputs}
               isInputLocked={isInputLocked}
@@ -502,14 +549,30 @@ const DesignPrefSections = ({
               moduleLists={moduleLists}
               isGuest={isGuest}
               onRefetchModuleOptions={onRefetchModuleOptions}
-              onClearSection={() =>
-                setSectionDetails((prev) => ({
-                  ...prev,
-                  supported: {},
-                }))
-              }
+              onClearSection={() => clearTabSection(ANGLE_TAB)}
               syncReady={syncReady}
-              onDesignationChange={(val, options) => handleDesignationChange(2, val, options)}
+              onDesignationChange={(val, options) => handleDesignationChange(ANGLE_TAB, val, options)}
+              {...modalCommon}
+            />
+          )}
+          {activeTab === CHANNEL_TAB && (
+            <GenericSectionView
+              sectionType="supported"
+              sectionTableName="Channels"
+              displayConfig={CHANNEL_DISPLAY_CONFIG}
+              module={module}
+              inputs={tabInputs[CHANNEL_TAB]}
+              sectionData={tabSectionData(CHANNEL_TAB)}
+              designPrefInputs={designPrefInputs}
+              setDesignPrefInputs={setDesignPrefInputs}
+              isInputLocked={isInputLocked}
+              materialList={materialListForModals}
+              moduleLists={moduleLists}
+              isGuest={isGuest}
+              onRefetchModuleOptions={onRefetchModuleOptions}
+              onClearSection={() => clearTabSection(CHANNEL_TAB)}
+              syncReady={syncReady}
+              onDesignationChange={(val, options) => handleDesignationChange(CHANNEL_TAB, val, options)}
               {...modalCommon}
             />
           )}
