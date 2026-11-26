@@ -33,6 +33,7 @@ from apps.core.design_dictionary import CORE_CLASSES
 
 from osdag_core.Common import (
     KEY_ANGLE_LIST,
+    KEY_BOTTOM_FLANGE_THICKNESS_PG,
     KEY_CONNECTOR_MATERIAL,
     KEY_DESIGN_FOR,
     KEY_DIA_ANCHOR_ICF,
@@ -79,6 +80,8 @@ from osdag_core.Common import (
     KEY_DP_WELD_FAB,
     KEY_DP_WELD_MATERIAL_G_O,
     KEY_MATERIAL,
+    KEY_OVERALL_DEPTH_PG,
+    KEY_OVERALL_DEPTH_PG_TYPE,
     KEY_SEC_MATERIAL,
     KEY_SEC_PROFILE,
     KEY_SECSIZE,
@@ -87,6 +90,10 @@ from osdag_core.Common import (
     KEY_SUPTDSEC_MATERIAL,
     KEY_SUPTNGSEC,
     KEY_SUPTNGSEC_MATERIAL,
+    KEY_TOP_FLANGE_THICKNESS_PG,
+    KEY_WEB_THICKNESS_PG,
+    KEY_BOTTOM_Bflange_PG,
+    KEY_TOP_Bflange_PG,
 )
 
 VALID_OPERATIONS = frozenset({"open", "refresh", "save", "reset"})
@@ -388,7 +395,59 @@ def _resolve_section_details(
         if row["tables"] == ("Angles",):
             designation = _normalize_angle(designation)
         details[role] = _section_row_for_designation(model, designation)
+    for role, row in computed_section_details(module_id, inputs).items():
+        details[role] = row
     return details
+
+
+# A built-up section has no catalog row: its core computes the properties from the dock dimensions.
+# The plate girder's Girder Properties tab (``tab_girder_sec``) shows the dimensions as Label_6..Label_11
+# and ``tab_value_changed`` turns them into Label_12..Label_23 (``Unsymm_I_Section_properties``). The
+# dock keys behind Label_6..Label_11, in that order, and the catalog column each answer is shown as.
+COMPUTED_SECTIONS: Dict[str, Dict[str, Any]] = {
+    KEY_DISP_PLATE_GIRDER_WELDED: {
+        "role": "supporting",
+        "dimensions": (
+            KEY_OVERALL_DEPTH_PG, KEY_WEB_THICKNESS_PG, KEY_TOP_Bflange_PG, KEY_TOP_FLANGE_THICKNESS_PG,
+            KEY_BOTTOM_Bflange_PG, KEY_BOTTOM_FLANGE_THICKNESS_PG,
+        ),
+        "first_output": "Label_12",
+        "columns": ("Mass", "Area", "Iz", "Iy", "rz", "ry", "Zz", "Zy", "Zpz", "Zpy", "It", "Iw"),
+    },
+}
+
+
+def computed_section_details(module_id: str, inputs: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """
+    {role: row} of the sections the core computes from the dock dimensions (``COMPUTED_SECTIONS``), in
+    the catalog's column names. Nothing when a dimension is missing or not a number, or when the
+    optimisation chooses the dimensions (design type Optimized).
+    """
+    spec = COMPUTED_SECTIONS.get(module_id)
+    if spec is None or inputs.get(KEY_OVERALL_DEPTH_PG_TYPE) == "Optimized":
+        return {}
+    values = []
+    for key in spec["dimensions"]:
+        value = inputs.get(key)
+        value = value[0] if isinstance(value, list) and value else value
+        try:
+            values.append(float(value))
+        except (TypeError, ValueError):
+            return {}
+    if min(values) <= 0:
+        return {}
+    instance = design_dictionary.core_instance(module_id)
+    compute = next(
+        (row for row in instance.tab_value_changed() if spec["first_output"] in row[2]), None
+    )
+    if compute is None:
+        return {}
+    outputs, function = compute[2], compute[4]
+    answer = function([str(v) for v in values] + [""])
+    start = outputs.index(spec["first_output"])
+    labels = outputs[start:start + len(spec["columns"])]
+    row = {column: answer.get(label, "") for column, label in zip(spec["columns"], labels)}
+    return {spec["role"]: row} if any(row.values()) else {}
 
 
 # --------------------------------------------------------------------------------------------
