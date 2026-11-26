@@ -80,3 +80,65 @@ export const COLUMN_OPTIMIZATION_DEFAULTS = {
 
 /** Optimum.Para: the one option the core's tab offers (the Cost option is commented out there). */
 export const OPTIMIZATION_PARA_OPTIONS = ["Utilization Ratio"];
+
+/**
+ * The Optimization tab of the welded strut (`optimization_tab_strut_design` in design_type/member.py). The tab is built
+ * from the section profile (`VALUES_SEC_PROFILE_Compression_Strut`): the single angle, and the back to back angles on
+ * the same side or on the opposite sides of the gusset. The values are the core's own keys (`Optimum.AllowUR`,
+ * `Effective.Area_Para`, ` Out_of_Plane`, ` In_Plane`, `Load.Type`, `Bolt.Number`, `Connector.Plate.Thickness_List`).
+ */
+export const STRUT_PROFILE_ANGLES = "Angles";
+export const STRUT_PROFILE_SAME_SIDE = "Back to Back Angles - Same side of gusset";
+export const STRUT_PROFILE_OPPOSITE_SIDE = "Back to Back Angles - Opposite side of gusset";
+
+/** Load.Type (Load_type1, Load_type2 in the core). */
+export const STRUT_LOAD_CONCENTRIC = "Concentric Load";
+export const STRUT_LOAD_LEG = "Leg Load";
+
+/** The gusset plate thicknesses the tab offers (PLATE_THICKNESS_SAIL in the core). */
+export const STRUT_GUSSET_THICKNESS_OPTIONS = [
+  "8", "10", "12", "14", "16", "18", "20", "22", "25", "28", "32", "36", "40", "45", "50", "56", "63", "75", "80", "90", "100",
+  "110", "120",
+];
+
+const isBackToBack = (profile) => profile === STRUT_PROFILE_SAME_SIDE || profile === STRUT_PROFILE_OPPOSITE_SIDE;
+
+/**
+ * The rows the core's tab shows for a profile: the load types it offers (the first is the default), whether it lists the
+ * gusset plate thickness, and whether it lists the number of bolts (the opposite-side tab leaves it out).
+ */
+export const strutOptimizationLayout = (profile) => ({
+  loadTypes:
+    profile === STRUT_PROFILE_SAME_SIDE
+      ? [STRUT_LOAD_LEG]
+      : profile === STRUT_PROFILE_OPPOSITE_SIDE
+        ? [STRUT_LOAD_CONCENTRIC]
+        : [STRUT_LOAD_CONCENTRIC, STRUT_LOAD_LEG],
+  gusset: isBackToBack(profile),
+  boltNumber: profile !== STRUT_PROFILE_OPPOSITE_SIDE,
+});
+
+/** The values the core's tab starts with for a profile; the back to back angles start with 0.85 in the plane of the gusset. */
+export const strutOptimizationDefaults = (profile) => {
+  const layout = strutOptimizationLayout(profile);
+  return {
+    allow_ur: "1.0",
+    effective_area_parameter: "1.0",
+    buckling_out_of_plane: "1.0",
+    buckling_in_plane: isBackToBack(profile) ? "0.85" : "1.0",
+    load_type: layout.loadTypes[0],
+    ...(layout.boltNumber ? { bolt_number: "1.0" } : {}),
+    ...(layout.gusset ? { plate_thickness: "8" } : {}),
+  };
+};
+
+/** Every form field the welded strut's Optimization tab can hold (which of them a profile shows is `strutOptimizationLayout`). */
+export const STRUT_OPTIMIZATION_FIELDS = [
+  "allow_ur",
+  "effective_area_parameter",
+  "buckling_out_of_plane",
+  "buckling_in_plane",
+  "load_type",
+  "bolt_number",
+  "plate_thickness",
+];

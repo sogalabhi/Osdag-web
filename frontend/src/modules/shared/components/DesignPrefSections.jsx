@@ -12,6 +12,7 @@ import WeldSectionModal from "./WeldSectionModal";
 import DetailingSectionModal from "./DetailingSectionModal";
 import OptimizationSectionModal from "./OptimizationSectionModal";
 import ColumnOptimizationSectionModal from "./ColumnOptimizationSectionModal";
+import StrutOptimizationSectionModal from "./StrutOptimizationSectionModal";
 import FlexureOptimizationSectionModal from "./FlexureOptimizationSectionModal";
 import DesignSectionModal from "./DesignSectionModal";
 import { Button, Modal, Spin, message } from "antd";
@@ -36,6 +37,7 @@ import {
 const FLEXURE_BEAM_MODULES = ["Simply Supported Beam Design", "On Cantilever Beam Design"];
 // The plate girder has its own tabs (Girder Properties, Optimisation, Stiffeners, Additional Girder Data, Deflection).
 const PLATE_GIRDER_MODULE = "Plate Girder Design";
+const STRUT_WELDED_MODULE = "Struts Welded to End Gusset";
 
 const DesignPrefSections = ({
   module,
@@ -652,7 +654,19 @@ const DesignPrefSections = ({
           {activeTab === 12 && module === PLATE_GIRDER_MODULE && (
             <GirderOptimisationTab inputs={inputs} {...girderTabProps} />
           )}
-          {activeTab === 12 && !FLEXURE_BEAM_MODULES.includes(module) && module !== "Axially Loaded Column" && module !== PLATE_GIRDER_MODULE && (
+          {activeTab === 12 && module === STRUT_WELDED_MODULE && (
+            <StrutOptimizationSectionModal
+              profile={inputs?.section_profile}
+              designPrefInputs={designPrefInputs}
+              setDesignPrefInputs={setDesignPrefInputs}
+              isInputLocked={isInputLocked}
+            />
+          )}
+          {activeTab === 12 &&
+            !FLEXURE_BEAM_MODULES.includes(module) &&
+            module !== "Axially Loaded Column" &&
+            module !== PLATE_GIRDER_MODULE &&
+            module !== STRUT_WELDED_MODULE && (
             <OptimizationSectionModal
               module={module}
               designPrefInputs={designPrefInputs}

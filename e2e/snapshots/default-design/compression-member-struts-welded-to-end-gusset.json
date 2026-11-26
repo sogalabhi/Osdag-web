@@ -3,33 +3,6 @@
   "body": {
     "inputs": {
       "Conn_Location": "Long Leg",
-      "Connector.Material": "E 250 (Fe 410 W)A",
-      "Connector.Plate.Thickness_List": [
-        "8",
-        "10",
-        "12",
-        "14",
-        "16",
-        "18",
-        "20",
-        "22",
-        "25",
-        "28",
-        "32",
-        "36",
-        "40",
-        "45",
-        "50",
-        "56",
-        "63",
-        "75",
-        "80",
-        "90",
-        "100",
-        "110",
-        "120"
-      ],
-      "Effective.Area_Para": "1.0",
       "End_1": "Hinged",
       "End_2": "Hinged",
       "Load.Axial": "100",
@@ -238,8 +211,7 @@
       "Member.Length": "3000",
       "Member.Material": "E 250 (Fe 410 W)A",
       "Member.Profile": "Angles",
-      "Module": "Struts Welded to End Gusset",
-      "Optimum.AllowUR": "1.0"
+      "Module": "Struts Welded to End Gusset"
     }
   }
 }

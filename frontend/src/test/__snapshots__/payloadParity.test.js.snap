@@ -1423,12 +1423,6 @@ exports[`payload parity: buildSubmissionParams on the default inputs > struts bo
 exports[`payload parity: buildSubmissionParams on the default inputs > struts welded > all 1`] = `
 {
   "Conn_Location": "Long Leg",
-  "Connector.Plate.Thickness_List": [
-    "8",
-    "10",
-    "12",
-  ],
-  "Effective.Area_Para": "1.0",
   "End_1": "Hinged",
   "End_2": "Hinged",
   "Load.Axial": "100",
@@ -1440,18 +1434,12 @@ exports[`payload parity: buildSubmissionParams on the default inputs > struts we
   "Member.Length": "3000",
   "Member.Profile": "Angles",
   "Module": "Struts Welded to End Gusset",
-  "Optimum.AllowUR": "1.0",
 }
 `;
 
 exports[`payload parity: buildSubmissionParams on the default inputs > struts welded > customized 1`] = `
 {
   "Conn_Location": "Long Leg",
-  "Connector.Plate.Thickness_List": [
-    "10",
-    "12",
-  ],
-  "Effective.Area_Para": "1.0",
   "End_1": "Hinged",
   "End_2": "Hinged",
   "Load.Axial": "100",
@@ -1462,7 +1450,6 @@ exports[`payload parity: buildSubmissionParams on the default inputs > struts we
   "Member.Length": "3000",
   "Member.Profile": "Angles",
   "Module": "Struts Welded to End Gusset",
-  "Optimum.AllowUR": "1.0",
 }
 `;
 
