@@ -24,8 +24,18 @@ import {
 import { buildPrefDraft, findEmptyPrefField } from "../utils/designPrefValidation";
 import { keepShownSections, withFormDefaults } from "../utils/prefDefaults";
 
+import {
+  AdditionalGirderDataTab,
+  DeflectionTab,
+  GirderOptimisationTab,
+  GirderPropertiesTab,
+  StiffenersTab,
+} from "../../flexuralMember/plateGirder/components/PlateGirderPrefTabs";
+
 // The beams show the core's Optimization tab; the other modules with that tab keep the shared one.
 const FLEXURE_BEAM_MODULES = ["Simply Supported Beam Design", "On Cantilever Beam Design"];
+// The plate girder has its own tabs (Girder Properties, Optimisation, Stiffeners, Additional Girder Data, Deflection).
+const PLATE_GIRDER_MODULE = "Plate Girder Design";
 
 const DesignPrefSections = ({
   module,
@@ -84,12 +94,24 @@ const DesignPrefSections = ({
     []
   );
 
+  // The fields of the main form. An answer carries them as the dock holds them; stored as overrides,
+  // such a copy would outlive a later edit of the main form (the Design request merges the overrides
+  // over the dock), so a main-form value is kept only where the dialog changed it (a section picked
+  // in a section tab).
+  const mainFormFields = useMemo(
+    () => new Set((moduleConfig?.inputSections || []).flatMap((section) => (section.fields || []).map((field) => field.key))),
+    [moduleConfig]
+  );
+
   const toStoredPrefOverrides = useCallback((resolvedInputs) => {
     const next = { ...(resolvedInputs || {}) };
     delete next.material;
     delete next.member_material;
+    for (const field of mainFormFields) {
+      if (field in next && JSON.stringify(next[field]) === JSON.stringify(inputsRef.current?.[field])) delete next[field];
+    }
     return next;
-  }, []);
+  }, [mainFormFields]);
 
   const syncSnapshotRef = useRef(
     lastKnownGoodDesignPrefSnapshot || {
@@ -369,6 +391,7 @@ const DesignPrefSections = ({
   };
 
   const modalCommon = { suppressInitialMaterialDispatch };
+  const girderTabProps = { designPrefInputs, setDesignPrefInputs, isInputLocked };
 
   // Safety fallback
   const safeSectionDetails = sectionDetails || { supporting: {}, supported: {} };
@@ -626,7 +649,10 @@ const DesignPrefSections = ({
               isInputLocked={isInputLocked}
             />
           )}
-          {activeTab === 12 && !FLEXURE_BEAM_MODULES.includes(module) && module !== "Axially Loaded Column" && (
+          {activeTab === 12 && module === PLATE_GIRDER_MODULE && (
+            <GirderOptimisationTab inputs={inputs} {...girderTabProps} />
+          )}
+          {activeTab === 12 && !FLEXURE_BEAM_MODULES.includes(module) && module !== "Axially Loaded Column" && module !== PLATE_GIRDER_MODULE && (
             <OptimizationSectionModal
               module={module}
               designPrefInputs={designPrefInputs}
@@ -644,6 +670,12 @@ const DesignPrefSections = ({
               isInputLocked={isInputLocked}
             />
           )}
+          {activeTab === 14 && (
+            <GirderPropertiesTab inputs={inputs} materialList={materialListForModals} {...girderTabProps} />
+          )}
+          {activeTab === 15 && <StiffenersTab inputs={inputs} />}
+          {activeTab === 16 && <AdditionalGirderDataTab inputs={inputs} />}
+          {activeTab === 17 && <DeflectionTab inputs={inputs} />}
         </div>
 
         <div

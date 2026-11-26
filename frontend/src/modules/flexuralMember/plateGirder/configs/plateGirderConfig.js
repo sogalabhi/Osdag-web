@@ -29,6 +29,7 @@ import {
   KEY_MOMENT,
   KEY_OVERALL_DEPTH_PG,
   KEY_OVERALL_DEPTH_PG_TYPE,
+  KEY_SEC_MATERIAL,
   KEY_SHEAR,
   KEY_STR_TYPE,
   KEY_SUPPORTING_OPTIONS,
@@ -55,145 +56,15 @@ import {
   WEB_TOTAL_DEPTH_UB,
 } from "../../../../constants/generated/webKeys";
 import { prefText } from "../../../shared/utils/prefValue";
-// Plate Girder uses backend key strings directly (matching backend Common.py)
+import { calculateMaxDeflection, memberOptionsFor, supportingOptionsFor } from "./plateGirderPrefOptions";
 
-/**
- * Helper function to calculate max_deflection based on structure_type, design_load, member_options, supporting_options
- * 
- * ARCHITECTURAL NOTE: This logic is duplicated from backend (plate_girder.py:max_defl_change())
- * 
- * Why duplicate instead of calling backend API?
- * - Performance: Dropdown changes need instant UI updates (0ms latency vs 50-200ms API call)
- * - UX: Users expect immediate feedback when changing structure_type/member_options
- * - Offline capability: Works without network connection
- * 
- * Backend source: osdag_core/design_type/plate_girder/core/plate_girder.py:249-308
- * 
- * IMPORTANT: If backend logic changes, this function must be updated to match.
- * Consider adding automated tests to ensure frontend/backend logic stays in sync.
- */
-/**
- * Member Options narrow by Structure Type, matching backend
- * plate_girder.py:member_options_change() / VALUES_MEMBER_OPTIONS.
- */
-const getMemberOptionsList = (structureType) => {
-  if (structureType === 'Industrial Structure') {
-    return ['Purlin and Girts', 'Simple span', 'Cantilever span', 'Rafter Supporting', 'Gantry']
-      .map((v) => ({ value: v, label: v }));
-  }
-  if (structureType === 'Other Building') {
-    return ['Floor and roof', 'Cantilever'].map((v) => ({ value: v, label: v }));
-  }
-  // Highway Bridge / Railway Bridge (default)
-  return ['Simple Span', 'Cantilever Span'].map((v) => ({ value: v, label: v }));
-};
+const asOptions = (values) => values.map((value) => ({ value, label: value }));
 
-/**
- * Supporting Options narrow by Structure Type + Member Options, matching
- * backend plate_girder.py:supp_options_change() (IS 800:2007 Table 6).
- */
-const getSupportingOptionsList = (structureType, memberOption) => {
-  if (structureType === 'Highway Bridge' || structureType === 'Railway Bridge') {
-    return [{ value: 'Not Applicable', label: 'Not Applicable' }];
-  }
-  const memberLower = String(memberOption || '').toLowerCase();
-  if (['purlin and girts', 'simple span', 'cantilever span'].includes(memberLower)) {
-    return ['Elastic cladding', 'Brittle cladding'].map((v) => ({ value: v, label: v }));
-  }
-  if (memberLower === 'rafter supporting') {
-    return ['Profiled Metal sheeting', 'Plastered sheeting'].map((v) => ({ value: v, label: v }));
-  }
-  if (memberLower === 'gantry') {
-    return [{ value: 'Crane', label: 'Crane' }];
-  }
-  if (['floor and roof', 'cantilever'].includes(memberLower)) {
-    return ['Elements not susceptible to cracking', 'Element susceptible to cracking'].map((v) => ({ value: v, label: v }));
-  }
-  return [{ value: 'Not Applicable', label: 'Not Applicable' }];
-};
+/** Member Options narrow by Structure Type (the core's member_options_change). */
+const getMemberOptionsList = (structureType) => asOptions(memberOptionsFor(structureType));
 
-const calculateMaxDeflection = (structureType, designLoad, memberOption, supportingOption) => {
-  const VALUES_MAX_DEFL = ['Span/600', 'Span/800', 'Span/400', 'Span/300', 'Span/360', 'Span/150', 'Span/180', 'Span/240', 'Span/120', 'Span/500', 'Span/750', 'Span/1000'];
-  
-  if (structureType === 'Highway Bridge' || structureType === 'Railway Bridge') {
-    if (memberOption === 'Simple Span') {
-      if (designLoad === 'Live load') {
-        return VALUES_MAX_DEFL[0]; // Span/600
-      } else if (designLoad === 'Dead load') {
-        return VALUES_MAX_DEFL[1]; // Span/800
-      } else {
-        return 'NA';
-      }
-    } else {
-      if (designLoad === 'Live load') {
-        return VALUES_MAX_DEFL[2]; // Span/400
-      } else if (designLoad === 'Dead load') {
-        return VALUES_MAX_DEFL[1]; // Span/800
-      } else {
-        return 'NA';
-      }
-    }
-  } else if (structureType === 'Other Building') {
-    if (designLoad === 'Live load') {
-      if (memberOption === 'Floor and roof') {
-        if (supportingOption === 'Elements not susceptible to cracking') {
-          return VALUES_MAX_DEFL[3]; // Span/300
-        } else {
-          return VALUES_MAX_DEFL[4]; // Span/360
-        }
-      } else {
-        if (supportingOption === 'Elements not susceptible to cracking') {
-          return VALUES_MAX_DEFL[5]; // Span/150
-        } else {
-          return VALUES_MAX_DEFL[6]; // Span/180
-        }
-      }
-    } else {
-      return 'NA';
-    }
-  } else {
-    // Industrial Structure
-    if (memberOption === 'Purlin and Girts' && designLoad === 'Live load') {
-      if (supportingOption === 'Elastic cladding') {
-        return VALUES_MAX_DEFL[5]; // Span/150
-      } else {
-        return VALUES_MAX_DEFL[6]; // Span/180
-      }
-    } else if (memberOption === 'Simple span' && designLoad === 'Live load') {
-      if (supportingOption === 'Elastic cladding') {
-        return VALUES_MAX_DEFL[7]; // Span/240
-      } else {
-        return VALUES_MAX_DEFL[3]; // Span/300
-      }
-    } else if (memberOption === 'Cantilever span' && designLoad === 'Live load') {
-      if (supportingOption === 'Elastic cladding') {
-        return VALUES_MAX_DEFL[8]; // Span/120
-      } else {
-        return VALUES_MAX_DEFL[5]; // Span/150
-      }
-    } else if (memberOption === 'Rafter Supporting' && designLoad === 'Live load') {
-      if (supportingOption === 'Profiled Metal sheeting') {
-        return VALUES_MAX_DEFL[6]; // Span/180
-      } else {
-        return VALUES_MAX_DEFL[7]; // Span/240
-      }
-    } else if (memberOption === 'Gantry') {
-      // Note: Backend has a logic bug (checks 'Live load' then crane loads on same arg[1])
-      // Corrected logic: if Gantry, check designLoad for crane types directly
-      if (designLoad === 'Crane Load(Manual operation)') {
-        return VALUES_MAX_DEFL[9]; // Span/500
-      } else if (designLoad === 'Crane load(Electric operation up to 50t)') {
-        return VALUES_MAX_DEFL[10]; // Span/750
-      } else if (designLoad === 'Crane load(Electric operation over 50t)') {
-        return VALUES_MAX_DEFL[11]; // Span/1000
-      } else {
-        return 'NA';
-      }
-    } else {
-      return 'NA';
-    }
-  }
-};
+/** Supporting Options narrow by Structure Type + Member Options (the core's supp_options_change, IS 800:2007 Table 6). */
+const getSupportingOptionsList = (structureType, memberOption) => asOptions(supportingOptionsFor(structureType, memberOption));
 
 export const plateGirderConfig = {
   sessionName: "Plate Girder Design",
@@ -262,6 +133,9 @@ export const plateGirderConfig = {
     ...MATERIAL_CORE_KEYS,
     module: KEY_MODULE,
     material: KEY_MATERIAL,
+    // The Girder Properties tab of Additional Inputs (the dock Material until it is saved). The design reads
+    // the dock Material; the request builder does not send this one.
+    girder_material: KEY_SEC_MATERIAL,
     design_type: KEY_OVERALL_DEPTH_PG_TYPE,
     // Customized sends the typed value; Optimized sends "1" and the lb/ub/inc bounds below.
     total_depth: KEY_OVERALL_DEPTH_PG,

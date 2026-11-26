@@ -1,12 +1,13 @@
 /**
  * Per-module config for Design Prefs (Additional Inputs) modal: tabs, initial tab, initial prefs, default prefs.
  * Keyed by module session name (e.g. "Butt Joint Bolted") or, for the shear connections, the module id.
- * Tab ids: 0 Column Section*, 1 Beam Section*, 2 Connector, 3 Bolt, 4 Weld, 5 Detailing, 6 Design.
+ * Tab ids: the `ALL_TABS` below. A module's tabs are shown in the order of its `tabIds`.
  */
 
 import {
   KEY_BASE_PLATE_MATERIAL,
   KEY_DISP_CLEATANGLE,
+  KEY_DISP_GIRDERSEC,
   KEY_DISP_SEATED_ANGLE,
   KEY_DP_ANCHOR_BOLT_DESIGNATION_ICF,
   KEY_DP_ANCHOR_BOLT_DESIGNATION_OCF,
@@ -32,6 +33,7 @@ import {
 } from "../../../constants/generated/coreKeys";
 
 import { COLUMN_OPTIMIZATION_DEFAULTS, DEFAULT_DESIGN_METHOD, FLEXURE_OPTIMIZATION_DEFAULTS } from "./prefOptions";
+import { PLATE_GIRDER_OPTIMISATION_DEFAULTS } from "../../flexuralMember/plateGirder/configs/plateGirderPrefOptions";
 
 const ALL_TABS = [
   { id: 0, name: "Column Section*" },
@@ -48,6 +50,11 @@ const ALL_TABS = [
   { id: 11, name: "Detailing" },
   { id: 12, name: "Optimization" },
   { id: 13, name: "Design" },
+  // The plate girder's own tabs (with 12 Optimization and 13 Design), as its core lists them.
+  { id: 14, name: KEY_DISP_GIRDERSEC },
+  { id: 15, name: "Stiffeners" },
+  { id: 16, name: "Additional Girder Data" },
+  { id: 17, name: "Deflection" },
 ];
 
 /*
@@ -56,9 +63,8 @@ const ALL_TABS = [
  * the dialog lists although the module's core has no value for it (the core never reads it), so
  * that Save is not blocked by an empty field.
  */
-// Fin plate, header plate and plate girder. The sync answers every one of these from the fin and
-// header plate cores; the fallbacks are for the plate girder, whose core has none of the bolt, weld
-// and detailing values (and never reads them), and for the packing plate no shear core has.
+// Fin plate and header plate. The sync answers every one of these from their cores; the fallbacks
+// are for the packing plate no shear core has.
 const DEFAULT_INITIAL_PREFS = (inputs) => ({
   supported_material: inputs.supported_material,
   supporting_material: inputs.supporting_material,
@@ -88,7 +94,32 @@ const columnOptimizationPrefs = (inputs) =>
     Object.entries(COLUMN_OPTIMIZATION_DEFAULTS).map(([field, fallback]) => [field, inputs[field] || fallback]),
   );
 
+/**
+ * The plate girder's dialog: the tabs its core lists (Girder Properties, Optimisation, Stiffeners,
+ * Additional Girder Data, Design, Deflection). The dialog holds only the values the main form does not:
+ * the girder material (Member.Material, which follows the dock Material) and the Optimisation and Design
+ * values. The stiffener, symmetry, loading condition and deflection values are main-form fields; their
+ * tabs show them read only (PlateGirderPrefTabs.jsx), so they have one source.
+ */
 const DESIGN_PREF_CONFIG = {
+  "Plate Girder Design": {
+    tabIds: [14, 12, 15, 16, 13, 17],
+    initialTabIndex: 14,
+    getInitialPrefs: (inputs) => ({
+      girder_material: inputs.girder_material ?? inputs.material,
+      design_method: inputs.design_method,
+      ...Object.fromEntries(
+        Object.entries(PLATE_GIRDER_OPTIMISATION_DEFAULTS).map(([field, fallback]) => [field, inputs[field] ?? fallback]),
+      ),
+    }),
+    // The server's reset answer gives the girder material (the dock Material) and the design method; the
+    // Optimisation values are the core's get_values_for_design_pref defaults, which the sync does not ask for.
+    getDefaultPrefs: (inputs, _module, answered) => ({
+      girder_material: answered?.girder_material ?? inputs.material,
+      design_method: answered?.design_method ?? DEFAULT_DESIGN_METHOD,
+      ...PLATE_GIRDER_OPTIMISATION_DEFAULTS,
+    }),
+  },
   "Butt Joint Bolted": {
     tabIds: [6, 11],
     initialTabIndex: 6,
@@ -502,5 +533,5 @@ export function getDesignPrefConfig(module) {
 
 export function getDesignPrefTabs(module) {
   const config = getDesignPrefConfig(module);
-  return ALL_TABS.filter((tab) => config.tabIds.includes(tab.id));
+  return config.tabIds.map((id) => ALL_TABS.find((tab) => tab.id === id)).filter(Boolean);
 }
