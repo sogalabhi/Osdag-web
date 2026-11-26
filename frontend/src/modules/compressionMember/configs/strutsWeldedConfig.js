@@ -11,9 +11,12 @@ import HINGED_FIXED from "../../../assets/CompressionMember/RRRFstrut.png";
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../shared/config/prefCoreKeys";
 import { validateRequiredFields } from '../../shared/utils/validation';
 import {
+  KEY_ALLOW_LOAD,
   KEY_ALLOW_UR,
   KEY_AXIAL,
-  KEY_CONNECTOR_MATERIAL,
+  KEY_BOLT_Number,
+  KEY_Buckling_In_plane,
+  KEY_Buckling_Out_plane,
   KEY_DISP_STRUT_WELDED_END_GUSSET,
   KEY_DP_DESIGN_METHOD,
   KEY_DP_WELD_FAB,
@@ -31,6 +34,9 @@ import {
   KEY_SEC_PROFILE,
 } from "../../../constants/generated/coreKeys";
 import { prefText } from "../../shared/utils/prefValue";
+// A saved gusset thickness is text; a file saved by an older form may hold a list.
+const firstOf = (value) => (Array.isArray(value) ? value[0] : value);
+
 export const strutsWeldedConfig = {
   sessionName: "Struts Welded to End Gusset",
   designType: KEY_DISP_STRUT_WELDED_END_GUSSET,
@@ -43,14 +49,11 @@ export const strutsWeldedConfig = {
     length: "3000",
     axial_force: "100",
     module: KEY_DISP_STRUT_WELDED_END_GUSSET,
-    plate_thickness: [],
     section_designation: [],
     material: "E 250 (Fe 410 W)A",
     member_designation: "All",
     end_condition_1: "Hinged",
     end_condition_2: "Hinged",
-    allow_ur: "1.0",
-    effective_area_parameter: "1.0",
   },
 
   // Every form field and the core key(s) it feeds; null for a field that feeds none.
@@ -59,7 +62,6 @@ export const strutsWeldedConfig = {
     ...PREF_CORE_KEYS,
     ...MATERIAL_CORE_KEYS,
     module: KEY_MODULE,
-    plate_thickness: KEY_PLATETHK,
     // The .osi loader also maps "Section.Profile" and "Section Profile" (the latter is the constant
     // with the odd Plate Girder name) onto this field, so it declares them although the builder sends Member.Profile.
     section_profile: KEY_SEC_PROFILE,
@@ -69,8 +71,14 @@ export const strutsWeldedConfig = {
     axial_force: KEY_AXIAL,
     end_condition_1: KEY_END1,
     end_condition_2: KEY_END2,
+    // The Optimization tab of Additional Inputs (the core's dock has none of these).
     allow_ur: KEY_ALLOW_UR,
     effective_area_parameter: KEY_EFFECTIVE_AREA_PARA,
+    buckling_out_of_plane: KEY_Buckling_Out_plane,
+    buckling_in_plane: KEY_Buckling_In_plane,
+    load_type: KEY_ALLOW_LOAD,
+    bolt_number: KEY_BOLT_Number,
+    plate_thickness: KEY_PLATETHK,
     // The dock material is Material; supported_material is the section tab of Additional Inputs, sent as the member material.
     material: KEY_MATERIAL,
     supported_material: KEY_SEC_MATERIAL,
@@ -81,12 +89,10 @@ export const strutsWeldedConfig = {
   },
 
   modalConfig: [
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
     { key: "sectionDesignation", inputKey: "section_designation", dataSource: null },
   ],
 
   selectionConfig: [
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
     { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
   ],
 
@@ -136,15 +142,6 @@ export const strutsWeldedConfig = {
   },
 
   buildSubmissionParams: (inputs, allSelected, lists) => {
-    const getList = (key, listName) => {
-      if (allSelected?.[key]) {
-        return lists?.[listName]?.map(item => String(item.value || item.Grade || item)) || [];
-      }
-      const val = inputs[key];
-      if (Array.isArray(val)) return val.map(String);
-      return val ? [String(val)] : [];
-    };
-
     const normalizeSectionItem = (item) => {
       if (item == null) return "";
       if (typeof item === "string") return item.trim();
@@ -190,14 +187,17 @@ export const strutsWeldedConfig = {
       [KEY_END1]: inputs.end_condition_1,
       [KEY_END2]: inputs.end_condition_2,
 
-      [KEY_CONNECTOR_MATERIAL]: prefText(inputs.connector_material),
-      [KEY_PLATETHK]: getList("plate_thickness", "thicknessList"),
-
       [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
       [KEY_DP_WELD_FAB]: prefText(inputs.weld_fab),
       [KEY_DP_WELD_MATERIAL_G_O]: prefText(inputs.weld_material_grade),
+      // The Optimization tab: what the user did not save the backend fills from the core.
       [KEY_ALLOW_UR]: prefText(inputs.allow_ur),
       [KEY_EFFECTIVE_AREA_PARA]: prefText(inputs.effective_area_parameter),
+      [KEY_Buckling_Out_plane]: prefText(inputs.buckling_out_of_plane),
+      [KEY_Buckling_In_plane]: prefText(inputs.buckling_in_plane),
+      [KEY_ALLOW_LOAD]: prefText(inputs.load_type),
+      [KEY_BOLT_Number]: prefText(inputs.bolt_number),
+      [KEY_PLATETHK]: prefText(firstOf(inputs.plate_thickness)),
     };
   },
 
@@ -285,7 +285,6 @@ export const strutsWeldedConfig = {
             setInputs({
               ...inputs,
               material: material.Grade,
-              connector_material: material.Grade,
             });
           }
         },
@@ -359,36 +358,6 @@ export const strutsWeldedConfig = {
       fields: [
         { key: "axial_force", label: "Axial Force (kN)", type: "number" }
       ]
-    },
-    {
-      title: "Plate",
-      fields: [
-        {
-          key: "plate_thickness",
-          label: "Thickness (mm)",
-          type: "customizable",
-          selectionKey: "thicknessSelect",
-          modalKey: "plateThickness",
-          dataSource: "thicknessList"
-        }
-      ]
-    },
-    {
-      title: "Optimization",
-      fields: [
-        {
-          key: "allow_ur",
-          label: "Allowable Utilization Ratio (UR)",
-          type: "number",
-          validation: "positive_number",
-        },
-        {
-          key: "effective_area_parameter",
-          label: "Effective Area Parameter",
-          type: "number",
-          validation: "positive_number",
-        },
-      ],
     },
   ]
 };

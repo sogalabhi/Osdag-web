@@ -17,7 +17,11 @@ import { describe, expect, it } from "vitest";
 import * as coreKeyExports from "../constants/generated/coreKeys";
 import * as webKeyExports from "../constants/generated/webKeys";
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../modules/shared/config/prefCoreKeys";
-import { COLUMN_OPTIMIZATION_DEFAULTS, FLEXURE_OPTIMIZATION_DEFAULTS } from "../modules/shared/config/prefOptions";
+import {
+  COLUMN_OPTIMIZATION_DEFAULTS,
+  FLEXURE_OPTIMIZATION_DEFAULTS,
+  STRUT_OPTIMIZATION_FIELDS,
+} from "../modules/shared/config/prefOptions";
 import { PLATE_GIRDER_OPTIMISATION_DEFAULTS } from "../modules/flexuralMember/plateGirder/configs/plateGirderPrefOptions";
 import { MODULES } from "./cases";
 import { LISTS, caseState, wire } from "./cases/shared";
@@ -42,6 +46,7 @@ const ADDITIONAL_INPUTS_FIELDS = new Set([
   ...Object.keys(MATERIAL_CORE_KEYS),
   ...Object.keys(FLEXURE_OPTIMIZATION_DEFAULTS),
   ...Object.keys(COLUMN_OPTIMIZATION_DEFAULTS),
+  ...STRUT_OPTIMIZATION_FIELDS,
   "member_material",
   // The plate girder's Girder Properties tab.
   "girder_material",

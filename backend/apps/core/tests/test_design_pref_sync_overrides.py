@@ -41,7 +41,6 @@ from osdag_core.Common import (
 # Material rules: modules whose old rule differs from the core's 'Input Dock' rows.
 RULE_OVERRIDES = {
     KEY_DISP_COMPRESSION_COLUMN,
-    KEY_DISP_STRUT_WELDED_END_GUSSET,
 }
 # Cover plates and the shear modules with a Connector tab: the dock Material copies to the member and
 # connector rows, as the core says.
@@ -50,6 +49,8 @@ SHEAR_CORE_RULES = {KEY_DISP_FINPLATE, KEY_DISP_HEADERPLATE, KEY_DISP_CLEATANGLE
 # Tension members and the bolted strut: the dock Material copies to Member.Material (the section tab, which
 # the web form holds as supported_material) and Connector.Material.
 MEMBER_CORE_RULES = {KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_STRUT_BOLTED_END_GUSSET}
+# The welded strut has no Connector tab: the dock Material copies to Member.Material alone.
+STRUT_WELDED_CORE_RULE = {KEY_DISP_STRUT_WELDED_END_GUSSET}
 # The simply supported and cantilever beams: the dock Material copies to Member.Material, the Column
 # Section tab (supporting_material in the web form).
 BEAM_CORE_RULES = {KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2}
@@ -69,8 +70,8 @@ END_PLATE_CORE_RULES = {
 }
 # The base plate: the dock Material copies to the column (Member.Material), base plate and stiffener materials.
 BASE_PLATE_CORE_RULES = {KEY_DISP_BASE_PLATE}
-CORE_RULES = (COVER_PLATE_RULES | SHEAR_CORE_RULES | MEMBER_CORE_RULES | BEAM_CORE_RULES | GIRDER_CORE_RULES | BASE_PLATE_CORE_RULES
-              | set(END_PLATE_CORE_RULES))
+CORE_RULES = (COVER_PLATE_RULES | SHEAR_CORE_RULES | MEMBER_CORE_RULES | STRUT_WELDED_CORE_RULE | BEAM_CORE_RULES
+              | GIRDER_CORE_RULES | BASE_PLATE_CORE_RULES | set(END_PLATE_CORE_RULES))
 # Modules where core and old agree on "no material sync": no copy rows.
 NO_RULES = {KEY_DISP_BUTTJOINTBOLTED, KEY_DISP_BUTTJOINTWELDED, KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED}
 
@@ -118,6 +119,17 @@ def test_a_shear_module_follows_the_core_rule(module_id):
 @pytest.mark.parametrize("module_id", sorted(MEMBER_CORE_RULES))
 def test_a_member_module_copies_the_dock_material_to_the_member_material(module_id):
     assert sync_merge.sync_rules(module_id) == [("Material", ["Member.Material", "Connector.Material"])]
+
+
+@pytest.mark.parametrize("module_id", sorted(STRUT_WELDED_CORE_RULE))
+def test_the_welded_strut_copies_the_dock_material_to_the_member_material_only(module_id):
+    # The core gives the welded strut no Connector tab and neither derives nor reads Connector.Material.
+    assert sync_merge.sync_rules(module_id) == [("Material", ["Member.Material"])]
+    resolved, _meta, _md, _sd = sync_merge.merge_design_pref_sync(
+        module_id, {"Material": "E 350 (Fe 490)", "Member.Material": "E 250 (Fe 410 W)A"}, "refresh",
+    )
+    assert resolved["Member.Material"] == "E 350 (Fe 490)"
+    assert "Connector.Material" not in resolved
 
 
 @pytest.mark.parametrize("module_id", sorted(MEMBER_CORE_RULES))

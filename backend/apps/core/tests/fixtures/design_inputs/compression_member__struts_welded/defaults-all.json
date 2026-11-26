@@ -210,33 +210,6 @@
     "Load.Axial": "100",
     "Conn_Location": "Long Leg",
     "End_1": "Hinged",
-    "End_2": "Hinged",
-    "Connector.Plate.Thickness_List": [
-      "8",
-      "10",
-      "12",
-      "14",
-      "16",
-      "18",
-      "20",
-      "22",
-      "25",
-      "28",
-      "32",
-      "36",
-      "40",
-      "45",
-      "50",
-      "56",
-      "63",
-      "75",
-      "80",
-      "90",
-      "100",
-      "110",
-      "120"
-    ],
-    "Optimum.AllowUR": "1.0",
-    "Effective.Area_Para": "1.0"
+    "End_2": "Hinged"
   }
 }

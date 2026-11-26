@@ -1,6 +1,6 @@
 {
   "source": "frontend-defaults:strutsWeldedConfig.js",
-  "notes": "Run of strutsWeldedConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"plate_thickness\":[\"10\",\"12\",\"16\"],\"section_designation\":[\"50 x 50 x 6\",\"60 x 60 x 6\"]}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
+  "notes": "Run of strutsWeldedConfig.buildSubmissionParams on defaultInputs; customizable lists set to explicit selections {\"section_designation\":[\"50 x 50 x 6\",\"60 x 60 x 6\"]}. Option lists come from osdag_core SQLite plus the constants in the backend options views.",
   "inputs": {
     "Module": "Struts Welded to End Gusset",
     "Member.Profile": "Angles",
@@ -13,13 +13,6 @@
     "Load.Axial": "100",
     "Conn_Location": "Long Leg",
     "End_1": "Hinged",
-    "End_2": "Hinged",
-    "Connector.Plate.Thickness_List": [
-      "10",
-      "12",
-      "16"
-    ],
-    "Optimum.AllowUR": "1.0",
-    "Effective.Area_Para": "1.0"
+    "End_2": "Hinged"
   }
 }

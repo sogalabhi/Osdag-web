@@ -32,7 +32,13 @@ import {
   KEY_ST_KEY_MATERIAL,
 } from "../../../constants/generated/coreKeys";
 
-import { COLUMN_OPTIMIZATION_DEFAULTS, DEFAULT_DESIGN_METHOD, FLEXURE_OPTIMIZATION_DEFAULTS } from "./prefOptions";
+import {
+  COLUMN_OPTIMIZATION_DEFAULTS,
+  DEFAULT_DESIGN_METHOD,
+  FLEXURE_OPTIMIZATION_DEFAULTS,
+  strutOptimizationDefaults,
+  strutOptimizationLayout,
+} from "./prefOptions";
 import { PLATE_GIRDER_OPTIMISATION_DEFAULTS } from "../../flexuralMember/plateGirder/configs/plateGirderPrefOptions";
 
 const ALL_TABS = [
@@ -93,6 +99,21 @@ const columnOptimizationPrefs = (inputs) =>
   Object.fromEntries(
     Object.entries(COLUMN_OPTIMIZATION_DEFAULTS).map(([field, fallback]) => [field, inputs[field] || fallback]),
   );
+
+/**
+ * The Optimization tab values of the welded strut, from the form or the core's defaults for its section profile
+ * (the tab is built from the profile). A load type the profile does not offer gives way to the profile's own.
+ */
+const strutOptimizationPrefs = (inputs) => {
+  const profile = inputs.section_profile;
+  const first = (value) => (Array.isArray(value) ? value[0] : value);
+  const prefs = Object.fromEntries(
+    Object.entries(strutOptimizationDefaults(profile)).map(([field, fallback]) => [field, first(inputs[field]) || fallback]),
+  );
+  const { loadTypes } = strutOptimizationLayout(profile);
+  if (!loadTypes.includes(prefs.load_type)) prefs.load_type = loadTypes[0];
+  return prefs;
+};
 
 /**
  * The plate girder's dialog: the tabs its core lists (Girder Properties, Optimisation, Stiffeners,
@@ -364,16 +385,13 @@ const DESIGN_PREF_CONFIG = {
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
   "Tension Member Welded Design":{
-    tabIds: [2, 3, 10, 11, 13],
+    tabIds: [2, 3, 10, 13],
     initialTabIndex: 2,
     getInitialPrefs: (inputs) => ({
       supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
       connector_material: inputs.connector_material,
       weld_fab: inputs.weld_fab,
       weld_material_grade: inputs.weld_material_grade,
-      detailing_edge_type: inputs.detailing_edge_type,
-      detailing_gap: inputs.detailing_gap,
-      detailing_corr_status: inputs.detailing_corr_status,
       design_method: inputs.design_method,
     }),
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
@@ -413,20 +431,17 @@ const DESIGN_PREF_CONFIG = {
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
   },
   "Struts Welded to End Gusset":{
-    tabIds: [2, 3, 10, 11, 13],
+    // The core's welded strut has the Angle Section, Optimization, Weld and Design tabs, in this order.
+    tabIds: [2, 12, 10, 13],
     initialTabIndex: 2,
     getInitialPrefs: (inputs) => ({
       supported_material: inputs.supported_material ?? inputs.member_material ?? inputs.material,
-      connector_material: inputs.connector_material,
       weld_fab: inputs.weld_fab,
       weld_material_grade: inputs.weld_material_grade,
-      // Not in the welded strut's core (never read by it).
-      detailing_edge_type: inputs.detailing_edge_type ?? "Sheared or hand flame cut",
-      detailing_gap: inputs.detailing_gap ?? "0",
-      detailing_corr_status: inputs.detailing_corr_status ?? "No",
       design_method: inputs.design_method,
+      ...strutOptimizationPrefs(inputs),
     }),
-    getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
+    getDefaultPrefs: (inputs) => strutOptimizationDefaults(inputs.section_profile),
   },
   "Simply Supported Beam Design":{
     tabIds: [0, 12, 13],
@@ -531,6 +546,7 @@ export function getDesignPrefConfig(module) {
   return DESIGN_PREF_CONFIG[module] || DEFAULT_CONFIG;
 }
 
+/** The tabs of a module in the order `tabIds` lists them, which is the core's order of tabs. */
 export function getDesignPrefTabs(module) {
   const config = getDesignPrefConfig(module);
   return config.tabIds.map((id) => ALL_TABS.find((tab) => tab.id === id)).filter(Boolean);

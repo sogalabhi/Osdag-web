@@ -125,12 +125,16 @@ def validate_input(input_values: Dict[str, Any]) -> None:
     if not isinstance(input_values[KEY_MODULE], str):
         raise InvalidInputTypeError(KEY_MODULE, "str")
 
-    # Validate Connector.Plate.Thickness_List
-    connector_plate_thicknesslist = input_values[KEY_PLATETHK]
-    if (not isinstance(connector_plate_thicknesslist, list)
-            or not validate_list_type(connector_plate_thicknesslist, str)
-            or not custom_list_validation(connector_plate_thicknesslist, int_able)):
-        raise InvalidInputTypeError(KEY_PLATETHK, "List[str] where all items can be converted to int")
+    # Validate Connector.Plate.Thickness_List: the gusset thickness of the Optimization tab, one text value
+    # (the core's combobox); a list of such values is also accepted and its first one is used.
+    gusset_thickness = input_values[KEY_PLATETHK]
+    if isinstance(gusset_thickness, str):
+        if not int_able(gusset_thickness):
+            raise InvalidInputTypeError(KEY_PLATETHK, "str that can be converted to int")
+    elif (not isinstance(gusset_thickness, list)
+            or not validate_list_type(gusset_thickness, str)
+            or not custom_list_validation(gusset_thickness, int_able)):
+        raise InvalidInputTypeError(KEY_PLATETHK, "str or List[str] where all items can be converted to int")
 
 
 def create_module() -> Compression_welded:

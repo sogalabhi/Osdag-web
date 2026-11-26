@@ -188,7 +188,7 @@ const MODULES = [
   // ----- compression member -----
   { slug: 'compression_member__axially_loaded_column', cfg: 'axiallyLoadedColumnConfig', lists: 'axiallyLoaded', custom: { section_designation: ['MB 300', 'MB 350'] } },
   { slug: 'compression_member__struts_bolted', cfg: 'strutsBoltedConfig', lists: 'strutsBolted', custom: { ...BOLT_CUSTOM, section_designation: ['50 x 50 x 6', '60 x 60 x 6'] } },
-  { slug: 'compression_member__struts_welded', cfg: 'strutsWeldedConfig', lists: 'strutsWelded', custom: { plate_thickness: ['10', '12', '16'], section_designation: ['50 x 50 x 6', '60 x 60 x 6'] } },
+  { slug: 'compression_member__struts_welded', cfg: 'strutsWeldedConfig', lists: 'strutsWelded', custom: { section_designation: ['50 x 50 x 6', '60 x 60 x 6'] } },
   // ----- flexure member -----
   { slug: 'flexure_member__simply_supported_beam', cfg: 'simplySupportedBeamConfig', lists: 'flexure', custom: { section_designation: ['MB 300', 'MB 350'] } },
   { slug: 'flexure_member__on_cantilever', cfg: 'onCantileverConfig', lists: 'flexure', custom: { section_designation: ['MB 300', 'MB 350'] } },

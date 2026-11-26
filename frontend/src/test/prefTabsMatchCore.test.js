@@ -26,10 +26,8 @@ const coreTabs = (designType) => [...new Set(DESIGN_PREF_TABLES[designType].pref
 const KNOWN_DIFFERENCES = {
   // The core has a Channel Section tab next to the Angle Section tab; the web's Angle Section tab serves both.
   "tension bolted": { webOnly: [], coreOnly: ["Channel Section"] },
-  "tension welded": { webOnly: ["Detailing"], coreOnly: ["Channel Section"] },
+  "tension welded": { webOnly: [], coreOnly: ["Channel Section"] },
   "struts bolted": { webOnly: [], coreOnly: ["Channel Section"] },
-  // The core's welded strut has no Connector or Detailing tab, but an Optimization tab.
-  "struts welded": { webOnly: ["Connector", "Detailing"], coreOnly: ["Optimization"] },
 };
 
 const sortedDiff = (a, b) => a.filter((name) => !b.includes(name)).sort();

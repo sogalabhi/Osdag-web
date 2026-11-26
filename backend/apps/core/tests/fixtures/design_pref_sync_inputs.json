@@ -5896,16 +5896,13 @@
         "inputs": {
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "open",
         "design_pref_draft": null
@@ -5915,16 +5912,13 @@
         "inputs": {
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "open",
         "design_pref_draft": {
@@ -5942,16 +5936,13 @@
           "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "open",
         "design_pref_draft": null
@@ -5961,16 +5952,13 @@
         "inputs": {
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -5980,16 +5968,13 @@
         "inputs": {
           "Material": "E 350 (Fe 490)",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -6003,16 +5988,13 @@
           "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "refresh",
         "design_pref_draft": null
@@ -6022,16 +6004,13 @@
         "inputs": {
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "save",
         "design_pref_draft": null
@@ -6041,16 +6020,13 @@
         "inputs": {
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "save",
         "design_pref_draft": {
@@ -6068,16 +6044,13 @@
           "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "save",
         "design_pref_draft": {
@@ -6091,16 +6064,13 @@
         "inputs": {
           "Material": "E 250 (Fe 410 W)A",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -6110,16 +6080,13 @@
         "inputs": {
           "Material": "E 350 (Fe 490)",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "reset",
         "design_pref_draft": null
@@ -6133,16 +6100,13 @@
           "Member.Material": "E 450 (Fe 570) D",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Welded to End Gusset",
-          "Connector.Plate.Thickness_List": [],
           "Member.Profile": "Angles",
           "Conn_Location": "Long Leg",
           "Member.Designation": [],
           "Member.Length": "3000",
           "Load.Axial": "100",
           "End_1": "Hinged",
-          "End_2": "Hinged",
-          "Optimum.AllowUR": "1.0",
-          "Effective.Area_Para": "1.0"
+          "End_2": "Hinged"
         },
         "operation": "reset",
         "design_pref_draft": null

@@ -220,7 +220,6 @@
   "weld_material_grade": "410"
  },
  "Struts Welded to End Gusset": {
-  "connector_material": "E 250 (Fe 410 W)A",
   "design_method": "Limit State Design",
   "supported_material": "E 250 (Fe 410 W)A",
   "weld_fab": "Shop Weld",

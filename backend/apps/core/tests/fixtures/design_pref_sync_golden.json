@@ -14564,8 +14564,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -14577,8 +14576,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "open",
@@ -14586,10 +14584,7 @@
         },
         "resolved_inputs": {
           "Conn_Location": "Long Leg",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -14599,7 +14594,6 @@
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
           "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
         },
@@ -14624,8 +14618,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -14637,8 +14630,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "open",
@@ -14648,9 +14640,7 @@
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Conn_Location": "Long Leg",
           "Connector.Material": "E 350 (Fe 490)",
-          "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -14661,7 +14651,6 @@
           "Member.Profile": "Angles",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
           "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
         },
@@ -14688,8 +14677,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "open",
@@ -14699,9 +14687,7 @@
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Conn_Location": "Long Leg",
           "Connector.Material": "E 450 (Fe 570) D",
-          "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -14712,7 +14698,6 @@
           "Member.Profile": "Angles",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
         },
@@ -14737,8 +14722,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [],
@@ -14746,8 +14730,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "refresh",
@@ -14755,9 +14738,6 @@
         },
         "resolved_inputs": {
           "Conn_Location": "Long Leg",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Connector.Plate.Thickness_List": [],
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -14766,8 +14746,7 @@
           "Member.Length": "3000",
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
-          "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0"
+          "Module": "Struts Welded to End Gusset"
         },
         "section_designations": {
           "connector": null,
@@ -14790,8 +14769,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [],
@@ -14799,8 +14777,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "refresh",
@@ -14808,9 +14785,6 @@
         },
         "resolved_inputs": {
           "Conn_Location": "Long Leg",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Connector.Plate.Thickness_List": [],
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -14819,8 +14793,7 @@
           "Member.Length": "3000",
           "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Angles",
-          "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0"
+          "Module": "Struts Welded to End Gusset"
         },
         "section_designations": {
           "connector": null,
@@ -14830,9 +14803,7 @@
       },
       "refresh_stale_prefs": {
         "material_grades": {
-          "connector": [
-            "E 250 (Fe 410 W)A"
-          ],
+          "connector": [],
           "supported": [
             "E 250 (Fe 410 W)A"
           ],
@@ -14841,8 +14812,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [],
@@ -14850,8 +14820,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "refresh",
@@ -14860,9 +14829,7 @@
         "resolved_inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Conn_Location": "Long Leg",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Connector.Plate.Thickness_List": [],
-          "Effective.Area_Para": "1.0",
+          "Connector.Material": "E 450 (Fe 570) D",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -14872,8 +14839,7 @@
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
-          "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0"
+          "Module": "Struts Welded to End Gusset"
         },
         "section_designations": {
           "connector": null,
@@ -14896,8 +14862,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -14909,8 +14874,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "reset",
@@ -14918,10 +14882,7 @@
         },
         "resolved_inputs": {
           "Conn_Location": "Long Leg",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -14931,7 +14892,6 @@
           "Member.Material": "E 250 (Fe 410 W)A",
           "Member.Profile": "Angles",
           "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
         },
@@ -14956,8 +14916,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -14969,8 +14928,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "reset",
@@ -14978,10 +14936,7 @@
         },
         "resolved_inputs": {
           "Conn_Location": "Long Leg",
-          "Connector.Material": "E 350 (Fe 490)",
-          "Connector.Plate.Thickness_List": [],
           "Design.Design_Method": "Limit State Design",
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -14991,7 +14946,6 @@
           "Member.Material": "E 350 (Fe 490)",
           "Member.Profile": "Angles",
           "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "490"
         },
@@ -15003,9 +14957,7 @@
       },
       "reset_saved_overrides": {
         "material_grades": {
-          "connector": [
-            "E 250 (Fe 410 W)A"
-          ],
+          "connector": [],
           "supported": [
             "E 250 (Fe 410 W)A"
           ],
@@ -15014,8 +14966,7 @@
         "metadata": {
           "copied_from_input_dock_keys": {
             "Material": [
-              "Member.Material",
-              "Connector.Material"
+              "Member.Material"
             ]
           },
           "defaulted_keys": [
@@ -15027,8 +14978,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "reset",
@@ -15037,10 +14987,8 @@
         "resolved_inputs": {
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Conn_Location": "Long Leg",
-          "Connector.Material": "E 250 (Fe 410 W)A",
-          "Connector.Plate.Thickness_List": [],
+          "Connector.Material": "E 450 (Fe 570) D",
           "Design.Design_Method": "Limit State Design",
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -15051,7 +14999,6 @@
           "Member.Profile": "Angles",
           "Member.Supporting_Section.Material": "E 450 (Fe 570) D",
           "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0",
           "Weld.Fab": "Shop Weld",
           "Weld.Material_Grade_OverWrite": "410"
         },
@@ -15080,8 +15027,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "save",
@@ -15089,8 +15035,6 @@
         },
         "resolved_inputs": {
           "Conn_Location": "Long Leg",
-          "Connector.Plate.Thickness_List": [],
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -15098,8 +15042,7 @@
           "Member.Designation": [],
           "Member.Length": "3000",
           "Member.Profile": "Angles",
-          "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0"
+          "Module": "Struts Welded to End Gusset"
         },
         "section_designations": {
           "connector": null,
@@ -15126,8 +15069,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "save",
@@ -15137,8 +15079,6 @@
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Conn_Location": "Long Leg",
           "Connector.Material": "E 350 (Fe 490)",
-          "Connector.Plate.Thickness_List": [],
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -15147,8 +15087,7 @@
           "Member.Length": "3000",
           "Member.Profile": "Angles",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
-          "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0"
+          "Module": "Struts Welded to End Gusset"
         },
         "section_designations": {
           "connector": null,
@@ -15173,8 +15112,7 @@
             "Material"
           ],
           "linked_pref_keys": [
-            "Member.Material",
-            "Connector.Material"
+            "Member.Material"
           ],
           "module_id": "Struts Welded to End Gusset",
           "operation": "save",
@@ -15184,8 +15122,6 @@
           "Bolt.Bolt_Hole_Type": "Over-sized",
           "Conn_Location": "Long Leg",
           "Connector.Material": "E 350 (Fe 490)",
-          "Connector.Plate.Thickness_List": [],
-          "Effective.Area_Para": "1.0",
           "End_1": "Hinged",
           "End_2": "Hinged",
           "Load.Axial": "100",
@@ -15195,8 +15131,7 @@
           "Member.Material": "E 450 (Fe 570) D",
           "Member.Profile": "Angles",
           "Member.Supporting_Section.Material": "E 350 (Fe 490)",
-          "Module": "Struts Welded to End Gusset",
-          "Optimum.AllowUR": "1.0"
+          "Module": "Struts Welded to End Gusset"
         },
         "section_designations": {
           "connector": null,

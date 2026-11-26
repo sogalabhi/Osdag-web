@@ -131,13 +131,10 @@ MATERIAL_ROLE_KEYS = {
 # old table named a field that feeds no core key (member_material in most modules) that driver is
 # gone. The core's own table for each module is core_sync_rules(module_id); the test
 # test_design_pref_sync_overrides.py lists how each differs.
-_M, _R, _S, _D, _C = (KEY_MATERIAL, KEY_SEC_MATERIAL, KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL,
-                      KEY_CONNECTOR_MATERIAL)
+_M, _S, _D, _C = KEY_MATERIAL, KEY_SUPTNGSEC_MATERIAL, KEY_SUPTDSEC_MATERIAL, KEY_CONNECTOR_MATERIAL
 _MEMBER_RULES = [(_M, [_S, _D, _C])]
 LEGACY_SYNC_RULES: Dict[str, List[Tuple[str, List[str]]]] = {
     KEY_DISP_COMPRESSION_COLUMN: _MEMBER_RULES,
-    # The core gives the welded strut no Connector.Material row, which the web form still sends.
-    KEY_DISP_STRUT_WELDED_END_GUSSET: [(_M, [_R, _C])],
 }
 
 # module id -> {role: [section source, ...]}; a section source is

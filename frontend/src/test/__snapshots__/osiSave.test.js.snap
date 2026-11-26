@@ -1170,12 +1170,6 @@ exports[`toDesignDictionary > struts bolted > customized, with Additional Inputs
 exports[`toDesignDictionary > struts welded > all 1`] = `
 {
   "Conn_Location": "Long Leg",
-  "Connector.Plate.Thickness_List": [
-    "8",
-    "10",
-    "12",
-  ],
-  "Effective.Area_Para": "1.0",
   "End_1": "Hinged",
   "End_2": "Hinged",
   "Load.Axial": "100",
@@ -1187,7 +1181,6 @@ exports[`toDesignDictionary > struts welded > all 1`] = `
   "Member.Length": "3000",
   "Member.Profile": "Angles",
   "Module": "Struts Welded to End Gusset",
-  "Optimum.AllowUR": "1.0",
 }
 `;
 
@@ -1195,12 +1188,7 @@ exports[`toDesignDictionary > struts welded > customized, with Additional Inputs
 {
   "Bolt.Bolt_Hole_Type": "Over-sized",
   "Conn_Location": "Long Leg",
-  "Connector.Plate.Thickness_List": [
-    "10",
-    "12",
-  ],
   "Detailing.Gap": "5",
-  "Effective.Area_Para": "1.0",
   "End_1": "Hinged",
   "End_2": "Hinged",
   "Load.Axial": "100",
@@ -1211,7 +1199,6 @@ exports[`toDesignDictionary > struts welded > customized, with Additional Inputs
   "Member.Length": "3000",
   "Member.Profile": "Angles",
   "Module": "Struts Welded to End Gusset",
-  "Optimum.AllowUR": "1.0",
 }
 `;
 
