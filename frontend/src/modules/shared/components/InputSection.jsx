@@ -523,41 +523,6 @@ export const InputSection = ({
         );
       }
 
-      case 'sectionProfileSelect': {
-        const rawOptions = getOptionsForField(field, safeContextData, safeInputs);
-        const options = toSelectOptions(rawOptions);
-        const currentValue = safeInputs[field.key] || field.defaultValue;
-        const value = options.find(opt => String(opt.value) === String(currentValue));
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            isSearchable={false}
-            onChange={(selected) => {
-              const val = selected.value;
-              setInputs((prev) => ({ ...prev, [field.key]: val, section_designation: [] }));
-              setExtraState((prev) => ({ ...prev, selectedProfile: val }));
-              if (typeof field.onChange === "function") {
-                try {
-                  field.onChange(val, safeInputs, setInputs, safeContextData, extraState, setExtraState);
-                } catch {
-                  try {
-                    field.onChange(val, setInputs, setExtraState);
-                  } catch (_e) {
-                    console.warn("[InputSection] sectionProfileSelect custom onChange warning:", _e?.message);
-                  }
-                }
-              }
-            }}
-            menuPortalTarget={document.body}
-            styles={customSelectStyles}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-          />
-        );
-      }
-
       case 'customizable': {
         const options = [{ value: "All", label: "All" }, { value: "Customized", label: "Customized" }];
         const value = options.find(opt => String(opt.value) === String(selectionStates?.[field.selectionKey] || "All"));

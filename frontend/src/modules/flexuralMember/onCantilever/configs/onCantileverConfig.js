@@ -212,14 +212,6 @@ export const onCantileverConfig = {
           label: "Material",
           type: "select",
           options: "materialList",
-          onChange: (value, inputs, setInputs, materialList) => {
-            const material = materialList.find((m) => m.id === value);
-            setInputs({
-              ...inputs,
-              material: material?.Grade || "",
-              supporting_material: material?.Grade || "",
-            });
-          },
         },
       ],
     },

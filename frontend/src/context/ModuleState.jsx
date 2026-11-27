@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useReducer, useCallback } from "react";
 import ModuleReducer from "./ModuleReducer";
-import { createDesign as apiCreateDesign } from '../modules/shared/api/moduleApi';
 import {
   fetchModuleOptions as dsFetchModuleOptions,
   downloadCad as dsDownloadCad,
@@ -185,18 +184,6 @@ export const ModuleProvider = ({ children }) => {
       return { success: false, error: error.message };
     }
   }, [getModuleData, dispatch, state.currentModuleName]);
-
-  // ===================================================================
-  // 2. CALCULATE - Design Computation
-  // ===================================================================
-
-  /**
-   * Create design calculation
-   * Uses external API function for consistency
-   */
-  const createDesign = useCallback((param, module_id, onCADSuccess = null) => {
-    return apiCreateDesign(param, module_id, onCADSuccess, dispatch);
-  }, [dispatch]);
 
   // ===================================================================
   // 3. CAD - 3D Model Generation and Download
@@ -405,9 +392,6 @@ export const ModuleProvider = ({ children }) => {
         getModuleData,              // Universal data fetcher - replaces 12+ functions
         getConnectivityData,        // Connectivity-specific data
         manageCustomMaterials,      // Custom material operations
-
-        // 2. CALCULATE (1 function) 
-        createDesign,               // Design calculation
 
         // 3. CAD (2 functions)
         downloadCADModel,           // Download CAD file
