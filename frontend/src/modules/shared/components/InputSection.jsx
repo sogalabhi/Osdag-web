@@ -261,6 +261,33 @@ export const InputSection = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safeContextData, section.fields]);
 
+  // A dynamic dropdown whose value is not among its current options takes the first option, or
+  // empties when there are none, so the displayed value and the stored value agree.
+  const dynamicSelectState = section.fields
+    .filter((f) => f.type === 'dynamicSelect')
+    .map((f) => JSON.stringify([f.key, safeInputs[f.key] ?? null, getOptionsForField(f, safeContextData, safeInputs).map((o) => (o && typeof o === 'object' ? o.value : o))]))
+    .join('|');
+  useEffect(() => {
+    setInputs((prev) => {
+      const current = prev || {};
+      const next = { ...current };
+      let isChanged = false;
+      section.fields.forEach((field) => {
+        if (field.type !== 'dynamicSelect') return;
+        const values = getOptionsForField(field, safeContextData, current).map((o) => (o && typeof o === 'object' ? o.value : o));
+        const value = current[field.key];
+        if (values.some((v) => String(v) === String(value))) return;
+        const replacement = values.length > 0 ? values[0] : '';
+        if (value === undefined && replacement === '') return;
+        if (value === replacement) return;
+        next[field.key] = replacement;
+        isChanged = true;
+      });
+      return isChanged ? next : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dynamicSelectState]);
+
   const handleCustomizableSelect = (field, value) => {
     const getAllValuesForInputKey = (inputKey) => {
       if (field?.getDynamicDataSource) {

@@ -21,7 +21,7 @@ import { weldedToEndConfig } from "../modules/TensionMembers/WeldedToEnd/configs
 import { beamToColumnEndPlateConfig } from "../modules/beamToColumnEndPlate/configs/beamToColumnEndPlateConfig";
 import { beamBeamEndPlateConfig } from "../modules/beamBeamEndPlate/configs/beamBeamEndPlateConfig";
 import { seatedAngleConfig } from "../modules/shearConnection/seatAngle/configs/seatedAngleConfig";
-import { CONN_CFBW, CONN_CWBW } from "../constants/generated/coreKeys";
+import { CONN_CFBW, CONN_CWBW, KEY_END1, KEY_END2 } from "../constants/generated/coreKeys";
 import { LISTS } from "./cases/shared";
 
 import FIXED_FIXED from "../assets/CompressionMember/RRRRstrut.png";
@@ -190,6 +190,53 @@ describe("a dynamic dropdown", () => {
     await show(axiallyLoadedColumnConfig, "end_condition_2", { inputs });
     pick("End 1", "Hinged");
     expect(optionsOf("End 2")).toEqual(["Fixed", "Hinged", "Roller"]);
+  });
+
+  const ends = { contextData: { ...DATA, endConditionList: ["Fixed", "Free", "Hinged", "Roller"] } };
+  const sentEnds = (formInputs) => {
+    const payload = axiallyLoadedColumnConfig.buildSubmissionParams(formInputs, {}, {});
+    return { end1: payload[KEY_END1], end2: payload[KEY_END2] };
+  };
+
+  it.each([
+    ["Free", "Free", "Fixed", ["Fixed"]],
+    ["Roller", "Free", "Fixed", ["Fixed", "Hinged"]],
+    ["Hinged", "Free", "Fixed", ["Fixed", "Hinged", "Roller"]],
+  ])("replaces a stale End 2 when End 1 becomes %s (End 2 was %s)", async (end1, staleEnd2, expectedEnd2, options) => {
+    await show(axiallyLoadedColumnConfig, "end_condition_2", { ...ends, inputs: { end_condition_1: "Fixed", end_condition_2: staleEnd2 } });
+    expect(shown("End 2")).toBe(staleEnd2);
+    pick("End 1", end1);
+    expect(optionsOf("End 2")).toEqual(options);
+    expect(shown("End 2")).toBe(expectedEnd2);
+    expect(inputsNow().end_condition_2).toBe(expectedEnd2);
+    expect(sentEnds(inputsNow())).toEqual({ end1, end2: expectedEnd2 });
+  });
+
+  it("keeps an End 2 that is still allowed", async () => {
+    await show(axiallyLoadedColumnConfig, "end_condition_2", { ...ends, inputs: { end_condition_1: "Fixed", end_condition_2: "Hinged" } });
+    pick("End 1", "Roller");
+    expect(shown("End 2")).toBe("Hinged");
+    expect(inputsNow().end_condition_2).toBe("Hinged");
+  });
+
+  it("applies the same rule to the y-y pair", async () => {
+    await show(axiallyLoadedColumnConfig, "end_condition_2_y", {
+      ...ends,
+      inputs: { end_condition_1_y: "Fixed", end_condition_2_y: "Roller" },
+    });
+    pick("End 1 (y-y)", "Free");
+    expect(shown("End 2 (y-y)")).toBe("Fixed");
+    expect(inputsNow().end_condition_2_y).toBe("Fixed");
+  });
+
+  it("takes the first option when the stored value is missing and empties when there are no options", async () => {
+    await show(axiallyLoadedColumnConfig, "end_condition_2", { inputs: { end_condition_1: "Roller" } });
+    expect(inputsNow().end_condition_2).toBe("Fixed");
+    expect(shown("End 2")).toBe("Fixed");
+    const section = { title: "T", fields: [{ key: "x", label: "X", type: "dynamicSelect", getOptions: () => [] }] };
+    render(<Host section={section} inputs={{ x: "Old" }} />);
+    await act(async () => {});
+    expect(screen.getAllByTestId("inputs").at(-1).textContent).toBe(JSON.stringify({ x: "" }));
   });
 });
 
