@@ -5,11 +5,15 @@ Bridges between the REST API and osdag_core ColumnDesign via the local adapter.
 
 from apps.core.utils.api_errors import failure_result
 from .adapter import validate_input, generate_output, create_cad_model
+from .schema import AxiallyLoadedColumnInput
 import traceback
 
 
 class AxiallyLoadedColumnService:
     """Service class for the axially loaded column module."""
+
+    # The design view validates the request with this before it enqueues the task.
+    input_model = AxiallyLoadedColumnInput
 
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:

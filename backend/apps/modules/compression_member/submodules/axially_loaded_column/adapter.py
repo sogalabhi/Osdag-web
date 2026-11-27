@@ -25,17 +25,12 @@ import json
 import traceback
 
 from apps.core.utils import (
-    MissingKeyError,
     InvalidInputTypeError,
-    contains_keys,
-    float_able,
-    int_able,
-    validate_list_type,
-    custom_list_validation,
     build_raw_output_dict,
 )
 from osdag_core.design_type.compression_member.compression_column import ColumnDesign
 from osdag_core.custom_logger import CustomLogger
+from apps.modules.compression_member.submodules.axially_loaded_column.schema import AxiallyLoadedColumnInput
 from osdag_core.Common import (
     KEY_ACTUAL_LEN_YY,
     KEY_ACTUAL_LEN_ZZ,
@@ -77,81 +72,9 @@ except ImportError:
 
 
 
-def get_required_keys() -> List[str]:
-    """
-    Return all required input parameters for the module.
-
-    Keys are what the frontend sends (buildSubmissionParams in axiallyLoadedColumnConfig.js).
-    The adapter maps these to the exact keys ColumnDesign.set_input_values() reads.
-    """
-    return [
-        KEY_MODULE,
-        KEY_SEC_PROFILE,
-        KEY_SECSIZE,
-        KEY_MATERIAL,
-        KEY_ACTUAL_LEN_ZZ,
-        KEY_ACTUAL_LEN_YY,
-        KEY_END1,
-        KEY_END2,
-        KEY_END1_Y,
-        KEY_END2_Y,
-        KEY_AXIAL,
-    ]
-
-
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """
-    Validate that all required keys are present and of the correct type.
-    """
-    required = get_required_keys()
-    missing = contains_keys(input_values, required)
-    if missing is not None:
-        raise MissingKeyError(missing[0])
-
-    # --- String fields ---
-    str_keys = [
-        KEY_MODULE,
-        KEY_SEC_PROFILE,
-        KEY_MATERIAL,
-        KEY_END1,
-        KEY_END2,
-        KEY_END1_Y,
-        KEY_END2_Y,
-    ]
-    for key in str_keys:
-        if not isinstance(input_values.get(key), str):
-            raise InvalidInputTypeError(key, "str")
-
-    # --- Member.Designation: must be a non-empty list of strings ---
-    md = input_values.get(KEY_SECSIZE)
-    if not isinstance(md, list):
-        raise InvalidInputTypeError(KEY_SECSIZE, "List[str]")
-    if not validate_list_type(md, str):
-        raise InvalidInputTypeError(KEY_SECSIZE, "List[str] where each item is a string")
-    cleaned = [s.strip() for s in md if s.strip()]
-    if not cleaned:
-        raise InvalidInputTypeError(
-            KEY_SECSIZE,
-            "non-empty List[str] — at least one section must be selected",
-        )
-
-    # --- Numeric fields (frontend sends strings or numbers) ---
-    for key in [KEY_ACTUAL_LEN_ZZ, KEY_ACTUAL_LEN_YY]:
-        val = input_values.get(key)
-        if not (isinstance(val, str) and float_able(val)) and not isinstance(val, (int, float)):
-            raise InvalidInputTypeError(
-                key, "str convertible to float, or a numeric value"
-            )
-
-    val_axial = input_values.get(KEY_AXIAL)
-    if not (isinstance(val_axial, str) and float_able(str(val_axial))) and not isinstance(val_axial, (int, float)):
-        raise InvalidInputTypeError(
-            KEY_AXIAL, "str convertible to float, or a numeric value"
-        )
-
-    # --- Member.Profile must be non-empty ---
-    if not input_values.get(KEY_SEC_PROFILE):
-        raise InvalidInputTypeError(KEY_SEC_PROFILE, "non-empty str")
+    """Raise ValidationError naming every bad key. The HTTP request path runs the same model."""
+    AxiallyLoadedColumnInput.validate_request(input_values)
 
 
 def create_module() -> ColumnDesign:
