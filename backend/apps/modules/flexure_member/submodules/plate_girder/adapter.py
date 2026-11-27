@@ -6,8 +6,8 @@ dimensions from loads/constraints).
 """
 from apps.core.utils import (
     validate_arr, validate_num, validate_string,
-    MissingKeyError, InvalidInputTypeError,
-    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
+    InvalidInputTypeError,
+    custom_list_validation, int_able, is_yes_or_no, validate_list_type,
     build_raw_output_dict
 )
 # PlateGirderWelded will be imported when needed in create_module()
@@ -36,6 +36,7 @@ from contextlib import contextmanager
 from typing import Dict, Any, List, Tuple
 import traceback
 import json
+from .schema import PlateGirderInput
 from apps.core.web_keys import (
     WEB_DESIGN_INTERMEDIATESTIFFENER_THICKNESS_VALUES,
     WEB_DESIGN_LONGITUDNALSTIFFENER_THICKNESS_VALUES,
@@ -44,35 +45,6 @@ from apps.core.web_keys import (
 old_stdout = sys.stdout  # Backup log
 sys.stdout = open(os.devnull, "w")  # redirect stdout
 sys.stdout = old_stdout  # Reset log
-
-
-def get_required_keys() -> List[str]:
-    """Return all required input parameters for the plate girder module."""
-    return [
-        KEY_MODULE,
-        KEY_MATERIAL,
-        KEY_LENGTH,
-        KEY_LOAD,
-        KEY_SHEAR,
-        KEY_MOMENT,
-        KEY_OVERALL_DEPTH_PG_TYPE,  # 'Customized' or 'Optimized'
-        KEY_WEB_THICKNESS_PG,  # list
-        KEY_TOP_FLANGE_THICKNESS_PG,  # list
-        KEY_BOTTOM_FLANGE_THICKNESS_PG,  # list
-        KEY_DESIGN_TYPE_FLEXURE,
-        KEY_BENDING_MOMENT_SHAPE,
-        KEY_TORSIONAL_RES,
-        KEY_WARPING_RES,
-        KEY_MAX_DEFL,
-        KEY_ALLOW_CLASS,
-        KEY_WEB_PHILOSOPHY,
-        KEY_SUPPORT_WIDTH,
-        KEY_IntermediateStiffener,
-        KEY_IntermediateStiffener_spacing,
-        KEY_IntermediateStiffener_thickness,
-        KEY_LongitudnalStiffener,
-        KEY_LongitudnalStiffener_thickness,
-    ]
 
 
 def get_optimization_required_keys() -> List[str]:
@@ -112,88 +84,8 @@ def get_optimization_required_keys() -> List[str]:
 
 
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate type for all values in design dict. Raise error when invalid"""
-    required_keys = get_required_keys()
-    missing_keys = contains_keys(input_values, required_keys)
-    if missing_keys is not None:
-        raise MissingKeyError(missing_keys[0])
-
-    # Validate string keys
-    str_keys = [
-        KEY_MODULE,
-        KEY_MATERIAL,
-        KEY_LOAD,
-        KEY_OVERALL_DEPTH_PG_TYPE,
-        KEY_DESIGN_TYPE_FLEXURE,
-        KEY_BENDING_MOMENT_SHAPE,
-        KEY_TORSIONAL_RES,
-        KEY_WARPING_RES,
-        KEY_MAX_DEFL,
-        KEY_ALLOW_CLASS,
-        KEY_WEB_PHILOSOPHY,
-        KEY_IntermediateStiffener,
-        KEY_IntermediateStiffener_thickness,
-        KEY_LongitudnalStiffener,
-        KEY_LongitudnalStiffener_thickness,
-    ]
-    for key in str_keys:
-        if not isinstance(input_values.get(key), str):
-            raise InvalidInputTypeError(key, "str")
-
-    # Validate numeric keys (as strings that can be converted to float)
-    # Some fields can be "NA" (optional fields)
-    num_keys_required = [
-        KEY_LENGTH,
-        KEY_SHEAR,
-        KEY_MOMENT,
-        KEY_SUPPORT_WIDTH,
-    ]
-    for key in num_keys_required:
-        if not isinstance(input_values.get(key), str) or not float_able(input_values.get(key)):
-            raise InvalidInputTypeError(key, "str where str can be converted to float")
-    
-    # Optional numeric keys that can be "NA"
-    num_keys_optional = [
-        KEY_IntermediateStiffener_spacing,
-    ]
-    for key in num_keys_optional:
-        value = input_values.get(key)
-        if value is not None:
-            if not isinstance(value, str):
-                raise InvalidInputTypeError(key, "str where str can be converted to float or 'NA'")
-            # Allow "NA" or numeric string
-            if value.upper() != "NA" and not float_able(value):
-                raise InvalidInputTypeError(key, "str where str can be converted to float or 'NA'")
-
-    # Validate list keys (for Customized design type)
-    design_type = input_values.get(KEY_OVERALL_DEPTH_PG_TYPE)
-    if design_type == "Customized":
-        # For Customized, we need overall depth and flange widths
-        if KEY_OVERALL_DEPTH_PG not in input_values:
-            raise MissingKeyError(KEY_OVERALL_DEPTH_PG)
-        if not isinstance(input_values.get(KEY_OVERALL_DEPTH_PG), str) or not float_able(input_values.get(KEY_OVERALL_DEPTH_PG)):
-            raise InvalidInputTypeError(KEY_OVERALL_DEPTH_PG, "str where str can be converted to float")
-        
-        if KEY_TOP_Bflange_PG not in input_values:
-            raise MissingKeyError(KEY_TOP_Bflange_PG)
-        if not isinstance(input_values.get(KEY_TOP_Bflange_PG), str) or not float_able(input_values.get(KEY_TOP_Bflange_PG)):
-            raise InvalidInputTypeError(KEY_TOP_Bflange_PG, "str where str can be converted to float")
-        
-        if KEY_BOTTOM_Bflange_PG not in input_values:
-            raise MissingKeyError(KEY_BOTTOM_Bflange_PG)
-        if not isinstance(input_values.get(KEY_BOTTOM_Bflange_PG), str) or not float_able(input_values.get(KEY_BOTTOM_Bflange_PG)):
-            raise InvalidInputTypeError(KEY_BOTTOM_Bflange_PG, "str where str can be converted to float")
-
-    # Validate list types for thickness lists
-    list_keys = [
-        KEY_WEB_THICKNESS_PG,
-        KEY_TOP_FLANGE_THICKNESS_PG,
-        KEY_BOTTOM_FLANGE_THICKNESS_PG,
-    ]
-    for key in list_keys:
-        value = input_values.get(key)
-        if not isinstance(value, list):
-            raise InvalidInputTypeError(key, "List[str]")
+    """Check the design request against the plate girder model. Raise ValidationError when invalid."""
+    PlateGirderInput.validate_request(input_values)
 
 
 def _derive_stiffener_lists(design_dict: Dict[str, Any], input_values: Dict[str, Any]) -> None:

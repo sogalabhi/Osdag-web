@@ -4,11 +4,13 @@ Bridges between API and osdag_core
 """
 from apps.core.utils.api_errors import failure_result
 from .adapter import validate_input, generate_output, create_cad_model
+from .schema import SimplySupportedBeamInput
 import traceback
 
 
 class SimplySupportedBeamService:
     """Service class for Simply-Supported-Beam module"""
+    input_model = SimplySupportedBeamInput
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:

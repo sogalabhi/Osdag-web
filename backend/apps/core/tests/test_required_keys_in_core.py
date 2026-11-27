@@ -42,6 +42,9 @@ SCHEMA_MODELS = {
     "moment_connection__column_column_cover_plate_welded": "ColumnColumnCoverPlateWeldedInput",
     "moment_connection__column_column_end_plate": "ColumnColumnEndPlateInput",
     "base_plate": "BasePlateInput",
+    "flexure_member__simply_supported_beam": "SimplySupportedBeamInput",
+    "flexure_member__on_cantilever": "OnCantileverInput",
+    "flexure_member__plate_girder": "PlateGirderInput",
 }
 
 
