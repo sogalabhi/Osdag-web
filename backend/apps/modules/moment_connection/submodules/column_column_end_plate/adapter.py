@@ -1,7 +1,5 @@
 from apps.core.utils import (
-    validate_arr, validate_num, validate_string,
-    MissingKeyError, InvalidInputTypeError,
-    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
+    InvalidInputTypeError,
     write_stl, build_raw_output_dict
 )
 from ...shared import setup_for_cad  # Use moment_connection shared utilities
@@ -10,42 +8,13 @@ from OCC.Core import BRepTools
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
 from OCC.Core.Message import Message_ProgressRange
-from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
-from OCC.Core.IGESControl import IGESControl_Writer
 from osdag_core.custom_logger import CustomLogger
 from osdag_core.design_type.connection.column_end_plate import ColumnEndPlate
-import sys
 import os
-import typing
 import traceback
 import logging
 import json
-from typing import Dict, Any, List
-from osdag_core.Common import (
-    KEY_AXIAL,
-    KEY_CONN,
-    KEY_CONNECTOR_MATERIAL,
-    KEY_D,
-    KEY_DP_BOLT_HOLE_TYPE,
-    KEY_DP_BOLT_SLIP_FACTOR,
-    KEY_DP_BOLT_TYPE,
-    KEY_DP_DESIGN_METHOD,
-    KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-    KEY_DP_DETAILING_EDGE_TYPE,
-    KEY_DP_DETAILING_GAP,
-    KEY_DP_WELD_FAB,
-    KEY_DP_WELD_MATERIAL_G_O,
-    KEY_GRD,
-    KEY_MATERIAL,
-    KEY_MODULE,
-    KEY_MOMENT,
-    KEY_PLATETHK,
-    KEY_SECSIZE,
-    KEY_SEC_MATERIAL,
-    KEY_SHEAR,
-    KEY_TYP,
-    KEY_WELD_TYPE,
-)
+from typing import Dict, Any
 from apps.core.web_keys import (
     WEB_COLUMNENDPLATE_FLANGETHICKNESS,
     WEB_COLUMNENDPLATE_MIDPITCH,
@@ -70,169 +39,12 @@ logger.addHandler(c_handler)
 logger.addHandler(f_handler)
 
 # Suppress output when necessary
-def get_required_keys() -> List[str]:
-    return [
-        KEY_DP_BOLT_HOLE_TYPE,
-        KEY_D,
-        KEY_GRD,
-        KEY_DP_BOLT_SLIP_FACTOR,
-        KEY_DP_BOLT_TYPE,
-        KEY_TYP,
-        KEY_CONN,
-        KEY_CONNECTOR_MATERIAL,
-        KEY_DP_DESIGN_METHOD,
-        KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-        KEY_DP_DETAILING_EDGE_TYPE,
-        KEY_DP_DETAILING_GAP,
-        KEY_AXIAL,
-        KEY_SHEAR,
-        KEY_MOMENT,
-        KEY_MATERIAL,
-        KEY_SECSIZE,
-        KEY_SEC_MATERIAL,
-        KEY_MODULE,
-        KEY_WELD_TYPE,
-        KEY_PLATETHK,
-    ]
+from .schema import ColumnColumnEndPlateInput
 
 
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate type for all values in design dict. Raise error when invalid"""
-
-    # Check if all required keys exist
-    required_keys = get_required_keys()
-    # Check if input_values contains all required keys.
-    missing_keys = contains_keys(input_values, required_keys)
-    if missing_keys != None:  # If keys are missing.
-        # Raise error for the first missing key.
-        raise MissingKeyError(missing_keys[0])
-
-    # Validate key types one by one:
-
-    # Validate Bolt.Bolt_Hole_Type.
-    if not isinstance(input_values[KEY_DP_BOLT_HOLE_TYPE], str):
-        raise InvalidInputTypeError(KEY_DP_BOLT_HOLE_TYPE, "str")
-
-     # Validate Bolt.Diameter.
-    bolt_diameter = input_values[KEY_D]
-    if (not isinstance(bolt_diameter, list)
-            or not validate_list_type(bolt_diameter, str)
-            or not custom_list_validation(bolt_diameter, int_able)):
-        raise InvalidInputTypeError(
-            KEY_D, "non empty List[str] where all items can be converted to int")
-
-    # Validate Bolt.Grade
-    bolt_grade = input_values[KEY_GRD]
-    if (not isinstance(bolt_grade, list)
-            or not validate_list_type(bolt_grade, str)
-            or not custom_list_validation(bolt_grade, float_able)):
-        raise InvalidInputTypeError(
-            KEY_GRD, "non empty List[str] where all items can be converted to float")
-
-    # Validate Bolt.Slip_Factor
-    bolt_slipfactor = input_values[KEY_DP_BOLT_SLIP_FACTOR]
-    if (not isinstance(bolt_slipfactor, str)
-            or not float_able(bolt_slipfactor)):
-        raise InvalidInputTypeError(
-            KEY_DP_BOLT_SLIP_FACTOR, "str where str can be converted to float")
-
-    # Validate Bolt.TensionType
-    if not isinstance(input_values[KEY_DP_BOLT_TYPE], str):
-        raise InvalidInputTypeError(KEY_DP_BOLT_TYPE, "str")
-
-    # Validate Bolt.Type
-    if not isinstance(input_values[KEY_TYP], str):
-        raise InvalidInputTypeError(KEY_TYP, "str")
-
-    # Validate Connectivity
-    if not isinstance(input_values[KEY_CONN], str):
-        raise InvalidInputTypeError(KEY_CONN, "str")
-
-
-    # Validate Connector.Material
-    if not isinstance(input_values[KEY_CONNECTOR_MATERIAL], str):
-        raise InvalidInputTypeError(KEY_CONNECTOR_MATERIAL, "str")
-
-    # Validate Design.Design_Method
-    if not isinstance(input_values[KEY_DP_DESIGN_METHOD], str):
-        raise InvalidInputTypeError(KEY_DP_DESIGN_METHOD, "str")
-
-    # Validate Detailing.Corrosive_Influences
-    if not is_yes_or_no(input_values[KEY_DP_DETAILING_CORROSIVE_INFLUENCES]):
-        raise InvalidInputTypeError(
-            KEY_DP_DETAILING_CORROSIVE_INFLUENCES, "'Yes' or 'No'")
-
-    # Validate Detailing.Edge_type
-    if not isinstance(input_values[KEY_DP_DETAILING_EDGE_TYPE], str):
-        raise InvalidInputTypeError(KEY_DP_DETAILING_EDGE_TYPE, "str")
-
-    # Validate Detailing.Gap
-    detailing_gap = input_values[KEY_DP_DETAILING_GAP]
-    if (not isinstance(detailing_gap, str)
-            or not int_able(detailing_gap)):
-        raise InvalidInputTypeError(
-            KEY_DP_DETAILING_GAP, "str where str can be converted to int")
-
-    # Validate Load.Axial
-    load_axial = input_values[KEY_AXIAL]
-    if (not isinstance(load_axial, str)
-            or not int_able(load_axial)):
-        raise InvalidInputTypeError(
-            KEY_AXIAL, "str where str can be converted to int")
-
-    # Validate Load.Shear
-    load_shear = input_values[KEY_SHEAR]
-    if (not isinstance(load_shear, str)
-            or not int_able(load_shear)):
-        raise InvalidInputTypeError(
-            KEY_SHEAR, "str where str can be converted to int")
-
-    # Validate Load.Moment
-    load_moment = input_values[KEY_MOMENT]
-    if (not isinstance(load_moment, str)
-            or not int_able(load_moment)):
-        raise InvalidInputTypeError(
-            KEY_MOMENT, "str where str can be converted to int")
-
-    # Validate Material
-    if not isinstance(input_values[KEY_MATERIAL], str):
-        raise InvalidInputTypeError(KEY_MATERIAL, "str")
-
-    # Validate Member.Designation
-    if not isinstance(input_values[KEY_SECSIZE], str):
-        raise InvalidInputTypeError(KEY_SECSIZE, "str")
-
-    # Validate Member.Material
-    if not isinstance(input_values[KEY_SEC_MATERIAL], str):
-        raise InvalidInputTypeError(KEY_SEC_MATERIAL, "str")
-
-    # Validate Module
-    if not isinstance(input_values[KEY_MODULE], str):
-        raise InvalidInputTypeError(KEY_MODULE, "str")
-
-    # Weld.Fab and Weld.Material_Grade_OverWrite are optional: the core neither derives nor reads
-    # them for this module. A saved value is still checked.
-    if KEY_DP_WELD_FAB in input_values and not isinstance(input_values[KEY_DP_WELD_FAB], str):
-        raise InvalidInputTypeError(KEY_DP_WELD_FAB, "str")
-
-    # Validate Weld.Type
-    if not isinstance(input_values[KEY_WELD_TYPE], str):
-        raise InvalidInputTypeError(KEY_WELD_TYPE, "str")
-
-    # Validate Weld.Material_Grade_OverWrite
-    weld_materialgradeoverwrite = input_values.get(KEY_DP_WELD_MATERIAL_G_O, "0")
-    if (not isinstance(weld_materialgradeoverwrite, str)
-            or not int_able(weld_materialgradeoverwrite)):
-        raise InvalidInputTypeError(
-            KEY_DP_WELD_MATERIAL_G_O, "str where str can be converted to int.")
-
-    # Validate Connector.Plate.Thickness_List
-    connector_plate_thicknesslist = input_values[KEY_PLATETHK]
-    if (not isinstance(connector_plate_thicknesslist, list)
-            or not validate_list_type(connector_plate_thicknesslist, str)
-            or not custom_list_validation(connector_plate_thicknesslist, int_able)):
-        raise InvalidInputTypeError(
-            KEY_PLATETHK, "List[str] where all items can be converted to int")
+    """Raise ValidationError naming every bad key. The HTTP request path runs the same model."""
+    ColumnColumnEndPlateInput.validate_request(input_values)
 
 
 def create_module() -> ColumnEndPlate:
