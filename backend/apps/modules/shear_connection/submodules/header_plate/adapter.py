@@ -1,4 +1,4 @@
-from apps.core.utils import build_raw_output_dict
+from apps.core.utils import InvalidInputTypeError, build_raw_output_dict
 from apps.modules.shear_connection.submodules.header_plate.schema import HeaderPlateInput
 from apps.core.utils.errors import DesignFailedError
 from apps.modules.shear_connection import shared as scc

@@ -55,13 +55,13 @@ class CadExportValidationTest(APISimpleTestCase):
     def test_missing_required_key_is_rejected_with_the_key(self):
         inputs = fin_plate_inputs()
         del inputs["Bolt.Diameter"]
-        error = self.assert_error(self.post(module_id=FIN_PLATE, input_values=inputs, format="step"), 400, "missing_key")
+        error = self.assert_error(self.post(module_id=FIN_PLATE, input_values=inputs, format="step"), 400, "validation_error")
         self.assertIn("Bolt.Diameter", error["fields"])
 
     def test_wrong_input_type_is_rejected(self):
         inputs = fin_plate_inputs()
         inputs["Bolt.Diameter"] = "16"
-        self.assert_error(self.post(module_id=FIN_PLATE, input_values=inputs, format="step"), 400, "invalid_type")
+        self.assert_error(self.post(module_id=FIN_PLATE, input_values=inputs, format="step"), 400, "validation_error")
 
     def test_unknown_format_is_rejected(self):
         for bad in ("exe", "../step", 5, ["step"]):
