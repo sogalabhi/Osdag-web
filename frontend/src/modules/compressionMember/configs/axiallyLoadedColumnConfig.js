@@ -325,6 +325,7 @@ export const axiallyLoadedColumnConfig = {
           key: "end_condition_2",
           label: "End 2",
           type: "dynamicSelect",
+          resetsWith: "end_condition_1",
           getOptions: (inputs) =>
             axiallyLoadedColumnConfig.getEnd2Options(inputs.end_condition_1),
         },
@@ -365,6 +366,7 @@ export const axiallyLoadedColumnConfig = {
           key: "end_condition_2_y",
           label: "End 2 (y-y)",
           type: "dynamicSelect",
+          resetsWith: "end_condition_1_y",
           getOptions: (inputs) =>
             axiallyLoadedColumnConfig.getEnd2Options(inputs.end_condition_1_y),
         },
