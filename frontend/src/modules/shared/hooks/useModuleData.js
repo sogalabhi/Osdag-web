@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { MODULE_DATA_LIST_KEYS, API_KEY_MAP } from "../constants/moduleDataKeys";
+import { MODULE_DATA_LIST_KEYS } from "../constants/moduleDataKeys";
 
 const CUSTOM_SECTION_EVENT = "osdag:custom-section-added";
 
@@ -64,9 +64,8 @@ export const useModuleData = (getModuleData, getOutputLayout, designType, option
         const result = await getModuleData(designType);
         if (result && result.success && result.data) {
           const data = result.data || {};
-          const pick = (camel, snake) => data[camel] ?? data[snake] ?? [];
           const next = MODULE_DATA_LIST_KEYS.reduce((acc, camel) => {
-            acc[camel] = pick(camel, API_KEY_MAP[camel]);
+            acc[camel] = data[camel] ?? [];
             return acc;
           }, {});
           setBaseModuleData(next);

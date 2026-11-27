@@ -213,14 +213,6 @@ export const simplySupportedBeamConfig = {
           label: "Material",
           type: "select",
           options: "materialList",
-          onChange: (value, inputs, setInputs, materialList) => {
-            const material = materialList.find(item => item.id === value);
-            setInputs({
-              ...inputs,
-              material: material.Grade,
-              supporting_material: material.Grade,
-            });
-          }
         }
       ]
     },

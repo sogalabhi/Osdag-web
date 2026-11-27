@@ -443,15 +443,6 @@ export const plateGirderConfig = {
           label: "Material",
           type: "select",
           options: "materialList",
-          onChange: (value, inputs, setInputs, materialList) => {
-            const material = materialList.find(item => item.id === value);
-            if (material) {
-              setInputs({
-                ...inputs,
-                material: material.Grade,
-              });
-            }
-          }
         },
         {
           key: "design_type",

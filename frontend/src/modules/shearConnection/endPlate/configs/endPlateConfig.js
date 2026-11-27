@@ -158,16 +158,6 @@ export const endPlateConfig = {
         { key: "beam_section", label: "Beam Section", type: "select", options: "beamList", conditionalDisplay: (extraState) => [CONN_CFBW, CONN_CWBW].includes(extraState?.selectedOption) },
         {
           key: "material", label: "Material", type: "select", options: "materialList",
-          onChange: (value, inputs, setInputs, materialList, setShowModal) => {
-            if (value == -1) {
-              setShowModal(true);
-              return;
-            }
-            const material = materialList.find((item) => item.id === value);
-            if (material) {
-              setInputs({ ...inputs, material: material.Grade, connector_material: material.Grade });
-            }
-          },
         },
       ],
     },

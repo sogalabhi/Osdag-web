@@ -320,14 +320,6 @@ export const strutsBoltedConfig = {
           label: "Material",
           type: "select",
           options: "materialList",
-          onChange: (value, inputs, setInputs, materialList) => {
-            const material = materialList.find(item => item.id === value);
-            setInputs({
-              ...inputs,
-              material: material.Grade,
-              connector_material: material.Grade,
-            });
-          }
         },
         {
           key: "length",

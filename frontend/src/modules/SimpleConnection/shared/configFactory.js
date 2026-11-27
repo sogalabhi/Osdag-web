@@ -107,10 +107,6 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
                         label: "Material",
                         type: "select",
                         options: "materialList",
-                        onChange: (value, inputs, setInputs, materialList) => {
-                            const material = materialList.find(item => item.id === value);
-                            setInputs({ ...inputs, material: material.Grade, connector_material: material.Grade });
-                        }
                     },
                     {
                         key: "plate1_thickness",
@@ -273,10 +269,6 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
                         label: "Material",
                         type: "select",
                         options: "materialList",
-                        onChange: (value, inputs, setInputs, materialList) => {
-                            const material = materialList.find(item => item.id === value);
-                            setInputs({ ...inputs, material: material.Grade, connector_material: material.Grade });
-                        }
                     },
                     ...(hasCoverPlate ? [{
                         key: "cover_plate",

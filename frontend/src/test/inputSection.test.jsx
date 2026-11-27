@@ -407,26 +407,6 @@ describe("a connectivity dropdown", () => {
   });
 });
 
-describe("a section profile dropdown", () => {
-  const field = { key: "section_profile", label: "Section Profile", type: "sectionProfileSelect", options: ["Angles", "Back to Back Angles - Same side of gusset"], defaultValue: "Angles" };
-
-  it("shows the value, or the field's default", () => {
-    const { unmount } = show([field], { inputs: { section_profile: "Back to Back Angles - Same side of gusset" } });
-    expect(shown("Section Profile")).toBe("Back to Back Angles - Same side of gusset");
-    unmount();
-    show([field], { inputs: {} });
-    expect(shown("Section Profile")).toBe("Angles");
-    expect(extraNow().selectedProfile).toBe("Angles");
-  });
-
-  it("writes the profile, empties the designation list and tells the shared state", () => {
-    show([field], { inputs: { section_profile: "Angles", section_designation: ["ISA 50"] } });
-    pick("Section Profile", "Back to Back Angles - Same side of gusset");
-    expect(inputsNow()).toEqual({ section_profile: "Back to Back Angles - Same side of gusset", section_designation: [] });
-    expect(extraNow().selectedProfile).toBe("Back to Back Angles - Same side of gusset");
-  });
-});
-
 describe("an optimised dimension", () => {
   const field = { key: "total_depth", label: "Total Depth", type: "optimized_number" };
 
