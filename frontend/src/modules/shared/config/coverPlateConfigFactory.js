@@ -322,8 +322,7 @@ export function makeCoverPlateWeldedConfig({
       [KEY_WEBPLATE_THICKNESS]: allSelected.web_plate_thickness
         ? lists.thicknessList : inputs.web_plate_thickness,
       [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
-      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: prefText(inputs.detailing_corr_status),
-      [KEY_DP_DETAILING_EDGE_TYPE]: prefText(inputs.detailing_edge_type),
+      // The core's Detailing tab of the welded cover plates is the gap alone.
       [KEY_DP_DETAILING_GAP]: prefText(inputs.detailing_gap),
       [KEY_AXIAL]: inputs.load_axial || "0",
       [KEY_MOMENT]: inputs.load_moment || "0",

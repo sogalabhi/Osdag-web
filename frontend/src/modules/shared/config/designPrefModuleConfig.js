@@ -231,9 +231,7 @@ const DESIGN_PREF_CONFIG = {
       connector_material: inputs.connector_material,
       weld_fab: inputs.weld_fab,
       weld_material_grade: inputs.weld_material_grade ?? inputs.weld_material_grade_overwrite,
-      detailing_edge_type: inputs.detailing_edge_type,
       detailing_gap: inputs.detailing_gap,
-      detailing_corr_status: inputs.detailing_corr_status,
       design_method: inputs.design_method,
     }),
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
@@ -246,9 +244,7 @@ const DESIGN_PREF_CONFIG = {
       connector_material: inputs.connector_material,
       weld_fab: inputs.weld_fab,
       weld_material_grade: inputs.weld_material_grade ?? inputs.weld_material_grade_overwrite,
-      detailing_edge_type: inputs.detailing_edge_type,
       detailing_gap: inputs.detailing_gap,
-      detailing_corr_status: inputs.detailing_corr_status,
       design_method: inputs.design_method,
     }),
     getDefaultPrefs: (_inputs, _module, contextDefaults) => contextDefaults || {},
@@ -320,7 +316,6 @@ const DESIGN_PREF_CONFIG = {
       weld_fab: inputs[KEY_DP_WELD_FAB] ?? inputs.weld_fab,
       weld_material_grade: inputs[KEY_DP_WELD_MATERIAL_G_O] || inputs.weld_material_grade,
       detailing_edge_type: inputs[KEY_DP_DETAILING_EDGE_TYPE] ?? inputs.detailing_edge_type,
-      detailing_gap: inputs.detailing_gap ?? "10", // not in the base plate's core
       detailing_corr_status: inputs[KEY_DP_DETAILING_CORROSIVE_INFLUENCES] ?? inputs.detailing_corr_status,
       design_method: inputs[KEY_DP_DESIGN_METHOD] ?? inputs.design_method,
       // Anchor Bolt OCF
