@@ -305,8 +305,8 @@ export const seatedAngleConfig = {
           key: "topangle_list",
           label: UI_STRINGS.TOPANGLE,
           type: "customizable",
-          selectionKey: "angleListSelect",
-          modalKey: "angleList",
+          selectionKey: "topAngleSelect",
+          modalKey: "topAngle",
           dataSource: "angleList"
         }
       ]

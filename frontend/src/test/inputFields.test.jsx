@@ -292,13 +292,21 @@ describe("the two angle lists of the seated angle connection", () => {
     return { angle: section.fields.find((f) => f.key === "angle_list"), top: section.fields.find((f) => f.key === "topangle_list") };
   };
 
-  it("share one selection state and one dialog", () => {
+  it("each have their own selection state and dialog", () => {
     const { angle, top } = fields();
-    expect(top.selectionKey).toBe(angle.selectionKey);
-    expect(top.modalKey).toBe(angle.modalKey);
+    expect(top.selectionKey).not.toBe(angle.selectionKey);
+    expect(top.modalKey).not.toBe(angle.modalKey);
   });
 
-  it("Customized on the Top Angle also switches the Angle list and opens the dialog of the Angle list", async () => {
+  it("each name a selection state and a dialog the module declares for them", () => {
+    const { angle, top } = fields();
+    for (const field of [angle, top]) {
+      expect(seatedAngleConfig.selectionConfig.find((item) => item.key === field.selectionKey)?.inputKey).toBe(field.key);
+      expect(seatedAngleConfig.modalConfig.find((item) => item.key === field.modalKey)?.inputKey).toBe(field.key);
+    }
+  });
+
+  it("Customized on the Top Angle leaves the Angle list on All and opens only its own dialog", async () => {
     const { angle, top } = fields();
     const spies = { updateSelectionState: vi.fn(), updateModalState: vi.fn() };
     await show(seatedAngleConfig, "topangle_list", { inputs: { angle_list: ANGLES, topangle_list: ANGLES }, spies });
@@ -306,8 +314,18 @@ describe("the two angle lists of the seated angle connection", () => {
     expect(shown(top.label)).toBe("All");
     pick(top.label, "Customized");
     expect(shown(top.label)).toBe("Customized");
+    expect(shown(angle.label)).toBe("All");
+    expect(spies.updateSelectionState).toHaveBeenCalledWith("topAngleSelect", "Customized");
+    expect(spies.updateSelectionState).not.toHaveBeenCalledWith("angleListSelect", expect.anything());
+    expect(spies.updateModalState).toHaveBeenCalledWith("topAngle", true);
+    expect(spies.updateModalState).not.toHaveBeenCalledWith("angleList", expect.anything());
+  });
+
+  it("Customized on the Angle list leaves the Top Angle on All", async () => {
+    const { angle, top } = fields();
+    await show(seatedAngleConfig, "angle_list", { inputs: { angle_list: ANGLES, topangle_list: ANGLES } });
+    pick(angle.label, "Customized");
     expect(shown(angle.label)).toBe("Customized");
-    expect(spies.updateSelectionState).toHaveBeenCalledWith("angleListSelect", "Customized");
-    expect(spies.updateModalState).toHaveBeenCalledWith("angleList", true);
+    expect(shown(top.label)).toBe("All");
   });
 });
