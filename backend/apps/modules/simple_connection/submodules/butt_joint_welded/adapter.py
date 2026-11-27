@@ -1,7 +1,7 @@
 """
 Adapter for Butt Joint Welded module
 """
-from typing import Dict, Any, List
+from typing import Dict, Any
 import os
 import json
 import traceback
@@ -14,24 +14,15 @@ from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
 from osdag_core.Common import (
-    KEY_AXIAL,
-    KEY_COVER_PLATE,
-    KEY_DESIGN_FOR,
     KEY_DISP_BUTTJOINTWELDED,
     KEY_DP_WELD_FAB,
     KEY_DP_WELD_MATERIAL_G_O,
     KEY_DP_WELD_TYPE,
-    KEY_MATERIAL,
-    KEY_MODULE,
     KEY_OUT_BOLT_CONN_LEN,
     KEY_OUT_WELD_LENGTH_EFF,
     KEY_OUT_WELD_SIZE,
     KEY_OUT_WELD_STRENGTH,
     KEY_OUT_WELD_TYPE,
-    KEY_PLATE1_THICKNESS,
-    KEY_PLATE2_THICKNESS,
-    KEY_PLATE_WIDTH,
-    KEY_WELD_SIZE,
 )
 from osdag_core.custom_logger import CustomLogger
 from apps.core.utils import (
@@ -40,41 +31,22 @@ from apps.core.utils import (
     build_raw_output_dict
 )
 from ...shared import setup_for_cad
-from ...shared_validation import create_welded_validator
-
-def get_required_keys() -> List[str]:
-    return [
-        KEY_MODULE,
-        KEY_MATERIAL,
-        KEY_AXIAL,
-        KEY_PLATE1_THICKNESS,
-        KEY_PLATE2_THICKNESS,
-        KEY_PLATE_WIDTH,
-        KEY_COVER_PLATE,
-        KEY_WELD_SIZE,
-        KEY_DP_WELD_MATERIAL_G_O,
-        KEY_DP_WELD_FAB,
-        KEY_DESIGN_FOR,
-    ]
-
-# Create shared validator instance
-_validator = create_welded_validator(get_required_keys(), "ButtJointWelded")
+from ...schema import normalise_numeric_inputs
+from .schema import ButtJointWeldedInput
 
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate required inputs for ButtJointWelded using shared validator."""
+    """Fill the weld material, fabrication and type when empty, then raise ValidationError naming every bad key."""
     iv = dict(input_values or {})
-    # Provide legacy defaults for weld metadata if omitted by caller or empty string
     if not iv.get(KEY_DP_WELD_MATERIAL_G_O) or iv.get(KEY_DP_WELD_MATERIAL_G_O, "").strip() == "":
         iv[KEY_DP_WELD_MATERIAL_G_O] = "410"
     if not iv.get(KEY_DP_WELD_FAB) or iv.get(KEY_DP_WELD_FAB, "").strip() == "":
         iv[KEY_DP_WELD_FAB] = "Shop Weld"
     if not iv.get(KEY_DP_WELD_TYPE) or iv.get(KEY_DP_WELD_TYPE, "").strip() == "":
         iv[KEY_DP_WELD_TYPE] = iv.get(KEY_DP_WELD_FAB, "Shop Weld")
-    # Persist defaults back to caller dict so downstream set_input_values sees them
+    # Downstream code reads the defaults from the caller's dict.
     input_values.update(iv)
-    # Use shared validator for validation
-    _validator.validate(input_values)
-
+    normalise_numeric_inputs(input_values)
+    ButtJointWeldedInput.validate_request(input_values)
 
 def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     """Generate output from input values"""
