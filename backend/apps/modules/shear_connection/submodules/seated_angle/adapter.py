@@ -1,9 +1,5 @@
-from apps.core.utils import (
-    validate_arr, validate_num, validate_string,
-    MissingKeyError, InvalidInputTypeError,
-    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
-    build_raw_output_dict
-)
+from apps.core.utils import build_raw_output_dict
+from apps.modules.shear_connection.submodules.seated_angle.schema import SeatedAngleInput
 from apps.modules.shear_connection import shared as scc
 from OCC.Core import BRepTools
 from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
@@ -11,30 +7,8 @@ from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.Message import Message_ProgressRange
 from osdag_core.cad.common_logic import CommonDesignLogic
 from osdag_core.Common import (
-    KEY_ANGLE_LIST,
     KEY_CONN,
-    KEY_CONNECTOR_MATERIAL,
-    KEY_D,
     KEY_DISP_SEATED_ANGLE,
-    KEY_DP_BOLT_HOLE_TYPE,
-    KEY_DP_BOLT_SLIP_FACTOR,
-    KEY_DP_BOLT_TYPE,
-    KEY_DP_DESIGN_METHOD,
-    KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-    KEY_DP_DETAILING_EDGE_TYPE,
-    KEY_DP_DETAILING_GAP,
-    KEY_DP_WELD_FAB,
-    KEY_DP_WELD_MATERIAL_G_O,
-    KEY_GRD,
-    KEY_MATERIAL,
-    KEY_MODULE,
-    KEY_SHEAR,
-    KEY_SUPTDSEC,
-    KEY_SUPTDSEC_MATERIAL,
-    KEY_SUPTNGSEC,
-    KEY_SUPTNGSEC_MATERIAL,
-    KEY_TOPANGLE,
-    KEY_TYP,
 )
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
@@ -51,179 +25,10 @@ try:
 except Exception:
     HAS_GLB = False
 
-def get_required_keys_seated_angle() -> List[str]:
-    return [
-        KEY_DP_BOLT_HOLE_TYPE,
-        KEY_D,
-        KEY_GRD,
-        KEY_DP_BOLT_SLIP_FACTOR,
-        KEY_DP_BOLT_TYPE,
-        KEY_TYP,
-        KEY_CONN,
-        KEY_CONNECTOR_MATERIAL,
-        KEY_DP_DESIGN_METHOD,
-        KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-        KEY_DP_DETAILING_EDGE_TYPE,
-        KEY_DP_DETAILING_GAP,
-        KEY_SHEAR,
-        KEY_MATERIAL,
-        KEY_SUPTDSEC,
-        KEY_SUPTDSEC_MATERIAL,
-        KEY_SUPTNGSEC,
-        KEY_SUPTNGSEC_MATERIAL,
-        KEY_MODULE,
-        KEY_ANGLE_LIST,
-        KEY_TOPANGLE
-    ]
+def validate_input(input_values: Dict[str, Any]) -> None:
+    """Raise ValidationError naming every bad key. The HTTP request path runs the same model."""
+    SeatedAngleInput.validate_request(input_values)
 
-def validate_input(input_values: Dict[str,Any])-> None:
-    #check iif all required keys exist 
-    required_keys = get_required_keys_seated_angle()
-    # check if input_values contains all required keys
-    missing_keys = contains_keys(input_values, required_keys)
-    if missing_keys != None: #if keys are missing.
-        #Raise error for the first missinf key.
-        raise MissingKeyError(missing_keys[0])
-    
-    #check if Seated.Angle_Type is a string.
-    if not isinstance(input_values[KEY_DP_BOLT_HOLE_TYPE],str):
-        #if not raise an error
-        raise InvalidInputTypeError(KEY_DP_BOLT_HOLE_TYPE)
-    
-    #validate Bolt Diameter
-    bolt_diameter =input_values[KEY_D]
-    if (not isinstance(bolt_diameter,list)
-        or not validate_list_type(bolt_diameter,str)
-        or not custom_list_validation(bolt_diameter, int_able)):
-        raise InvalidInputTypeError(
-            KEY_D,"non empty List[str] where all items can be converted to int"
-        )
-        
-    # validate seated grade
-    bolt_grade = input_values[KEY_GRD]
-    if(not isinstance(bolt_grade,list)
-        or not validate_list_type(bolt_grade,str)
-        or not custom_list_validation(bolt_grade,float_able)):
-        
-        #if any condition fail raise an error
-        raise InvalidInputTypeError(
-            KEY_GRD, "non empty List[str] where all items can be converted to float"
-        )
-    
-    #Validate seated.Slip_Factor
-    bolt_slipfactor = input_values[KEY_DP_BOLT_SLIP_FACTOR]
-    if (not isinstance(bolt_slipfactor,str)
-        or not float_able(bolt_slipfactor)):
-        raise InvalidInputTypeError(
-            KEY_DP_BOLT_SLIP_FACTOR, "str where str can be converted to float"
-        )
-        
-    #Validate seated.TensionType
-    if not isinstance(input_values[KEY_DP_BOLT_TYPE], str):
-        # If not, raise error.
-        raise InvalidInputTypeError(KEY_DP_BOLT_TYPE, "str")
-    
-    #Validate seated.Type
-    if not isinstance(input_values[KEY_TYP], str):
-        raise InvalidInputTypeError(KEY_TYP, "str")  # If not, raise error.
-
-    # validate connectivity
-    if not isinstance(input_values[KEY_CONN], str):
-        # If not, raise error.
-        raise InvalidInputTypeError(KEY_CONN, "str")
-
-    #Validate Connector Material
-    if not isinstance(input_values[KEY_CONNECTOR_MATERIAL], str):
-        # If not, raise error.
-        raise InvalidInputTypeError(KEY_CONNECTOR_MATERIAL, "str")
-
-    # Validate Design.Design_Method
-    # Check if Design.Design_Method is a string.
-    if not isinstance(input_values[KEY_DP_DESIGN_METHOD], str):
-        # If not, raise error.
-        raise InvalidInputTypeError(KEY_DP_DESIGN_METHOD, "str")
-
-    # Validate Detailing.Corrosive_Influences
-    # Check if Detailing.Corrosive_Influences is 'Yes' or 'No'.
-    if not is_yes_or_no(input_values[KEY_DP_DETAILING_CORROSIVE_INFLUENCES]):
-        # If not, raise error.
-        raise InvalidInputTypeError(
-            KEY_DP_DETAILING_CORROSIVE_INFLUENCES, "'Yes' or 'No'")
-
-    # Validate Detailing.Edge_type
-    # Check if Detailing.Edge_type is a string.
-    if not isinstance(input_values[KEY_DP_DETAILING_EDGE_TYPE], str):
-        # If not, raise error.
-        raise InvalidInputTypeError(KEY_DP_DETAILING_EDGE_TYPE, "str")
-
-    # Validate Detailing.Gap
-    detailing_gap = input_values[KEY_DP_DETAILING_GAP]
-    if (not isinstance(detailing_gap, str)  # Check if Detailing.Gap is a string.
-            or not int_able(detailing_gap)):  # Check if Detailing.Gap can be converted to int.
-        # If any of these conditions fail, raise error.
-        raise InvalidInputTypeError(
-            KEY_DP_DETAILING_GAP, "str where str can be converted to int")
-
-    
-    # Validate Load.Shear
-    load_shear = input_values[KEY_SHEAR]
-    if (not isinstance(load_shear, str)  # Check if Load.Shear is a string.
-            or not int_able(load_shear)):  # Check if Load.Shear can be converted to int.
-        # If any of these conditions fail, raise error.
-        raise InvalidInputTypeError(
-            KEY_SHEAR, "str where str can be converted to int")
-
-    # Validate Material
-    # Check if Material is a string.
-    if not isinstance(input_values[KEY_MATERIAL], str):
-        raise InvalidInputTypeError(KEY_MATERIAL, "str")  # If not, raise error.
-
-    # Validate Member.Supported_Section.Designation
-    # Check if Member.Supported_Section.Designation is a string.
-    if not isinstance(input_values[KEY_SUPTDSEC], str):
-        # If not, raise error.
-        raise InvalidInputTypeError(
-            KEY_SUPTDSEC, "str")
-
-    # Validate Member.Supported_Section.Material
-    # Check if Member.Supported_Section.Material is a string.
-    if not isinstance(input_values[KEY_SUPTDSEC_MATERIAL], str):
-        # If not, raise error.
-        raise InvalidInputTypeError(KEY_SUPTDSEC_MATERIAL, "str")
-
-    # Validate Member.Supporting_Section.Designation
-    # Check if Member.Supporting_Section.Designation is a string.
-    if not isinstance(input_values[KEY_SUPTNGSEC], str):
-        # If not, raise error.
-        raise InvalidInputTypeError(
-            KEY_SUPTNGSEC, "str")
-
-    # Validate Member.Supporting_Section.Material
-    # Check if Member.Supporting_Section.Material is a string.
-    if not isinstance(input_values[KEY_SUPTNGSEC_MATERIAL], str):
-        # If not, raise error.
-        raise InvalidInputTypeError(
-            KEY_SUPTNGSEC_MATERIAL, "str")
-
-    # Validate Module
-    # Check if Module is a string.
-    if not isinstance(input_values[KEY_MODULE], str):
-        raise InvalidInputTypeError(KEY_MODULE, "str")  # If not, raise error.
-
-    # Validate Weld.Fab
-    # Check if Weld.Fab is a string.
-    # Weld.Fab and Weld.Material_Grade_OverWrite are optional: the core neither derives nor reads
-    # them for this module. A saved value is still checked.
-    if KEY_DP_WELD_FAB in input_values and not isinstance(input_values[KEY_DP_WELD_FAB], str):
-        raise InvalidInputTypeError(KEY_DP_WELD_FAB, "str")  # If not, raise error.
-
-    # Validate Weld.Material_Grade_OverWrite
-    weld_materialgradeoverwrite = input_values.get(KEY_DP_WELD_MATERIAL_G_O, "0")
-    if (not isinstance(weld_materialgradeoverwrite, str)  # Check if Weld.Material_Grade_OverwWite is a string.
-            or not int_able(weld_materialgradeoverwrite)):  # Check if Weld.Material_Grade_OverWrite can be converted to int.
-        # If any of these conditions fail, raise error.
-        raise InvalidInputTypeError(
-            KEY_DP_WELD_MATERIAL_G_O, "str where str can be converted to int.")
 
 def create_module() -> SeatedAngleConnection:
     """Create an instance of the FinPlateConnection module design class and set it up for use"""

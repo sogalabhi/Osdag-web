@@ -5,6 +5,7 @@ End Plate Service - Business logic layer
 from osdag_core.design_type.connection.header_plate_connection import HeaderPlateConnection
 from apps.core.utils.api_errors import failure_result
 from .adapter import validate_input, generate_output, create_cad_model
+from .schema import HeaderPlateInput
 from osdag_core.Common import (
     KEY_CONN,
     KEY_MODULE,
@@ -17,6 +18,9 @@ from osdag_core.Common import (
 
 class EndPlateService:
     """Service class for End Plate Connection module"""
+
+    # The design view validates the request with this before it enqueues the task.
+    input_model = HeaderPlateInput
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:
