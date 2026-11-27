@@ -147,6 +147,7 @@ def handle_design_request(
 from rest_framework.response import Response
 from rest_framework import status
 from apps.core.tasks import run_design_calculation_task, run_report_generation_task
+from apps.core.design_dictionary import fill_request_prefs
 from apps.core.osdag_overrides import unknown_material_error, user_id_from_request
 from apps.core.utils.api_errors import error_response
 
@@ -169,6 +170,12 @@ def trigger_async_design(module_name: str, submodule_slug: str, ServiceClass, re
     inputs = request.data.get('inputs', request.data)
     project_id = request.data.get('project_id')
     user_id = user_id_from_request(request)
+
+    # A bad request is a 400 here, with every bad key in `fields`, not a failed task later.
+    input_model = getattr(ServiceClass, 'input_model', None)
+    if input_model is not None:
+        # The task fills the Additional Inputs the request lacks before it validates; so do we.
+        input_model.validate_request(fill_request_prefs(inputs))
 
     material_error = _unknown_material_response(inputs, user_id)
     if material_error:
