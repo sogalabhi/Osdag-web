@@ -473,7 +473,15 @@ export const InputSection = ({
                 setShowCustomMaterialModal(true);
                 return;
               }
-              setInputs({ ...safeInputs, [field.key]: selected.value });
+              const nextInputs = { ...safeInputs, [field.key]: selected.value };
+              // A dynamic dropdown that names this field in `resetsWith` takes the first option of its
+              // new list whenever the user picks a value here.
+              section.fields.forEach((dependent) => {
+                if (dependent.type !== 'dynamicSelect' || dependent.resetsWith !== field.key) return;
+                const values = getOptionsForField(dependent, safeContextData, nextInputs).map((o) => (o && typeof o === 'object' ? o.value : o));
+                nextInputs[dependent.key] = values.length > 0 ? values[0] : '';
+              });
+              setInputs(nextInputs);
             }}
             menuPortalTarget={document.body}
             styles={customSelectStyles}

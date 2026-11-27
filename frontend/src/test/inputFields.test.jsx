@@ -212,9 +212,15 @@ describe("a dynamic dropdown", () => {
     expect(sentEnds(inputsNow())).toEqual({ end1, end2: expectedEnd2 });
   });
 
-  it("keeps an End 2 that is still allowed", async () => {
+  it("takes the first option of the new list when the user changes End 1, even if End 2 is still allowed", async () => {
     await show(axiallyLoadedColumnConfig, "end_condition_2", { ...ends, inputs: { end_condition_1: "Fixed", end_condition_2: "Hinged" } });
     pick("End 1", "Roller");
+    expect(shown("End 2")).toBe("Fixed");
+    expect(sentEnds(inputsNow())).toEqual({ end1: "Roller", end2: "Fixed" });
+  });
+
+  it("keeps a loaded End 2 that is valid for its End 1", async () => {
+    await show(axiallyLoadedColumnConfig, "end_condition_2", { ...ends, inputs: { end_condition_1: "Roller", end_condition_2: "Hinged" } });
     expect(shown("End 2")).toBe("Hinged");
     expect(inputsNow().end_condition_2).toBe("Hinged");
   });
