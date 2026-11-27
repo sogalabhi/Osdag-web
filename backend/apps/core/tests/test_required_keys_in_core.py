@@ -30,6 +30,10 @@ SCHEMA_MODELS = {
     "compression_member__struts_bolted": "BoltedStrutInput",
     "compression_member__struts_welded": "WeldedStrutInput",
     "compression_member__axially_loaded_column": "AxiallyLoadedColumnInput",
+    "simple_connection__butt_joint_bolted": "ButtJointBoltedInput",
+    "simple_connection__butt_joint_welded": "ButtJointWeldedInput",
+    "simple_connection__lap_joint_bolted": "LapJointBoltedInput",
+    "simple_connection__lap_joint_welded": "LapJointWeldedInput",
 }
 
 

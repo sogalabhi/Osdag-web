@@ -1,7 +1,7 @@
 """
 Adapter for Lap Joint Bolted module
 """
-from typing import Dict, Any, List
+from typing import Dict, Any
 import os
 import json
 import traceback
@@ -15,15 +15,8 @@ from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Core.BRep import BRep_Builder
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
 from osdag_core.Common import (
-    KEY_AXIAL,
-    KEY_D,
     KEY_DESIGN_FOR,
     KEY_DISP_LAPJOINTBOLTED,
-    KEY_DP_BOLT_HOLE_TYPE,
-    KEY_DP_BOLT_SLIP_FACTOR,
-    KEY_GRD,
-    KEY_MATERIAL,
-    KEY_MODULE,
     KEY_OUT_BASE_METAL_CAPACITY,
     KEY_OUT_BASE_METAL_UTILIZATION,
     KEY_OUT_BOLT_BEARING,
@@ -41,10 +34,7 @@ from osdag_core.Common import (
     KEY_OUT_ROW_PROVIDED,
     KEY_OUT_TOT_NO_BOLTS,
     KEY_OUT_TYP_PROVIDED,
-    KEY_PLATE1_THICKNESS,
-    KEY_PLATE2_THICKNESS,
     KEY_PLATE_WIDTH,
-    KEY_TYP,
     KEY_UTILIZATION_RATIO,
 )
 from osdag_core.custom_logger import CustomLogger
@@ -54,7 +44,8 @@ from apps.core.utils import (
     build_raw_output_dict
 )
 from ...shared import setup_for_cad
-from ...shared_validation import create_bolted_validator
+from ...schema import normalise_numeric_inputs
+from .schema import LapJointBoltedInput
 from apps.core.web_keys import (
     WEB_BOLT_COLUMNS_PROVIDED,
     WEB_BOLT_CONNECTION_LENGTH,
@@ -66,28 +57,10 @@ from apps.core.web_keys import (
     WEB_UTILIZATION_RATIO,
 )
 
-def get_required_keys() -> List[str]:
-    return [
-        KEY_MODULE,
-        KEY_MATERIAL,
-        KEY_AXIAL,
-        KEY_PLATE1_THICKNESS,
-        KEY_PLATE2_THICKNESS,
-        KEY_PLATE_WIDTH,
-        KEY_D,
-        KEY_GRD,
-        KEY_TYP,
-        KEY_DP_BOLT_HOLE_TYPE,
-        KEY_DP_BOLT_SLIP_FACTOR,
-        KEY_DESIGN_FOR,
-    ]
-
-# Create shared validator instance
-_validator = create_bolted_validator(get_required_keys(), "LapJointBolted")
-
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate input values using shared validator"""
-    _validator.validate(input_values)
+    """Raise ValidationError naming every bad key. The HTTP request path runs the same model."""
+    normalise_numeric_inputs(input_values)
+    LapJointBoltedInput.validate_request(input_values)
 
 def generate_output(input_values: Dict[str, Any]) -> Dict[str, Any]:
     """Generate output from input values"""

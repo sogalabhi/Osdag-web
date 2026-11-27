@@ -4,6 +4,7 @@ Service for Butt Joint Welded
 from osdag_core.Common import KEY_DISP_BUTTJOINTWELDED
 from apps.core.utils.api_errors import failure_result
 from .adapter import validate_input, generate_output, create_cad_model
+from .schema import ButtJointWeldedInput
 import traceback
 
 
@@ -11,6 +12,9 @@ MODULE_ID = KEY_DISP_BUTTJOINTWELDED
 
 
 class Service:
+    # The design view validates the request with this before it enqueues the task.
+    input_model = ButtJointWeldedInput
+
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:
         try:
