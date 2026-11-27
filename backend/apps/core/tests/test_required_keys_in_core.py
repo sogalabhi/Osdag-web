@@ -34,6 +34,14 @@ SCHEMA_MODELS = {
     "simple_connection__butt_joint_welded": "ButtJointWeldedInput",
     "simple_connection__lap_joint_bolted": "LapJointBoltedInput",
     "simple_connection__lap_joint_welded": "LapJointWeldedInput",
+    "moment_connection__beam_beam_cover_plate_bolted": "BeamBeamCoverPlateBoltedInput",
+    "moment_connection__beam_beam_cover_plate_welded": "BeamBeamCoverPlateWeldedInput",
+    "moment_connection__beam_beam_end_plate": "BeamBeamEndPlateInput",
+    "moment_connection__beam_column_end_plate": "BeamColumnEndPlateInput",
+    "moment_connection__column_column_cover_plate_bolted": "ColumnColumnCoverPlateBoltedInput",
+    "moment_connection__column_column_cover_plate_welded": "ColumnColumnCoverPlateWeldedInput",
+    "moment_connection__column_column_end_plate": "ColumnColumnEndPlateInput",
+    "base_plate": "BasePlateInput",
 }
 
 

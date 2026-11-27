@@ -1,12 +1,8 @@
 """
 Api for Column Cover Plate Welded Connection module
 Functions:
-    get_required_keys() -> List[str]:
-        Return all required input parameters for the module.
     validate_input(input_values: Dict[str, Any]) -> None:
-        Go through all the input parameters.
-        Check if all required parameters are given.
-        Check if all parameters are of correct data type.
+        Check that all required parameters are given and of the correct data type.
     create_module() -> ColumnCoverPlateWeld:
         Create an instance of the column cover plate welded connection module design class and set it up for use
     create_from_input(input_values: Dict[str, Any]) -> ColumnCoverPlateWeld
@@ -18,42 +14,20 @@ Functions:
 """
 
 from apps.core.utils import (
-    validate_arr, validate_num, validate_string,
-    MissingKeyError, InvalidInputTypeError,
-    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
+    InvalidInputTypeError,
     write_stl, build_raw_output_dict,
 )
 
 from ...shared import setup_for_cad  # Use moment_connection shared utilities
 from OCC.Core import BRepTools
-from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
-from OCC.Core.IGESControl import IGESControl_Writer
 from OCC.Core.Message import Message_ProgressRange
 from osdag_core.cad.common_logic import CommonDesignLogic
 from osdag_core.design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
-import sys
 import os
-import typing
-from typing import Dict, Any, List
+from typing import Dict, Any
 import traceback
 from osdag_core.Common import (
-    KEY_AXIAL,
-    KEY_CONNECTOR_MATERIAL,
-    KEY_DP_DESIGN_METHOD,
-    KEY_DP_DETAILING_GAP,
-    KEY_DP_WELD_FAB,
-    KEY_DP_WELD_MATERIAL_G_O,
-    KEY_FLANGEPLATE_PREFERENCES,
-    KEY_FLANGEPLATE_THICKNESS,
-    KEY_MATERIAL,
-    KEY_MODULE,
-    KEY_MOMENT,
     KEY_OUT_WELD_STRENGTH_RED,
-    KEY_SECSIZE,
-    KEY_SEC_MATERIAL,
-    KEY_SHEAR,
-    KEY_WEBPLATE_THICKNESS,
-    KEY_WELD_TYPE,
 )
 from apps.core.web_keys import (
     WEB_FLANGE_WELD_REDUCTION,
@@ -61,102 +35,12 @@ from apps.core.web_keys import (
     WEB_WEB_WELD_REDUCTION,
     WEB_WEB_WELD_STRENGTH_RED,
 )
-
-def get_required_keys() -> List[str]:
-    return [
-        KEY_MODULE,
-        KEY_SECSIZE,  
-        KEY_SEC_MATERIAL,
-        KEY_MATERIAL,
-        KEY_MOMENT,
-        KEY_SHEAR, 
-        KEY_AXIAL,
-        KEY_WELD_TYPE,
-        KEY_DP_WELD_FAB,
-        KEY_DP_WELD_MATERIAL_G_O,
-        KEY_DP_DESIGN_METHOD,
-        KEY_DP_DETAILING_GAP,
-        KEY_CONNECTOR_MATERIAL,
-        KEY_FLANGEPLATE_PREFERENCES, 
-        KEY_FLANGEPLATE_THICKNESS,
-        KEY_WEBPLATE_THICKNESS
-    ]
+from .schema import ColumnColumnCoverPlateWeldedInput
 
 
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate type for all values in design dict. Raise error when invalid"""
-    try:
-        required_keys = get_required_keys()
-        
-        # Filter out UI-specific keys that are not required by the backend module
-        filtered_input = {k: v for k, v in input_values.items() if k != "out_titles_status"}
-        
-        missing_keys = contains_keys(filtered_input, required_keys)
-        if missing_keys != None:
-            raise MissingKeyError(f"Required key '{missing_keys[0]}' is missing from input")
-
-        # Validate string fields
-        string_fields = [
-            KEY_MODULE,
-            KEY_SECSIZE,
-            KEY_SEC_MATERIAL,
-            KEY_MATERIAL,
-            KEY_WELD_TYPE,
-            KEY_DP_WELD_FAB, 
-            KEY_DP_DESIGN_METHOD,
-            KEY_CONNECTOR_MATERIAL,
-            KEY_FLANGEPLATE_PREFERENCES
-        ]
-        for key in string_fields:
-            if key in filtered_input and not isinstance(filtered_input[key], str):
-                raise InvalidInputTypeError(
-                    f"Field '{key}' must be a string, got {type(filtered_input[key]).__name__}"
-                )
-
-        # Validate numeric fields
-        numeric_fields = [
-            KEY_MOMENT,
-            KEY_SHEAR,
-            KEY_AXIAL,
-            KEY_DP_WELD_MATERIAL_G_O,
-            KEY_DP_DETAILING_GAP
-        ]
-        for key in numeric_fields:
-            if key in filtered_input:
-                value = filtered_input[key]
-                if not isinstance(value, str) or not float_able(value):
-                    raise InvalidInputTypeError(
-                        f"Field '{key}' must be a string that can be converted to float, got '{value}'"
-                    )
-                # Additional numeric validation
-                float_val = float(value)
-                if key == KEY_DP_DETAILING_GAP and float_val < 0:
-                    raise ValueError(f"Gap value must be non-negative, got {float_val}")
-
-        # Validate plate thickness lists
-        thickness_lists = [
-            KEY_FLANGEPLATE_THICKNESS,
-            KEY_WEBPLATE_THICKNESS
-        ]
-        for key in thickness_lists:
-            if key in filtered_input:
-                thickness = filtered_input[key]
-                if not isinstance(thickness, list):
-                    raise InvalidInputTypeError(
-                        f"Field '{key}' must be a list, got {type(thickness).__name__}"
-                    )
-                if not validate_list_type(thickness, str):
-                    raise InvalidInputTypeError(
-                        f"All items in '{key}' must be strings"
-                    )
-                if not custom_list_validation(thickness, float_able):
-                    invalid_items = [x for x in thickness if not float_able(x)]
-                    raise InvalidInputTypeError(
-                        f"All items in '{key}' must be convertible to float. Invalid items: {invalid_items}"
-                    )
-
-    except Exception as e:
-        raise type(e)(f"Input validation failed: {str(e)}")
+    """Raise ValidationError naming every bad key. The HTTP request path runs the same model."""
+    ColumnColumnCoverPlateWeldedInput.validate_request(input_values)
 
 
 def create_module() -> ColumnCoverPlateWeld:

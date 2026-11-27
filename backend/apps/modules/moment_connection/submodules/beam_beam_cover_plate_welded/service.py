@@ -3,10 +3,14 @@ Cover Plate Welded Service - Business logic layer
 Bridges between API and osdag_core
 """
 from .adapter import validate_input, generate_output, create_cad_model
+from .schema import BeamBeamCoverPlateWeldedInput
 
 
 class CoverPlateWeldedService:
     """Service class for Cover Plate Welded Connection module"""
+
+    # The design view validates the request with this before it enqueues the task.
+    input_model = BeamBeamCoverPlateWeldedInput
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:

@@ -3,10 +3,14 @@ Column End Plate Service - Business logic layer
 Bridges between API and osdag_core
 """
 from .adapter import validate_input, generate_output, create_cad_model
+from .schema import ColumnColumnEndPlateInput
 
 
 class ColumnEndPlateService:
     """Service class for Column End Plate Connection module"""
+
+    # The design view validates the request with this before it enqueues the task.
+    input_model = ColumnColumnEndPlateInput
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:

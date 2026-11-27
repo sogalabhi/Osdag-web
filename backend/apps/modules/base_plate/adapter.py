@@ -4,9 +4,7 @@ Maps web API payload to osdag_core BasePlateConnection keys and back.
 """
 from apps.core import catalog
 from apps.core.utils import (
-    validate_arr, validate_num, validate_string,
-    MissingKeyError, InvalidInputTypeError, InvalidInputError,
-    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
+    InvalidInputTypeError, InvalidInputError,
     write_stl, build_raw_output_dict,
 )
 from osdag_core.design_type.connection.base_plate_connection import BasePlateConnection
@@ -46,7 +44,6 @@ from osdag_core.Common import (
     KEY_GRD_ANCHOR_OCF,
     KEY_GRD_FOOTING,
     KEY_MATERIAL,
-    KEY_MODULE,
     KEY_MOMENT,
     KEY_MOMENT_MAJOR,
     KEY_MOMENT_MINOR,
@@ -61,7 +58,6 @@ from osdag_core.Common import (
 )
 from OCC.Core import BRepTools
 from OCC.Core.Message import Message_ProgressRange
-import sys
 import os
 from typing import Dict, Any, List
 import traceback
@@ -80,54 +76,12 @@ HOLLOW_CONNECTIVITY = 'Hollow/Tubular Column Base'
 HOLLOW_SECTION_TABLES = ('RHS', 'SHS', 'CHS')
 
 # Core expects these key names (from osdag_core.Common / base_plate_connection.set_input_values)
-
-
-def get_required_keys() -> List[str]:
-    """Return required input parameters matching desktop Base Plate input dock only."""
-    return [
-        KEY_MODULE,
-        KEY_CONN,
-        KEY_END_CONDITION,
-        KEY_SECSIZE,
-        KEY_MATERIAL,
-        KEY_AXIAL,
-        KEY_AXIAL_TENSION_BP,
-        KEY_SHEAR_MAJOR,
-        KEY_SHEAR_MINOR,
-        KEY_MOMENT_MAJOR,
-        KEY_MOMENT_MINOR,
-    ]
+from .schema import BasePlateInput
 
 
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate type for values; only keys present in desktop Base Plate input dock."""
-    required_keys = get_required_keys()
-    missing_keys = contains_keys(input_values, required_keys)
-    if missing_keys is not None:
-        raise MissingKeyError(missing_keys[0])
-
-    str_keys = [KEY_MODULE, KEY_MATERIAL, KEY_CONN, KEY_END_CONDITION]
-    for key in str_keys:
-        if not isinstance(input_values.get(key), str):
-            raise InvalidInputTypeError(key, "str")
-
-    load_keys = [
-        KEY_AXIAL, KEY_AXIAL_TENSION_BP,
-        KEY_SHEAR_MAJOR, KEY_SHEAR_MINOR,
-        KEY_MOMENT_MAJOR, KEY_MOMENT_MINOR,
-    ]
-    for key in load_keys:
-        val = input_values.get(key)
-        if val is not None and val != "":
-            if not isinstance(val, str) or not float_able(val):
-                raise InvalidInputTypeError(key, "str (number)")
-
-    member_designation = input_values.get(KEY_SECSIZE)
-    if isinstance(member_designation, list):
-        if not validate_list_type(member_designation, str):
-            raise InvalidInputTypeError(KEY_SECSIZE, "List[str]")
-    elif not isinstance(member_designation, str):
-        raise InvalidInputTypeError(KEY_SECSIZE, "str or List[str]")
+    """Raise ValidationError naming every bad key. The HTTP request path runs the same model."""
+    BasePlateInput.validate_request(input_values)
 
 
 def create_module() -> BasePlateConnection:

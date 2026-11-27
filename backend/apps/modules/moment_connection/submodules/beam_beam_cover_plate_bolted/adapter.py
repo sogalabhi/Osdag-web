@@ -8,18 +8,15 @@ from OCC.Core.Message import Message_ProgressRange
 from osdag_core.cad.common_logic import CommonDesignLogic
 # Will log a lot of unnessecary data.
 from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
-import sys
 import os
-from typing import Dict, Any, List
+from typing import Dict, Any
 import traceback
-
-def get_required_keys() -> List[str]:
-    return mc_shared.COVER_PLATE_BOLTED_REQUIRED_KEYS
+from .schema import BeamBeamCoverPlateBoltedInput
 
 
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate type for all values in design dict. Raise error when invalid"""
-    mc_shared.validate_cover_plate_bolted_input(input_values)
+    """Raise ValidationError naming every bad key. The HTTP request path runs the same model."""
+    BeamBeamCoverPlateBoltedInput.validate_request(input_values)
 
 
 def create_module() -> BeamCoverPlate:
@@ -89,7 +86,6 @@ def create_cad_model(input_values: Dict[str, Any], section: str, session: str, e
         if section == "Model":
             from OCC.Core.TopoDS import TopoDS_Compound
             from OCC.Core.BRep import BRep_Builder
-            import json
 
             builder = BRep_Builder()
             compound = TopoDS_Compound()
