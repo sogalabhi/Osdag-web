@@ -20,7 +20,7 @@ Functions:
     create_cad_model(input_values: Dict[str, Any], section: str, session: str) -> str:
         Generate the CAD model from input values as a BREP file. Return file path.
 """
-from apps.core.utils import build_raw_output_dict
+from apps.core.utils import InvalidInputTypeError, build_raw_output_dict
 from apps.modules.shear_connection.submodules.fin_plate.schema import FinPlateInput
 from apps.modules.shear_connection import shared as scc
 from OCC.Core import BRepTools

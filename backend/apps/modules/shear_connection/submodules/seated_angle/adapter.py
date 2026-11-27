@@ -1,4 +1,4 @@
-from apps.core.utils import build_raw_output_dict
+from apps.core.utils import InvalidInputTypeError, build_raw_output_dict
 from apps.modules.shear_connection.submodules.seated_angle.schema import SeatedAngleInput
 from apps.modules.shear_connection import shared as scc
 from OCC.Core import BRepTools
