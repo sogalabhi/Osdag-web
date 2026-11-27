@@ -27,6 +27,9 @@ SCHEMA_MODELS = {
     "shear_connection__header_plate": "HeaderPlateInput",
     "shear_connection__cleat_angle": "CleatAngleInput",
     "shear_connection__seated_angle": "SeatedAngleInput",
+    "compression_member__struts_bolted": "BoltedStrutInput",
+    "compression_member__struts_welded": "WeldedStrutInput",
+    "compression_member__axially_loaded_column": "AxiallyLoadedColumnInput",
 }
 
 

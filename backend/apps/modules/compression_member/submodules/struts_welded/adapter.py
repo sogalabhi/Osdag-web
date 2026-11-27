@@ -4,26 +4,15 @@ Implements the business logic for compression member welded design
 """
 # Module identifier for CommonDesignLogic (used for CAD generation)
 
+from apps.modules.compression_member.submodules.struts_welded.schema import WeldedStrutInput
 from osdag_core.Common import (
-    KEY_AXIAL,
-    KEY_CONNECTOR_MATERIAL,
     KEY_DISP_STRUT_WELDED_END_GUSSET,
-    KEY_DP_DESIGN_METHOD,
-    KEY_END1,
-    KEY_END2,
-    KEY_LENGTH,
-    KEY_LOCATION,
-    KEY_MATERIAL,
-    KEY_MODULE,
     KEY_PLATETHK,
     KEY_SECSIZE,
-    KEY_SEC_MATERIAL,
-    KEY_SEC_PROFILE,
 )
 from apps.core.utils import (
     validate_arr, validate_num, validate_string,
-    MissingKeyError, InvalidInputTypeError,
-    contains_keys, custom_list_validation, float_able, int_able, is_yes_or_no, validate_list_type,
+    InvalidInputTypeError,
     write_stl, build_raw_output_dict
 )
 from OCC.Core import BRepTools
@@ -37,104 +26,13 @@ from osdag_core.design_type.compression_member.compression_welded import Compres
 import sys
 import os
 import typing
-from typing import Dict, Any, List
+from typing import Dict, Any
 import json
 import traceback
 
-def get_required_keys() -> List[str]:
-    """Return all required input parameters for the module."""
-    return [
-        KEY_SEC_PROFILE,
-        KEY_SECSIZE,
-        KEY_MATERIAL,
-        KEY_SEC_MATERIAL,
-        KEY_PLATETHK,
-        KEY_DP_DESIGN_METHOD,
-        KEY_AXIAL,
-        KEY_LENGTH,
-        KEY_LOCATION,
-        KEY_END1,
-        KEY_END2,
-        KEY_MODULE
-    ]
-
-
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate type for all values in design dict. Raise error when invalid"""
-    required_keys = get_required_keys()
-    missing_keys = contains_keys(input_values, required_keys)
-    if missing_keys is not None:
-        raise MissingKeyError(missing_keys[0])
-
-    # Connector.Material is optional: the welded strut core neither derives nor reads it. A saved
-    # value is still checked.
-    if KEY_CONNECTOR_MATERIAL in input_values and not isinstance(input_values[KEY_CONNECTOR_MATERIAL], str):
-        raise InvalidInputTypeError(KEY_CONNECTOR_MATERIAL, "str")
-
-    # Validate Design.Design_Method
-    if not isinstance(input_values[KEY_DP_DESIGN_METHOD], str):
-        raise InvalidInputTypeError(KEY_DP_DESIGN_METHOD, "str")
-
-    # Validate Load.Axial
-    load_axial = input_values[KEY_AXIAL]
-    if (not isinstance(load_axial, str)
-            or not int_able(load_axial)):
-        raise InvalidInputTypeError(KEY_AXIAL, "str where str can be converted to int")
-
-    # Validate Material
-    if not isinstance(input_values[KEY_MATERIAL], str):
-        raise InvalidInputTypeError(KEY_MATERIAL, "str")
-
-    # Validate Member.Profile
-    if not isinstance(input_values[KEY_SEC_PROFILE], str):
-        raise InvalidInputTypeError(KEY_SEC_PROFILE, "str")
-
-    # Validate Member.Designation
-    member_designation = input_values.get(KEY_SECSIZE)
-    if isinstance(member_designation, list):
-        if not validate_list_type(member_designation, str):
-            raise InvalidInputTypeError(KEY_SECSIZE, "non-empty List[str]")
-        stripped = [str(x).strip() for x in member_designation if str(x).strip() != ""]
-        if not stripped:
-            raise InvalidInputTypeError(KEY_SECSIZE, "non-empty List[str]")
-    elif isinstance(member_designation, str):
-        s = member_designation.strip()
-        if not s or s.lower() == "all":
-            raise InvalidInputTypeError(
-                KEY_SECSIZE,
-                "non-empty str (single section) or non-empty List[str]",
-            )
-    else:
-        raise InvalidInputTypeError(KEY_SECSIZE, "str or List[str]")
-
-    # Validate Member.Length
-    if not isinstance(input_values[KEY_LENGTH], str):
-        raise InvalidInputTypeError(KEY_LENGTH, "str")
-
-    # Validate Conn_Location
-    if not isinstance(input_values[KEY_LOCATION], str):
-        raise InvalidInputTypeError(KEY_LOCATION, "str")
-
-    # Validate End Conditions
-    if not isinstance(input_values[KEY_END1], str):
-        raise InvalidInputTypeError(KEY_END1, "str")
-    if not isinstance(input_values[KEY_END2], str):
-        raise InvalidInputTypeError(KEY_END2, "str")
-
-    # Validate Module
-    if not isinstance(input_values[KEY_MODULE], str):
-        raise InvalidInputTypeError(KEY_MODULE, "str")
-
-    # Validate Connector.Plate.Thickness_List: the gusset thickness of the Optimization tab, one text value
-    # (the core's combobox); a list of such values is also accepted and its first one is used.
-    gusset_thickness = input_values[KEY_PLATETHK]
-    if isinstance(gusset_thickness, str):
-        if not int_able(gusset_thickness):
-            raise InvalidInputTypeError(KEY_PLATETHK, "str that can be converted to int")
-    elif (not isinstance(gusset_thickness, list)
-            or not validate_list_type(gusset_thickness, str)
-            or not custom_list_validation(gusset_thickness, int_able)):
-        raise InvalidInputTypeError(KEY_PLATETHK, "str or List[str] where all items can be converted to int")
+    """Raise ValidationError naming every bad key. The HTTP request path runs the same model."""
+    WeldedStrutInput.validate_request(input_values)
 
 
 def create_module() -> Compression_welded:
