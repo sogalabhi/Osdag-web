@@ -10,6 +10,10 @@ const SIMPLE_CONNECTION_MODULES = [
   "Lap Joint Welded",
 ];
 
+// The core's Detailing tab of the welded cover plates is the gap alone, and that of the base plate has no gap.
+const GAP_ONLY_MODULES = ["Beam Cover Plate Welded Connection", "Column Cover Plate Welded Connection"];
+const NO_GAP_MODULES = ["Base Plate"];
+
 const DetailingSectionModal = ({
   module,
   designPrefInputs,
@@ -21,12 +25,16 @@ const DetailingSectionModal = ({
 This gap should include the tolerance value of 5mm or 1.5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5mm {tolerance} or if the assumed clearance is 1.5mm, then the gap should be = 3mm (= 1.5mm {clearance} + 1.5mm {tolerance}. These are the default gap values based on the site practice for convenience of erection and IS 7215,Clause 2.3.1. The gap value can also be zero based on the nature of connection where clearance is not required.
 
 Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3`;
+  const gapOnly = GAP_ONLY_MODULES.includes(module);
+  const showGap = module && !SIMPLE_CONNECTION_MODULES.includes(module) && !NO_GAP_MODULES.includes(module);
+  const showCorrosive = module && !SIMPLE_CONNECTION_MODULES.includes(module) && !gapOnly;
   return (
     <>
       <div className="Connector-col-beam-cont">
         <div>
           <h4>Inputs</h4>
           <div className="sub-container">
+            {!gapOnly && (
             <div className="input-cont">
               <h5>Edge Preparation Method</h5>
               <div>
@@ -50,6 +58,7 @@ Specifying whether the members are exposed to corrosive influences, here, only a
                 </Select>
               </div>
             </div>
+            )}
             {module === "Butt Joint Welded" && (
               <div className="input-cont">
                 <h5>{KEY_DISP_DP_DETAILING_PACKING_PLATE}</h5>
@@ -71,8 +80,7 @@ Specifying whether the members are exposed to corrosive influences, here, only a
                 </div>
               </div>
             )}
-            {module && !SIMPLE_CONNECTION_MODULES.includes(module) && (
-              <>
+            {showGap && (
                 <div className="input-cont">
                   <h5>Gap Between Beam And Support (mm) </h5>
                   <div>
@@ -120,6 +128,8 @@ Specifying whether the members are exposed to corrosive influences, here, only a
                     />
                   </div>
                 </div>
+            )}
+            {showCorrosive && (
                 <div className="input-cont">
                   <h5>Are the Member Exposed to Corrosive influences?</h5>
                   <div>
@@ -143,7 +153,6 @@ Specifying whether the members are exposed to corrosive influences, here, only a
                     </Select>
                   </div>
                 </div>
-              </>
             )}
           </div>
         </div>

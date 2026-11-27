@@ -146,14 +146,8 @@ const webKeys = ({ Tab, keys }, sessionName) => {
  * `coreOnly` keys it lists that the web does not show. Everything else agrees. A module whose core class has no
  * tab of that name at all is not compared here (see prefTabsMatchCore.test.js).
  */
-const CORE_DETAILING_GAP_ONLY = { webOnly: [KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_DP_DETAILING_EDGE_TYPE], coreOnly: [] };
-const KNOWN_DIFFERENCES = {
-  // The core's Detailing tab of the welded cover plates is the gap alone; the web shows the bolted cover plates' tab.
-  "beam-beam cover plate welded|Detailing": CORE_DETAILING_GAP_ONLY,
-  "column-column cover plate welded|Detailing": CORE_DETAILING_GAP_ONLY,
-  // The core's Detailing tab of the base plate has no gap row.
-  "base plate|Detailing": { webOnly: [KEY_DP_DETAILING_GAP], coreOnly: [] },
-};
+// No module differs today: a new difference fails the test, and so does listing one that was fixed.
+const KNOWN_DIFFERENCES = {};
 
 /**
  * The plate girder's own tabs (Design is compared above). Each row label stands for one core key; the rows the
