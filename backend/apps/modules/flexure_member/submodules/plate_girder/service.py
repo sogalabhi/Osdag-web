@@ -6,11 +6,13 @@ from apps.core.utils.api_errors import failure_result
 from .adapter import validate_input, generate_output, create_cad_model, create_from_input
 from apps.core import catalog
 from apps.core.models import CustomMaterials
+from .schema import PlateGirderInput
 import traceback
 
 
 class PlateGirderService:
     """Service class for Plate Girder module"""
+    input_model = PlateGirderInput
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:

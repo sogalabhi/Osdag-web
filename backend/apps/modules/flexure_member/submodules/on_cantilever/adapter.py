@@ -6,57 +6,27 @@ Uses Flexure_Cantilever from osdag_core.
 from osdag_core.Common import (
     KEY_ALLOW_CLASS,
     KEY_BEARING_LENGTH,
-    KEY_DESIGN_TYPE_FLEXURE,
     KEY_DISP_FLEXURE2,
     KEY_DP_DESIGN_METHOD,
     KEY_EFFECTIVE_AREA_PARA,
-    KEY_LENGTH,
     KEY_LENGTH_OVERWRITE,
     KEY_LOAD,
-    KEY_MATERIAL,
-    KEY_MODULE,
-    KEY_MOMENT,
-    KEY_SECSIZE,
-    KEY_SEC_MATERIAL,
-    KEY_SEC_PROFILE,
-    KEY_SHEAR,
-    KEY_SUPPORT_TYPE,
-    KEY_SUPPORT_TYPE2,
 )
 from apps.core.utils import (
-    MissingKeyError, InvalidInputTypeError, InvalidInputError,
-    contains_keys, build_raw_output_dict,
+    InvalidInputTypeError, InvalidInputError,
+    build_raw_output_dict,
 )
 from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
 from apps.modules.flexure_member import shared as fm_shared
+from .schema import OnCantileverInput
 import json
 import traceback
-from typing import Dict, Any, List
-
-
-def get_required_keys() -> List[str]:
-    """Return all required input parameters for the module."""
-    return [
-        KEY_MODULE,
-        KEY_SEC_PROFILE,
-        KEY_SECSIZE,
-        KEY_MATERIAL,
-        KEY_SEC_MATERIAL,
-        KEY_DESIGN_TYPE_FLEXURE,  # support type
-        KEY_SUPPORT_TYPE,  # support restraint
-        KEY_SUPPORT_TYPE2,  # top restraint
-        KEY_LENGTH,
-        KEY_SHEAR,
-        KEY_MOMENT,
-    ]
+from typing import Dict, Any
 
 
 def validate_input(input_values: Dict[str, Any]) -> None:
-    """Validate presence of required keys."""
-    required_keys = get_required_keys()
-    missing_keys = contains_keys(input_values, required_keys)
-    if missing_keys is not None:
-        raise MissingKeyError(missing_keys[0])
+    """Check the design request against the cantilever beam model. Raise ValidationError when invalid."""
+    OnCantileverInput.validate_request(input_values)
 
 
 def _create_cantilever_module() -> Flexure_Cantilever:

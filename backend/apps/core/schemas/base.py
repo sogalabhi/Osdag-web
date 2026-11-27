@@ -13,6 +13,8 @@ retyped here::
         bolt_diameter: IntStrList = Field(alias=KEY_D)                  # required
         gap: IntStr = Field(default="0", alias=KEY_DP_DETAILING_GAP)    # optional, checked if sent
 
+A validator that finds a key required only under some condition raises ``PydanticCustomError("conditionally_missing", ...)``, which is reported like a missing required key.
+
 ``MyInput.validate_request(inputs)`` raises ``ValidationError`` (the shared 400 body, one
 ``fields`` entry per bad key) and ``MyInput.required_keys()`` lists the required keys.
 """
@@ -68,13 +70,15 @@ class DesignInput(BaseModel):
     @classmethod
     def _field_errors(cls, exc: PydanticValidationError, inputs: Any) -> List[Dict[str, str]]:
         required = set(cls.required_keys())
+        aliases = {name: f.alias for name, f in cls.model_fields.items()}
         errors: Dict[str, str] = {}
         for err in exc.errors():
             key = str(err["loc"][0]) if err["loc"] else "non_field_errors"
+            key = aliases.get(key, key)
             if key in errors:
                 continue
             empty = isinstance(inputs, dict) and inputs.get(key) in _EMPTY
-            if key in required and (err["type"] == "missing" or empty):
+            if err["type"] == "conditionally_missing" or (key in required and (err["type"] == "missing" or empty)):
                 errors[key] = f"Please specify {key} in input values."
             elif err["loc"][1:]:
                 errors[key] = f"Item {err['loc'][1]} of {key}: {err['msg']}."
