@@ -22,6 +22,13 @@ REQUIRED_KEYS_FUNCTION = {
     "shear_connection__seated_angle": "get_required_keys_seated_angle",
 }
 
+# Adapters that validate with a Pydantic model: the model's name in the adapter.
+SCHEMA_MODELS = {
+    "tension_member__bolted": "BoltedTensionInput",
+    "tension_member__welded": "WeldedTensionInput",
+}
+
+
 def adapter_slug(adapter_file: Path) -> str:
     """apps/modules/<family>/submodules/<sub>/adapter.py -> '<family>__<sub>';
     apps/modules/<family>/adapter.py -> '<family>'."""
@@ -47,7 +54,10 @@ def test_core_constants_were_collected():
 @pytest.mark.parametrize("slug", ADAPTER_SLUGS)
 def test_required_keys_are_core_keys(slug):
     adapter = importlib.import_module(adapter_import_path(slug))
-    required = getattr(adapter, REQUIRED_KEYS_FUNCTION.get(slug, "get_required_keys"))()
+    if slug in SCHEMA_MODELS:
+        required = getattr(adapter, SCHEMA_MODELS[slug]).required_keys()
+    else:
+        required = getattr(adapter, REQUIRED_KEYS_FUNCTION.get(slug, "get_required_keys"))()
 
     missing = sorted(k for k in required if k not in CORE_VALUES)
     assert not missing, f"{slug}: required keys that are not Common.py values: {missing}"

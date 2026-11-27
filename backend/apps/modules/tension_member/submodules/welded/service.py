@@ -4,11 +4,15 @@ Bridges between API and osdag_core
 """
 from apps.core.utils.api_errors import failure_result
 from .adapter import validate_input, generate_output, create_cad_model
+from .schema import WeldedTensionInput
 import traceback
 
 
 class WeldedTensionMemberService:
     """Service class for the welded tension member module"""
+
+    # The design view validates the request with this before it enqueues the task.
+    input_model = WeldedTensionInput
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:
