@@ -3,10 +3,14 @@ Cleat Angle Service - Business logic layer
 """
 from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
 from .adapter import validate_input, generate_output, create_cad_model
+from .schema import CleatAngleInput
 
 
 class CleatAngleService:
     """Service class for Cleat Angle Connection module"""
+
+    # The design view validates the request with this before it enqueues the task.
+    input_model = CleatAngleInput
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:

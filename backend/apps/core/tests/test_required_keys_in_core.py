@@ -17,15 +17,16 @@ MODULES_DIR = BACKEND_DIR / "apps" / "modules"
 CORE_VALUES = {v for k, v in vars(Common).items() if not k.startswith("_") and isinstance(v, str)}
 
 # Adapters whose required-keys function is not called get_required_keys.
-REQUIRED_KEYS_FUNCTION = {
-    "shear_connection__cleat_angle": "get_required_keys_cleat_angle",
-    "shear_connection__seated_angle": "get_required_keys_seated_angle",
-}
+REQUIRED_KEYS_FUNCTION = {}
 
 # Adapters that validate with a Pydantic model: the model's name in the adapter.
 SCHEMA_MODELS = {
     "tension_member__bolted": "BoltedTensionInput",
     "tension_member__welded": "WeldedTensionInput",
+    "shear_connection__fin_plate": "FinPlateInput",
+    "shear_connection__header_plate": "HeaderPlateInput",
+    "shear_connection__cleat_angle": "CleatAngleInput",
+    "shear_connection__seated_angle": "SeatedAngleInput",
 }
 
 

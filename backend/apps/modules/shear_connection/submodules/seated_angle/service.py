@@ -3,10 +3,14 @@ Seated Angle Service - Business logic layer
 """
 from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
 from .adapter import validate_input, generate_output, create_cad_model
+from .schema import SeatedAngleInput
 
 
 class SeatedAngleService:
     """Service class for Seated Angle Connection module"""
+
+    # The design view validates the request with this before it enqueues the task.
+    input_model = SeatedAngleInput
     
     @staticmethod
     def calculate(inputs: dict, request=None, project_id=None, user_email=None) -> dict:
