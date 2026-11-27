@@ -2,9 +2,8 @@
 Pydantic base class and field types for design requests.
 
 One model per module says which keys the request must carry and what type each has. The
-field types accept exactly what the helpers in ``apps.core.utils.validation`` accept, so a
-model never rejects a request the old hand-written ``validate_input()`` took (nor takes one
-it rejected). Values stay strings on the wire; the models only check, they do not convert.
+field types accept what the helpers in ``apps.core.utils.validation`` accept. Values stay
+strings on the wire; the models only check, they do not convert.
 
 Declare a field with the core's key constant as its alias, so the key string is never
 retyped here::
@@ -38,7 +37,7 @@ def _check(test, expected):
 
 # A required key sent as "", None or [] counts as missing (as ``contains_keys`` did).
 Text = Annotated[StrictStr, Field(min_length=1)]
-# Required with any non-empty value: the old validator only checked that the key was there.
+# Required with any non-empty value; the type is not checked.
 Present = Annotated[Any, AfterValidator(_check(lambda v: v not in _EMPTY, "specified"))]
 IntStr = Annotated[StrictStr, AfterValidator(_check(int_able, "a string that can be converted to int"))]
 FloatStr = Annotated[StrictStr, AfterValidator(_check(float_able, "a string that can be converted to float"))]
