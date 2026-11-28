@@ -45,8 +45,8 @@ const BEAM_COLUMN_END_PLATE_IMAGES = {
  * `imageSource(extraState, inputs)` of a connectivity field: the picture of the selected
  * connectivity, the "not selected" picture for an unknown one, nothing before a choice exists.
  */
-export const connectivityImage = (extraState) => {
-  const selected = extraState?.selectedOption;
+export const connectivityImage = (extraState, inputs) => {
+  const selected = inputs?.connectivity;
   if (!selected) return null;
   return CONNECTIVITY_IMAGES[selected] || ErrorImg;
 };
@@ -56,7 +56,7 @@ export const connectivityImage = (extraState) => {
  * the picture for the connectivity and the end plate type, else the picture of the type alone.
  */
 export const beamColumnEndPlateImage = (extraState, inputs) => {
-  const selected = extraState?.selectedOption;
+  const selected = inputs?.endPlateType;
   if (!selected) return null;
   const connectivity = inputs?.connectivity;
   return (
@@ -70,8 +70,8 @@ export const beamColumnEndPlateImage = (extraState, inputs) => {
  * `imageSource(extraState, inputs)` of the end plate type field of the beam-to-beam end plate:
  * the picture of the selected end plate type.
  */
-export const endPlateTypeImage = (extraState) => {
-  const selected = extraState?.selectedOption;
+export const endPlateTypeImage = (extraState, inputs) => {
+  const selected = inputs?.endPlateType;
   if (!selected) return null;
   return END_PLATE_TYPE_IMAGES[selected] || ErrorImg;
 };

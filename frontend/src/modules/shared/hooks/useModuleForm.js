@@ -1,13 +1,4 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import {
-  KEY_DISP_FINPLATE,
-  KEY_DISP_CLEATANGLE,
-  KEY_DISP_SEATED_ANGLE,
-  KEY_DISP_HEADERPLATE,
-  KEY_DISP_BB_EP_SPLICE,
-  KEY_DISP_BCENDPLATE,
-  CONN_CFBW,
-} from "../../../constants/generated/coreKeys";
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { optionText } from "../utils/fieldOptionUtils";
 import { loadStateFromOsi } from "../utils/osiLoader";
@@ -57,20 +48,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     if (typeof moduleConfig.getInitialExtraState === "function") {
       return moduleConfig.getInitialExtraState();
     }
-    if (moduleConfig.cameraKey === KEY_DISP_FINPLATE) {
-      return { selectedOption: CONN_CFBW };
-    } else if (moduleConfig.cameraKey === KEY_DISP_CLEATANGLE) {
-      return { selectedOption: CONN_CFBW };
-    } else if (moduleConfig.cameraKey === KEY_DISP_SEATED_ANGLE) {
-      return { selectedOption: CONN_CFBW };
-    } else if (moduleConfig.cameraKey === KEY_DISP_HEADERPLATE) {
-      return { selectedOption: CONN_CFBW };
-    } else if (moduleConfig.cameraKey === KEY_DISP_BB_EP_SPLICE) {
-      return { selectedOption: "Flushed - Reversible Moment" };
-    } else if (moduleConfig.cameraKey === KEY_DISP_BCENDPLATE) {
-      return { selectedOption: "Flushed - Reversible Moment" };
-    }
-    return { selectedOption: CONN_CFBW };
+    return {};
   };
 
   const [extraState, setExtraState] = useState(resolveInitialExtraState());

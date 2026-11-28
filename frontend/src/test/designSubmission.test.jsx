@@ -69,7 +69,7 @@ const setup = (service, { module = finPlate, projectId = null } = {}) => {
     const state = caseState(module, "customized", module.connectivities?.[0]);
     // the end plate modules ask the user to pick the type of the plate; the page's first option stands in
     const plateType = (module.config.inputSections || []).flatMap((section) => section.fields || []).find((f) => f.type === "endPlateSelect");
-    const picked = plateType ? { [plateType.key]: formExtraState.selectedOption } : {};
+    const picked = plateType ? { [plateType.key]: plateType.options[0] } : {};
     return view.result.current.submitDesign({
       inputs: { ...state.inputs, ...picked },
       selectionStates: Object.fromEntries((module.config.selectionConfig || []).map((s) => [s.key, "Customized"])),

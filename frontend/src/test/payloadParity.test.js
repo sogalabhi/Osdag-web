@@ -33,7 +33,7 @@ describe("payload parity: buildSubmissionParams on the default inputs", () => {
           let inputs = { ...config.defaultInputs, ...(module.fill || {}) };
           if (connectivity) inputs[module.connectivityKey || "connectivity"] = connectivity;
           if (selection === "customized") inputs = { ...inputs, ...(module.custom || {}) };
-          const payload = config.buildSubmissionParams(inputs, allSelected, LISTS, initialExtraState(config, connectivity));
+          const payload = config.buildSubmissionParams(inputs, allSelected, LISTS, initialExtraState(config));
           expect(wire(payload)).toMatchSnapshot();
         });
       }

@@ -26,7 +26,6 @@ function UnifiedDropdownMenu({
   setSelectedItems = () => { },
   logs,
   triggerScreenshotCapture,
-  selectedOption = null,
   boltDiameterList = [],
   propertyClassList = [],
   thicknessList = [],
@@ -251,7 +250,7 @@ function UnifiedDropdownMenu({
         const guard = canOpenAdditionalInputs(
           mod,
           inputs,
-          { selectedOption },
+          {},
           contextData,
           selectionStates
         );

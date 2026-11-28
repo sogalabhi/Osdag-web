@@ -98,9 +98,6 @@ export const validateFormFields = (moduleConfig, inputs, extraState, selectionSt
 
       const label = stripRequiredMark(field.label)?.trim() || field.key;
       let value = inputs?.[field.key];
-      if (effectiveType === 'connectivitySelect' || effectiveType === 'endPlateSelect') {
-        value = extraState?.selectedOption || value;
-      }
 
       if (effectiveType === 'customizable') {
         // Shown without a required mark, so it may be left blank.

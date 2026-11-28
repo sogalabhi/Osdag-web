@@ -272,15 +272,6 @@ describe("opening", () => {
     ]);
   });
 
-  it("calls the two sections of a beam-to-beam connection primary and secondary beam", async () => {
-    open({ selectedOption: "Beam-Beam" });
-    await ready();
-    expect(screen.getAllByTestId("pref-tab").map((tab) => tab.textContent).slice(0, 2)).toEqual([
-      "Primary Beam*",
-      "Secondary Beam*",
-    ]);
-  });
-
   it("does not sync again while nothing it depends on changes", async () => {
     const { withInputs } = open();
     await ready();

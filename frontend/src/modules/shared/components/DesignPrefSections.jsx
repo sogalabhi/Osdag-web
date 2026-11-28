@@ -58,7 +58,6 @@ const DesignPrefSections = ({
   setInputs,
   designPrefOverrides = {},
   setDesignPrefOverrides,
-  selectedOption = null,
   setDesignPrefModalStatus,
   setConfirmationModal,
   confirmationModal,
@@ -478,12 +477,7 @@ const DesignPrefSections = ({
               disabled={syncLoading}
               style={prefErrors.some((error) => error.tabId === item.id) ? { color: "#c62828" } : undefined}
             >
-              {selectedOption === "Beam-Beam" &&
-              (item.name === "Column Section*" || item.name == "Beam Section*")
-                ? item.name === "Column Section*"
-                  ? "Primary Beam*"
-                  : "Secondary Beam*"
-                : item.name}
+              {item.name}
             </button>
           ))}
         </div>

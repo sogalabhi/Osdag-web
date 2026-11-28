@@ -158,7 +158,7 @@ export const useEngineeringModule = (moduleConfig) => {
     moduleData
   );
 
-  useDependentData(getDesignPreferences, moduleConfig, inputs, extraState);
+  useDependentData(getDesignPreferences, moduleConfig, inputs);
 
   const resetToDefaultState = () => {
     resetModuleState();

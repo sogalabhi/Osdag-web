@@ -111,12 +111,12 @@ export const cleatAngleConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     // Matches the connectivitySelect widget's own options[0] visual
     // fallback (InputSection.jsx), derived from the live list rather than
     // a hardcoded literal that could drift out of sync with the backend's
     // actual option order.
-    const connectivity = extraState?.selectedOption || inputs.connectivity || lists?.connectivityList?.[0];
+    const connectivity = inputs.connectivity || lists?.connectivityList?.[0];
     // Common parameters
     const baseParams = {
       [KEY_DP_BOLT_HOLE_TYPE]: inputs.bolt_hole_type,
@@ -167,8 +167,7 @@ export const cleatAngleConfig = {
           label: UI_STRINGS.CONNECTIVITY,
           type: "connectivitySelect",
           imageSource: connectivityImage,
-          onChange: (value, { inputs, setInputs, extraState, setExtraState }) => {
-            setExtraState({ ...extraState, selectedOption: value });
+          onChange: (value, { inputs, setInputs }) => {
             setInputs({ ...inputs, connectivity: value });
           }
         },
@@ -177,8 +176,8 @@ export const cleatAngleConfig = {
           label: UI_STRINGS.COLUMN_SECTION,
           type: "select",
           options: "columnList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
+          conditionalDisplay: (extraState, inputs) => {
+            const connectivity = inputs?.connectivity;
             return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
@@ -187,8 +186,8 @@ export const cleatAngleConfig = {
           label: UI_STRINGS.BEAM_SECTION, 
           type: "select",
           options: "beamList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
+          conditionalDisplay: (extraState, inputs) => {
+            const connectivity = inputs?.connectivity;
             return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
@@ -197,8 +196,8 @@ export const cleatAngleConfig = {
           label: UI_STRINGS.PRIMARY_BEAM,
           type: "select", 
           options: "beamList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
+          conditionalDisplay: (extraState, inputs) => {
+            const connectivity = inputs?.connectivity;
             return connectivity === "Beam-Beam";
           }
         },
@@ -207,8 +206,8 @@ export const cleatAngleConfig = {
           label: UI_STRINGS.SECONDARY_BEAM,
           type: "select",
           options: "beamList", 
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
+          conditionalDisplay: (extraState, inputs) => {
+            const connectivity = inputs?.connectivity;
             return connectivity === "Beam-Beam";
           }
         },

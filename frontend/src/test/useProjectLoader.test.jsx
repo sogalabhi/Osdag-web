@@ -145,7 +145,7 @@ describe("useProjectLoader opening a project", () => {
     expect(view.service.getProject).toHaveBeenCalledTimes(1);
     expect(view.service.getProject).toHaveBeenCalledWith("5", expect.objectContaining({ signal: expect.any(AbortSignal) }));
     expect(view.result.current.inputs).toMatchObject({ load_shear: "222", bolt_diameter: ["12", "16"] });
-    expect(view.result.current.extraState.selectedOption).toBe("Column Web-Beam Web");
+    expect(view.result.current.inputs.connectivity).toBe("Column Web-Beam Web");
     expect(view.spies.loadSavedOutputs).toHaveBeenCalledWith(OUTPUTS);
     expect(view.spies.resetCalls).not.toHaveBeenCalled();
   });
@@ -333,7 +333,7 @@ describe("useProjectLoader leaving a project", () => {
     view.change({ projectId: undefined });
     await waitFor(() => expect(view.spies.resetCalls).toHaveBeenCalledTimes(1));
     expect(view.result.current.inputs).toMatchObject({ material: finPlate.defaultInputs.material, load_shear: finPlate.defaultInputs.load_shear });
-    expect(view.result.current.extraState.selectedOption).toBe("Column Flange-Beam Web");
+    expect(view.result.current.inputs.connectivity).toBe("Column Flange-Beam Web");
   });
 
   it("then keeps the form again: the next change of auth or lists does not reset it", async () => {

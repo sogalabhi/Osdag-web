@@ -8,9 +8,7 @@ exports[`loading a desktop .osi example into its module > EP-1 (Header Plate Con
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Flange-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "NPB 300 X 150 X 49.32",
     "bolt_diameter": [
@@ -75,9 +73,7 @@ exports[`loading a desktop .osi example into its module > EP-2 (Header Plate Con
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Flange-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "NPB 750 X 270 X 145.29",
     "bolt_diameter": [
@@ -138,9 +134,7 @@ exports[`loading a desktop .osi example into its module > EP-3 (Header Plate Con
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Web-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "UB 305 x 127 x 37",
     "bolt_diameter": [
@@ -201,9 +195,7 @@ exports[`loading a desktop .osi example into its module > EP-4 (Header Plate Con
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Beam-Beam",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "NPB 400 X 180 X 57.38",
     "bolt_diameter": [
@@ -264,9 +256,7 @@ exports[`loading a desktop .osi example into its module > EP-5 (Header Plate Con
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Beam-Beam",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "NPB 400 X 180 X 66.31",
     "bolt_diameter": [
@@ -329,9 +319,7 @@ exports[`loading a desktop .osi example into its module > SA-1 (Seated Angle Con
     "topangle_list": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Flange-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "angle_list": [
       "130 x130 x 12",
@@ -405,9 +393,7 @@ exports[`loading a desktop .osi example into its module > SA-2 (Seated Angle Con
     "topangle_list": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Flange-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "angle_list": [
       "120 x 120 x 12",
@@ -481,9 +467,7 @@ exports[`loading a desktop .osi example into its module > SA-3 (Seated Angle Con
     "topangle_list": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Flange-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "angle_list": [
       "130 x130 x 12",
@@ -557,9 +541,7 @@ exports[`loading a desktop .osi example into its module > SA-4 (Seated Angle Con
     "topangle_list": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Web-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "angle_list": [
       "100 x 100 x 15",
@@ -633,9 +615,7 @@ exports[`loading a desktop .osi example into its module > SA-5 (Seated Angle Con
     "topangle_list": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Web-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "angle_list": [
       "90 x 90 x 12",
@@ -710,9 +690,7 @@ exports[`loading a desktop .osi example into its module > baseplate_1 (Base Plat
     "anchor_grade_ocf": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Moment Base Plate",
-  },
+  "extraState": {},
   "inputs": {
     "Base_Plate.Material": "E 250 (Fe 410 W)A",
     "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
@@ -863,9 +841,7 @@ exports[`loading a desktop .osi example into its module > baseplate_2 (Base Plat
     "anchor_grade_ocf": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Hollow/Tubular Column Base",
-  },
+  "extraState": {},
   "inputs": {
     "Base_Plate.Material": "E 250 (Fe 410 W)A",
     "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
@@ -1019,9 +995,7 @@ exports[`loading a desktop .osi example into its module > baseplate_3 (Base Plat
     "Member.Fu": "410",
     "Member.Fy": "250",
   },
-  "extraState": {
-    "selectedOption": "Welded Column Base",
-  },
+  "extraState": {},
   "inputs": {
     "Base_Plate.Material": "E 250 (Fe 410 W)A",
     "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
@@ -1129,9 +1103,7 @@ exports[`loading a desktop .osi example into its module > baseplate_4 (Base Plat
     "Member.Fu": "440",
     "Member.Fy": "300",
   },
-  "extraState": {
-    "selectedOption": "Moment Base Plate",
-  },
+  "extraState": {},
   "inputs": {
     "Base_Plate.Material": "E 300 (Fe 440)",
     "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
@@ -1217,9 +1189,7 @@ exports[`loading a desktop .osi example into its module > baseplate_5 (Base Plat
     "Member.Fu": "440",
     "Member.Fy": "300",
   },
-  "extraState": {
-    "selectedOption": "Hollow/Tubular Column Base",
-  },
+  "extraState": {},
   "inputs": {
     "Base_Plate.Material": "E 250 (Fe 410 W)A",
     "DesignPreferences.Anchor_Bolt.Friction_coefficient": "0.3",
@@ -1301,9 +1271,7 @@ exports[`loading a desktop .osi example into its module > bbep_1 (Beam-to-Beam E
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Extended One Way - Irreversible Moment",
-  },
+  "extraState": {},
   "inputs": {
     "bolt_diameter": [
       "20",
@@ -1407,9 +1375,7 @@ exports[`loading a desktop .osi example into its module > bbep_2 (Beam-to-Beam E
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Extended Both Ways - Reversible Moment",
-  },
+  "extraState": {},
   "inputs": {
     "bolt_diameter": [
       "20",
@@ -1513,9 +1479,7 @@ exports[`loading a desktop .osi example into its module > bc_ep_1 (Beam-to-Colum
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Flushed - Reversible Moment",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "WB 500",
     "bolt_diameter": [
@@ -1625,9 +1589,7 @@ exports[`loading a desktop .osi example into its module > bc_ep_2 (Beam-to-Colum
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Extended One Way - Irreversible Moment",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "WB 450",
     "bolt_diameter": [
@@ -1703,9 +1665,7 @@ exports[`loading a desktop .osi example into its module > bc_ep_3 (Beam-to-Colum
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Extended Both Ways - Reversible Moment",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "MB 500",
     "bolt_diameter": [
@@ -1779,9 +1739,7 @@ exports[`loading a desktop .osi example into its module > bc_ep_4 (Beam-to-Colum
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Flushed - Reversible Moment",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "MB 300",
     "bolt_diameter": [
@@ -1887,9 +1845,7 @@ exports[`loading a desktop .osi example into its module > bc_ep_5 (Beam-to-Colum
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Extended One Way - Irreversible Moment",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "LB 400",
     "bolt_diameter": [
@@ -3666,9 +3622,7 @@ exports[`loading a desktop .osi example into its module > ccep1 (Column-to-Colum
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Extended Both Ways",
-  },
+  "extraState": {},
   "inputs": {
     "bolt_diameter": [
       "8",
@@ -3827,9 +3781,7 @@ exports[`loading a desktop .osi example into its module > ccep2 (Column-to-Colum
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Extended Both Ways",
-  },
+  "extraState": {},
   "inputs": {
     "bolt_diameter": [
       "8",
@@ -3990,9 +3942,7 @@ exports[`loading a desktop .osi example into its module > cleat_1 (Cleat Angle C
     "cleat_section": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Flange-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "WPB 280 X 280 X 188.54",
     "bolt_diameter": [
@@ -4208,9 +4158,7 @@ exports[`loading a desktop .osi example into its module > cleat_2 (Cleat Angle C
     "cleat_section": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Flange-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "WPB 280 X 280 X 188.54",
     "bolt_diameter": [
@@ -4426,9 +4374,7 @@ exports[`loading a desktop .osi example into its module > cleat_3 (Cleat Angle C
     "cleat_section": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Web-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "NPB 220 X 110 X 29.35",
     "bolt_diameter": [
@@ -4684,9 +4630,7 @@ exports[`loading a desktop .osi example into its module > cleat_4 (Cleat Angle C
     "cleat_section": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Beam-Beam",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "WPB 140 X 140 X 18.08",
     "bolt_diameter": [
@@ -4942,9 +4886,7 @@ exports[`loading a desktop .osi example into its module > cleat_5 (Cleat Angle C
     "cleat_section": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Beam-Beam",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "WPB 200 X 200 X 83.52",
     "bolt_diameter": [
@@ -6803,9 +6745,7 @@ exports[`loading a desktop .osi example into its module > fin1 (Fin Plate Connec
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Flange-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "MB 500",
     "bolt_diameter": [
@@ -6914,9 +6854,7 @@ exports[`loading a desktop .osi example into its module > fin2 (Fin Plate Connec
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Flange-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "MB 550",
     "bolt_diameter": [
@@ -7025,9 +6963,7 @@ exports[`loading a desktop .osi example into its module > fin3 (Fin Plate Connec
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Column Web-Beam Web",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "UB 406 x 140 x 39",
     "bolt_diameter": [
@@ -7146,9 +7082,7 @@ exports[`loading a desktop .osi example into its module > fin4 (Fin Plate Connec
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Beam-Beam",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "MB 200",
     "bolt_diameter": [
@@ -7257,9 +7191,7 @@ exports[`loading a desktop .osi example into its module > fin5 (Fin Plate Connec
     "plate_thickness": false,
   },
   "designPrefOverrides": {},
-  "extraState": {
-    "selectedOption": "Beam-Beam",
-  },
+  "extraState": {},
   "inputs": {
     "beam_section": "MB 600",
     "bolt_diameter": [

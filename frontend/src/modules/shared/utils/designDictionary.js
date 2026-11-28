@@ -203,11 +203,7 @@ const buildState = (config, dock, pref, lists) => {
     });
   });
 
-  // The option dropdown of the end plate modules is the end plate type; elsewhere it is the
-  // connectivity.
   const extraState = {};
-  const selectedOption = inputs.endPlateType || inputs.connectivity;
-  if (selectedOption) extraState.selectedOption = selectedOption;
   if (inputs.section_profile) {
     const img = typeof config.getSectionImage === "function" ? config.getSectionImage(inputs.section_profile) : null;
     extraState.selectedProfile = inputs.section_profile;

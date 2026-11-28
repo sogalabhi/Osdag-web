@@ -70,7 +70,6 @@ export const beamToColumnEndPlateConfig = {
     load_moment: KEY_MOMENT,
     load_shear: KEY_SHEAR,
     weld_type: KEY_WELD_TYPE,
-    // The end plate type is an option list read from extraState.selectedOption, not from inputs.
     endPlateType: KEY_ENDPLATE_TYPE,
     beam_section: KEY_SUPTDSEC,
     column_section: KEY_SUPTNGSEC,
@@ -98,7 +97,7 @@ export const beamToColumnEndPlateConfig = {
     }
     return { isValid: true };
   },
-  buildSubmissionParams: (inputs, allSelected, lists, extraData) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     return {
       [KEY_DP_BOLT_HOLE_TYPE]: inputs.bolt_hole_type,
       [KEY_D]: allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
@@ -107,7 +106,7 @@ export const beamToColumnEndPlateConfig = {
       [KEY_DP_BOLT_TYPE]: inputs.bolt_tension_type,
       [KEY_TYP]: inputs.bolt_type.replaceAll("_", " "),
       [KEY_CONN]: inputs.connectivity,
-      [KEY_ENDPLATE_TYPE]: extraData?.selectedOption || "Flushed - Reversible Moment",
+      [KEY_ENDPLATE_TYPE]: inputs.endPlateType || "Flushed - Reversible Moment",
       [KEY_PLATETHK]: allSelected.plate_thickness 
         ? lists.thicknessList : inputs.plate_thickness,
       [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,

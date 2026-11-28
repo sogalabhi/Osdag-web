@@ -51,7 +51,7 @@ const requestsOf = (module) => {
     if (selection === "customized") inputs = { ...inputs, ...(module.custom || {}) };
     return {
       label: `${selection}${connectivity ? ` / ${connectivity}` : ""}`,
-      payload: wire(config.buildSubmissionParams(inputs, allSelected, LISTS, initialExtraState(config, connectivity))),
+      payload: wire(config.buildSubmissionParams(inputs, allSelected, LISTS, initialExtraState(config))),
     };
   });
 };

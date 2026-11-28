@@ -196,31 +196,6 @@ export const InputSection = ({
       return isChanged ? nextInputs : prev;
     });
 
-    // Set default for connectivity / endplate dropdowns in extraState
-    const connectivityField = section.fields.find(
-      (f) => f.type === 'connectivitySelect' || f.type === 'endPlateSelect'
-    );
-    let list = [];
-    if (connectivityField) {
-      list = getOptionsForField(connectivityField, safeContextData, safeInputs);
-      if (!list || list.length === 0) {
-        list = connectivityField.type === 'connectivitySelect'
-          ? (safeContextData.connectivityList || [])
-          : (safeContextData.endPlateList || []);
-      }
-    }
-    if (connectivityField && list && list.length > 0) {
-      const firstValue = firstOptionValue(list);
-
-      const currentOpt = extraState.selectedOption;
-      const opts = toSelectOptions(list);
-      const optExists = opts.some(opt => String(opt.value).trim().toLowerCase() === String(currentOpt).trim().toLowerCase());
-
-      if (!currentOpt || !optExists) {
-        setExtraState((prev) => ({ ...prev, selectedOption: firstValue }));
-      }
-    }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safeContextData, section.fields]);
 
@@ -455,7 +430,7 @@ export const InputSection = ({
             : (safeContextData.endPlateList || []);
         }
         const options = toSelectOptions(list);
-        const value = options.find(opt => String(opt.value) === String(extraState.selectedOption || safeInputs[field.key])) || options[0] || null;
+        const value = options.find(opt => String(opt.value) === String(safeInputs[field.key])) || options[0] || null;
         return (
           <Select
             options={options}
@@ -464,7 +439,6 @@ export const InputSection = ({
             isSearchable={false}
             onChange={(selected) => {
               const val = selected.value;
-              setExtraState((prev) => ({ ...prev, selectedOption: val }));
               setInputs((prev) => ({ ...prev, [field.key]: val, output: null }));
               if (typeof field.onChange === "function") {
                 field.onChange(val, { inputs: safeInputs, setInputs, contextData: safeContextData, extraState, setExtraState });

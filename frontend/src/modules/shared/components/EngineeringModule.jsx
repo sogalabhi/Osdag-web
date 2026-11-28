@@ -600,7 +600,7 @@ export const EngineeringModule = ({
   // Get connectivity for the fin plate module
   const getConnectivity = () => {
     if (moduleConfig.cameraKey === KEY_DISP_FINPLATE) {
-      return extraState?.selectedOption || inputs?.connectivity;
+      return inputs?.connectivity;
     }
     return null;
   };
@@ -694,7 +694,7 @@ export const EngineeringModule = ({
     const guard = canOpenAdditionalInputs(
       mod,
       inputs,
-      { selectedOption: extraState?.selectedOption },
+      extraState,
       contextData,
       selectionStates
     );
@@ -959,10 +959,6 @@ export const EngineeringModule = ({
                 logs={logs}
                 setCreateDesignReportBool={setCreateDesignReportBool}
                 triggerScreenshotCapture={triggerScreenshotCapture}
-                selectedOption={extraState.selectedOption}
-                setSelectedOption={(value) =>
-                  setExtraState({ ...extraState, selectedOption: value })
-                }
                 cadModelPaths={cadModelPaths}
                 contextData={contextData}
                 selectionStates={selectionStates}

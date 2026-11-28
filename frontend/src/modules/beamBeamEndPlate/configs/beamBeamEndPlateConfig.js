@@ -67,7 +67,6 @@ export const beamBeamEndPlateConfig = {
     load_moment: KEY_MOMENT,
     load_shear: KEY_SHEAR,
     weld_type: KEY_WELD_TYPE,
-    // The end plate type is an option list read from extraState.selectedOption, not from inputs.
     endPlateType: KEY_ENDPLATE_TYPE,
     supported_designation: KEY_SUPTDSEC,
     // The dock material is Material. The Beam Section tab of Additional Inputs (supported_material) is the
@@ -99,7 +98,7 @@ export const beamBeamEndPlateConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraData) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     const conn_map = {
       "Flushed - Reversible Moment": "Flushed - Reversible Moment",
       "Extended One Way - Irreversible Moment": "Extended One Way - Irreversible Moment",
@@ -115,7 +114,7 @@ export const beamBeamEndPlateConfig = {
       [KEY_TYP]: inputs.bolt_type.replaceAll("_", " "),
       "Connectivity *": inputs.connectivity,
       [KEY_CONN]: inputs.connectivity,
-      [KEY_ENDPLATE_TYPE]: conn_map[extraData?.selectedOption] || "Flushed - Reversible Moment",
+      [KEY_ENDPLATE_TYPE]: conn_map[inputs.endPlateType] || "Flushed - Reversible Moment",
       [KEY_PLATETHK]: allSelected.plate_thickness 
         ? lists.thicknessList : inputs.plate_thickness,
       [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,

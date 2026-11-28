@@ -110,7 +110,7 @@ export const seatedAngleConfig = {
     // fallback (InputSection.jsx) — a user who never touches the
     // Connectivity dropdown still sees/submits a real value, derived from
     // the live list rather than a hardcoded literal.
-    const connectivity = extraState?.selectedOption || inputs.connectivity || lists?.connectivityList?.[0];
+    const connectivity = inputs.connectivity || lists?.connectivityList?.[0];
     
     if (connectivity === CONN_CFBW || connectivity === CONN_CWBW) {
       if (!inputs.beam_section || !inputs.column_section || 
@@ -127,10 +127,10 @@ export const seatedAngleConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
 
     // See validateInputs's identical comment on this fallback chain.
-    const connectivity = extraState?.selectedOption || inputs.connectivity || lists?.connectivityList?.[0];
+    const connectivity = inputs.connectivity || lists?.connectivityList?.[0];
 
     if (connectivity === CONN_CFBW || connectivity === CONN_CWBW) {
       return {
@@ -204,8 +204,8 @@ export const seatedAngleConfig = {
           label: UI_STRINGS.COLUMN_SECTION,
           type: "select",
           options: "columnList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
+          conditionalDisplay: (extraState, inputs) => {
+            const connectivity = inputs?.connectivity;
             return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
@@ -214,31 +214,11 @@ export const seatedAngleConfig = {
           label: UI_STRINGS.BEAM_SECTION, 
           type: "select",
           options: "beamList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
+          conditionalDisplay: (extraState, inputs) => {
+            const connectivity = inputs?.connectivity;
             return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
-        // {
-        //   key: "primary_beam",
-        //   label: UI_STRINGS.PRIMARY_BEAM,
-        //   type: "select", 
-        //   options: "beamList",
-        //   conditionalDisplay: (extraState) => {
-        //     const connectivity = extraState?.selectedOption;
-        //     return connectivity === "Beam-Beam";
-        //   }
-        // },
-        // {
-        //   key: "secondary_beam",
-        //   label: UI_STRINGS.SECONDARY_BEAM,
-        //   type: "select",
-        //   options: "beamList", 
-        //   conditionalDisplay: (extraState) => {
-        //     const connectivity = extraState?.selectedOption;
-        //     return connectivity === "Beam-Beam";
-        //   }
-        // },
         {
           key: "material", customMaterial: "connector",
           label: UI_STRINGS.MATERIAL,
