@@ -9,6 +9,7 @@ import {
   CONN_CFBW,
 } from "../../../constants/generated/coreKeys";
 import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
+import { optionText } from "../utils/fieldOptionUtils";
 import { loadStateFromOsi } from "../utils/osiLoader";
 import { shouldClearOverridesOnDockChange } from "../utils/dockDriverChange";
 import { isAdditionalInput, prefClearingFields } from "../utils/prefSyncKeys";
@@ -133,12 +134,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
         const fullList = safeModuleData[listKey];
         const normalized = Array.isArray(fullList)
-          ? fullList.map((val) => {
-            if (typeof val === "object" && val !== null) {
-              return val.value || val.Grade || String(val);
-            }
-            return String(val);
-          })
+          ? fullList.map(optionText)
           : [];
 
         if (normalized.length > 0) {

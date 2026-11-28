@@ -29,3 +29,25 @@ export function getListForInputKey(inputKey, contextData = {}, fieldDataSource) 
   const list = contextData[listKey];
   return Array.isArray(list) ? list : [];
 }
+
+/**
+ * The text an option stands for: `value`, else `Grade` of an option object, else the option itself.
+ */
+export function optionText(option) {
+  if (typeof option === 'object' && option !== null) {
+    return option.value || option.Grade || String(option);
+  }
+  return String(option);
+}
+
+/**
+ * The value of the first option of a list: its `value` (or `Grade`) when it is an object, else the option.
+ */
+export function firstOptionValue(list) {
+  const first = list[0];
+  if (typeof first === 'object' && first !== null) {
+    if ('value' in first) return first.value;
+    if ('Grade' in first) return first.Grade;
+  }
+  return first;
+}

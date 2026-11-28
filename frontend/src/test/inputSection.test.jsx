@@ -264,6 +264,12 @@ describe("a dropdown", () => {
     expect(screen.queryByTestId("custom-material")).toBeNull();
   });
 
+  it("fails in development on a field type the renderer does not know", () => {
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => show([{ key: "x", label: "X", type: "dropdwon" }])).toThrow(/Unknown field type "dropdwon"/);
+    quiet.mockRestore();
+  });
+
   it("prefers the material list of the module context to the one in the data", () => {
     const fromContext = [{ id: 7, Grade: "E 410 (Fe 540)" }, { id: -1, Grade: "Custom" }];
     show([{ key: "material", label: "Material", type: "select", options: "materialList" }], {

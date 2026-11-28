@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import Select, { components } from 'react-select';
 import { Modal } from 'antd';
-import { getOptionsForField, getListForInputKey } from '../utils/fieldOptionUtils';
+import { getOptionsForField, getListForInputKey, optionText, firstOptionValue } from '../utils/fieldOptionUtils';
 import { stripRequiredMark } from '../utils/validation';
 import { ModuleContext } from "../../../context/ModuleState";
 import CustomMaterialModal from "./CustomMaterialModal";
@@ -211,9 +211,7 @@ export const InputSection = ({
         if (isCustomizable) return;
 
         // Determine first option value (1st element in array)
-        const first = rawList[0];
-        const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
-          : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
+        const firstValue = firstOptionValue(rawList);
 
         const current = nextInputs[field.key];
         const opts = toSelectOptions(rawList);
@@ -245,9 +243,7 @@ export const InputSection = ({
       }
     }
     if (connectivityField && list && list.length > 0) {
-      const first = list[0];
-      const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
-        : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
+      const firstValue = firstOptionValue(list);
 
       const currentOpt = extraState.selectedOption;
       const opts = toSelectOptions(list);
@@ -302,13 +298,7 @@ export const InputSection = ({
       // Get all available values
       const allValues = getAllValuesForInputKey(field.key);
       // Convert to array of keys/strings for Transfer component
-      const allKeys = allValues.map(val => {
-        // Handle different data formats (object with value/Grade property, or plain string/number)
-        if (typeof val === 'object' && val !== null) {
-          return val.value || val.Grade || val.toString();
-        }
-        return val.toString();
-      });
+      const allKeys = allValues.map(optionText);
 
       const isCurrentlyCustomized = selectionStates?.[field.selectionKey] === "Customized";
       if (!isCurrentlyCustomized) {
@@ -324,12 +314,7 @@ export const InputSection = ({
       // "All" option - get all values and set them in inputs 
       const allValues = getAllValuesForInputKey(field.key);
       // Convert to array format if needed
-      const allValuesArray = allValues.map(val => {
-        if (typeof val === 'object' && val !== null) {
-          return val.value || val.Grade || val.toString();
-        }
-        return val.toString();
-      });
+      const allValuesArray = allValues.map(optionText);
       setInputs({ ...safeInputs, [field.key]: allValuesArray });
       // Clear selectedItems since we're using "All" (not managed via Transfer)
       updateSelectedItems(field.key, []);
@@ -663,6 +648,10 @@ export const InputSection = ({
         return renderNumericInput(field, true);
 
       default:
+        // A free-text field has type 'text'; any other type is not one the renderer knows.
+        if (effectiveType !== 'text' && import.meta.env.DEV) {
+          throw new Error(`Unknown field type "${effectiveType}" for input "${field.key}"`);
+        }
         return renderNumericInput(field, field.type === 'number');
     }
   };
