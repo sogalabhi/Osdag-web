@@ -90,6 +90,9 @@ export const useEngineeringModule = (moduleConfig) => {
     loadSavedOutputs,
     loadOutputs,
     loadCadModel,
+    fieldErrors,
+    prefErrors,
+    clearFieldError,
   } = useDesignSubmission(service, moduleConfig);
 
   const {
@@ -282,6 +285,9 @@ export const useEngineeringModule = (moduleConfig) => {
       screenshotTrigger,
       setScreenshotTrigger,
       hoverDict: cadData?.hover,
+      fieldErrors,
+      prefErrors,
+      clearFieldError,
     },
 
     // 5. Actions / Handlers

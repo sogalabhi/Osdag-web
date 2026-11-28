@@ -77,6 +77,62 @@ const getInvalidNumberFields = (inputSections, inputs, extraState) => {
   return invalid;
 };
 
+const EMPTY_FORM_VALUES = new Set(['Select Section']);
+
+/**
+ * Every problem of the form, one entry per field: `[{ field, message }]`, in form order.
+ *
+ * A visible field that is required (unless `required: false`) must hold a value; a customizable
+ * list set to "Customized" must hold at least one entry; a visible number field must hold a number.
+ * Image fields hold no value. An empty list means the form passes these checks.
+ */
+export const validateFormFields = (moduleConfig, inputs, extraState, selectionStates) => {
+  const errors = [];
+  for (const section of moduleConfig?.inputSections || []) {
+    for (const field of section.fields || []) {
+      if (field.conditionalDisplay && !field.conditionalDisplay(extraState, inputs)) continue;
+      const effectiveType = typeof field.conditionalType === 'function'
+        ? field.conditionalType(inputs)
+        : field.type;
+      if (effectiveType === 'image') continue;
+
+      const label = stripRequiredMark(field.label)?.trim() || field.key;
+      let value = inputs?.[field.key];
+      if (effectiveType === 'connectivitySelect' || effectiveType === 'endPlateSelect') {
+        value = extraState?.selectedOption || value;
+      }
+
+      if (effectiveType === 'customizable') {
+        // Shown without a required mark, so it may be left blank.
+        if (field.required === false) continue;
+        const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
+        if (isCustomized && (!Array.isArray(value) || value.length === 0)) {
+          errors.push({ field: field.key, message: `Please select at least one value for ${label}.` });
+        }
+        continue;
+      }
+
+      const isEmpty =
+        value === undefined ||
+        value === null ||
+        (typeof value === 'string' && value.trim() === '') ||
+        EMPTY_FORM_VALUES.has(value) ||
+        (Array.isArray(value) && value.length === 0);
+      if (isEmpty) {
+        // Shown without a required mark, so it may be left blank.
+        if (field.required === false) continue;
+        errors.push({ field: field.key, message: `Please fill in the ${label} field.` });
+        continue;
+      }
+
+      if (effectiveType === 'number' && !field.disabled && !isNumericValue(value)) {
+        errors.push({ field: field.key, message: `Please enter a valid number for ${label}.` });
+      }
+    }
+  }
+  return errors;
+};
+
 /** Convenience wrapper returning the shape modules' validateInputs() expects. */
 export const validateRequiredFields = (inputSections, inputs, extraState, selectionStates, message) => {
   const missing = getMissingRequiredFields(inputSections, inputs, extraState, selectionStates);

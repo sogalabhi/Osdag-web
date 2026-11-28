@@ -79,13 +79,17 @@ export const useEngineeringService = () => {
    * @param {Function} options.onDesignReady - Called with the calculated design as soon as it
    *   is ready, before the 3D model is built
    * @returns {Promise<{status: number, body: Object}>} body holds the design and its 3D model
-   *   (`files`, `hover_dict`, `cad_error`)
+   *   (`files`, `hover_dict`, `cad_error`). A rejected request gives its HTTP status and a body
+   *   with `error`, and `code` and `fields` (core key -> message) when the backend sent them.
    */
   const createDesign = useCallback(async (moduleKey, inputs, options = {}) => {
     try {
       return await dsCreateDesign(moduleKey, inputs, options);
     } catch (error) {
-      return { status: 500, body: { success: false, error: error.message } };
+      const body = { success: false, error: error.message };
+      if (error.code) body.code = error.code;
+      if (error.fields) body.fields = error.fields;
+      return { status: error.status || 500, body };
     }
   }, []);
 

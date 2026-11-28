@@ -29,6 +29,8 @@ export const BaseInputDock = React.memo(({
   updateSelectedItems,
   setModalDynamicSrc,
   onRefetchModuleOptions,
+  fieldErrors,
+  onClearFieldError,
   isOpen,
   loadingOptions,
 }) => {
@@ -219,6 +221,8 @@ export const BaseInputDock = React.memo(({
               updateSelectedItems={updateSelectedItems}
               setModalDynamicSrc={setModalDynamicSrc}
               onRefetchModuleOptions={onRefetchModuleOptions}
+              fieldErrors={fieldErrors}
+              onClearFieldError={onClearFieldError}
             />
           ))}
         </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useMemo } from 'react';
+import { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import Select, { components } from 'react-select';
 import { Modal } from 'antd';
 import { getOptionsForField, getListForInputKey } from '../utils/fieldOptionUtils';
@@ -44,6 +44,11 @@ const CustomOption = (props) => {
 };
 
 const EMPTY_LIST = [];
+const NO_ERRORS = {};
+
+const errorIdFor = (field) => `field-error-${field.key}`;
+
+const sameValue = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 export const InputSection = ({
   section,
@@ -60,6 +65,8 @@ export const InputSection = ({
   updateSelectedItems = () => { },
   setModalDynamicSrc,
   onRefetchModuleOptions,
+  fieldErrors = NO_ERRORS,
+  onClearFieldError,
 }) => {
   const safeInputs = inputs || {};
   const [imageSource, setImageSource] = useState("");
@@ -100,6 +107,30 @@ export const InputSection = ({
     }),
   };
 
+
+  // A field with an error is outlined in red and flagged to assistive technology.
+  const hasError = (field) => Boolean(field.key && fieldErrors[field.key]);
+  const stylesFor = (field) => {
+    if (!hasError(field)) return customSelectStyles;
+    return {
+      ...customSelectStyles,
+      control: (base, state) => ({ ...customSelectStyles.control(base, state), borderColor: '#c62828', '&:hover': { borderColor: '#c62828' } }),
+    };
+  };
+  const selectErrorProps = (field) =>
+    hasError(field) ? { 'aria-invalid': true, 'aria-errormessage': errorIdFor(field) } : {};
+
+  // An edit of a field clears the error shown for it.
+  const previousInputs = useRef(safeInputs);
+  useEffect(() => {
+    const before = previousInputs.current;
+    previousInputs.current = safeInputs;
+    if (!onClearFieldError) return;
+    for (const key of Object.keys(fieldErrors)) {
+      if (!sameValue(before[key], safeInputs[key])) onClearFieldError(key);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [safeInputs]);
 
   // Helper to normalize lists into react-select option shape
   const toSelectOptions = (list = []) => {
@@ -384,7 +415,9 @@ export const InputSection = ({
         }}
         placeholder={field.placeholder || `ex. ${stripRequiredMark(field.label)}`}
         disabled={field.disabled || isInputLocked}
-        className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70"
+        aria-invalid={hasError(field) ? true : undefined}
+        aria-describedby={hasError(field) ? errorIdFor(field) : undefined}
+        className={`w-full h-9 border ${hasError(field) ? 'border-red-600' : 'border-gray-400'} rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70`}
       />
     </div>
   );
@@ -411,7 +444,8 @@ export const InputSection = ({
               <Select
                 value={{ label: "All", value: "All" }}
                 isDisabled={true}
-                styles={customSelectStyles}
+                styles={stylesFor(field)}
+                {...selectErrorProps(field)}
                 classNamePrefix="react-select"
                 className="w-[60%]"
                 isSearchable={false}
@@ -433,7 +467,8 @@ export const InputSection = ({
                 setInputs({ ...safeInputs, [field.key]: newValues });
               }}
               menuPortalTarget={document.body}
-              styles={customSelectStyles}
+              styles={stylesFor(field)}
+                {...selectErrorProps(field)}
               classNamePrefix="react-select"
               className="w-[60%]"
             />
@@ -445,7 +480,8 @@ export const InputSection = ({
             <Select
               isDisabled={true}
               placeholder="No data available"
-              styles={customSelectStyles}
+              styles={stylesFor(field)}
+                {...selectErrorProps(field)}
               classNamePrefix="react-select"
               className="w-[60%]"
               isSearchable={false}
@@ -484,7 +520,8 @@ export const InputSection = ({
               setInputs(nextInputs);
             }}
             menuPortalTarget={document.body}
-            styles={customSelectStyles}
+            styles={stylesFor(field)}
+                {...selectErrorProps(field)}
             classNamePrefix="react-select"
             className="w-[60%]"
           />
@@ -524,7 +561,8 @@ export const InputSection = ({
               }
             }}
             menuPortalTarget={document.body}
-            styles={customSelectStyles}
+            styles={stylesFor(field)}
+                {...selectErrorProps(field)}
             classNamePrefix="react-select"
             className="w-[60%]"
           />
@@ -542,7 +580,8 @@ export const InputSection = ({
             isSearchable={false}
             onChange={(selected) => handleCustomizableSelect(field, selected.value)}
             menuPortalTarget={document.body}
-            styles={customSelectStyles}
+            styles={stylesFor(field)}
+                {...selectErrorProps(field)}
             classNamePrefix="react-select"
             className="w-[60%]"
             components={{ Option: CustomOption }}
@@ -593,7 +632,8 @@ export const InputSection = ({
               }
             }}
             menuPortalTarget={document.body}
-            styles={customSelectStyles}
+            styles={stylesFor(field)}
+                {...selectErrorProps(field)}
             classNamePrefix="react-select"
             className="w-[60%]"
             isSearchable={false}
@@ -610,7 +650,8 @@ export const InputSection = ({
             isDisabled={isInputLocked}
             onChange={(selected) => setInputs({ ...inputs, [field.key]: selected.value })}
             menuPortalTarget={document.body}
-            styles={customSelectStyles}
+            styles={stylesFor(field)}
+                {...selectErrorProps(field)}
             classNamePrefix="react-select"
             className="w-[60%]"
             isSearchable={false}
@@ -675,6 +716,15 @@ export const InputSection = ({
                 </h4>
                 {renderField(field)}
               </div>
+              {hasError(field) && (
+                <p
+                  id={errorIdFor(field)}
+                  data-testid={errorIdFor(field)}
+                  className="text-red-600 text-xs -mt-2 mb-3 ml-[40%]"
+                >
+                  {fieldErrors[field.key]}
+                </p>
+              )}
               {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (
                 <div className="flex justify-center">
                   <img
