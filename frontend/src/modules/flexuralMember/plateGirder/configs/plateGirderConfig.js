@@ -622,6 +622,7 @@ export const plateGirderConfig = {
           selectionKey: "intermediateStiffenerThicknessSelect",
           modalKey: "intermediateStiffenerThicknessValues",
           dataSource: "thicknessList",
+          autoFill: false,
           conditionalDisplay: (extraState, inputs) =>
             inputs?.intermediate_stiffener === "Yes" && inputs?.intermediate_stiffener_thickness === "Customized"
         },
@@ -654,6 +655,7 @@ export const plateGirderConfig = {
           selectionKey: "longitudinalStiffenerThicknessSelect",
           modalKey: "longitudinalStiffenerThicknessValues",
           dataSource: "thicknessList",
+          autoFill: false,
           conditionalDisplay: (extraState, inputs) =>
             inputs?.longitudinal_stiffener !== "No" && inputs?.longitudinal_stiffener_thickness === "Customized"
         }

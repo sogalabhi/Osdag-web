@@ -148,6 +148,14 @@ describe("useModuleForm lists on All", () => {
     expect(view.result.current.inputs.plate_thickness).toEqual(["8", "10"]);
   });
 
+  it("does not fill an empty All of the plate girder stiffener thickness lists", () => {
+    const girder = caseOf("plate girder");
+    const view = setup(girder, {});
+    view.rerender({ cfg: girder, data });
+    expect(view.result.current.inputs.intermediate_stiffener_thickness_val).toEqual([]);
+    expect(view.result.current.inputs.longitudinal_stiffener_thickness_val).toEqual([]);
+  });
+
   it("leaves a list the user picked alone, and one that is no longer on All", () => {
     const view = setup(finPlate, {});
     act(() => result(view).updateSelectedItems("bolt_diameter", ["20"]));

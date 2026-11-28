@@ -49,7 +49,7 @@ describe("lists derived from the input fields", () => {
 
     it("names the list of every customizable field that has a data source", () => {
       for (const field of customizable(config)) {
-        if (field.dataSource) expect(config.inputKeyToList[field.key]).toBe(field.dataSource);
+        if (field.dataSource && field.autoFill !== false) expect(config.inputKeyToList[field.key]).toBe(field.dataSource);
         else expect(config.inputKeyToList[field.key]).toBeUndefined();
       }
     });
@@ -60,8 +60,12 @@ describe("lists derived from the input fields", () => {
     expect(customizable(seatedAngleConfig).some((field) => field.key === "secondary_beam")).toBe(false);
   });
 
-  it("lists the stiffener thickness values of the plate girder", () => {
-    expect(plateGirderConfig.inputKeyToList.intermediate_stiffener_thickness_val).toBe("thicknessList");
-    expect(plateGirderConfig.inputKeyToList.longitudinal_stiffener_thickness_val).toBe("thicknessList");
+  it("does not fill an empty All of the plate girder stiffener thickness lists", () => {
+    expect(plateGirderConfig.inputKeyToList.intermediate_stiffener_thickness_val).toBeUndefined();
+    expect(plateGirderConfig.inputKeyToList.longitudinal_stiffener_thickness_val).toBeUndefined();
+    expect(plateGirderConfig.inputKeyToList.web_thickness).toBe("thicknessList");
+    const keys = plateGirderConfig.modalConfig.map((m) => m.key);
+    expect(keys).toContain("intermediateStiffenerThicknessValues");
+    expect(keys).toContain("longitudinalStiffenerThicknessValues");
   });
 });

@@ -25,11 +25,14 @@ export const deriveModalConfig = (config) =>
     .filter((field) => field.modalKey)
     .map((field) => ({ key: field.modalKey, inputKey: field.key, dataSource: field.dataSource ?? null }));
 
-/** The module data list of each customizable field that names one. */
+/**
+ * The module data list of each customizable field that names one. A field with `autoFill: false` is
+ * left out: its empty "All" is not filled with the whole list.
+ */
 export const deriveInputKeyToList = (config) =>
   Object.fromEntries(
     declaredFields(config)
-      .filter((field) => (field.selectionKey || field.modalKey) && field.dataSource)
+      .filter((field) => (field.selectionKey || field.modalKey) && field.dataSource && field.autoFill !== false)
       .map((field) => [field.key, field.dataSource]),
   );
 
