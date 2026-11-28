@@ -196,6 +196,7 @@ export const boltedToEndConfig = {
           key: "section_profile",
           label: "Section Profile",
           type: "sectionProfileList",
+          resets: ["section_designation"],
           onChange: (value, setInputs, setExtraState) => {
             const imageSource = boltedToEndConfig.getSectionImage(value);
             setExtraState((extState) => ({
@@ -243,7 +244,7 @@ export const boltedToEndConfig = {
           }
         },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: "Material",
           type: "select",
           options: "materialList",

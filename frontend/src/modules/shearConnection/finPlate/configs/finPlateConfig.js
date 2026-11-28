@@ -215,7 +215,7 @@ export const finPlateConfig = {
           conditionalDisplay: (extraState) => extraState?.selectedOption === "Beam-Beam"
         },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: UI_STRINGS.MATERIAL,
           type: "select",
           options: "materialList",

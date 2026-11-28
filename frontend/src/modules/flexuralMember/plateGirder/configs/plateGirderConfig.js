@@ -439,7 +439,7 @@ export const plateGirderConfig = {
           disabled: true
         },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: "Material",
           type: "select",
           options: "materialList",
@@ -464,6 +464,7 @@ export const plateGirderConfig = {
           key: "total_depth",
           label: "Total Depth (mm)",
           type: "optimized_number",
+          optimizedBy: { key: "design_type", value: "Optimized" },
           validation: "positive_number",
           placeholder: "Enter total depth"
         },
@@ -485,6 +486,7 @@ export const plateGirderConfig = {
           key: "top_flange_width",
           label: "Width of Top Flange (mm)",
           type: "optimized_number",
+          optimizedBy: { key: "design_type", value: "Optimized" },
           validation: "positive_number",
           placeholder: "Enter top flange width"
         },
@@ -504,6 +506,7 @@ export const plateGirderConfig = {
           key: "bottom_flange_width",
           label: "Width of Bottom Flange (mm)",
           type: "optimized_number",
+          optimizedBy: { key: "design_type", value: "Optimized" },
           validation: "positive_number",
           placeholder: "Enter bottom flange width"
         },

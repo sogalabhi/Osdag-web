@@ -253,7 +253,7 @@ export const basePlateConfig = {
               ? lists.hollowSectionDesignation
               : lists.sectionDesignation) ?? [],
         },
-        { key: "material", label: "Material", type: "select", options: "materialList" },
+        { key: "material", customMaterial: "connector", label: "Material", type: "select", options: "materialList" },
       ],
     },
     {

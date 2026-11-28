@@ -103,7 +103,7 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
                 title: "Connecting Members",
                 fields: [
                     {
-                        key: "material",
+                        key: "material", customMaterial: "connector",
                         label: "Material",
                         type: "select",
                         options: "materialList",
@@ -265,7 +265,7 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
                     },
                     { key: "plate_width", label: KEY_DISP_PLATE_WIDTH, type: "number" },
                     {
-                        key: "material",
+                        key: "material", customMaterial: "connector",
                         label: "Material",
                         type: "select",
                         options: "materialList",

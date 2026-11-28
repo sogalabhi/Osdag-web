@@ -402,7 +402,7 @@ export const InputSection = ({
 
     switch (effectiveType) {
       case 'select': {
-        const isCustomizable = Boolean(field.selectionKey) && !(field.key.includes("plate1") || field.key.includes("plate2"));
+        const isCustomizable = Boolean(field.selectionKey);
         const rawList = getOptionsForField(field, safeContextData, safeInputs);
         const options = toSelectOptions(rawList);
 
@@ -458,8 +458,6 @@ export const InputSection = ({
           );
         }
 
-        const isMaterialField = field.key?.includes('material');
-
         // Same comparison as the option check above, so a value it accepts is also shown.
         const normalizeOption = (v) => String(v).trim().toLowerCase().replace(/\s+/g, '');
         const value = options.find(opt => normalizeOption(opt.value) === normalizeOption(safeInputs[field.key]));
@@ -471,10 +469,9 @@ export const InputSection = ({
             isDisabled={isInputLocked}
             isSearchable={false}
             onChange={(selected) => {
-              if (isMaterialField && selected.value === 'Custom') {
-                if (field.key.includes('supported')) setCustomMaterialType('supported');
-                else if (field.key.includes('supporting')) setCustomMaterialType('supporting');
-                else setCustomMaterialType('connector');
+              // `customMaterial` names the kind of material the field holds ('connector', 'supported', 'supporting').
+              if (field.customMaterial && selected.value === 'Custom') {
+                setCustomMaterialType(field.customMaterial);
                 setShowCustomMaterialModal(true);
                 return;
               }
@@ -577,7 +574,8 @@ export const InputSection = ({
               setInputs((prev) => ({
                 ...prev,
                 [field.key]: val,
-                section_designation: [],
+                // `resets` lists the fields a new choice here empties
+                ...Object.fromEntries((field.resets || []).map((key) => [key, []])),
               }));
 
               // 2. Direct extraState update for profile image
@@ -639,7 +637,8 @@ export const InputSection = ({
       case 'optimized_number': {
         // Customized → plain number input; Optimized → "Set Bounds" button
         // that captures lower/upper/increment optimization bounds.
-        const isOptimized = safeInputs.design_type === 'Optimized';
+        // `optimizedBy` names the input and value that switch the field to optimization bounds.
+        const isOptimized = Boolean(field.optimizedBy) && safeInputs[field.optimizedBy.key] === field.optimizedBy.value;
         if (!isOptimized) {
           return renderNumericInput(field, true);
         }

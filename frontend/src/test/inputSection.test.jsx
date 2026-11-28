@@ -242,7 +242,7 @@ describe("a dropdown", () => {
   });
 
   it("opens the custom material dialog for the Custom grade instead of choosing it", () => {
-    show([{ key: "supported_material", label: "Supported Material", type: "select", options: "materialList" }], { inputs: { supported_material: "E 165 (Fe 290)" } });
+    show([{ key: "supported_material", label: "Supported Material", type: "select", options: "materialList", customMaterial: "supported" }], { inputs: { supported_material: "E 165 (Fe 290)" } });
     pick("Supported Material", "Custom");
     expect(screen.getByTestId("custom-material").textContent).toBe("custom material for supported");
     expect(inputsNow().supported_material).toBe("E 165 (Fe 290)");
@@ -253,9 +253,15 @@ describe("a dropdown", () => {
     ["supporting_material", "supporting"],
     ["supported_material", "supported"],
   ])("opens the custom material dialog of %s for the %s material", (key, type) => {
-    show([{ key, label: "Grade", type: "select", options: "materialList" }], { inputs: { [key]: "E 165 (Fe 290)" } });
+    show([{ key, label: "Grade", type: "select", options: "materialList", customMaterial: type }], { inputs: { [key]: "E 165 (Fe 290)" } });
     pick("Grade", "Custom");
     expect(screen.getByTestId("custom-material").textContent).toBe(`custom material for ${type}`);
+  });
+
+  it("offers no custom material dialog for a material field that does not name one", () => {
+    show([{ key: "material", label: "Grade", type: "select", options: "materialList" }], { inputs: { material: "E 165 (Fe 290)" } });
+    pick("Grade", "Custom");
+    expect(screen.queryByTestId("custom-material")).toBeNull();
   });
 
   it("prefers the material list of the module context to the one in the data", () => {
@@ -408,7 +414,7 @@ describe("a connectivity dropdown", () => {
 });
 
 describe("an optimised dimension", () => {
-  const field = { key: "total_depth", label: "Total Depth", type: "optimized_number" };
+  const field = { key: "total_depth", label: "Total Depth", type: "optimized_number", optimizedBy: { key: "design_type", value: "Optimized" } };
 
   it("is a plain number box for a customised design", () => {
     show([field], { inputs: { design_type: "Customized", total_depth: "800" } });

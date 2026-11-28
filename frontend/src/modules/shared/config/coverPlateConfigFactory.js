@@ -138,7 +138,7 @@ export function makeCoverPlateBoltedConfig({
             required: true,
           },
           {
-            key: "material",
+            key: "material", customMaterial: "connector",
             label: "Material",
             type: "select",
             options: "materialList",
@@ -341,7 +341,7 @@ export function makeCoverPlateWeldedConfig({
             required: true,
           },
           {
-            key: "material",
+            key: "material", customMaterial: "connector",
             label: "Material",
             type: "select",
             options: "materialList",

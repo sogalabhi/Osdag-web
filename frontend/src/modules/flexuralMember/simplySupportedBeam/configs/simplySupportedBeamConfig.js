@@ -209,7 +209,7 @@ export const simplySupportedBeamConfig = {
           }
         },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: "Material",
           type: "select",
           options: "materialList",

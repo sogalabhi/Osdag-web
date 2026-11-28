@@ -157,7 +157,7 @@ export const endPlateConfig = {
         { key: "column_section", label: "Column Section", type: "select", options: "columnList", conditionalDisplay: (extraState) => [CONN_CFBW, CONN_CWBW].includes(extraState?.selectedOption) },
         { key: "beam_section", label: "Beam Section", type: "select", options: "beamList", conditionalDisplay: (extraState) => [CONN_CFBW, CONN_CWBW].includes(extraState?.selectedOption) },
         {
-          key: "material", label: "Material", type: "select", options: "materialList",
+          key: "material", customMaterial: "connector", label: "Material", type: "select", options: "materialList",
         },
       ],
     },

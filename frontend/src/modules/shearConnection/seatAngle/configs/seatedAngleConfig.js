@@ -238,7 +238,7 @@ export const seatedAngleConfig = {
         //   }
         // },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: UI_STRINGS.MATERIAL,
           type: "select",
           options: "materialList",
