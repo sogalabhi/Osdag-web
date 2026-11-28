@@ -37,6 +37,7 @@ import {
 } from "../../../constants/generated/coreKeys";
 import { WEB_IS_LEG_LOADED } from "../../../constants/generated/webKeys";
 import { prefText } from "../../shared/utils/prefValue";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 export const strutsBoltedConfig = {
   sessionName: "Struts Bolted to End Gusset",
   designType: KEY_DISP_STRUT_BOLTED_END_GUSSET,
@@ -90,20 +91,6 @@ export const strutsBoltedConfig = {
     profile_image: null,
     end_condition_image: null,
   },
-
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-    { key: "sectionDesignation", inputKey: "section_designation", dataSource: null },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-    { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
-  ],
 
   // Helper function to get section image based on profile
   getSectionImage: (profile) => {
@@ -260,7 +247,8 @@ export const strutsBoltedConfig = {
           key: "section_profile",
           label: "Section Profile",
           type: "sectionProfileList",
-          onChange: (value, setInputs,setExtraState) => {
+          resets: ["section_designation"],
+          onChange: (value, { setInputs, setExtraState }) => {
             const imageSource = strutsBoltedConfig.getSectionImage(value);
             setExtraState((extState) => ({
               ...extState,
@@ -316,7 +304,7 @@ export const strutsBoltedConfig = {
           }
         },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: "Material",
           type: "select",
           options: "materialList",
@@ -339,17 +327,6 @@ export const strutsBoltedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, setExtraState) => {
-            const endImage = strutsBoltedConfig.getEndConditionImage(value, inputs.end_condition_2);
-            setExtraState((extState) => ({
-              ...extState,
-              endConditionImage: endImage
-            }));
-            setInputs((inps) => ({
-              ...inps,
-              end_condition_1: value
-            }));
-          }
         },
         {
           key: "end_condition_2",
@@ -359,17 +336,6 @@ export const strutsBoltedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, setExtraState) => {
-            const endImage = strutsBoltedConfig.getEndConditionImage(inputs.end_condition_1, value);
-            setExtraState((extState) => ({
-              ...extState,
-              endConditionImage: endImage
-            }));
-            setInputs((inps) => ({
-              ...inps,
-              end_condition_2: value
-            }));
-          }
         },
         {
           key: "end_condition_image",
@@ -437,3 +403,5 @@ export const strutsBoltedConfig = {
     }
   ]
 };
+
+applyFieldLists(strutsBoltedConfig);

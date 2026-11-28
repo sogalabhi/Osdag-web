@@ -2,6 +2,7 @@ import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../../shared/config/prefCoreKeys';
+import { connectivityImage } from '../../../shared/config/connectionImages';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -31,6 +32,7 @@ import {
   KEY_TOPANGLE,
   KEY_TYP,
 } from "../../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const seatedAngleConfig = {
   sessionName: KEY_DISP_SEATED_ANGLE,
   designType: KEY_DISP_SEATED_ANGLE,
@@ -86,21 +88,6 @@ export const seatedAngleConfig = {
     connector_material: KEY_CONNECTOR_MATERIAL,
   },
 
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "angleList", inputKey: "angle_list", dataSource: "angleList" },
-    { key: "topAngle", inputKey: "topangle_list", dataSource: "angleList" },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "angleListSelect", inputKey: "angle_list", defaultValue: "All" },
-    { key: "topAngleSelect", inputKey: "topangle_list", defaultValue: "All" },
-    { key: "secondaryBeamSelect", inputKey: "secondary_beam", defaultValue: "All" },
-  ],
-
   validateInputs: (inputs, extraState, lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(seatedAngleConfig.inputSections, inputs, extraState, selectionStates);
     if (!requiredCheck.isValid) return requiredCheck;
@@ -109,7 +96,7 @@ export const seatedAngleConfig = {
     // fallback (InputSection.jsx) — a user who never touches the
     // Connectivity dropdown still sees/submits a real value, derived from
     // the live list rather than a hardcoded literal.
-    const connectivity = extraState?.selectedOption || inputs.connectivity || lists?.connectivityList?.[0];
+    const connectivity = inputs.connectivity || lists?.connectivityList?.[0];
     
     if (connectivity === CONN_CFBW || connectivity === CONN_CWBW) {
       if (!inputs.beam_section || !inputs.column_section || 
@@ -126,10 +113,10 @@ export const seatedAngleConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
 
     // See validateInputs's identical comment on this fallback chain.
-    const connectivity = extraState?.selectedOption || inputs.connectivity || lists?.connectivityList?.[0];
+    const connectivity = inputs.connectivity || lists?.connectivityList?.[0];
 
     if (connectivity === CONN_CFBW || connectivity === CONN_CWBW) {
       return {
@@ -195,15 +182,16 @@ export const seatedAngleConfig = {
         {
           key: "connectivity",
           label: UI_STRINGS.CONNECTIVITY,
-          type: "connectivitySelect"
+          type: "connectivitySelect",
+          imageSource: connectivityImage
         },
         {
           key: "column_section", 
           label: UI_STRINGS.COLUMN_SECTION,
           type: "select",
           options: "columnList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
+          conditionalDisplay: (extraState, inputs) => {
+            const connectivity = inputs?.connectivity;
             return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
@@ -212,33 +200,13 @@ export const seatedAngleConfig = {
           label: UI_STRINGS.BEAM_SECTION, 
           type: "select",
           options: "beamList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
+          conditionalDisplay: (extraState, inputs) => {
+            const connectivity = inputs?.connectivity;
             return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
-        // {
-        //   key: "primary_beam",
-        //   label: UI_STRINGS.PRIMARY_BEAM,
-        //   type: "select", 
-        //   options: "beamList",
-        //   conditionalDisplay: (extraState) => {
-        //     const connectivity = extraState?.selectedOption;
-        //     return connectivity === "Beam-Beam";
-        //   }
-        // },
-        // {
-        //   key: "secondary_beam",
-        //   label: UI_STRINGS.SECONDARY_BEAM,
-        //   type: "select",
-        //   options: "beamList", 
-        //   conditionalDisplay: (extraState) => {
-        //     const connectivity = extraState?.selectedOption;
-        //     return connectivity === "Beam-Beam";
-        //   }
-        // },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: UI_STRINGS.MATERIAL,
           type: "select",
           options: "materialList",
@@ -305,3 +273,8 @@ export const seatedAngleConfig = {
     }
   ]
 };
+
+// The secondary beam is not a field of the form, but a loaded file can still hold a list for it.
+applyFieldLists(seatedAngleConfig, {
+  extraSelections: [{ key: "secondaryBeamSelect", inputKey: "secondary_beam" }],
+});

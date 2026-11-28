@@ -2,6 +2,7 @@ import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../../shared/config/prefCoreKeys';
+import { connectivityImage } from '../../../shared/config/connectionImages';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -30,6 +31,7 @@ import {
   KEY_SUPTNGSEC_MATERIAL,
   KEY_TYP,
 } from "../../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const finPlateConfig = {
   sessionName: KEY_DISP_FINPLATE,
   designType: KEY_DISP_FINPLATE,
@@ -75,22 +77,10 @@ export const finPlateConfig = {
     connector_material: KEY_CONNECTOR_MATERIAL,
   },
 
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-  ],
-
   validateInputs: (inputs, extraState, lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(finPlateConfig.inputSections, inputs, extraState, selectionStates);
     if (!requiredCheck.isValid) return requiredCheck;
-    const connectivity = extraState?.selectedOption || inputs.connectivity || lists?.connectivityList?.[0];
+    const connectivity = inputs.connectivity || lists?.connectivityList?.[0];
 
     // Basic numeric loads must not be empty
     if (inputs.load_shear === "") {
@@ -112,9 +102,9 @@ export const finPlateConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
 
-    const connectivity = extraState?.selectedOption || inputs.connectivity || lists?.connectivityList?.[0];
+    const connectivity = inputs.connectivity || lists?.connectivityList?.[0];
 
     if (connectivity === CONN_CFBW || connectivity === CONN_CWBW) {
       return {
@@ -178,15 +168,16 @@ export const finPlateConfig = {
         {
           key: "connectivity",
           label: UI_STRINGS.CONNECTIVITY,
-          type: "connectivitySelect"
+          type: "connectivitySelect",
+          imageSource: connectivityImage
         },
         {
           key: "column_section",
           label: UI_STRINGS.COLUMN_SECTION,
           type: "select",
           options: "columnList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
+          conditionalDisplay: (extraState, inputs) => {
+            const connectivity = inputs?.connectivity;
             return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
@@ -195,8 +186,8 @@ export const finPlateConfig = {
           label: UI_STRINGS.BEAM_SECTION,
           type: "select",
           options: "beamList",
-          conditionalDisplay: (extraState) => {
-            const connectivity = extraState?.selectedOption;
+          conditionalDisplay: (extraState, inputs) => {
+            const connectivity = inputs?.connectivity;
             return connectivity === CONN_CFBW || connectivity === CONN_CWBW;
           }
         },
@@ -205,17 +196,17 @@ export const finPlateConfig = {
           label: "Primary Beam Section",
           type: "select",
           options: "beamList",
-          conditionalDisplay: (extraState) => extraState?.selectedOption === "Beam-Beam"
+          conditionalDisplay: (extraState, inputs) => inputs?.connectivity === "Beam-Beam"
         },
         {
           key: "secondary_beam",
           label: "Secondary Beam Section",
           type: "select",
           options: "beamList",
-          conditionalDisplay: (extraState) => extraState?.selectedOption === "Beam-Beam"
+          conditionalDisplay: (extraState, inputs) => inputs?.connectivity === "Beam-Beam"
         },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: UI_STRINGS.MATERIAL,
           type: "select",
           options: "materialList",
@@ -274,3 +265,5 @@ export const finPlateConfig = {
     }
   ]
 };
+
+applyFieldLists(finPlateConfig);

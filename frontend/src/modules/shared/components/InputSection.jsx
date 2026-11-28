@@ -1,50 +1,28 @@
-import { useState, useEffect, useContext, useMemo } from 'react';
-import Select, { components } from 'react-select';
+import { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { Modal } from 'antd';
-import { getOptionsForField, getListForInputKey } from '../utils/fieldOptionUtils';
+import { getOptionsForField, getListForDataSource, optionText, firstOptionValue, toSelectOptions, comparableOption } from '../utils/fieldOptionUtils';
 import { stripRequiredMark } from '../utils/validation';
 import { ModuleContext } from "../../../context/ModuleState";
 import CustomMaterialModal from "./CustomMaterialModal";
-import FRM from "../../../assets/flush_ep.png";
-import EOWIM from "../../../assets/owe_ep.png";
-import EBWRM from "../../../assets/extended.png";
-import CFBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cf_bw.png";
-import CWBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cw_bw.png";
-import BB from "../../../assets/ShearConnection/sc_fin_plate/fin_beam_beam.png";
-import BC_CF_BW_FLUSH from "../../../assets/BC_CF-BW-Flush.png";
-import BC_CF_BW_EOW from "../../../assets/BC_CF-BW-EOW.png";
-import BC_CF_BW_EBW from "../../../assets/BC_CF-BW-EBW.png";
-import BC_CW_BW_FLUSH from "../../../assets/BC_CW-BW-Flush.png";
-import BC_CW_BW_EOW from "../../../assets/BC_CW-BW-EOW.png";
-import BC_CW_BW_EBW from "../../../assets/BC_CW-BW-EBW.png";
-import ANGLE_SECTION from "../../../assets/TensionMember/com1_1.png";
-import BACK_TO_BACK_ANGLES_SAME_SIDE from "../../../assets/TensionMember/com1_2.png";
-import BACK_TO_BACK_ANGLES_OPPOSITE_SIDE from "../../../assets/TensionMember/com1_3.png";
-import ErrorImg from "../../../assets/notSelected.png";
-import { CONN_CFBW, CONN_CWBW } from "../../../constants/generated/coreKeys";
-
-const CustomOption = (props) => {
-  return (
-    <components.Option {...props}>
-      <div
-        onClick={(e) => {
-          if (props.innerProps.onClick) {
-            props.innerProps.onClick(e);
-          }
-          if (props.data.value === 'Customized') {
-            props.selectProps.onCustomizedClick(props.selectProps.field);
-          }
-        }}
-        className="w-full h-full"
-      >
-        {props.children}
-      </div>
-    </components.Option>
-  );
-};
+import { fieldComponentFor } from './fields';
+import { errorIdFor, fieldHasError } from './fields/common';
 
 const EMPTY_LIST = [];
+const NO_ERRORS = {};
 
+const sameValue = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+/**
+ * Field callbacks.
+ *
+ * A field of type `connectivitySelect`, `endPlateSelect` or `sectionProfileList` may declare
+ * `onChange(value, context)`, called after the widget has stored the chosen value. `context` is
+ * `{ inputs, setInputs, contextData, extraState, setExtraState }`: the inputs and extra state as
+ * rendered, the two state setters and the module's data lists.
+ *
+ * A field of type `image`, `connectivitySelect` or `endPlateSelect` may declare
+ * `imageSource(extraState, inputs)`, which returns the picture to show for the current state.
+ */
 export const InputSection = ({
   section,
   inputs,
@@ -60,9 +38,12 @@ export const InputSection = ({
   updateSelectedItems = () => { },
   setModalDynamicSrc,
   onRefetchModuleOptions,
+  fieldErrors = NO_ERRORS,
+  onClearFieldError,
 }) => {
   const safeInputs = inputs || {};
-  const [imageSource, setImageSource] = useState("");
+  // The picture a connectivity or end plate type field declares through `imageSource`.
+  const fieldImage = (field) => (typeof field.imageSource === 'function' ? field.imageSource(extraState, safeInputs) : null);
   const [showCustomMaterialModal, setShowCustomMaterialModal] = useState(false);
   const [customMaterialType, setCustomMaterialType] = useState("connector");
   // Field whose optimization bounds modal is open (for optimized_number fields)
@@ -76,107 +57,20 @@ export const InputSection = ({
         : contextData?.materialList || [],
   }), [contextData, contextMaterialList]);
 
-  // Styling object for react-select to fix z-index and other container issues
-  const customSelectStyles = {
-    menuPortal: base => ({ ...base, zIndex: 9999 }),
-    option: (base) => ({
-      ...base,
-      minHeight: 35,
-      lineHeight: '1',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    }),
-    control: (base) => ({
-      ...base,
-      borderColor: '#000',
-      '&:hover': {
-        borderColor: '#91B014',
-      },
-    }),
-    menu: (base) => ({
-      ...base,
-      minWidth: 'max-content',
-    }),
-  };
+  // A field with an error is outlined in red and flagged to assistive technology.
+  const hasError = (field) => fieldHasError(field, fieldErrors);
 
-
-  // Helper to normalize lists into react-select option shape
-  const toSelectOptions = (list = []) => {
-    if (!list || list.length === 0) return [];
-    if (typeof list[0] === 'object' && list[0] !== null) {
-      // If already in { value, label } shape, keep it
-      if ('value' in list[0] && 'label' in list[0]) {
-        return list;
-      }
-      // Otherwise normalize using common keys; fallback to stringified object
-      return list.map((item) => {
-        const val =
-          item.value ??
-          item.label ??
-          item.Grade ??
-          item.grade ??
-          item.Designation ??
-          item.designation ??
-          item.name ??
-          item.section ??
-          item.id ??
-          String(item);
-        return { value: val, label: val };
-      });
-    }
-    return list.map(item => ({ value: item, label: item }));
-  };
-
-
+  // An edit of a field clears the error shown for it.
+  const previousInputs = useRef(safeInputs);
   useEffect(() => {
-    // Check for section profile first (takes priority)
-    const sectionProfileField = section.fields.find(
-      (f) => f.type === 'sectionProfileSelect'
-    );
-    if (sectionProfileField) {
-      const profileValue = extraState.selectedProfile || safeInputs[sectionProfileField.key] || sectionProfileField.defaultValue;
-      if (profileValue) {
-        const sectionProfileMap = {
-          "Angles": ANGLE_SECTION,
-          "Back to Back Angles - Same side of gusset": BACK_TO_BACK_ANGLES_SAME_SIDE,
-          "Back to Back Angles - Opposite side of gusset": BACK_TO_BACK_ANGLES_OPPOSITE_SIDE,
-        };
-        setImageSource(sectionProfileMap[profileValue] || ErrorImg);
-        return; // Exit early if section profile is found
-      }
-    }
-
-    // Handle connectivity/endplate images
-    if (extraState.selectedOption) {
-      const conn = safeInputs.connectivity;
-      const epType = extraState.selectedOption;
-      if (conn && epType) {
-        console.log(conn + "  " + epType);
-      }
-      // Beam-to-column end plate pictures, by connectivity then end plate type.
-      const endPlateImages = {
-        [CONN_CFBW]: {
-          "Flushed - Reversible Moment": BC_CF_BW_FLUSH,
-          "Extended One Way - Irreversible Moment": BC_CF_BW_EOW,
-          "Extended Both Ways - Reversible Moment": BC_CF_BW_EBW,
-        },
-        [CONN_CWBW]: {
-          "Flushed - Reversible Moment": BC_CW_BW_FLUSH,
-          "Extended One Way - Irreversible Moment": BC_CW_BW_EOW,
-          "Extended Both Ways - Reversible Moment": BC_CW_BW_EBW,
-        },
-      };
-      const imageMap = {
-        "Flushed - Reversible Moment": FRM, "Extended One Way - Irreversible Moment": EOWIM, "Extended Both Ways - Reversible Moment": EBWRM,
-        [CONN_CFBW]: CFBW, [CONN_CWBW]: CWBW, "Beam-Beam": BB,
-      };
-
-      const selectedImage = (conn ? endPlateImages[conn]?.[epType] : null) || imageMap[extraState.selectedOption] || ErrorImg;
-      setImageSource(selectedImage);
+    const before = previousInputs.current;
+    previousInputs.current = safeInputs;
+    if (!onClearFieldError) return;
+    for (const key of Object.keys(fieldErrors)) {
+      if (!sameValue(before[key], safeInputs[key])) onClearFieldError(key);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [extraState.selectedOption, extraState.selectedProfile, safeInputs.connectivity, safeInputs.section_profile]);
+  }, [safeInputs]);
 
   useEffect(() => {
     setInputs((prev) => {
@@ -201,17 +95,11 @@ export const InputSection = ({
         if (isCustomizable) return;
 
         // Determine first option value (1st element in array)
-        const first = rawList[0];
-        const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
-          : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
+        const firstValue = firstOptionValue(rawList);
 
         const current = nextInputs[field.key];
         const opts = toSelectOptions(rawList);
-        const currentExistsInOptions = opts.some(opt => {
-          const s1 = String(opt.value).trim().toLowerCase().replace(/\s+/g, '');
-          const s2 = String(current).trim().toLowerCase().replace(/\s+/g, '');
-          return s1 === s2;
-        });
+        const currentExistsInOptions = opts.some(opt => comparableOption(opt.value) === comparableOption(current));
 
         if (current === undefined || current === null || current === '' || !currentExistsInOptions) {
           nextInputs[field.key] = firstValue;
@@ -221,43 +109,6 @@ export const InputSection = ({
       return isChanged ? nextInputs : prev;
     });
 
-    // Set default for connectivity / endplate dropdowns in extraState
-    const connectivityField = section.fields.find(
-      (f) => f.type === 'connectivitySelect' || f.type === 'endPlateSelect'
-    );
-    let list = [];
-    if (connectivityField) {
-      list = getOptionsForField(connectivityField, safeContextData, safeInputs);
-      if (!list || list.length === 0) {
-        list = connectivityField.type === 'connectivitySelect'
-          ? (safeContextData.connectivityList || [])
-          : (safeContextData.endPlateList || []);
-      }
-    }
-    if (connectivityField && list && list.length > 0) {
-      const first = list[0];
-      const firstValue = typeof first === 'object' && first !== null && 'value' in first ? first.value
-        : (typeof first === 'object' && first !== null && 'Grade' in first ? first.Grade : first);
-
-      const currentOpt = extraState.selectedOption;
-      const opts = toSelectOptions(list);
-      const optExists = opts.some(opt => String(opt.value).trim().toLowerCase() === String(currentOpt).trim().toLowerCase());
-
-      if (!currentOpt || !optExists) {
-        setExtraState((prev) => ({ ...prev, selectedOption: firstValue }));
-      }
-    }
-
-    // Set default for section profile dropdowns
-    const sectionProfileField = section.fields.find(
-      (f) => f.type === 'sectionProfileSelect'
-    );
-    if (sectionProfileField && !extraState.selectedProfile) {
-      const currentValue = safeInputs[sectionProfileField.key] || sectionProfileField.defaultValue;
-      if (currentValue) {
-        setExtraState((prev) => ({ ...prev, selectedProfile: currentValue }));
-      }
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safeContextData, section.fields]);
 
@@ -289,26 +140,20 @@ export const InputSection = ({
   }, [dynamicSelectState]);
 
   const handleCustomizableSelect = (field, value) => {
-    const getAllValuesForInputKey = (inputKey) => {
+    const getAllValues = () => {
       if (field?.getDynamicDataSource) {
         const options = field.getDynamicDataSource(inputs, contextData);
         setModalDynamicSrc((modalDynSrc) => ({ ...modalDynSrc, [field.key]: options }));
         return options;
       }
-      return getListForInputKey(inputKey, safeContextData, field.dataSource);
+      return getListForDataSource(safeContextData, field.dataSource);
     };
 
     if (value === "Customized") {
       // Get all available values
-      const allValues = getAllValuesForInputKey(field.key);
+      const allValues = getAllValues();
       // Convert to array of keys/strings for Transfer component
-      const allKeys = allValues.map(val => {
-        // Handle different data formats (object with value/Grade property, or plain string/number)
-        if (typeof val === 'object' && val !== null) {
-          return val.value || val.Grade || val.toString();
-        }
-        return val.toString();
-      });
+      const allKeys = allValues.map(optionText);
 
       const isCurrentlyCustomized = selectionStates?.[field.selectionKey] === "Customized";
       if (!isCurrentlyCustomized) {
@@ -322,14 +167,9 @@ export const InputSection = ({
       toggleAllSelected(field.key, false);
     } else {
       // "All" option - get all values and set them in inputs 
-      const allValues = getAllValuesForInputKey(field.key);
+      const allValues = getAllValues();
       // Convert to array format if needed
-      const allValuesArray = allValues.map(val => {
-        if (typeof val === 'object' && val !== null) {
-          return val.value || val.Grade || val.toString();
-        }
-        return val.toString();
-      });
+      const allValuesArray = allValues.map(optionText);
       setInputs({ ...safeInputs, [field.key]: allValuesArray });
       // Clear selectedItems since we're using "All" (not managed via Transfer)
       updateSelectedItems(field.key, []);
@@ -339,323 +179,37 @@ export const InputSection = ({
     }
   };
 
-  const renderNumericInput = (field, isNumeric) => (
-    <div className="w-[60%]">
-      <input
-        type="text"
-        inputMode={isNumeric ? 'decimal' : 'text'}
-        value={safeInputs[field.key] ?? ""}
-        onChange={(e) => {
-          let val = e.target.value;
-          if (isNumeric) {
-            val = val.replace(/[^0-9.-]/g, '');
-            const decimalCount = (val.match(/\./g) || []).length;
-            if (decimalCount > 1) {
-              const firstDecimalIdx = val.indexOf('.');
-              val = val.slice(0, firstDecimalIdx + 1) + val.slice(firstDecimalIdx + 1).replace(/\./g, '');
-            }
-            if (val.includes('-')) {
-              const isNegative = val.startsWith('-');
-              val = val.replace(/-/g, '');
-              if (isNegative) {
-                val = '-' + val;
-              }
-            }
-          }
-          setInputs({ ...safeInputs, [field.key]: val });
-        }}
-        onKeyDown={(e) => {
-          if (isNumeric) {
-            const allowedKeys = [
-              'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
-              'Home', 'End', 'ArrowLeft', 'ArrowRight', '.', '-'
-            ];
-            const isShortcut = (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase());
-
-            if (e.key === ' ') {
-              e.preventDefault();
-              return;
-            }
-
-            if (!allowedKeys.includes(e.key) && !isShortcut && isNaN(Number(e.key))) {
-              e.preventDefault();
-            }
-          }
-        }}
-        placeholder={field.placeholder || `ex. ${stripRequiredMark(field.label)}`}
-        disabled={field.disabled || isInputLocked}
-        className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70"
-      />
-    </div>
-  );
+  const fieldContext = {
+    inputs: safeInputs,
+    rawInputs: inputs,
+    setInputs,
+    isInputLocked,
+    section,
+    contextData: safeContextData,
+    extraState,
+    setExtraState,
+    selectionStates,
+    fieldErrors,
+    updateModalState,
+    handleCustomizableSelect,
+    openCustomMaterial: (type) => {
+      setCustomMaterialType(type);
+      setShowCustomMaterialModal(true);
+    },
+    openBounds: setBoundsModalField,
+  };
 
   const renderField = (field) => {
     if (field.conditionalDisplay && !field.conditionalDisplay(extraState, safeInputs)) return null;
 
-    // Resolve a dynamic field type (e.g. plate girder switches between number and
-    // customizable based on Customized vs Optimized design type).
+    // A field may resolve its type from the inputs (plate girder switches between number and
+    // customizable on Customized vs Optimized design type).
     const effectiveType = typeof field.conditionalType === 'function'
       ? field.conditionalType(safeInputs)
       : field.type;
 
-    switch (effectiveType) {
-      case 'select': {
-        const isCustomizable = Boolean(field.selectionKey) && !(field.key.includes("plate1") || field.key.includes("plate2"));
-        const rawList = getOptionsForField(field, safeContextData, safeInputs);
-        const options = toSelectOptions(rawList);
-
-        if (isCustomizable) {
-          const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
-          if (!isCustomized) {
-            return (
-              <Select
-                value={{ label: "All", value: "All" }}
-                isDisabled={true}
-                styles={customSelectStyles}
-                classNamePrefix="react-select"
-                className="w-[60%]"
-                isSearchable={false}
-              />
-            );
-          }
-          const currentValue = (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [])
-            .map(val => ({ value: val, label: val }));
-
-          return (
-            <Select
-              isMulti
-              options={options}
-              value={currentValue}
-              isDisabled={isInputLocked}
-              isSearchable={false}
-              onChange={(selectedOptions) => {
-                const newValues = selectedOptions.map(opt => opt.value);
-                setInputs({ ...safeInputs, [field.key]: newValues });
-              }}
-              menuPortalTarget={document.body}
-              styles={customSelectStyles}
-              classNamePrefix="react-select"
-              className="w-[60%]"
-            />
-          );
-        }
-
-        if (!rawList || rawList.length === 0) {
-          return (
-            <Select
-              isDisabled={true}
-              placeholder="No data available"
-              styles={customSelectStyles}
-              classNamePrefix="react-select"
-              className="w-[60%]"
-              isSearchable={false}
-            />
-          );
-        }
-
-        const isMaterialField = field.key?.includes('material');
-
-        // Same comparison as the option check above, so a value it accepts is also shown.
-        const normalizeOption = (v) => String(v).trim().toLowerCase().replace(/\s+/g, '');
-        const value = options.find(opt => normalizeOption(opt.value) === normalizeOption(safeInputs[field.key]));
-
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            isSearchable={false}
-            onChange={(selected) => {
-              if (isMaterialField && selected.value === 'Custom') {
-                if (field.key.includes('supported')) setCustomMaterialType('supported');
-                else if (field.key.includes('supporting')) setCustomMaterialType('supporting');
-                else setCustomMaterialType('connector');
-                setShowCustomMaterialModal(true);
-                return;
-              }
-              const nextInputs = { ...safeInputs, [field.key]: selected.value };
-              // A dynamic dropdown that names this field in `resetsWith` takes the first option of its
-              // new list whenever the user picks a value here.
-              section.fields.forEach((dependent) => {
-                if (dependent.type !== 'dynamicSelect' || dependent.resetsWith !== field.key) return;
-                const values = getOptionsForField(dependent, safeContextData, nextInputs).map((o) => (o && typeof o === 'object' ? o.value : o));
-                nextInputs[dependent.key] = values.length > 0 ? values[0] : '';
-              });
-              setInputs(nextInputs);
-            }}
-            menuPortalTarget={document.body}
-            styles={customSelectStyles}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-          />
-        );
-      }
-
-      case 'connectivitySelect':
-      case 'endPlateSelect': {
-        let list = getOptionsForField(field, safeContextData, safeInputs);
-        if (!list || list.length === 0) {
-          list = field.type === 'connectivitySelect'
-            ? (safeContextData.connectivityList || [])
-            : (safeContextData.endPlateList || []);
-        }
-        const options = toSelectOptions(list);
-        const value = options.find(opt => String(opt.value) === String(extraState.selectedOption || safeInputs[field.key])) || options[0] || null;
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            isSearchable={false}
-            onChange={(selected) => {
-              const val = selected.value;
-              setExtraState((prev) => ({ ...prev, selectedOption: val }));
-              setInputs((prev) => ({ ...prev, [field.key]: val, output: null }));
-              if (typeof field.onChange === "function") {
-                try {
-                  field.onChange(val, safeInputs, setInputs, safeContextData, extraState, setExtraState);
-                } catch {
-                  try {
-                    field.onChange(val, setInputs, setExtraState);
-                  } catch (_e) {
-                    console.warn("[InputSection] connectivitySelect custom onChange warning:", _e?.message);
-                  }
-                }
-              }
-            }}
-            menuPortalTarget={document.body}
-            styles={customSelectStyles}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-          />
-        );
-      }
-
-      case 'customizable': {
-        const options = [{ value: "All", label: "All" }, { value: "Customized", label: "Customized" }];
-        const value = options.find(opt => String(opt.value) === String(selectionStates?.[field.selectionKey] || "All"));
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            isSearchable={false}
-            onChange={(selected) => handleCustomizableSelect(field, selected.value)}
-            menuPortalTarget={document.body}
-            styles={customSelectStyles}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-            components={{ Option: CustomOption }}
-            onCustomizedClick={(f) => updateModalState(f.modalKey, true)}
-            field={field}
-          />
-        );
-      }
-
-      case 'sectionProfileList': {
-        const rawSectionList = getOptionsForField(field, safeContextData, safeInputs);
-        const options = (rawSectionList || []).map((elem) => ({ value: elem, label: elem }));
-        const currentValue = safeInputs[field.key] || field.defaultValue;
-        const value = options.find(opt => String(opt.value) === String(currentValue));
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            onChange={(selected) => {
-              const val = selected.value;
-
-              // 1. Direct inputs state update
-              setInputs((prev) => ({
-                ...prev,
-                [field.key]: val,
-                section_designation: [],
-              }));
-
-              // 2. Direct extraState update for profile image
-              setExtraState((prev) => ({
-                ...prev,
-                selectedProfile: val,
-              }));
-
-              // 3. Execute field.onChange safely
-              if (typeof field.onChange === "function") {
-                try {
-                  field.onChange(val, setInputs, safeContextData, setExtraState, safeInputs, extraState);
-                } catch {
-                  // Fallback invocation for (val, setInputs, setExtraState) signature
-                  try {
-                    field.onChange(val, setInputs, setExtraState);
-                  } catch (_e) {
-                    console.warn("[InputSection] sectionProfileList custom onChange warning:", _e?.message);
-                  }
-                }
-              }
-            }}
-            menuPortalTarget={document.body}
-            styles={customSelectStyles}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-            isSearchable={false}
-          />
-        );
-      }
-      case 'dynamicSelect': {
-        const options = getOptionsForField(field, safeContextData, safeInputs);
-        const value = options.find(opt => String(opt.value) === String(inputs[field.key]));
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            onChange={(selected) => setInputs({ ...inputs, [field.key]: selected.value })}
-            menuPortalTarget={document.body}
-            styles={customSelectStyles}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-            isSearchable={false}
-          />
-        );
-      }
-      case 'image':
-        return (<>{field.conditionalDisplay() &&
-          <div className="flex justify-center">
-            <img
-              src={field.imageSource(extraState, safeInputs)}
-              alt="Connection type"
-              style={{ width: field.width || '100px', height: field.height || '100px', objectFit: 'contain' }}
-            /></div>}</>);
-
-      case 'optimized_number': {
-        // Customized → plain number input; Optimized → "Set Bounds" button
-        // that captures lower/upper/increment optimization bounds.
-        const isOptimized = safeInputs.design_type === 'Optimized';
-        if (!isOptimized) {
-          return renderNumericInput(field, true);
-        }
-        const lb = safeInputs[`${field.key}_lb`];
-        const ub = safeInputs[`${field.key}_ub`];
-        const boundsSet = lb !== undefined && lb !== '' && ub !== undefined && ub !== '';
-        return (
-          <div className="w-[60%]">
-            <button
-              type="button"
-              disabled={isInputLocked}
-              onClick={() => setBoundsModalField(field)}
-              className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm bg-white hover:border-osdag-green hover:text-osdag-green transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {boundsSet ? `Bounds: ${lb} - ${ub}` : 'Set Bounds'}
-            </button>
-          </div>
-        );
-      }
-
-      case 'number':
-        return renderNumericInput(field, true);
-
-      default:
-        return renderNumericInput(field, field.type === 'number');
-    }
+    const FieldComponent = fieldComponentFor(effectiveType, field.key);
+    return FieldComponent ? <FieldComponent field={field} ctx={fieldContext} /> : null;
   };
 
   return (
@@ -675,10 +229,19 @@ export const InputSection = ({
                 </h4>
                 {renderField(field)}
               </div>
-              {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (
+              {hasError(field) && (
+                <p
+                  id={errorIdFor(field)}
+                  data-testid={errorIdFor(field)}
+                  className="text-red-600 text-xs -mt-2 mb-3 ml-[40%]"
+                >
+                  {fieldErrors[field.key]}
+                </p>
+              )}
+              {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && fieldImage(field) && (
                 <div className="flex justify-center">
                   <img
-                    src={imageSource}
+                    src={fieldImage(field)}
                     alt="Connection type"
                     className="w-[150px] h-[100px] object-contain"
                   />

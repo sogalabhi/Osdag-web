@@ -76,10 +76,10 @@ describe("useModuleForm initial state", () => {
     expect(setup().result.current.inputs).toEqual({});
   });
 
-  it("starts with the connectivity of the module's own kind in the extra state", () => {
-    expect(setup(finPlate).result.current.extraState).toEqual({ selectedOption: CONN_CFBW });
-    expect(setup(caseOf("beam-beam end plate")).result.current.extraState).toEqual({ selectedOption: "Flushed - Reversible Moment" });
-    expect(setup(caseOf("beam-column end plate")).result.current.extraState).toEqual({ selectedOption: "Flushed - Reversible Moment" });
+  it("starts with an empty extra state and the connectivity in the inputs", () => {
+    expect(setup(finPlate).result.current.extraState).toEqual({});
+    expect(setup(caseOf("beam-column end plate")).result.current.extraState).toEqual({});
+    expect(setup(finPlate).result.current.inputs.connectivity).toBe(CONN_CFBW);
   });
 
   it("takes the extra state from the config's own getInitialExtraState when it has one", () => {
@@ -95,8 +95,8 @@ describe("useModuleForm setters", () => {
     expect(result.current.inputs.load_shear).toBe("99");
     expect(result.current.inputs.load_axial).toBe(finPlate.defaultInputs.load_axial);
 
-    act(() => result.current.setExtraState({ selectedOption: "Beam-Beam" }));
-    expect(result.current.extraState).toEqual({ selectedOption: "Beam-Beam" });
+    act(() => result.current.setExtraState({ selectedProfile: "Channels" }));
+    expect(result.current.extraState).toEqual({ selectedProfile: "Channels" });
 
     act(() => result.current.updateSelectionState("boltDiameterSelect", "Customized"));
     expect(result.current.selectionStates.boltDiameterSelect).toBe("Customized");
@@ -148,6 +148,14 @@ describe("useModuleForm lists on All", () => {
     expect(view.result.current.inputs.plate_thickness).toEqual(["8", "10"]);
   });
 
+  it("does not fill an empty All of the plate girder stiffener thickness lists", () => {
+    const girder = caseOf("plate girder");
+    const view = setup(girder, {});
+    view.rerender({ cfg: girder, data });
+    expect(view.result.current.inputs.intermediate_stiffener_thickness_val).toEqual([]);
+    expect(view.result.current.inputs.longitudinal_stiffener_thickness_val).toEqual([]);
+  });
+
   it("leaves a list the user picked alone, and one that is no longer on All", () => {
     const view = setup(finPlate, {});
     act(() => result(view).updateSelectedItems("bolt_diameter", ["20"]));
@@ -174,7 +182,7 @@ describe("useModuleForm prefill from a file", () => {
     const view = setup(finPlate, { loadingOptions: false, ...LISTS });
     expect(view.result.current.inputs).toMatchObject({ material: GRADE, load_shear: "123" });
     expect(view.result.current.inputs.bolt_diameter).toEqual(["12"]);
-    expect(view.result.current.extraState.selectedOption).toBe("Column Web-Beam Web");
+    expect(view.result.current.inputs.connectivity).toBe("Column Web-Beam Web");
     expect(sessionStorage.getItem(key)).toBeNull();
   });
 
@@ -208,7 +216,7 @@ describe("useModuleForm reset", () => {
     const form = () => view.result.current;
     act(() => {
       form().setInputs((prev) => ({ ...prev, load_shear: "5" }));
-      form().setExtraState({ selectedOption: "Beam-Beam" });
+      form().setExtraState({ selectedProfile: "Channels" });
       form().updateSelectionState("boltDiameterSelect", "Customized");
       form().updateSelectedItems("bolt_diameter", ["20"]);
       form().toggleAllSelected("bolt_diameter", false);
@@ -223,7 +231,7 @@ describe("useModuleForm reset", () => {
     act(() => form().resetFormState());
 
     expect(form().inputs).toBe(finPlate.defaultInputs);
-    expect(form().extraState).toEqual({ selectedOption: CONN_CFBW });
+    expect(form().extraState).toEqual({});
     expect(form().selectionStates.boltDiameterSelect).toBe("All");
     expect(form().selectedItems.bolt_diameter).toEqual([]);
     expect(form().allSelected.bolt_diameter).toBe(true);

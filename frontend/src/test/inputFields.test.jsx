@@ -21,6 +21,9 @@ import { weldedToEndConfig } from "../modules/TensionMembers/WeldedToEnd/configs
 import { beamToColumnEndPlateConfig } from "../modules/beamToColumnEndPlate/configs/beamToColumnEndPlateConfig";
 import { beamBeamEndPlateConfig } from "../modules/beamBeamEndPlate/configs/beamBeamEndPlateConfig";
 import { seatedAngleConfig } from "../modules/shearConnection/seatAngle/configs/seatedAngleConfig";
+import { finPlateConfig } from "../modules/shearConnection/finPlate/configs/finPlateConfig";
+import { cleatAngleConfig } from "../modules/shearConnection/cleatAngle/configs/cleatAngleConfig";
+import { endPlateConfig } from "../modules/shearConnection/endPlate/configs/endPlateConfig";
 import { CONN_CFBW, CONN_CWBW, KEY_END1, KEY_END2 } from "../constants/generated/coreKeys";
 import { LISTS } from "./cases/shared";
 
@@ -285,24 +288,52 @@ describe("the end condition pictures", () => {
   });
 });
 
-describe("the connectivity picture", () => {
-  const section = { title: "Connecting Members", fields: [{ key: "connectivity", label: "Connectivity", type: "connectivitySelect" }] };
-
+describe.each([
+  ["fin plate", finPlateConfig],
+  ["cleat angle", cleatAngleConfig],
+  ["seated angle", seatedAngleConfig],
+  ["end plate", endPlateConfig],
+])("the connectivity picture of the %s connection", (_name, config) => {
   it.each([
     [CONN_CFBW, FIN_CFBW],
     [CONN_CWBW, FIN_CWBW],
     ["Beam-Beam", FIN_BEAM_BEAM],
   ])("of %s is its own picture", async (connectivity, expected) => {
-    render(<Host section={section} inputs={{ connectivity }} extra={{ selectedOption: connectivity }} />);
-    await act(async () => {});
+    await show(config, "connectivity", { inputs: { connectivity } });
     expect(picture()).toBe(expected);
   });
 
   it("changes when another connectivity is chosen", async () => {
-    render(<Host section={section} inputs={{ connectivity: CONN_CFBW }} extra={{ selectedOption: CONN_CFBW }} />);
-    await act(async () => {});
+    await show(config, "connectivity", { inputs: { connectivity: CONN_CFBW } });
     pick("Connectivity", "Beam-Beam");
     expect(picture()).toBe(FIN_BEAM_BEAM);
+  });
+});
+
+describe("the fields that depend on the connectivity", () => {
+  const section = sectionWith(finPlateConfig, "column_section");
+  const labels = () => screen.queryAllByRole("heading", { level: 4 }).map((h) => h.textContent.replace(/\s*\*$/, ""));
+
+  it("show the column and beam sections for a column connectivity and the two beams for Beam-Beam", async () => {
+    const { unmount } = render(<Host section={section} inputs={{ connectivity: CONN_CFBW }} />);
+    await act(async () => {});
+    expect(labels()).toEqual(expect.arrayContaining(["Column Section", "Beam Section"]));
+    expect(labels()).not.toContain("Primary Beam Section");
+    unmount();
+    render(<Host section={section} inputs={{ connectivity: "Beam-Beam" }} />);
+    await act(async () => {});
+    expect(labels()).toEqual(expect.arrayContaining(["Primary Beam Section", "Secondary Beam Section"]));
+    expect(labels()).not.toContain("Column Section");
+  });
+});
+
+describe("the end plate type default", () => {
+  it.each([
+    ["beam-to-column", beamToColumnEndPlateConfig],
+    ["beam-to-beam", beamBeamEndPlateConfig],
+  ])("of the %s end plate is the first type of the list", async (_name, config) => {
+    await show(config, "endPlateType", { inputs: {} });
+    expect(inputsNow().endPlateType).toBe("Flushed - Reversible Moment");
   });
 });
 
@@ -313,7 +344,7 @@ describe("the end plate picture", () => {
     [CONN_CFBW, [BC_CF_FLUSH, BC_CF_ONE_WAY, BC_CF_BOTH_WAYS]],
     [CONN_CWBW, [BC_CW_FLUSH, BC_CW_ONE_WAY, BC_CW_BOTH_WAYS]],
   ])("of a beam-to-column end plate on %s follows the end plate type", async (connectivity, pics) => {
-    await show(beamToColumnEndPlateConfig, "endPlateType", { inputs: { connectivity, endPlateType: TYPES[0] }, extra: { selectedOption: TYPES[0] } });
+    await show(beamToColumnEndPlateConfig, "endPlateType", { inputs: { connectivity, endPlateType: TYPES[0] } });
     expect(picture()).toBe(pics[0]);
     pick("End Plate Type", TYPES[1]);
     expect(picture()).toBe(pics[1]);
@@ -322,14 +353,14 @@ describe("the end plate picture", () => {
   });
 
   it("of a beam-to-column end plate changes with the connectivity", async () => {
-    await show(beamToColumnEndPlateConfig, "endPlateType", { inputs: { connectivity: CONN_CFBW, endPlateType: TYPES[0] }, extra: { selectedOption: TYPES[0] } });
+    await show(beamToColumnEndPlateConfig, "endPlateType", { inputs: { connectivity: CONN_CFBW, endPlateType: TYPES[0] } });
     expect(picture()).toBe(BC_CF_FLUSH);
     pick("Connectivity", CONN_CWBW);
     expect(picture()).toBe(BC_CW_FLUSH);
   });
 
   it("of a beam-to-beam end plate follows the end plate type", async () => {
-    await show(beamBeamEndPlateConfig, "endPlateType", { inputs: { endPlateType: TYPES[0] }, extra: { selectedOption: TYPES[0] } });
+    await show(beamBeamEndPlateConfig, "endPlateType", { inputs: { endPlateType: TYPES[0] } });
     expect(picture()).toBe(FLUSH);
     pick("End Plate Type", TYPES[1]);
     expect(picture()).toBe(ONE_WAY);

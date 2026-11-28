@@ -34,6 +34,7 @@ import {
   KEY_SEC_PROFILE,
 } from "../../../constants/generated/coreKeys";
 import { prefText } from "../../shared/utils/prefValue";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 // A saved gusset thickness is text; a file saved by an older form may hold a list.
 const firstOf = (value) => (Array.isArray(value) ? value[0] : value);
 
@@ -87,14 +88,6 @@ export const strutsWeldedConfig = {
     profile_image: null,
     end_condition_image: null,
   },
-
-  modalConfig: [
-    { key: "sectionDesignation", inputKey: "section_designation", dataSource: null },
-  ],
-
-  selectionConfig: [
-    { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
-  ],
 
   getSectionImage: (profile) => {
     switch (profile) {
@@ -229,7 +222,8 @@ export const strutsWeldedConfig = {
           key: "section_profile",
           label: "Section Profile",
           type: "sectionProfileList",
-          onChange: (value, setInputs, setExtraState) => {
+          resets: ["section_designation"],
+          onChange: (value, { setInputs, setExtraState }) => {
             const imageSource = strutsWeldedConfig.getSectionImage(value);
             setExtraState((extState) => ({
               ...extState,
@@ -276,7 +270,7 @@ export const strutsWeldedConfig = {
           }
         },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: "Material",
           type: "select",
           options: "materialList",
@@ -299,17 +293,6 @@ export const strutsWeldedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, setExtraState) => {
-            const endImage = strutsWeldedConfig.getEndConditionImage(value, inputs.end_condition_2);
-            setExtraState((extState) => ({
-              ...extState,
-              endConditionImage: endImage
-            }));
-            setInputs((inps) => ({
-              ...inps,
-              end_condition_1: value
-            }));
-          }
         },
         {
           key: "end_condition_2",
@@ -319,17 +302,6 @@ export const strutsWeldedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, setExtraState) => {
-            const endImage = strutsWeldedConfig.getEndConditionImage(inputs.end_condition_1, value);
-            setExtraState((extState) => ({
-              ...extState,
-              endConditionImage: endImage
-            }));
-            setInputs((inps) => ({
-              ...inps,
-              end_condition_2: value
-            }));
-          }
         },
         {
           key: "end_condition_image",
@@ -354,3 +326,5 @@ export const strutsWeldedConfig = {
     },
   ]
 };
+
+applyFieldLists(strutsWeldedConfig);

@@ -1,0 +1,1426 @@
+{
+ "fin plate": {
+  "all / Column Flange-Beam Web": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Flange-Beam Web",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "30",
+   "Load.Shear": "70",
+   "Material": "E 165 (Fe 290)",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Fin Plate Connection"
+  },
+  "all / Column Web-Beam Web": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Web-Beam Web",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "30",
+   "Load.Shear": "70",
+   "Material": "E 165 (Fe 290)",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Fin Plate Connection"
+  },
+  "all / Beam-Beam": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Beam-Beam",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "30",
+   "Load.Shear": "70",
+   "Material": "E 165 (Fe 290)",
+   "Member.Supported_Section.Designation": "JB 150",
+   "Member.Supporting_Section.Designation": "JB 200",
+   "Module": "Fin Plate Connection"
+  },
+  "customized / Column Flange-Beam Web": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Flange-Beam Web",
+   "Connector.Plate.Thickness_List": [
+    "10",
+    "12"
+   ],
+   "Load.Axial": "30",
+   "Load.Shear": "70",
+   "Material": "E 165 (Fe 290)",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Fin Plate Connection"
+  }
+ },
+ "cleat angle": {
+  "all / Column Flange-Beam Web": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Flange-Beam Web",
+   "Connector.Angle_List": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Load.Shear": "20",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Cleat Angle Connection"
+  },
+  "all / Column Web-Beam Web": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Web-Beam Web",
+   "Connector.Angle_List": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Load.Shear": "20",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Cleat Angle Connection"
+  },
+  "all / Beam-Beam": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Beam-Beam",
+   "Connector.Angle_List": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Load.Shear": "20",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "MB 300",
+   "Module": "Cleat Angle Connection"
+  },
+  "customized / Column Flange-Beam Web": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Flange-Beam Web",
+   "Connector.Angle_List": [
+    "50 x 50 x 6"
+   ],
+   "Load.Shear": "20",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Cleat Angle Connection"
+  }
+ },
+ "header plate": {
+  "all / Column Flange-Beam Web": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Flange-Beam Web",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "10",
+   "Load.Shear": "20",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Header Plate Connection"
+  },
+  "all / Column Web-Beam Web": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Web-Beam Web",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "10",
+   "Load.Shear": "20",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Header Plate Connection"
+  },
+  "all / Beam-Beam": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Beam-Beam",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "10",
+   "Load.Shear": "20",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "JB 150",
+   "Member.Supporting_Section.Designation": "JB 200",
+   "Module": "Header Plate Connection"
+  },
+  "customized / Column Flange-Beam Web": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Flange-Beam Web",
+   "Connector.Plate.Thickness_List": [
+    "10",
+    "12"
+   ],
+   "Load.Axial": "10",
+   "Load.Shear": "20",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Header Plate Connection"
+  }
+ },
+ "seated angle": {
+  "all / Column Flange-Beam Web": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Flange-Beam Web",
+   "Connector.Angle_List": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Connector.Top_Angle": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Load.Axial": "0",
+   "Load.Shear": "70",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Seated Angle Connection"
+  },
+  "all / Column Web-Beam Web": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Web-Beam Web",
+   "Connector.Angle_List": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Connector.Top_Angle": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Load.Axial": "0",
+   "Load.Shear": "70",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Seated Angle Connection"
+  },
+  "customized / Column Flange-Beam Web": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Flange-Beam Web",
+   "Connector.Angle_List": [
+    "50 x 50 x 6"
+   ],
+   "Connector.Top_Angle": [
+    "50 x 50 x 6"
+   ],
+   "Load.Axial": "0",
+   "Load.Shear": "70",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "MB 300",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Seated Angle Connection"
+  }
+ },
+ "beam-beam cover plate bolted": {
+  "all": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connector.Flange_Plate.Preferences": "Outside",
+   "Connector.Flange_Plate.Thickness_list": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "10",
+   "Load.Moment": "10",
+   "Load.Shear": "10",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "MB 300",
+   "Module": "Beam-to-Beam Cover Plate Bolted Connection"
+  },
+  "customized": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connector.Flange_Plate.Preferences": "Outside",
+   "Connector.Flange_Plate.Thickness_list": [
+    "10",
+    "12"
+   ],
+   "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10"
+   ],
+   "Load.Axial": "10",
+   "Load.Moment": "10",
+   "Load.Shear": "10",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "MB 300",
+   "Module": "Beam-to-Beam Cover Plate Bolted Connection"
+  }
+ },
+ "column-column cover plate bolted": {
+  "all": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connector.Flange_Plate.Preferences": "Outside",
+   "Connector.Flange_Plate.Thickness_list": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "100",
+   "Load.Moment": "70",
+   "Load.Shear": "50",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "UC 305 x 305 x 118",
+   "Module": "Column-to-Column Cover Plate Bolted Connection"
+  },
+  "customized": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connector.Flange_Plate.Preferences": "Outside",
+   "Connector.Flange_Plate.Thickness_list": [
+    "10",
+    "12"
+   ],
+   "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10"
+   ],
+   "Load.Axial": "100",
+   "Load.Moment": "70",
+   "Load.Shear": "50",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "UC 305 x 305 x 118",
+   "Module": "Column-to-Column Cover Plate Bolted Connection"
+  }
+ },
+ "beam-beam cover plate welded": {
+  "all": {
+   "Connector.Flange_Plate.Preferences": "Outside",
+   "Connector.Flange_Plate.Thickness_list": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "10",
+   "Load.Moment": "10",
+   "Load.Shear": "10",
+   "Material": "E 165 (Fe 290)",
+   "Member.Designation": "MB 600",
+   "Module": "Beam-to-Beam Cover Plate Welded Connection",
+   "Weld.Type": "Fillet Weld",
+   "out_titles_status": [
+    1,
+    1,
+    1,
+    1,
+    0
+   ]
+  },
+  "customized": {
+   "Connector.Flange_Plate.Preferences": "Outside",
+   "Connector.Flange_Plate.Thickness_list": [
+    "10",
+    "12"
+   ],
+   "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10"
+   ],
+   "Load.Axial": "10",
+   "Load.Moment": "10",
+   "Load.Shear": "10",
+   "Material": "E 165 (Fe 290)",
+   "Member.Designation": "MB 600",
+   "Module": "Beam-to-Beam Cover Plate Welded Connection",
+   "Weld.Type": "Fillet Weld",
+   "out_titles_status": [
+    1,
+    1,
+    1,
+    1,
+    0
+   ]
+  }
+ },
+ "column-column cover plate welded": {
+  "all": {
+   "Connector.Flange_Plate.Preferences": "Outside",
+   "Connector.Flange_Plate.Thickness_list": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "100",
+   "Load.Moment": "100",
+   "Load.Shear": "100",
+   "Material": "E 165 (Fe 290)",
+   "Member.Designation": "UC 305 x 305 x 118",
+   "Module": "Column-to-Column Cover Plate Welded Connection",
+   "Weld.Type": "Fillet Weld",
+   "flangespace": "0",
+   "out_titles_status": [
+    1,
+    1,
+    1,
+    1,
+    0
+   ],
+   "type": "Fillet Weld"
+  },
+  "customized": {
+   "Connector.Flange_Plate.Preferences": "Outside",
+   "Connector.Flange_Plate.Thickness_list": [
+    "10",
+    "12"
+   ],
+   "Connector.Web_Plate.Thickness_List": [
+    "8",
+    "10"
+   ],
+   "Load.Axial": "100",
+   "Load.Moment": "100",
+   "Load.Shear": "100",
+   "Material": "E 165 (Fe 290)",
+   "Member.Designation": "UC 305 x 305 x 118",
+   "Module": "Column-to-Column Cover Plate Welded Connection",
+   "Weld.Type": "Fillet Weld",
+   "flangespace": "0",
+   "out_titles_status": [
+    1,
+    1,
+    1,
+    1,
+    0
+   ],
+   "type": "Fillet Weld"
+  }
+ },
+ "beam-beam end plate": {
+  "all": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Coplanar Tension-Compression Flange",
+   "Connectivity *": "Coplanar Tension-Compression Flange",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "EndPlateType": "Flushed - Reversible Moment",
+   "Load.Axial": "100",
+   "Load.Moment": "100",
+   "Load.Shear": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "WPB 900 X 300 X 291.46",
+   "Module": "Beam-to-Beam End Plate Connection",
+   "Weld.Type": "Groove Weld"
+  },
+  "customized": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Coplanar Tension-Compression Flange",
+   "Connectivity *": "Coplanar Tension-Compression Flange",
+   "Connector.Plate.Thickness_List": [
+    "10",
+    "12"
+   ],
+   "EndPlateType": "Flushed - Reversible Moment",
+   "Load.Axial": "100",
+   "Load.Moment": "100",
+   "Load.Shear": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Supported_Section.Designation": "WPB 900 X 300 X 291.46",
+   "Module": "Beam-to-Beam End Plate Connection",
+   "Weld.Type": "Groove Weld"
+  }
+ },
+ "beam-column end plate": {
+  "all": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Flange-Beam Web",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "EndPlateType": "Column Flange-Beam Web",
+   "Load.Axial": "0",
+   "Load.Moment": "2",
+   "Load.Shear": "2",
+   "Material": "E 165 (Fe 290)",
+   "Member.Supported_Section.Designation": "JB 150",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Beam-to-Column End Plate Connection",
+   "Weld.Type": "Groove Weld"
+  },
+  "customized": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Column Flange-Beam Web",
+   "Connector.Plate.Thickness_List": [
+    "10",
+    "12"
+   ],
+   "EndPlateType": "Column Flange-Beam Web",
+   "Load.Axial": "0",
+   "Load.Moment": "2",
+   "Load.Shear": "2",
+   "Material": "E 165 (Fe 290)",
+   "Member.Supported_Section.Designation": "JB 150",
+   "Member.Supporting_Section.Designation": "HB 150",
+   "Module": "Beam-to-Column End Plate Connection",
+   "Weld.Type": "Groove Weld"
+  }
+ },
+ "column-column end plate": {
+  "all / Flush End Plate": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Flush End Plate",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "100",
+   "Load.Moment": "100",
+   "Load.Shear": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "UC 305 x 305 x 118",
+   "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
+   "Module": "Column-to-Column End Plate Connection",
+   "Weld.Type": "Groove Weld"
+  },
+  "all / Extended Both Ways": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Extended Both Ways",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "100",
+   "Load.Moment": "100",
+   "Load.Shear": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "UC 305 x 305 x 118",
+   "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
+   "Module": "Column-to-Column End Plate Connection",
+   "Weld.Type": "Groove Weld"
+  },
+  "customized / Flush End Plate": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Connectivity": "Flush End Plate",
+   "Connector.Plate.Thickness_List": [
+    "10",
+    "12"
+   ],
+   "Load.Axial": "100",
+   "Load.Moment": "100",
+   "Load.Shear": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "UC 305 x 305 x 118",
+   "Member.Supported_Section.Designation": "UC 305 x 305 x 118",
+   "Module": "Column-to-Column End Plate Connection",
+   "Weld.Type": "Groove Weld"
+  }
+ },
+ "tension bolted": {
+  "all": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Conn_Location": "Long Leg",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "60",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Member.Length": "1250",
+   "Member.Profile": "Back to Back Angles",
+   "Module": "Tension Member Design - Bolted to End Gusset"
+  },
+  "customized": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Conn_Location": "Long Leg",
+   "Connector.Plate.Thickness_List": [
+    "10",
+    "12"
+   ],
+   "Load.Axial": "60",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "50 x 50 x 6"
+   ],
+   "Member.Length": "1250",
+   "Member.Profile": "Back to Back Angles",
+   "Module": "Tension Member Design - Bolted to End Gusset"
+  }
+ },
+ "tension welded": {
+  "all": {
+   "Conn_Location": "Long Leg",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "Load.Axial": "60",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Member.Length": "1250",
+   "Member.Profile": "Back to Back Angles",
+   "Module": "Tension Member Design - Welded to End Gusset"
+  },
+  "customized": {
+   "Conn_Location": "Long Leg",
+   "Connector.Plate.Thickness_List": [
+    "10",
+    "12"
+   ],
+   "Load.Axial": "60",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Member.Length": "1250",
+   "Member.Profile": "Back to Back Angles",
+   "Module": "Tension Member Design - Welded to End Gusset"
+  }
+ },
+ "base plate": {
+  "all / Welded Column Base": {
+   "Anchor Bolt.ICF.Diameter": [
+    "M20",
+    "M24"
+   ],
+   "Anchor Bolt.ICF.Grade": [
+    "4.6",
+    "8.8"
+   ],
+   "Anchor Bolt.OCF.Diameter": [
+    "M20",
+    "M24"
+   ],
+   "Anchor Bolt.OCF.Grade": [
+    "4.6",
+    "8.8"
+   ],
+   "Anchor Bolt.Type": "End Plate Type",
+   "Connectivity": "Welded Column Base",
+   "End Condition": "Pinned",
+   "Footing.Grade": "M25",
+   "Load.Axial": "200",
+   "Load.Axial_Tension": "50",
+   "Load.Moment.Major": "40",
+   "Load.Moment.Minor": "20",
+   "Load.Shear.Major": "50",
+   "Load.Shear.Minor": "30",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "HB 200",
+   "Module": "Base Plate Connection",
+   "Weld.Type": "Fillet Weld"
+  },
+  "all / Moment Base Plate": {
+   "Anchor Bolt.ICF.Diameter": [
+    "M20",
+    "M24"
+   ],
+   "Anchor Bolt.ICF.Grade": [
+    "4.6",
+    "8.8"
+   ],
+   "Anchor Bolt.OCF.Diameter": [
+    "M20",
+    "M24"
+   ],
+   "Anchor Bolt.OCF.Grade": [
+    "4.6",
+    "8.8"
+   ],
+   "Anchor Bolt.Type": "End Plate Type",
+   "Connectivity": "Moment Base Plate",
+   "End Condition": "Pinned",
+   "Footing.Grade": "M25",
+   "Load.Axial": "200",
+   "Load.Axial_Tension": "50",
+   "Load.Moment.Major": "40",
+   "Load.Moment.Minor": "20",
+   "Load.Shear.Major": "50",
+   "Load.Shear.Minor": "30",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "HB 200",
+   "Module": "Base Plate Connection",
+   "Weld.Type": "Fillet Weld"
+  },
+  "all / Hollow/Tubular Column Base": {
+   "Anchor Bolt.ICF.Diameter": [
+    "M20",
+    "M24"
+   ],
+   "Anchor Bolt.ICF.Grade": [
+    "4.6",
+    "8.8"
+   ],
+   "Anchor Bolt.OCF.Diameter": [
+    "M20",
+    "M24"
+   ],
+   "Anchor Bolt.OCF.Grade": [
+    "4.6",
+    "8.8"
+   ],
+   "Anchor Bolt.Type": "End Plate Type",
+   "Connectivity": "Hollow/Tubular Column Base",
+   "End Condition": "Pinned",
+   "Footing.Grade": "M25",
+   "Load.Axial": "200",
+   "Load.Axial_Tension": "50",
+   "Load.Moment.Major": "40",
+   "Load.Moment.Minor": "20",
+   "Load.Shear.Major": "50",
+   "Load.Shear.Minor": "30",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "HB 200",
+   "Module": "Base Plate Connection",
+   "Weld.Type": "Fillet Weld"
+  },
+  "customized / Welded Column Base": {
+   "Anchor Bolt.ICF.Diameter": [
+    "M20"
+   ],
+   "Anchor Bolt.ICF.Grade": [
+    "8.8"
+   ],
+   "Anchor Bolt.OCF.Diameter": [
+    "M20",
+    "M24"
+   ],
+   "Anchor Bolt.OCF.Grade": [
+    "8.8"
+   ],
+   "Anchor Bolt.Type": "End Plate Type",
+   "Connectivity": "Welded Column Base",
+   "End Condition": "Pinned",
+   "Footing.Grade": "M25",
+   "Load.Axial": "200",
+   "Load.Axial_Tension": "50",
+   "Load.Moment.Major": "40",
+   "Load.Moment.Minor": "20",
+   "Load.Shear.Major": "50",
+   "Load.Shear.Minor": "30",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": "HB 200",
+   "Module": "Base Plate Connection",
+   "Weld.Type": "Fillet Weld"
+  }
+ },
+ "lap joint bolted": {
+  "all": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Design.For": "Tension",
+   "Load.Axial": "60",
+   "Material": "E 250 (Fe 410 W)A",
+   "Module": "Lap Joint Bolted Connection",
+   "Plate1Thickness": "10",
+   "Plate2Thickness": "12",
+   "PlateWidth": "200"
+  },
+  "customized": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Design.For": "Tension",
+   "Load.Axial": "60",
+   "Material": "E 250 (Fe 410 W)A",
+   "Module": "Lap Joint Bolted Connection",
+   "Plate1Thickness": "10",
+   "Plate2Thickness": "12",
+   "PlateWidth": "200"
+  }
+ },
+ "lap joint welded": {
+  "all": {
+   "Design.For": "Tension",
+   "Load.Axial": "40",
+   "Material": "E 250 (Fe 410 W)A",
+   "Module": "Lap Joint Welded Connection",
+   "Plate1Thickness": "10",
+   "Plate2Thickness": "12",
+   "PlateWidth": "200",
+   "Weld.Size": [
+    "4",
+    "6",
+    "8"
+   ]
+  },
+  "customized": {
+   "Design.For": "Tension",
+   "Load.Axial": "40",
+   "Material": "E 250 (Fe 410 W)A",
+   "Module": "Lap Joint Welded Connection",
+   "Plate1Thickness": "10",
+   "Plate2Thickness": "12",
+   "PlateWidth": "200",
+   "Weld.Size": [
+    "6",
+    "8"
+   ]
+  }
+ },
+ "butt joint bolted": {
+  "all": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "ButtJoint.CoverPlate": "Single-Cover",
+   "Design.For": "Tension",
+   "Load.Axial": "60",
+   "Material": "E 250 (Fe 410 W)A",
+   "Module": "Butt Joint Bolted Connection",
+   "Plate1Thickness": "10",
+   "Plate2Thickness": "12",
+   "PlateWidth": "200"
+  },
+  "customized": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "ButtJoint.CoverPlate": "Single-Cover",
+   "Design.For": "Tension",
+   "Load.Axial": "60",
+   "Material": "E 250 (Fe 410 W)A",
+   "Module": "Butt Joint Bolted Connection",
+   "Plate1Thickness": "10",
+   "Plate2Thickness": "12",
+   "PlateWidth": "200"
+  }
+ },
+ "butt joint welded": {
+  "all": {
+   "ButtJoint.CoverPlate": "Single-Cover",
+   "Design.For": "Tension",
+   "Load.Axial": "40",
+   "Material": "E 250 (Fe 410 W)A",
+   "Module": "Butt Joint Welded Connection",
+   "Plate1Thickness": "10",
+   "Plate2Thickness": "12",
+   "PlateWidth": "200",
+   "Weld.Size": [
+    "4",
+    "6",
+    "8"
+   ]
+  },
+  "customized": {
+   "ButtJoint.CoverPlate": "Single-Cover",
+   "Design.For": "Tension",
+   "Load.Axial": "40",
+   "Material": "E 250 (Fe 410 W)A",
+   "Module": "Butt Joint Welded Connection",
+   "Plate1Thickness": "10",
+   "Plate2Thickness": "12",
+   "PlateWidth": "200",
+   "Weld.Size": [
+    "6",
+    "8"
+   ]
+  }
+ },
+ "axially loaded column": {
+  "all": {
+   "Actual.Length_yy": "3000",
+   "Actual.Length_zz": "3000",
+   "End_1": "Fixed",
+   "End_1_Y": "Fixed",
+   "End_2": "Fixed",
+   "End_2_Y": "Fixed",
+   "Load.Axial": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "MB 300",
+    "JB 200",
+    "HB 150",
+    "UC 305 x 305 x 118"
+   ],
+   "Member.Profile": "Beams and Columns",
+   "Module": "Columns with known support conditions",
+   "Optimum.Para": "Utilization Ratio"
+  },
+  "customized": {
+   "Actual.Length_yy": "3000",
+   "Actual.Length_zz": "3000",
+   "End_1": "Fixed",
+   "End_1_Y": "Fixed",
+   "End_2": "Fixed",
+   "End_2_Y": "Fixed",
+   "Load.Axial": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "MB 300",
+    "JB 200"
+   ],
+   "Member.Profile": "Beams and Columns",
+   "Module": "Columns with known support conditions",
+   "Optimum.Para": "Utilization Ratio"
+  }
+ },
+ "struts bolted": {
+  "all": {
+   "Bolt.Diameter": [
+    "12",
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "4.6",
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Conn_Location": "Long Leg",
+   "Connector.Plate.Thickness_List": [
+    "8",
+    "10",
+    "12"
+   ],
+   "End_1": "Hinged",
+   "End_2": "Hinged",
+   "Load.Axial": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Member.Length": "3000",
+   "Member.Profile": "Angles",
+   "Module": "Struts Bolted to End Gusset",
+   "is_leg_loaded": "Yes"
+  },
+  "customized": {
+   "Bolt.Diameter": [
+    "16",
+    "20"
+   ],
+   "Bolt.Grade": [
+    "8.8",
+    "10.9"
+   ],
+   "Bolt.Type": "Bearing Bolt",
+   "Conn_Location": "Long Leg",
+   "Connector.Plate.Thickness_List": [
+    "10",
+    "12"
+   ],
+   "End_1": "Hinged",
+   "End_2": "Hinged",
+   "Load.Axial": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "50 x 50 x 6"
+   ],
+   "Member.Length": "3000",
+   "Member.Profile": "Angles",
+   "Module": "Struts Bolted to End Gusset",
+   "is_leg_loaded": "Yes"
+  }
+ },
+ "struts welded": {
+  "all": {
+   "Conn_Location": "Long Leg",
+   "End_1": "Hinged",
+   "End_2": "Hinged",
+   "Load.Axial": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "50 x 50 x 6",
+    "60 x 60 x 6"
+   ],
+   "Member.Length": "3000",
+   "Member.Profile": "Angles",
+   "Module": "Struts Welded to End Gusset"
+  },
+  "customized": {
+   "Conn_Location": "Long Leg",
+   "End_1": "Hinged",
+   "End_2": "Hinged",
+   "Load.Axial": "100",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "50 x 50 x 6"
+   ],
+   "Member.Length": "3000",
+   "Member.Profile": "Angles",
+   "Module": "Struts Welded to End Gusset"
+  }
+ },
+ "simply supported beam": {
+  "all": {
+   "Flexure.Support": "Simply Supported",
+   "Flexure.Type": "Major Laterally Supported",
+   "Load.Moment": "100",
+   "Load.Shear": "50",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "MB 300",
+    "JB 200",
+    "HB 150",
+    "UC 305 x 305 x 118"
+   ],
+   "Member.Length": "6000",
+   "Member.Profile": "Beams and Columns",
+   "Module": "Flexural Members - Simply Supported",
+   "Torsion.restraint": "Fully Restrained",
+   "Warping.restraint": "Both flanges fully restrained"
+  },
+  "customized": {
+   "Flexure.Support": "Simply Supported",
+   "Flexure.Type": "Major Laterally Supported",
+   "Load.Moment": "100",
+   "Load.Shear": "50",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "MB 300",
+    "JB 200"
+   ],
+   "Member.Length": "6000",
+   "Member.Profile": "Beams and Columns",
+   "Module": "Flexural Members - Simply Supported",
+   "Torsion.restraint": "Fully Restrained",
+   "Warping.restraint": "Both flanges fully restrained"
+  }
+ },
+ "on cantilever": {
+  "all": {
+   "Cantilever.Support": "Continuous, with lateral restraint to top flange",
+   "Cantilever.Top": "Free",
+   "Flexure.Type": "Major Laterally Supported",
+   "Load.Moment": "100",
+   "Load.Shear": "50",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "MB 300",
+    "JB 200",
+    "HB 150",
+    "UC 305 x 305 x 118"
+   ],
+   "Member.Length": "5000",
+   "Member.Profile": "Beams and Columns",
+   "Module": "Flexural Members - Cantilever"
+  },
+  "customized": {
+   "Cantilever.Support": "Continuous, with lateral restraint to top flange",
+   "Cantilever.Top": "Free",
+   "Flexure.Type": "Major Laterally Supported",
+   "Load.Moment": "100",
+   "Load.Shear": "50",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Designation": [
+    "MB 300",
+    "JB 200"
+   ],
+   "Member.Length": "5000",
+   "Member.Profile": "Beams and Columns",
+   "Module": "Flexural Members - Cantilever"
+  }
+ },
+ "plate girder": {
+  "all": {
+   "Bendingmoment.shape": "Uniform Loading with pinned-pinned support",
+   "BottomFlange.Thickness": [
+    "40"
+   ],
+   "Bottomflange.Width": "350",
+   "Deflection.Max": "Span/600",
+   "Design.Load": "Live load",
+   "Flexure.Type": "Major Laterally Supported",
+   "IntermediateStiffener.Data": "No",
+   "IntermediateStiffener.Spacing": "NA",
+   "IntermediateStiffener.Thickness": "Standard",
+   "Load.Moment": "2000",
+   "Load.Shear": "400",
+   "Loading.Condition": "Normal",
+   "LongitudnalStiffener.Data": "No",
+   "LongitudnalStiffner.Thickness": "Standard",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Length": "20000",
+   "Member.Options": "Simple Span",
+   "Module": "PLATE GIRDER",
+   "S.B.Methods": "Simple Post Critical",
+   "Structure.Type": "Highway Bridge",
+   "Support.Width": "300",
+   "Supporting.Options": "Not Applicable",
+   "Symmetry": "Symmetrical",
+   "TopFlange.Thickness": [
+    "40"
+   ],
+   "Topflange.Width": "350",
+   "Torsion.restraint": "Fully Restrained",
+   "Total.Depth": "1300",
+   "Total.Design_Type": "Customized",
+   "Warping.restraint": "Both flanges fully restrained",
+   "Web.Philosophy": "Thick Web without ITS",
+   "Web.Thickness": [
+    "20"
+   ]
+  },
+  "customized": {
+   "Bendingmoment.shape": "Uniform Loading with pinned-pinned support",
+   "BottomFlange.Thickness": [
+    "12"
+   ],
+   "Bottomflange.Width": "350",
+   "Deflection.Max": "Span/600",
+   "Design.Load": "Live load",
+   "Flexure.Type": "Major Laterally Supported",
+   "IntermediateStiffener.Data": "No",
+   "IntermediateStiffener.Spacing": "NA",
+   "IntermediateStiffener.Thickness": "Standard",
+   "Load.Moment": "2000",
+   "Load.Shear": "400",
+   "Loading.Condition": "Normal",
+   "LongitudnalStiffener.Data": "No",
+   "LongitudnalStiffner.Thickness": "Standard",
+   "Material": "E 250 (Fe 410 W)A",
+   "Member.Length": "20000",
+   "Member.Options": "Simple Span",
+   "Module": "PLATE GIRDER",
+   "S.B.Methods": "Simple Post Critical",
+   "Structure.Type": "Highway Bridge",
+   "Support.Width": "300",
+   "Supporting.Options": "Not Applicable",
+   "Symmetry": "Symmetrical",
+   "TopFlange.Thickness": [
+    "12"
+   ],
+   "Topflange.Width": "350",
+   "Torsion.restraint": "Fully Restrained",
+   "Total.Depth": "1300",
+   "Total.Design_Type": "Customized",
+   "Warping.restraint": "Both flanges fully restrained",
+   "Web.Philosophy": "Thick Web without ITS",
+   "Web.Thickness": [
+    "10"
+   ]
+  }
+ }
+}

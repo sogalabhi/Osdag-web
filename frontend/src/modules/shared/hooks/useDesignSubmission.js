@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router";
 import { message } from "antd";
 import { toDesignDictionary } from "../utils/osiSave";
+import { mapServerFieldErrors } from "../utils/fieldErrors";
+import { validateFormFields } from "../utils/validation";
 
 /**
  * Status state machine types
@@ -62,6 +64,34 @@ export const useDesignSubmission = (service, moduleConfig) => {
     error: null
   });
 
+  // Errors tied to a form field ({ field: message }) and to Additional Inputs rows
+  // ([{ coreKey, field, message, tabId }]); the page shows them next to the inputs.
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [prefErrors, setPrefErrors] = useState([]);
+
+  const clearFieldErrors = () => {
+    setFieldErrors({});
+    setPrefErrors([]);
+  };
+
+  const clearFieldError = (field) => {
+    setFieldErrors((prev) => {
+      if (!(field in prev)) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  // Shows errors that are all tied to a field: next to the field, plus one toast.
+  const showFieldErrors = (errors, toast, prefRows = []) => {
+    setFieldErrors(errors);
+    setPrefErrors(prefRows);
+    setStatus({ step: DESIGN_STATUS.IDLE, message: '', error: null });
+    setLoading(false);
+    message.error(toast);
+  };
+
   // Cleanup/Flush pending save on unmount
   useEffect(() => {
     return () => {
@@ -99,63 +129,14 @@ export const useDesignSubmission = (service, moduleConfig) => {
       error: null
     });
 
-    if (moduleConfig.inputSections) {
-      for (const section of moduleConfig.inputSections) {
-        for (const field of section.fields || []) {
-          if (field.conditionalDisplay && !field.conditionalDisplay(extraState, inputs)) {
-            continue;
-          }
-
-          // Shown without a required mark, so it may be left blank.
-          if (field.required === false) {
-            continue;
-          }
-
-          const effectiveType = typeof field.conditionalType === 'function'
-            ? field.conditionalType(inputs)
-            : field.type;
-
-          if (effectiveType === 'image') {
-            continue;
-          }
-
-          let value = inputs[field.key];
-          if (effectiveType === 'connectivitySelect' || effectiveType === 'endPlateSelect') {
-            value = extraState?.selectedOption || value;
-          }
-          const isCustomizable = effectiveType === 'customizable';
-
-          if (isCustomizable) {
-            const selectionKey = field.selectionKey;
-            const isCustomized = selectionStates?.[selectionKey] === 'Customized';
-            if (isCustomized && (!Array.isArray(value) || value.length === 0)) {
-              const errMsg = `Please select at least one value for ${field.label}.`;
-              setStatus({
-                step: DESIGN_STATUS.ERROR,
-                message: errMsg,
-                error: new Error(errMsg)
-              });
-              return;
-            }
-          } else {
-            if (
-              value === undefined ||
-              value === null ||
-              (typeof value === 'string' && value.trim() === '') ||
-              value === 'Select Section' ||
-              (Array.isArray(value) && value.length === 0)
-            ) {
-              const errMsg = `Please fill in the ${field.label} field.`;
-              setStatus({
-                step: DESIGN_STATUS.ERROR,
-                message: errMsg,
-                error: new Error(errMsg)
-              });
-              return;
-            }
-          }
-        }
-      }
+    clearFieldErrors();
+    const formErrors = validateFormFields(moduleConfig, inputs, extraState, selectionStates);
+    if (formErrors.length > 0) {
+      showFieldErrors(
+        Object.fromEntries(formErrors.map(({ field, message: text }) => [field, text])),
+        formErrors.length === 1 ? formErrors[0].message : `Please correct the ${formErrors.length} highlighted fields.`
+      );
+      return;
     }
 
     const validationResult = moduleConfig.validateInputs(
@@ -290,6 +271,15 @@ export const useDesignSubmission = (service, moduleConfig) => {
 
       if (!designSuccess) {
         const errorMessage = designBody?.error || "Design failed. Please check inputs.";
+        if (designBody?.fields && Object.keys(designBody.fields).length > 0) {
+          const mapped = mapServerFieldErrors(moduleConfig, designBody.fields, { inputs, extraState });
+          setFieldErrors(mapped.fieldErrors);
+          setPrefErrors(mapped.prefErrors);
+          if (Object.keys(mapped.unmapped).length === 0) {
+            showFieldErrors(mapped.fieldErrors, errorMessage, mapped.prefErrors);
+            return;
+          }
+        }
         setStatus({
           step: DESIGN_STATUS.ERROR,
           message: errorMessage,
@@ -519,6 +509,11 @@ export const useDesignSubmission = (service, moduleConfig) => {
     loadSavedOutputs,
     loadOutputs,
     loadCadModel,
+    // per-field errors
+    fieldErrors,
+    prefErrors,
+    clearFieldError,
+    clearFieldErrors,
   };
 };
 

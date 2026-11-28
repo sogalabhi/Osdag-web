@@ -249,7 +249,9 @@ A module's id is also a `Common.py` constant: its desktop module name (for examp
 python scripts/gen_core_keys.py
 ```
 
-The script imports `osdag_core.Common` and `apps.core.web_keys`, so run it in the backend environment (set `QT_QPA_PLATFORM=offscreen` on a machine without a display; the script does this by default). The `backend-qa` CI job runs the generator and then `git diff --exit-code frontend/src/constants/generated/`, so a stale file fails the build.
+The script also writes `inputSchemas.js`: for every module, the keys its Pydantic request model (`DesignInput`) requires or allows, with the kind of value each takes. `frontend/src/test/inputSchemas.test.js` checks the request each module's form builds against it, so a model that gains a required key fails the frontend test until the form sends it. Run the generator after changing a request model.
+
+The script imports `osdag_core.Common`, `apps.core.web_keys` and the registered module services (Django is set up with placeholder secrets and never connects to a database), so run it in the backend environment (set `QT_QPA_PLATFORM=offscreen` on a machine without a display; the script does this by default). The `backend-qa` CI job runs the generator and then `git diff --exit-code frontend/src/constants/generated/`, so a stale file fails the build.
 
 **The lint rule.** `frontend/eslint.config.js` has a `no-restricted-syntax` block for `src/**/*.{js,jsx}` that reports a string literal (or a template literal without expressions) matching the dotted-key pattern `^[A-Z][A-Za-z0-9_]*( [A-Z][A-Za-z0-9_]*)?(\.[A-Za-z0-9_]+)+$`, and the undotted keys `Module`, `Material`, `Connectivity`, `Conn_Location`, `End_1`, `End_2`, `End_1_Y`, `End_2_Y`, `EndPlateType`, `PlateWidth`, `Plate1Thickness`, `Plate2Thickness` when they are an object key or `obj["..."]`. Import the constant instead. The rule does not apply to `src/constants/generated`, tests and purlin. A string that only looks like a key is silenced with `// eslint-disable-next-line no-restricted-syntax -- <why>` (the `"Outputs.csv"` file name in `groupedCsvExport.js` is the one case today).
 

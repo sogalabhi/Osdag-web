@@ -90,12 +90,9 @@ const keysFedBy = (module, field, state, owners) => {
   const lists = new Proxy(LISTS, {
     get: (target, prop) => (owners[prop]?.size === 1 && owners[prop].has(field) ? [SENTINEL] : target[prop]),
   });
-  const extraState = field === (module.connectivityKey || "connectivity")
-    ? { ...state.extraState, selectedOption: SENTINEL }
-    : state.extraState;
   let params;
   try {
-    params = wire(config.buildSubmissionParams(inputs, state.allSelected, lists, extraState));
+    params = wire(config.buildSubmissionParams(inputs, state.allSelected, lists, state.extraState));
   } catch {
     return []; // a field the builder cannot take a sentinel for; its other variants still run
   }

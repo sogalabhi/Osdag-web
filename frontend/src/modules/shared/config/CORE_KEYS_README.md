@@ -25,7 +25,7 @@ export const finPlateConfig = {
 - Key: the form field name (`inputs.<field>`), as a plain identifier.
 - Value: a key constant imported from `constants/generated/coreKeys.js` or `webKeys.js` (never a string literal; ESLint blocks it), an array of them, or `null`.
 - `null` means the field feeds no core key: pure UI state (images, `module`-style constants, leftovers the builder never reads). Write a short comment saying why.
-- List every field of the form: each `defaultInputs` key, each `inputSections[].fields[].key`, each `selectionConfig`/`modalConfig` `inputKey`, and the Additional Inputs fields the module uses. A field you declare that the form does not have is reported as unknown (usually a typo).
+- List every field of the form: each `defaultInputs` key, each `inputSections[].fields[].key`, each field with a `selectionKey` (the `selectionConfig` and `modalConfig` are derived from the fields), and the Additional Inputs fields the module uses. A field you declare that the form does not have is reported as unknown (usually a typo).
 - Shared prefs live in `prefCoreKeys.js`: `PREF_CORE_KEYS` (bolt_tension_type, bolt_hole_type, bolt_slip_factor, weld_fab, weld_material_grade, detailing_*, design_method, design_for) and `MATERIAL_CORE_KEYS` (material, connector_material, supported_material, supporting_material in their one-to-one meaning). Spread them, then write the module's own entries after the spread so they win. Only add a row there if it means the same in every module.
 - Put the field's core key where the wire carries it, not where it "should" go, and comment any quirk. Do not fix a quirk while declaring keys.
 
@@ -56,14 +56,14 @@ The check is one way: a declared key the builder never sends is allowed (prefs t
 - Declare a field only if the form has it. A spread row for a field the form lacks (`material` in a module whose dock has `connector_material`) is loaded as a stray input; give the module `material: null`.
 - `computedCoreKeys: [KEY]` on a config lists keys the builder derives from several fields (plate girder `Deflection.Max`); a file's value is never read back into them. The fields it comes from must each be saved under a key of their own (plate girder `Structure.Type`), or a reopened form cannot rebuild them.
 - `notLoadedFromDictionary: [field]` lists fields a file must not fill. No module uses it now: base plate loads its inside-flange anchor lists (`anchor_diameter_icf`, `anchor_grade_icf`) from `Anchor Bolt.ICF.*` like the outside-flange ones from `Anchor Bolt.OCF.*`.
-- A selection field is read back as "All" when the file holds the field's whole option list: its `INPUT_KEY_TO_LIST` list, or for the section designation the `getDynamicDataSource` of its input field (it depends on the section profile). A new customizable field needs one of the two, or a saved "All" reopens as "Customized" (`test/allSelectionReopen.test.js` checks every module).
+- A selection field is read back as "All" when the file holds the field's whole option list: the module data list named by its `dataSource`, or for the section designation the `getDynamicDataSource` of its input field (it depends on the section profile). A new customizable field needs one of the two, or a saved "All" reopens as "Customized" (`test/allSelectionReopen.test.js` checks every module).
 - When several keys feed one field, the more specific key wins: `Material`, then `Connector.Material`, then the rest (`keyPriority`).
 
 ## Pitfalls
 
 - A field the builder reshapes before sending (`Number(x)`, `parseFloat`, an object built from it) loses the sentinel, so the test cannot see it; declare it from the code, not from a green run. String edits (`replaceAll`, `String()`, template strings) are fine.
-- A field that only selects a branch (`bolt_type`, `weld_type`, `connectivity`) is traced only through the key that carries its value. The connectivity field is traced through `extraState.selectedOption`.
-- Fields fed by an "All" list need `dataSource` on the field or on its `modalConfig` entry; without it the sentinel never reaches the wire and the field is untested.
+- A field that only selects a branch (`bolt_type`, `weld_type`, `connectivity`) is traced only through the key that carries its value. The connectivity field is traced through `inputs.connectivity`.
+- Fields fed by an "All" list need `dataSource` on the field; without it the sentinel never reaches the wire and the field is untested.
 - One core key can come from several fields (shear sections by connectivity) and one field can feed several keys. Declare both; there is no "primary" key.
 - The same web field name can mean a different core key in another module (`material` is `Material` in one, `Section.Material` in another). That is why materials are not forced into the shared table.
 - Field names that look like core keys (`Module`, `Material`) are blocked as bare property names by ESLint; use the lower-case field names the configs already have.

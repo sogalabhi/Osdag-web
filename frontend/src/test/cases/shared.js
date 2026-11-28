@@ -40,12 +40,8 @@ export const PLATE_FILL = { plate1_thickness: "10", plate2_thickness: "12" };
 export const allSelectedFor = (config, value) =>
   Object.fromEntries((config.selectionConfig || []).map((s) => [s.inputKey, value]));
 
-export const initialExtraState = (config, connectivity) => {
-  const base = typeof config.getInitialExtraState === "function"
-    ? config.getInitialExtraState()
-    : { selectedOption: "Column Flange-Beam Web" };
-  return connectivity ? { ...base, selectedOption: connectivity } : base;
-};
+export const initialExtraState = (config) =>
+  typeof config.getInitialExtraState === "function" ? config.getInitialExtraState() : {};
 
 // What goes over the wire: JSON drops `undefined`.
 export const wire = (value) => JSON.parse(JSON.stringify(value));
@@ -57,7 +53,7 @@ export const caseState = (module, selection, connectivity = null) => {
   let inputs = { ...config.defaultInputs, ...(module.fill || {}) };
   if (connectivity) inputs[module.connectivityKey || "connectivity"] = connectivity;
   if (selection === "customized") inputs = { ...inputs, ...(module.custom || {}) };
-  return { inputs, allSelected, extraState: initialExtraState(config, connectivity) };
+  return { inputs, allSelected, extraState: initialExtraState(config) };
 };
 
 const buildInitialSelection = (config) => ({

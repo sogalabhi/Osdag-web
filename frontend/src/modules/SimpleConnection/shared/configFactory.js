@@ -11,6 +11,7 @@ import { validateSimpleConnectionInputs } from "./validation";
 import { validateRequiredFields } from "../../shared/utils/validation";
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../shared/config/prefCoreKeys";
 import { prefText } from "../../shared/utils/prefValue";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 
 function getArrayParam(allSelectedFlag, fullList, selectedList) {
     if (allSelectedFlag) {
@@ -69,16 +70,6 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
             ...(hasCoverPlate ? { cover_plate: KEY_COVER_PLATE } : {}),
         },
 
-        modalConfig: [
-            { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-            { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-        ],
-
-        selectionConfig: [
-            { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-            { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-        ],
-
         buildSubmissionParams: (inputs, allSelected, lists) => ({
             [KEY_MODULE]: designType,
             [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
@@ -103,7 +94,7 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
                 title: "Connecting Members",
                 fields: [
                     {
-                        key: "material",
+                        key: "material", customMaterial: "connector",
                         label: "Material",
                         type: "select",
                         options: "materialList",
@@ -113,14 +104,12 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
                         label: KEY_DISP_PLATE1_THICKNESS,
                         type: "select",
                         options: "thicknessList",
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "plate1_thickness": value }); }
                     },
                     {
                         key: "plate2_thickness",
                         label: KEY_DISP_PLATE2_THICKNESS,
                         type: "select",
                         options: "thicknessList",
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "plate2_thickness": value }); }
                     },
                     { key: "plate_width", label: KEY_DISP_PLATE_WIDTH, type: "number" },
                     ...(hasCoverPlate ? [{
@@ -128,7 +117,6 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
                         label: KEY_DISP_COVER_PLT,
                         type: "select",
                         options: 'coverPlateList',
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "cover_plate": value }); }
                     }] : []),
                 ]
             },
@@ -175,7 +163,7 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
         return validateSimpleConnectionInputs(inputs, { moduleType: 'bolted' });
     };
 
-    return config;
+    return applyFieldLists(config);
 }
 
 // Shared shape for the 4 SimpleConnection welded configs (butt/lap joint welded).
@@ -221,14 +209,6 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
             ...(hasCoverPlate ? { cover_plate: KEY_COVER_PLATE } : {}),
         },
 
-        modalConfig: [
-            { key: "weldSelect", inputKey: "weld_size", dataSource: "weldSizeList" },
-        ],
-
-        selectionConfig: [
-            { key: "weldSizeSelect", inputKey: "weld_size", defaultValue: "All" },
-        ],
-
         buildSubmissionParams: (inputs, allSelected, lists) => ({
             [KEY_MODULE]: designType,
             [KEY_PLATE1_THICKNESS]: String(inputs.plate1_thickness),
@@ -254,18 +234,16 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
                         label: KEY_DISP_PLATE1_THICKNESS,
                         type: "select",
                         options: "thicknessList",
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "plate1_thickness": value }); }
                     },
                     {
                         key: "plate2_thickness",
                         label: KEY_DISP_PLATE2_THICKNESS,
                         type: "select",
                         options: "thicknessList",
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "plate2_thickness": value }); }
                     },
                     { key: "plate_width", label: KEY_DISP_PLATE_WIDTH, type: "number" },
                     {
-                        key: "material",
+                        key: "material", customMaterial: "connector",
                         label: "Material",
                         type: "select",
                         options: "materialList",
@@ -275,7 +253,6 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
                         label: KEY_DISP_COVER_PLT,
                         type: "select",
                         options: 'coverPlateList',
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "cover_plate": value }); }
                     }] : []),
                 ]
             },
@@ -305,5 +282,5 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
         return validateSimpleConnectionInputs(inputs, { moduleType: 'welded' });
     };
 
-    return config;
+    return applyFieldLists(config);
 }

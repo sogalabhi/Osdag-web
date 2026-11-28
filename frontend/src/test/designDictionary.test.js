@@ -13,6 +13,7 @@ import { designRequest, formRecorder } from "./cases/shared";
 const config = {
   defaultInputs: { bolt_diameter: [], bolt_type: "Bearing_Bolt", bolt_tension_type: "Non pre-tensioned", material: "E 250" },
   selectionConfig: [{ key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" }],
+  inputKeyToList: { bolt_diameter: "boltDiameterList" },
   inputSections: [{ fields: [{ key: "bolt_type", options: [{ value: "Bearing_Bolt" }, { value: "Friction_Grip_Bolt" }] }] }],
   coreKeys: {
     bolt_diameter: "Bolt.Diameter",
@@ -88,14 +89,15 @@ describe("fromDesignDictionary", () => {
     expect(inputs.secondary_beam).toBe("MB 300");
   });
 
-  it("sets the option dropdown and the section profile image state", () => {
+  it("sets the section profile image state", () => {
     const withImage = {
       ...config,
       coreKeys: { ...config.coreKeys, connectivity: "Connectivity", section_profile: "Member.Profile" },
       getSectionImage: (profile) => `img:${profile}`,
     };
     const { extraState, inputs } = fromDesignDictionary(withImage, { Connectivity: "Beam-Beam", "Member.Profile": "Channels" }, LISTS);
-    expect(extraState).toEqual({ selectedOption: "Beam-Beam", selectedProfile: "Channels", imageSource: "img:Channels" });
+    expect(extraState).toEqual({ selectedProfile: "Channels", imageSource: "img:Channels" });
+    expect(inputs.connectivity).toBe("Beam-Beam");
     expect(inputs.location).toBe("Web");
   });
 });

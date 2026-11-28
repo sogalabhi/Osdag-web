@@ -27,6 +27,7 @@ import {
   KEY_WELD_TYPE,
 } from "../../../constants/generated/coreKeys";
 import { prefText } from "../utils/prefValue";
+import { applyFieldLists } from "../utils/fieldLists";
 
 // Shared shape for coverPlateBolted / columnColumnCoverPlateBolted, which were
 // identical except for ~8 values (session/designType strings, cadOptions'
@@ -84,20 +85,6 @@ export function makeCoverPlateBoltedConfig({
       [memberMaterialField]: KEY_SEC_MATERIAL,
     },
 
-    modalConfig: [
-      { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-      { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-      { key: "flangePlateThickness", inputKey: "flange_plate_thickness", dataSource: "thicknessList" },
-      { key: "webPlateThickness", inputKey: "web_plate_thickness", dataSource: "thicknessList" },
-    ],
-
-    selectionConfig: [
-      { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-      { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-      { key: "flangeThicknessSelect", inputKey: "flange_plate_thickness", defaultValue: "All" },
-      { key: "webThicknessSelect", inputKey: "web_plate_thickness", defaultValue: "All" },
-    ],
-
     buildSubmissionParams: (inputs, allSelected, lists) => ({
       [KEY_DP_BOLT_HOLE_TYPE]: prefText(inputs.bolt_hole_type),
       [KEY_D]: allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
@@ -138,7 +125,7 @@ export function makeCoverPlateBoltedConfig({
             required: true,
           },
           {
-            key: "material",
+            key: "material", customMaterial: "connector",
             label: "Material",
             type: "select",
             options: "materialList",
@@ -235,7 +222,7 @@ export function makeCoverPlateBoltedConfig({
     return { isValid: true };
   };
 
-  return config;
+  return applyFieldLists(config);
 }
 
 // Shared shape for coverPlateWelded / columnColumnCoverPlateWelded. These two
@@ -295,16 +282,6 @@ export function makeCoverPlateWeldedConfig({
       [memberMaterialField]: KEY_SEC_MATERIAL,
     },
 
-    modalConfig: [
-      { key: "flangePlateThickness", inputKey: "flange_plate_thickness", dataSource: "thicknessList" },
-      { key: "webPlateThickness", inputKey: "web_plate_thickness", dataSource: "thicknessList" },
-    ],
-
-    selectionConfig: [
-      { key: "flangeThicknessSelect", inputKey: "flange_plate_thickness", defaultValue: "All" },
-      { key: "webThicknessSelect", inputKey: "web_plate_thickness", defaultValue: "All" },
-    ],
-
     buildSubmissionParams: (inputs, allSelected, lists) => ({
       [KEY_FLANGEPLATE_PREFERENCES]: inputs.flange_plate_preferences,
       [KEY_FLANGEPLATE_THICKNESS]: allSelected.flange_plate_thickness
@@ -341,7 +318,7 @@ export function makeCoverPlateWeldedConfig({
             required: true,
           },
           {
-            key: "material",
+            key: "material", customMaterial: "connector",
             label: "Material",
             type: "select",
             options: "materialList",
@@ -419,5 +396,5 @@ export function makeCoverPlateWeldedConfig({
     return { isValid: true };
   };
 
-  return config;
+  return applyFieldLists(config);
 }

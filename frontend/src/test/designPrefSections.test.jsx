@@ -208,6 +208,27 @@ const ready = () => waitFor(() => expect(button("Save").disabled).toBe(false));
 const goTo = (tab) => fireEvent.click(screen.getAllByTestId("pref-tab").find((element) => element.textContent === tab));
 const lastOverrides = (spies) => spies.setDesignPrefOverrides.mock.calls.at(-1)[0];
 
+describe("rows the server rejected", () => {
+  const rejected = [{ coreKey: KEY_DP_BOLT_HOLE_TYPE, field: "bolt_hole_type", message: "Hole type is not allowed", tabId: 6 }];
+
+  it("opens on the tab that holds the row and shows the message there", async () => {
+    open({ prefErrors: rejected });
+    await ready();
+    const active = screen.getAllByTestId("pref-tab").find((tab) => tab.className.includes("active-tabs"));
+    expect(active.textContent).toBe("Bolt");
+    expect(screen.getByTestId("pref-errors").textContent).toBe("Hole type is not allowed");
+  });
+
+  it("shows the message on its own tab only", async () => {
+    open({ prefErrors: rejected });
+    await ready();
+    goTo("Weld");
+    expect(screen.queryByTestId("pref-errors")).toBeNull();
+    goTo("Bolt");
+    expect(screen.getByTestId("pref-errors")).toBeTruthy();
+  });
+});
+
 describe("opening", () => {
   it("syncs once with `open`, in core keys, and holds Save and Defaults until the answer is in", async () => {
     open();
@@ -248,15 +269,6 @@ describe("opening", () => {
       "Weld",
       "Detailing",
       "Design",
-    ]);
-  });
-
-  it("calls the two sections of a beam-to-beam connection primary and secondary beam", async () => {
-    open({ selectedOption: "Beam-Beam" });
-    await ready();
-    expect(screen.getAllByTestId("pref-tab").map((tab) => tab.textContent).slice(0, 2)).toEqual([
-      "Primary Beam*",
-      "Secondary Beam*",
     ]);
   });
 

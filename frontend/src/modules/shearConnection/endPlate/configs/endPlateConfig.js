@@ -1,6 +1,7 @@
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../../shared/config/prefCoreKeys';
+import { connectivityImage } from '../../../shared/config/connectionImages';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -29,6 +30,7 @@ import {
   KEY_SUPTNGSEC_MATERIAL,
   KEY_TYP,
 } from "../../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const endPlateConfig = {
   sessionName: KEY_DISP_HEADERPLATE,
   designType: KEY_DISP_HEADERPLATE,
@@ -81,23 +83,11 @@ export const endPlateConfig = {
     connector_material: KEY_CONNECTOR_MATERIAL,
   },
 
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-  ],
-
   validateInputs: (inputs, extraState, _lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(endPlateConfig.inputSections, inputs, extraState, selectionStates);
     if (!requiredCheck.isValid) return requiredCheck;
 
-    const connectivity = extraState?.selectedOption || inputs.connectivity;
+    const connectivity = inputs.connectivity;
     // IMPROVEMENT: Simplified validation logic for conciseness.
     if (connectivity === CONN_CFBW || connectivity === CONN_CWBW) {
       if (!inputs.beam_section || !inputs.column_section) {
@@ -111,14 +101,14 @@ export const endPlateConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraState) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     // Ensure plate thickness list is always List[str]
     const toStrList = (arr = []) => (Array.isArray(arr) ? arr.map((v) => `${v}`) : []);
     const plateList = allSelected.plate_thickness
       ? toStrList(lists.thicknessList)
       : toStrList(inputs.plate_thickness);
 
-    const connectivity = extraState?.selectedOption || inputs.connectivity;
+    const connectivity = inputs.connectivity;
     const params = {
       [KEY_DP_BOLT_HOLE_TYPE]: inputs.bolt_hole_type,
       [KEY_D]: allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
@@ -151,13 +141,13 @@ export const endPlateConfig = {
     {
       title: "Connecting Members",
       fields: [
-        { key: "connectivity", label: "Connectivity", type: "connectivitySelect", options: "connectivityList" },
-        { key: "primary_beam", label: "Primary Beam", type: "select", options: "beamList", conditionalDisplay: (extraState) => extraState?.selectedOption === "Beam-Beam" },
-        { key: "secondary_beam", label: "Secondary Beam", type: "select", options: "beamList", conditionalDisplay: (extraState) => extraState?.selectedOption === "Beam-Beam" },
-        { key: "column_section", label: "Column Section", type: "select", options: "columnList", conditionalDisplay: (extraState) => [CONN_CFBW, CONN_CWBW].includes(extraState?.selectedOption) },
-        { key: "beam_section", label: "Beam Section", type: "select", options: "beamList", conditionalDisplay: (extraState) => [CONN_CFBW, CONN_CWBW].includes(extraState?.selectedOption) },
+        { key: "connectivity", label: "Connectivity", type: "connectivitySelect", options: "connectivityList", imageSource: connectivityImage },
+        { key: "primary_beam", label: "Primary Beam", type: "select", options: "beamList", conditionalDisplay: (extraState, inputs) => inputs?.connectivity === "Beam-Beam" },
+        { key: "secondary_beam", label: "Secondary Beam", type: "select", options: "beamList", conditionalDisplay: (extraState, inputs) => inputs?.connectivity === "Beam-Beam" },
+        { key: "column_section", label: "Column Section", type: "select", options: "columnList", conditionalDisplay: (extraState, inputs) => [CONN_CFBW, CONN_CWBW].includes(inputs?.connectivity) },
+        { key: "beam_section", label: "Beam Section", type: "select", options: "beamList", conditionalDisplay: (extraState, inputs) => [CONN_CFBW, CONN_CWBW].includes(inputs?.connectivity) },
         {
-          key: "material", label: "Material", type: "select", options: "materialList",
+          key: "material", customMaterial: "connector", label: "Material", type: "select", options: "materialList",
         },
       ],
     },
@@ -190,3 +180,5 @@ export const endPlateConfig = {
     },
   ],
 };
+
+applyFieldLists(endPlateConfig);

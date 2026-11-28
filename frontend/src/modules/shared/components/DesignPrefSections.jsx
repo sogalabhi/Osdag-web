@@ -58,7 +58,6 @@ const DesignPrefSections = ({
   setInputs,
   designPrefOverrides = {},
   setDesignPrefOverrides,
-  selectedOption = null,
   setDesignPrefModalStatus,
   setConfirmationModal,
   confirmationModal,
@@ -66,6 +65,7 @@ const DesignPrefSections = ({
   moduleMaterialList,
   moduleLists,
   onRefetchModuleOptions,
+  prefErrors = [],
 }) => {
   const { user, loading: authLoading } = useAuth();
   const isGuest = authLoading || !user;
@@ -75,7 +75,11 @@ const DesignPrefSections = ({
   const materialListForModals = (moduleMaterialList ?? ctx.materialList ?? []).filter(
     (item) => item?.id !== -1 && item?.Grade !== "Custom"
   );
-  const [activeTab, setActiveTab] = useState(() => designPrefConfig.initialTabIndex);
+  const [activeTab, setActiveTab] = useState(() => prefErrors[0]?.tabId ?? designPrefConfig.initialTabIndex);
+  // The dialog shows the tab of the first row the server rejected.
+  useEffect(() => {
+    if (prefErrors.length > 0) setActiveTab(prefErrors[0].tabId);
+  }, [prefErrors]);
   const {
     applyDesignPrefSyncBundle,
     setLastKnownGoodDesignPrefSnapshot,
@@ -471,17 +475,24 @@ const DesignPrefSections = ({
               }
               onClick={() => setActiveTab(item.id)}
               disabled={syncLoading}
+              style={prefErrors.some((error) => error.tabId === item.id) ? { color: "#c62828" } : undefined}
             >
-              {selectedOption === "Beam-Beam" &&
-              (item.name === "Column Section*" || item.name == "Beam Section*")
-                ? item.name === "Column Section*"
-                  ? "Primary Beam*"
-                  : "Secondary Beam*"
-                : item.name}
+              {item.name}
             </button>
           ))}
         </div>
         <div className="design-pref-cont">
+          {prefErrors.some((error) => error.tabId === activeTab) && (
+            <ul role="alert" data-testid="pref-errors" style={{ color: "#c62828", fontSize: "12px", margin: "0 0 8px", paddingLeft: "16px" }}>
+              {prefErrors
+                .filter((error) => error.tabId === activeTab)
+                .map((error) => (
+                  <li key={error.coreKey} data-pref-error={error.field}>
+                    {error.message}
+                  </li>
+                ))}
+            </ul>
+          )}
           {activeTab === 0 && (
             <GenericSectionView
               sectionType="supporting"

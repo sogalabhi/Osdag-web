@@ -1,14 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import {
-  KEY_DISP_FINPLATE,
-  KEY_DISP_CLEATANGLE,
-  KEY_DISP_SEATED_ANGLE,
-  KEY_DISP_HEADERPLATE,
-  KEY_DISP_BB_EP_SPLICE,
-  KEY_DISP_BCENDPLATE,
-  CONN_CFBW,
-} from "../../../constants/generated/coreKeys";
-import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
+import { optionText } from "../utils/fieldOptionUtils";
 import { loadStateFromOsi } from "../utils/osiLoader";
 import { shouldClearOverridesOnDockChange } from "../utils/dockDriverChange";
 import { isAdditionalInput, prefClearingFields } from "../utils/prefSyncKeys";
@@ -43,6 +34,8 @@ const buildInitialModalDynamicSrc = (config) =>
     return acc;
   }, {});
 
+const NO_LISTS = {};
+
 export const useModuleForm = (moduleConfig, moduleData) => {
   const safeModuleData = useMemo(() => moduleData || {}, [moduleData]);
 
@@ -56,20 +49,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     if (typeof moduleConfig.getInitialExtraState === "function") {
       return moduleConfig.getInitialExtraState();
     }
-    if (moduleConfig.cameraKey === KEY_DISP_FINPLATE) {
-      return { selectedOption: CONN_CFBW };
-    } else if (moduleConfig.cameraKey === KEY_DISP_CLEATANGLE) {
-      return { selectedOption: CONN_CFBW };
-    } else if (moduleConfig.cameraKey === KEY_DISP_SEATED_ANGLE) {
-      return { selectedOption: CONN_CFBW };
-    } else if (moduleConfig.cameraKey === KEY_DISP_HEADERPLATE) {
-      return { selectedOption: CONN_CFBW };
-    } else if (moduleConfig.cameraKey === KEY_DISP_BB_EP_SPLICE) {
-      return { selectedOption: "Flushed - Reversible Moment" };
-    } else if (moduleConfig.cameraKey === KEY_DISP_BCENDPLATE) {
-      return { selectedOption: "Flushed - Reversible Moment" };
-    }
-    return { selectedOption: CONN_CFBW };
+    return {};
   };
 
   const [extraState, setExtraState] = useState(resolveInitialExtraState());
@@ -119,12 +99,13 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     }
   }, [safeModuleData, moduleConfig]);
 
+  const inputKeyToList = moduleConfig.inputKeyToList || NO_LISTS;
   useEffect(() => {
     setInputs((prev) => {
       let isChanged = false;
       const nextInputs = { ...prev };
 
-      Object.entries(INPUT_KEY_TO_LIST).forEach(([inputKey, listKey]) => {
+      Object.entries(inputKeyToList).forEach(([inputKey, listKey]) => {
         if (!allSelected?.[inputKey]) return;
 
         const current = prev?.[inputKey];
@@ -133,12 +114,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
         const fullList = safeModuleData[listKey];
         const normalized = Array.isArray(fullList)
-          ? fullList.map((val) => {
-            if (typeof val === "object" && val !== null) {
-              return val.value || val.Grade || String(val);
-            }
-            return String(val);
-          })
+          ? fullList.map(optionText)
           : [];
 
         if (normalized.length > 0) {
@@ -149,7 +125,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
       return isChanged ? nextInputs : prev;
     });
-  }, [safeModuleData, allSelected]);
+  }, [safeModuleData, allSelected, inputKeyToList]);
 
   useEffect(() => {
     if (displaySaveInputPopup) {

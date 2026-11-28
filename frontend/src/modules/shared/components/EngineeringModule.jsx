@@ -76,7 +76,8 @@ export const EngineeringModule = ({
 
   const {
     output, outputLayout, designSafe, logs, rawCsvData, loading, renderBoolean, modelKey, status, setStatus,
-    screenshotTrigger, setScreenshotTrigger, cadModelPaths, hoverDict: ctxHoverDict
+    screenshotTrigger, setScreenshotTrigger, cadModelPaths, hoverDict: ctxHoverDict,
+    fieldErrors, prefErrors, clearFieldError
   } = designStatus;
 
   // The output dock lists the engine's outputs: the latest design's layout, or the module's
@@ -410,6 +411,11 @@ export const EngineeringModule = ({
     },
   });
 
+  // An error on an Additional Inputs row opens the dialog, on the tab that holds the row.
+  useEffect(() => {
+    if (prefErrors?.length > 0) setDesignPrefModalStatus(true);
+  }, [prefErrors, setDesignPrefModalStatus]);
+
   const handleSubmitEnhanced = useCallback(async () => {
     setIsInputLocked(false);
     // If there's already an existing design, completely reset everything
@@ -594,7 +600,7 @@ export const EngineeringModule = ({
   // Get connectivity for the fin plate module
   const getConnectivity = () => {
     if (moduleConfig.cameraKey === KEY_DISP_FINPLATE) {
-      return extraState?.selectedOption || inputs?.connectivity;
+      return inputs?.connectivity;
     }
     return null;
   };
@@ -688,7 +694,7 @@ export const EngineeringModule = ({
     const guard = canOpenAdditionalInputs(
       mod,
       inputs,
-      { selectedOption: extraState?.selectedOption },
+      extraState,
       contextData,
       selectionStates
     );
@@ -953,10 +959,6 @@ export const EngineeringModule = ({
                 logs={logs}
                 setCreateDesignReportBool={setCreateDesignReportBool}
                 triggerScreenshotCapture={triggerScreenshotCapture}
-                selectedOption={extraState.selectedOption}
-                setSelectedOption={(value) =>
-                  setExtraState({ ...extraState, selectedOption: value })
-                }
                 cadModelPaths={cadModelPaths}
                 contextData={contextData}
                 selectionStates={selectionStates}
@@ -1174,6 +1176,8 @@ export const EngineeringModule = ({
             updateSelectedItems={updateSelectedItems}
             setModalDynamicSrc={setModalDynamicSrc}
             onRefetchModuleOptions={refetchModuleOptions}
+            fieldErrors={fieldErrors}
+            onClearFieldError={clearFieldError}
             isOpen={docks.input}
             loadingOptions={loadingOptions}
           />
@@ -1501,6 +1505,7 @@ ${!isMobile ? (docks.output ? 'pr-0' : 'pr-[40px]') : ''}
               moduleLists={contextData}
               isGuest={isGuestUser()}
               onRefetchModuleOptions={refetchModuleOptions}
+              prefErrors={prefErrors}
             />
           </Modal>
         )

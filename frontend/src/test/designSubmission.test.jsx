@@ -10,6 +10,7 @@
  */
 import { act, fireEvent, render, renderHook, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
+import { message } from "antd";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { BaseOutputDock } from "../modules/shared/components/BaseOutputDock";
@@ -68,7 +69,7 @@ const setup = (service, { module = finPlate, projectId = null } = {}) => {
     const state = caseState(module, "customized", module.connectivities?.[0]);
     // the end plate modules ask the user to pick the type of the plate; the page's first option stands in
     const plateType = (module.config.inputSections || []).flatMap((section) => section.fields || []).find((f) => f.type === "endPlateSelect");
-    const picked = plateType ? { [plateType.key]: formExtraState.selectedOption } : {};
+    const picked = plateType ? { [plateType.key]: plateType.options[0] } : {};
     return view.result.current.submitDesign({
       inputs: { ...state.inputs, ...picked },
       selectionStates: Object.fromEntries((module.config.selectionConfig || []).map((s) => [s.key, "Customized"])),
@@ -304,8 +305,9 @@ describe("a design that does not complete", () => {
     const state = caseState(finPlate, "customized");
     await view.submit({ inputs: { ...state.inputs, load_shear: "" } });
     expect(createDesign).not.toHaveBeenCalled();
-    expect(view.result.current.status.step).toBe(DESIGN_STATUS.ERROR);
-    expect(view.result.current.status.message).toMatch(/^Please fill in the .* field\.$/);
+    expect(view.result.current.status.step).toBe(DESIGN_STATUS.IDLE);
+    expect(view.result.current.fieldErrors.load_shear).toMatch(/^Please fill in the .* field\.$/);
+    expect(message.error).toHaveBeenCalledWith(view.result.current.fieldErrors.load_shear);
   });
 
   it("does not call the service for a customized list with nothing picked", async () => {
@@ -314,7 +316,7 @@ describe("a design that does not complete", () => {
     const state = caseState(finPlate, "customized");
     await view.submit({ inputs: { ...state.inputs, bolt_diameter: [] } });
     expect(createDesign).not.toHaveBeenCalled();
-    expect(view.result.current.status.message).toMatch(/^Please select at least one value for/);
+    expect(view.result.current.fieldErrors.bolt_diameter).toMatch(/^Please select at least one value for/);
   });
 });
 

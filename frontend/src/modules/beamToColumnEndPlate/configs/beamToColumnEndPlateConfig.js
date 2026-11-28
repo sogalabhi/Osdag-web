@@ -1,6 +1,7 @@
 
 import { validateRequiredFields } from '../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../shared/config/prefCoreKeys';
+import { beamColumnEndPlateImage } from '../../shared/config/connectionImages';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -32,6 +33,7 @@ import {
   KEY_TYP,
   KEY_WELD_TYPE,
 } from "../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 export const beamToColumnEndPlateConfig = {
   sessionName: "Beam to Column End Plate Connection",
   designType: KEY_DISP_BCENDPLATE,
@@ -69,23 +71,11 @@ export const beamToColumnEndPlateConfig = {
     load_moment: KEY_MOMENT,
     load_shear: KEY_SHEAR,
     weld_type: KEY_WELD_TYPE,
-    // The end plate type is an option list read from extraState.selectedOption, not from inputs.
     endPlateType: KEY_ENDPLATE_TYPE,
     beam_section: KEY_SUPTDSEC,
     column_section: KEY_SUPTNGSEC,
   },
 
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-  ],
   validateInputs: (inputs, extraState, _lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(beamToColumnEndPlateConfig.inputSections, inputs, extraState, selectionStates);
     if (!requiredCheck.isValid) return requiredCheck;
@@ -97,7 +87,7 @@ export const beamToColumnEndPlateConfig = {
     }
     return { isValid: true };
   },
-  buildSubmissionParams: (inputs, allSelected, lists, extraData) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     return {
       [KEY_DP_BOLT_HOLE_TYPE]: inputs.bolt_hole_type,
       [KEY_D]: allSelected.bolt_diameter ? lists.boltDiameterList : inputs.bolt_diameter,
@@ -106,7 +96,7 @@ export const beamToColumnEndPlateConfig = {
       [KEY_DP_BOLT_TYPE]: inputs.bolt_tension_type,
       [KEY_TYP]: inputs.bolt_type.replaceAll("_", " "),
       [KEY_CONN]: inputs.connectivity,
-      [KEY_ENDPLATE_TYPE]: extraData?.selectedOption || "Flushed - Reversible Moment",
+      [KEY_ENDPLATE_TYPE]: inputs.endPlateType || "Flushed - Reversible Moment",
       [KEY_PLATETHK]: allSelected.plate_thickness 
         ? lists.thicknessList : inputs.plate_thickness,
       [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
@@ -145,6 +135,7 @@ export const beamToColumnEndPlateConfig = {
           key: "endPlateType",
           label: "End Plate Type",
           type: "endPlateSelect",
+          imageSource: beamColumnEndPlateImage,
           options: [
             "Flushed - Reversible Moment",
             "Extended One Way - Irreversible Moment",
@@ -166,7 +157,7 @@ export const beamToColumnEndPlateConfig = {
           required: true
         },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: "Material",
           type: "select",
           options: "materialList",
@@ -240,3 +231,5 @@ export const beamToColumnEndPlateConfig = {
     }
   ]
 };
+
+applyFieldLists(beamToColumnEndPlateConfig);

@@ -30,6 +30,7 @@ import {
   KEY_SEC_PROFILE,
 } from "../../../constants/generated/coreKeys";
 import { prefText } from "../../shared/utils/prefValue";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 export const axiallyLoadedColumnConfig = {
   sessionName: "Axially Loaded Column",
   designType: KEY_DISP_COMPRESSION_COLUMN,
@@ -76,22 +77,6 @@ export const axiallyLoadedColumnConfig = {
     end_condition_image_zz: null,
     end_condition_image_yy: null,
   },
-
-  modalConfig: [
-    {
-      key: "sectionDesignation",
-      inputKey: "section_designation",
-      dataSource: null,
-    },
-  ],
-
-  selectionConfig: [
-    {
-      key: "sectionDesignationSelect",
-      inputKey: "section_designation",
-      defaultValue: "All",
-    },
-  ],
 
   getEnd2Values: (end1) => {
     if (end1 === "Fixed") {
@@ -279,7 +264,7 @@ export const axiallyLoadedColumnConfig = {
           },
         },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: "Material",
           type: "select",
           options: "materialList",
@@ -311,15 +296,6 @@ export const axiallyLoadedColumnConfig = {
           label: "End 1",
           type: "select",
           options: "endConditionList",
-          onChange: (value, inputs, setInputs) => {
-            const nextValues = axiallyLoadedColumnConfig.getEnd2Values(value);
-            const nextEnd2 = nextValues[0] || inputs.end_condition_2 || "Fixed";
-            setInputs({
-              ...inputs,
-              end_condition_1: value,
-              end_condition_2: nextEnd2,
-            });
-          },
         },
         {
           key: "end_condition_2",
@@ -352,15 +328,6 @@ export const axiallyLoadedColumnConfig = {
           label: "End 1 (y-y)",
           type: "select",
           options: "endConditionList",
-          onChange: (value, inputs, setInputs) => {
-            const nextValues = axiallyLoadedColumnConfig.getEnd2Values(value);
-            const nextEnd2Y = nextValues[0] || inputs.end_condition_2_y || "Fixed";
-            setInputs({
-              ...inputs,
-              end_condition_1_y: value,
-              end_condition_2_y: nextEnd2Y,
-            });
-          },
         },
         {
           key: "end_condition_2_y",
@@ -398,4 +365,6 @@ export const axiallyLoadedColumnConfig = {
     },
   ],
 };
+
+applyFieldLists(axiallyLoadedColumnConfig);
 

@@ -2,7 +2,7 @@
  * A selection saved as "All" reopens as "All", and a smaller selection reopens as "Customized".
  *
  * "All" is the whole option list of the field. For most fields that is a list the module data holds
- * (`INPUT_KEY_TO_LIST`); the section designation of the tension, strut, column and beam modules depends
+ * (the `dataSource` of the field); the section designation of the tension, strut, column and beam modules depends
  * on the section profile, so its list is the field's `getDynamicDataSource`.
  */
 import { describe, expect, it } from "vitest";

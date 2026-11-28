@@ -6,7 +6,7 @@ import { KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, CONN_CFBW, CONN_CWBW } from "..
  * - Supported section preferences (non Fin/Cleat)
  * - Design preferences for FinPlate/CleatAngle connectivity combos
  */
-export const useDependentData = (getDesignPreferences, moduleConfig, inputs, extraState) => {
+export const useDependentData = (getDesignPreferences, moduleConfig, inputs) => {
   // Supported section preferences for other modules
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -60,7 +60,7 @@ export const useDependentData = (getDesignPreferences, moduleConfig, inputs, ext
     const handler = setTimeout(() => {
       const loadDesignPreferences = async () => {
         if (moduleConfig.cameraKey === KEY_DISP_FINPLATE || moduleConfig.cameraKey === KEY_DISP_CLEATANGLE) {
-          const connectivity = extraState?.selectedOption || inputs.connectivity;
+          const connectivity = inputs.connectivity;
 
           try {
             let params = null;
@@ -101,7 +101,6 @@ export const useDependentData = (getDesignPreferences, moduleConfig, inputs, ext
     inputs.beam_section,
     inputs.primary_beam,
     inputs.secondary_beam,
-    extraState?.selectedOption,
     inputs.connectivity,
     getDesignPreferences,
     moduleConfig.cameraKey,

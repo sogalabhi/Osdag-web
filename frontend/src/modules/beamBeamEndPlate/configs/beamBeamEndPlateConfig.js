@@ -1,6 +1,7 @@
 
 import { validateRequiredFields } from '../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../shared/config/prefCoreKeys';
+import { endPlateTypeImage } from '../../shared/config/connectionImages';
 import {
   KEY_AXIAL,
   KEY_CONN,
@@ -29,6 +30,7 @@ import {
   KEY_TYP,
   KEY_WELD_TYPE,
 } from "../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 export const beamBeamEndPlateConfig = {
   sessionName: "Beam Beam End Plate Connection",
   designType: KEY_DISP_BB_EP_SPLICE,
@@ -66,25 +68,12 @@ export const beamBeamEndPlateConfig = {
     load_moment: KEY_MOMENT,
     load_shear: KEY_SHEAR,
     weld_type: KEY_WELD_TYPE,
-    // The end plate type is an option list read from extraState.selectedOption, not from inputs.
     endPlateType: KEY_ENDPLATE_TYPE,
     supported_designation: KEY_SUPTDSEC,
     // The dock material is Material. The Beam Section tab of Additional Inputs (supported_material) is the
     // supported section's material and the Connector tab (connector_material) is Connector.Material; both are
     // the spread's one-to-one rows, which default to the dock material.
   },
-
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-  ],
 
   validateInputs: (inputs, extraState, _lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(beamBeamEndPlateConfig.inputSections, inputs, extraState, selectionStates);
@@ -98,7 +87,7 @@ export const beamBeamEndPlateConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists, extraData) => {
+  buildSubmissionParams: (inputs, allSelected, lists) => {
     const conn_map = {
       "Flushed - Reversible Moment": "Flushed - Reversible Moment",
       "Extended One Way - Irreversible Moment": "Extended One Way - Irreversible Moment",
@@ -114,7 +103,7 @@ export const beamBeamEndPlateConfig = {
       [KEY_TYP]: inputs.bolt_type.replaceAll("_", " "),
       "Connectivity *": inputs.connectivity,
       [KEY_CONN]: inputs.connectivity,
-      [KEY_ENDPLATE_TYPE]: conn_map[extraData?.selectedOption] || "Flushed - Reversible Moment",
+      [KEY_ENDPLATE_TYPE]: conn_map[inputs.endPlateType] || "Flushed - Reversible Moment",
       [KEY_PLATETHK]: allSelected.plate_thickness 
         ? lists.thicknessList : inputs.plate_thickness,
       [KEY_CONNECTOR_MATERIAL]: inputs.connector_material,
@@ -153,6 +142,7 @@ export const beamBeamEndPlateConfig = {
           key: "endPlateType",
           label: "End Plate Type",
           type: "endPlateSelect",
+          imageSource: endPlateTypeImage,
           options: [
             "Flushed - Reversible Moment",
             "Extended One Way - Irreversible Moment",
@@ -167,7 +157,7 @@ export const beamBeamEndPlateConfig = {
           required: true
         },
         {
-          key: "material",
+          key: "material", customMaterial: "connector",
           label: "Material",
           type: "select",
           options: "materialList",
@@ -240,3 +230,5 @@ export const beamBeamEndPlateConfig = {
     }
   ]
 };
+
+applyFieldLists(beamBeamEndPlateConfig);

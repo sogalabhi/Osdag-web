@@ -46,6 +46,7 @@ import {
   KEY_DP_WELD_FAB,
   KEY_DP_WELD_MATERIAL_G_O,
 } from "../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 // The Additional Inputs the request carries: the request key, then the form fields that hold it
 // (the first one with a value wins). The Weld, Detailing and Design tabs save under both their
 // own field name and the core key. A pref that was never saved is not sent, so the backend
@@ -224,19 +225,6 @@ export const basePlateConfig = {
     [KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF]: KEY_DP_ANCHOR_BOLT_MATERIAL_G_O_ICF,
   },
 
-  modalConfig: [
-    { key: "anchorDiameterOcf", inputKey: "anchor_diameter_ocf", dataSource: "anchorDiameterList" },
-    { key: "anchorGradeOcf", inputKey: "anchor_grade_ocf", dataSource: "anchorGradeList" },
-    { key: "anchorDiameterIcf", inputKey: "anchor_diameter_icf", dataSource: "anchorDiameterList" },
-    { key: "anchorGradeIcf", inputKey: "anchor_grade_icf", dataSource: "anchorGradeList" },
-  ],
-  selectionConfig: [
-    { key: "anchorDiameterOcfSelect", inputKey: "anchor_diameter_ocf", defaultValue: "All" },
-    { key: "anchorGradeOcfSelect", inputKey: "anchor_grade_ocf", defaultValue: "All" },
-    { key: "anchorDiameterIcfSelect", inputKey: "anchor_diameter_icf", defaultValue: "All" },
-    { key: "anchorGradeIcfSelect", inputKey: "anchor_grade_icf", defaultValue: "All" },
-  ],
-
   inputSections: [
     {
       title: "Connecting Members",
@@ -253,7 +241,7 @@ export const basePlateConfig = {
               ? lists.hollowSectionDesignation
               : lists.sectionDesignation) ?? [],
         },
-        { key: "material", label: "Material", type: "select", options: "materialList" },
+        { key: "material", customMaterial: "connector", label: "Material", type: "select", options: "materialList" },
       ],
     },
     {
@@ -296,3 +284,5 @@ export const basePlateConfig = {
     },
   ],
 };
+
+applyFieldLists(basePlateConfig);

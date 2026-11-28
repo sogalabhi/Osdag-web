@@ -144,14 +144,14 @@ describe("rendering from a config", () => {
 
   it("hides the row of a field whose conditionalDisplay says no, and shows it when the state changes", () => {
     const fields = [
-      { key: "primary_beam", label: "Primary Beam", type: "number", conditionalDisplay: (extra) => extra?.selectedOption === "Beam-Beam" },
+      { key: "primary_beam", label: "Primary Beam", type: "number", conditionalDisplay: (extra, inputs) => inputs?.connectivity === "Beam-Beam" },
       { key: "load_shear", label: "Shear Force", type: "number" },
     ];
-    const { unmount } = show(fields, { extra: { selectedOption: "Column Flange-Beam Web" } });
+    const { unmount } = show(fields, { inputs: { connectivity: "Column Flange-Beam Web" } });
     expect(label("Primary Beam")).toBeUndefined();
     expect(label("Shear Force")).toBeTruthy();
     unmount();
-    show(fields, { extra: { selectedOption: "Beam-Beam" } });
+    show(fields, { inputs: { connectivity: "Beam-Beam" } });
     expect(label("Primary Beam")).toBeTruthy();
   });
 
@@ -242,7 +242,7 @@ describe("a dropdown", () => {
   });
 
   it("opens the custom material dialog for the Custom grade instead of choosing it", () => {
-    show([{ key: "supported_material", label: "Supported Material", type: "select", options: "materialList" }], { inputs: { supported_material: "E 165 (Fe 290)" } });
+    show([{ key: "supported_material", label: "Supported Material", type: "select", options: "materialList", customMaterial: "supported" }], { inputs: { supported_material: "E 165 (Fe 290)" } });
     pick("Supported Material", "Custom");
     expect(screen.getByTestId("custom-material").textContent).toBe("custom material for supported");
     expect(inputsNow().supported_material).toBe("E 165 (Fe 290)");
@@ -253,9 +253,21 @@ describe("a dropdown", () => {
     ["supporting_material", "supporting"],
     ["supported_material", "supported"],
   ])("opens the custom material dialog of %s for the %s material", (key, type) => {
-    show([{ key, label: "Grade", type: "select", options: "materialList" }], { inputs: { [key]: "E 165 (Fe 290)" } });
+    show([{ key, label: "Grade", type: "select", options: "materialList", customMaterial: type }], { inputs: { [key]: "E 165 (Fe 290)" } });
     pick("Grade", "Custom");
     expect(screen.getByTestId("custom-material").textContent).toBe(`custom material for ${type}`);
+  });
+
+  it("offers no custom material dialog for a material field that does not name one", () => {
+    show([{ key: "material", label: "Grade", type: "select", options: "materialList" }], { inputs: { material: "E 165 (Fe 290)" } });
+    pick("Grade", "Custom");
+    expect(screen.queryByTestId("custom-material")).toBeNull();
+  });
+
+  it("fails in development on a field type the renderer does not know", () => {
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => show([{ key: "x", label: "X", type: "dropdwon" }])).toThrow(/Unknown field type "dropdwon"/);
+    quiet.mockRestore();
   });
 
   it("prefers the material list of the module context to the one in the data", () => {
@@ -379,36 +391,43 @@ describe("an All / Customized list", () => {
 describe("a connectivity dropdown", () => {
   const field = { key: "connectivity", label: "Connectivity", type: "connectivitySelect" };
 
-  it("starts on the first connectivity of the list and says so in the shared state", () => {
+  it("starts on the first connectivity of the list and writes it to the inputs", () => {
     show([field], { inputs: {} });
-    expect(extraNow().selectedOption).toBe("Column Flange-Beam Web");
+    expect(inputsNow().connectivity).toBe("Column Flange-Beam Web");
     expect(optionsOf("Connectivity")).toEqual(DATA.connectivityList);
   });
 
   it("keeps the connectivity the state already has", () => {
-    show([field], { inputs: { connectivity: "Beam-Beam" }, extra: { selectedOption: "Beam-Beam" } });
-    expect(extraNow().selectedOption).toBe("Beam-Beam");
+    show([field], { inputs: { connectivity: "Beam-Beam" } });
+    expect(inputsNow().connectivity).toBe("Beam-Beam");
     expect(shown("Connectivity")).toBe("Beam-Beam");
   });
 
-  it("writes a choice to the inputs and the shared state, clears the output and calls the field's handler", () => {
+  it("writes a choice to the inputs, clears the output and calls the field's handler", () => {
     const onChange = vi.fn();
-    show([{ ...field, onChange }], { inputs: { connectivity: "Column Flange-Beam Web", output: { done: true } }, extra: { selectedOption: "Column Flange-Beam Web" } });
+    show([{ ...field, onChange }], { inputs: { connectivity: "Column Flange-Beam Web", output: { done: true } } });
     pick("Connectivity", "Beam-Beam");
     expect(inputsNow()).toEqual({ connectivity: "Beam-Beam", output: null });
-    expect(extraNow().selectedOption).toBe("Beam-Beam");
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange.mock.calls[0][0]).toBe("Beam-Beam");
+    expect(Object.keys(onChange.mock.calls[0][1]).sort()).toEqual(["contextData", "extraState", "inputs", "setExtraState", "setInputs"]);
   });
 
-  it("shows the picture of the connectivity", () => {
-    show([field], { inputs: {}, extra: { selectedOption: "Beam-Beam" } });
-    expect(screen.getByAltText("Connection type").getAttribute("src")).toBeTruthy();
+  it("shows the picture its field declares for the current state", () => {
+    const imageSource = vi.fn(() => "pic.png");
+    show([{ ...field, imageSource }], { inputs: { connectivity: "Beam-Beam" } });
+    expect(screen.getByAltText("Connection type").getAttribute("src")).toBe("pic.png");
+    expect(imageSource).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({ connectivity: "Beam-Beam" }));
+  });
+
+  it("shows no picture when its field declares none", () => {
+    show([field], { inputs: { connectivity: "Beam-Beam" } });
+    expect(screen.queryByAltText("Connection type")).toBeNull();
   });
 });
 
 describe("an optimised dimension", () => {
-  const field = { key: "total_depth", label: "Total Depth", type: "optimized_number" };
+  const field = { key: "total_depth", label: "Total Depth", type: "optimized_number", optimizedBy: { key: "design_type", value: "Optimized" } };
 
   it("is a plain number box for a customised design", () => {
     show([field], { inputs: { design_type: "Customized", total_depth: "800" } });
