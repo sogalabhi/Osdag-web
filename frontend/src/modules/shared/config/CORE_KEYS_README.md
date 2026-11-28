@@ -62,7 +62,7 @@ The check is one way: a declared key the builder never sends is allowed (prefs t
 ## Pitfalls
 
 - A field the builder reshapes before sending (`Number(x)`, `parseFloat`, an object built from it) loses the sentinel, so the test cannot see it; declare it from the code, not from a green run. String edits (`replaceAll`, `String()`, template strings) are fine.
-- A field that only selects a branch (`bolt_type`, `weld_type`, `connectivity`) is traced only through the key that carries its value. The connectivity field is traced through `extraState.selectedOption`.
+- A field that only selects a branch (`bolt_type`, `weld_type`, `connectivity`) is traced only through the key that carries its value. The connectivity field is traced through `inputs.connectivity`.
 - Fields fed by an "All" list need `dataSource` on the field or on its `modalConfig` entry; without it the sentinel never reaches the wire and the field is untested.
 - One core key can come from several fields (shear sections by connectivity) and one field can feed several keys. Declare both; there is no "primary" key.
 - The same web field name can mean a different core key in another module (`material` is `Material` in one, `Section.Material` in another). That is why materials are not forced into the shared table.
