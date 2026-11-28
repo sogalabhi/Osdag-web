@@ -1,35 +1,14 @@
 import { useState, useEffect, useContext, useMemo, useRef } from 'react';
-import Select, { components } from 'react-select';
 import { Modal } from 'antd';
-import { getOptionsForField, getListForInputKey, optionText, firstOptionValue } from '../utils/fieldOptionUtils';
+import { getOptionsForField, getListForInputKey, optionText, firstOptionValue, toSelectOptions, comparableOption } from '../utils/fieldOptionUtils';
 import { stripRequiredMark } from '../utils/validation';
 import { ModuleContext } from "../../../context/ModuleState";
 import CustomMaterialModal from "./CustomMaterialModal";
-
-const CustomOption = (props) => {
-  return (
-    <components.Option {...props}>
-      <div
-        onClick={(e) => {
-          if (props.innerProps.onClick) {
-            props.innerProps.onClick(e);
-          }
-          if (props.data.value === 'Customized') {
-            props.selectProps.onCustomizedClick(props.selectProps.field);
-          }
-        }}
-        className="w-full h-full"
-      >
-        {props.children}
-      </div>
-    </components.Option>
-  );
-};
+import { fieldComponentFor } from './fields';
+import { errorIdFor, fieldHasError } from './fields/common';
 
 const EMPTY_LIST = [];
 const NO_ERRORS = {};
-
-const errorIdFor = (field) => `field-error-${field.key}`;
 
 const sameValue = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -78,42 +57,8 @@ export const InputSection = ({
         : contextData?.materialList || [],
   }), [contextData, contextMaterialList]);
 
-  // Styling object for react-select to fix z-index and other container issues
-  const customSelectStyles = {
-    menuPortal: base => ({ ...base, zIndex: 9999 }),
-    option: (base) => ({
-      ...base,
-      minHeight: 35,
-      lineHeight: '1',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-    }),
-    control: (base) => ({
-      ...base,
-      borderColor: '#000',
-      '&:hover': {
-        borderColor: '#91B014',
-      },
-    }),
-    menu: (base) => ({
-      ...base,
-      minWidth: 'max-content',
-    }),
-  };
-
-
   // A field with an error is outlined in red and flagged to assistive technology.
-  const hasError = (field) => Boolean(field.key && fieldErrors[field.key]);
-  const stylesFor = (field) => {
-    if (!hasError(field)) return customSelectStyles;
-    return {
-      ...customSelectStyles,
-      control: (base, state) => ({ ...customSelectStyles.control(base, state), borderColor: '#c62828', '&:hover': { borderColor: '#c62828' } }),
-    };
-  };
-  const selectErrorProps = (field) =>
-    hasError(field) ? { 'aria-invalid': true, 'aria-errormessage': errorIdFor(field) } : {};
+  const hasError = (field) => fieldHasError(field, fieldErrors);
 
   // An edit of a field clears the error shown for it.
   const previousInputs = useRef(safeInputs);
@@ -126,34 +71,6 @@ export const InputSection = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safeInputs]);
-
-  // Helper to normalize lists into react-select option shape
-  const toSelectOptions = (list = []) => {
-    if (!list || list.length === 0) return [];
-    if (typeof list[0] === 'object' && list[0] !== null) {
-      // If already in { value, label } shape, keep it
-      if ('value' in list[0] && 'label' in list[0]) {
-        return list;
-      }
-      // Otherwise normalize using common keys; fallback to stringified object
-      return list.map((item) => {
-        const val =
-          item.value ??
-          item.label ??
-          item.Grade ??
-          item.grade ??
-          item.Designation ??
-          item.designation ??
-          item.name ??
-          item.section ??
-          item.id ??
-          String(item);
-        return { value: val, label: val };
-      });
-    }
-    return list.map(item => ({ value: item, label: item }));
-  };
-
 
   useEffect(() => {
     setInputs((prev) => {
@@ -182,11 +99,7 @@ export const InputSection = ({
 
         const current = nextInputs[field.key];
         const opts = toSelectOptions(rawList);
-        const currentExistsInOptions = opts.some(opt => {
-          const s1 = String(opt.value).trim().toLowerCase().replace(/\s+/g, '');
-          const s2 = String(current).trim().toLowerCase().replace(/\s+/g, '');
-          return s1 === s2;
-        });
+        const currentExistsInOptions = opts.some(opt => comparableOption(opt.value) === comparableOption(current));
 
         if (current === undefined || current === null || current === '' || !currentExistsInOptions) {
           nextInputs[field.key] = firstValue;
@@ -266,318 +179,37 @@ export const InputSection = ({
     }
   };
 
-  const renderNumericInput = (field, isNumeric) => (
-    <div className="w-[60%]">
-      <input
-        type="text"
-        inputMode={isNumeric ? 'decimal' : 'text'}
-        value={safeInputs[field.key] ?? ""}
-        onChange={(e) => {
-          let val = e.target.value;
-          if (isNumeric) {
-            val = val.replace(/[^0-9.-]/g, '');
-            const decimalCount = (val.match(/\./g) || []).length;
-            if (decimalCount > 1) {
-              const firstDecimalIdx = val.indexOf('.');
-              val = val.slice(0, firstDecimalIdx + 1) + val.slice(firstDecimalIdx + 1).replace(/\./g, '');
-            }
-            if (val.includes('-')) {
-              const isNegative = val.startsWith('-');
-              val = val.replace(/-/g, '');
-              if (isNegative) {
-                val = '-' + val;
-              }
-            }
-          }
-          setInputs({ ...safeInputs, [field.key]: val });
-        }}
-        onKeyDown={(e) => {
-          if (isNumeric) {
-            const allowedKeys = [
-              'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
-              'Home', 'End', 'ArrowLeft', 'ArrowRight', '.', '-'
-            ];
-            const isShortcut = (e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase());
-
-            if (e.key === ' ') {
-              e.preventDefault();
-              return;
-            }
-
-            if (!allowedKeys.includes(e.key) && !isShortcut && isNaN(Number(e.key))) {
-              e.preventDefault();
-            }
-          }
-        }}
-        placeholder={field.placeholder || `ex. ${stripRequiredMark(field.label)}`}
-        disabled={field.disabled || isInputLocked}
-        aria-invalid={hasError(field) ? true : undefined}
-        aria-describedby={hasError(field) ? errorIdFor(field) : undefined}
-        className={`w-full h-9 border ${hasError(field) ? 'border-red-600' : 'border-gray-400'} rounded-md px-3 text-sm focus:border-osdag-green focus:ring-2 focus:ring-osdag-green/20 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70`}
-      />
-    </div>
-  );
+  const fieldContext = {
+    inputs: safeInputs,
+    rawInputs: inputs,
+    setInputs,
+    isInputLocked,
+    section,
+    contextData: safeContextData,
+    extraState,
+    setExtraState,
+    selectionStates,
+    fieldErrors,
+    updateModalState,
+    handleCustomizableSelect,
+    openCustomMaterial: (type) => {
+      setCustomMaterialType(type);
+      setShowCustomMaterialModal(true);
+    },
+    openBounds: setBoundsModalField,
+  };
 
   const renderField = (field) => {
     if (field.conditionalDisplay && !field.conditionalDisplay(extraState, safeInputs)) return null;
 
-    // Resolve a dynamic field type (e.g. plate girder switches between number and
-    // customizable based on Customized vs Optimized design type).
+    // A field may resolve its type from the inputs (plate girder switches between number and
+    // customizable on Customized vs Optimized design type).
     const effectiveType = typeof field.conditionalType === 'function'
       ? field.conditionalType(safeInputs)
       : field.type;
 
-    switch (effectiveType) {
-      case 'select': {
-        const isCustomizable = Boolean(field.selectionKey);
-        const rawList = getOptionsForField(field, safeContextData, safeInputs);
-        const options = toSelectOptions(rawList);
-
-        if (isCustomizable) {
-          const isCustomized = selectionStates?.[field.selectionKey] === 'Customized';
-          if (!isCustomized) {
-            return (
-              <Select
-                value={{ label: "All", value: "All" }}
-                isDisabled={true}
-                styles={stylesFor(field)}
-                {...selectErrorProps(field)}
-                classNamePrefix="react-select"
-                className="w-[60%]"
-                isSearchable={false}
-              />
-            );
-          }
-          const currentValue = (Array.isArray(safeInputs[field.key]) ? safeInputs[field.key] : [])
-            .map(val => ({ value: val, label: val }));
-
-          return (
-            <Select
-              isMulti
-              options={options}
-              value={currentValue}
-              isDisabled={isInputLocked}
-              isSearchable={false}
-              onChange={(selectedOptions) => {
-                const newValues = selectedOptions.map(opt => opt.value);
-                setInputs({ ...safeInputs, [field.key]: newValues });
-              }}
-              menuPortalTarget={document.body}
-              styles={stylesFor(field)}
-                {...selectErrorProps(field)}
-              classNamePrefix="react-select"
-              className="w-[60%]"
-            />
-          );
-        }
-
-        if (!rawList || rawList.length === 0) {
-          return (
-            <Select
-              isDisabled={true}
-              placeholder="No data available"
-              styles={stylesFor(field)}
-                {...selectErrorProps(field)}
-              classNamePrefix="react-select"
-              className="w-[60%]"
-              isSearchable={false}
-            />
-          );
-        }
-
-        // Same comparison as the option check above, so a value it accepts is also shown.
-        const normalizeOption = (v) => String(v).trim().toLowerCase().replace(/\s+/g, '');
-        const value = options.find(opt => normalizeOption(opt.value) === normalizeOption(safeInputs[field.key]));
-
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            isSearchable={false}
-            onChange={(selected) => {
-              // `customMaterial` names the kind of material the field holds ('connector', 'supported', 'supporting').
-              if (field.customMaterial && selected.value === 'Custom') {
-                setCustomMaterialType(field.customMaterial);
-                setShowCustomMaterialModal(true);
-                return;
-              }
-              const nextInputs = { ...safeInputs, [field.key]: selected.value };
-              // A dynamic dropdown that names this field in `resetsWith` takes the first option of its
-              // new list whenever the user picks a value here.
-              section.fields.forEach((dependent) => {
-                if (dependent.type !== 'dynamicSelect' || dependent.resetsWith !== field.key) return;
-                const values = getOptionsForField(dependent, safeContextData, nextInputs).map((o) => (o && typeof o === 'object' ? o.value : o));
-                nextInputs[dependent.key] = values.length > 0 ? values[0] : '';
-              });
-              setInputs(nextInputs);
-            }}
-            menuPortalTarget={document.body}
-            styles={stylesFor(field)}
-                {...selectErrorProps(field)}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-          />
-        );
-      }
-
-      case 'connectivitySelect':
-      case 'endPlateSelect': {
-        let list = getOptionsForField(field, safeContextData, safeInputs);
-        if (!list || list.length === 0) {
-          list = field.type === 'connectivitySelect'
-            ? (safeContextData.connectivityList || [])
-            : (safeContextData.endPlateList || []);
-        }
-        const options = toSelectOptions(list);
-        const value = options.find(opt => String(opt.value) === String(safeInputs[field.key])) || options[0] || null;
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            isSearchable={false}
-            onChange={(selected) => {
-              const val = selected.value;
-              setInputs((prev) => ({ ...prev, [field.key]: val, output: null }));
-              if (typeof field.onChange === "function") {
-                field.onChange(val, { inputs: safeInputs, setInputs, contextData: safeContextData, extraState, setExtraState });
-              }
-            }}
-            menuPortalTarget={document.body}
-            styles={stylesFor(field)}
-                {...selectErrorProps(field)}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-          />
-        );
-      }
-
-      case 'customizable': {
-        const options = [{ value: "All", label: "All" }, { value: "Customized", label: "Customized" }];
-        const value = options.find(opt => String(opt.value) === String(selectionStates?.[field.selectionKey] || "All"));
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            isSearchable={false}
-            onChange={(selected) => handleCustomizableSelect(field, selected.value)}
-            menuPortalTarget={document.body}
-            styles={stylesFor(field)}
-                {...selectErrorProps(field)}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-            components={{ Option: CustomOption }}
-            onCustomizedClick={(f) => updateModalState(f.modalKey, true)}
-            field={field}
-          />
-        );
-      }
-
-      case 'sectionProfileList': {
-        const rawSectionList = getOptionsForField(field, safeContextData, safeInputs);
-        const options = (rawSectionList || []).map((elem) => ({ value: elem, label: elem }));
-        const currentValue = safeInputs[field.key] || field.defaultValue;
-        const value = options.find(opt => String(opt.value) === String(currentValue));
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            onChange={(selected) => {
-              const val = selected.value;
-
-              // 1. Direct inputs state update
-              setInputs((prev) => ({
-                ...prev,
-                [field.key]: val,
-                // `resets` lists the fields a new choice here empties
-                ...Object.fromEntries((field.resets || []).map((key) => [key, []])),
-              }));
-
-              // 2. Direct extraState update for profile image
-              setExtraState((prev) => ({
-                ...prev,
-                selectedProfile: val,
-              }));
-
-              // 3. Run the field's own callback
-              if (typeof field.onChange === "function") {
-                field.onChange(val, { inputs: safeInputs, setInputs, contextData: safeContextData, extraState, setExtraState });
-              }
-            }}
-            menuPortalTarget={document.body}
-            styles={stylesFor(field)}
-                {...selectErrorProps(field)}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-            isSearchable={false}
-          />
-        );
-      }
-      case 'dynamicSelect': {
-        const options = getOptionsForField(field, safeContextData, safeInputs);
-        const value = options.find(opt => String(opt.value) === String(inputs[field.key]));
-        return (
-          <Select
-            options={options}
-            value={value}
-            isDisabled={isInputLocked}
-            onChange={(selected) => setInputs({ ...inputs, [field.key]: selected.value })}
-            menuPortalTarget={document.body}
-            styles={stylesFor(field)}
-                {...selectErrorProps(field)}
-            classNamePrefix="react-select"
-            className="w-[60%]"
-            isSearchable={false}
-          />
-        );
-      }
-      case 'image':
-        return (<>{field.conditionalDisplay() &&
-          <div className="flex justify-center">
-            <img
-              src={field.imageSource(extraState, safeInputs)}
-              alt="Connection type"
-              style={{ width: field.width || '100px', height: field.height || '100px', objectFit: 'contain' }}
-            /></div>}</>);
-
-      case 'optimized_number': {
-        // Customized → plain number input; Optimized → "Set Bounds" button
-        // that captures lower/upper/increment optimization bounds.
-        // `optimizedBy` names the input and value that switch the field to optimization bounds.
-        const isOptimized = Boolean(field.optimizedBy) && safeInputs[field.optimizedBy.key] === field.optimizedBy.value;
-        if (!isOptimized) {
-          return renderNumericInput(field, true);
-        }
-        const lb = safeInputs[`${field.key}_lb`];
-        const ub = safeInputs[`${field.key}_ub`];
-        const boundsSet = lb !== undefined && lb !== '' && ub !== undefined && ub !== '';
-        return (
-          <div className="w-[60%]">
-            <button
-              type="button"
-              disabled={isInputLocked}
-              onClick={() => setBoundsModalField(field)}
-              className="w-full h-9 border border-gray-400 rounded-md px-3 text-sm bg-white hover:border-osdag-green hover:text-osdag-green transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {boundsSet ? `Bounds: ${lb} - ${ub}` : 'Set Bounds'}
-            </button>
-          </div>
-        );
-      }
-
-      case 'number':
-        return renderNumericInput(field, true);
-
-      default:
-        // A free-text field has type 'text'; any other type is not one the renderer knows.
-        if (effectiveType !== 'text' && import.meta.env.DEV) {
-          throw new Error(`Unknown field type "${effectiveType}" for input "${field.key}"`);
-        }
-        return renderNumericInput(field, field.type === 'number');
-    }
+    const FieldComponent = fieldComponentFor(effectiveType, field.key);
+    return FieldComponent ? <FieldComponent field={field} ctx={fieldContext} /> : null;
   };
 
   return (

@@ -41,6 +41,40 @@ export function optionText(option) {
 }
 
 /**
+ * Turn a list into react-select options `{ value, label }`. A list already in that shape is kept;
+ * object items take their text from the first of value, label, Grade, grade, Designation,
+ * designation, name, section or id; any other item is its own value and label.
+ */
+export function toSelectOptions(list = []) {
+  if (!list || list.length === 0) return [];
+  if (typeof list[0] === 'object' && list[0] !== null) {
+    if ('value' in list[0] && 'label' in list[0]) return list;
+    return list.map((item) => {
+      const val =
+        item.value ??
+        item.label ??
+        item.Grade ??
+        item.grade ??
+        item.Designation ??
+        item.designation ??
+        item.name ??
+        item.section ??
+        item.id ??
+        String(item);
+      return { value: val, label: val };
+    });
+  }
+  return list.map((item) => ({ value: item, label: item }));
+}
+
+/**
+ * An option's text without case and whitespace, for comparing a stored value with an option.
+ */
+export function comparableOption(value) {
+  return String(value).trim().toLowerCase().replace(/\s+/g, '');
+}
+
+/**
  * The value of the first option of a list: its `value` (or `Grade`) when it is an object, else the option.
  */
 export function firstOptionValue(list) {
