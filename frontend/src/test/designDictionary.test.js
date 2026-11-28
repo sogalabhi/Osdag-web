@@ -13,6 +13,7 @@ import { designRequest, formRecorder } from "./cases/shared";
 const config = {
   defaultInputs: { bolt_diameter: [], bolt_type: "Bearing_Bolt", bolt_tension_type: "Non pre-tensioned", material: "E 250" },
   selectionConfig: [{ key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" }],
+  inputKeyToList: { bolt_diameter: "boltDiameterList" },
   inputSections: [{ fields: [{ key: "bolt_type", options: [{ value: "Bearing_Bolt" }, { value: "Friction_Grip_Bolt" }] }] }],
   coreKeys: {
     bolt_diameter: "Bolt.Diameter",

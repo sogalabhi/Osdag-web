@@ -34,6 +34,7 @@ import {
   KEY_SEC_PROFILE,
 } from "../../../constants/generated/coreKeys";
 import { prefText } from "../../shared/utils/prefValue";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 // A saved gusset thickness is text; a file saved by an older form may hold a list.
 const firstOf = (value) => (Array.isArray(value) ? value[0] : value);
 
@@ -87,14 +88,6 @@ export const strutsWeldedConfig = {
     profile_image: null,
     end_condition_image: null,
   },
-
-  modalConfig: [
-    { key: "sectionDesignation", inputKey: "section_designation", dataSource: null },
-  ],
-
-  selectionConfig: [
-    { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
-  ],
 
   getSectionImage: (profile) => {
     switch (profile) {
@@ -333,3 +326,5 @@ export const strutsWeldedConfig = {
     },
   ]
 };
+
+applyFieldLists(strutsWeldedConfig);

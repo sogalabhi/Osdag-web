@@ -28,6 +28,7 @@ import {
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../../shared/config/prefCoreKeys";
 import { prefText } from "../../../shared/utils/prefValue";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const simplySupportedBeamConfig = {
   sessionName: "Simply Supported Beam Design",
   designType: KEY_DISP_FLEXURE,
@@ -76,14 +77,6 @@ export const simplySupportedBeamConfig = {
     torsional_restraint: KEY_TORSIONAL_RES,
     warping_restraint: KEY_WARPING_RES,
   },
-
-  modalConfig: [
-    { key: "sectionDesignation", inputKey: "section_designation", dataSource: null }, // Dynamic data source
-  ],
-
-  selectionConfig: [
-    { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
-  ],
 
   // Helper function to get section image
   getSectionImage: (profile) => {
@@ -268,3 +261,5 @@ export const simplySupportedBeamConfig = {
     },
   ],
 }; 
+
+applyFieldLists(simplySupportedBeamConfig);

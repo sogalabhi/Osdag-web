@@ -57,6 +57,7 @@ import {
 } from "../../../../constants/generated/webKeys";
 import { prefText } from "../../../shared/utils/prefValue";
 import { calculateMaxDeflection, memberOptionsFor, supportingOptionsFor } from "./plateGirderPrefOptions";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 
 const asOptions = (values) => values.map((value) => ({ value, label: value }));
 
@@ -186,34 +187,6 @@ export const plateGirderConfig = {
     bottom_flange_width_ub: WEB_BOTTOMFLANGE_WIDTH_UB,
     bottom_flange_width_inc: WEB_BOTTOMFLANGE_WIDTH_INC,
   },
-
-  modalConfig: [
-    { key: "webThickness", inputKey: "web_thickness", dataSource: "thicknessList" },
-    { key: "topFlangeThickness", inputKey: "top_flange_thickness", dataSource: "thicknessList" },
-    { key: "bottomFlangeThickness", inputKey: "bottom_flange_thickness", dataSource: "thicknessList" },
-    {
-      key: "intermediateStiffenerThicknessValues",
-      inputKey: "intermediate_stiffener_thickness_val",
-      dataSource: "thicknessList",
-      type: "thickness",
-      title: "Intermediate Stiffener Thickness",
-    },
-    {
-      key: "longitudinalStiffenerThicknessValues",
-      inputKey: "longitudinal_stiffener_thickness_val",
-      dataSource: "thicknessList",
-      type: "thickness",
-      title: "Longitudinal Stiffener Thickness",
-    },
-  ],
-
-  selectionConfig: [
-    { key: "webThicknessSelect", inputKey: "web_thickness", defaultValue: "All" },
-    { key: "topFlangeThicknessSelect", inputKey: "top_flange_thickness", defaultValue: "All" },
-    { key: "bottomFlangeThicknessSelect", inputKey: "bottom_flange_thickness", defaultValue: "All" },
-    { key: "intermediateStiffenerThicknessSelect", inputKey: "intermediate_stiffener_thickness_val", defaultValue: "All" },
-    { key: "longitudinalStiffenerThicknessSelect", inputKey: "longitudinal_stiffener_thickness_val", defaultValue: "All" },
-  ],
 
   // Helper function to get section image
   getSectionImage: () => {
@@ -761,5 +734,7 @@ export const plateGirderConfig = {
     }
   ],
 };
+
+applyFieldLists(plateGirderConfig);
 
 

@@ -21,6 +21,7 @@ import {
   KEY_SUPPORT_TYPE2,
 } from "../../../../constants/generated/coreKeys";
 import { prefText } from "../../../shared/utils/prefValue";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 
 
 export const onCantileverConfig = {
@@ -73,22 +74,6 @@ export const onCantileverConfig = {
     bearing_length: KEY_BEARING_LENGTH,
     loading_condition: KEY_LOAD,
   },
-
-  modalConfig: [
-    {
-      key: "sectionDesignation",
-      inputKey: "section_designation",
-      dataSource: null,
-    },
-  ],
-
-  selectionConfig: [
-    {
-      key: "sectionDesignationSelect",
-      inputKey: "section_designation",
-      defaultValue: "All",
-    },
-  ],
 
   // Helper: get list of sections based on profile (mirrors simply-supported beam)
   getDynamicSectionList: (profile, beamList, columnList) => {
@@ -303,3 +288,5 @@ export const onCantileverConfig = {
     },
   ],
 };
+
+applyFieldLists(onCantileverConfig);

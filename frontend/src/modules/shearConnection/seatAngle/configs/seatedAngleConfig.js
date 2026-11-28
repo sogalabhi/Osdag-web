@@ -32,6 +32,7 @@ import {
   KEY_TOPANGLE,
   KEY_TYP,
 } from "../../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const seatedAngleConfig = {
   sessionName: KEY_DISP_SEATED_ANGLE,
   designType: KEY_DISP_SEATED_ANGLE,
@@ -86,21 +87,6 @@ export const seatedAngleConfig = {
     material: KEY_MATERIAL,
     connector_material: KEY_CONNECTOR_MATERIAL,
   },
-
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "angleList", inputKey: "angle_list", dataSource: "angleList" },
-    { key: "topAngle", inputKey: "topangle_list", dataSource: "angleList" },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "angleListSelect", inputKey: "angle_list", defaultValue: "All" },
-    { key: "topAngleSelect", inputKey: "topangle_list", defaultValue: "All" },
-    { key: "secondaryBeamSelect", inputKey: "secondary_beam", defaultValue: "All" },
-  ],
 
   validateInputs: (inputs, extraState, lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(seatedAngleConfig.inputSections, inputs, extraState, selectionStates);
@@ -287,3 +273,8 @@ export const seatedAngleConfig = {
     }
   ]
 };
+
+// The secondary beam is not a field of the form, but a loaded file can still hold a list for it.
+applyFieldLists(seatedAngleConfig, {
+  extraSelections: [{ key: "secondaryBeamSelect", inputKey: "secondary_beam" }],
+});

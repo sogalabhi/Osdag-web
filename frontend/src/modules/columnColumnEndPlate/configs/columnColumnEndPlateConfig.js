@@ -27,6 +27,7 @@ import {
   KEY_TYP,
   KEY_WELD_TYPE,
 } from "../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 
 export const columnColumnEndPlateConfig = {
   sessionName: "Column Column End Plate Connection",
@@ -70,18 +71,6 @@ export const columnColumnEndPlateConfig = {
     // column's material, Member.Material; the Connector tab (connector_material) is Connector.Material.
     supporting_material: KEY_SEC_MATERIAL,
   },
-
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-  ],
 
   validateInputs: (inputs, extraState, _lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(columnColumnEndPlateConfig.inputSections, inputs, extraState, selectionStates);
@@ -207,3 +196,5 @@ export const columnColumnEndPlateConfig = {
     }
   ]
 };
+
+applyFieldLists(columnColumnEndPlateConfig);

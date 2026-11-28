@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { optionText } from "../utils/fieldOptionUtils";
 import { loadStateFromOsi } from "../utils/osiLoader";
 import { shouldClearOverridesOnDockChange } from "../utils/dockDriverChange";
@@ -34,6 +33,8 @@ const buildInitialModalDynamicSrc = (config) =>
     if (!modal?.dataSource) acc[modal.key] = [];
     return acc;
   }, {});
+
+const NO_LISTS = {};
 
 export const useModuleForm = (moduleConfig, moduleData) => {
   const safeModuleData = useMemo(() => moduleData || {}, [moduleData]);
@@ -98,12 +99,13 @@ export const useModuleForm = (moduleConfig, moduleData) => {
     }
   }, [safeModuleData, moduleConfig]);
 
+  const inputKeyToList = moduleConfig.inputKeyToList || NO_LISTS;
   useEffect(() => {
     setInputs((prev) => {
       let isChanged = false;
       const nextInputs = { ...prev };
 
-      Object.entries(INPUT_KEY_TO_LIST).forEach(([inputKey, listKey]) => {
+      Object.entries(inputKeyToList).forEach(([inputKey, listKey]) => {
         if (!allSelected?.[inputKey]) return;
 
         const current = prev?.[inputKey];
@@ -123,7 +125,7 @@ export const useModuleForm = (moduleConfig, moduleData) => {
 
       return isChanged ? nextInputs : prev;
     });
-  }, [safeModuleData, allSelected]);
+  }, [safeModuleData, allSelected, inputKeyToList]);
 
   useEffect(() => {
     if (displaySaveInputPopup) {

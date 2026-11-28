@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { Modal } from 'antd';
-import { getOptionsForField, getListForInputKey, optionText, firstOptionValue, toSelectOptions, comparableOption } from '../utils/fieldOptionUtils';
+import { getOptionsForField, getListForDataSource, optionText, firstOptionValue, toSelectOptions, comparableOption } from '../utils/fieldOptionUtils';
 import { stripRequiredMark } from '../utils/validation';
 import { ModuleContext } from "../../../context/ModuleState";
 import CustomMaterialModal from "./CustomMaterialModal";
@@ -140,18 +140,18 @@ export const InputSection = ({
   }, [dynamicSelectState]);
 
   const handleCustomizableSelect = (field, value) => {
-    const getAllValuesForInputKey = (inputKey) => {
+    const getAllValues = () => {
       if (field?.getDynamicDataSource) {
         const options = field.getDynamicDataSource(inputs, contextData);
         setModalDynamicSrc((modalDynSrc) => ({ ...modalDynSrc, [field.key]: options }));
         return options;
       }
-      return getListForInputKey(inputKey, safeContextData, field.dataSource);
+      return getListForDataSource(safeContextData, field.dataSource);
     };
 
     if (value === "Customized") {
       // Get all available values
-      const allValues = getAllValuesForInputKey(field.key);
+      const allValues = getAllValues();
       // Convert to array of keys/strings for Transfer component
       const allKeys = allValues.map(optionText);
 
@@ -167,7 +167,7 @@ export const InputSection = ({
       toggleAllSelected(field.key, false);
     } else {
       // "All" option - get all values and set them in inputs 
-      const allValues = getAllValuesForInputKey(field.key);
+      const allValues = getAllValues();
       // Convert to array format if needed
       const allValuesArray = allValues.map(optionText);
       setInputs({ ...safeInputs, [field.key]: allValuesArray });

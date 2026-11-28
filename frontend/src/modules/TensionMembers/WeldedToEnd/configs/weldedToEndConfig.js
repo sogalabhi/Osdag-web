@@ -24,6 +24,7 @@ import {
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../../shared/config/prefCoreKeys";
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import { prefText } from "../../../shared/utils/prefValue";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const weldedToEndConfig = {
     sessionName: "Tension Member Welded Design",
     designType: KEY_DISP_TENSION_WELDED,
@@ -64,16 +65,6 @@ export const weldedToEndConfig = {
       member_designation: null,
       profile_image: null,
     },
-
-    modalConfig: [
-        { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-        { key: "sectionDesignation", inputKey: "section_designation", dataSource: null }, // Dynamic data source handled in EngineeringModule
-    ],
-
-    selectionConfig: [
-        { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-        { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
-    ],
 
     // Helper function to get section image based on profile
     getSectionImage: (profile) => {
@@ -248,3 +239,5 @@ export const weldedToEndConfig = {
         }
     ]
 }; 
+
+applyFieldLists(weldedToEndConfig);

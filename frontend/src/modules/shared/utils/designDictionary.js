@@ -1,4 +1,3 @@
-import { INPUT_KEY_TO_LIST } from "../constants/moduleDataKeys";
 import { KEY_CONNECTOR_MATERIAL } from "../../../constants/generated/coreKeys";
 import { DESIGN_PREF_TABLES } from "../../../constants/generated/designPrefTables";
 import { BOLT_NON_PRE_TENSIONED, BOLT_PRE_TENSIONED } from "../config/prefOptions";
@@ -136,11 +135,11 @@ const prefOverridesOf = (config, dict) => {
 
 /**
  * The options a selection field offers: "All" is all of them. Most lists are held by the module data
- * (`INPUT_KEY_TO_LIST`); the section designation depends on the section profile of the form, so the
+ * (the config's `inputKeyToList`); the section designation depends on the section profile of the form, so the
  * module's field gives its own list (`getDynamicDataSource`), read with the profile just loaded.
  */
 const optionsOf = (config, field, inputs, lists) => {
-  const listKey = INPUT_KEY_TO_LIST[field];
+  const listKey = (config.inputKeyToList || {})[field];
   if (listKey) return lists[listKey];
   for (const section of config.inputSections || []) {
     const entry = (section.fields || []).find((f) => f.key === field);

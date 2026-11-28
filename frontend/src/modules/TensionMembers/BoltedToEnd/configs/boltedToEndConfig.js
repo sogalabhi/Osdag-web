@@ -31,6 +31,7 @@ import {
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../../shared/config/prefCoreKeys";
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import { prefText } from "../../../shared/utils/prefValue";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const boltedToEndConfig = {
   sessionName: "Tension Member Bolted Design",
   designType: KEY_DISP_TENSION_BOLTED,
@@ -76,20 +77,6 @@ export const boltedToEndConfig = {
     member_designation: null,
     profile_image: null,
   },
-
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-    { key: "sectionDesignation", inputKey: "section_designation", dataSource: null }, // Dynamic data source handled in EngineeringModule
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-    { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
-  ],
 
   // Helper function to get section image based on profile
   getSectionImage: (profile) => {
@@ -307,3 +294,5 @@ export const boltedToEndConfig = {
     }
   ]
 }; 
+
+applyFieldLists(boltedToEndConfig);

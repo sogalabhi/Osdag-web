@@ -1,5 +1,3 @@
-import { INPUT_KEY_TO_LIST } from '../constants/moduleDataKeys';
-
 /**
  * Resolve raw options for a field from contextData or field config.
  * @param {Object} field - Field config (options, getOptions, type)
@@ -17,16 +15,13 @@ export function getOptionsForField(field, contextData = {}, inputs = {}) {
 }
 
 /**
- * Get the list array for an input key (for "All" / customizable).
- * @param {string} inputKey - Form input key (e.g. bolt_diameter)
+ * The list of a module data list key (for "All" / customizable).
  * @param {Object} contextData - Module lists
- * @param {string} [fieldDataSource] - Optional override from field.dataSource
+ * @param {string} [dataSource] - The field's `dataSource`
  * @returns {Array}
  */
-export function getListForInputKey(inputKey, contextData = {}, fieldDataSource) {
-  const listKey = fieldDataSource || INPUT_KEY_TO_LIST[inputKey];
-  if (!listKey) return [];
-  const list = contextData[listKey];
+export function getListForDataSource(contextData = {}, dataSource) {
+  const list = dataSource ? contextData[dataSource] : undefined;
   return Array.isArray(list) ? list : [];
 }
 

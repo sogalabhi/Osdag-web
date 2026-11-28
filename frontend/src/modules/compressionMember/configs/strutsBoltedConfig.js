@@ -37,6 +37,7 @@ import {
 } from "../../../constants/generated/coreKeys";
 import { WEB_IS_LEG_LOADED } from "../../../constants/generated/webKeys";
 import { prefText } from "../../shared/utils/prefValue";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 export const strutsBoltedConfig = {
   sessionName: "Struts Bolted to End Gusset",
   designType: KEY_DISP_STRUT_BOLTED_END_GUSSET,
@@ -90,20 +91,6 @@ export const strutsBoltedConfig = {
     profile_image: null,
     end_condition_image: null,
   },
-
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-    { key: "sectionDesignation", inputKey: "section_designation", dataSource: null },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-    { key: "sectionDesignationSelect", inputKey: "section_designation", defaultValue: "All" },
-  ],
 
   // Helper function to get section image based on profile
   getSectionImage: (profile) => {
@@ -416,3 +403,5 @@ export const strutsBoltedConfig = {
     }
   ]
 };
+
+applyFieldLists(strutsBoltedConfig);

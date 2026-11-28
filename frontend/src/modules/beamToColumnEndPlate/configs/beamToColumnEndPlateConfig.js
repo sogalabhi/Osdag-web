@@ -33,6 +33,7 @@ import {
   KEY_TYP,
   KEY_WELD_TYPE,
 } from "../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 export const beamToColumnEndPlateConfig = {
   sessionName: "Beam to Column End Plate Connection",
   designType: KEY_DISP_BCENDPLATE,
@@ -75,17 +76,6 @@ export const beamToColumnEndPlateConfig = {
     column_section: KEY_SUPTNGSEC,
   },
 
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-  ],
   validateInputs: (inputs, extraState, _lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(beamToColumnEndPlateConfig.inputSections, inputs, extraState, selectionStates);
     if (!requiredCheck.isValid) return requiredCheck;
@@ -241,3 +231,5 @@ export const beamToColumnEndPlateConfig = {
     }
   ]
 };
+
+applyFieldLists(beamToColumnEndPlateConfig);

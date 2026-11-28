@@ -30,6 +30,7 @@ import {
   KEY_SUPTNGSEC_MATERIAL,
   KEY_TYP,
 } from "../../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const cleatAngleConfig = {
   sessionName: KEY_DISP_CLEATANGLE,
   designType: KEY_DISP_CLEATANGLE,
@@ -76,22 +77,6 @@ export const cleatAngleConfig = {
     material: KEY_MATERIAL,
     connector_material: KEY_CONNECTOR_MATERIAL,
   },
-
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "cleatSection", inputKey: "cleat_section", dataSource: "angleList" }, // Was cleatSectionList, now use angleList
-  ],
-
-  selectionConfig: [
-    {
-      key: "boltDiameterSelect",
-      inputKey: "bolt_diameter",
-      defaultValue: "All",
-    },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "cleatSectionSelect", inputKey: "cleat_section", defaultValue: "All" },
-  ],
 
   validateInputs: (inputs, extraState, lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(cleatAngleConfig.inputSections, inputs, extraState, selectionStates);
@@ -270,3 +255,5 @@ export const cleatAngleConfig = {
     }
   ]
 };
+
+applyFieldLists(cleatAngleConfig);

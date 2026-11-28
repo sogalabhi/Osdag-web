@@ -31,6 +31,7 @@ import {
   KEY_SUPTNGSEC_MATERIAL,
   KEY_TYP,
 } from "../../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const finPlateConfig = {
   sessionName: KEY_DISP_FINPLATE,
   designType: KEY_DISP_FINPLATE,
@@ -75,18 +76,6 @@ export const finPlateConfig = {
     material: KEY_MATERIAL,
     connector_material: KEY_CONNECTOR_MATERIAL,
   },
-
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-  ],
 
   validateInputs: (inputs, extraState, lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(finPlateConfig.inputSections, inputs, extraState, selectionStates);
@@ -276,3 +265,5 @@ export const finPlateConfig = {
     }
   ]
 };
+
+applyFieldLists(finPlateConfig);

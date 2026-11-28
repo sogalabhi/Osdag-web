@@ -11,6 +11,7 @@ import { validateSimpleConnectionInputs } from "./validation";
 import { validateRequiredFields } from "../../shared/utils/validation";
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../shared/config/prefCoreKeys";
 import { prefText } from "../../shared/utils/prefValue";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 
 function getArrayParam(allSelectedFlag, fullList, selectedList) {
     if (allSelectedFlag) {
@@ -68,16 +69,6 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
             connector_material: null,
             ...(hasCoverPlate ? { cover_plate: KEY_COVER_PLATE } : {}),
         },
-
-        modalConfig: [
-            { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-            { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-        ],
-
-        selectionConfig: [
-            { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-            { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-        ],
 
         buildSubmissionParams: (inputs, allSelected, lists) => ({
             [KEY_MODULE]: designType,
@@ -172,7 +163,7 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
         return validateSimpleConnectionInputs(inputs, { moduleType: 'bolted' });
     };
 
-    return config;
+    return applyFieldLists(config);
 }
 
 // Shared shape for the 4 SimpleConnection welded configs (butt/lap joint welded).
@@ -217,14 +208,6 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
             connector_material: null,
             ...(hasCoverPlate ? { cover_plate: KEY_COVER_PLATE } : {}),
         },
-
-        modalConfig: [
-            { key: "weldSelect", inputKey: "weld_size", dataSource: "weldSizeList" },
-        ],
-
-        selectionConfig: [
-            { key: "weldSizeSelect", inputKey: "weld_size", defaultValue: "All" },
-        ],
 
         buildSubmissionParams: (inputs, allSelected, lists) => ({
             [KEY_MODULE]: designType,
@@ -299,5 +282,5 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
         return validateSimpleConnectionInputs(inputs, { moduleType: 'welded' });
     };
 
-    return config;
+    return applyFieldLists(config);
 }

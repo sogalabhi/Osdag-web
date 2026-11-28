@@ -30,6 +30,7 @@ import {
   KEY_TYP,
   KEY_WELD_TYPE,
 } from "../../../constants/generated/coreKeys";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 export const beamBeamEndPlateConfig = {
   sessionName: "Beam Beam End Plate Connection",
   designType: KEY_DISP_BB_EP_SPLICE,
@@ -73,18 +74,6 @@ export const beamBeamEndPlateConfig = {
     // supported section's material and the Connector tab (connector_material) is Connector.Material; both are
     // the spread's one-to-one rows, which default to the dock material.
   },
-
-  modalConfig: [
-    { key: "boltDiameter", inputKey: "bolt_diameter", dataSource: "boltDiameterList" },
-    { key: "propertyClass", inputKey: "bolt_grade", dataSource: "propertyClassList" },
-    { key: "plateThickness", inputKey: "plate_thickness", dataSource: "thicknessList" },
-  ],
-
-  selectionConfig: [
-    { key: "boltDiameterSelect", inputKey: "bolt_diameter", defaultValue: "All" },
-    { key: "propertyClassSelect", inputKey: "bolt_grade", defaultValue: "All" },
-    { key: "thicknessSelect", inputKey: "plate_thickness", defaultValue: "All" },
-  ],
 
   validateInputs: (inputs, extraState, _lists, selectionStates) => {
     const requiredCheck = validateRequiredFields(beamBeamEndPlateConfig.inputSections, inputs, extraState, selectionStates);
@@ -241,3 +230,5 @@ export const beamBeamEndPlateConfig = {
     }
   ]
 };
+
+applyFieldLists(beamBeamEndPlateConfig);

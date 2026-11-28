@@ -30,6 +30,7 @@ import {
   KEY_SEC_PROFILE,
 } from "../../../constants/generated/coreKeys";
 import { prefText } from "../../shared/utils/prefValue";
+import { applyFieldLists } from "../../shared/utils/fieldLists";
 export const axiallyLoadedColumnConfig = {
   sessionName: "Axially Loaded Column",
   designType: KEY_DISP_COMPRESSION_COLUMN,
@@ -76,22 +77,6 @@ export const axiallyLoadedColumnConfig = {
     end_condition_image_zz: null,
     end_condition_image_yy: null,
   },
-
-  modalConfig: [
-    {
-      key: "sectionDesignation",
-      inputKey: "section_designation",
-      dataSource: null,
-    },
-  ],
-
-  selectionConfig: [
-    {
-      key: "sectionDesignationSelect",
-      inputKey: "section_designation",
-      defaultValue: "All",
-    },
-  ],
 
   getEnd2Values: (end1) => {
     if (end1 === "Fixed") {
@@ -380,4 +365,6 @@ export const axiallyLoadedColumnConfig = {
     },
   ],
 };
+
+applyFieldLists(axiallyLoadedColumnConfig);
 
