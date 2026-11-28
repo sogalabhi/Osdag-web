@@ -17,9 +17,6 @@ import BC_CF_BW_EBW from "../../../assets/BC_CF-BW-EBW.png";
 import BC_CW_BW_FLUSH from "../../../assets/BC_CW-BW-Flush.png";
 import BC_CW_BW_EOW from "../../../assets/BC_CW-BW-EOW.png";
 import BC_CW_BW_EBW from "../../../assets/BC_CW-BW-EBW.png";
-import ANGLE_SECTION from "../../../assets/TensionMember/com1_1.png";
-import BACK_TO_BACK_ANGLES_SAME_SIDE from "../../../assets/TensionMember/com1_2.png";
-import BACK_TO_BACK_ANGLES_OPPOSITE_SIDE from "../../../assets/TensionMember/com1_3.png";
 import ErrorImg from "../../../assets/notSelected.png";
 import { CONN_CFBW, CONN_CWBW } from "../../../constants/generated/coreKeys";
 
@@ -161,23 +158,6 @@ export const InputSection = ({
 
 
   useEffect(() => {
-    // Check for section profile first (takes priority)
-    const sectionProfileField = section.fields.find(
-      (f) => f.type === 'sectionProfileSelect'
-    );
-    if (sectionProfileField) {
-      const profileValue = extraState.selectedProfile || safeInputs[sectionProfileField.key] || sectionProfileField.defaultValue;
-      if (profileValue) {
-        const sectionProfileMap = {
-          "Angles": ANGLE_SECTION,
-          "Back to Back Angles - Same side of gusset": BACK_TO_BACK_ANGLES_SAME_SIDE,
-          "Back to Back Angles - Opposite side of gusset": BACK_TO_BACK_ANGLES_OPPOSITE_SIDE,
-        };
-        setImageSource(sectionProfileMap[profileValue] || ErrorImg);
-        return; // Exit early if section profile is found
-      }
-    }
-
     // Handle connectivity/endplate images
     if (extraState.selectedOption) {
       const conn = safeInputs.connectivity;
@@ -206,8 +186,7 @@ export const InputSection = ({
       const selectedImage = (conn ? endPlateImages[conn]?.[epType] : null) || imageMap[extraState.selectedOption] || ErrorImg;
       setImageSource(selectedImage);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [extraState.selectedOption, extraState.selectedProfile, safeInputs.connectivity, safeInputs.section_profile]);
+  }, [extraState.selectedOption, safeInputs.connectivity]);
 
   useEffect(() => {
     setInputs((prev) => {
@@ -279,16 +258,6 @@ export const InputSection = ({
       }
     }
 
-    // Set default for section profile dropdowns
-    const sectionProfileField = section.fields.find(
-      (f) => f.type === 'sectionProfileSelect'
-    );
-    if (sectionProfileField && !extraState.selectedProfile) {
-      const currentValue = safeInputs[sectionProfileField.key] || sectionProfileField.defaultValue;
-      if (currentValue) {
-        setExtraState((prev) => ({ ...prev, selectedProfile: currentValue }));
-      }
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safeContextData, section.fields]);
 

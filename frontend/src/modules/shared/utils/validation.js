@@ -4,7 +4,7 @@
 // Types whose required-ness is fully determined by presence/emptiness of inputs[field.key].
 const SIMPLE_VALUE_TYPES = new Set([
   'number', 'text', 'select', 'connectivitySelect', 'endPlateSelect',
-  'sectionProfileSelect', 'sectionProfileList', 'dynamicSelect', 'thickness',
+  'sectionProfileList', 'dynamicSelect', 'thickness',
 ]);
 
 /**
