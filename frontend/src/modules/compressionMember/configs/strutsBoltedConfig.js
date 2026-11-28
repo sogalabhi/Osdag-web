@@ -261,7 +261,7 @@ export const strutsBoltedConfig = {
           label: "Section Profile",
           type: "sectionProfileList",
           resets: ["section_designation"],
-          onChange: (value, setInputs,setExtraState) => {
+          onChange: (value, { setInputs, setExtraState }) => {
             const imageSource = strutsBoltedConfig.getSectionImage(value);
             setExtraState((extState) => ({
               ...extState,
@@ -340,17 +340,6 @@ export const strutsBoltedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, setExtraState) => {
-            const endImage = strutsBoltedConfig.getEndConditionImage(value, inputs.end_condition_2);
-            setExtraState((extState) => ({
-              ...extState,
-              endConditionImage: endImage
-            }));
-            setInputs((inps) => ({
-              ...inps,
-              end_condition_1: value
-            }));
-          }
         },
         {
           key: "end_condition_2",
@@ -360,17 +349,6 @@ export const strutsBoltedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, setExtraState) => {
-            const endImage = strutsBoltedConfig.getEndConditionImage(inputs.end_condition_1, value);
-            setExtraState((extState) => ({
-              ...extState,
-              endConditionImage: endImage
-            }));
-            setInputs((inps) => ({
-              ...inps,
-              end_condition_2: value
-            }));
-          }
         },
         {
           key: "end_condition_image",

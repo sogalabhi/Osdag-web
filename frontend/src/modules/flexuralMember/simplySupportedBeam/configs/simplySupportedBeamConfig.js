@@ -179,19 +179,6 @@ export const simplySupportedBeamConfig = {
           type: "select",
           options: "sectionProfileList",
           defaultValue: "Beams and Columns", // Default to the only available option
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
-            const imageSource = simplySupportedBeamConfig.getSectionImage(value);
-            setExtraState({
-              ...extraState,
-              selectedProfile: value,
-              imageSource: imageSource
-            });
-            setInputs({
-              ...inputs,
-              section_profile: value,
-              section_designation: [], // Reset section designation
-            });
-          }
         },
         {
           key: "section_designation",

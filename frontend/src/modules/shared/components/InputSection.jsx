@@ -5,20 +5,6 @@ import { getOptionsForField, getListForInputKey, optionText, firstOptionValue } 
 import { stripRequiredMark } from '../utils/validation';
 import { ModuleContext } from "../../../context/ModuleState";
 import CustomMaterialModal from "./CustomMaterialModal";
-import FRM from "../../../assets/flush_ep.png";
-import EOWIM from "../../../assets/owe_ep.png";
-import EBWRM from "../../../assets/extended.png";
-import CFBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cf_bw.png";
-import CWBW from "../../../assets/ShearConnection/sc_fin_plate/fin_cw_bw.png";
-import BB from "../../../assets/ShearConnection/sc_fin_plate/fin_beam_beam.png";
-import BC_CF_BW_FLUSH from "../../../assets/BC_CF-BW-Flush.png";
-import BC_CF_BW_EOW from "../../../assets/BC_CF-BW-EOW.png";
-import BC_CF_BW_EBW from "../../../assets/BC_CF-BW-EBW.png";
-import BC_CW_BW_FLUSH from "../../../assets/BC_CW-BW-Flush.png";
-import BC_CW_BW_EOW from "../../../assets/BC_CW-BW-EOW.png";
-import BC_CW_BW_EBW from "../../../assets/BC_CW-BW-EBW.png";
-import ErrorImg from "../../../assets/notSelected.png";
-import { CONN_CFBW, CONN_CWBW } from "../../../constants/generated/coreKeys";
 
 const CustomOption = (props) => {
   return (
@@ -47,6 +33,17 @@ const errorIdFor = (field) => `field-error-${field.key}`;
 
 const sameValue = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
+/**
+ * Field callbacks.
+ *
+ * A field of type `connectivitySelect`, `endPlateSelect` or `sectionProfileList` may declare
+ * `onChange(value, context)`, called after the widget has stored the chosen value. `context` is
+ * `{ inputs, setInputs, contextData, extraState, setExtraState }`: the inputs and extra state as
+ * rendered, the two state setters and the module's data lists.
+ *
+ * A field of type `image`, `connectivitySelect` or `endPlateSelect` may declare
+ * `imageSource(extraState, inputs)`, which returns the picture to show for the current state.
+ */
 export const InputSection = ({
   section,
   inputs,
@@ -66,7 +63,8 @@ export const InputSection = ({
   onClearFieldError,
 }) => {
   const safeInputs = inputs || {};
-  const [imageSource, setImageSource] = useState("");
+  // The picture a connectivity or end plate type field declares through `imageSource`.
+  const fieldImage = (field) => (typeof field.imageSource === 'function' ? field.imageSource(extraState, safeInputs) : null);
   const [showCustomMaterialModal, setShowCustomMaterialModal] = useState(false);
   const [customMaterialType, setCustomMaterialType] = useState("connector");
   // Field whose optimization bounds modal is open (for optimized_number fields)
@@ -156,37 +154,6 @@ export const InputSection = ({
     return list.map(item => ({ value: item, label: item }));
   };
 
-
-  useEffect(() => {
-    // Handle connectivity/endplate images
-    if (extraState.selectedOption) {
-      const conn = safeInputs.connectivity;
-      const epType = extraState.selectedOption;
-      if (conn && epType) {
-        console.log(conn + "  " + epType);
-      }
-      // Beam-to-column end plate pictures, by connectivity then end plate type.
-      const endPlateImages = {
-        [CONN_CFBW]: {
-          "Flushed - Reversible Moment": BC_CF_BW_FLUSH,
-          "Extended One Way - Irreversible Moment": BC_CF_BW_EOW,
-          "Extended Both Ways - Reversible Moment": BC_CF_BW_EBW,
-        },
-        [CONN_CWBW]: {
-          "Flushed - Reversible Moment": BC_CW_BW_FLUSH,
-          "Extended One Way - Irreversible Moment": BC_CW_BW_EOW,
-          "Extended Both Ways - Reversible Moment": BC_CW_BW_EBW,
-        },
-      };
-      const imageMap = {
-        "Flushed - Reversible Moment": FRM, "Extended One Way - Irreversible Moment": EOWIM, "Extended Both Ways - Reversible Moment": EBWRM,
-        [CONN_CFBW]: CFBW, [CONN_CWBW]: CWBW, "Beam-Beam": BB,
-      };
-
-      const selectedImage = (conn ? endPlateImages[conn]?.[epType] : null) || imageMap[extraState.selectedOption] || ErrorImg;
-      setImageSource(selectedImage);
-    }
-  }, [extraState.selectedOption, safeInputs.connectivity]);
 
   useEffect(() => {
     setInputs((prev) => {
@@ -500,15 +467,7 @@ export const InputSection = ({
               setExtraState((prev) => ({ ...prev, selectedOption: val }));
               setInputs((prev) => ({ ...prev, [field.key]: val, output: null }));
               if (typeof field.onChange === "function") {
-                try {
-                  field.onChange(val, safeInputs, setInputs, safeContextData, extraState, setExtraState);
-                } catch {
-                  try {
-                    field.onChange(val, setInputs, setExtraState);
-                  } catch (_e) {
-                    console.warn("[InputSection] connectivitySelect custom onChange warning:", _e?.message);
-                  }
-                }
+                field.onChange(val, { inputs: safeInputs, setInputs, contextData: safeContextData, extraState, setExtraState });
               }
             }}
             menuPortalTarget={document.body}
@@ -569,18 +528,9 @@ export const InputSection = ({
                 selectedProfile: val,
               }));
 
-              // 3. Execute field.onChange safely
+              // 3. Run the field's own callback
               if (typeof field.onChange === "function") {
-                try {
-                  field.onChange(val, setInputs, safeContextData, setExtraState, safeInputs, extraState);
-                } catch {
-                  // Fallback invocation for (val, setInputs, setExtraState) signature
-                  try {
-                    field.onChange(val, setInputs, setExtraState);
-                  } catch (_e) {
-                    console.warn("[InputSection] sectionProfileList custom onChange warning:", _e?.message);
-                  }
-                }
+                field.onChange(val, { inputs: safeInputs, setInputs, contextData: safeContextData, extraState, setExtraState });
               }
             }}
             menuPortalTarget={document.body}
@@ -682,10 +632,10 @@ export const InputSection = ({
                   {fieldErrors[field.key]}
                 </p>
               )}
-              {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && imageSource && (
+              {(field.type === 'connectivitySelect' || field.type === 'endPlateSelect') && fieldImage(field) && (
                 <div className="flex justify-center">
                   <img
-                    src={imageSource}
+                    src={fieldImage(field)}
                     alt="Connection type"
                     className="w-[150px] h-[100px] object-contain"
                   />

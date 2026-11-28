@@ -230,7 +230,7 @@ export const strutsWeldedConfig = {
           label: "Section Profile",
           type: "sectionProfileList",
           resets: ["section_designation"],
-          onChange: (value, setInputs, setExtraState) => {
+          onChange: (value, { setInputs, setExtraState }) => {
             const imageSource = strutsWeldedConfig.getSectionImage(value);
             setExtraState((extState) => ({
               ...extState,
@@ -300,17 +300,6 @@ export const strutsWeldedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, setExtraState) => {
-            const endImage = strutsWeldedConfig.getEndConditionImage(value, inputs.end_condition_2);
-            setExtraState((extState) => ({
-              ...extState,
-              endConditionImage: endImage
-            }));
-            setInputs((inps) => ({
-              ...inps,
-              end_condition_1: value
-            }));
-          }
         },
         {
           key: "end_condition_2",
@@ -320,17 +309,6 @@ export const strutsWeldedConfig = {
             { value: "Fixed", label: "Fixed" },
             { value: "Hinged", label: "Hinged" }
           ],
-          onChange: (value, inputs, setInputs, setExtraState) => {
-            const endImage = strutsWeldedConfig.getEndConditionImage(inputs.end_condition_1, value);
-            setExtraState((extState) => ({
-              ...extState,
-              endConditionImage: endImage
-            }));
-            setInputs((inps) => ({
-              ...inps,
-              end_condition_2: value
-            }));
-          }
         },
         {
           key: "end_condition_image",

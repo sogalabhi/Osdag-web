@@ -411,11 +411,19 @@ describe("a connectivity dropdown", () => {
     expect(extraNow().selectedOption).toBe("Beam-Beam");
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange.mock.calls[0][0]).toBe("Beam-Beam");
+    expect(Object.keys(onChange.mock.calls[0][1]).sort()).toEqual(["contextData", "extraState", "inputs", "setExtraState", "setInputs"]);
   });
 
-  it("shows the picture of the connectivity", () => {
+  it("shows the picture its field declares for the current state", () => {
+    const imageSource = vi.fn(() => "pic.png");
+    show([{ ...field, imageSource }], { inputs: {}, extra: { selectedOption: "Beam-Beam" } });
+    expect(screen.getByAltText("Connection type").getAttribute("src")).toBe("pic.png");
+    expect(imageSource).toHaveBeenCalledWith({ selectedOption: "Beam-Beam" }, expect.any(Object));
+  });
+
+  it("shows no picture when its field declares none", () => {
     show([field], { inputs: {}, extra: { selectedOption: "Beam-Beam" } });
-    expect(screen.getByAltText("Connection type").getAttribute("src")).toBeTruthy();
+    expect(screen.queryByAltText("Connection type")).toBeNull();
   });
 });
 

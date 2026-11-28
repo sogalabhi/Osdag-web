@@ -2,6 +2,7 @@ import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../../shared/config/prefCoreKeys';
+import { connectivityImage } from '../../../shared/config/connectionImages';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -165,7 +166,8 @@ export const cleatAngleConfig = {
           key: "connectivity",
           label: UI_STRINGS.CONNECTIVITY,
           type: "connectivitySelect",
-          onChange: (value, inputs, setInputs, contextData, extraState, setExtraState) => {
+          imageSource: connectivityImage,
+          onChange: (value, { inputs, setInputs, extraState, setExtraState }) => {
             setExtraState({ ...extraState, selectedOption: value });
             setInputs({ ...inputs, connectivity: value });
           }

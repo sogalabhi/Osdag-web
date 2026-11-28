@@ -2,6 +2,7 @@ import { UI_STRINGS } from '../../../../constants/UIStrings';
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../../shared/config/prefCoreKeys';
+import { connectivityImage } from '../../../shared/config/connectionImages';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -195,7 +196,8 @@ export const seatedAngleConfig = {
         {
           key: "connectivity",
           label: UI_STRINGS.CONNECTIVITY,
-          type: "connectivitySelect"
+          type: "connectivitySelect",
+          imageSource: connectivityImage
         },
         {
           key: "column_section", 

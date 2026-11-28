@@ -453,12 +453,6 @@ export const plateGirderConfig = {
             { value: "Optimized", label: "Optimized" }
           ],
           defaultValue: "Customized",
-          onChange: (value, inputs, setInputs) => {
-            setInputs({
-              ...inputs,
-              design_type: value,
-            });
-          }
         },
         {
           key: "total_depth",

@@ -1,6 +1,7 @@
 
 import { validateRequiredFields } from '../../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../../shared/config/prefCoreKeys';
+import { connectivityImage } from '../../../shared/config/connectionImages';
 import {
   CONN_CFBW,
   CONN_CWBW,
@@ -151,7 +152,7 @@ export const endPlateConfig = {
     {
       title: "Connecting Members",
       fields: [
-        { key: "connectivity", label: "Connectivity", type: "connectivitySelect", options: "connectivityList" },
+        { key: "connectivity", label: "Connectivity", type: "connectivitySelect", options: "connectivityList", imageSource: connectivityImage },
         { key: "primary_beam", label: "Primary Beam", type: "select", options: "beamList", conditionalDisplay: (extraState) => extraState?.selectedOption === "Beam-Beam" },
         { key: "secondary_beam", label: "Secondary Beam", type: "select", options: "beamList", conditionalDisplay: (extraState) => extraState?.selectedOption === "Beam-Beam" },
         { key: "column_section", label: "Column Section", type: "select", options: "columnList", conditionalDisplay: (extraState) => [CONN_CFBW, CONN_CWBW].includes(extraState?.selectedOption) },

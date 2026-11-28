@@ -168,7 +168,7 @@ export const weldedToEndConfig = {
                     label: "Section Profile",
                     type: "sectionProfileList",
                     resets: ["section_designation"],
-                    onChange: (value, setInputs, setExtraState) => {
+                    onChange: (value, { setInputs, setExtraState }) => {
                         const imageSource = weldedToEndConfig.getSectionImage(value);
                         setExtraState((extState) => ({
                             ...extState,

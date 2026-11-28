@@ -113,14 +113,12 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
                         label: KEY_DISP_PLATE1_THICKNESS,
                         type: "select",
                         options: "thicknessList",
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "plate1_thickness": value }); }
                     },
                     {
                         key: "plate2_thickness",
                         label: KEY_DISP_PLATE2_THICKNESS,
                         type: "select",
                         options: "thicknessList",
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "plate2_thickness": value }); }
                     },
                     { key: "plate_width", label: KEY_DISP_PLATE_WIDTH, type: "number" },
                     ...(hasCoverPlate ? [{
@@ -128,7 +126,6 @@ export function makeSimpleConnectionBoltedConfig({ sessionName, designType, hasC
                         label: KEY_DISP_COVER_PLT,
                         type: "select",
                         options: 'coverPlateList',
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "cover_plate": value }); }
                     }] : []),
                 ]
             },
@@ -254,14 +251,12 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
                         label: KEY_DISP_PLATE1_THICKNESS,
                         type: "select",
                         options: "thicknessList",
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "plate1_thickness": value }); }
                     },
                     {
                         key: "plate2_thickness",
                         label: KEY_DISP_PLATE2_THICKNESS,
                         type: "select",
                         options: "thicknessList",
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "plate2_thickness": value }); }
                     },
                     { key: "plate_width", label: KEY_DISP_PLATE_WIDTH, type: "number" },
                     {
@@ -275,7 +270,6 @@ export function makeSimpleConnectionWeldedConfig({ sessionName, designType, hasC
                         label: KEY_DISP_COVER_PLT,
                         type: "select",
                         options: 'coverPlateList',
-                        onChange: (value, inputs, setInputs) => { setInputs({ ...inputs, "cover_plate": value }); }
                     }] : []),
                 ]
             },

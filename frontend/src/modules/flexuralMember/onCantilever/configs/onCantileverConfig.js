@@ -184,13 +184,6 @@ export const onCantileverConfig = {
           type: "select",
           options: "sectionProfileList",
           defaultValue: "Beams and Columns",
-          onChange: (value, inputs, setInputs) => {
-            setInputs({
-              ...inputs,
-              section_profile: value,
-              section_designation: [],
-            });
-          },
         },
         {
           key: "section_designation",

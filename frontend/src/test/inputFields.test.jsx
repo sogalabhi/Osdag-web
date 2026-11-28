@@ -21,6 +21,9 @@ import { weldedToEndConfig } from "../modules/TensionMembers/WeldedToEnd/configs
 import { beamToColumnEndPlateConfig } from "../modules/beamToColumnEndPlate/configs/beamToColumnEndPlateConfig";
 import { beamBeamEndPlateConfig } from "../modules/beamBeamEndPlate/configs/beamBeamEndPlateConfig";
 import { seatedAngleConfig } from "../modules/shearConnection/seatAngle/configs/seatedAngleConfig";
+import { finPlateConfig } from "../modules/shearConnection/finPlate/configs/finPlateConfig";
+import { cleatAngleConfig } from "../modules/shearConnection/cleatAngle/configs/cleatAngleConfig";
+import { endPlateConfig } from "../modules/shearConnection/endPlate/configs/endPlateConfig";
 import { CONN_CFBW, CONN_CWBW, KEY_END1, KEY_END2 } from "../constants/generated/coreKeys";
 import { LISTS } from "./cases/shared";
 
@@ -285,22 +288,23 @@ describe("the end condition pictures", () => {
   });
 });
 
-describe("the connectivity picture", () => {
-  const section = { title: "Connecting Members", fields: [{ key: "connectivity", label: "Connectivity", type: "connectivitySelect" }] };
-
+describe.each([
+  ["fin plate", finPlateConfig],
+  ["cleat angle", cleatAngleConfig],
+  ["seated angle", seatedAngleConfig],
+  ["end plate", endPlateConfig],
+])("the connectivity picture of the %s connection", (_name, config) => {
   it.each([
     [CONN_CFBW, FIN_CFBW],
     [CONN_CWBW, FIN_CWBW],
     ["Beam-Beam", FIN_BEAM_BEAM],
   ])("of %s is its own picture", async (connectivity, expected) => {
-    render(<Host section={section} inputs={{ connectivity }} extra={{ selectedOption: connectivity }} />);
-    await act(async () => {});
+    await show(config, "connectivity", { inputs: { connectivity }, extra: { selectedOption: connectivity } });
     expect(picture()).toBe(expected);
   });
 
   it("changes when another connectivity is chosen", async () => {
-    render(<Host section={section} inputs={{ connectivity: CONN_CFBW }} extra={{ selectedOption: CONN_CFBW }} />);
-    await act(async () => {});
+    await show(config, "connectivity", { inputs: { connectivity: CONN_CFBW }, extra: { selectedOption: CONN_CFBW } });
     pick("Connectivity", "Beam-Beam");
     expect(picture()).toBe(FIN_BEAM_BEAM);
   });

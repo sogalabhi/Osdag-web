@@ -1,6 +1,7 @@
 
 import { validateRequiredFields } from '../../shared/utils/validation';
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from '../../shared/config/prefCoreKeys';
+import { endPlateTypeImage } from '../../shared/config/connectionImages';
 import {
   KEY_AXIAL,
   KEY_CONN,
@@ -153,6 +154,7 @@ export const beamBeamEndPlateConfig = {
           key: "endPlateType",
           label: "End Plate Type",
           type: "endPlateSelect",
+          imageSource: endPlateTypeImage,
           options: [
             "Flushed - Reversible Moment",
             "Extended One Way - Irreversible Moment",

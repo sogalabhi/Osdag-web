@@ -311,15 +311,6 @@ export const axiallyLoadedColumnConfig = {
           label: "End 1",
           type: "select",
           options: "endConditionList",
-          onChange: (value, inputs, setInputs) => {
-            const nextValues = axiallyLoadedColumnConfig.getEnd2Values(value);
-            const nextEnd2 = nextValues[0] || inputs.end_condition_2 || "Fixed";
-            setInputs({
-              ...inputs,
-              end_condition_1: value,
-              end_condition_2: nextEnd2,
-            });
-          },
         },
         {
           key: "end_condition_2",
@@ -352,15 +343,6 @@ export const axiallyLoadedColumnConfig = {
           label: "End 1 (y-y)",
           type: "select",
           options: "endConditionList",
-          onChange: (value, inputs, setInputs) => {
-            const nextValues = axiallyLoadedColumnConfig.getEnd2Values(value);
-            const nextEnd2Y = nextValues[0] || inputs.end_condition_2_y || "Fixed";
-            setInputs({
-              ...inputs,
-              end_condition_1_y: value,
-              end_condition_2_y: nextEnd2Y,
-            });
-          },
         },
         {
           key: "end_condition_2_y",
