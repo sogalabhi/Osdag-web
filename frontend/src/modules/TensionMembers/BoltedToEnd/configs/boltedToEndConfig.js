@@ -6,16 +6,8 @@ import BACK_TO_BACK_CHANNELS from "../../../../assets/TensionMember/back_back_ch
 import ErrorImg from "../../../../assets/notSelected.png";
 import {
   KEY_AXIAL,
-  KEY_CONNECTOR_MATERIAL,
   KEY_D,
   KEY_DISP_TENSION_BOLTED,
-  KEY_DP_BOLT_HOLE_TYPE,
-  KEY_DP_BOLT_SLIP_FACTOR,
-  KEY_DP_BOLT_TYPE,
-  KEY_DP_DESIGN_METHOD,
-  KEY_DP_DETAILING_CORROSIVE_INFLUENCES,
-  KEY_DP_DETAILING_EDGE_TYPE,
-  KEY_DP_DETAILING_GAP,
   KEY_GRD,
   KEY_LENGTH,
   KEY_LOCATION,
@@ -30,7 +22,7 @@ import {
 
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../../shared/config/prefCoreKeys";
 import { validateRequiredFields } from '../../../shared/utils/validation';
-import { prefText } from "../../../shared/utils/prefValue";
+import { makePayloadBuilder } from "../../../shared/utils/buildPayload";
 import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const boltedToEndConfig = {
   sessionName: "Tension Member Bolted Design",
@@ -128,52 +120,6 @@ export const boltedToEndConfig = {
     return { isValid: true };
   },
 
-  buildSubmissionParams: (inputs, allSelected, lists) => {
-    const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
-      if (allSelectedFlag) {
-        // Exclude "All" if present in the list
-        return fullList.filter(item => item !== "All");
-      }
-      // Ensure always array
-      if (Array.isArray(selectedList)) {
-        return selectedList.filter(item => item !== "All");
-      }
-      return [selectedList].filter(item => item !== "All");
-    };
-
-    const dynamicSectionList = boltedToEndConfig.getDynamicSectionList(
-      inputs.section_profile,
-      lists.angleList,
-      lists.channelList
-    );
-
-    return {
-      [KEY_DP_BOLT_HOLE_TYPE]: prefText(inputs.bolt_hole_type),
-      [KEY_D]: getArrayParam(allSelected.bolt_diameter, lists.boltDiameterList, inputs.bolt_diameter),
-      [KEY_GRD]: getArrayParam(allSelected.bolt_grade, lists.propertyClassList, inputs.bolt_grade),
-      [KEY_DP_BOLT_SLIP_FACTOR]: prefText(inputs.bolt_slip_factor),
-      [KEY_DP_BOLT_TYPE]: prefText(inputs.bolt_tension_type),
-      [KEY_TYP]: String(inputs.bolt_type),
-      [KEY_CONNECTOR_MATERIAL]: prefText(inputs.connector_material),
-      [KEY_MATERIAL]: String(inputs.material),
-      [KEY_SEC_MATERIAL]: prefText(inputs.supported_material),
-      [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
-      [KEY_DP_DETAILING_CORROSIVE_INFLUENCES]: prefText(inputs.detailing_corr_status),
-      [KEY_DP_DETAILING_EDGE_TYPE]: prefText(inputs.detailing_edge_type),
-      [KEY_DP_DETAILING_GAP]: prefText(inputs.detailing_gap),
-      [KEY_AXIAL]: String(inputs.axial_force),
-      [KEY_SECSIZE]: allSelected.section_designation
-        ? dynamicSectionList  // Entire list if "All" selected
-        : (Array.isArray(inputs.section_designation)
-          ? inputs.section_designation
-          : [inputs.section_designation || ""]),
-      [KEY_LENGTH]: String(inputs.length),
-      [KEY_SEC_PROFILE]: String(inputs.section_profile),
-      [KEY_LOCATION]: String(inputs.location),
-      [KEY_MODULE]: KEY_DISP_TENSION_BOLTED,
-      [KEY_PLATETHK]: getArrayParam(allSelected.plate_thickness, lists.thicknessList, inputs.plate_thickness),
-    };
-  },
 
   inputSections: [
     {
@@ -294,5 +240,9 @@ export const boltedToEndConfig = {
     }
   ]
 }; 
+
+boltedToEndConfig.buildSubmissionParams = makePayloadBuilder(boltedToEndConfig, {
+  hook: (params) => ({ ...params, [KEY_MODULE]: KEY_DISP_TENSION_BOLTED }),
+});
 
 applyFieldLists(boltedToEndConfig);

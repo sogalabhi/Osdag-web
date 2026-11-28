@@ -6,11 +6,7 @@ import BACK_TO_BACK_CHANNELS from "../../../../assets/TensionMember/back_back_ch
 import ErrorImg from "../../../../assets/notSelected.png";
 import {
   KEY_AXIAL,
-  KEY_CONNECTOR_MATERIAL,
   KEY_DISP_TENSION_WELDED,
-  KEY_DP_DESIGN_METHOD,
-  KEY_DP_WELD_FAB,
-  KEY_DP_WELD_MATERIAL_G_O,
   KEY_LENGTH,
   KEY_LOCATION,
   KEY_MATERIAL,
@@ -23,7 +19,7 @@ import {
 
 import { MATERIAL_CORE_KEYS, PREF_CORE_KEYS } from "../../../shared/config/prefCoreKeys";
 import { validateRequiredFields } from '../../../shared/utils/validation';
-import { prefText } from "../../../shared/utils/prefValue";
+import { makePayloadBuilder } from "../../../shared/utils/buildPayload";
 import { applyFieldLists } from "../../../shared/utils/fieldLists";
 export const weldedToEndConfig = {
     sessionName: "Tension Member Welded Design",
@@ -116,39 +112,6 @@ export const weldedToEndConfig = {
         return { isValid: true };
     },
 
-    buildSubmissionParams: (inputs, allSelected, lists) => {
-        const getArrayParam = (allSelectedFlag, fullList, selectedList) => {
-            if (allSelectedFlag) {
-                return fullList.filter(item => item !== "All");
-            }
-            if (Array.isArray(selectedList)) {
-                return selectedList.filter(item => item !== "All");
-            }
-            return [selectedList].filter(item => item !== "All");
-        };
-
-        const dynamicSectionList = weldedToEndConfig.getDynamicSectionList(
-            inputs.section_profile,
-            lists.angleList,
-            lists.channelList
-        );
-
-        return {
-            [KEY_CONNECTOR_MATERIAL]: prefText(inputs.connector_material),
-            [KEY_MATERIAL]: String(inputs.material),
-            [KEY_SEC_MATERIAL]: prefText(inputs.supported_material),
-            [KEY_DP_DESIGN_METHOD]: prefText(inputs.design_method),
-            [KEY_DP_WELD_FAB]: prefText(inputs.weld_fab),
-            [KEY_DP_WELD_MATERIAL_G_O]: prefText(inputs.weld_material_grade),
-            [KEY_AXIAL]: String(inputs.axial_force),
-            [KEY_SECSIZE]: dynamicSectionList,
-            [KEY_LENGTH]: String(inputs.length),
-            [KEY_SEC_PROFILE]: String(inputs.section_profile),
-            [KEY_LOCATION]: String(inputs.location),
-            [KEY_MODULE]: KEY_DISP_TENSION_WELDED,
-            [KEY_PLATETHK]: getArrayParam(allSelected.plate_thickness, lists.thicknessList, inputs.plate_thickness),
-        };
-    },
 
     inputSections: [
         {
@@ -239,5 +202,14 @@ export const weldedToEndConfig = {
         }
     ]
 }; 
+
+// The request always carries the whole list of the profile, whatever the selection holds.
+weldedToEndConfig.buildSubmissionParams = makePayloadBuilder(weldedToEndConfig, {
+  hook: (params, { inputs, lists }) => ({
+    ...params,
+    [KEY_SECSIZE]: weldedToEndConfig.getDynamicSectionList(inputs.section_profile, lists.angleList, lists.channelList),
+    [KEY_MODULE]: KEY_DISP_TENSION_WELDED,
+  }),
+});
 
 applyFieldLists(weldedToEndConfig);
